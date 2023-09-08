@@ -273,6 +273,7 @@ object EntityOutlineRenderer {
         if (isMissingMixin) return false
         if (SkyHanniMod.feature.fishing.rareSeaCreatureHighlight) return true
         if (SkyHanniMod.feature.misc.glowingDroppedItems.enabled) return true
+        if (SkyHanniMod.feature.dungeon.highlightTeammates) return true
 
         return false
     }

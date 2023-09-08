@@ -396,6 +396,7 @@ class SkyHanniMod {
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
+        loadModule(DungeonTeammateOutlines())
 
         init()
 
