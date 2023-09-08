@@ -152,7 +152,7 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
-    fun ItemStack.getItemRarity() = getItemRarityOrNull() ?: error("item rarity not detected for ")
+    fun ItemStack.getItemRarity() = getItemRarityOrNull() ?: error("item rarity not detected for item '$name'")
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
         return when (this.getLore().lastOrNull()?.take(4)) {
