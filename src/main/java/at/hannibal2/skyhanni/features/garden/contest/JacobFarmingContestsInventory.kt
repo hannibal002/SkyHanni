@@ -162,7 +162,7 @@ class JacobFarmingContestsInventory {
                 var y = event.y + 1
                 var scale = .7f
 
-                if (finneganContest) {
+                if (finneganContest && config.jacobFarmingContestFinneganIcon) {
                     stackTip = "§${medalEarned.color}▲"
                     x = event.x + 5
                     y = event.y - 2

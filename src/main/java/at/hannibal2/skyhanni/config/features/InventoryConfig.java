@@ -132,7 +132,7 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this contest. " +
-            "§eIf you use a texture pack for this you should continue to use that.")
+            "§eIf you use a texture pack this may cause conflicting icons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
