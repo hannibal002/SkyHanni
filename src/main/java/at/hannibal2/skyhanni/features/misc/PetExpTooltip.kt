@@ -34,7 +34,7 @@ class PetExpTooltip {
         ) ?: return
 
         val maxLevel = ItemUtils.maxPetLevel(name)
-        val maxXp = if (maxLevel == 200) 210255385 else 25353230L
+        val maxXp = maxPetExp(name) // lvl 100 legendary
 
         val percentage = petExperience / maxXp
         val percentageFormat = LorenzUtils.formatPercentage(percentage)
@@ -47,5 +47,12 @@ class PetExpTooltip {
             event.toolTip.add(index, "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}")
             event.toolTip.add(index, "§7Progress to Level $maxLevel: §e$percentageFormat")
         }
+    }
+
+    private fun maxPetExp(petName: String) = when {
+        petName.contains("Golden Dragon") -> 210_255_385 // lvl 200 legendary
+        petName.contains("Bingo") -> 5_624_785 // lvl 100 common
+
+        else -> 25_353_230 // lvl 100 legendary
     }
 }
