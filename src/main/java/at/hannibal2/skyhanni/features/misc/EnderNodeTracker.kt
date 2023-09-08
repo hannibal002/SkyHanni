@@ -146,8 +146,7 @@ class EnderNodeTracker {
         display = formatDisplay(drawDisplay())
     }
 
-    private fun isInTheEnd() = LorenzUtils.inIsland(IslandType.THE_END)
-            && ScoreboardData.sidebarLines.any { it.contains("The End") }
+    private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
 
     private fun isEnderArmor(displayName: String?) = when (displayName) {
         "§5Ender Helmet",
