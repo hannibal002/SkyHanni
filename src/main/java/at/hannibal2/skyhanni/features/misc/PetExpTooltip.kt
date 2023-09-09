@@ -42,8 +42,8 @@ class PetExpTooltip {
             event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
         } else {
             val progressBar = StringUtils.progressBar(percentage)
-            val isBelowLEgendary = itemStack.getItemRarity() < LorenzRarity.LEGENDARY
-            val addLegendaryColor = if (isBelowLEgendary) "§6" else ""
+            val isBelowLegendary = itemStack.getItemRarity() < LorenzRarity.LEGENDARY
+            val addLegendaryColor = if (isBelowLegendary) "§6" else ""
             event.toolTip.add(index, "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}")
             event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
         }
