@@ -65,7 +65,7 @@ class SackDisplay {
 
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,

@@ -80,7 +80,7 @@ class GardenOptimalSpeed {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!isEnabled()) return
 
         if (optimalSpeed == -1) return

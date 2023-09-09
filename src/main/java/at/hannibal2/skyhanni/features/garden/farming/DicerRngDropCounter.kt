@@ -103,7 +103,7 @@ class DicerRngDropCounter {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (isEnabled()) {
             config.dicerCounterPos.renderStrings(display, posLabel = "Dicer Counter")
         }

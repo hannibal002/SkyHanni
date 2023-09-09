@@ -19,7 +19,7 @@ import java.util.*
 class FarmingWeightDisplay {
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (isEnabled()) {
             if (config.eliteFarmingWeightIgnoreLow || weight >= 200) {
                 config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")

@@ -82,7 +82,7 @@ class RiftTimer {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockArea == "Mirrorverse") return
 

@@ -34,7 +34,7 @@ class ChestValue {
     private val inInventory get() = InventoryUtils.openInventoryName().removeColor().isValidStorage()
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "") return
         if (inInventory) {

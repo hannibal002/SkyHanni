@@ -492,7 +492,7 @@ class ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
         if (inInventory) {
             config.composterOverlayOrganicMatterPos.renderStringsAndItems(
                 organicMatterDisplay,

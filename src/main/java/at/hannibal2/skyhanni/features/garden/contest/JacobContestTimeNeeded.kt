@@ -116,7 +116,7 @@ class JacobContestTimeNeeded {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         config.jacobContextTimesPos.renderStringsAndItems(display, posLabel = "Jacob Contest Time Needed")

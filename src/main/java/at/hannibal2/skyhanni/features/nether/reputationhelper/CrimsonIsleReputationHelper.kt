@@ -105,7 +105,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun renderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!config.crimsonIsleReputationHelper) return
 
         if (!LorenzUtils.inSkyBlock) return

@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
+import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-import kotlin.math.floor
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -163,7 +163,7 @@ class ComposterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (GardenAPI.inGarden() && config.composterDisplayEnabled) {

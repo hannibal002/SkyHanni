@@ -140,7 +140,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")

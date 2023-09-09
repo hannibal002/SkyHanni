@@ -132,7 +132,7 @@ class AnitaMedalProfit {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
         if (inInventory) {
             config.anitaMedalProfitPos.renderStringsAndItems(
                 display,

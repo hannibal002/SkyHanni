@@ -143,7 +143,7 @@ class FrozenTreasureTracker {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return

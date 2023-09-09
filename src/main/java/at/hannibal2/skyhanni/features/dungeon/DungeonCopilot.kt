@@ -123,7 +123,7 @@ class DungeonCopilot {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
         if (!isEnabled()) return
 
         SkyHanniMod.feature.dungeon.copilotPos.renderString(nextStep, posLabel = "Dungeon Copilot")
