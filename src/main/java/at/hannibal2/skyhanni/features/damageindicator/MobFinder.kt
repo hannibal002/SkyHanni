@@ -205,11 +205,11 @@ class MobFinder {
 
                 if (entity.name == "Bloodfiend ") {
                     when {
-                        entity.hasMaxHealth(625) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
-                        entity.hasMaxHealth(1_100) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
-                        entity.hasMaxHealth(1_800) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
-                        entity.hasMaxHealth(2_400) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
-                        entity.hasMaxHealth(3_000) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                        entity.hasMaxHealth(625, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                        entity.hasMaxHealth(1_100, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                        entity.hasMaxHealth(1_800, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                        entity.hasMaxHealth(2_400, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                        entity.hasMaxHealth(3_000, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
                     }
                 }
             }
@@ -222,7 +222,7 @@ class MobFinder {
             if (entity is EntityBlaze) {
                 if (entity.name != "Dinnerbone") {
                     if (entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ")) {
-                        if (entity.hasMaxHealth(50_000_000)) {
+                        if (entity.hasMaxHealth(50_000_000, true)) {
                             return EntityResult(bossType = BossType.NETHER_ASHFANG)
                         }
                     }
@@ -251,10 +251,10 @@ class MobFinder {
             if (entity is EntityEnderman) {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
                     when {
-                        entity.hasMaxHealth(300_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
-                        entity.hasMaxHealth(12_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
-                        entity.hasMaxHealth(50_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
-                        entity.hasMaxHealth(210_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
+                        entity.hasMaxHealth(300_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
+                        entity.hasMaxHealth(12_000_000, true -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+                        entity.hasMaxHealth(50_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
+                        entity.hasMaxHealth(210_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
                     }
                 }
             }
@@ -274,14 +274,14 @@ class MobFinder {
             if (entity is EntityZombie) {
                 if (entity.hasNameTagWith(2, "§c☠ §bRevenant Horror")) {
                     when {
-                        entity.hasMaxHealth(500) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
-                        entity.hasMaxHealth(20_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
-                        entity.hasMaxHealth(400_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
-                        entity.hasMaxHealth(1_500_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
+                        entity.hasMaxHealth(500, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
+                        entity.hasMaxHealth(20_000, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
+                        entity.hasMaxHealth(400_000, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
+                        entity.hasMaxHealth(1_500_000, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
                     }
                 }
                 if (entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ")) {
-                    if (entity.hasMaxHealth(10_000_000)) {
+                    if (entity.hasMaxHealth(10_000_000, true)) {
                         return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
                     }
                 }
@@ -293,14 +293,14 @@ class MobFinder {
             }
             if (entity is EntityMagmaCube) {
                 if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
-                    if (entity.hasMaxHealth(200_000_000)) {
+                    if (entity.hasMaxHealth(200_000_000, true)) {
                         return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
                     }
                 }
             }
             if (entity is EntityHorse) {
                 if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
-                    if (entity.hasMaxHealth(3_000_000)) {
+                    if (entity.hasMaxHealth(3_000_000, true)) {
                         return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
                     }
                 }
@@ -333,10 +333,10 @@ class MobFinder {
             if (entity is EntitySpider) {
                 if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
                     when {
-                        entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-                        entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-                        entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-                        entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+                        entity.hasMaxHealth(740, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                        entity.hasMaxHealth(30_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                        entity.hasMaxHealth(900_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                        entity.hasMaxHealth(2_400_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
                     }
                 }
                 checkArachne(entity)?.let { return it }
@@ -344,10 +344,10 @@ class MobFinder {
             if (entity is EntityWolf) {
                 if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
                     when {
-                        entity.hasMaxHealth(2_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
-                        entity.hasMaxHealth(40_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
-                        entity.hasMaxHealth(750_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
-                        entity.hasMaxHealth(2_000_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
+                        entity.hasMaxHealth(2_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
+                        entity.hasMaxHealth(40_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
+                        entity.hasMaxHealth(750_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
+                        entity.hasMaxHealth(2_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
                     }
                 }
             }
@@ -555,12 +555,12 @@ class MobFinder {
 
         for (entity in EntityUtils.getEntities<EntityGuardian>()) {
             //F3
-            if (entity.hasMaxHealth(1_000_000) || entity.hasMaxHealth(1_200_000)) {
+            if (entity.hasMaxHealth(1_000_000, true) || entity.hasMaxHealth(1_200_000, true)) {
                 guardians.add(entity)
             }
 
             //M3
-            if (entity.hasMaxHealth(120_000_000) || entity.hasMaxHealth(240_000_000)) {
+            if (entity.hasMaxHealth(120_000_000, true) || entity.hasMaxHealth(240_000_000, true)) {
                 guardians.add(entity)
             }
         }
