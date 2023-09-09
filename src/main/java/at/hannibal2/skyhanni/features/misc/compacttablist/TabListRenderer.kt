@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -37,11 +38,11 @@ object TabListRenderer {
         }
 
         var totalHeight = maxLines * lineHeight
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList
+        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
 
         var header = listOf<String>()
-        if (tabList.header != null) {
-            header = tabList.header.formattedText.split("\n").toMutableList()
+        if (tabList.header_skyhanni != null) {
+            header = tabList.header_skyhanni.formattedText.split("\n").toMutableList()
             header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
             if (config.hideAdverts) {
                 header = listOf()
@@ -51,8 +52,8 @@ object TabListRenderer {
         }
 
         var footer = listOf<String>()
-        if (tabList.footer != null) {
-            footer = tabList.footer.formattedText.split("\n").toMutableList()
+        if (tabList.footer_skyhanni != null) {
+            footer = tabList.footer_skyhanni.formattedText.split("\n").toMutableList()
             footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
             if (config.hideAdverts) {
                 footer = listOf()

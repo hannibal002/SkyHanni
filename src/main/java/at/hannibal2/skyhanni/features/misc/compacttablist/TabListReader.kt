@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -74,21 +75,21 @@ object TabListReader {
     }
 
     private fun parseFooterAsColumn(): TabColumn? {
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList
+        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
 
-        if (tabList.footer == null) {
+        if (tabList.footer_skyhanni == null) {
             return null
         }
 
         val column = TabColumn("§2§lOther")
 
-        var footer = tabListSPattern.matcher(tabList.footer.formattedText).replaceAll("")
+        var footer = tabListSPattern.matcher(tabList.footer_skyhanni.formattedText).replaceAll("")
 
-        var matcher = godPotPattern.matcher(tabList.footer.unformattedText)
+        var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
         if (matcher.find()) {
             footer = activeEffectPattern.matcher(footer).replaceAll("Active Effects:\n§cGod Potion§r: ${matcher.group("timer")}")
         } else {
-            matcher = effectCountPattern.matcher(tabList.footer.unformattedText)
+            matcher = effectCountPattern.matcher(tabList.footer_skyhanni.unformattedText)
             footer = if (matcher.find()) {
                 activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + matcher.group("effectCount"))
             } else {
