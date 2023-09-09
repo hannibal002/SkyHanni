@@ -66,7 +66,7 @@ public class DungeonConfig {
     public boolean highlightDeathmites = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Teammates", desc = "Highlight teammates with a glowing outline")
+    @ConfigOption(name = "Highlight Teammates", desc = "Highlight dungeon teammates with a glowing outline.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightTeammates = true;
