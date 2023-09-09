@@ -50,7 +50,7 @@ class PetExpTooltip {
     }
 
     private fun maxPetExp(petName: String) = when {
-        petName.contains("Golden Dragon") -> 210_255_385 // lvl 200 legendary
+        petName.contains("Golden Dragon") && config.goldenDragon200 -> 210_255_385 // lvl 200 legendary
         petName.contains("Bingo") -> 5_624_785 // lvl 100 common
 
         else -> 25_353_230 // lvl 100 legendary
