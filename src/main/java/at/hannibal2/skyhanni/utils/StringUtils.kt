@@ -10,6 +10,9 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+    private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
+    private val resetPattern = "(?i)§R".toPattern()
+
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
@@ -152,4 +155,7 @@ object StringUtils {
         builder.append(end)
         return builder.toString()
     }
+
+    fun trimWhiteSpaceAndResets(string: String): String = whiteSpaceResetPattern.matcher(string).replaceAll("")
+    fun removeResets(string: String): String = resetPattern.matcher(string).replaceAll("")
 }

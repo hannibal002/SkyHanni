@@ -51,6 +51,8 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesI
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
+import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
+import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -395,6 +397,8 @@ class SkyHanniMod {
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
+        loadModule(TabListReader)
+        loadModule(TabListRenderer)
         loadModule(GlowingDroppedItems())
 
         init()

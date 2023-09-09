@@ -53,12 +53,9 @@ class TabListData {
         return result.dropLast(1)
     }
 
-    private var ticks = 0
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-
-        if (ticks++ % 5 != 0) return
+        if (!event.isMod(5)) return
 
         val tabList = readTabList() ?: return
         if (cache != tabList) {
