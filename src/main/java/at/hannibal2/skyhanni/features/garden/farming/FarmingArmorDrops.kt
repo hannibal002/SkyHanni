@@ -69,7 +69,7 @@ class FarmingArmorDrops {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.farmingArmorDropsEnabled) return
         if (!hasArmor) return

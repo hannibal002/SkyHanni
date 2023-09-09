@@ -87,7 +87,7 @@ object GhostCounter {
     private val VOLTA = "VOLTA".asInternalName()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (config.onlyOnMist && !inMist) return
         config.position.renderStringsAndItems(

@@ -157,7 +157,7 @@ class CityProjectFeatures {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showMaterials) return
         if (!inInventory) return

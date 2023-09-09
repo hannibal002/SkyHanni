@@ -67,7 +67,7 @@ object DanceRoomHelper {
     } + this
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRoom) return
         config.position.renderStrings(

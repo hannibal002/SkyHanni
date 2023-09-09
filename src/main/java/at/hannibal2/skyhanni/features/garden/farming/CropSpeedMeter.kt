@@ -125,7 +125,7 @@ class CropSpeedMeter {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         SkyHanniMod.feature.garden.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")

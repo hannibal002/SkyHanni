@@ -24,7 +24,7 @@ class CustomTextBox {
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
 

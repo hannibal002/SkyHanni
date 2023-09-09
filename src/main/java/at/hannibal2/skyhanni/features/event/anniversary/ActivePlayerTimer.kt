@@ -43,7 +43,7 @@ object ActivePlayerTimer {
 
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         SkyHanniMod.feature.misc.century.activeTimerPosition.renderSingleLineWithItems(
             overlay ?: return,
             posLabel = "300þ Anniversary Active Timer"

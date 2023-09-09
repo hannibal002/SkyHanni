@@ -367,7 +367,7 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         if (display.isEmpty()) {
@@ -378,7 +378,7 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.nextJacobContestDisplay) return
         if (!inCalendar) return
 

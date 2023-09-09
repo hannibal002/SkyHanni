@@ -45,7 +45,7 @@ object BestiaryData {
     )
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGUIOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(

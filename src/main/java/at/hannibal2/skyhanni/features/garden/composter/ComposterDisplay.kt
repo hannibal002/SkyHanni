@@ -163,7 +163,7 @@ class ComposterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (GardenAPI.inGarden() && config.composterDisplayEnabled) {

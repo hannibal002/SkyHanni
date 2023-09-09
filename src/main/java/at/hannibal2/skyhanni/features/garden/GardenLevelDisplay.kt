@@ -108,7 +108,7 @@ class GardenLevelDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.gardenLevelPos.renderString(display, posLabel = "Garden Level")

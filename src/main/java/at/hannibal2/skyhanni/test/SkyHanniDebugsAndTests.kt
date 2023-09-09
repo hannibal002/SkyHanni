@@ -252,7 +252,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onRenderLocation(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderLocation(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
@@ -267,7 +267,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.debugEnabled) return
 

@@ -26,7 +26,7 @@ class AshfangFreezeCooldown {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val duration = System.currentTimeMillis() - lastHit
         val maxDuration = 3_000

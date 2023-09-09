@@ -17,7 +17,7 @@ class RenderGuiData {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui()) return
 
-        GuiRenderEvent.GUIOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
     }
 
     @SubscribeEvent
@@ -30,10 +30,10 @@ class RenderGuiData {
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
-            GuiRenderEvent.GUIOverlayRenderEvent().postAndCatch()
+            GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
         }
 
-        GuiRenderEvent.ChestGUIOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
 
         GlStateManager.popMatrix()
     }

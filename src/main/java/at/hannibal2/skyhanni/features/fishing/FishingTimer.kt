@@ -88,7 +88,7 @@ class FishingTimer {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.barnTimer) return
         if (!rightLocation) return

@@ -239,7 +239,7 @@ class MinionCraftHelper {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
 

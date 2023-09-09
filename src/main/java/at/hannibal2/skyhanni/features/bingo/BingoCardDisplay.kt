@@ -138,7 +138,7 @@ class BingoCardDisplay {
     private var lastSneak = false
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GUIOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
