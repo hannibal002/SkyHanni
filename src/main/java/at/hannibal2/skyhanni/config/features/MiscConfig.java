@@ -960,6 +960,12 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Highlight Party Members", desc = "Draws a glowing outline around your party members")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightPartyMembers = false;
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
