@@ -58,9 +58,9 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.misc.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
-import at.hannibal2.skyhanni.features.misc.tabcomplete.GfsTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
@@ -344,7 +344,7 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
-        loadModule(GfsTabComplete)
+        loadModule(GetFromSacksTabComplete)
         loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
