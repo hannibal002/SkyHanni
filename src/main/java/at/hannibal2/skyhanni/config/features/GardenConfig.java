@@ -295,6 +295,11 @@ public class GardenConfig {
                         "§b1 §cSpace Helmet",
                         " ", // If they want another empty row
                         "§212,735 Garden EXP",
+                        "§b1 §9Cultivating I",
+                        "§b1 §9Replenish I",
+                        "§b11,056 Bits",
+                        "§250,556 Mithril Powder",
+                        "§d50,556 Gemstone Powder",
                 }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
