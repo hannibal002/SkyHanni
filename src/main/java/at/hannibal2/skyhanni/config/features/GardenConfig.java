@@ -1180,7 +1180,7 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 21)
     @FeatureToggle
-    public boolean composterNotifyLowEnabled = true;
+    public boolean composterNotifyLowEnabled = false;
 
     @Expose
     @ConfigOption(name = "Show Title", desc = "Send a title to notify.")
