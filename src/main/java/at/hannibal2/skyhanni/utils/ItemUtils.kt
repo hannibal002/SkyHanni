@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
@@ -159,7 +160,16 @@ object ItemUtils {
             return getPetRarity(this)
         }
 
-        return when (this.getLore().lastOrNull()?.take(4)) {
+        val lore = getLore()
+        var lastLine = lore.lastOrNull() ?: return null
+        if (lastLine == "§eClick to inspect!") {
+            // Assuming inside ah browser
+            val index = lore.indexOfFirst { it.startsWith("§7Seller: ") } - 2
+            if (index > 0) {
+                lastLine = lore[index]
+            }
+        }
+        return when (lastLine.take(4)) {
             "§f§l" -> LorenzRarity.COMMON
             "§a§l" -> LorenzRarity.UNCOMMON
             "§9§l" -> LorenzRarity.RARE
@@ -169,7 +179,13 @@ object ItemUtils {
             "§b§l" -> LorenzRarity.DIVINE
             "§4§l" -> LorenzRarity.SUPREME
             "§c§l" -> LorenzRarity.SPECIAL
-            else -> null
+            else -> {
+                CopyErrorCommand.logErrorState(
+                    "Could not read rarity for item $name",
+                    "getItemRarityOrNull not found for: ${getInternalName()}, name:'$name', lastLine:'$lastLine'"
+                )
+                return null
+            }
         }
     }
 
@@ -248,6 +264,14 @@ object ItemUtils {
 
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
-        return LorenzRarity.getById(rarityId)
+        val rarity = LorenzRarity.getById(rarityId)
+        val name = pet.name
+        if (rarity == null) {
+            CopyErrorCommand.logErrorState(
+                "Could not read rarity for pet $name",
+                "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
+            )
+        }
+        return rarity
     }
 }

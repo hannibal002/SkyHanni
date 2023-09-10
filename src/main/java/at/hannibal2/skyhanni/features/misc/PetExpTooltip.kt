@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -42,15 +42,15 @@ class PetExpTooltip {
             event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
         } else {
             val progressBar = StringUtils.progressBar(percentage)
-            val isBelowLEgendary = itemStack.getItemRarity() < LorenzRarity.LEGENDARY
-            val addLegendaryColor = if (isBelowLEgendary) "§6" else ""
+            val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
+            val addLegendaryColor = if (isBelowLegendary) "§6" else ""
             event.toolTip.add(index, "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}")
             event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
         }
     }
 
     private fun maxPetExp(petName: String) = when {
-        petName.contains("Golden Dragon") -> 210_255_385 // lvl 200 legendary
+        petName.contains("Golden Dragon") && config.goldenDragon200 -> 210_255_385 // lvl 200 legendary
         petName.contains("Bingo") -> 5_624_785 // lvl 100 common
 
         else -> 25_353_230 // lvl 100 legendary

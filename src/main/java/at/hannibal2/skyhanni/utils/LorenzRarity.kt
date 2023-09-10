@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+
 
 // TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
@@ -12,10 +14,33 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     DIVINE(LorenzColor.AQUA, 6),
     SUPREME(LorenzColor.DARK_RED, 7),
     SPECIAL(LorenzColor.RED, 8),
+    VERY_SPECIAL(LorenzColor.RED, 9),
     ;
 
+    fun oneBelow(logError: Boolean = true): LorenzRarity? {
+        val rarityBelow = getById(ordinal - 1)
+        if (rarityBelow == null && logError) {
+            CopyErrorCommand.logErrorState(
+                "Problem with item rarity detected.",
+                "Trying to get an item rarity below common"
+            )
+        }
+        return rarityBelow
+    }
+
+    fun oneAbove(logError: Boolean = true): LorenzRarity? {
+        val rarityBelow = getById(ordinal + 1)
+        if (rarityBelow == null && logError) {
+            CopyErrorCommand.logErrorState(
+                "Problem with item rarity detected.",
+                "Trying to get an item rarity above special"
+            )
+        }
+        return rarityBelow
+    }
+
     companion object {
-        fun getById(id: Int) = entries.firstOrNull { it.id == id }
+        fun getById(id: Int) = entries.firstOrNull { it.ordinal == id }
     }
 
 }

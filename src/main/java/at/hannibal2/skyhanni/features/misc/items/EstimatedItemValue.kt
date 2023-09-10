@@ -7,25 +7,23 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.manager
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.GemstoneSlotType
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -55,6 +53,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
@@ -285,20 +284,61 @@ object EstimatedItemValue {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
-            val stone = values.asJsonObject
-            val reforgeName = stone.get("reforgeName").asString
+            val stoneJson = values.asJsonObject
+            val reforgeName = stoneJson.get("reforgeName").asString
             if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
                 val internalName = rawInternalName.asInternalName()
-                val price = internalName.getPrice()
-                val name = internalName.getItemName()
+                val reforgeStonePrice = internalName.getPrice()
+                val reforgeStoneName = internalName.getItemName()
+
+                val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
+                val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
+
                 val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
                 list.add("§7Reforge: §9$realReforgeName")
-                list.add("  §7($name §6" + NumberUtil.format(price) + "§7)")
-                return price
+                list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
+                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost))
+                return reforgeStonePrice + applyCost
             }
         }
 
         return 0.0
+    }
+
+    private fun getReforgeStoneApplyCost(
+        stack: ItemStack,
+        reforgeCosts: JsonObject,
+        reforgeStone: NEUInternalName
+    ): Int? {
+        var itemRarity = stack.getItemRarityOrNull() ?: return null
+
+        // Catch cases of special or very special
+        if (itemRarity > LorenzRarity.MYTHIC) {
+            itemRarity = LorenzRarity.LEGENDARY
+        } else {
+            if (stack.isRecombobulated()) {
+                val oneBelow = itemRarity.oneBelow(logError = false)
+                if (oneBelow == null) {
+                    CopyErrorCommand.logErrorState(
+                        "Wrong item rarity detected in estimated item value for item ${stack.name}",
+                        "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
+                    )
+                    return null
+                }
+                itemRarity = oneBelow
+            }
+        }
+        val rarityName = itemRarity.name
+        if (!reforgeCosts.has(rarityName)) {
+            val reforgesFound = reforgeCosts.entrySet().map { it.key }
+            CopyErrorCommand.logErrorState(
+                "Can not calculate reforge cost for item ${stack.name}",
+                "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
+            )
+            return null
+        }
+
+        return reforgeCosts[rarityName].asInt
     }
 
     private fun addRecomb(stack: ItemStack, list: MutableList<String>): Double {
@@ -674,7 +714,8 @@ object EstimatedItemValue {
         val internalName = stack.getInternalName()
 
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+        val unlockedSlots =
+            stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
 
         // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0

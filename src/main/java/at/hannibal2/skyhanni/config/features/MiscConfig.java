@@ -26,7 +26,7 @@ public class MiscConfig {
     public boolean petDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Pet Experience Tooltip", desc = "Show the currently active pet.")
+    @ConfigOption(name = "Pet Experience Tooltip", desc = "")
     @ConfigAccordionId(id = 0)
     @Accordion
     public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
@@ -43,6 +43,11 @@ public class MiscConfig {
         @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
         @ConfigEditorBoolean
         public boolean showAlways = false;
+
+        @Expose
+        @ConfigOption(name = "GDrag 200", desc = "Show for Golden Dragon the exp needed for level 200.")
+        @ConfigEditorBoolean
+        public boolean goldenDragon200 = true;
 
     }
 
@@ -540,6 +545,12 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean vipVisits = true;
+
+        @Expose
+        @ConfigOption(name = "/gfs Sack", desc = "Tab complete /gfs sack items.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean gfsSack = true;
     }
 
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")

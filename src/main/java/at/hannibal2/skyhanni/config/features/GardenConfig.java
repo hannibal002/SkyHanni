@@ -295,6 +295,11 @@ public class GardenConfig {
                         "§b1 §cSpace Helmet",
                         " ", // If they want another empty row
                         "§212,735 Garden EXP",
+                        "§b1 §9Cultivating I",
+                        "§b1 §9Replenish I",
+                        "§b11,056 Bits",
+                        "§250,556 Mithril Powder",
+                        "§d50,556 Gemstone Powder",
                 }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
@@ -551,7 +556,7 @@ public class GardenConfig {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand. §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     @FeatureToggle
@@ -1180,7 +1185,7 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 21)
     @FeatureToggle
-    public boolean composterNotifyLowEnabled = true;
+    public boolean composterNotifyLowEnabled = false;
 
     @Expose
     @ConfigOption(name = "Show Title", desc = "Send a title to notify.")

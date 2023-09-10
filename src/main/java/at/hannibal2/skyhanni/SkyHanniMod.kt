@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
@@ -60,6 +61,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.misc.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
@@ -188,7 +190,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
-        loadModule(SackAPI())
+        loadModule(SackAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -335,7 +337,7 @@ class SkyHanniMod {
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(CaptureFarmingGear())
-        loadModule(SackDisplay())
+        loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
@@ -345,6 +347,7 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
+        loadModule(GetFromSacksTabComplete)
         loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
@@ -400,6 +403,7 @@ class SkyHanniMod {
         loadModule(TabListReader)
         loadModule(TabListRenderer)
         loadModule(GlowingDroppedItems())
+        loadModule(DungeonTeammateOutlines())
 
         init()
 
@@ -421,7 +425,10 @@ class SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
-        Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
+        Runtime.getRuntime().addShutdownHook(Thread {
+            configManager.saveConfig("shutdown-hook")
+            configManager.saveSackData("shutdown-hook")
+        })
         repo = RepoManager(configManager.configDirectory)
         try {
             repo.loadRepoInformation()
@@ -456,6 +463,7 @@ class SkyHanniMod {
 
         @JvmStatic
         val feature: Features get() = configManager.features
+        val sackData: SackData get() = configManager.sackData
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
