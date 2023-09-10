@@ -72,8 +72,7 @@ class JacobContestTimeNeeded {
                 val timeInMinutes = amount.toDouble() / speedForFormular / 60
                 val formatDuration = TimeUtils.formatDuration((timeInMinutes * 60 * 1000).toLong())
                 val color = if (timeInMinutes < 20) "§b" else "§c"
-                var line: String
-                var marking: String = ""
+                var marking = ""
                 var bracketText = "${bracket.displayName} $color$formatDuration"
                 var blocksPerSecond = crop.getLatestBlocksPerSecond()
                 if (blocksPerSecond == null) {
@@ -84,23 +83,22 @@ class JacobContestTimeNeeded {
                     if (blocksPerSecond < 15.0) {
                         marking += "§4§l !"
                         blocksPerSecond = 19.9
-                        lowBPSWarning = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
+                        lowBPSWarning =
+                            listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
                     } else {
                         marking += " "
                         lowBPSWarning = listOf("§aYour Blocks/second is good :)")
                     }
                 }
-                if (timeInMinutes < 20) {
-                    line = "§9${crop.cropName} §b$formatDuration" + marking
+                val line = if (timeInMinutes < 20) {
+                    "§9${crop.cropName} §b$formatDuration" + marking
                 } else {
-                    line =
-                        "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!" + marking
                     val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
                     val cropsPerSecond = amount.toDouble() / blocksPerSecond / 60
                     val ffNeeded = cropsPerSecond * 100 / 20 / crop.baseDrops
                     val missing = (ffNeeded - cropFF).toInt()
                     bracketText += " §7(${missing.addSeparators()} more FF needed!)"
-
+                    "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!" + marking
                 }
                 brackets.add(bracketText)
                 if (bracket == currentBracket) {
