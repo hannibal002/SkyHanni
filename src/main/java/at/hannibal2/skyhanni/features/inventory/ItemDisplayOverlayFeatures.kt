@@ -23,9 +23,10 @@ class ItemDisplayOverlayFeatures {
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val museumDonationPattern = "§7Items Donated: §e(?<amount>[0-9.]+)§6%".toPattern()
     private val dojoTestOfGradePattern = "§7(§6)?Your Rank: (?<grade>§.[A-Z]).*".toPattern()
-    private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\[§.?(?<sblvl>[0-9]{0,3})§.?\].*".toPattern()
+    private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
     private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\.[0-9])?) Skill Avg\..*".toPattern()
     private val collUnlockPattern = "..Collections Unlocked: §.(?<coll>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val collMenuUnlockPattern = "..Collections .*: §.(?<collMenu>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons")
@@ -236,6 +237,15 @@ class ItemDisplayOverlayFeatures {
                     for (line in item.getLore()) {
                         if (line.contains("Collections Unlocked: ")) {
                             return collUnlockPattern.matchMatcher(line) { group("coll").toDouble().toInt().toString() } ?: "§a✔"
+                        }
+                    }
+                }
+            }
+            if (InventoryUtils.openInventoryName() == "Collections") {
+                if (itemName.contains(" Collections")) {
+                    for (line in item.getLore()) {
+                        if (line.contains("Collections ") && line.contains(": §")) {
+                            return collMenuUnlockPattern.matchMatcher(line) { group("collMenu").toDouble().toInt().toString() } ?: "§a✔"
                         }
                     }
                 }
