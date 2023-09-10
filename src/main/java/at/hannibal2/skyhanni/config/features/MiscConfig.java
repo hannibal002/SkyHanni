@@ -456,7 +456,10 @@ public class MiscConfig {
         public boolean trapperTalkCooldown = true;
 
         @Expose
-        @ConfigOption(name = "Trapper Cooldown GUI", desc = "Show the cooldown on screen in an overlay (intended for abiphone users)")
+        @ConfigOption(
+                name = "Trapper Cooldown GUI",
+                desc = "Show the cooldown on screen in an overlay (intended for abiphone users)."
+        )
         @ConfigEditorBoolean
         public boolean trapperCooldownGui = false;
 

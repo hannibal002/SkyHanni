@@ -179,10 +179,8 @@ class TrevorFeatures {
             Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase) {
             if (config.trapperTalkCooldown) {
-                RenderLivingEntityHelper.setEntityColor(
-                    entityTrapper,
-                    currentStatus.color
-                ) { config.trapperTalkCooldown }
+                RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+                { config.trapperTalkCooldown }
                 entityTrapper.getLorenzVec().let {
                     if (it.distanceToPlayer() < 15) {
                         event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
@@ -245,10 +243,14 @@ class TrevorFeatures {
         currentLabel = "§2Ready"
     }
 
-    enum class TrapperStatus(val color: Int, val colorCode: String) {
-        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75), "§2"),
-        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75), "§3"),
-        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75), "§4"),
+    enum class TrapperStatus(baseColor: LorenzColor) {
+        READY(LorenzColor.DARK_GREEN),
+        WAITING(LorenzColor.DARK_AQUA),
+        ACTIVE(LorenzColor.DARK_RED),
+        ;
+
+        val color = baseColor.toColor().withAlpha(75)
+        val colorCode = baseColor.getChatColor()
     }
 
     private fun onFarmingIsland() =
