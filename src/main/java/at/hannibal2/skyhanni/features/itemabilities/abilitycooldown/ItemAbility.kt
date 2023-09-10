@@ -41,6 +41,7 @@ enum class ItemAbility(
     WITHER_CLOAK(10),
     HOLY_ICE(4),
     VOODOO_DOLL_WILTED(3),
+    FIRE_FURY_STAFF(20),
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
 
     // doesn't have a sound
@@ -48,7 +49,6 @@ enum class ItemAbility(
     LIVID_DAGGER("Throw", 5, "Livid Dagger"),
     FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
-    FIRE_FURY_STAFF("Firestorm", 20, "Fire Fury Staff"),
 
     // doesn't have a consistent sound
     ECHO("Echo", 3, "Ancestral Spade");
