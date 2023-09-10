@@ -955,8 +955,8 @@ public class MiscConfig {
 
     public static class CompactTabList {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer and doesn't " +
-                "break the information in the footer like SBA does.") //made tablist one word here so both searches will pick it up
+        @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
+                "doesn't break god-pot detection and shortens some other lines.") //made tablist one word here so both searches will pick it up
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
