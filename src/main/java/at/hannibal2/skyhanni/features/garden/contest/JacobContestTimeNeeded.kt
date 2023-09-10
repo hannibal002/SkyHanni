@@ -97,7 +97,6 @@ class JacobContestTimeNeeded {
         map: MutableMap<CropType, Renderable>
     ) {
         val lowBPSWarning = listOf<String>()
-        var lowBPSWarning1 = lowBPSWarning
         val rawSpeed = speed.toDouble()
         val speedForFormular = crop.getLatestBlocksPerSecond()?.let {
             if (it < 15) {
@@ -117,16 +116,16 @@ class JacobContestTimeNeeded {
             if (blocksPerSecond == null) {
                 marking += "§0§l !" //hoping this never shows
                 blocksPerSecond = 19.9
-                lowBPSWarning1 = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
+                lowBPSWarning = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
             } else {
                 if (blocksPerSecond < 15.0) {
                     marking += "§4§l !"
                     blocksPerSecond = 19.9
-                    lowBPSWarning1 =
+                    lowBPSWarning =
                         listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
                 } else {
                     marking += " "
-                    lowBPSWarning1 = listOf("§aYour Blocks/second is good :)")
+                    lowBPSWarning = listOf("§aYour Blocks/second is good :)")
                 }
             }
             val line = if (timeInMinutes < 20) {
@@ -153,7 +152,7 @@ class JacobContestTimeNeeded {
             add("§7Latest FF: §e${(latestFF).addSeparators()}")
             val bps = crop.getLatestBlocksPerSecond()?.round(1) ?: 0
             add("§7Blocks/Second: §e${bps.addSeparators()}")
-            addAll(lowBPSWarning1)
+            addAll(lowBPSWarning)
         })
     }
 
