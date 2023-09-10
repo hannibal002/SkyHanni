@@ -399,6 +399,7 @@ class SkyHanniMod {
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
+        loadModule(PlayerChatSymbols())
 
         init()
 
