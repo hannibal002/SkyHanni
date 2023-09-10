@@ -23,7 +23,6 @@ class JacobContestTimeNeeded {
     private val config get() = SkyHanniMod.feature.garden
     private var display = emptyList<List<Any>>()
     private var currentBracket = ContestBracket.GOLD
-    private var lowBPSWarning = ""
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
@@ -36,6 +35,7 @@ class JacobContestTimeNeeded {
         val sorted = mutableMapOf<CropType, Double>()
         val map = mutableMapOf<CropType, Renderable>()
         for (crop in CropType.entries) {
+            var lowBPSWarning = listOf<String>()
             val speed = crop.getSpeed()
             if (speed == null) {
                 sorted[crop] = Double.MAX_VALUE
@@ -58,10 +58,18 @@ class JacobContestTimeNeeded {
                 )
                 continue
             }
+
+            val rawSpeed = speed.toDouble()
+            val speedForFormular = crop.getLatestBlocksPerSecond()?.let {
+                if (it < 15) {
+                    val v = rawSpeed / it
+                    (v * 19.9).toInt()
+                } else speed
+            } ?: speed
             var showLine = ""
             val brackets = mutableListOf<String>()
             for ((bracket, amount) in averages) {
-                val timeInMinutes = amount.toDouble() / speed / 60
+                val timeInMinutes = amount.toDouble() / speedForFormular / 60
                 val formatDuration = TimeUtils.formatDuration((timeInMinutes * 60 * 1000).toLong())
                 val color = if (timeInMinutes < 20) "§b" else "§c"
                 var line: String
@@ -71,15 +79,15 @@ class JacobContestTimeNeeded {
                 if (blocksPerSecond == null) {
                     marking += "§0§l !" //hoping this never shows
                     blocksPerSecond = 19.9
-                    lowBPSWarning = "§cYour Blocks/second is too low, showing 19.9 Blocks/second instead!"
+                    lowBPSWarning = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
                 } else {
                     if (blocksPerSecond < 15.0) {
                         marking += "§4§l !"
                         blocksPerSecond = 19.9
-                        lowBPSWarning = "§cYour Blocks/second is too low, showing 19.9 Blocks/second instead!"
+                        lowBPSWarning = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
                     } else {
                         marking += " "
-                        lowBPSWarning = "§aYour Blocks/second is good :)"
+                        lowBPSWarning = listOf("§aYour Blocks/second is good :)")
                     }
                 }
                 if (timeInMinutes < 20) {
@@ -109,7 +117,7 @@ class JacobContestTimeNeeded {
                 add("§7Latest FF: §e${(latestFF).addSeparators()}")
                 val bps = crop.getLatestBlocksPerSecond()?.round(1) ?: 0
                 add("§7Blocks/Second: §e${bps.addSeparators()}")
-                add(lowBPSWarning)
+                addAll(lowBPSWarning)
             })
         }
 
