@@ -19,6 +19,7 @@ object TabListReader {
     private val activeEffectPattern = "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*".toPattern()
     private val effectCountPattern = "You have (?<effectCount>[0-9]+) active effect".toPattern()
     private val cookiePattern = "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
+    private val dungeonBuffPattern = "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
     private val upgradesPattern = "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)".toPattern()
     private val tabListSPattern = "(?i)§S".toPattern()
 
@@ -100,6 +101,11 @@ object TabListReader {
         matcher = cookiePattern.matcher(footer)
         if (matcher.find() && matcher.group().contains("Not active!")) {
             footer = matcher.replaceAll("Cookie Buff \n§r§7Not Active")
+        }
+
+        matcher = dungeonBuffPattern.matcher(footer)
+        if (matcher.find() && matcher.group().contains("No Buffs active.")) {
+            footer = matcher.replaceAll("Dungeon Buffs \n§r§7None Found")
         }
 
         for (line in footer.split("\n")) {
