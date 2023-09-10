@@ -29,12 +29,13 @@
 + Account upgrade complete reminder. - appable0
 + Chat message how many places you dropped in the farming weight lb when joining garden.
 + Added command /shfarmingprofile [player name]
-+ Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
+    + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
       shift key.
     + Highlight the level 100 text in gold for pets below legendary. - hannibal2
       (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)
+    + Option to only show level 100 for golden dragon in the pet experience tooltip. - hannibal2
 + Anita Extra Farming Fortune:
     + Show current tier and cost to max out in the item tooltip.
 + Sync Jacob Contests - Kaeso + CalMWolfs
@@ -74,11 +75,13 @@
 + Added Anniversary Event Active Player Ticket Timer. - nea
     + Option to play a sound as well.
 + Added highlight and outline feature for rare sea creatures. - Cad
++ Add feature to outline dropped items. - Cad
++ Add Outline Dungeon Teammates. - Cad
 + Added Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
-+ Add feature to outline dropped items. - Cad
 + Added icons for the medals received in a contest. - CalMWolfs
     + Different symbol for when it was a Finnegan contest.
++ Added Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
 
 ### Changes
 
@@ -126,7 +129,12 @@
     + This has no effect right now but allows Kaeso to change the values easier in the future.
 + Slightly changed the FF guide tab colors to make more sense. - Obsidian
 + Changed the bingo tips description to show the actual data source.
-+ Added Fire Fury Staff support to to item ability cooldown feature. - Cad
++ Added Fire Fury Staff support to item ability cooldown feature. - Cad
++ Estimated item value now shows the reforge stone apply cost as well. - hannibal2
++ Added Bits, Mithril Powder, and Gemstone Powder to visitor drop statistics. - Obsidian
++ Added support for slayer profit trackers on stranded. - hannibal2
++ Added Trapper Cooldown GUI. - NetheriteMiner
+    + Show the cooldown on screen in an overlay (intended for abiphone users).
 
 ### Fixes
 
@@ -203,6 +211,11 @@
 + Wilted Berberis Helper (in the Rift, Dreadfarm)
 + Slayer Profit Tracker (in the Park, Howling Cave)
 + End Node profit Tracker (in the End)
++ Fixed crash when item rarity cannot be detected in Auction House. - hannibal2
++ Fixed Replenish and Cultivating being bugged in visitor drop statistics. - Obsidian
++ Summoning souls should no longer be counted as sea creatures for the fishing timer. - hannibal2
++ Fixed Jacob Contests times needed display showing impossible FF values. - ReyMaratov
++ Fixed item cooldown issues with fire fury staff and jinxed voodoo doll. - Cad
 
 ### Removed Features
 

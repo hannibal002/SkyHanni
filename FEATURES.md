@@ -57,6 +57,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Catacombs class level color in party finder inventory.
 - Visual highlight chests that have not yet been opened in the Croesus inventory.
 
++ Outline Dungeon Teammates. - Cad
+
 ## Inventory
 
 - Not Clickable Items
@@ -505,6 +507,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
++ Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
 
 ## Misc
 
@@ -595,6 +598,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       shift key.
     + Highlight the level 100 text in gold for pets below legendary. - hannibal2
       (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)
+    + Option to only show level 100 for golden dragon in the pet experience tooltip. - hannibal2
 + **SkyHanni Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
 + **Default Option Settings:** - nea
@@ -608,6 +612,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       super-pairs minigames.
 + Anniversary Event Active Player Ticket Timer. - nea
     + Option to play a sound as well.
+* **Travor Trapper** Features in Farming Islands
+    + Trapper Cooldown GUI. - NetheriteMiner
+        + Show the cooldown on screen in an overlay (intended for abiphone users).
 
 ## Cosmetics
 
