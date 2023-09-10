@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.entity.player.InventoryPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -28,6 +29,7 @@ class BazaarOpenPriceWebsite {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         BazaarApi.currentlyOpenedProduct ?: return
+        if (event.inventory is InventoryPlayer) return
 
         if (event.slotNumber == 22) {
             event.replaceWith(item)
