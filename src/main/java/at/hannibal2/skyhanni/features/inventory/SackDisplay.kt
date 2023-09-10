@@ -41,14 +41,14 @@ object SackDisplay {
         var rendered = 0
         SackAPI.getSacksData(savingSacks)
 
-        val saclItems = SackAPI.sackItem.toList()
-        if (saclItems.isNotEmpty()) {
+        val sackItems = SackAPI.sackItem.toList()
+        if (sackItems.isNotEmpty()) {
             val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-                0 -> saclItems.sortedByDescending { it.second.stored.formatNumber() }
-                1 -> saclItems.sortedBy { it.second.stored.formatNumber() }
-                2 -> saclItems.sortedByDescending { it.second.price }
-                3 -> saclItems.sortedBy { it.second.price }
-                else -> saclItems.sortedByDescending { it.second.stored.formatNumber() }
+                0 -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
+                1 -> sackItems.sortedBy { it.second.stored.formatNumber() }
+                2 -> sackItems.sortedByDescending { it.second.price }
+                3 -> sackItems.sortedBy { it.second.price }
+                else -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
             }.toMap().toMutableMap()
 
             sortedPairs.toList().forEach { (k, v) ->
