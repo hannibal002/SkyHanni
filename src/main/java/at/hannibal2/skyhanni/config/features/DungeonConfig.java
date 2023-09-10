@@ -176,7 +176,7 @@ public class DungeonConfig {
     public boolean highlightSkeletonSkull = true;
 
     @Expose
-    @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus' inventory that " +
+    @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
             "shows unopened chests.")
     @ConfigEditorBoolean
     @FeatureToggle
