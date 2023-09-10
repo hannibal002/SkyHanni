@@ -661,7 +661,7 @@ public class GardenConfig {
     public boolean optimalSpeedWarning = false;
 
     @Expose
-    @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the Fancher Boots overlay by clicking on the presets.")
+    @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the Rancher Boots overlay by clicking on the presets.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     @FeatureToggle
