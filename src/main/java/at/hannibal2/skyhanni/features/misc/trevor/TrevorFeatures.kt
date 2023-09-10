@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -105,6 +106,22 @@ class TrevorFeatures {
             TrevorSolver.findMobHeight(height, false)
         }
     }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (!config.trapperCooldownGui) return
+        if (!onFarmingIsland()) return
+
+        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
+        else if (timeUntilNextReady == 1) "1 second left"
+        else "$timeUntilNextReady seconds left"
+
+        config.trapperCooldownPos.renderString(
+            "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
+            posLabel = "Trapper Cooldown GUI"
+        )
+    }
+
 
     private fun updateTrapper() {
         timeUntilNextReady -= 1
@@ -228,10 +245,10 @@ class TrevorFeatures {
         currentLabel = "§2Ready"
     }
 
-    enum class TrapperStatus(val color: Int) {
-        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75)),
-        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
-        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
+    enum class TrapperStatus(val color: Int, val colorCode: String) {
+        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75), "§2"),
+        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75), "§3"),
+        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75), "§4"),
     }
 
     private fun onFarmingIsland() =

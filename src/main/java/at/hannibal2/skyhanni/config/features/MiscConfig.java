@@ -454,6 +454,14 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean trapperTalkCooldown = true;
+
+        @Expose
+        @ConfigOption(name = "Trapper Cooldown GUI", desc = "Show the cooldown on screen in an overlay (intended for abiphone users)")
+        @ConfigEditorBoolean
+        public boolean trapperCooldownGui = false;
+
+        @Expose
+        public Position trapperCooldownPos = new Position(10, 10, false, true);
     }
 
     @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
