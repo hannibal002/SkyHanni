@@ -34,7 +34,7 @@ public class SlayerConfig {
         public String beaconColor = "0:255:255:0:88";
 
         @Expose
-        @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen then the Enderman Slayer throws a Yang Glyph (beacon).")
+        @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen when the Enderman Slayer throws a Yang Glyph (beacon).")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean showWarning = false;

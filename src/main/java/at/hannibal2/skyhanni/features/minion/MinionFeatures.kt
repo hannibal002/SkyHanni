@@ -38,7 +38,6 @@ class MinionFeatures {
     private var minionInventoryOpen = false
 
     private var lastInventoryClosed = 0L
-    private var lastMinionPickedUp = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
 
@@ -123,7 +122,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!minionInventoryOpen) return
-        var minions = minions ?: return
+        val minions = minions ?: return
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
@@ -134,10 +133,6 @@ class MinionFeatures {
 
         if (location !in minions) {
             minions[location]!!.lastClicked = 0
-        }
-
-        if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
-            MinionFeatures.minions = minions.editCopy { remove(location) }
         }
     }
 
@@ -210,7 +205,12 @@ class MinionFeatures {
 
         }
         if (message.startsWith("§aYou picked up a minion!")) {
-            lastMinionPickedUp = System.currentTimeMillis()
+            if (lastMinion != null) {
+                minions = minions?.editCopy { remove(lastMinion) }
+                lastClickedEntity = null
+                lastMinion = null
+                lastMinionOpened = 0L
+            }
         }
 
         minionUpgradePattern.matchMatcher(message) {

@@ -5,4 +5,4 @@ import net.minecraft.item.ItemStack
 /**
  * Note: This event is async and may not be executed on the main minecraft thread.
  */
-data class OwnInventorItemUpdateEvent(val itemStack: ItemStack) : LorenzEvent()
+data class OwnInventoryItemUpdateEvent(val itemStack: ItemStack) : LorenzEvent()

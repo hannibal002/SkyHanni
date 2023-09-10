@@ -11,8 +11,9 @@ import java.util.*
 
 class FeatureToggleProcessor : ConfigStructureReader {
 
-    var latestCategory: Category? = null
-    val pathStack = Stack<String>()
+    private var latestCategory: Category? = null
+    private val pathStack = Stack<String>()
+    private val accordionStack = Stack<String>()
 
     val allOptions = mutableListOf<FeatureToggleableOption>()
     val orderedOptions by lazy {
@@ -26,10 +27,13 @@ class FeatureToggleProcessor : ConfigStructureReader {
     override fun endCategory() {
     }
 
-    override fun beginAccordion(baseObject: Any?, field: Field?, option: ConfigOption?, id: Int) {
+    override fun beginAccordion(baseObject: Any?, field: Field?, o: ConfigOption?, id: Int) {
+        val option = o ?: return
+        accordionStack.push(option.name)
     }
 
     override fun endAccordion() {
+        accordionStack.pop()
     }
 
     override fun pushPath(fieldPath: String) {
@@ -63,9 +67,15 @@ class FeatureToggleProcessor : ConfigStructureReader {
 
             else -> error("Invalid FeatureToggle type: $field")
         }
+
+        var name = option.name
+        if ((name == "Enable" || name == "Enabled") && !accordionStack.empty()) {
+            name = accordionStack.peek()
+        }
+
         allOptions.add(
             FeatureToggleableOption(
-                option.name,
+                name,
                 option.desc,
                 value,
                 featureToggle.trueIsEnabled,

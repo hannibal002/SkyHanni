@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
@@ -19,16 +22,19 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.GemstoneSlotType
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
@@ -49,10 +55,15 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.reflect.TypeToken
+import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
+import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.File
+import java.util.*
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -60,6 +71,22 @@ object EstimatedItemValue {
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
+    private var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
+
+        if (data != null)
+        // item_internal_names -> gemstone_slots -> ingredients_array
+            gemstoneUnlockCosts =
+                ConfigManager.gson.fromJson(
+                    data,
+                    object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+                )
+        else
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
@@ -188,6 +215,7 @@ object EstimatedItemValue {
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
         totalPrice += addDrillUpgrades(stack, list)
+        totalPrice += addGemstoneSlotUnlockCost(stack, list)
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
         return Pair(totalPrice, basePrice)
@@ -383,8 +411,8 @@ object EstimatedItemValue {
     private fun addSilex(stack: ItemStack, list: MutableList<String>): Double {
         val tier = stack.getSilexCount() ?: return 0.0
 
-        val internalName = stack.getInternalName_old()
-        val maxTier = if (internalName == "STONK_PICKAXE") 4 else 5
+        val internalName = stack.getInternalName()
+        val maxTier = if (internalName == "STONK_PICKAXE".asInternalName()) 4 else 5
 
         val wtfHardcodedSilex = "SIL_EX".asInternalName()
         val price = wtfHardcodedSilex.getPrice() * tier
@@ -639,6 +667,59 @@ object EstimatedItemValue {
             list.add("§7Gemstones: §6" + NumberUtil.format(totalPrice))
             list += priceMap.sortedDesc().keys
         }
+        return totalPrice
+    }
+
+    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalName()
+
+        // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
+        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+
+        // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
+//        if (unlockedSlots == "null") return 0.0
+
+        val priceMap = mutableMapOf<String, Double>()
+        if (gemstoneUnlockCosts.isEmpty()) return 0.0
+
+        if (internalName !in gemstoneUnlockCosts) {
+            CopyErrorCommand.logErrorState(
+                "Could not find gemstone slot price for ${stack.name}",
+                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
+            )
+            return 0.0
+        }
+
+        var totalPrice = 0.0
+        val slots = gemstoneUnlockCosts[internalName] ?: return 0.0
+        for (slot in slots) {
+            if (!unlockedSlots.contains(slot.key)) continue
+
+            val previousTotal = totalPrice
+            for (ingredients in slot.value) {
+                val ingredient = Ingredient(manager, ingredients)
+
+                totalPrice += if (ingredient.isCoins) {
+                    ingredient.count
+                } else {
+                    getPrice(ingredient.internalItemId) * ingredient.count
+                }
+            }
+
+            val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
+            val colorCode = GemstoneSlotType.getColorCode(splitSlot[0])
+            val formattedPrice = NumberUtil.format(totalPrice - previousTotal)
+
+            // eg. SAPPHIRE_1 -> Sapphire Slot 2
+            val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
+                    // If the slot index is 0, we don't need to specify
+                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+
+            priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
+        }
+
+        list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
+        list += priceMap.sortedDesc().keys
         return totalPrice
     }
 }

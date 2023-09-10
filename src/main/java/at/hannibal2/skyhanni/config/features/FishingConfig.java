@@ -192,6 +192,12 @@ public class FishingConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Highlight Rare", desc = "Highlight rare sea creatures in blue color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean rareSeaCreatureHighlight = false;
+
+    @Expose
     @ConfigOption(
             name = "Shark Fish Counter",
             desc = "Counts how many sharks have been caught."

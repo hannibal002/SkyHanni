@@ -83,7 +83,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
 
         try {
@@ -104,7 +104,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            LorenzUtils.error("[SkyHanni] Error in OwnInventorItemUpdateEvent")
+            LorenzUtils.error("[SkyHanni] Error in OwnInventoryItemUpdateEvent")
             e.printStackTrace()
         }
     }

@@ -48,13 +48,15 @@ class TrophyFishMessages {
             " §7(${total.addSeparators()}. total)"
         } else ""
 
-        val component = ChatComponentText(if (config.trophyCounter) {
-            "§6§lTROPHY FISH! " + when (config.trophyDesign) {
-                0 -> "§7$amount. §r$displayRarity $displayName$totalText"
-                1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})$totalText"
-                else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b.$totalText"
-            }
-        } else event.message)
+        val component = ChatComponentText(
+            if (config.trophyCounter) {
+                "§6§lTROPHY FISH! " + when (config.trophyDesign) {
+                    0 -> "§7$amount. §r$displayRarity $displayName$totalText"
+                    1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})$totalText"
+                    else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b.$totalText"
+                }
+            } else event.message
+        )
 
         if (config.trophyFishTooltip) {
             TrophyFishManager.getInfo(internalName)?.let {

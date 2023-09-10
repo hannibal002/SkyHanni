@@ -259,7 +259,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             MinecraftExecutor.OnThread.execute {
                 update()
