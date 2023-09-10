@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiChat
@@ -18,12 +17,13 @@ import kotlin.math.max
 interface Renderable {
     val width: Int
     val height: Int
-    fun isHovered(posX: Int, posY: Int) =
-        Utils.getMouseX() in (posX..posX + width)
-            && Utils.getMouseY() in (posY..posY + height) // TODO: adjust for variable height?
+    fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { mp ->
+        mp.first in (posX..posX + width)
+                && mp.second in (posY..posY + height) // TODO: adjust for variable height?
+    } ?: false
 
     /**
-     * N.B.: the offset is absolute, not relative to the position and shouldn't be used for rendering
+     * Pos x and pos y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
      */
     fun render(posX: Int, posY: Int)
@@ -31,6 +31,19 @@ interface Renderable {
     companion object {
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
+
+        var currentRenderPassMousePosition: Pair<Int, Int>? = null
+            private set
+
+        fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
+            val last = currentRenderPassMousePosition
+            try {
+                currentRenderPassMousePosition = Pair(posX, posY)
+                return block()
+            } finally {
+                currentRenderPassMousePosition = last
+            }
+        }
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -101,7 +114,14 @@ interface Renderable {
                 }
             }
 
-        fun hoverTips(text: String, tips: List<String>, indexes: List<Int> = listOf(), stack: ItemStack? = null, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+        fun hoverTips(
+            text: String,
+            tips: List<String>,
+            indexes: List<Int> = listOf(),
+            stack: ItemStack? = null,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable {
 
             val render = string(text)
             return object : Renderable {
