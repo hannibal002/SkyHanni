@@ -21,7 +21,7 @@ public class CommandsConfig {
     public boolean usePartyTransferAlias = true;
 
     @Expose
-    @ConfigOption(name = "Replace Warp Is", desc = "Replaces §e/warp is §7with §e/is§7. Idk why. Ask §cKaeso")
+    @ConfigOption(name = "Replace Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;

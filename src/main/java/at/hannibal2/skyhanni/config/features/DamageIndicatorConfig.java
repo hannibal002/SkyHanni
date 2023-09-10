@@ -111,7 +111,7 @@ public class DamageIndicatorConfig {
 
     public static class VampireSlayerConfig {
         @Expose
-        @ConfigOption(name = "HP until Steak", desc = "Show the amount of HP missing until the steak can be used on the vampire slayer on top of the boss.")
+        @ConfigOption(name = "HP until Steak", desc = "Show the amount of HP missing until the steak can be used on the Vampire Slayer on top of the boss.")
         @ConfigEditorBoolean
         public boolean hpTillSteak = false;
 
