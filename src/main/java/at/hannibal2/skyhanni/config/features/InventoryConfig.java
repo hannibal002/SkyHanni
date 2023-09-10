@@ -293,22 +293,29 @@ public class InventoryConfig {
             desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
-            exampleText = {
-                    "§bMaster Star Tier",
-                    "§bMaster Skull Tier",
-                    "§bDungeon Head Floor Number",
-                    "§bNew Year Cake",
-                    "§bPet Level",
-                    "§bMinion Tier",
-                    "§bCrimson Armor",
-                    "§7(Removed)",
-                    "§bKuudra Key",
-                    "§bSkill Level",
-                    "§bCollection Level",
-                    "§bRancher's Boots speed",
-                    "§bLarva Hook",
-                    "§bDungeon Potion Level"
-            }
+        exampleText = {
+                "§bMaster Star Tier",
+                "§bMaster Skull Tier",
+                "§bDungeon Head Floor Number",
+                "§bNew Year Cake",
+                "§bPet Level",
+                "§bMinion Tier",
+                "§bCrimson Armor",
+                "§bSkyblock Level",
+                "§bKuudra Key",
+                "§bSkill Level",
+                "§bCollection Level",
+                "§bRancher's Boots speed",
+                "§bLarva Hook",
+                "§bDungeon Potion Level",
+                "§bMuseum Donation Progress",
+                "§bDojo Progress",
+                "§bUnlocked Collections",
+                "§bUnlocked Recipes",
+                "§bSkill Average",
+                "§bWardrobe Slot #",
+                "§bBank Tier"
+        }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
 

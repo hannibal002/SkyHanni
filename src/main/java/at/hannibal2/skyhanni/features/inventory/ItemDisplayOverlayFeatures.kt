@@ -21,6 +21,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
+    private val museumDonationPattern = "§7Items Donated: §e(?<amount>[0-9.]+)§6%".toPattern()
+    private val dojoTestOfGradePattern = "§7(§6)?Your Rank: (?<grade>§.[A-Z]).*".toPattern()
+    private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\[§.?(?<sblvl>[0-9]{0,3})§.?\].*".toPattern()
+    private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\.[0-9])?) Skill Avg\..*".toPattern()
+    private val collUnlockPattern = "..Collections Unlocked: §.(?<coll>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons")
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -94,6 +102,20 @@ class ItemDisplayOverlayFeatures {
             if (ItemUtils.isSack(itemName)) {
                 val sackName = grabSackName(itemName)
                 return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
+            if (InventoryUtils.openInventoryName().toLowerCase() == "skyblock menu") {
+                if (itemName.endsWith(" Leveling")) {
+                    for (line in item.getLore()) {
+                        if (line.contains(" Level: ")) {
+                            skyblockLevelPattern.matchMatcher(line) {
+                                return group("sblvl").toInt().toString()
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -171,6 +193,82 @@ class ItemDisplayOverlayFeatures {
                             in 3..4 -> "§a$level"
                             in 5..6 -> "§9$level"
                             else -> "§5$level"
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(14)) {
+            if (InventoryUtils.openInventoryName().endsWith("Your Museum")) {
+                if (hannibalInsistedOnThisList.contains(itemName)) {
+                    for (line in item.getLore()) {
+                        if (line.contains("Items Donated")) {
+                            museumDonationPattern.matchMatcher(line) {
+                                return when (val amount = group("amount")) {
+                                    in "100" -> "§a✔"
+                                    else -> amount.toDouble().toInt().toString()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(15)) {
+            if (InventoryUtils.openInventoryName().endsWith("Challenges")) {
+                if (itemName.startsWith("Test of ") || itemName == "Rank") {
+                    for (line in item.getLore()) {
+                        if (line.contains("Your Rank:")) {
+                            dojoTestOfGradePattern.matchMatcher(line) {
+                                return group("grade")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(16)) {
+            if (InventoryUtils.openInventoryName().toLowerCase() == "skyblock menu") {
+                if (itemName == "Collections") {
+                    for (line in item.getLore()) {
+                        if (line.contains("Collections Unlocked: ")) {
+                            return collUnlockPattern.matchMatcher(line) { group("coll").toDouble().toInt().toString() } ?: "§a✔"
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(17)) {
+            if (InventoryUtils.openInventoryName().toLowerCase() == "skyblock menu") {
+                if (itemName == "Recipe Book") {
+                    for (line in item.getLore()) {
+                        if (line.contains(" Book Unlocked: ")) {
+                            return recipeBookPattern.matchMatcher(line) { group("recipe").toDouble().toInt().toString() } ?: "§a✔"
+                        }
+                    }
+                }
+            }
+            if (InventoryUtils.openInventoryName() == "Recipe Book") {
+                if (itemName.contains(" Recipes")) {
+                    for (line in item.getLore()) {
+                        if (line.contains("Recipes Unlocked: ")) {
+                            return recipeMenuPattern.matchMatcher(line) { group("specific").toDouble().toInt().toString() } ?: "§a✔"
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(18)) {
+            if (InventoryUtils.openInventoryName().toLowerCase() == "skyblock menu") {
+                if (itemName == "Your Skills") {
+                    for (line in item.getLore()) {
+                        if (line.removeColor().contains(" Skill Avg. ")) {
+                            return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
                         }
                     }
                 }
