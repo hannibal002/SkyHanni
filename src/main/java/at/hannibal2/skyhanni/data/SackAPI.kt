@@ -97,8 +97,7 @@ object SackAPI {
     }
 
     fun getSacksData(savingSacks: Boolean) {
-        if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
-        if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
+        if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for ((_, stack) in stackList) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
@@ -228,7 +227,7 @@ object SackAPI {
 
     @SubscribeEvent
     fun sackChange(event: SackChangeEvent) {
-        sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
 
         // if it gets added and subtracted but only 1 shows it will be outdated
         val justChanged = mutableMapOf<NEUInternalName, Int>()
@@ -272,7 +271,7 @@ object SackAPI {
     }
 
     fun fetchSackItem(item: NEUInternalName): SackItem? {
-        sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return SackItem(0, 0, -1)
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, -1)
 
         if (sackData.containsKey(item)) {
             return sackData[item]
@@ -283,7 +282,7 @@ object SackAPI {
     }
 
     private fun saveSackData() {
-        ProfileStorageData.sackProfiles?.sacks?.sackContents = sackData
+        ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveSackData("shutdown-hook")
     }
 

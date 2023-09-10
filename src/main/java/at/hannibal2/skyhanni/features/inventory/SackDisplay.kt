@@ -43,14 +43,11 @@ object SackDisplay {
 
         if (SackAPI.sackItem.isNotEmpty()) {
             val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-                0 -> SackAPI.sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap()
-                    .toMutableMap()
-
+                0 -> SackAPI.sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
                 1 -> SackAPI.sackItem.toList().sortedBy { it.second.stored.formatNumber() }.toMap().toMutableMap()
                 2 -> SackAPI.sackItem.toList().sortedByDescending { it.second.price }.toMap().toMutableMap()
                 3 -> SackAPI.sackItem.toList().sortedBy { it.second.price }.toMap().toMutableMap()
-                else -> SackAPI.sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap()
-                    .toMutableMap()
+                else -> SackAPI.sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
             }
 
             sortedPairs.toList().forEach {
@@ -155,11 +152,11 @@ object SackDisplay {
         STORED_DESC("Stored D", "Stored Descending"),
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending")
+        PRICE_ASC("Price A", "Price Ascending"),;
     }
 
     enum class PriceFrom(val displayName: String) {
         BAZAAR("Bazaar Price"),
-        NPC("Npc Price")
+        NPC("Npc Price"),;
     }
 }

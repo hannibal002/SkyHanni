@@ -19,13 +19,8 @@ public class SackData {
     }
 
     public static class ProfileSpecific {
+
         @Expose
-        public SackContents sacks = new SackContents();
-
-        public static class SackContents {
-
-            @Expose
-            public Map<NEUInternalName, SackItem> sackContents = new HashMap<>();
-        }
+        public Map<NEUInternalName, SackItem> sackContents = new HashMap<>();
     }
 }
