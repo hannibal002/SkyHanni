@@ -23,6 +23,7 @@ class JacobContestTimeNeeded {
     private val config get() = SkyHanniMod.feature.garden
     private var display = emptyList<List<Any>>()
     private var currentBracket = ContestBracket.GOLD
+    private var lowBPSWarning = ""
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
@@ -63,19 +64,35 @@ class JacobContestTimeNeeded {
                 val timeInMinutes = amount.toDouble() / speed / 60
                 val formatDuration = TimeUtils.formatDuration((timeInMinutes * 60 * 1000).toLong())
                 val color = if (timeInMinutes < 20) "§b" else "§c"
-                val line: String
+                var line: String
+                var marking: String = ""
                 var bracketText = "${bracket.displayName} $color$formatDuration"
+                var blocksPerSecond = crop.getLatestBlocksPerSecond()
+                if (blocksPerSecond == null) {
+                    marking += "§0§l !" //hoping this never shows
+                    blocksPerSecond = 19.9
+                    lowBPSWarning = "§cYour Blocks/second is too low, showing 19.9 Blocks/second instead!"
+                } else {
+                    if (blocksPerSecond < 15.0) {
+                        marking += "§4§l !"
+                        blocksPerSecond = 19.9
+                        lowBPSWarning = "§cYour Blocks/second is too low, showing 19.9 Blocks/second instead!"
+                    } else {
+                        marking += " "
+                        lowBPSWarning = "§aYour Blocks/second is good :)"
+                    }
+                }
                 if (timeInMinutes < 20) {
-                    line = "§9${crop.cropName} §b$formatDuration"
+                    line = "§9${crop.cropName} §b$formatDuration" + marking
                 } else {
                     line =
-                        "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!"
+                        "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!" + marking
                     val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
-                    val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
                     val cropsPerSecond = amount.toDouble() / blocksPerSecond / 60
                     val ffNeeded = cropsPerSecond * 100 / 20 / crop.baseDrops
                     val missing = (ffNeeded - cropFF).toInt()
                     bracketText += " §7(${missing.addSeparators()} more FF needed!)"
+
                 }
                 brackets.add(bracketText)
                 if (bracket == currentBracket) {
@@ -83,6 +100,7 @@ class JacobContestTimeNeeded {
                     showLine = line
                 }
             }
+
             map[crop] = Renderable.hoverTips(showLine, buildList {
                 add("§7Time Needed for §9${crop.cropName} Medals§7:")
                 addAll(brackets)
@@ -91,7 +109,7 @@ class JacobContestTimeNeeded {
                 add("§7Latest FF: §e${(latestFF).addSeparators()}")
                 val bps = crop.getLatestBlocksPerSecond()?.round(1) ?: 0
                 add("§7Blocks/Second: §e${bps.addSeparators()}")
-
+                add(lowBPSWarning)
             })
         }
 
