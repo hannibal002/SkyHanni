@@ -335,7 +335,7 @@ public class MiscConfig {
     public boolean estimatedIemValueExactPrice = false;
 
     @Expose
-    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the Wardrobe inventory.")
+    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     @FeatureToggle
