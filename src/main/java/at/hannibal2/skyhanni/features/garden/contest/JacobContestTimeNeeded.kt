@@ -96,7 +96,7 @@ class JacobContestTimeNeeded {
         sorted: MutableMap<CropType, Double>,
         map: MutableMap<CropType, Renderable>
     ) {
-        val lowBPSWarning = listOf<String>()
+        var lowBPSWarning = listOf<String>()
         val rawSpeed = speed.toDouble()
         val speedForFormular = crop.getLatestBlocksPerSecond()?.let {
             if (it < 15) {
