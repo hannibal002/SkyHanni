@@ -41,18 +41,19 @@ object SackDisplay {
         var rendered = 0
         SackAPI.getSacksData(savingSacks)
 
-        if (SackAPI.sackItem.isNotEmpty()) {
+        val saclItems = SackAPI.sackItem.toList()
+        if (saclItems.isNotEmpty()) {
             val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-                0 -> SackAPI.sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
-                1 -> SackAPI.sackItem.toList().sortedBy { it.second.stored.formatNumber() }.toMap().toMutableMap()
-                2 -> SackAPI.sackItem.toList().sortedByDescending { it.second.price }.toMap().toMutableMap()
-                3 -> SackAPI.sackItem.toList().sortedBy { it.second.price }.toMap().toMutableMap()
-                else -> SackAPI.sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
-            }
+                0 -> saclItems.sortedByDescending { it.second.stored.formatNumber() }
+                1 -> saclItems.sortedBy { it.second.stored.formatNumber() }
+                2 -> saclItems.sortedByDescending { it.second.price }
+                3 -> saclItems.sortedBy { it.second.price }
+                else -> saclItems.sortedByDescending { it.second.stored.formatNumber() }
+            }.toMap().toMutableMap()
 
-            sortedPairs.toList().forEach {
-                if (it.second.stored == "0" && !config.showEmpty) {
-                    sortedPairs.remove(it.first)
+            sortedPairs.forEach { (k, v) ->
+                if (v.stored == "0" && !config.showEmpty) {
+                    sortedPairs.remove(k)
                 }
             }
 
@@ -152,11 +153,13 @@ object SackDisplay {
         STORED_DESC("Stored D", "Stored Descending"),
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending"),;
+        PRICE_ASC("Price A", "Price Ascending"),
+        ;
     }
 
     enum class PriceFrom(val displayName: String) {
         BAZAAR("Bazaar Price"),
-        NPC("Npc Price"),;
+        NPC("Npc Price"),
+        ;
     }
 }
