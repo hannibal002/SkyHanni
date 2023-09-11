@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -10,7 +11,6 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.http.client.config.RequestConfig
@@ -29,16 +29,17 @@ class Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onGuiChat(e: ClientChatReceivedEvent) {
+    fun onGuiChat(e: LorenzChatEvent) {
         if (!SkyHanniMod.feature.chat.translator) return
         if (e.type != 0.toByte()) return // If this is not a player-sent message, return
 
-        val chatComponent = e.message
-        val message = chatComponent.unformattedText
+        val message = e.message.removeColor()
         if (!messageContentRegex.matches(message.removeColor())) return
 
-        val clickStyle = createClickStyle(message)
-        chatComponent.siblings.last().setChatStyle(clickStyle)
+        if (e.chatComponent.siblings.size > 0) {
+            val clickStyle = createClickStyle(message)
+            e.chatComponent.siblings.last().setChatStyle(clickStyle)
+        }
     }
 
     private fun createClickStyle(message: String): ChatStyle {

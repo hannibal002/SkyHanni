@@ -79,7 +79,6 @@ class PlayerChatSymbols {
                             }
                             else -> oldText
                         }
-                        println("old text: $oldText")
 
                         component.text = component.text.replace(oldText, newText)
                         true
