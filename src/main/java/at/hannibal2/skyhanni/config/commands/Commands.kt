@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
@@ -156,6 +157,10 @@ object Commands {
                     "Copies the translation for a given message to your clipboard. " +
                     "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
+        registerCommand(
+                "shmouselock",
+                "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+        ) { LockMouseLook.toggleLock() }
     }
 
     private fun usersBugFix() {
