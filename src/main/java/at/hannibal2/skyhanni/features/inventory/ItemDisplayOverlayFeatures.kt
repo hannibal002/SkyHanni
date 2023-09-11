@@ -391,7 +391,7 @@ class ItemDisplayOverlayFeatures {
                 if (itemName == "Completed Quests") {
                     for (line in item.getLore()) {
                         if (line.contains("§7Completed: §a")) {
-                            return "§a" + line.removeColor().replace("§7Completed: §a", "")
+                            return "§a" + line.removeColor().replace("Completed: §a", "")
                         }
                     }
                 }
