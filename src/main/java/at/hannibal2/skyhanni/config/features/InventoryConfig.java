@@ -290,7 +290,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(
             name = "Item number",
-            desc = "Showing the item number as a stack size for these items."
+            desc = "Showing the item number as a stack size for these items. Values based on percentages are either truncated or a §a✔§r§7 when displayed."
     )
     @ConfigEditorDraggableList(
         exampleText = {
