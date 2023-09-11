@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.regularName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -40,7 +39,6 @@ class ItemDisplayOverlayFeatures {
 
     private fun getStackTip(item: ItemStack): String {
         val itemName = item.cleanName()
-        val itemNameRegular = item.regularName()
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(0)) {
             when (itemName) {
@@ -332,8 +330,9 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(23)) {
             if (InventoryUtils.openInventoryName().startsWith("Your Stats Breakdown")) {
-                if (!itemNameRegular.isEmpty()) {
-                    skyblockStatBreakdownPattern.matchMatcher(itemNameRegular) {
+                val statName = item.name ?: return ""
+                if (!(statName.isEmpty())) {
+                    skyblockStatBreakdownPattern.matchMatcher(statName) {
                         val name = group("name")
                         val color = group("color")
                         val icon = group("icon")

@@ -17,7 +17,6 @@ import java.util.*
 object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
-    fun ItemStack.regularName() = this.displayName
 
     fun isSack(name: String): Boolean =
         name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
