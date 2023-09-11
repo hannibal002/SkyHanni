@@ -373,6 +373,31 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(24)) {
+            if (InventoryUtils.openInventoryName() == "Quest Log") {
+                if (itemName == "Find all Fairy Souls") {
+                    for (line in item.getLore()) {
+                        val newLine = line.removeColor()
+                        if (newLine.contains("Found: ")) {
+                            return "§d" + newLine.removeColor().replace(" ✖ Found: ", "").substring(0, 3)
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(25)) {
+            if (InventoryUtils.openInventoryName() == "Quest Log") {
+                if (itemName == "Completed Quests") {
+                    for (line in item.getLore()) {
+                        if (line.contains("§7Completed: §a")) {
+                            return "§a" + line.removeColor().replace("§7Completed: §a", "")
+                        }
+                    }
+                }
+            }
+        }
+
         return ""
     }
 

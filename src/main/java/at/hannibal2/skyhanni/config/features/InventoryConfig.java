@@ -317,7 +317,9 @@ public class InventoryConfig {
                 "§bBank Tier",
                 "§bHighest Crafted Minion Tier",
                 "§bProgress to Next Minion Slot",
-                "§bShortened Skyblock Stats"
+                "§bShortened Skyblock Stats",
+                "§bCollected Fairy Souls",
+                "§bCompleted Quests"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
