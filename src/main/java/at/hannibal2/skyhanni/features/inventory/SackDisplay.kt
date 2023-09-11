@@ -23,6 +23,7 @@ object SackDisplay {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (SackAPI.inSackInventory) {
             if (!isEnabled()) return
             config.position.renderStringsAndItems(
                 display, extraSpace = config.extraSpace, itemScale = 1.3, posLabel = "Sacks Items"
