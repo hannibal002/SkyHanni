@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiChat
@@ -136,7 +137,13 @@ interface Renderable {
                             list[Pair(posX, posY)] = indexes
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
-                            RenderLineTooltips.drawHoveringText(posX, posY, tips, stack)
+
+                            RenderLineTooltips.drawHoveringText(
+                                posX, posY, tips,
+                                stack,
+                                currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
+                                currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                            )
                             GlStateManager.popMatrix()
                         }
                     } else {
