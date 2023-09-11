@@ -1,28 +1,30 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatSymbols {
     private val config get() = SkyHanniMod.feature.misc.chatSymbols
     private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val usernamePattern =
-        "^(?:\\[\\d+] )?(?<symbol>\\S)? ?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
-
+    private val chatUsernamePattern =
+        "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    private val tabUsernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
     private val nameSymbols = mutableMapOf<String, String>()
 
-
+    // some code taken from SBA but most changed so that it works
     @SubscribeEvent
-    fun onChatReceived(event: ClientChatReceivedEvent) {
+    fun onChatReceived(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (event.type != 0.toByte()) return
 
-        val message = event.message.formattedText
+        val message = event.message
         if (!playerChatPattern.matcher(message).matches()) return
 
         var username = message.removeColor().split(":")[0]
@@ -31,7 +33,7 @@ class PlayerChatSymbols {
             username = username.substring(username.indexOf('>') + 1).trim()
         }
 
-        val matcher = usernamePattern.matcher(username)
+        val matcher = chatUsernamePattern.matcher(username)
         if (!matcher.matches()) return
         username = matcher.group("username")
 
@@ -44,25 +46,53 @@ class PlayerChatSymbols {
 
             val result = playerNames.stream()
                 .filter { npi -> npi.displayName != null }
-                .filter { npi -> TabStringType.usernameFromLine(npi.displayName.formattedText) == username }
+                .filter { npi -> usernameFromLine(npi.displayName.formattedText) == username }
                 .findAny()
 
             if (result.isPresent) {
                 nameSymbols[username] = result.get().displayName.formattedText
             }
         }
-    }
-}
 
-// todo when compact tab list is merged remove this. leaving as an enum so that transition is easier
-enum class TabStringType {
-;
-    companion object {
-        private val usernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
+        if (nameSymbols.contains(username)) {
+            val usernameWithSymbols = nameSymbols[username]!!
 
-        fun usernameFromLine(input: String): String {
-            val usernameMatcher = usernamePattern.matcher(input.removeColor())
-            return if (usernameMatcher.find()) usernameMatcher.group("username") else input
+            val split = usernameWithSymbols.split("$username ")
+            val emblemText = if (split.size > 1) split[1] else ""
+
+            if (emblemText != "") {
+                event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")
+
+                StringUtils.modifyFirstChatComponent(event.chatComponent) { component ->
+                    if (component is ChatComponentText && component.text.contains(username)) {
+                        val oldText = component.text
+                        val newText = when (config.symbolLocation) {
+                            0 -> "$emblemText $oldText"
+                            1 -> {
+                                // fixing it for when you type a message as the chat isn't split the same
+                                if (oldText.contains("§f:")) {
+                                    val ownChatSplit = oldText.split("§f:")
+                                    if (ownChatSplit.size > 1) {
+                                        "${ownChatSplit[0]} $emblemText §f:${ownChatSplit[1]}"
+                                    } else oldText
+                                } else "$oldText $emblemText "
+                            }
+                            else -> oldText
+                        }
+                        println("old text: $oldText")
+
+                        component.text = component.text.replace(oldText, newText)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
         }
+    }
+
+    private fun usernameFromLine(input: String): String {
+        val usernameMatcher = tabUsernamePattern.matcher(input.removeColor())
+        return if (usernameMatcher.find()) usernameMatcher.group("username") else input
     }
 }

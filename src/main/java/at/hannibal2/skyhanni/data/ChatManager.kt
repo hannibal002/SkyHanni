@@ -83,7 +83,7 @@ object ChatManager {
 
         if (message.startsWith("§f{\"server\":\"")) return
         val key = IdentityCharacteristics(original)
-        val chatEvent = LorenzChatEvent(message, original)
+        val chatEvent = LorenzChatEvent(message, original, event.type)
         if (!isSoopyMessage(event.message)) {
             chatEvent.postAndCatch()
         }
