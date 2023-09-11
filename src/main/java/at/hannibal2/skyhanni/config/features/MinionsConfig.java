@@ -14,7 +14,7 @@ public class MinionsConfig {
     public boolean nameDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Only Tier", desc = "Show only the tier number over the minion. (Useful for bingo)")
+    @ConfigOption(name = "Only Tier", desc = "Show only the tier number over the minion. (Useful for Bingo)")
     @ConfigEditorBoolean
     public boolean nameOnlyTier = false;
 
