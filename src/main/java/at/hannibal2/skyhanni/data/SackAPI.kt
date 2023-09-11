@@ -283,7 +283,7 @@ object SackAPI {
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
-        SkyHanniMod.configManager.saveSackData("shutdown-hook")
+        SkyHanniMod.configManager.saveSackData("saving-data")
     }
 
     data class SackGemstone(
