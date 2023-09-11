@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.regularName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -29,6 +30,7 @@ class ItemDisplayOverlayFeatures {
     private val collMenuUnlockPattern = ".*Collections .*: §.(?<collMenu>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
     private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
     @SubscribeEvent
@@ -38,6 +40,7 @@ class ItemDisplayOverlayFeatures {
 
     private fun getStackTip(item: ItemStack): String {
         val itemName = item.cleanName()
+        val itemNameRegular = item.regularName()
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(0)) {
             when (itemName) {
@@ -322,6 +325,50 @@ class ItemDisplayOverlayFeatures {
                         if (line.removeColor().contains("Craft ") && line.removeColor().contains(" more unique")) {
                             return line.removeColor().replace("Craft ", "").replace(" more unique", "").trim()
                         }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(23)) {
+            if (InventoryUtils.openInventoryName().startsWith("Your Stats Breakdown")) {
+                if (!itemNameRegular.isEmpty()) {
+                    skyblockStatBreakdownPattern.matchMatcher(itemNameRegular) {
+                        val name = group("name")
+                        val color = group("color")
+                        val icon = group("icon")
+                        val me = when (name) {
+                            "Health" -> "HP"
+                            "Defense" -> "Def"
+                            "Strength" -> "Str"
+                            "Intelligence" -> "Int"
+                            "Crit Damage" -> "CD"
+                            "Crit Chance" -> "CC"
+                            "Ferocity" -> "Fer"
+                            "Vitality" -> "Vit"
+                            "Mending" -> "Mnd"
+                            "Speed" -> "Spd"
+                            "Sea Creature Chance" -> "SCC"
+                            "Magic Find" -> "MF"
+                            "Fishing Speed" -> "FiS"
+                            "Combat Wisdom" -> "CoW"
+                            "Mining Wisdom" -> "MiW"
+                            "Farming Wisdom" -> "FaW"
+                            "Foraging Wisdom" -> "FoW"
+                            "Fishing Wisdom" -> "FiW"
+                            "Enchanting Wisdom" -> "EnW"
+                            "Alchemy Wisdom" -> "AlW"
+                            "Carpentry Wisdom" -> "CaW"
+                            "Runecrafting Wisdom" -> "RuW"
+                            "Social Wisdom" -> "SoW"
+                            "Mining Speed" -> "MiS"
+                            "Breaking Power" -> "BP"
+                            "Foraging Fortune" -> "FoF"
+                            "Farming Fortune" -> "FaF"
+                            "Mining Fortune" -> "MiF"
+                            else -> "[icon]"
+                        }
+                        return "" + "§" + color + me.replace("[icon]", icon)
                     }
                 }
             }
