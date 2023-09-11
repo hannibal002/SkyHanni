@@ -205,12 +205,7 @@ class ItemDisplayOverlayFeatures {
                 if (hannibalInsistedOnThisList.contains(itemName)) {
                     for (line in item.getLore()) {
                         if (line.contains("Items Donated")) {
-                            museumDonationPattern.matchMatcher(line) {
-                                return when (val amount = group("amount")) {
-                                    in "100" -> "§a✔"
-                                    else -> amount.toDouble().toInt().toString()
-                                }
-                            }
+                            return museumDonationPattern.matchMatcher(line) { group("amount").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -223,7 +218,7 @@ class ItemDisplayOverlayFeatures {
                     for (line in item.getLore()) {
                         if (line.contains("Your Rank:")) {
                             dojoTestOfGradePattern.matchMatcher(line) {
-                                return group("grade")
+                                return group("grade").removeColor()
                             }
                         }
                     }
@@ -236,7 +231,7 @@ class ItemDisplayOverlayFeatures {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
                         if (line.contains("Collections Unlocked: ")) {
-                            return collUnlockPattern.matchMatcher(line) { group("coll").toDouble().toInt().toString() } ?: "§a✔"
+                            return collUnlockPattern.matchMatcher(line) { group("coll").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -245,7 +240,7 @@ class ItemDisplayOverlayFeatures {
                 if (itemName.contains(" Collections")) {
                     for (line in item.getLore()) {
                         if (line.contains("Collections ") && line.contains(": §")) {
-                            return collMenuUnlockPattern.matchMatcher(line) { group("collMenu").toDouble().toInt().toString() } ?: "§a✔"
+                            return collMenuUnlockPattern.matchMatcher(line) { group("collMenu").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -257,7 +252,7 @@ class ItemDisplayOverlayFeatures {
                 if (itemName == "Recipe Book") {
                     for (line in item.getLore()) {
                         if (line.contains(" Book Unlocked: ")) {
-                            return recipeBookPattern.matchMatcher(line) { group("recipe").toDouble().toInt().toString() } ?: "§a✔"
+                            return recipeBookPattern.matchMatcher(line) { group("recipe").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -266,7 +261,7 @@ class ItemDisplayOverlayFeatures {
                 if (itemName.contains(" Recipes")) {
                     for (line in item.getLore()) {
                         if (line.contains("Recipes Unlocked: ")) {
-                            return recipeMenuPattern.matchMatcher(line) { group("specific").toDouble().toInt().toString() } ?: "§a✔"
+                            return recipeMenuPattern.matchMatcher(line) { group("specific").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -281,6 +276,41 @@ class ItemDisplayOverlayFeatures {
                             return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
                         }
                     }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(19)) {
+            if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
+                if (itemName.startsWith("Slot ")) {
+                    return itemName.replace("Slot ", "").substring(0,2).trim()
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(20)) {
+            if (InventoryUtils.openInventoryName() == "Bank") {
+                if (itemName == "Bank Upgrades") {
+                    for (line in item.getLore()) {
+                        if (line.startsWith("§7Current account: ")) {
+                            return line.removeColor().replace("Current account: ", "").substring(0,1)
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(21)) {
+            if (InventoryUtils.openInventoryName().startsWith("Crafted Minions")) {
+                val lore = item.getLore()
+                if (lore.any { it.contains("Click to view ") }) {
+                    var tiersToSubtract = 0
+                    var totalTiers = 0
+                    for (line in lore) {
+                        if (line.contains(" Tier ")) { totalTiers++ }
+                        if (line.contains(" Tier ") && line.contains("§c")) { tiersToSubtract++ }
+                    }
+                    return (totalTiers - tiersToSubtract).toString().replace(totalTiers.toString(), "§a✔")
                 }
             }
         }

@@ -314,7 +314,10 @@ public class InventoryConfig {
                 "§bUnlocked Recipes",
                 "§bSkill Average",
                 "§bWardrobe Slot #",
-                "§bBank Tier"
+                "§bBank Tier",
+                "§bHighest Crafted Minion Tier",
+                "§bProgress to Next Minion Slot",
+                "§bShortened Skyblock Stats"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
