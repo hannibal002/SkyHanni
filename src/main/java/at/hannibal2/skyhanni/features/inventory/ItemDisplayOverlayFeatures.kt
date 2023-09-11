@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val museumDonationPattern = "§7Items Donated: §e(?<amount>[0-9.]+)§6%".toPattern()
+    private val museumDonationPattern = "§7Items Donated: §e(?<amount>[0-9.]+).*".toPattern()
     private val dojoTestOfGradePattern = "§7(§6)?Your Rank: (?<grade>§.[A-Z]).*".toPattern()
     private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
     private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\.[0-9])?) Skill Avg\..*".toPattern()
@@ -29,7 +29,7 @@ class ItemDisplayOverlayFeatures {
     private val collMenuUnlockPattern = ".*Collections .*: §.(?<collMenu>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
-    private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons")
+    private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -282,8 +282,8 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(19)) {
             if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
-                if (itemName.startsWith("Slot ")) {
-                    return itemName.replace("Slot ", "").substring(0,2).trim()
+                if (itemName.startsWith("Slot ") && itemName.contains(":")) {
+                    return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
                 }
             }
         }
@@ -311,6 +311,18 @@ class ItemDisplayOverlayFeatures {
                         if (line.contains(" Tier ") && line.contains("§c")) { tiersToSubtract++ }
                     }
                     return (totalTiers - tiersToSubtract).toString().replace(totalTiers.toString(), "§a✔")
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(22)) {
+            if (InventoryUtils.openInventoryName().startsWith("Crafted Minions")) {
+                if (itemName == "Information") {
+                    for (line in item.getLore()) {
+                        if (line.removeColor().contains("Craft ") && line.removeColor().contains(" more unique")) {
+                            return line.removeColor().replace("Craft ", "").replace(" more unique", "").trim()
+                        }
+                    }
                 }
             }
         }
