@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -38,7 +37,6 @@ class Translator {
         val chatComponent = e.message
         val message = chatComponent.unformattedText
         if (!messageContentRegex.matches(message.removeColor())) return
-        consoleLog(chatComponent.toString())
         if (!chatComponent.isFromAHuman()) return // some messages are considered "player-sent" by hypixel when they actually aren't
         val theChatComponentWeCareAbout =
             if (chatComponent.siblings.isNotEmpty()) chatComponent.siblings.last() else chatComponent
