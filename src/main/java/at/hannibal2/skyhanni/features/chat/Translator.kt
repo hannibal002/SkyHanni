@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -10,6 +11,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,11 +26,11 @@ import java.net.URLEncoder
 
 class Translator {
 
-    private val messageContentRegex = Regex(".*: (.*)")
+    private val messageContentRegex = Regex(".*?: (.*)")
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onGuiChat(e: ClientChatReceivedEvent) {
         if (!SkyHanniMod.feature.chat.translator) return
         if (e.type != 0.toByte()) return // If this is not a player-sent message, return
@@ -36,26 +38,45 @@ class Translator {
         val chatComponent = e.message
         val message = chatComponent.unformattedText
         if (!messageContentRegex.matches(message.removeColor())) return
-
-        val clickStyle = createClickStyle(message)
-        chatComponent.siblings.last().setChatStyle(clickStyle)
+        consoleLog(chatComponent.toString())
+        if (!chatComponent.isFromAHuman()) return // some messages are considered "player-sent" by hypixel when they actually aren't
+        val theChatComponentWeCareAbout =
+            if (chatComponent.siblings.isNotEmpty()) chatComponent.siblings.last() else chatComponent
+        val clickStyle = createClickStyle(message, theChatComponentWeCareAbout.chatStyle)
+        theChatComponentWeCareAbout.setChatStyle(clickStyle)
     }
 
-    private fun createClickStyle(message: String): ChatStyle {
-        val style = ChatStyle()
-        style.setChatClickEvent(
+    private fun IChatComponent.isFromAHuman(): Boolean {
+        val hasSiblings = siblings.isNotEmpty()
+
+        val sbLevelsPublic =
+            hasSiblings && siblings[0]?.chatStyle?.chatHoverEvent?.action == HoverEvent.Action.SHOW_TEXT
+        val noSbLevelsPublic =
+            (siblings.size == 1 && siblings[0]?.chatStyle?.chatClickEvent == null) || (!hasSiblings && chatStyle.chatClickEvent == null && chatStyle.chatHoverEvent == null)
+        val private =
+            hasSiblings && siblings[0]?.chatStyle?.chatClickEvent?.action == ClickEvent.Action.SUGGEST_COMMAND && (siblings[0]?.chatStyle?.chatClickEvent?.value?.startsWith(
+                "/msg"
+            ) ?: false)
+        val party = formattedText.startsWith("§r§9Party")
+        val guild = formattedText.startsWith("§r§2Guild")
+
+        return sbLevelsPublic || noSbLevelsPublic || private || party || guild
+    }
+
+    private fun createClickStyle(message: String, chatStyleTemplate: ChatStyle): ChatStyle {
+        chatStyleTemplate.setChatClickEvent(
             ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
                 "/shsendtranslation ${messageContentRegex.find(message.removeColor())!!.groupValues[1]}"
             )
         )
-        style.setChatHoverEvent(
+        chatStyleTemplate.setChatHoverEvent(
             HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
                 ChatComponentText("§bClick to translate!")
             )
         )
-        return style
+        return chatStyleTemplate
     }
 
 
