@@ -270,15 +270,15 @@ object SackAPI {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, 0) }
     }
 
-    fun fetchSackItem(item: NEUInternalName): SackItem? {
+    fun fetchSackItem(item: NEUInternalName): SackItem {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, -1)
 
         if (sackData.containsKey(item)) {
-            return sackData[item]
+            return sackData[item]!!
         }
 
         sackData = sackData.editCopy { this[item] = SackItem(0, 0, 2) }
-        return sackData[item]
+        return sackData[item]!!
     }
 
     private fun saveSackData() {
