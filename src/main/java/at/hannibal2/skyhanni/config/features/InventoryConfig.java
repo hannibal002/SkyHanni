@@ -319,7 +319,8 @@ public class InventoryConfig {
                 "§bProgress to Next Minion Slot",
                 "§bShortened Skyblock Stats",
                 "§bCollected Fairy Souls",
-                "§bCompleted Quests"
+                "§bCompleted Quests",
+                "§bArmadillo Blocks Walked Progress (%)"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));

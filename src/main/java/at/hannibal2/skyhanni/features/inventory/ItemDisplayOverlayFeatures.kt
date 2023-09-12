@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -395,6 +396,24 @@ class ItemDisplayOverlayFeatures {
                         }
                     }
                 }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(26)) {
+            if (itemName == "Prehistoric Egg") {
+                val lore = item.getLore()
+                if (lore.lastOrNull() == null) return ""
+                val rarity = lore.last().removeColor().trim()
+                val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
+                val threshold = when (rarity) {
+                    "COMMMON" -> 4000
+                    "UNCOMMON" -> 10000
+                    "RARE" -> 20000
+                    "EPIC" -> 40000
+                    "LEGENDARY" -> 100000
+                    else -> 1
+                }
+                if (threshold != 1) { return (((blocksWalked.toFloat()) / (threshold.toFloat())) * 100).toInt().toString() }
             }
         }
 

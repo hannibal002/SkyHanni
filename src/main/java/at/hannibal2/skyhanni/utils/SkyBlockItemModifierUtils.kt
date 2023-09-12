@@ -161,6 +161,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
+    fun ItemStack.getPrehistoricEggBlocksWalked() = getAttributeInt("blocks_walked")
+
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }
