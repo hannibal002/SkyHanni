@@ -321,7 +321,8 @@ public class InventoryConfig {
                 "§bCollected Fairy Souls",
                 "§bCompleted Quests",
                 "§bArmadillo Blocks Walked Progress (%)",
-                "§bHeart of the Mountain Perk Levels"
+                "§bHeart of the Mountain Perk Levels",
+                "§bCrystal Hollows Crystal Progress"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));

@@ -419,7 +419,6 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(27)) {
             if (InventoryUtils.openInventoryName() == "Heart of the Mountain") {
-                // if (itemName.startsWith("Tier ") || itemName.startsWith("Scroll ") || itemName.startsWith("Go ")) return ""
                 val nameWithColor = item.name ?: return ""
                 if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
                     val lore = item.getLore()
@@ -433,6 +432,24 @@ class ItemDisplayOverlayFeatures {
                     if (lore.last().removeColor().replace("Right click to ","").contains("enable")) colorCode = "§c"
                     return "" + colorCode + level
                 }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(28)) {
+            if (InventoryUtils.openInventoryName() == "Heart of the Mountain") {
+                val nameWithColor = item.name ?: return ""
+                if (nameWithColor != "§5Crystal Hollows Crystals") return ""
+                val lore = item.getLore()
+                var crystalsPlaced = 0
+                var crystalsNotPlaced = 0
+                var crystalsNotFound = 0
+                val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
+                for (line in lore) {
+                    if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
+                    else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
+                }
+                crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
+                return "§a${crystalsPlaced}§r|§e${crystalsNotPlaced}§r|§c${crystalsNotFound}"
             }
         }
 
