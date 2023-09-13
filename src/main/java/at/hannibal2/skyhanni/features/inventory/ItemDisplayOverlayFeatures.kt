@@ -148,7 +148,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
-            if (item.getInternalName_old() == "LARVA_HOOK") {
+            if (itemName.contains("Larva Hook")) {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
                         val amount = group("amount").toInt()
@@ -163,7 +163,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
-            if (item.getInternalName_old() == "POTION") {
+            if (itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
                 item.name?.let {
                     "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                         return when (val level = group("level").romanToDecimal()) {

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemAbilityCooldown {
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
+    private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
@@ -232,19 +234,15 @@ class ItemAbilityCooldown {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.isMod(2)) {
-            checkHotBar()
-        }
+        checkHotBar(event.isMod(10))
     }
 
-    private fun checkHotBar() {
-        val items = mutableMapOf<ItemStack, MutableList<ItemText>>()
-        for ((stack, _) in ItemUtils.getItemsInInventoryWithSlots(true)) {
-            for (ability in hasAbility(stack)) {
-                items.getOrPut(stack) { mutableListOf() }.add(createItemText(ability))
-            }
+    private fun checkHotBar(recheckInventorySlots: Boolean = false) {
+        if (recheckInventorySlots || abilityItems.isEmpty()) {
+            abilityItems = ItemUtils.getItemsInInventory(true).associateWith { hasAbility(it) }
         }
-        this.items = items
+
+        items = abilityItems.mapValues { kp -> kp.value.map { createItemText(it) } }
     }
 
     private fun createItemText(ability: ItemAbility): ItemText {
@@ -285,7 +283,7 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val list = items.filter { it.key == stack }
+        val list = items.filter { it.key.getItemUuid() == stack.getItemUuid() }
             .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
