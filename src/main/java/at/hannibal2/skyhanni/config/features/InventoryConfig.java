@@ -320,7 +320,8 @@ public class InventoryConfig {
                 "§bShortened Skyblock Stats",
                 "§bCollected Fairy Souls",
                 "§bCompleted Quests",
-                "§bArmadillo Blocks Walked Progress (%)"
+                "§bArmadillo Blocks Walked Progress (%)",
+                "§bHeart of the Mountain Perk Levels"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));

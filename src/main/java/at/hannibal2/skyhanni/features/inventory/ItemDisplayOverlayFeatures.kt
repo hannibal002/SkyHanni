@@ -417,6 +417,25 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(27)) {
+            if (InventoryUtils.openInventoryName() == "Heart of the Mountain") {
+                // if (itemName.startsWith("Tier ") || itemName.startsWith("Scroll ") || itemName.startsWith("Go ")) return ""
+                val nameWithColor = item.name ?: return ""
+                if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
+                    val lore = item.getLore()
+                    if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
+                    if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
+                    if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
+                    var level = lore.first().removeColor().replace("Level ", "")
+                    var colorCode = ""
+                    if (level.contains("/")) level = level.split("/")[0]
+                    if (nameWithColor.startsWith("§a")) level = "✔"
+                    if (lore.last().removeColor().replace("Right click to ","").contains("enable")) colorCode = "§c"
+                    return "" + colorCode + level
+                }
+            }
+        }
+
         return ""
     }
 
