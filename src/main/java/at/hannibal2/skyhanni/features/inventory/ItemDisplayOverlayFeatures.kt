@@ -379,8 +379,11 @@ class ItemDisplayOverlayFeatures {
                 if (itemName == "Find all Fairy Souls") {
                     for (line in item.getLore()) {
                         val newLine = line.removeColor()
+                        val totalFairySouls = "242" //change this whenever hypixel adds more fairy souls
+                        // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
+                        // ✔ Found: 242/242
                         if (newLine.contains("Found: ")) {
-                            return "§d" + newLine.removeColor().replace(" ✖ Found: ", "").substring(0, 3)
+                            return "§d" + newLine.removeColor().replace(" ✖ Found: ", "").replace(" ✔ Found: ", "").replace(("/" + totalFairySouls), "").replace(totalFairySouls, "§a${totalFairySouls}")
                         }
                     }
                 }
