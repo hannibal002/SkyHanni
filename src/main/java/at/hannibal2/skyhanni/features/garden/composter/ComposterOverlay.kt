@@ -2,24 +2,26 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+import at.hannibal2.skyhanni.data.SackAPI.fetchSackItem
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -31,6 +33,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+import kotlin.time.Duration.Companion.seconds
 
 class ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
@@ -51,7 +54,7 @@ class ComposterOverlay {
 
     private var maxLevel = false
     private var lastHovered = 0L
-
+    private var lastAttemptTime = SimpleTimeMark.farPast()
     companion object {
         var currentOrganicMatterItem: String?
             get() = GardenAPI.config?.composterCurrentOrganicMatterItem
@@ -414,8 +417,29 @@ class ComposterOverlay {
             list.add(Renderable.link("$name§r §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
                 if (LorenzUtils.isControlKeyDown()) {
-                    inInventory = false
-                    BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+                    if(lastAttemptTime.passedSince()>0.5.seconds){
+                        lastAttemptTime = SimpleTimeMark.now()
+                        val amountInSacks = fetchSackItem(internalName.asInternalName())?.amount
+                        if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
+                            if (config.composterOverlayGetType == 0) {
+                                inInventory = false
+                                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+                            } else if (amountInSacks == 0) {
+                                SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
+                                chat("§e[SkyHanni] No $itemName §r§efound in sacks. Opening bazaar.")
+                                inInventory = false
+                                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+                            } else {
+                                val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
+                                if (having < itemsNeeded) {
+                                    chat("having: $having gfs $internalName ${itemsNeeded.toInt() - having}")
+                                    LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
+                                } else {
+                                    chat("§e[SkyHanni] $itemName §r§8x${itemsNeeded.toInt()}§r§e already found in inventory!")
+                                }
+                            }
+                        }
+                    }
                 }
             })
             bigList.add(list)
