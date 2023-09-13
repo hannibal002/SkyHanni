@@ -58,7 +58,8 @@ class PlayerChatSymbols {
             val usernameWithSymbols = nameSymbols[username]!!
 
             val split = usernameWithSymbols.split("$username ")
-            val emblemText = if (split.size > 1) split[1] else ""
+            var emblemText = if (split.size > 1) split[1] else ""
+            emblemText = StringUtils.removeResets(emblemText)
 
             if (emblemText != "") {
                 event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")
