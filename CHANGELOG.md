@@ -264,16 +264,16 @@
     + This contains RNG Meter, Slayer quest warning and Items on ground
 + Added item ability cooldown support for **Weirder Tuba** and **Holy Ice** - HiZe
 + Added **Lazer Parkour** Solver - CalMWolfs
-    + Highlights the location of the invisible blocks in the MirrorVerse
+    + Highlights the location of the invisible blocks in the Mirrorverse
 + Added Mirrorverse **Dance Room Helper** - HiZe
-    + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+    + Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.
     + Change how many tasks you should see
     + Hide other players inside the dance room
     + Added timer before next instruction
     + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
     + Fully customize the description for now, next and later (with color)
 + Added **Upside Down** Parkour & **Lava Maze** - hannibal2
-    + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
+    + Helps to solve the Upside Down Parkour and Lava Maze in the Mirrorverse by showing the correct way
     + Change how many platforms should be shown in front of you
     + Rainbow color (optional) - nea
     + Hide other players while doing the parkour
