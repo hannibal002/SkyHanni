@@ -443,9 +443,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Crux Talisman Progress** Display - HiZe
     + Show bonuses you get from the talisman
 + **Lazer Parkour** Solver - CalMWolfs
-    + Highlights the location of the invisible blocks in the MirrorVerse
+    + Highlights the location of the invisible blocks in the Mirrorverse
 + Mirrorverse **Dance Room Helper** - HiZe
-    + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+    + Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.
     + Change how many tasks you should see
     + Hide other players inside the dance room
     + Timer before next instruction
