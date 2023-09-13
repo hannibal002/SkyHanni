@@ -452,7 +452,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
     + Fully customize the description for now, next and later (with color)
 + **Upside Down** Parkour & **Lava Maze** - hannibal2
-    + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
+    + Helps to solve the Upside Down Parkour and Lava Maze in the Mirrorverse by showing the correct way
     + Change how many platforms should be shown in front of you
     + Rainbow color (optional) - nea
     + Hide other players while doing the parkour
