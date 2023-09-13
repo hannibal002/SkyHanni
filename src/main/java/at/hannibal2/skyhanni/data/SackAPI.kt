@@ -274,11 +274,11 @@ object SackAPI {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, -1)
 
         if (sackData.containsKey(item)) {
-            return sackData[item]!!
+            return sackData[item] ?: return SackItem(0, 0, -1)
         }
 
         sackData = sackData.editCopy { this[item] = SackItem(0, 0, 2) }
-        return sackData[item]!!
+        return sackData[item] ?: return SackItem(0, 0, -1)
     }
 
     private fun saveSackData() {
