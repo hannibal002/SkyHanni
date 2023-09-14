@@ -220,7 +220,7 @@ object EntityOutlineRenderer {
      */
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
-        // Skyblock Conditions
+        // SkyBlock Conditions
         if (!LorenzUtils.inSkyBlock) {
             return false
         }

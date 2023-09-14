@@ -435,18 +435,18 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
             boolean deletingFailure = false;
             if (modsFolder.isDirectory()) { // Delete in this current folder.
-                boolean failed = findSkyblockAddonsAndDelete(modsFolder.listFiles());
+                boolean failed = findSkyHanniAndDelete(modsFolder.listFiles());
                 if (failed) deletingFailure = true;
             }
             if (inSubFolder) { // We are in the 1.8.9 folder, delete in the parent folder as well.
                 if (modsFolder.getParentFile().isDirectory()) {
-                    boolean failed = findSkyblockAddonsAndDelete(modsFolder.getParentFile().listFiles());
+                    boolean failed = findSkyHanniAndDelete(modsFolder.getParentFile().listFiles());
                     if (failed) deletingFailure = true;
                 }
             } else { // We are in the main mods folder, but the 1.8.9 subfolder exists... delete in there too.
                 File subFolder = new File(modsFolder, "1.8.9");
                 if (subFolder.exists() && subFolder.isDirectory()) {
-                    boolean failed = findSkyblockAddonsAndDelete(subFolder.listFiles());
+                    boolean failed = findSkyHanniAndDelete(subFolder.listFiles());
                     if (failed) deletingFailure = true;
                 }
             }
@@ -471,7 +471,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         }
     }
 
-    private boolean findSkyblockAddonsAndDelete(File[] files) {
+    private boolean findSkyHanniAndDelete(File[] files) {
         if (files == null) return false;
 
         for (File file : files) {
