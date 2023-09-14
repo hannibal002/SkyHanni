@@ -2,7 +2,7 @@
   {
     "modid": "skyhanni",
     "name": "SkyHanni",
-    "description": "Hypixel Skyblock Mod",
+    "description": "Hypixel SkyBlock Mod",
     "version": "${version}",
     "mcversion": "1.8.9",
     "url": "",
