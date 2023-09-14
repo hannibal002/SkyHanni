@@ -322,7 +322,9 @@ public class InventoryConfig {
                 "§bCompleted Quests",
                 "§bArmadillo Blocks Walked Progress (%)",
                 "§bHeart of the Mountain Perk Levels",
-                "§bCrystal Hollows Crystal Progress"
+                "§bCrystal Hollows Crystal Progress",
+                "§bSkyblock Profile Name (Fruits)",
+                "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));

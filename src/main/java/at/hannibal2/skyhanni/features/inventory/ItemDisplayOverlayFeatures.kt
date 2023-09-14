@@ -31,6 +31,7 @@ class ItemDisplayOverlayFeatures {
     private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
+    private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // REQUIRES .removeColor() BEFOREHAND!!! -ERY
     private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
     @SubscribeEvent
@@ -453,6 +454,51 @@ class ItemDisplayOverlayFeatures {
                 }
                 crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
                 return "§a${crystalsPlaced}§r|§e${crystalsNotPlaced}§r|§c${crystalsNotFound}"
+            }
+        }
+        
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(29)) {
+            if (InventoryUtils.openInventoryName().toLowerCase() == "skyblock menu") {
+                val nameWithColor = item.name ?: return ""
+                if (nameWithColor != "§aProfile Management") return ""
+                val lore = item.getLore()
+                for (line in lore) {
+                    if (line.contains("§7Playing on: §a")) {
+                        val profileName = line.replace("§7Playing on: §a", "").removeColor().trim()
+                        return when (profileName) {
+                            "Apple" -> "Apl"
+                            "Banana" -> "Bna"
+                            "Blueberry" -> "Blu"
+                            "Coconut" -> "Ccn"
+                            "Cucumber" -> "Ccb"
+                            "Grapes" -> "Grp"
+                            "Kiwi" -> "Kwi"
+                            "Lemon" -> "Lmn"
+                            "Lime" -> "Lim"
+                            "Mango" -> "Mng"
+                            "Not Allowed To Quit Skyblock Ever Again" -> "Akin"
+                            "Orange" -> "Org"
+                            "Papaya" -> "Ppy"
+                            "Pear" -> "Pr"
+                            "Peach" -> "Pch"
+                            "Pineapple" -> "Pnp"
+                            "Pomegranate" -> "Pom"
+                            "Raspberry" -> "Rsp"
+                            "Strawberry" -> "Stb"
+                            "Tomato" -> "Tmt"
+                            "Watermelon" -> "Wlm"
+                            "Zucchini" -> "Zch"
+                            else -> profileName.take(3)
+                        }
+                    }
+                }  
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(30)) {
+            if (InventoryUtils.openInventoryName() == "Profile Management") {
+                if (!itemName.contains("Profile: ")) return ""
+                profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
             }
         }
 
