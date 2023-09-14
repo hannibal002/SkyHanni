@@ -12,6 +12,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+    private val resetPattern = "(?i)§R".toPattern()
+
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
@@ -181,4 +183,6 @@ object StringUtils {
         }
         return chatComponent
     }
+
+    fun removeResets(string: String): String = resetPattern.matcher(string).replaceAll("")
 }
