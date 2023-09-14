@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -49,7 +50,7 @@ import kotlin.time.Duration.Companion.seconds
 private val config get() = SkyHanniMod.feature.garden
 
 class GardenVisitorFeatures {
-    private val visitors = mutableMapOf<String, Visitor>()
+    private var visitors = mapOf<String, Visitor>()
     private var display = emptyList<List<Any>>()
     private var lastClickedNpc = 0
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
@@ -68,7 +69,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
         display = emptyList()
-        visitors.clear()
+        visitors = emptyMap()
     }
 
     @SubscribeEvent
@@ -97,17 +98,7 @@ class GardenVisitorFeatures {
             name = name.substring(2)
         }
 
-        val visitor = visitors[name]
-        if (visitor == null) {
-            println("visitors: $visitors")
-            println("name: $name")
-            println("npcItem.name: ${npcItem.name}")
-            CopyErrorCommand.logError(
-                RuntimeException("visitor is null! '$name'"),
-                "Error finding the visitor `$name§c`. Try to reopen the inventory"
-            )
-            return
-        }
+        val visitor = getOrCreateVisitor(name) ?: return
 
         visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
@@ -146,6 +137,27 @@ class GardenVisitorFeatures {
             }
             update()
         }
+    }
+
+    private fun getOrCreateVisitor(name: String): Visitor? {
+        var visitor = visitors[name]
+        if (visitor == null) {
+            // workaround if the tab list has not yet updated when opening the visitor
+            addVisitor(name)
+            LorenzUtils.debug("Found visitor from npc that is not in tab list. Adding it still.")
+            updateDisplay()
+            visitor = visitors[name]
+        }
+
+        if (visitor != null) return visitor
+
+        println("visitors: $visitors")
+        println("name: $name")
+        CopyErrorCommand.logErrorState(
+            "Error finding the visitor `$name§c`. Try to reopen the inventory",
+            "visitor is null! name='$name', visitors=`$visitors`"
+        )
+        return null
     }
 
     private fun readReward(offerItem: ItemStack): VisitorReward? {
@@ -259,7 +271,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             MinecraftExecutor.OnThread.execute {
                 update()
@@ -511,26 +523,37 @@ class GardenVisitorFeatures {
                 visitorsInTab.add(name)
             }
         }
-        if (visitors.keys.removeIf {
-                val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-                val removed = it !in visitorsInTab && time > 2_000
-                if (removed) {
-                    logger.log("Removed old visitor: '$it'")
-                }
-                removed
-            }) {
-            updateDisplay()
+        val removedVisitors = mutableListOf<String>()
+        visitors.forEach {
+            val name = it.key
+            val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
+            val removed = name !in visitorsInTab && time > 2_000
+            if (removed) {
+                logger.log("Removed old visitor: '$name'")
+                removedVisitors.add(name)
+            }
+        }
+        var dirty = false
+        if (removedVisitors.isNotEmpty()) {
+            visitors = visitors.editCopy {
+                keys.removeIf { it in removedVisitors }
+            }
+            dirty = true
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 addVisitor(name)
+                dirty = true
             }
+        }
+        if (dirty) {
+            updateDisplay()
         }
     }
 
     private fun addVisitor(name: String) {
         val visitor = Visitor(name, status = VisitorStatus.NEW)
-        visitors[name] = visitor
+        visitors = visitors.editCopy { this[name] = visitor }
         VisitorArrivalEvent(visitor).postAndCatch()
 
         logger.log("New visitor detected: '$name'")
@@ -542,7 +565,6 @@ class GardenVisitorFeatures {
             val displayName = GardenVisitorColorNames.getColoredName(name)
             LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
         }
-        updateDisplay()
 
         if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
             if (name.removeColor().contains("Jerry")) {

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.OwnInventorItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -29,7 +29,7 @@ class OwnInventoryData {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
                 val item = packet.func_149174_e() ?: return
-                OwnInventorItemUpdateEvent(item).postAndCatch()
+                OwnInventoryItemUpdateEvent(item).postAndCatch()
             }
         }
         if (packet is S2FPacketSetSlot) {

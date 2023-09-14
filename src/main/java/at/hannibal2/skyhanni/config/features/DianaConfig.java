@@ -35,6 +35,25 @@ public class DianaConfig {
     public int keyBindWarp = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(name = "Ignored Warps", desc = "")
+    @Accordion
+    public IgnoredWarpsConfig ignoredWarps = new IgnoredWarpsConfig();
+
+    public static class IgnoredWarpsConfig {
+
+        @Expose
+        @ConfigOption(name = "Crypt", desc = "Ignore the Crypt warp point (Because it takes a long time to leave).")
+        @ConfigEditorBoolean
+        public boolean crypt = false;
+
+        @Expose
+        @ConfigOption(name = "Wizard", desc = "Ignore the Wizard Tower warp point (Because it is easy to fall into the rift).")
+        @ConfigEditorBoolean
+        public boolean wizard = false;
+
+    }
+
+    @Expose
     @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
     @Accordion
     @ConfigAccordionId(id = 9)
@@ -49,12 +68,12 @@ public class DianaConfig {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Focus", desc = "Hide other waypoints when your party finds a inquisitor.")
+        @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds a Inquisitor.")
         @ConfigEditorBoolean
         public boolean focusInquisitor = false;
 
         @Expose
-        @ConfigOption(name = "Instant Share", desc = "Share the waypoint as soon as you find a inquisitor. As alternative, you can share it only via key press")
+        @ConfigOption(name = "Instant Share", desc = "Share the waypoint as soon as you find a Inquisitor. As alternative, you can share it only via key press")
         @ConfigEditorBoolean
         public boolean instantShare = true;
 
@@ -70,7 +89,7 @@ public class DianaConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Griffin Pet Warning", desc = "Warn when holding an Ancestral Spade while no Griffin pet is selected.")
+    @ConfigOption(name = "Griffin Pet Warning", desc = "Warn when holding an Ancestral Spade if a Griffin pet is not equipped.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = true;

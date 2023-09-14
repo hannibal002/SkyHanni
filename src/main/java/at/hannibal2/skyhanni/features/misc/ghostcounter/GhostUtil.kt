@@ -123,6 +123,6 @@ object GhostUtil {
     }
 
     private fun percent(number: Double): String {
-        return "${((number / 250_000) * 100).roundToPrecision(4)}"
+        return 100.0.coerceAtMost(((number / 250_000) * 100).roundToPrecision(4)).toString()
     }
 }

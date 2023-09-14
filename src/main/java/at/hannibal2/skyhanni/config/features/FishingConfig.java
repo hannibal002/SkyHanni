@@ -35,7 +35,7 @@ public class FishingConfig {
     public int trophyDesign = 0;
 
     @Expose
-    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same trophy fish from chat.")
+    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same Trophy Fish from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyFishDuplicateHider = false;
@@ -47,32 +47,32 @@ public class FishingConfig {
     public boolean trophyFishTotalAmount = false;
 
     @Expose
-    @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a trophy fish when hovering over a catch message in chat.")
+    @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a Trophy Fish when hovering over a catch message in chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyFishTooltip = true;
 
     @Expose
-    @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
+    @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze Trophy Fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyFishBronzeHider = false;
 
     @Expose
-    @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver trophy fishes from chat.")
+    @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver Trophy Fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyFishSilverHider = false;
 
     @Expose
-    @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of trophy fish in tooltip.")
+    @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
     public boolean trophyFilletTooltip = true;
 
     @Expose
-    @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.")
+    @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
@@ -115,12 +115,20 @@ public class FishingConfig {
     @Expose
     @ConfigOption(
             name = "Worm Fishing",
-            desc = "Show the barn fishing timer even for worms or other sea creatures in the crystal hollows."
+            desc = "Show the Barn Fishing Timer even for worms or other sea creatures in the Crystal Hollows."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    @FeatureToggle
     public boolean barnTimerCrystalHollows = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Stranded Fishing",
+            desc = "Show the Barn Fishing Timer even on all the different islands Stranded players can visit."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean barnTimerForStranded = true;
 
     @Expose
     @ConfigOption(
@@ -190,6 +198,12 @@ public class FishingConfig {
         public boolean showBaits = false;
 
     }
+
+    @Expose
+    @ConfigOption(name = "Highlight Rare", desc = "Highlight rare sea creatures in blue color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean rareSeaCreatureHighlight = false;
 
     @Expose
     @ConfigOption(

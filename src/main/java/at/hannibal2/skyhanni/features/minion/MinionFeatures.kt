@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -21,9 +23,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -34,13 +38,32 @@ class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
     private var lastMinion: LorenzVec? = null
+    private var newMinion: LorenzVec? = null
+    private var newMinionName: String? = null
     private var lastMinionOpened = 0L
     private var minionInventoryOpen = false
 
     private var lastInventoryClosed = 0L
-    private var lastMinionPickedUp = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+
+    @SubscribeEvent
+    fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
+
+        val lookingAt = event.pos.offset(event.face).toLorenzVec()
+        val equipped = InventoryUtils.getItemInHand() ?: return
+
+        if (equipped.displayName.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.air) {
+            newMinion = lookingAt.add(0.5, 0.0, 0.5)
+            newMinionName = getMinionName(equipped.cleanName())
+        } else {
+            newMinion = null
+            newMinionName = null
+        }
+    }
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
@@ -123,7 +146,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!minionInventoryOpen) return
-        var minions = minions ?: return
+        val minions = minions ?: return
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
@@ -134,10 +157,6 @@ class MinionFeatures {
 
         if (location !in minions) {
             minions[location]!!.lastClicked = 0
-        }
-
-        if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
-            MinionFeatures.minions = minions.editCopy { remove(location) }
         }
     }
 
@@ -210,7 +229,24 @@ class MinionFeatures {
 
         }
         if (message.startsWith("§aYou picked up a minion!")) {
-            lastMinionPickedUp = System.currentTimeMillis()
+            if (lastMinion != null) {
+                minions = minions?.editCopy { remove(lastMinion) }
+                lastClickedEntity = null
+                lastMinion = null
+                lastMinionOpened = 0L
+            }
+        }
+        if (message.startsWith("§bYou placed a minion!")) {
+            if (newMinion != null) {
+                minions = minions?.editCopy {
+                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                        displayName = newMinionName
+                        lastClicked = 0
+                    }
+                }
+                newMinion = null
+                newMinionName = null
+            }
         }
 
         minionUpgradePattern.matchMatcher(message) {

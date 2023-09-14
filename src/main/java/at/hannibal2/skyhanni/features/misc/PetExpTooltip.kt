@@ -1,15 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
-import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -34,7 +32,7 @@ class PetExpTooltip {
         ) ?: return
 
         val maxLevel = ItemUtils.maxPetLevel(name)
-        val maxXp = if (maxLevel == 200) 210255385 else 25353230L
+        val maxXp = maxPetExp(name) // lvl 100 legendary
 
         val percentage = petExperience / maxXp
         val percentageFormat = LorenzUtils.formatPercentage(percentage)
@@ -44,8 +42,17 @@ class PetExpTooltip {
             event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
         } else {
             val progressBar = StringUtils.progressBar(percentage)
+            val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
+            val addLegendaryColor = if (isBelowLegendary) "§6" else ""
             event.toolTip.add(index, "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}")
-            event.toolTip.add(index, "§7Progress to Level $maxLevel: §e$percentageFormat")
+            event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
         }
+    }
+
+    private fun maxPetExp(petName: String) = when {
+        petName.contains("Golden Dragon") && config.goldenDragon200 -> 210_255_385 // lvl 200 legendary
+        petName.contains("Bingo") -> 5_624_785 // lvl 100 common
+
+        else -> 25_353_230 // lvl 100 legendary
     }
 }

@@ -111,12 +111,12 @@ public class DamageIndicatorConfig {
 
     public static class VampireSlayerConfig {
         @Expose
-        @ConfigOption(name = "HP untill Steak", desc = "Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.")
+        @ConfigOption(name = "HP until Steak", desc = "Show the amount of HP missing until the steak can be used on the Vampire Slayer on top of the boss.")
         @ConfigEditorBoolean
         public boolean hpTillSteak = false;
 
         @Expose
-        @ConfigOption(name = "Mania Circles", desc = "Show a timer until the boss leaves the invicible Mania Circles state.")
+        @ConfigOption(name = "Mania Circles", desc = "Show a timer until the boss leaves the invincible Mania Circles state.")
         @ConfigEditorBoolean
         public boolean maniaCircles = false;
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
@@ -969,5 +970,26 @@ object RenderUtils {
                 brightness
             )
         )
+    }
+
+    fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableBlend()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
+        GlStateManager.scale(scale, scale, 1f)
+        fontRenderer.drawStringWithShadow(text, 0f, 0f, 16777215)
+
+        val reverseScale = 1 / scale
+
+        GlStateManager.scale(reverseScale, reverseScale, 1f)
+        GlStateManager.popMatrix()
+
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
     }
 }

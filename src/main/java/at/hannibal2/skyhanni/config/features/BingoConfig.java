@@ -17,17 +17,17 @@ public class BingoConfig {
 
     public static class BingoCard {
         @Expose
-        @ConfigOption(name = "Enable", desc = "Displays the bingo card.")
+        @ConfigOption(name = "Enable", desc = "Displays the Bingo Card.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
         @Expose
-        @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the bingo card or the step helper by sneaking with SkyBlock menu in hand.")
+        @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the Bingo Card or the step helper by sneaking with SkyBlock Menu in hand.")
         @ConfigEditorBoolean
         public boolean quickToggle = true;
 
         @Expose
-        @ConfigOption(name = "Bingo Steps", desc = "Show help with the next step in bingo instead of the bingo card. " +
+        @ConfigOption(name = "Bingo Steps", desc = "Show help with the next step in Bingo instead of the Bingo Card. " +
                 "§cThis feature is in early development. Expect bugs and missing goals.")
         @ConfigEditorBoolean
         public boolean stepHelper = false;
@@ -40,8 +40,9 @@ public class BingoConfig {
         @Expose
         @ConfigOption(
                 name = "Show Guide",
-                desc = "Show tips and difficulty for bingo goals inside the bingo card inventory.\n" +
-                        "§eData from Bingo Splash Community§7, made by §cMayxo"
+                desc = "Show tips and difficulty for bingo goals inside the Bingo Card inventory.\n" +
+                        "These tips are made from inspirations and guides from the community,\n"+
+                        "aiming to help you to complete the bingo card."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -60,7 +61,7 @@ public class BingoConfig {
 
         @Expose
         @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
-                "new area discoveries and skyblock level up messages while on bingo.")
+                "new area discoveries and SkyBlock level up messages while on Bingo.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
@@ -72,13 +73,13 @@ public class BingoConfig {
         public boolean hideBorder = true;
 
         @Expose
-        @ConfigOption(name = "Outside Bingo", desc = "Compact the level up chat messages outside of an bingo profile as well.")
+        @ConfigOption(name = "Outside Bingo", desc = "Compact the level up chat messages outside of an Bingo profile as well.")
         @ConfigEditorBoolean
         public boolean outsideBingo = false;
     }
 
     @Expose
-    @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for bingo.")
+    @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for Bingo.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean minionCraftHelperEnabled = true;

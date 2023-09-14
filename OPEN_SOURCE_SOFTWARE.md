@@ -13,3 +13,4 @@ SkyHanni would not be possible without the following open source software:
 | [Forge1.8.9Template](https://github.com/romangraef/Forge1.8.9Template)         | [Unlicensed](https://github.com/romangraef/Forge1.8.9Template/blob/master/LICENSE)                                |
 | [SoopyV2](https://github.com/Soopyboo32/SoopyV2)                               | [GPL 3.0](https://github.com/Soopyboo32/SoopyV2/blob/master/LICENSE)                                              |
 | [DiscordIPC](https://github.com/jagrosh/DiscordIPC)                            | [Apache 2.0](https://github.com/jagrosh/DiscordIPC/blob/master/LICENSE)                                           |
+| [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/)        | [MIT](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/e9fd003f359b357f52b7430c24e64a4c8192a868/LICENSE) |

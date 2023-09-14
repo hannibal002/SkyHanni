@@ -20,6 +20,7 @@ object TabComplete {
     }
 
     private fun customTabComplete(command: String): List<String>? {
+        GetFromSacksTabComplete.handleTabComplete(command)?.let { return it }
         WarpTabComplete.handleTabComplete(command)?.let { return it }
         PlayerTabComplete.handleTabComplete(command)?.let { return it }
         CollectionTracker.handleTabComplete(command)?.let { return it }

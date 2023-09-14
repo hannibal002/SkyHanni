@@ -42,6 +42,10 @@ object CopyErrorCommand {
         } ?: "§c[SkyHanni] Error id not found!")
     }
 
+    fun logErrorState(userMessage: String, internalMessage: String) {
+        logError(IllegalStateException(internalMessage), userMessage)
+    }
+
     fun logError(throwable: Throwable, message: String) {
         val error = Error(message, throwable)
         Minecraft.getMinecraft().thePlayer ?: throw error

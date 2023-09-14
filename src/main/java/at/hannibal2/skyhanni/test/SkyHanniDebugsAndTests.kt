@@ -15,15 +15,17 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 
-class SkyHanniTestCommand {
+class SkyHanniDebugsAndTests {
 
     companion object {
+        private val config get() = SkyHanniMod.feature.dev
         var displayLine = ""
         var displayList = emptyList<List<Any>>()
 
@@ -198,7 +200,7 @@ class SkyHanniTestCommand {
             builder.append("\n")
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
-            builder.append("repoAutoUpdate: ${SkyHanniMod.feature.dev.repoAutoUpdate}\n")
+            builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
             builder.append("\n")
 
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
@@ -232,21 +234,31 @@ class SkyHanniTestCommand {
 
     @SubscribeEvent
     fun onShowInternalName(event: ItemTooltipEvent) {
-        if (!SkyHanniMod.feature.dev.showInternalName) return
+        if (!config.showInternalName) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalName()
-        if ((internalName == NEUInternalName.NONE) && !SkyHanniMod.feature.dev.showEmptyNames) return
+        if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
     @SubscribeEvent
     fun onSHowNpcPrice(event: ItemTooltipEvent) {
-        if (!SkyHanniMod.feature.dev.showNpcPrice) return
+        if (!config.showNpcPrice) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7Npc price: §6${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onRenderLocation(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+            config.debugLocationPos.renderString(
+                "Current Area: ${HypixelData.skyBlockArea}",
+                posLabel = "SkyBlock Area (Debug)"
+            )
+        }
     }
 
     @SubscribeEvent
@@ -257,12 +269,12 @@ class SkyHanniTestCommand {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.dev.debugEnabled) return
+        if (!config.debugEnabled) return
 
         if (displayLine.isNotEmpty()) {
-            SkyHanniMod.feature.dev.debugPos.renderString("test: $displayLine", posLabel = "Test")
+            config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+        config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
     @SubscribeEvent
