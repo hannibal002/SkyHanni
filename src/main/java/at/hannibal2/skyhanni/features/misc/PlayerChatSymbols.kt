@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.CustomChatComponentText
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatSymbols {
@@ -65,7 +65,7 @@ class PlayerChatSymbols {
                 event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")
 
                 StringUtils.modifyFirstChatComponent(event.chatComponent) { component ->
-                    if (component is ChatComponentText && component.formattedText.contains(username)) {
+                    if (component is CustomChatComponentText && component.formattedText.contains(username)) {
                         val oldText = component.formattedText
                         val newText = when (config.symbolLocation) {
                             0 -> "$emblemText $oldText"
@@ -81,11 +81,10 @@ class PlayerChatSymbols {
                             else -> oldText
                         }
 
-                        component.text = component.formattedText.replace(oldText, newText)
+                        component.setCustomText(component.formattedText.replace(oldText, newText))
                         return@modifyFirstChatComponent true
-                    } else {
-                        return@modifyFirstChatComponent false
                     }
+                    return@modifyFirstChatComponent false
                 }
             }
         }
