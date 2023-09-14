@@ -149,7 +149,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Saves missing items from canceled buy orders to clipboard for faster re-entry.
 + Update Timer showing when the next api data update happens.
 + Added Price Website button. - hannibal2
-    + Adds a button to the bazaar product inventory that will open the item page in SkyBlock.bz.
+    + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
 
 ## Fishing
 

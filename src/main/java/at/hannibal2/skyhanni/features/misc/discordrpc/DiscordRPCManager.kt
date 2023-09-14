@@ -170,7 +170,7 @@ object DiscordRPCManager : IPCListener {
             },
             5,
             TimeUnit.SECONDS
-        ) // wait 5 seconds to check if the new world is SkyBlock or not before stopping the function
+        ) // wait 5 seconds to check if the new world is skyblock or not before stopping the function
     }
 
     @SubscribeEvent
