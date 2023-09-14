@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -420,19 +421,25 @@ class ComposterOverlay {
                     if(lastAttemptTime.passedSince()>0.5.seconds){
                         lastAttemptTime = SimpleTimeMark.now()
                         val amountInSacks = fetchSackItem(internalName.asInternalName())?.amount
+                        val sacksLoaded = fetchSackItem(internalName.asInternalName())?.outdatedStatus
                         if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
                             if (config.composterOverlayGetType == 0) {
                                 inInventory = false
                                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
-                            } else if (amountInSacks == 0) {
+                            } else if (amountInSacks == 0 && sacksLoaded != -1) {
                                 SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
-                                chat("§e[SkyHanni] No $itemName §r§efound in sacks. Opening bazaar.")
+                                chat("§e[SkyHanni] No $itemName §r§efound in sacks. Opening Bazaar.")
                                 inInventory = false
                                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
                             } else {
                                 val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
+                                if (sacksLoaded == -1) {
+                                    clickableChat("§e[SkyHanni] sacks could not be loaded. Open your sacks to update the data!.","sax")
+                                }
+                                if (amountInSacks != null && amountInSacks < itemsNeeded) {
+                                    clickableChat("§e[SkyHanni] You're out of $itemName §r§ein your sacks! Click here to buy on the Bazaar!","bz ${itemName.removeColor()}")
+                                }
                                 if (having < itemsNeeded) {
-                                    chat("having: $having gfs $internalName ${itemsNeeded.toInt() - having}")
                                     LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
                                 } else {
                                     chat("§e[SkyHanni] $itemName §r§8x${itemsNeeded.toInt()}§r§e already found in inventory!")
