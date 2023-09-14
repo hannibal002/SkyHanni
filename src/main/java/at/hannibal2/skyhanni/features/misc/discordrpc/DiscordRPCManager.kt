@@ -152,7 +152,7 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins skyblock but only running it again once they join and leave.
+        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins SkyBlock but only running it again once they join and leave.
         if (LorenzUtils.inSkyBlock) {
             start()
             startOnce = true
@@ -170,7 +170,7 @@ object DiscordRPCManager : IPCListener {
             },
             5,
             TimeUnit.SECONDS
-        ) // wait 5 seconds to check if the new world is skyblock or not before stopping the function
+        ) // wait 5 seconds to check if the new world is SkyBlock or not before stopping the function
     }
 
     @SubscribeEvent
