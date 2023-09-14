@@ -171,12 +171,12 @@ object StringUtils {
     // replaces without breaking any click or hover events (unless that whole text is removed)
     fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
         modifyFirstChatComponent(chatComponent) { component ->
-            if (component is ChatComponentText && component.text.contains(toReplace)) {
+            if (component is ChatComponentText && component.formattedText.contains(toReplace)) {
 
-                component.text = component.text.replace(toReplace, replacement)
-                true
+                component.text = component.formattedText.replace(toReplace, replacement)
+                return@modifyFirstChatComponent true
             } else {
-                false
+                return@modifyFirstChatComponent false
             }
         }
         return chatComponent

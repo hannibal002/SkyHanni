@@ -64,8 +64,8 @@ class PlayerChatSymbols {
                 event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")
 
                 StringUtils.modifyFirstChatComponent(event.chatComponent) { component ->
-                    if (component is ChatComponentText && component.text.contains(username)) {
-                        val oldText = component.text
+                    if (component is ChatComponentText && component.formattedText.contains(username)) {
+                        val oldText = component.formattedText
                         val newText = when (config.symbolLocation) {
                             0 -> "$emblemText $oldText"
                             1 -> {
@@ -80,10 +80,10 @@ class PlayerChatSymbols {
                             else -> oldText
                         }
 
-                        component.text = component.text.replace(oldText, newText)
-                        true
+                        component.text = component.formattedText.replace(oldText, newText)
+                        return@modifyFirstChatComponent true
                     } else {
-                        false
+                        return@modifyFirstChatComponent false
                     }
                 }
             }
