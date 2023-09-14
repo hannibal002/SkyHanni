@@ -953,7 +953,7 @@
 
 + Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
-+ Added option to hide all damage splashes, from anywhere in Skyblock.
++ Added option to hide all damage splashes, from anywhere in SkyBlock.
 + Added highlight Thunder Sparks after killing a Thunder
 + Added Thunder to damage indicator
 + Mark the own player name (for Chat messages)
@@ -1003,8 +1003,8 @@
 
 ### Other Misc Features
 
-- Added option to hide the Skyblock Level from the chat messages (alpha only atm)
-- Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and
+- Added option to hide the SkyBlock Level from the chat messages (alpha only atm)
+- Added option to change the way the SkyBlock Level gets displayed in the chat (only working when skyblock level and
   fancy player message format are enabled)
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color

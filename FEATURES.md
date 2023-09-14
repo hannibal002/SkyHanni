@@ -519,7 +519,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Display the current computer time, a handy feature when playing in full-screen mode.
 + Highlight the voidling extremist in pink color.
 + Highlight millenia aged blaze color in red
-+ Option to hide all damage splashes, from anywhere in Skyblock.
++ Option to hide all damage splashes, from anywhere in SkyBlock.
 + Hide armor or just helmet of other player or yourself
 + Display the active non-god potion effects.
 + Wishing compass uses amount display.

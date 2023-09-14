@@ -59,11 +59,11 @@ class CompactBingoChat {
 
     private fun onSkyBlockLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§3§lSKYBLOCK LEVEL UP §bLevel ")) {
-            inSkyblockLevelUp = true
+            inSkyBlockLevelUp = true
             return false
         }
 
-        if (inSkyblockLevelUp) {
+        if (inSkyBlockLevelUp) {
             if (message == "  §r§a§lREWARDS") return true
             // We don't care about extra health & strength
             healthPattern.matchMatcher(message) {
