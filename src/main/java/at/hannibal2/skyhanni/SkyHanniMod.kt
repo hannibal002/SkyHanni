@@ -271,7 +271,7 @@ class SkyHanniMod {
         loadModule(FishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyblockLevelGuideHelper())
+        loadModule(SkyBlockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())

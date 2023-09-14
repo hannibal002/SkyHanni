@@ -617,7 +617,7 @@
     + Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires
       a tool with either a counter or cultivating enchantment)
 + Added **Best Crop Display**
-    + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
+    + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or SkyBlock level.
 + Added **Copper Price**
     + Show the price for copper inside the visitor gui.
 + Added **Amount and Time**
@@ -627,7 +627,7 @@
 + Added Desk shortcut in SkyBlock Menu.
 + Added **Garden Level Display**
     + Show the current garden level and progress to the next level.
-+ Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ Added **Farming Weight and Leaderboard**, provided by the Elite SkyBlock Farmers.
 + Added farming weight next leaderboard position eta.
 + Added **Dicer Counter**
     + Count RNG drops for Melon Dicer and Pumpkin Dicer.
@@ -736,7 +736,7 @@
 
 ## Features
 
-+ Added highlight for stuff that is missing in the skyblock level guide inventory.
++ Added highlight for stuff that is missing in the SkyBlock level guide inventory.
 + Added Bingo Card display.
 + **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
@@ -826,7 +826,7 @@
 
 ### Removals
 
-- Removed additional settings for the chat design, like channel prefix and skyblock level
+- Removed additional settings for the chat design, like channel prefix and SkyBlock level
 
 ### Fixes
 
@@ -953,7 +953,7 @@
 
 + Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
-+ Added option to hide all damage splashes, from anywhere in Skyblock.
++ Added option to hide all damage splashes, from anywhere in SkyBlock.
 + Added highlight Thunder Sparks after killing a Thunder
 + Added Thunder to damage indicator
 + Mark the own player name (for Chat messages)
@@ -1003,8 +1003,8 @@
 
 ### Other Misc Features
 
-- Added option to hide the Skyblock Level from the chat messages (alpha only atm)
-- Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and
+- Added option to hide the SkyBlock Level from the chat messages (alpha only atm)
+- Added option to change the way the SkyBlock Level gets displayed in the chat (only working when SkyBlock level and
   fancy player message format are enabled)
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color

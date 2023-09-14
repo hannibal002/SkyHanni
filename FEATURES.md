@@ -86,7 +86,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight the selected template in the stats tuning inventory.
 + Show the stats for the tuning point templates.
 + Highlight depleted Bonzo's Masks in your inventory.
-+ Highlight stuff that is missing in the skyblock level guide inventory.
++ Highlight stuff that is missing in the SkyBlock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + **Duplicate Hider** - Hides duplicate farming contests in the inventory.
@@ -309,7 +309,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the
   current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
 + **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden
-  level or skyblock level.
+  level or SkyBlock level.
 + **Copper Price** - Show the price for copper inside the visitor gui.
 + **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for
   ironman.
@@ -319,7 +319,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
 + **Farming Weight and Leaderboard**
-    + provided by the elite skyblock farmers.
+    + provided by the Elite SkyBlock Farmers.
     + next leaderboard position eta.
     + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
     + Chat message how many places you dropped in the farming weight lb when joining garden.
@@ -519,7 +519,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Display the current computer time, a handy feature when playing in full-screen mode.
 + Highlight the voidling extremist in pink color.
 + Highlight millenia aged blaze color in red
-+ Option to hide all damage splashes, from anywhere in Skyblock.
++ Option to hide all damage splashes, from anywhere in SkyBlock.
 + Hide armor or just helmet of other player or yourself
 + Display the active non-god potion effects.
 + Wishing compass uses amount display.

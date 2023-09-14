@@ -11,7 +11,7 @@ class CompactBingoChat {
     private val config get() = SkyHanniMod.feature.bingo.compactChat
 
     private var inSkillLevelUp = false
-    private var inSkyblockLevelUp = false
+    private var inSkyBlockLevelUp = false
     private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
@@ -28,7 +28,7 @@ class CompactBingoChat {
             message == "§e§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
         ) {
             inSkillLevelUp = false
-            inSkyblockLevelUp = false
+            inSkyBlockLevelUp = false
             inCollectionLevelUp = false
             if (config.hideBorder) {
                 event.blockedReason = "compact_bingo_border"
@@ -59,11 +59,11 @@ class CompactBingoChat {
 
     private fun onSkyBlockLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§3§lSKYBLOCK LEVEL UP §bLevel ")) {
-            inSkyblockLevelUp = true
+            inSkyBlockLevelUp = true
             return false
         }
 
-        if (inSkyblockLevelUp) {
+        if (inSkyBlockLevelUp) {
             if (message == "  §r§a§lREWARDS") return true
             // We don't care about extra health & strength
             healthPattern.matchMatcher(message) {
