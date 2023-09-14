@@ -400,6 +400,7 @@ class SkyHanniMod {
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
+        loadModule(QuickCraftFeatures())
 
         init()
 
