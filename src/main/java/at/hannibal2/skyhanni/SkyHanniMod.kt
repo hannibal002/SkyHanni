@@ -269,6 +269,7 @@ class SkyHanniMod {
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
+        loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
         loadModule(SkyBlockLevelGuideHelper())

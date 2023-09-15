@@ -200,6 +200,28 @@ public class FishingConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Fishing Hook Display", desc = "")
+    @Accordion
+    public FishingHookDisplay fishingHookDisplay = new FishingHookDisplay();
+
+    public static class FishingHookDisplay {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Display the hypixel timer until the fishing hook can be pulled out of the water, only bigger and on your screen.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Armor Stand", desc = "Hide the original armor stand from hypixel when the Skyhanni display is enabled.")
+        @ConfigEditorBoolean
+        public boolean hideArmorStand = true;
+
+        @Expose
+        public Position position = new Position(460, -240, 3.4f);
+    }
+
+    @Expose
     @ConfigOption(name = "Highlight Rare", desc = "Highlight rare sea creatures in blue color.")
     @ConfigEditorBoolean
     @FeatureToggle
