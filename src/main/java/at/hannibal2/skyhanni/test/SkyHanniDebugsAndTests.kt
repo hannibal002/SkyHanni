@@ -53,10 +53,10 @@ class SkyHanniDebugsAndTests {
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
 
-            val a = Thread { OSUtils.copyToClipboard("123") }
-            val b = Thread { OSUtils.copyToClipboard("456") }
-            a.start()
-            b.start()
+//            val a = Thread { OSUtils.copyToClipboard("123") }
+//            val b = Thread { OSUtils.copyToClipboard("456") }
+//            a.start()
+//            b.start()
 
 
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
