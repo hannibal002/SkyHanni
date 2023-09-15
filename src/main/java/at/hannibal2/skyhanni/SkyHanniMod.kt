@@ -423,7 +423,6 @@ class SkyHanniMod {
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread {
             configManager.saveConfig("shutdown-hook")
-            configManager.saveSackData("shutdown-hook")
         })
         repo = RepoManager(configManager.configDirectory)
         try {
