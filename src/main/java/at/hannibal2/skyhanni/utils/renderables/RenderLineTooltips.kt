@@ -13,11 +13,13 @@ import java.awt.Color
 
 object RenderLineTooltips {
 
-    fun drawHoveringText(posX: Int, posY: Int, tips: List<String?>, stack: ItemStack? = null) {
+    fun drawHoveringText(posX: Int, posY: Int, tips: List<String?>, stack: ItemStack? = null,
+                         mouseX: Int = Utils.getMouseX(),
+                         mouseY: Int = Utils.getMouseY()) {
         if (tips.isNotEmpty()) {
             var textLines = tips
-            val x = Utils.getMouseX() + 12 - posX
-            val y = Utils.getMouseY() - 10 - posY
+            val x = mouseX + 12 - posX
+            val y = mouseY - 10 - posY
             val color: Char = stack?.getLore()?.lastOrNull()?.take(4)?.get(1)
                 ?: Utils.getPrimaryColourCode(textLines[0])
             val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)

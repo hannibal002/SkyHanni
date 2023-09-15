@@ -95,7 +95,7 @@ class GuiEditManager {
                 return Vector2i(5, 5)
             } else {
                 val (x, y) = currentBorderSize[internalName] ?: return Vector2i(1, 1)
-                return Vector2i(x, y)
+                return Vector2i((x * effectiveScale).toInt(), (y * effectiveScale).toInt())
             }
         }
 
