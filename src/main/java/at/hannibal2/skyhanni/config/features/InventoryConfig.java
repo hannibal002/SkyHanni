@@ -325,8 +325,8 @@ public class InventoryConfig {
                 "§bCrystal Hollows Crystal Progress",
                 "§bSkyblock Profile Name (Fruits)",
                 "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
-                "§bGarden Visitor's Logbook Accepted/Visited Ratio (per visitor)",
-                "§bGarden Level"
+                "§bGarden Level",
+                "§bGarden Visitor's Logbook Accepted/Visited Ratio (per visitor)"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
