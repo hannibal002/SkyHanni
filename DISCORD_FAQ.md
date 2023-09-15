@@ -7,7 +7,7 @@ _Frequently Asked Questions_
 > To make the mod work, you need to use the latest version from <#1123201092193366027>.
 
 > **3: How can I resize the GUI?**
-> Do `/sh gui` to open the position editor. then hover over a element and scroll your mouse wheel to change the size of a single gui element.
+> Do `/sh gui` to open the position editor. Then hover over a element and scroll your mouse wheel to change the size of a single gui element.
 > Do `/sh scale` to change the global gui scale of all elements at once.
 
 > **4: My Garden Crop Milestones are not accurate. What should I do?**
