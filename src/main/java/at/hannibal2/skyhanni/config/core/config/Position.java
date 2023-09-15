@@ -56,14 +56,15 @@ public class Position {
         this.y = other.y;
         this.centerX = other.centerX;
         this.centerY = other.centerY;
-        this.scale = other.scale;
+        this.scale = other.getScale();
     }
 
     public float getEffectiveScale() {
-        return Math.max(Math.min(scale * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
+        return Math.max(Math.min(getScale() * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
     }
 
     public float getScale() {
+        if (scale == 0) return 1f;
         return scale;
     }
 
