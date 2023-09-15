@@ -11,12 +11,15 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -230,6 +233,36 @@ class SkyHanniDebugsAndTests {
             OSUtils.copyToClipboard(builder.toString())
             LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")
         }
+
+        fun copyItemInternalName() {
+            val hand = InventoryUtils.getItemInHand()
+            if (hand == null) {
+                LorenzUtils.chat("§cNo item in hand!")
+                return
+            }
+
+            val internalName = hand.getInternalNameOrNull()
+            if (internalName == null) {
+                LorenzUtils.chat("§cInternal name is null for item ${hand.name}")
+                return
+            }
+
+            val rawInternalName = internalName.asString()
+            OSUtils.copyToClipboard(rawInternalName)
+            LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+        }
+    }
+
+    @SubscribeEvent
+    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyInternalName)) return
+        val gui = event.gui as? GuiContainer ?: return
+        val focussedSlot = gui.slotUnderMouse ?: return
+        val stack = focussedSlot.stack ?: return
+        val internalName = stack.getInternalNameOrNull() ?: return
+        val rawInternalName = internalName.asString()
+        OSUtils.copyToClipboard(rawInternalName)
+        LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
     @SubscribeEvent
