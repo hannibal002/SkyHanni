@@ -34,10 +34,10 @@ object GetFromSacksTabComplete {
         if (commands.any { message.startsWith("/$it ") }) {
             val rawName = message.split(" ")[1]
             val realName = rawName.replace("_", " ")
-            if (realName in sackList) {
-                event.isCanceled = true
-                LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
-            }
+            if (realName == rawName) return
+            if (realName !in sackList) return
+            event.isCanceled = true
+            LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
         }
     }
 

@@ -212,4 +212,25 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
         }
     }
+
+    override fun handleMouseInput() {
+        super.handleMouseInput()
+        val mw = Mouse.getEventDWheel()
+        if (mw == 0) return
+        val mx = Mouse.getEventX() * width / mc.displayWidth
+        val my = height - Mouse.getEventY() * height / mc.displayHeight - 1
+        val hovered = positions.firstOrNull { it.clicked }
+            ?: positions.lastOrNull {
+                val size = it.getDummySize()
+                GuiRenderUtils.isPointInRect(
+                    mx, my,
+                    it.getAbsX() - border, it.getAbsY() - border,
+                    size.x + border * 2, size.y + border * 2
+                )
+            } ?: return
+        if (mw < 0)
+            hovered.scale -= .1F
+        else
+            hovered.scale += .1F
+    }
 }

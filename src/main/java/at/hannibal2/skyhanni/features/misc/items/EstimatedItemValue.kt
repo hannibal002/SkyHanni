@@ -297,7 +297,7 @@ object EstimatedItemValue {
                 val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
                 list.add("§7Reforge: §9$realReforgeName")
                 list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
-                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost))
+                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
                 return reforgeStonePrice + applyCost
             }
         }

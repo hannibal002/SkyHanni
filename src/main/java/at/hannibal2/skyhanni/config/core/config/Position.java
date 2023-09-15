@@ -19,6 +19,7 @@
 
 package at.hannibal2.skyhanni.config.core.config;
 
+import at.hannibal2.skyhanni.SkyHanniMod;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -28,6 +29,9 @@ public class Position {
     private int x;
     @Expose
     private int y;
+    @Expose
+    private float scale = 1F;
+
     @Expose
     private boolean centerX;
     @Expose
@@ -52,6 +56,20 @@ public class Position {
         this.y = other.y;
         this.centerX = other.centerX;
         this.centerY = other.centerY;
+        this.scale = other.getScale();
+    }
+
+    public float getEffectiveScale() {
+        return Math.max(Math.min(getScale() * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
+    }
+
+    public float getScale() {
+        if (scale == 0) return 1f;
+        return scale;
+    }
+
+    public void setScale(float newScale) {
+        scale = Math.max(Math.min(10F, newScale), 0.1f);
     }
 
     public int getRawX() {

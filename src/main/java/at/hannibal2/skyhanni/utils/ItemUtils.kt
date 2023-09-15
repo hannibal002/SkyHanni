@@ -210,7 +210,12 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
-    fun readItemAmount(input: String): Pair<String, Int>? {
+    fun readItemAmount(originalInput: String): Pair<String, Int>? {
+        // This workaround fixes 'Tubto Cacti I Book'
+        val input = if (originalInput.endsWith(" Book")) {
+            originalInput.replace(" Book", "")
+        } else originalInput
+
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
         }

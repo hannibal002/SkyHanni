@@ -263,7 +263,8 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Position) {
             val x = javaClass.getDeclaredField("x").makeAccessible().get(this)
             val y = javaClass.getDeclaredField("y").makeAccessible().get(this)
-            return "($x, $y)"
+            val scale = javaClass.getDeclaredField("scale").makeAccessible().get(this)
+            return "($x, $y, $scale)"
         }
 
         if (this is String) {
