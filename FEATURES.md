@@ -319,7 +319,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
 + **Farming Weight and Leaderboard**
-    + provided by the Elite SkyBlock Farmers.
+    + provided by the Elite SkyBlock farmers.
     + next leaderboard position eta.
     + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
     + Chat message how many places you dropped in the farming weight lb when joining garden.
