@@ -502,6 +502,28 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(31)) {
+            if (!(InventoryUtils.openInventoryName() == "Visitor's Logbook")) return ""
+            var timesVisited = 0
+            var timesAccepted = 0
+            if (item.getLore().any { it.contains("Times Visited:") }) {
+                for (line in item.getLore()) {
+                    if (line.contains("Times Visited:")) {
+                        timesVisited = line.removeColor().replace("Times Visited:", "").trim().toInt()
+                    } else if (line.contains("Offers Accepted:")) {
+                        timesAccepted = line.removeColor().replace("Offers Accepted:", "").trim().toInt()
+                    }
+                }
+                if (timesVisited == 0) return ""
+                return ((((timesAccepted / timesVisited) * 100).toInt()) / 100).toString()
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(32)) {
+            val nameWithColor = item.name ?: return "FUCK"
+            if (nameWithColor.contains("Garden Level ")) return itemName.replace("Garden Level ", "")
+        }
+
         return ""
     }
 
