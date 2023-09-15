@@ -326,7 +326,8 @@ public class InventoryConfig {
                 "§bSkyblock Profile Name (Fruits)",
                 "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
                 "§bGarden Level",
-                "§bGarden Visitor's Logbook Accepted/Visited Ratio (per visitor)"
+                "§bGarden Visitor's Logbook Accepted/Visited Ratio (per visitor)",
+                "§bFarming Contests Medal Inventory"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));

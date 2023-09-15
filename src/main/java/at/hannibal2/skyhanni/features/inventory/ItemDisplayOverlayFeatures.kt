@@ -20,6 +20,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
+    private val genericDecimalPattern = "(?<beforeDecimal>[01])\.(?<pastDecimal>[0-9]*)".toPattern()
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
@@ -44,6 +45,29 @@ class ItemDisplayOverlayFeatures {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
         val chestName = InventoryUtils.openInventoryName()
+        /*
+        -------------------------------IMPORTANT------------------------------------
+        
+        If at *any* point someone tells you to not nest your code, do the following
+        (in any order, but more importantly in the order given below):
+        - tell them to "cope and seethe", especially if they cite CodeAesthetic
+        - kindly remind them that the last time someone attempted this, friendships
+          were almost shattered in the process
+        - you will lose your sanity as you try to figure out what the fuck went wrong
+          in your forays with string manipulation
+        - remind them of the Single-responsibility Principle:
+          https://en.wikipedia.org/wiki/Single-responsibility_principle
+        - make sure you have an IDE capable of debugging within your reach
+        
+        This concludes the PSA. Happy writing! -Erymanthus
+
+        PS: T'was all a joke. Just don't do stupid shit like
+        ` if (!(InventoryUtils.openInventoryName() == "Visitor's Logbook")) return "" `
+        and you *should* be fine for the most part.
+        ----------------------------------------------------------------------------
+        */
+
+        //NOTE: IT'S String.length, NOT String.length()!
 
         if (stackSizeConfig.contains(0)) {
             when (itemName) {
@@ -112,7 +136,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(7)) {
-            if (chestName.toLowerCase() == "skyblock menu") {
+            if (chestName.lowercase() == "skyblock menu") {
                 if (itemName.endsWith(" Leveling")) {
                     for (line in item.getLore()) {
                         if (line.contains(" Level: ")) {
@@ -232,7 +256,7 @@ class ItemDisplayOverlayFeatures {
         }
         
         if (stackSizeConfig.contains(16)) {
-            if (chestName.toLowerCase() == "skyblock menu") {
+            if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
                         if (line.contains("Collections Unlocked: ")) {
@@ -253,7 +277,7 @@ class ItemDisplayOverlayFeatures {
         }
         
         if (stackSizeConfig.contains(17)) {
-            if (chestName.toLowerCase() == "skyblock menu") {
+            if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Recipe Book") {
                     for (line in item.getLore()) {
                         if (line.contains(" Book Unlocked: ")) {
@@ -274,7 +298,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(18)) {
-            if (chestName.toLowerCase() == "skyblock menu") {
+            if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Your Skills") {
                     for (line in item.getLore()) {
                         if (line.removeColor().contains(" Skill Avg. ")) {
@@ -446,7 +470,6 @@ class ItemDisplayOverlayFeatures {
                 val nameWithColor = item.name ?: return ""
                 if (nameWithColor != "§5Crystal Hollows Crystals") return ""
                 val lore = item.getLore()
-                var crystalsPlaced = 0
                 var crystalsNotPlaced = 0
                 var crystalsNotFound = 0
                 val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
@@ -454,13 +477,13 @@ class ItemDisplayOverlayFeatures {
                     if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
                     else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
                 }
-                crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
-                return "§a${crystalsPlaced}§r|§e${crystalsNotPlaced}§r|§c${crystalsNotFound}"
+                var crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
+                return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
             }
         }
         
         if (stackSizeConfig.contains(29)) {
-            if (chestName.toLowerCase() == "skyblock menu") {
+            if (chestName.lowercase() == "skyblock menu") {
                 val nameWithColor = item.name ?: return ""
                 if (nameWithColor != "§aProfile Management") return ""
                 val lore = item.getLore()
@@ -508,22 +531,45 @@ class ItemDisplayOverlayFeatures {
             if (chestName == "Visitor's Logbook") {
                 var timesVisited = 0
                 var timesAccepted = 0
-                if (item.getLore().any { it.contains("Times Visited:") }) {
+                if (item.getLore().any { it.contains("Times Visited: ") }) {
                     for (line in item.getLore()) {
-                        if (line.contains("Times Visited:")) {
-                            timesVisited = line.removeColor().replace("Times Visited:", "").trim().toInt()
-                        } else if (line.contains("Offers Accepted:")) {
-                            timesAccepted = line.removeColor().replace("Offers Accepted:", "").trim().toInt()
+                        if (line.contains("Times Visited: ")) {
+                            timesVisited = line.removeColor().replace("Times Visited: ", "").trim().toInt()
+                        } else if (line.contains("Offers Accepted: ")) {
+                            timesAccepted = line.removeColor().replace("Offers Accepted: ", "").trim().toInt()
                         }
                     }
                     if (timesVisited == 0) return ""
-                    return ((((timesAccepted / timesVisited) * 100).toInt()) / 100).toString()
+                    var theString = ((timesAccepted / timesVisited)).toString()
+                    genericDecimalPattern.matchMatcher(theString) {
+                        val beforeDecimal = group("beforeDecimal").toString()
+                        var pastDecimal = group("pastDecimal").toString()
+                        if (pastDecimal.length > 2) {
+                            pastDecimal = pastDecimal.take(2)
+                        }
+                        return "" + beforeDecimal + "." + pastDecimal
+                    }
                 }
             }
         }
 
         if (stackSizeConfig.contains(31)) {
             if ((chestName == "Farming Skill") && itemName.contains("Garden Level ")) return itemName.replace("Garden Level ", "")
+        }
+
+        if (stackSizeConfig.contains(31)) {
+            if ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!")){
+                var gold = "§60"
+                var silver = "§f0"
+                var bronze = "§c0"
+                for (line in item.getLore()) {
+                    var noColorLine = line.removeColor()
+                    if (noColorLine.contains("GOLD")) gold = "§6" + noColorLine.split(" ").last()
+                    if (noColorLine.contains("SILVER")) silver = "§f" + noColorLine.split(" ").last()
+                    if (noColorLine.contains("BRONZE")) bronze = "§c" + noColorLine.split(" ").last()
+                }
+                return gold + silver + bronze
+            }
         }
 
         return ""
