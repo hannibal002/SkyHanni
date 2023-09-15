@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private val expToNextLevelPattern = "(?:.*) §e(?<nextLevelExp>.*)§6\\/(?:.*)".toPattern()
+    private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
     private var display = ""
