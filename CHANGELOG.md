@@ -82,6 +82,9 @@
 + Added icons for the medals received in a contest. - CalMWolfs
     + Different symbol for when it was a Finnegan contest.
 + Added Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
++ Added GUI Scale. - nea
+    + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
+    + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
 
 ### Changes
 
@@ -135,6 +138,7 @@
 + Added support for slayer profit trackers on stranded. - hannibal2
 + Added Trapper Cooldown GUI. - NetheriteMiner
     + Show the cooldown on screen in an overlay (intended for abiphone users).
++ Made the fake garden level up message (after level 15) clickable. - J10a1n15
 
 ### Fixes
 
@@ -216,6 +220,11 @@
 + Summoning souls should no longer be counted as sea creatures for the fishing timer. - hannibal2
 + Fixed Jacob Contests times needed display showing impossible FF values. - ReyMaratov
 + Fixed item cooldown issues with fire fury staff and jinxed voodoo doll. - Cad
++ Fixed the percentage going above 100% for bestiary progress. - HiZe
++ Fixed max kills from Ghost Counter using old bestiary data when resetting the config. - HiZe
++ Fixed part of Zealot Hideout area showing as The End. - Cad
++ Fixed many typos in the config. - schlaumeyer, oofy, CalMWolfs & hannibal2
++ Fixed a missing bracket in the reforge apply cost display from Estimated Item Value. - jaNI
 
 ### Removed Features
 

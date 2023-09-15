@@ -318,6 +318,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Also available to select directly in the rancher boots overlay (contributed by nea)
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
++ **Fake garden level up** message: - hannibal2
+    + In 10k garden exp steps after level 15.
+    + Uses the overflow exp that hypixel still caluclates (maybe official upgrade with more garden levels in the
+      future?).
+    + Click on the message to open the garden level display. - J10a1n15
 + **Farming Weight and Leaderboard**
     + provided by the Elite SkyBlock farmers.
     + next leaderboard position eta.
@@ -612,9 +617,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       super-pairs minigames.
 + Anniversary Event Active Player Ticket Timer. - nea
     + Option to play a sound as well.
-* **Travor Trapper** Features in Farming Islands
++ **Travor Trapper** Features in Farming Islands
     + Trapper Cooldown GUI. - NetheriteMiner
         + Show the cooldown on screen in an overlay (intended for abiphone users).
++ **GUI Scale**: - nea
+    + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
+    + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
 
 ## Cosmetics
 
