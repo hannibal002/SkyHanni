@@ -453,10 +453,10 @@ object RenderUtils {
 
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
         GlStateManager.pushMatrix()
-        val mp = transform()
+        val (x, y) = transform()
         GlStateManager.translate(0f, offsetY.toFloat(), 0F)
         var offsetX = 0
-        Renderable.withMousePosition(mp.first, mp.second) {
+        Renderable.withMousePosition(x, y) {
             for (any in line) {
                 val renderable = Renderable.fromAny(any, itemScale = itemScale)
                     ?: throw RuntimeException("Unknown render object: $any")

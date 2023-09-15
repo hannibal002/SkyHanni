@@ -13,9 +13,11 @@ import java.awt.Color
 
 object RenderLineTooltips {
 
-    fun drawHoveringText(posX: Int, posY: Int, tips: List<String?>, stack: ItemStack? = null,
-                         mouseX: Int = Utils.getMouseX(),
-                         mouseY: Int = Utils.getMouseY()) {
+    fun drawHoveringText(
+        posX: Int, posY: Int, tips: List<String?>, stack: ItemStack? = null,
+        mouseX: Int = Utils.getMouseX(),
+        mouseY: Int = Utils.getMouseY()
+    ) {
         if (tips.isNotEmpty()) {
             var textLines = tips
             val x = mouseX + 12 - posX
@@ -189,7 +191,15 @@ object RenderLineTooltips {
         GlStateManager.disableLighting()
     }
 
-    private fun drawGradientRect(zLevel: Int, left: Int, top: Int, right: Int, bottom: Int, startColor: Int, endColor: Int) {
+    private fun drawGradientRect(
+        zLevel: Int,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        startColor: Int,
+        endColor: Int
+    ) {
         val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
         val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
         val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
@@ -206,10 +216,14 @@ object RenderLineTooltips {
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos(right.toDouble(), top.toDouble(), zLevel.toDouble()).color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), top.toDouble(), zLevel.toDouble()).color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), bottom.toDouble(), zLevel.toDouble()).color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        worldrenderer.pos(right.toDouble(), bottom.toDouble(), zLevel.toDouble()).color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        worldrenderer.pos(right.toDouble(), top.toDouble(), zLevel.toDouble())
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldrenderer.pos(left.toDouble(), top.toDouble(), zLevel.toDouble())
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldrenderer.pos(left.toDouble(), bottom.toDouble(), zLevel.toDouble())
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        worldrenderer.pos(right.toDouble(), bottom.toDouble(), zLevel.toDouble())
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
         tessellator.draw()
         GlStateManager.shadeModel(7424)
         GlStateManager.disableBlend()

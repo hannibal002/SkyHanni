@@ -18,9 +18,9 @@ import kotlin.math.max
 interface Renderable {
     val width: Int
     val height: Int
-    fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { mp ->
-        mp.first in (posX..posX + width)
-                && mp.second in (posY..posY + height) // TODO: adjust for variable height?
+    fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (posX..posX + width)
+                && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
