@@ -13,12 +13,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class PlayerChatSymbols {
     private val config get() = SkyHanniMod.feature.misc.chatSymbols
     private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val chatUsernamePattern =
-        "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
     private val tabUsernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
     private val nameSymbols = mutableMapOf<String, String>()
 
-    // some code taken from SBA but most changed so that it works
+    // code inspired by SBA but heavily modified to be more functional and actually work
     @SubscribeEvent
     fun onChatReceived(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -46,8 +45,8 @@ class PlayerChatSymbols {
             val playerNames = Minecraft.getMinecraft().thePlayer.sendQueue.playerInfoMap
 
             val result = playerNames.stream()
-                .filter { npi -> npi.displayName != null }
-                .filter { npi -> usernameFromLine(npi.displayName.formattedText) == username }
+                .filter { playerName -> playerName.displayName != null }
+                .filter { playerName -> usernameFromLine(playerName.displayName.formattedText) == username }
                 .findAny()
 
             if (result.isPresent) {
