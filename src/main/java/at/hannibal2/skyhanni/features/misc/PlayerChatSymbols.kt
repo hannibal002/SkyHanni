@@ -86,13 +86,11 @@ class PlayerChatSymbols {
                             }
 
                             component.setText_skyhanni(component.text_skyhanni().replace(oldText, newText))
-                            true
-                        } else {
-                            false
+                            return@modifyFirstChatComponent true
                         }
-                    } else {
-                        false
+                        return@modifyFirstChatComponent false
                     }
+                    return@modifyFirstChatComponent false
                 }
             }
         }

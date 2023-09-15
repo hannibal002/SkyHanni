@@ -179,13 +179,11 @@ object StringUtils {
                 component as AccessorChatComponentText
                 if (component.text_skyhanni().contains(toReplace)) {
                     component.setText_skyhanni(component.text_skyhanni().replace(toReplace, replacement))
-                    true
-                } else {
-                    false
+                    return@modifyFirstChatComponent true
                 }
-            } else {
-                false
+                return@modifyFirstChatComponent false
             }
+            return@modifyFirstChatComponent false
         }
         return chatComponent
     }
