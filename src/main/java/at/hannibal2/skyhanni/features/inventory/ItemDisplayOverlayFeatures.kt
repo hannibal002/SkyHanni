@@ -540,21 +540,25 @@ class ItemDisplayOverlayFeatures {
                         }
                     }
                     if (timesVisited == 0) return ""
-                    var theString = ((timesAccepted / timesVisited)).toString()
-                    genericDecimalPattern.matchMatcher(theString) {
-                        val beforeDecimal = group("beforeDecimal").toString()
-                        var pastDecimal = group("pastDecimal").toString()
-                        if (pastDecimal.length > 2) {
-                            pastDecimal = pastDecimal.take(2)
-                        }
-                        return "" + beforeDecimal + "." + pastDecimal
-                    }
+                    var theString = ((timesAccepted / timesVisited)).toDouble().toString()
+                    return theString
+                    // genericDecimalPattern.matchMatcher(theString) {
+                    //     val beforeDecimal = group("beforeDecimal").toString()
+                    //     var pastDecimal = group("pastDecimal").toString()
+                    //     if (pastDecimal.length > 2) {
+                    //         pastDecimal = pastDecimal.take(2)
+                    //     }
+                    //     return "" + beforeDecimal + "." + pastDecimal
+                    // }
                 }
             }
         }
 
         if (stackSizeConfig.contains(31)) {
-            if ((chestName == "Farming Skill") && itemName.contains("Garden Level ")) return itemName.replace("Garden Level ", "")
+            if ((chestName == "Farming Skill") && itemName.contains("Garden Level ")) {
+                // if (getGardenLevel() != null) return getGardenLevel().toString()
+                return itemName.replace("Garden Level ", "")
+            }
         }
 
         if (stackSizeConfig.contains(31)) {
