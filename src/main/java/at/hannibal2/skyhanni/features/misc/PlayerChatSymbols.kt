@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.CustomChatComponentText
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatSymbols {
@@ -65,26 +66,33 @@ class PlayerChatSymbols {
                 event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")
 
                 StringUtils.modifyFirstChatComponent(event.chatComponent) { component ->
-                    if (component is CustomChatComponentText && component.formattedText.contains(username)) {
-                        val oldText = component.formattedText
-                        val newText = when (config.symbolLocation) {
-                            0 -> "$emblemText $oldText"
-                            1 -> {
-                                // fixing it for when you type a message as the chat isn't split the same
-                                if (oldText.contains("§f:")) {
-                                    val ownChatSplit = oldText.split("§f:")
-                                    if (ownChatSplit.size > 1) {
-                                        "${ownChatSplit[0]} $emblemText §f:${ownChatSplit[1]}"
-                                    } else oldText
-                                } else "$oldText $emblemText "
-                            }
-                            else -> oldText
-                        }
+                    if (component is ChatComponentText) {
+                        component as AccessorChatComponentText
+                        if ( component.text_skyhanni().contains(username)) {
+                            val oldText = component.text_skyhanni()
 
-                        component.setCustomText(component.formattedText.replace(oldText, newText))
-                        return@modifyFirstChatComponent true
+                            val newText = when (config.symbolLocation) {
+                                0 -> "$emblemText $oldText"
+                                1 -> {
+                                    // fixing it for when you type a message as the chat isn't split the same
+                                    if (oldText.contains("§f:")) {
+                                        val ownChatSplit = oldText.split("§f:")
+                                        if (ownChatSplit.size > 1) {
+                                            "${ownChatSplit[0]} $emblemText §f:${ownChatSplit[1]}"
+                                        } else oldText
+                                    } else "$oldText $emblemText "
+                                }
+                                else -> oldText
+                            }
+
+                            component.setText_skyhanni(component.text_skyhanni().replace(oldText, newText))
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
                     }
-                    return@modifyFirstChatComponent false
                 }
             }
         }
