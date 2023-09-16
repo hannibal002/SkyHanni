@@ -34,5 +34,24 @@ public class CrimsonIsleConfig {
             @ConfigEditorColour
             public String color = "0:120:255:85:85";
         }
+
+        @ConfigOption(name = "Blazing Souls", desc = "")
+        @Accordion
+        @Expose
+        public BlazingSoulsColor blazingSouls = new BlazingSoulsColor();
+
+        public static class BlazingSoulsColor {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Shows the Blazing Souls more clearly.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = false;
+
+            @Expose
+            @ConfigOption(name = "Souls Color", desc = "Color of the Blazing Souls.")
+            @ConfigEditorColour
+            public String color = "0:245:85:255:85";
+        }
     }
 }

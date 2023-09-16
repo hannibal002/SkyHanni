@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class AshfangConfig {
@@ -26,17 +25,6 @@ public class AshfangConfig {
 
     @Expose
     public Position nextResetCooldownPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Blazing Souls", desc = "Shows the Blazing Souls more clearly.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean blazingSouls = false;
-
-    @Expose
-    @ConfigOption(name = "Souls Color", desc = "Color of the Ashfang Blazing Souls.")
-    @ConfigEditorColour
-    public String blazingSoulsColor = "0:245:85:255:85";
 
     @Expose
     @ConfigOption(name = "Highlight Blazes", desc = "Highlight the different blazes in their respective colors.")
