@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import org.intellij.lang.annotations.Language
 import java.util.*
+import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -162,5 +165,35 @@ object StringUtils {
             i += lengthJudger(it)
             i < limit
         }
+    }
+
+    // recursively goes through the component and siblings until an action = true
+    fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
+
+        if (action.test(chatComponent)) {
+            return true
+        }
+        for (sibling in chatComponent.siblings) {
+            if (modifyFirstChatComponent(sibling, action)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    // replaces without breaking any click or hover events (unless that whole text is removed)
+    fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
+        modifyFirstChatComponent(chatComponent) { component ->
+            if (component is ChatComponentText) {
+                component as AccessorChatComponentText
+                if (component.text_skyhanni().contains(toReplace)) {
+                    component.setText_skyhanni(component.text_skyhanni().replace(toReplace, replacement))
+                    return@modifyFirstChatComponent true
+                }
+                return@modifyFirstChatComponent false
+            }
+            return@modifyFirstChatComponent false
+        }
+        return chatComponent
     }
 }

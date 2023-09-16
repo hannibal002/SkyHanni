@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.*
@@ -55,8 +56,8 @@ class HighlightBonzoMasks {
     }
 
     @SubscribeEvent
-    fun onChatReceived(event: ClientChatReceivedEvent) {
-        val message = event.message.unformattedText
+    fun onChatReceived(event: LorenzChatEvent) {
+        val message = event.message.removeColor()
         if (bonzoMaskMessage.matches(message)) {
             maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)
         } else if (spiritMaskMessage.matches(message)) {
