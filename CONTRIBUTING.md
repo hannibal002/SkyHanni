@@ -3,18 +3,18 @@
 This is a technical guide that helps Kotlin and Java developers understand how SkyHanni works, and provides the first
 steps for new Forge developers to take.
 
-# Set up the development environment
+## Development Environment Setup
 
 When making changes to the code, it is recommended to use an IDE for live debugging and testing.
 This tutorial explains how to set up the development environment for SkyHanni.
 We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
-## Download IntelliJ
+### Download IntelliJ
 
 - Download IntelliJ from the [JetBrains Website](https://www.jetbrains.com/idea/download/).
     - Use the Community Edition. (Scroll down a bit.)
 
-## Cloning the project
+### Cloning the project
 
 - Create an account on GitHub
     - Go to https://github.com/hannibal002/SkyHanni
@@ -28,85 +28,30 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
         - Select `SkyHanni` from the list.
         - Open the project.
 
-## Setting up IntelliJ
+### Setting up IntelliJ
 
-SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**; just follow this guide:
-https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md
+SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, just
+follow [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
 
-# Software Used in SkyHanni
+## Creating a Pull Request
 
-## Core
+_An explanation how to use intellij and branches will follow here soon_
 
-SkyHanni is a Forge mod for Minecraft 1.8.9, written in [Kotlin](https://kotlinlang.org/)
-and [Java](https://www.java.com/en/).
+Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
 
-We use a [Gradle configuration](https://gradle.org/) to build the mod,
-written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html):
-[build.gradle.kts](https://github.com/hannibal002/SkyHanni/blob/beta/build.gradle.kts)
+You can write in the description of the pr the wording for the changelog as well (optional).
 
-This start script will automatically download all required libraries.
-
-## NotEnoughUpdates
-
-SkyHanni requires NEU.
-We use NEU to get auction house and bazaar price data for items and to read
-the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
-and recipes.
-
-For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
-
-## Config
-
-SkyHanni uses the config system from NEU.
-
-For more information, see https://github.com/NotEnoughUpdates/MoulConfig
-
-## Elite Farmers API
-
-SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for some farming features.
-
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience. All data sent is anonymonized and opt-in. 
-
-## Mixin
-
-A system to inject code into the original Minecraft code.
-This library is not part of SkyHanni itself; it comes preinstalled with Forge.
-
-For more information, see https://github.com/SpongePowered/Mixin.
-
-## Repo
-
-SkyHanni uses a repo system to easily change static variables without the need for a mod update.
-The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all files in the repo is stored for every SkyHanni user under `.minecraft\config\skyhanni\repo`.
-On every game start, the copy gets updated (if outdated and if not manually disabled).
-When working with the repo, it is recommended to disable the manual repo update to prevent overriding your local changes
-accidentally.
-
-## DiscordIPC
-
-DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-Specifically, we use [TirelessTraveler's Fork](https://github.com/ILikePlayingGames/DiscordIPC) of a fork of a fork of
-the [original](https://github.com/jagrosh/DiscordIPC).
-For info on usage, look
-at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
-
-
-## Auto Updater
-
-We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libautoupdate) from nea.
-
-# Coding Styles and Conventions
+## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
-    - Paid only mods.
-    - Mods that have reached the end of life. (Rip SBA, Dulkir and Soopy)
-    - The mod has, according to Hypixel rules, illegal features ("cheat mod").
+    - Mods that are paid to use.
+    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy)
+    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
-- All classes should be written in Kotlin, with a few exceptions:
+- All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
     - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
@@ -120,10 +65,82 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
 - Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
+- Try to avoid using kotlin's `!!` (catch if not null) feature.
+    - Replace it with `?:` (ff null return this).
+    - This will most likely not be possible to avoid when working with obects from java.
+- Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
+- Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
+- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 
-# Additional Useful Developement Tools
+## Software Used in SkyHanni
 
-## DevAuth
+### Basics
+
+SkyHanni is a Forge mod for Minecraft 1.8.9, written in [Kotlin](https://kotlinlang.org/)
+and [Java](https://www.java.com/en/).
+
+We use a [Gradle configuration](https://gradle.org/) to build the mod,
+written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html):
+[build.gradle.kts](https://github.com/hannibal002/SkyHanni/blob/beta/build.gradle.kts)
+
+This start script will automatically download all required libraries.
+
+### NotEnoughUpdates
+
+SkyHanni requires NEU.
+We use NEU to get auction house and bazaar price data for items and to read
+the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
+and recipes.
+
+For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
+
+### Config
+
+SkyHanni stores the config (settings and user data) as a json object in a single text file.
+For rendering the /sh config (categories, toggles, search, etc.),
+SkyHanni uses **MoulConfig**, the same config system as NotEnoughUpdates.
+
+For more information, see https://github.com/NotEnoughUpdates/MoulConfig
+
+### Elite Farmers API
+
+SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for
+some farming features.
+
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience.
+All data sent is anonymonized and opt-in.
+
+### Mixin
+
+A system to inject code into the original Minecraft code.
+This library is not part of SkyHanni itself; it comes preinstalled with Forge.
+
+For more information, see https://github.com/SpongePowered/Mixin.
+
+### Repo
+
+SkyHanni uses a repo system to easily change static variables without the need for a mod update.
+The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
+A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+On every game start, the copy gets updated (if outdated and if not manually disabled).
+When working with the repo, it is recommended to disable the manual repo update to prevent overriding your local changes
+accidentally.
+
+### Discord IPC
+
+DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
+Specifically, we use [TirelessTraveler's Fork](https://github.com/ILikePlayingGames/DiscordIPC) of a fork of a fork of
+the [original](https://github.com/jagrosh/DiscordIPC).
+For info on usage, look
+at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+
+### Auto Updater
+
+We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libautoupdate) from nea.
+
+## Additional Useful Developement Tools
+
+### DevAuth
 
 [DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
 debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar, put it into the
@@ -150,7 +167,7 @@ type = "microsoft"
     - Click on the link in the console and verify with a Mojang account.
     - The verification process will reappear every few days (after the session token expires).
 
-## Hot Swap
+### Hot Swap
 
 Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
 

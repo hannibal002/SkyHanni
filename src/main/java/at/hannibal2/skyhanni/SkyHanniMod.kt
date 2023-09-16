@@ -3,15 +3,13 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
-import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
-import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
+import at.hannibal2.skyhanni.features.bazaar.*
 import at.hannibal2.skyhanni.features.bingo.*
 import at.hannibal2.skyhanni.features.chat.*
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
@@ -20,8 +18,10 @@ import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
+import at.hannibal2.skyhanni.features.event.anniversary.ActivePlayerTimer
 import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -56,6 +56,10 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.misc.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
@@ -102,6 +106,7 @@ import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
@@ -126,7 +131,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.13",
+    version = "0.20.Beta.20",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -139,12 +144,14 @@ class SkyHanniMod {
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())
+        loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
         loadModule(ItemClickData())
+        loadModule(ActivePlayerTimer)
         loadModule(MinecraftData())
         loadModule(TitleUtils())
         loadModule(ItemTipHelper())
@@ -168,6 +175,8 @@ class SkyHanniMod {
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
+        loadModule(DefaultConfigFeatures)
+        loadModule(EntityOutlineRenderer)
 
         // APIs
         loadModule(BazaarApi())
@@ -179,6 +188,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
+        loadModule(SackAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -202,6 +212,7 @@ class SkyHanniMod {
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
         loadModule(BazaarBestSellMethod())
+        loadModule(BazaarOpenPriceWebsite())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         //        registerEvent(new GriffinBurrowFinder());
@@ -215,7 +226,7 @@ class SkyHanniMod {
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
         loadModule(MinionFeatures())
-        loadModule(RealTime())
+        loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
@@ -225,7 +236,7 @@ class SkyHanniMod {
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(MarkedPlayerManager())
-        loadModule(HighlightSlayerMiniBoss())
+        loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
@@ -258,9 +269,10 @@ class SkyHanniMod {
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
+        loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyblockLevelGuideHelper())
+        loadModule(SkyBlockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -324,7 +336,7 @@ class SkyHanniMod {
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(CaptureFarmingGear())
-        loadModule(SackDisplay())
+        loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
@@ -334,6 +346,7 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
+        loadModule(GetFromSacksTabComplete)
         loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
@@ -382,11 +395,17 @@ class SkyHanniMod {
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
+        loadModule(GardenPlotBorders())
+        loadModule(CosmeticFollowingLine())
+        loadModule(SuperpairsClicksAlert())
+        loadModule(PowderTracker())
+        loadModule(GlowingDroppedItems())
+        loadModule(DungeonTeammateOutlines())
 
         init()
 
         // test stuff
-        loadModule(SkyHanniTestCommand())
+        loadModule(SkyHanniDebugsAndTests())
         loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
@@ -403,7 +422,9 @@ class SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
-        Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
+        Runtime.getRuntime().addShutdownHook(Thread {
+            configManager.saveConfig("shutdown-hook")
+        })
         repo = RepoManager(configManager.configDirectory)
         try {
             repo.loadRepoInformation()
@@ -438,6 +459,7 @@ class SkyHanniMod {
 
         @JvmStatic
         val feature: Features get() = configManager.features
+        val sackData: SackData get() = configManager.sackData
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")

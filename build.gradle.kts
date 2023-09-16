@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.20.Beta.13"
+version = "0.20.Beta.20"
 
 // Toolchains:
 java {
@@ -19,7 +19,7 @@ java {
 }
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/java/main"))
+    output.setResourcesDir(file("$buildDir/classes/kotlin/main"))
 }
 
 repositories {
@@ -34,6 +34,7 @@ repositories {
         }
     }
     maven("https://repo.nea.moe/releases")
+    maven("https://maven.notenoughupdates.org/releases")
 }
 
 val shadowImpl by configurations.creating {
@@ -87,10 +88,10 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.5")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.5:test")
+    shadowModImpl(libs.moulconfig)
+    devenvMod(variantOf(libs.moulconfig) { classifier("test") })
 
-    shadowImpl("moe.nea:libautoupdate:1.0.3")
+    shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
 //    testImplementation(kotlin("test"))

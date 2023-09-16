@@ -11,19 +11,24 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 
-class SkyHanniTestCommand {
+class SkyHanniDebugsAndTests {
 
     companion object {
+        private val config get() = SkyHanniMod.feature.dev
         var displayLine = ""
         var displayList = emptyList<List<Any>>()
 
@@ -48,10 +53,10 @@ class SkyHanniTestCommand {
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
 
-            val a = Thread { OSUtils.copyToClipboard("123") }
-            val b = Thread { OSUtils.copyToClipboard("456") }
-            a.start()
-            b.start()
+//            val a = Thread { OSUtils.copyToClipboard("123") }
+//            val b = Thread { OSUtils.copyToClipboard("456") }
+//            a.start()
+//            b.start()
 
 
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
@@ -198,7 +203,7 @@ class SkyHanniTestCommand {
             builder.append("\n")
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
-            builder.append("repoAutoUpdate: ${SkyHanniMod.feature.dev.repoAutoUpdate}\n")
+            builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
             builder.append("\n")
 
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
@@ -228,25 +233,65 @@ class SkyHanniTestCommand {
             OSUtils.copyToClipboard(builder.toString())
             LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")
         }
+
+        fun copyItemInternalName() {
+            val hand = InventoryUtils.getItemInHand()
+            if (hand == null) {
+                LorenzUtils.chat("§cNo item in hand!")
+                return
+            }
+
+            val internalName = hand.getInternalNameOrNull()
+            if (internalName == null) {
+                LorenzUtils.chat("§cInternal name is null for item ${hand.name}")
+                return
+            }
+
+            val rawInternalName = internalName.asString()
+            OSUtils.copyToClipboard(rawInternalName)
+            LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+        }
+    }
+
+    @SubscribeEvent
+    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyInternalName)) return
+        val gui = event.gui as? GuiContainer ?: return
+        val focussedSlot = gui.slotUnderMouse ?: return
+        val stack = focussedSlot.stack ?: return
+        val internalName = stack.getInternalNameOrNull() ?: return
+        val rawInternalName = internalName.asString()
+        OSUtils.copyToClipboard(rawInternalName)
+        LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
     @SubscribeEvent
     fun onShowInternalName(event: ItemTooltipEvent) {
-        if (!SkyHanniMod.feature.dev.showInternalName) return
+        if (!config.showInternalName) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalName()
-        if ((internalName == NEUInternalName.NONE) && !SkyHanniMod.feature.dev.showEmptyNames) return
+        if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
     @SubscribeEvent
     fun onSHowNpcPrice(event: ItemTooltipEvent) {
-        if (!SkyHanniMod.feature.dev.showNpcPrice) return
+        if (!config.showNpcPrice) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7Npc price: §6${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onRenderLocation(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+            config.debugLocationPos.renderString(
+                "Current Area: ${HypixelData.skyBlockArea}",
+                posLabel = "SkyBlock Area (Debug)"
+            )
+        }
     }
 
     @SubscribeEvent
@@ -257,12 +302,12 @@ class SkyHanniTestCommand {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.dev.debugEnabled) return
+        if (!config.debugEnabled) return
 
         if (displayLine.isNotEmpty()) {
-            SkyHanniMod.feature.dev.debugPos.renderString("test: $displayLine", posLabel = "Test")
+            config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+        config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
     @SubscribeEvent

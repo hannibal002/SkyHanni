@@ -14,6 +14,8 @@
 + **Ender Node Tracker** - pretz
     + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
 + **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
++ Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
++ Added barn fishing timer support for stranded. - hannibal2
 + Option to shorten the **bestiary level-up message**.
 + **Bestiary overlay** - HiZe
     + Options for change number format, display time, number type and hide maxed.
@@ -23,15 +25,17 @@
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
-+ Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
 + Added timer till shared inquisitors will despawn. - hannibal2
 + Account upgrade complete reminder. - appable0
 + Chat message how many places you dropped in the farming weight lb when joining garden.
 + Added command /shfarmingprofile [player name]
-+ Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
+    + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
       shift key.
+    + Highlight the level 100 text in gold for pets below legendary. - hannibal2
+      (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)
+    + Option to only show level 100 for golden dragon in the pet experience tooltip. - hannibal2
 + Anita Extra Farming Fortune:
     + Show current tier and cost to max out in the item tooltip.
 + Sync Jacob Contests - Kaeso + CalMWolfs
@@ -44,6 +48,43 @@
     + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
++ Added **Default Option Settings:** - nea
+    + Enables or disables all features at once, or per category.
+    + Sends a chat message on first SkyHanni startup (starting with this feature, so this version everyone will see this
+      message).
+    + Shows new features after an update (starting with the next beta, not this one).
+    + Allows to change those settings anytime again with /shdefaultoptions.
++ While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
++ Added Reindrake support to the Damage Indicator. - hannibal2
++ Added visual garden plot borders. - VixidDev
+    + Press F3 + G to enable/disable the view.
++ Added **Following Line** Cosmetic - hannibal2
+    + Draws a colored line behind the player.
+    + Change the color, width, and duration of the line.
++ Show alert when reaching max super-pairs clicks. - pretz
+    + Plays a beep sound and sends a message in chat when the player reaches the maximum number of clicks gained for
+      super-pairs minigames.
++ Added gemstone slot unlock costs to the Estimated Item Value. - Fix3dll
++ **Powder Grinding Tracker** - HiZe
+    + Shows the Mithril/Gemstone Powder gained, the number of chests opened, if Double Powder is active, and the items
+      collected.
+    + Change between current session and total (open the inventory and click on Display Mode).
+    + Fully customizable: change what items or stats to show.
+    + Has support for the maxed Great Explorer perk.
+    + Option to hide while not grinding powder.
++ Added Anniversary Event Active Player Ticket Timer. - nea
+    + Option to play a sound as well.
++ Added highlight and outline feature for rare sea creatures. - Cad
++ Add feature to outline dropped items. - Cad
++ Add Outline Dungeon Teammates. - Cad
++ Added Price Website button. - hannibal2
+    + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
++ Added icons for the medals received in a contest. - CalMWolfs
+    + Different symbol for when it was a Finnegan contest.
++ Added Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
++ Added GUI Scale. - nea
+    + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
+    + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
 
 ### Changes
 
@@ -84,6 +125,20 @@
 + Added support for the new fixed inquisitor spawn message from Hypixel for the detection. - hannibal2
 + Added option to hide the off-screen drop chat message. - hannibal2
 + Now hides the farming weight display by default when below 200 weight (can be disabled). - hannibal2
++ Added option to change the Enderman Slayer beacon color. - hannibal2
++ Added option to show a line to every slayer mini boss around you. - hannibal2
++ Added options to ignore the wizard and the crypt warp for Diana.
++ Loading farming weight values directly from elitebot.dev. - CalMWolfs
+    + This has no effect right now but allows Kaeso to change the values easier in the future.
++ Slightly changed the FF guide tab colors to make more sense. - Obsidian
++ Changed the bingo tips description to show the actual data source.
++ Added Fire Fury Staff support to item ability cooldown feature. - Cad
++ Estimated item value now shows the reforge stone apply cost as well. - hannibal2
++ Added Bits, Mithril Powder, and Gemstone Powder to visitor drop statistics. - Obsidian
++ Added support for slayer profit trackers on stranded. - hannibal2
++ Added Trapper Cooldown GUI. - NetheriteMiner
+    + Show the cooldown on screen in an overlay (intended for abiphone users).
++ Made the fake garden level up message (after level 15) clickable. - J10a1n15
 
 ### Fixes
 
@@ -131,9 +186,45 @@
     + Reward items no longer impact the visitor drop coins spent data negatively.
     + Copper per coin price now respects the reward item profit as well.
     + Now showing the NPC price for items without ah/bazaar data (looking at pet candy).
-+ Now correctly ignoring the minis from tier 2 Arachne in the Damage Indicator. - hannibal2
 + Fixed highlight in the main bestiary menu. - HiZe
 + Fixed maxed farming fortune possible in /ff - CalMWolfs
++ Fixed negative coins per copper price in visitor inventory. - hannibal2
++ Fixed rare error message while farming. - hannibal2
++ Fixed a rare error message while showing the lore of a farming tool. - hannibal2
++ Fixed estimated item value doesn't detect master stars in Auction House. - hannibal2
++ Fixed enderman slayer beacon warning only visible for a very short amount of time. - hannibal2
++ Fixed enderman slayer line to beacon only shows when beacon highlight is enabled. - hannibal2
++ Fixed major composter profit calculation with multi-drop. - pretz
++ Garden Money Per Hour: Fixed the wrong NPC price when Merge Seeds is enabled. - hannibal2
++ Hopefully fixed error messages in bingo around collection values. - hannibal2
++ Hopefully fixed a rare chat error. - hannibal2
++ Fixed duration format in non-god-potion display. - appable0
++ Fixed various typos. - pretz
++ Fixed minion nametag not getting removed after picking it up. - Cad
++ Fixed 3k hp spiders being falsely highlighted as Arachne's Keepers. - oofy
++ Fixed a bug in GhostCounter for the 48th time. - HiZe
++ Fixed typo of effigy in the rift blood effigies display. - Vahvl
++ Fixed potential bug in salvage inventory with "hide not clickable items" on the alpha. - hannibal2
++ Fixed small typos in config. - hannibal2
++ Fixed maxed pet exp progress bar is wrong for bingo pet. - hannibal2
++ Hopefully fixed bug that opening a visitor too quickly causes detection problems. - hannibal2
++ Added nametags for minions as soon as they are placed. - Cad
++ Fixed wrong display offset in Powder Tracker. - Hize
++ Fixed some features not working correctly because of broken location detection for wrong Hypixel area names. - Cad
++ This includes:
++ Wilted Berberis Helper (in the Rift, Dreadfarm)
++ Slayer Profit Tracker (in the Park, Howling Cave)
++ End Node profit Tracker (in the End)
++ Fixed crash when item rarity cannot be detected in Auction House. - hannibal2
++ Fixed Replenish and Cultivating being bugged in visitor drop statistics. - Obsidian
++ Summoning souls should no longer be counted as sea creatures for the fishing timer. - hannibal2
++ Fixed Jacob Contests times needed display showing impossible FF values. - ReyMaratov
++ Fixed item cooldown issues with fire fury staff and jinxed voodoo doll. - Cad
++ Fixed the percentage going above 100% for bestiary progress. - HiZe
++ Fixed max kills from Ghost Counter using old bestiary data when resetting the config. - HiZe
++ Fixed part of Zealot Hideout area showing as The End. - Cad
++ Fixed many typos in the config. - schlaumeyer, oofy, CalMWolfs & hannibal2
++ Fixed a missing bracket in the reforge apply cost display from Estimated Item Value. - jaNI
 
 ### Removed Features
 
@@ -160,8 +251,8 @@
     + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
     + Customize the color
 + Added **Odonatas Highlighter**
-    + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
-    + Customize the color
+    + Highlight the small Odonatas flying around the trees while holding an Empty Odonata Bottle in the hand.
+    + Customize the color.
 + Added **Agaricus Cap** countdown
     + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
 + Added **Leech Supreme** to Damage Indicator
@@ -182,16 +273,16 @@
     + This contains RNG Meter, Slayer quest warning and Items on ground
 + Added item ability cooldown support for **Weirder Tuba** and **Holy Ice** - HiZe
 + Added **Lazer Parkour** Solver - CalMWolfs
-    + Highlights the location of the invisible blocks in the MirrorVerse
+    + Highlights the location of the invisible blocks in the Mirrorverse
 + Added Mirrorverse **Dance Room Helper** - HiZe
-    + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+    + Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.
     + Change how many tasks you should see
     + Hide other players inside the dance room
     + Added timer before next instruction
     + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
     + Fully customize the description for now, next and later (with color)
 + Added **Upside Down** Parkour & **Lava Maze** - hannibal2
-    + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
+    + Helps to solve the Upside Down Parkour and Lava Maze in the Mirrorverse by showing the correct way
     + Change how many platforms should be shown in front of you
     + Rainbow color (optional) - nea
     + Hide other players while doing the parkour
@@ -228,8 +319,8 @@
     + Option to only show the helper while standing on Farmland blocks
     + Option to hide the wilted berberis particles
 + Added **Vampire Slayer** features in Damage Indicator
-    + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
-    + Show a timer until the boss leaves the invicible Mania Circles state.
+    + Show the amount of HP missing until the steak can be used on the vampire slayer on top of the boss.
+    + Show a timer until the boss leaves the invincible Mania Circles state.
     + Show the percentage of HP next to the HP.
 + Added **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
@@ -448,9 +539,9 @@
     + Config toggles and GUI elements stay synced between all profiles
 + Reworked Hide Armor
     + More options
-      = Fixed Movement bugs with Depth Strider enchantment
-      = Fixed compatibility issues with other mods
-      Note: The hide armor config got reset, if you want to use it, you have to enable it again)
+        + Fixed Movement bugs with Depth Strider enchantment
+        + Fixed compatibility issues with other mods
+        + Note: The hide armor config got reset, if you want to use it, you have to enable it again)
 + Added support for maxed out crop milestones
 + Showing total price for visitor items needed
 + Warning when BPS in Jacob contest ff needed display is below 1
@@ -535,7 +626,7 @@
     + Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires
       a tool with either a counter or cultivating enchantment)
 + Added **Best Crop Display**
-    + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
+    + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or SkyBlock level.
 + Added **Copper Price**
     + Show the price for copper inside the visitor gui.
 + Added **Amount and Time**
@@ -545,7 +636,7 @@
 + Added Desk shortcut in SkyBlock Menu.
 + Added **Garden Level Display**
     + Show the current garden level and progress to the next level.
-+ Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ Added **Farming Weight and Leaderboard**, provided by the Elite SkyBlock farmers.
 + Added farming weight next leaderboard position eta.
 + Added **Dicer Counter**
     + Count RNG drops for Melon Dicer and Pumpkin Dicer.
@@ -654,7 +745,7 @@
 
 ## Features
 
-+ Added highlight for stuff that is missing in the skyblock level guide inventory.
++ Added highlight for stuff that is missing in the SkyBlock level guide inventory.
 + Added Bingo Card display.
 + **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
@@ -744,7 +835,7 @@
 
 ### Removals
 
-- Removed additional settings for the chat design, like channel prefix and skyblock level
+- Removed additional settings for the chat design, like channel prefix and SkyBlock level
 
 ### Fixes
 
@@ -871,7 +962,7 @@
 
 + Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
-+ Added option to hide all damage splashes, from anywhere in Skyblock.
++ Added option to hide all damage splashes, from anywhere in SkyBlock.
 + Added highlight Thunder Sparks after killing a Thunder
 + Added Thunder to damage indicator
 + Mark the own player name (for Chat messages)
@@ -921,8 +1012,8 @@
 
 ### Other Misc Features
 
-- Added option to hide the Skyblock Level from the chat messages (alpha only atm)
-- Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and
+- Added option to hide the SkyBlock Level from the chat messages (alpha only atm)
+- Added option to change the way the SkyBlock Level gets displayed in the chat (only working when SkyBlock level and
   fancy player message format are enabled)
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color

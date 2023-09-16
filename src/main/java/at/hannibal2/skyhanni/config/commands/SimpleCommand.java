@@ -32,9 +32,9 @@ public class SimpleCommand extends CommandBase {
         public abstract void processCommand(ICommandSender sender, String[] args);
     }
 
-    public abstract static class TabCompleteRunnable {
+    public interface TabCompleteRunnable {
 
-        public abstract List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos);
+         List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos);
     }
 
     public boolean canCommandSenderUseCommand(ICommandSender sender) {

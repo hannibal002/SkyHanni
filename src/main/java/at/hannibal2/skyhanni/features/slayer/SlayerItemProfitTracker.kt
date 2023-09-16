@@ -29,6 +29,7 @@ import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object SlayerItemProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
@@ -148,7 +149,7 @@ object SlayerItemProfitTracker {
         }
         if (config.titleWarning) {
             if (price > config.minimumPriceWarning) {
-                TitleUtils.sendTitle("§a+ $itemName", 5_000)
+                TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
             }
         }
     }

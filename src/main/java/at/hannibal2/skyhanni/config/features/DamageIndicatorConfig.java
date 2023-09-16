@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -12,6 +13,7 @@ public class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the boss' remaining health.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = false;
 
     @Expose
@@ -56,11 +58,12 @@ public class DamageIndicatorConfig {
                     "Dummy",
                     "§bArachne",
                     "§bThe Rift Bosses",
-                    "§bRiftstalker Bloodfiend"
+                    "§bRiftstalker Bloodfiend",
+                    "§6Reindrake"
             }
     )
     //TODO only show currently working and tested features
-    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22, 23));
+    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22, 23, 24));
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
@@ -108,12 +111,12 @@ public class DamageIndicatorConfig {
 
     public static class VampireSlayerConfig {
         @Expose
-        @ConfigOption(name = "HP untill Steak", desc = "Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.")
+        @ConfigOption(name = "HP until Steak", desc = "Show the amount of HP missing until the steak can be used on the Vampire Slayer on top of the boss.")
         @ConfigEditorBoolean
         public boolean hpTillSteak = false;
 
         @Expose
-        @ConfigOption(name = "Mania Circles", desc = "Show a timer until the boss leaves the invicible Mania Circles state.")
+        @ConfigOption(name = "Mania Circles", desc = "Show a timer until the boss leaves the invincible Mania Circles state.")
         @ConfigEditorBoolean
         public boolean maniaCircles = false;
 

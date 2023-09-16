@@ -21,6 +21,8 @@ class BazaarApi {
         var inBazaarInventory = false
         private var currentSearchedItem = ""
 
+        var currentlyOpenedProduct: NEUInternalName? = null
+
         fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
 
         fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
@@ -45,6 +47,21 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
+        if (inBazaarInventory) {
+            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+            currentlyOpenedProduct = openedProduct
+            BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
+        }
+    }
+
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+        val buyInstantly = inventoryItems[10] ?: return null
+
+        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        val bazaarItem = inventoryItems[13] ?: return null
+
+        val itemName = bazaarItem.displayName
+        return NEUItems.getInternalNameOrNull(itemName)
     }
 
     @SubscribeEvent
@@ -118,5 +135,6 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
+        currentlyOpenedProduct = null
     }
 }

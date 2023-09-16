@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
@@ -82,7 +83,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
 
         try {
@@ -103,7 +104,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            LorenzUtils.error("[SkyHanni] Error in OwnInventorItemUpdateEvent")
+            LorenzUtils.error("[SkyHanni] Error in OwnInventoryItemUpdateEvent")
             e.printStackTrace()
         }
     }
@@ -215,7 +216,7 @@ object GardenCropMilestoneDisplay {
             SoundUtils.playBeepSound()
         }
         if (!needsInventory) {
-            TitleUtils.sendTitle(title, 1_500)
+            TitleUtils.sendTitle(title, 1.5.seconds)
         }
     }
 

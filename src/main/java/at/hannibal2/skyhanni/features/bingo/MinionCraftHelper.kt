@@ -16,6 +16,7 @@ import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
@@ -248,7 +249,7 @@ class MinionCraftHelper {
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        TitleUtils.sendTitle("Can craft $minionName", 3_000)
+        TitleUtils.sendTitle("Can craft $minionName", 3.seconds)
         alreadyNotified.add(minionName)
     }
 

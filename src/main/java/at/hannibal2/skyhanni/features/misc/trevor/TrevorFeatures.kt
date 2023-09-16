@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
+import kotlin.time.Duration.Companion.seconds
 
 
 class TrevorFeatures {
@@ -69,7 +71,7 @@ class TrevorFeatures {
         if (event.message == "§aReturn to the Trapper soon to get a new animal to hunt!") {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                TitleUtils.sendTitle("§2Mob Died ", 5_000)
+                TitleUtils.sendTitle("§2Mob Died ", 5.seconds)
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
@@ -105,6 +107,22 @@ class TrevorFeatures {
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (!config.trapperCooldownGui) return
+        if (!onFarmingIsland()) return
+
+        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
+        else if (timeUntilNextReady == 1) "1 second left"
+        else "$timeUntilNextReady seconds left"
+
+        config.trapperCooldownPos.renderString(
+            "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
+            posLabel = "Trapper Cooldown GUI"
+        )
+    }
+
+
     private fun updateTrapper() {
         timeUntilNextReady -= 1
         if (trapperReady && timeUntilNextReady > 0) {
@@ -114,7 +132,7 @@ class TrevorFeatures {
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                TitleUtils.sendTitle("§2Trapper Ready", 3_000)
+                TitleUtils.sendTitle("§2Trapper Ready", 3.seconds)
                 SoundUtils.playBeepSound()
             }
             currentStatus = TrapperStatus.READY
@@ -161,10 +179,8 @@ class TrevorFeatures {
             Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase) {
             if (config.trapperTalkCooldown) {
-                RenderLivingEntityHelper.setEntityColor(
-                    entityTrapper,
-                    currentStatus.color
-                ) { config.trapperTalkCooldown }
+                RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+                { config.trapperTalkCooldown }
                 entityTrapper.getLorenzVec().let {
                     if (it.distanceToPlayer() < 15) {
                         event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
@@ -227,10 +243,14 @@ class TrevorFeatures {
         currentLabel = "§2Ready"
     }
 
-    enum class TrapperStatus(val color: Int) {
-        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75)),
-        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
-        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
+    enum class TrapperStatus(baseColor: LorenzColor) {
+        READY(LorenzColor.DARK_GREEN),
+        WAITING(LorenzColor.DARK_AQUA),
+        ACTIVE(LorenzColor.DARK_RED),
+        ;
+
+        val color = baseColor.toColor().withAlpha(75)
+        val colorCode = baseColor.getChatColor()
     }
 
     private fun onFarmingIsland() =

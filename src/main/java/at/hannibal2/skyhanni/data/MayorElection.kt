@@ -58,7 +58,7 @@ class MayorElection {
     private fun checkCurrentMayor() {
         var currentYear = SkyBlockTime.now().year
 
-        // The time in the current skyblock year when the election circle will restart
+        // The time in the current SkyBlock year when the election circle will restart
         val month = 3 // Late Spring
         val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
 

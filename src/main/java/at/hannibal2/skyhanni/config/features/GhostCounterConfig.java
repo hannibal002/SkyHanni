@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
@@ -15,6 +16,7 @@ public class GhostCounterConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable ghost counter.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = true;
 
     @Expose

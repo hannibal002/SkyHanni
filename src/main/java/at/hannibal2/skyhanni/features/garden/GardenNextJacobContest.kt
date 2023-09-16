@@ -29,6 +29,7 @@ import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.UIManager
+import kotlin.time.Duration.Companion.seconds
 
 object GardenNextJacobContest {
     private var display = emptyList<Any>()
@@ -314,7 +315,7 @@ object GardenNextJacobContest {
 
         val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
         LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
-        TitleUtils.sendTitle("§eFarming Contest!", 5_000)
+        TitleUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
         if (config.nextJacobContestWarnPopup && !Display.isActive()) {

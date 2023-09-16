@@ -68,12 +68,12 @@ class RiftBloodEffigies {
             if (diff < 0L) {
                 if (s == "7") {
                     if (time != 0L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} respawned!")
+                        LorenzUtils.chat("§e[SkyHanni] Effigy #${index + 1} respawned!")
                         effigiesTimes = effigiesTimes.editCopy { this[index] = 0L }
                     }
                 } else {
                     if (time != -1L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} is broken!")
+                        LorenzUtils.chat("§e[SkyHanni] Effigy #${index + 1} is broken!")
                         val endTime = System.currentTimeMillis() + 1_000 * 60 * 20
                         effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }
@@ -104,7 +104,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         for ((index, location) in locations.withIndex()) {
-            val name = "Effigies #${index + 1}"
+            val name = "Effigy #${index + 1}"
             val duration = effigiesTimes[index]!!
 
             if (duration == -1L) {

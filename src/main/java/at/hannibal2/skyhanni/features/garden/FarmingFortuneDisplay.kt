@@ -49,7 +49,7 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onInventoryUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.itemStack.getCropType() == null) return
         updateToolFortune(event.itemStack)

@@ -66,6 +66,11 @@ class FarmingWeightDisplay {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         update()
+
+        SkyHanniMod.coroutineScope.launch {
+            getCropWeights()
+            hasFetchedCropWeights = true
+        }
     }
 
     companion object {
@@ -209,7 +214,7 @@ class FarmingWeightDisplay {
                 } else {
                     leaderboardPosition--
                 }
-                ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
+                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
 
                 // Remove passed player to present the next one
@@ -283,7 +288,7 @@ class FarmingWeightDisplay {
                 if (wasNotLoaded && config.eliteFarmingWeightoffScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
-                ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
+                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
                 lastLeaderboardUpdate = System.currentTimeMillis()
                 isLoadingLeaderboard = false
@@ -292,7 +297,7 @@ class FarmingWeightDisplay {
 
         private fun checkOffScreenLeaderboardChanges() {
             val profileSpecific = ProfileStorageData.profileSpecific ?: return
-            val oldPosition = profileSpecific.garden.faramingWeight.lastFarmingWeightLeaderboard
+            val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
             if (oldPosition == -1) return
 
             val diff = leaderboardPosition - oldPosition
@@ -403,15 +408,35 @@ class FarmingWeightDisplay {
 
         private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
-        private fun CropType.getFactor() = factorPerCrop[this]!!
+        private fun CropType.getFactor(): Double {
+            return factorPerCrop[this] ?: backupFactors[this] ?: error("Crop $this not in backupFactors!")
+        }
 
         fun lookUpCommand(it: Array<String>) {
             val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
-            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile from §b$name")
+            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile of player §b$name")
         }
 
-        private val factorPerCrop by lazy {
+        private val factorPerCrop = mutableMapOf<CropType, Double>()
+        private var attemptingCropWeightFetch = false
+        private var hasFetchedCropWeights = false
+
+        private suspend fun getCropWeights() {
+            if (attemptingCropWeightFetch || hasFetchedCropWeights) return
+            attemptingCropWeightFetch = true
+
+            val url = "https://api.elitebot.dev/weights"
+            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+
+            for (crop in result.entrySet()) {
+                val cropType = CropType.getByName(crop.key)
+                factorPerCrop[cropType] = crop.value.asDouble
+            }
+        }
+
+        // still needed when first joining garden and if they cant make https requests
+        private val backupFactors by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
                 CropType.CARROT to 302_061.86,
@@ -425,7 +450,7 @@ class FarmingWeightDisplay {
                 CropType.CACTUS to 177_254.45,
             )
         }
-    }
 
-    class UpcomingPlayer(val name: String, val weight: Double)
+        class UpcomingPlayer(val name: String, val weight: Double)
+    }
 }

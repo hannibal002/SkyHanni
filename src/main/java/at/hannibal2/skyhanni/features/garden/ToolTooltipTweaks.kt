@@ -104,9 +104,7 @@ class ToolTooltipTweaks {
                 if (removingFarmhandDescription) {
                     iterator.remove()
                     removingFarmhandDescription = line != "§5§o"
-                }
-
-                if (removingCounterDescription && !line.startsWith("§5§o§7You have")) {
+                } else if (removingCounterDescription && !line.startsWith("§5§o§7You have")) {
                     iterator.remove()
                 } else {
                     removingCounterDescription = false

@@ -27,10 +27,11 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -105,6 +106,11 @@ object Commands {
         registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { commandHelp(it) }
+        registerCommand0("shdefaultoptions", "Select default options", {
+            DefaultConfigFeatures.onCommand(
+                it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
+            )
+        }, DefaultConfigFeatures::onComplete)
     }
 
     private fun usersNormal() {
@@ -177,11 +183,11 @@ object Commands {
         registerCommand(
             "shdebugdata",
             "Prints debug data in the clipboard"
-        ) { SkyHanniTestCommand.debugData(it) }
+        ) { SkyHanniDebugsAndTests.debugData(it) }
         registerCommand(
             "shversion",
             "Prints the SkyHanni version in the chat"
-        ) { SkyHanniTestCommand.debugVersion() }
+        ) { SkyHanniDebugsAndTests.debugVersion() }
         registerCommand(
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
@@ -192,7 +198,7 @@ object Commands {
         registerCommand("shtestbingo", "dev command") { TestBingo.toggle() }
         registerCommand("shprintbingohelper", "dev command") { BingoNextStepHelper.command() }
         registerCommand("shreloadbingodata", "dev command") { BingoCardDisplay.command() }
-        registerCommand("shtestgardenvisitors", "dev command") { SkyHanniTestCommand.testGardenVisitors() }
+        registerCommand("shtestgardenvisitors", "dev command") { SkyHanniDebugsAndTests.testGardenVisitors() }
         registerCommand("shtestcomposter", "dev command") { ComposterOverlay.onCommand(it) }
         registerCommand("shtestinquisitor", "dev command") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation", "dev command") { CropMoneyDisplay.toggleShowCalculation() }
@@ -204,21 +210,21 @@ object Commands {
     }
 
     private fun developersCodingHelp() {
-        registerCommand("shtest", "Unused test command.") { SkyHanniTestCommand.testCommand(it) }
+        registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"
-        ) { SkyHanniTestCommand.stopListeners() }
+        ) { SkyHanniDebugsAndTests.stopListeners() }
         registerCommand(
             "shreloadlisteners",
             "Trying to load all forge event listeners again. Might not work at all"
-        ) { SkyHanniTestCommand.reloadListeners() }
+        ) { SkyHanniDebugsAndTests.reloadListeners() }
         registerCommand(
             "shcopylocation",
             "Copies the player location as LorenzVec format to the clipboard"
-        ) { SkyHanniTestCommand.copyLocation(it) }
+        ) { SkyHanniDebugsAndTests.copyLocation(it) }
         registerCommand(
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
@@ -241,6 +247,10 @@ object Commands {
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
         ) { TestChatCommand.command(it) }
+        registerCommand(
+            "shcopyinternalname",
+            "Copies the internal name of the item in hand to the clipboard."
+        ) { SkyHanniDebugsAndTests.copyItemInternalName() }
     }
 
     private fun internalCommands() {
@@ -294,7 +304,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
+            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -308,8 +318,24 @@ object Commands {
         config.outdatedItems.clear()
     }
 
-    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
-        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+    private fun registerCommand(
+        name: String,
+        description: String,
+        function: (Array<String>) -> Unit
+    ) = registerCommand0(name, description, function)
+
+    private fun registerCommand0(
+        name: String,
+        description: String,
+        function: (Array<String>) -> Unit,
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+    ) {
+        ClientCommandHandler.instance.registerCommand(
+            SimpleCommand(
+                name,
+                createCommand(function)
+            ) { _, b, _ -> autoComplete(b) }
+        )
         commands.add(CommandInfo(name, description, currentCategory))
     }
 

@@ -5,14 +5,15 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -21,6 +22,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
@@ -29,6 +31,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Timer
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -53,6 +56,8 @@ object LorenzUtils {
     val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
     val noTradeMode get() = HypixelData.noTrade
+
+    val isStrandedProfile get() = HypixelData.stranded
 
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
@@ -227,16 +232,25 @@ object LorenzUtils {
 
     fun setTextIntoSign(text: String) {
         val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
+        if (gui !is AccessorGuiEditSign) return
         gui.tileSign.signText[0] = ChatComponentText(text)
+    }
+
+    fun addTextIntoSign(addedText: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is AccessorGuiEditSign) return
+        val lines = gui.tileSign.signText
+        val index = gui.editLine
+        val text = lines[index].unformattedText + addedText
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
     fun clickableChat(message: String, command: String) {
         val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        val fullCommand = "/" + command.removePrefix("/")
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /${command.removePrefix("/")}"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
@@ -279,6 +293,9 @@ object LorenzUtils {
     fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
 
     fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
+
+    // A mac-only key, represents Windows key on windows (but different key code)
+    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_LMETA)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -426,17 +443,25 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inIsland(this)
 
-    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N): N {
-        val old = this[item] ?: 0
-        val new = when (old) {
-            is Double -> old + amount.toDouble()
-            is Float -> old + amount.toFloat()
-            is Long -> old + amount.toLong()
-            else -> old.toInt() + amount.toInt()
-        }
-        @Suppress("UNCHECKED_CAST")
-        this[item] = new as N
-        return new
+    fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
+        val currentValue = this[key] ?: 0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K> MutableMap<K, Long>.addOrPut(key: K, number: Long): Long {
+        val currentValue = this[key] ?: 0L
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double {
+        val currentValue = this[key] ?: 0.0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
     }
 
     fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
@@ -468,7 +493,7 @@ object LorenzUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun Any.equalsOneOf(vararg other: Any): Boolean {
+    fun <T> T.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }
@@ -499,5 +524,10 @@ object LorenzUtils {
                 runnable()
             }
         }, duration.inWholeMilliseconds)
+    }
+
+    fun isPastingKeysDown(): Boolean {
+        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+        return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
     }
 }

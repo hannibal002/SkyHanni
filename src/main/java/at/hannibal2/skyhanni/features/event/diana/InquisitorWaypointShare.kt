@@ -226,7 +226,7 @@ object InquisitorWaypointShare {
             if (!waypoints.containsKey(cleanName)) {
                 LorenzUtils.chat("§e[SkyHanni] $playerName §l§efound an inquisitor at §l§c$x $y $z!")
                 if (cleanName != LorenzUtils.getPlayerName()) {
-                    TitleUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5_000)
+                    TitleUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5.seconds)
                     SoundUtils.playBeepSound()
                 }
             }

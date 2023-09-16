@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -25,6 +25,7 @@ class ItemAbilityCooldown {
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
@@ -34,6 +35,11 @@ class ItemAbilityCooldown {
                 if (abilityScrolls.size != 3) return
 
                 ItemAbility.HYPERION.sound()
+            }
+        }
+        if (event.soundName == "liquid.lavapop") {
+            if (event.pitch == 1.0f && event.volume == 1f) {
+                ItemAbility.FIRE_FURY_STAFF.sound()
             }
         }
         if (event.soundName == "mob.enderdragon.growl") {
@@ -46,8 +52,12 @@ class ItemAbilityCooldown {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
             }
             if (event.pitch == 1f && event.volume == 1f) {
-                val internalName = InventoryUtils.getItemInHand()?.getInternalName_old() ?: return
-                if (!internalName.equalsOneOf("SHADOW_FURY", "STARRED_SHADOW_FURY")) return
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (!internalName.equalsOneOf(
+                        "SHADOW_FURY".asInternalName(),
+                        "STARRED_SHADOW_FURY".asInternalName()
+                    )
+                ) return
 
                 ItemAbility.SHADOW_FURY.sound()
             }
@@ -82,9 +92,17 @@ class ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
         }
-        if (event.soundName == "random.successful_hit") {
+        if (event.soundName == "random.successful_hit") { // Jinxed Voodoo Doll Hit
             if (event.volume == 1.0f && event.pitch == 0.7936508f) {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
+            }
+        }
+        if (event.soundName == "mob.ghast.scream") { // Jinxed Voodoo Doll Miss
+            if (event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7) {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if (VOODOO_DOLL_WILTED in recentItems) {
+                    ItemAbility.VOODOO_DOLL_WILTED.sound()
+                }
             }
         }
         if (event.soundName == "random.explode") {
@@ -157,7 +175,7 @@ class ItemAbilityCooldown {
 
     private fun handleItemClick(itemInHand: ItemStack?) {
         if (!LorenzUtils.inSkyBlock) return
-        itemInHand?.getInternalName_old()?.run {
+        itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
         }
     }
@@ -321,7 +339,7 @@ class ItemAbilityCooldown {
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
-        val internalName = stack.getInternalName_old()
+        val internalName = stack.getInternalName()
 
         val list = mutableListOf<ItemAbility>()
         for (ability in ItemAbility.entries) {
