@@ -27,7 +27,7 @@ class WikiCommand {
                 LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §c$search")
 
                 // val url = "https://www.google.com/search?q=inurl%3Ahypixel-skyblock.fandom.com $search&hl=en"
-                val url = "https://hypixel-skyblock.fandom.com/wiki/Special:Search?query=cock+and+ball+torture&scope=internal"
+                val url = "https://hypixel-skyblock.fandom.com/wiki/Special:Search?query= $search&scope=internal"
                 OSUtils.openBrowser(url.replace(' ', '+'))
             }
         }
