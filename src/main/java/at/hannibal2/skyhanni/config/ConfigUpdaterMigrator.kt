@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -69,8 +70,7 @@ object ConfigUpdaterMigrator {
     }
 
     fun fixConfig(config: JsonObject): JsonObject {
-        val lV = (config.get("lastVersion") as? JsonPrimitive)
-            ?.takeIf { it.isNumber }?.asInt ?: -1
+        val lV = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lV == configVersion) return config
         logger.log("Starting config transformation from $lV to $configVersion")
         val migration = ConfigFixEvent(config, JsonObject().also {

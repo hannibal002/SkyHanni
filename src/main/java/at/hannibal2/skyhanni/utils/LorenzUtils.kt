@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -530,4 +531,6 @@ object LorenzUtils {
         val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
         return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
     }
+
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 }
