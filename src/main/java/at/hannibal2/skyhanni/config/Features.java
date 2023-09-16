@@ -68,10 +68,6 @@ public class Features extends Config {
     public SummoningsConfig summonings = new SummoningsConfig();
 
     @Expose
-    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
-    public AshfangConfig ashfang = new AshfangConfig();
-
-    @Expose
     @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
     public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
