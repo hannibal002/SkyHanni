@@ -210,7 +210,8 @@ object GardenAPI {
         return 0
     }
 
-    fun getLevelForExp(gardenExp: Long): Int {
+    fun getGardenLevel(): Int {
+        val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
         for (tierExp in gardenExperience) {

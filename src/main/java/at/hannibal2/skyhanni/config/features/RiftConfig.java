@@ -250,7 +250,7 @@ public class RiftConfig {
             }
         }
 
-        @ConfigOption(name = "Mirror Verse", desc = "")
+        @ConfigOption(name = "Mirrorverse", desc = "")
         @Accordion
         @Expose
         public MirrorVerse mirrorVerseConfig = new MirrorVerse();
@@ -265,7 +265,7 @@ public class RiftConfig {
             public static class LavaMazeConfig {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the mirror verse by showing the correct way.")
+                @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the Mirrorverse by showing the correct way.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean enabled = true;
@@ -301,7 +301,7 @@ public class RiftConfig {
             public static class UpsideDownParkour {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the mirror verse by showing the correct way.")
+                @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the Mirrorverse by showing the correct way.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean enabled = true;
@@ -342,7 +342,7 @@ public class RiftConfig {
             public static class DanceRoomHelper {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
+                @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean enabled = false;

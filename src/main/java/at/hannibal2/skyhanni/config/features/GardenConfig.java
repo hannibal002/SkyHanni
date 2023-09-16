@@ -775,7 +775,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
-            "The calculation and API is provided by The Elite SkyBlock Farmers. " +
+            "The calculation and API is provided by The Elite SkyBlock farmers. " +
             "See §ehttps://elitebot.dev/info §7for more info.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
