@@ -84,8 +84,8 @@ public class Features extends Config {
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
-    @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
+    @Category(name = "Combat", desc = "Everything combat and PVE related.")
+    public CombatConfig combat = new CombatConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
