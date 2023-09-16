@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
@@ -21,11 +21,6 @@ class GardenLevelDisplay {
     private val expToNextLevelPattern = "(?:.*) §e(?<nextLevelExp>.*)§6\\/(?:.*)".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
-    private var gardenExp
-        get() = GardenAPI.config?.experience ?: -1
-        set(value) {
-            GardenAPI.config?.experience = value
-        }
     private var display = ""
     private var visitorRewardPattern = " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience".toPattern()
 
@@ -44,15 +39,17 @@ class GardenLevelDisplay {
     }
 
     private fun addExp(moreExp: Int) {
-        val oldLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
-        gardenExp += moreExp
-        val newLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
+        val gardenExp = GardenAPI.gardenExp ?: return
+        val oldLevel = GardenAPI.getGardenLevel()
+        GardenAPI.gardenExp = gardenExp + moreExp
+        val newLevel = GardenAPI.getGardenLevel()
         if (newLevel == oldLevel + 1) {
             if (newLevel > 15) {
                 LorenzUtils.runDelayed(50.milliseconds) {
-                    LorenzUtils.chat(
+                    LorenzUtils.clickableChat(
                         " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                                " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "
+                                " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
+                        "/gardenlevels"
                     )
                 }
             }
