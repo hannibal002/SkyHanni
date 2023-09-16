@@ -136,4 +136,8 @@ public class Features extends Config {
 
     @Expose
     public Storage storage = new Storage();
+
+    @Expose
+    public int lastVersion = ConfigUpdaterMigrator.INSTANCE.getConfigVersion();
+
 }
