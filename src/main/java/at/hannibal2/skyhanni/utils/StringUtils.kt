@@ -167,9 +167,8 @@ object StringUtils {
         }
     }
 
-    // recursively goes through the component and siblings until an action = true
+    // recursively goes through the chat component until an action is completed
     fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
-
         if (action.test(chatComponent)) {
             return true
         }
@@ -181,7 +180,7 @@ object StringUtils {
         return false
     }
 
-    // replaces without breaking any click or hover events (unless that whole text is removed)
+    // replaces a word without breaking any chat components
     fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
         modifyFirstChatComponent(chatComponent) { component ->
             if (component is ChatComponentText) {
