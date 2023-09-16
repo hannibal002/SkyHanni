@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -20,7 +21,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
-    private val genericDecimalPattern = "(?<beforeDecimal>[01])\.(?<pastDecimal>[0-9]*)".toPattern()
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
@@ -529,40 +529,32 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(32)) {
             if (chestName == "Visitor's Logbook") {
-                var timesVisited = 0
-                var timesAccepted = 0
-                if (item.getLore().any { it.contains("Times Visited: ") }) {
-                    for (line in item.getLore()) {
-                        if (line.contains("Times Visited: ")) {
-                            timesVisited = line.removeColor().replace("Times Visited: ", "").trim().toInt()
-                        } else if (line.contains("Offers Accepted: ")) {
-                            timesAccepted = line.removeColor().replace("Offers Accepted: ", "").trim().toInt()
-                        }
-                    }
-                    if (timesVisited == 0) return ""
-                    var theString = ((timesAccepted / timesVisited)).toDouble().toString()
-                    return theString
-                    // genericDecimalPattern.matchMatcher(theString) {
-                    //     val beforeDecimal = group("beforeDecimal").toString()
-                    //     var pastDecimal = group("pastDecimal").toString()
-                    //     if (pastDecimal.length > 2) {
-                    //         pastDecimal = pastDecimal.take(2)
-                    //     }
-                    //     return "" + beforeDecimal + "." + pastDecimal
-                    // }
-                }
+                // var timesVisited = 0
+                // var timesAccepted = 0
+                // if (item.getLore().any { it.contains("Times Visited: ") }) {
+                //     for (line in item.getLore()) {
+                //         if (line.contains("Times Visited: ")) {
+                //             timesVisited = line.removeColor().replace("Times Visited: ", "").trim().toInt()
+                //         } else if (line.contains("Offers Accepted: ")) {
+                //             timesAccepted = line.removeColor().replace("Offers Accepted: ", "").trim().toInt()
+                //         }
+                //     }
+                //     if (timesVisited == 0) return ""
+                //     var theString = ((timesAccepted.toDouble() / timesVisited.toDouble()).toString().take(4).replace("0.",".").replace("1.00","1").replace("1.0","1"))
+                //     return theString
+                // }
             }
         }
 
         if (stackSizeConfig.contains(31)) {
             if ((chestName == "Farming Skill") && itemName.contains("Garden Level ")) {
-                // if (getGardenLevel() != null) return getGardenLevel().toString()
+                if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
                 return itemName.replace("Garden Level ", "")
             }
         }
 
         if (stackSizeConfig.contains(31)) {
-            if ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!")){
+            if ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!")) {
                 var gold = "§60"
                 var silver = "§f0"
                 var bronze = "§c0"
@@ -573,6 +565,16 @@ class ItemDisplayOverlayFeatures {
                     if (noColorLine.contains("BRONZE")) bronze = "§c" + noColorLine.split(" ").last()
                 }
                 return gold + silver + bronze
+            }
+        }
+
+        if (stackSizeConfig.contains(32)) {
+            if ((chestName == "Visitor's Logbook") && itemName == ("Logbook")) {
+                for (line in item.getLore()) {
+                    if (line.contains("Next Visitor: ")) {
+                        return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m","")
+                    }
+                }
             }
         }
 
