@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
@@ -34,7 +33,7 @@ class AshfangFreezeCooldown {
 
         val remainingLong = maxDuration - duration
         if (remainingLong > 0) {
-            var format = TimeUtils.formatDuration(remainingLong, showMilliSeconds = true)
+            val format = TimeUtils.formatDuration(remainingLong, showMilliSeconds = true)
             SkyHanniMod.feature.ashfang.freezeCooldownPos.renderString(
                 "§cAshfang Freeze: §a$format",
                 posLabel = "Ashfang Freeze Cooldown"
@@ -42,13 +41,8 @@ class AshfangFreezeCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(0, "ashfang.freezeCooldown", "ashfang.brrrrItsSoColdCooldownCooldown")
-    }
-
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.brrrrItsSoColdCooldownCooldown &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.freezeCooldown &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }
