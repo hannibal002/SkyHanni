@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = LorenzLogger("ConfigMigration")
-    val configVersion = 1
+    val configVersion = 2
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -31,6 +31,13 @@ object ConfigUpdaterMigrator {
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
+                return
+            }
+            if (since > configVersion) {
+                error("Illegally new version $since > $configVersion")
+            }
+            if (since > oldVersion + 1) {
+                logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
                 return
             }
             val op = oldPath.split(".")
@@ -71,15 +78,21 @@ object ConfigUpdaterMigrator {
 
     fun fixConfig(config: JsonObject): JsonObject {
         val lV = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
+        if (lV > configVersion) {
+            error("Cannot downgrade config")
+        }
         if (lV == configVersion) return config
-        logger.log("Starting config transformation from $lV to $configVersion")
-        val migration = ConfigFixEvent(config, JsonObject().also {
-            it.add("lastVersion", JsonPrimitive(configVersion))
-        }, lV, 0).also { it.postAndCatch() }
-        logger.log("Transformations scheduled: ${migration.new}")
-        val mergesPerformed = merge(migration.old, migration.new)
-        logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")
-        return migration.old
+        return (lV until configVersion).fold(config) { acc, i ->
+            logger.log("Starting config transformation from $i to ${i + 1}")
+            val migration = ConfigFixEvent(acc, JsonObject().also {
+                it.add("lastVersion", JsonPrimitive(i + 1))
+            }, i, 0).also { it.postAndCatch() }
+            logger.log("Transformations scheduled: ${migration.new}")
+            val mergesPerformed = merge(migration.old, migration.new)
+            logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")
+            migration.old
+        }.also {
+            logger.log("Final config: $it")
+        }
     }
-
 }
