@@ -137,40 +137,6 @@ public class MiscConfig {
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Crimson Reputation Helper", desc = "")
-    @ConfigEditorAccordion(id = 6)
-    public boolean reputationHelper = false;
-
-    @Expose
-    @ConfigOption(name = "Crimson Isle Reputation", desc = "Enable features around Reputation features in the Crimson Isle.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    @FeatureToggle
-    public boolean crimsonIsleReputationHelper = true;
-
-    @Expose
-    @ConfigOption(name = "Use Hotkey", desc = "Only show the Reputation Helper while pressing the hotkey.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    public boolean reputationHelperUseHotkey = false;
-
-    @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    @ConfigAccordionId(id = 6)
-    public int reputationHelperHotkey = Keyboard.KEY_NONE;
-
-
-    @Expose
-    public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
-    @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
-    @ConfigAccordionId(id = 6)
-    public int crimsonIsleReputationShowLocation = 1;
-
-    @Expose
     @ConfigOption(name = "Tia Relay", desc = "")
     @ConfigEditorAccordion(id = 7)
     public boolean tiaRelay = false;
