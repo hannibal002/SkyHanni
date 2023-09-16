@@ -103,18 +103,6 @@ public class MiscConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Damage Splash", desc = "")
-    @ConfigEditorAccordion(id = 4)
-    public boolean damageSplash = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean hideDamageSplash = false;
-
-    @Expose
     @ConfigOption(name = "Potion Effects", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean potionEffects = false;

@@ -120,10 +120,6 @@ public class Features extends Config {
     public RiftConfig rift = new RiftConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
-
-    @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public MiscConfig misc = new MiscConfig();
 
