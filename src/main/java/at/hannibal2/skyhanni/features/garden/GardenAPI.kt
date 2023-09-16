@@ -230,25 +230,6 @@ object GardenAPI {
         return tier
     }
 
-    fun getGardenLevel(): Int {
-        val gardenExp = this.gardenExp ?: return 0
-        var tier = 0
-        var totalExp = 0L
-        for (tierExp in gardenExperience) {
-            totalExp += tierExp
-            if (totalExp > gardenExp) {
-                return tier
-            }
-            tier++
-        }
-        totalExp += gardenOverflowExp
-        while (totalExp < gardenExp) {
-            tier++
-            totalExp += gardenOverflowExp
-        }
-        return tier
-    }
-
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden") ?: return
