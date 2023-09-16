@@ -44,6 +44,14 @@ public class Position {
         this(x, y, false, false);
     }
 
+    public Position(int x, int y, float scale) {
+        this.x = x;
+        this.y = y;
+        this.centerX = false;
+        this.centerY = true;
+        this.scale = scale;
+    }
+
     public Position(int x, int y, boolean centerX, boolean centerY) {
         this.x = x;
         this.y = y;
