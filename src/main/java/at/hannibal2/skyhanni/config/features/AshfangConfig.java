@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
@@ -27,25 +26,6 @@ public class AshfangConfig {
 
     @Expose
     public Position nextResetCooldownPos = new Position(10, 10, false, true);
-
-    @ConfigOption(name = "Gravity Orbs", desc = "")
-    @Accordion
-    @Expose
-    public GravityOrbsConfig gravityOrbs = new GravityOrbsConfig();
-
-    public static class GravityOrbsConfig {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Shows the Gravity Orbs more clearly.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Color", desc = "Color of the Gravity Orbs.")
-        @ConfigEditorColour
-        public String color = "0:120:255:85:85";
-    }
 
     @Expose
     @ConfigOption(name = "Blazing Souls", desc = "Shows the Blazing Souls more clearly.")

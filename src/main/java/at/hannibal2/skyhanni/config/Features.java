@@ -72,7 +72,7 @@ public class Features extends Config {
     public AshfangConfig ashfang = new AshfangConfig();
 
     @Expose
-    @Category(name = "Crimson Isle", desc = "Crimson isle nether features.")
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
     public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose

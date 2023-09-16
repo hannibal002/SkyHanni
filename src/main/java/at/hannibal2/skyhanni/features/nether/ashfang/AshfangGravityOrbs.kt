@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class AshfangGravityOrbs {
-    private val config get() = SkyHanniMod.feature.ashfang.gravityOrbs
+    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang.gravityOrbs
 
     private val texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV" +
             "0L3RleHR1cmUvMWE2OWNjZjdhZDkwNGM5YTg1MmVhMmZmM2Y1YjRlMjNhZGViZjcyZWQxMmQ1ZjI0Yjc4Y2UyZDQ0YjRhMiJ9fX0="
@@ -58,6 +58,8 @@ class AshfangGravityOrbs {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(1, "ashfang.gravityOrbs", "ashfang.gravityOrbs.enabled")
         event.move(1, "ashfang.gravityOrbsColor", "ashfang.gravityOrbs.color")
+
+        event.move(2, "ashfang.gravityOrbs", "crimsonIsle.ashfang.gravityOrbs")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
