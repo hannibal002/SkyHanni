@@ -226,28 +226,6 @@ public class MiscConfig {
     public boolean hideCloseRedstoneparticles = true;
 
     @Expose
-    @ConfigOption(name = "Chicken Head Timer", desc = "")
-    @ConfigEditorAccordion(id = 10)
-    public boolean chickenHeadTimer = false;
-
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 10)
-    @FeatureToggle
-    public boolean chickenHeadTimerDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You laid an egg!' chat message.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 10)
-    @FeatureToggle
-    public boolean chickenHeadTimerHideChat = true;
-
-    @Expose
-    public Position chickenHeadTimerPosition = new Position(-372, 73, false, true);
-
-    @Expose
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
     @ConfigEditorAccordion(id = 11)
     public boolean estimatedItemValue = false;

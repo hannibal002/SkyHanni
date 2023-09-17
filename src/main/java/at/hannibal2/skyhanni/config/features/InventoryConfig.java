@@ -332,13 +332,6 @@ public class InventoryConfig {
     public boolean itemStars = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
-            desc = "Highlights used Bonzo's Masks with a background.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightDepletedBonzosMasks = false;
-
-    @Expose
     @ConfigOption(name = "Missing Tasks",
             desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     @ConfigEditorBoolean
