@@ -103,18 +103,6 @@ public class MiscConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Damage Splash", desc = "")
-    @ConfigEditorAccordion(id = 4)
-    public boolean damageSplash = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean hideDamageSplash = false;
-
-    @Expose
     @ConfigOption(name = "Potion Effects", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean potionEffects = false;
@@ -135,40 +123,6 @@ public class MiscConfig {
 
     @Expose
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Crimson Reputation Helper", desc = "")
-    @ConfigEditorAccordion(id = 6)
-    public boolean reputationHelper = false;
-
-    @Expose
-    @ConfigOption(name = "Crimson Isle Reputation", desc = "Enable features around Reputation features in the Crimson Isle.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    @FeatureToggle
-    public boolean crimsonIsleReputationHelper = true;
-
-    @Expose
-    @ConfigOption(name = "Use Hotkey", desc = "Only show the Reputation Helper while pressing the hotkey.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    public boolean reputationHelperUseHotkey = false;
-
-    @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    @ConfigAccordionId(id = 6)
-    public int reputationHelperHotkey = Keyboard.KEY_NONE;
-
-
-    @Expose
-    public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
-    @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
-    @ConfigAccordionId(id = 6)
-    public int crimsonIsleReputationShowLocation = 1;
 
     @Expose
     @ConfigOption(name = "Tia Relay", desc = "")
@@ -366,7 +320,7 @@ public class MiscConfig {
                 "Bits",
                 "Stats",
                 "Held Item",
-                "Skyblock Date",
+                "SkyBlock Date",
                 "Profile",
                 "Slayer",
                 "Custom",
@@ -385,7 +339,7 @@ public class MiscConfig {
                 "Bits",
                 "Stats",
                 "Held Item",
-                "Skyblock Date",
+                "SkyBlock Date",
                 "Profile",
                 "Slayer",
                 "Custom",
@@ -409,7 +363,7 @@ public class MiscConfig {
                 "Bits",
                 "Stats",
                 "Held Item",
-                "Skyblock Date",
+                "SkyBlock Date",
                 "Profile",
                 "Slayer",
                 "Custom",

@@ -17,7 +17,7 @@ class GlowingDroppedItems {
     private val config get() = SkyHanniMod.feature.misc.glowingDroppedItems
 
     /**
-     * List of skyblock locations where we might see items in showcases
+     * List of SkyBlock locations where we might see items in showcases
      */
     private val showcaseItemLocations = setOf(
         "The End",

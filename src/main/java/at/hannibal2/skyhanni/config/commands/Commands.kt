@@ -247,6 +247,10 @@ object Commands {
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
         ) { TestChatCommand.command(it) }
+        registerCommand(
+            "shcopyinternalname",
+            "Copies the internal name of the item in hand to the clipboard."
+        ) { SkyHanniDebugsAndTests.copyItemInternalName() }
     }
 
     private fun internalCommands() {
@@ -300,7 +304,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
+            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()

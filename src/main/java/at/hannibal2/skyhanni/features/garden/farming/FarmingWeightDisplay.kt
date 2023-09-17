@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
@@ -71,6 +72,11 @@ class FarmingWeightDisplay {
             getCropWeights()
             hasFetchedCropWeights = true
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
     }
 
     companion object {
@@ -285,7 +291,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded && config.eliteFarmingWeightoffScreenDropMessage) {
+                if (wasNotLoaded && config.eliteFarmingWeightOffScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =

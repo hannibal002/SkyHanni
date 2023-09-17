@@ -155,7 +155,7 @@ object ProfileStorageData {
         }
 
         profileSpecific?.garden?.let {
-            it.experience = oldHidden.gardenExp
+            it.experience = oldHidden.gardenExp.toLong()
             it.cropCounter = oldHidden.gardenCropCounter
             it.cropUpgrades = oldHidden.gardenCropUpgrades
 
