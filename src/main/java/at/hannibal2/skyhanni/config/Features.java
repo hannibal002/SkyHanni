@@ -48,6 +48,10 @@ public class Features extends Config {
     public GUIConfig gui = new GUIConfig();
 
     @Expose
+    @Category(name = "Chroma", desc = "Settings for Chroma text. (Credit to SBA)")
+    public ChromaConfig chroma = new ChromaConfig();
+
+    @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
     public ChatConfig chat = new ChatConfig();
 

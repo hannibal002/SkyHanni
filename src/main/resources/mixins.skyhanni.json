@@ -2,6 +2,9 @@
   "package": "at.hannibal2.skyhanni.mixins.transformers",
   "refmap": "mixins.skyhanni.refmap.json",
   "compatibilityLevel": "JAVA_8",
+  "injectors": {
+    "maxShiftBy": 2
+  },
   "mixins": [
     "AccessorGuiPlayerTabOverlay",
     "MixinBlockFire",
@@ -21,10 +24,13 @@
     "renderer.MixinRendererLivingEntity"
   ],
   "client": [
+    "AccessorFontRenderer",
     "AccessorGuiEditSign",
     "AccessorKeyBinding",
+    "AccessorMinecraft",
     "CustomRenderGlobal",
     "MixinEntityRenderer",
+    "MixinFontRenderer",
     "MixinGuiChat",
     "MixinGuiIngame",
     "MixinGuiPlayerTabOverlay",
