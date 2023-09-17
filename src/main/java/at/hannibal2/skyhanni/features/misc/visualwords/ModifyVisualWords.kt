@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -9,10 +9,7 @@ object ModifyVisualWords {
     private val config get() = SkyHanniMod.feature.misc.modifyWords
     private var textCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build<String, String>()
 
-
     private val replacements: Map<String, String> = mapOf(
-        "Garden" to "nedraG",
-        "SkyHanni" to "Test Omg"
     )
 
     fun modifyText(originalText: String): String {
@@ -28,12 +25,6 @@ object ModifyVisualWords {
         var modifiedText = originalText
         for ((word, replacement) in replacements) {
             modifiedText = modifiedText.replace(word, replacement)
-        }
-        println("in thing")
-        if (modifiedText != originalText) {
-            println("something changed\n" +
-                    "original: $originalText\n" +
-                    "new: $modifiedText")
         }
 
         textCache.put(originalText, modifiedText)

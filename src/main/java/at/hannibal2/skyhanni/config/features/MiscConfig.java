@@ -939,7 +939,7 @@ public class MiscConfig {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Work Outside SkyBlock", desc = "Allows modifying visual words outside of SkyBlock.")
+        @ConfigOption(name = "Work Outside SkyBlock", desc = "Allows modifying visual words anywhere on Hypixel.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean workOutside = false;
