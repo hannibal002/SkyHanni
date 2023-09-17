@@ -68,8 +68,8 @@ public class Features extends Config {
     public SummoningsConfig summonings = new SummoningsConfig();
 
     @Expose
-    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
-    public AshfangConfig ashfang = new AshfangConfig();
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose
     @Category(name = "Minion", desc = "The minions at your private island.")
@@ -84,8 +84,8 @@ public class Features extends Config {
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
-    @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
+    @Category(name = "Combat", desc = "Everything combat and PVE related.")
+    public CombatConfig combat = new CombatConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
@@ -120,10 +120,6 @@ public class Features extends Config {
     public RiftConfig rift = new RiftConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
-
-    @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public MiscConfig misc = new MiscConfig();
 
@@ -136,4 +132,8 @@ public class Features extends Config {
 
     @Expose
     public Storage storage = new Storage();
+
+    @Expose
+    public int lastVersion = ConfigUpdaterMigrator.INSTANCE.getConfigVersion();
+
 }

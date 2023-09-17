@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -100,10 +101,6 @@ class ConfigManager {
         configFile = File(configDirectory, "config.json")
         sackFile = File(configDirectory, "sacks.json")
 
-        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
-            saveConfig("auto-save-60s")
-        }
-
         logger.log("Trying to load config from $configFile")
 
         if (configFile!!.exists()) {
@@ -119,8 +116,10 @@ class ConfigManager {
 
 
                 logger.log("load-config-now")
+                val jsonObject = gson.fromJson(builder.toString(), JsonObject::class.java)
+                val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                 features = gson.fromJson(
-                    builder.toString(),
+                    newJsonObject,
                     Features::class.java
                 )
                 logger.log("Loaded config from file")
@@ -166,6 +165,10 @@ class ConfigManager {
             saveConfig("blank config")
         }
 
+        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+            saveConfig("auto-save-60s")
+        }
+
         if (!::sackData.isInitialized) {
             logger.log("Creating blank sack data and saving")
             sackData = SackData()
@@ -201,11 +204,14 @@ class ConfigManager {
         try {
             logger.log("Saving config file")
             file.parentFile.mkdirs()
-            file.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
+            val unit = file.parentFile.resolve("config.json.write")
+            unit.createNewFile()
+            BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
                 // TODO remove old "hidden" area
                 writer.write(gson.toJson(SkyHanniMod.feature))
             }
+            // Perform move — which is atomic, unlike writing — after writing is done.
+            unit.renameTo(file)
         } catch (e: IOException) {
             logger.log("Could not save config file to $file")
             e.printStackTrace()
