@@ -4,9 +4,9 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.*
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
@@ -264,7 +263,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     CROP_MILESTONES({
         val crop = InventoryUtils.getItemInHand()?.getCropType()
         val cropCounter = crop?.getCounter()
-        val tier = cropCounter?.let { getTierForCrops(it) }
+        val tier = cropCounter?.let { getTierForCropCount(it, crop) }
 
         val progress = tier?.let {
             LorenzUtils.formatPercentage(crop.progressToNextLevel())
@@ -297,7 +296,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             } else item.getSubCompound("ExtraAttributes", false)
         }
 
-        val itemInHand = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()
+        val itemInHand = InventoryUtils.getItemInHand()
         val itemName = itemInHand?.displayName?.removeColor() ?: ""
 
         val extraAttributes = getExtraAttributes(itemInHand)

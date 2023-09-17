@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class SlayerBossSpawnSoon {
 
@@ -28,7 +29,7 @@ class SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                TitleUtils.sendTitle("§cSlayer boss soon!", 2_000)
+                TitleUtils.sendTitle("§cSlayer boss soon!", 2.seconds)
                 warned = true
             }
         } else {

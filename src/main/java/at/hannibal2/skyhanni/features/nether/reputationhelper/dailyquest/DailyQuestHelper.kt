@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.*
@@ -15,6 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -60,7 +60,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    // TODO use OwnInventorItemUpdateEvent
+    // TODO use OwnInventoryItemUpdateEvent
     private fun checkInventoryForTrophyFish() {
         val fishQuest = getQuest<TrophyFishQuest>() ?: return
         if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
@@ -179,7 +179,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (!reputationHelper.showLocations()) return
 
         for (quest in quests) {
             if (quest is MiniBossQuest) continue
@@ -338,6 +338,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         storage.latestTrophyFishInInventory = latestTrophyFishInInventory
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE &&
-            SkyHanniMod.feature.misc.crimsonIsleReputationHelper
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
 }

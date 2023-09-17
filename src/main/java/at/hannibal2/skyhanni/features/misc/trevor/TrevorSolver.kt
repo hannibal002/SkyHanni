@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -13,6 +14,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.passive.EntityChicken
+import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
     private val animalHealths = intArrayOf(100, 200, 400, 500, 1000, 2000, 5000, 10000, 20000) //future proofing for Derpy :)
@@ -51,7 +53,7 @@ object TrevorSolver {
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
-            val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
+            val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMobs.entries.firstOrNull { it.mobName.contains(name) }
             if (currentMob == TrevorMobs.CHICKEN) {
                 if (entity is EntityChicken) {
@@ -78,7 +80,7 @@ object TrevorSolver {
                         }
                         if (canSee) {
                             if (mobLocation != CurrentMobArea.FOUND) {
-                                TitleUtils.sendTitle("§2Saw Mob!", 3_000)
+                                TitleUtils.sendTitle("§2Saw Mob!", 3.seconds)
                             }
                             mobLocation = CurrentMobArea.FOUND
                             mobCoordinates = entity.position.toLorenzVec()

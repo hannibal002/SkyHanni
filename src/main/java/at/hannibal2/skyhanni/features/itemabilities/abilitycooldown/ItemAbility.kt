@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
 enum class ItemAbility(
     val abilityName: String,
@@ -39,6 +41,7 @@ enum class ItemAbility(
     WITHER_CLOAK(10),
     HOLY_ICE(4),
     VOODOO_DOLL_WILTED(3),
+    FIRE_FURY_STAFF(20),
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
 
     // doesn't have a sound
@@ -51,7 +54,7 @@ enum class ItemAbility(
     ECHO("Echo", 3, "Ancestral Spade");
 
     var newVariant = false
-    var internalNames = mutableListOf<String>()
+    var internalNames = mutableListOf<NEUInternalName>()
 
     constructor(
         cooldownInSeconds: Int,
@@ -59,8 +62,10 @@ enum class ItemAbility(
         alternativePosition: Boolean = false,
     ) : this("no name", cooldownInSeconds, actionBarDetection = false, alternativePosition = alternativePosition) {
         newVariant = true
-        internalNames.addAll(alternateInternalNames)
-        internalNames.add(name)
+        alternateInternalNames.forEach {
+            internalNames.add(it.asInternalName())
+        }
+        internalNames.add(name.asInternalName())
     }
 
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
@@ -92,7 +97,7 @@ enum class ItemAbility(
     }
 
     companion object {
-        fun getByInternalName(internalName: String): ItemAbility? {
+        fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
     }

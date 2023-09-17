@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
+import java.util.*
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
@@ -39,8 +40,13 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
-    fun ItemStack.getDungeonStarCount() =
+    fun ItemStack.getDungeonStarCount() = if (isDungeonItem()) {
         getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
+    } else null
+
+    private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
+
+    fun ItemStack.getPetExp() = getPetInfo()?.get("exp")?.asDouble
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
@@ -256,6 +262,29 @@ object SkyBlockItemModifierUtils {
 
         companion object {
             fun getByName(name: String) = entries.firstOrNull { it.name == name }
+        }
+    }
+
+    enum class GemstoneSlotType(val colorCode: Char) {
+        JADE('a'),
+        AMBER('6'),
+        TOPAZ('e'),
+        SAPPHIRE('b'),
+        AMETHYST('5'),
+        JASPER('d'),
+        RUBY('c'),
+        OPAL('f'),
+        COMBAT('4'),
+        OFFENSIVE('9'),
+        DEFENSIVE('a'),
+        MINING('5'),
+        UNIVERSAL('f')
+        ;
+
+        companion object {
+            fun getColorCode(name: String) = entries.stream().filter {
+                name.uppercase(Locale.ENGLISH).contains(it.name)
+            }.findFirst().get().colorCode
         }
     }
 }

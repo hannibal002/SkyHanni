@@ -44,7 +44,7 @@ object TestCopyBestiaryValues {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
         if (!SkyHanniMod.feature.dev.copyBestiaryData) return
-        SkyHanniTestCommand.displayLine = ""
+        SkyHanniDebugsAndTests.displayLine = ""
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3]
         if (backItem == null) {
@@ -112,6 +112,6 @@ object TestCopyBestiaryValues {
         val text = gson.toJson(obj)
         OSUtils.copyToClipboard(text)
 
-        SkyHanniTestCommand.displayLine = "Bestiary for $titleName"
+        SkyHanniDebugsAndTests.displayLine = "Bestiary for $titleName"
     }
 }

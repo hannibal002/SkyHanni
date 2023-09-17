@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -28,7 +28,7 @@ class CityProjectFeatures {
     private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
 
     companion object {
-        private val config get() = SkyHanniMod.feature.misc.cityProject
+        private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
             LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
@@ -150,12 +150,10 @@ class CityProjectFeatures {
             if (line == "") break
             if (line.contains("Bits")) break
 
-            val (name, amount) = ItemUtils.readItemAmount(line)
-            if (name != null) {
-                val internalName = NEUItems.getRawInternalName(name)
-                val old = materials.getOrPut(internalName) { 0 }
-                materials[internalName] = old + amount
-            }
+            val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
+            val internalName = NEUItems.getRawInternalName(name)
+            val old = materials.getOrPut(internalName) { 0 }
+            materials[internalName] = old + amount
         }
     }
 
@@ -190,5 +188,10 @@ class CityProjectFeatures {
                 slot highlight LorenzColor.YELLOW
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.cityProject", "event.cityProject")
     }
 }

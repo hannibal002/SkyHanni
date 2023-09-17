@@ -4,5 +4,4 @@ data class BazaarData(
     val displayName: String,
     val sellPrice: Double,
     val buyPrice: Double,
-    val npcPrice: Double,
 )

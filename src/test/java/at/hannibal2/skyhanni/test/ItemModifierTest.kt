@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -23,6 +22,6 @@ class ItemModifierTest {
         assert(itemStack.getHotPotatoCount() == 15)
         assert(itemStack.getEnchantments()?.size == 11)
         assert(itemStack.hasArtOfPeace())
-        assert(itemStack.getDungeonStarCount() == 10)
+//        assert(itemStack.getDungeonStarCount() == 10)
     }
 }

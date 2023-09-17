@@ -39,7 +39,7 @@ enum class CropType(
             return entries.firstOrNull { it.cropName == itemName }
         }
 
-        fun getByName(name: String) = getByNameOrNull(name) ?: throw RuntimeException("No valid crop type '$name'")
+        fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid crop type '$name'")
 
         fun IBlockState.getCropType(): CropType? {
             return when (block) {

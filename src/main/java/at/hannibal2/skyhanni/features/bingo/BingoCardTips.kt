@@ -66,7 +66,7 @@ class BingoCardTips {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.bingo.bingoCard.bingoSplashGuide
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.event.bingo.bingoCard.bingoSplashGuide
 
     enum class Difficulty(rawName: String, val color: LorenzColor) {
         EASY("Easy", LorenzColor.GREEN),

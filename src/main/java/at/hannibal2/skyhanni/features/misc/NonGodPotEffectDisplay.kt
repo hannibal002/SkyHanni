@@ -12,14 +12,20 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.Timer
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class NonGodPotEffectDisplay {
     private val config get() = SkyHanniMod.feature.misc
     private var checkFooter = false
-    private val effectDuration = mutableMapOf<NonGodPotEffect, Long>()
+    private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
 
     enum class NonGodPotEffect(val apiName: String, val displayName: String, val isMixin: Boolean = false) {
@@ -52,26 +58,26 @@ class NonGodPotEffectDisplay {
 
         if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
             checkFooter = true
-            effectDuration[NonGodPotEffect.SMOLDERING] = System.currentTimeMillis() + 1000 * 60 * 60
+            effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
             update()
         }
 
         if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
             checkFooter = true
-            effectDuration[NonGodPotEffect.GLOWY] = System.currentTimeMillis() + 1000 * 60 * 60
+            effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
             update()
         }
 
         if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
             checkFooter = true
-            effectDuration[NonGodPotEffect.WISP] = System.currentTimeMillis() + 1000 * 60 * 5
+            effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
             update()
         }
 
 
         if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
             checkFooter = true
-            effectDuration[NonGodPotEffect.GOBLIN] = System.currentTimeMillis() + 1000 * 60 * 20
+            effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
         if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
@@ -83,7 +89,7 @@ class NonGodPotEffectDisplay {
 
     private fun update() {
         val now = System.currentTimeMillis()
-        if (effectDuration.values.removeIf { now > it }) {
+        if (effectDuration.values.removeIf { it.ended }) {
             //to fetch the real amount of active pots
             totalEffectsCount = 0
             checkFooter = true
@@ -95,13 +101,14 @@ class NonGodPotEffectDisplay {
     private fun drawDisplay(now: Long): MutableList<String> {
         val newDisplay = mutableListOf<String>()
         for ((effect, time) in effectDuration.sorted()) {
+            if (time.ended) continue
             if (effect == NonGodPotEffect.INVISIBILITY) continue
 
             if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
 
-            val seconds = time - now
-            val format = TimeUtils.formatDuration(seconds, TimeUnit.HOUR)
-            val color = colorForTime(seconds)
+            val remaining = time.remaining.coerceAtLeast(0.seconds)
+            val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
+            val color = colorForTime(remaining)
 
             val displayName = effect.displayName
             newDisplay.add("$displayName $color$format")
@@ -115,14 +122,11 @@ class NonGodPotEffectDisplay {
         return newDisplay
     }
 
-    private fun colorForTime(seconds: Long): String {
-        return if (seconds <= 60) {
-            "§c"
-        } else if (seconds <= 60 * 3) {
-            "§6"
-        } else if (seconds <= 60 * 10) {
-            "§e"
-        } else "§f"
+    private fun colorForTime(duration: Duration) = when (duration) {
+        in 0.seconds..60.seconds -> "§c"
+        in 60.seconds..3.minutes -> "§6"
+        in 3.minutes..10.minutes -> "§e"
+        else -> "§f"
     }
 
     @SubscribeEvent
@@ -144,27 +148,27 @@ class NonGodPotEffectDisplay {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
-                val name = stack.name ?: continue
-                for (effect in NonGodPotEffect.entries) {
-                    if (name != effect.displayName) continue
-                    for (line in stack.getLore()) {
-                        if (line.contains("Remaining") &&
-                            line != "§7Time Remaining: §aCompleted!" &&
-                            !line.contains("Remaining Uses")
-                        ) {
-                            val duration = try {
-                                TimeUtils.getMillis(line.split("§f")[1])
-                            } catch (e: IndexOutOfBoundsException) {
-                                CopyErrorCommand.logError(
-                                    Exception("'§f' not found in line '$line'", e),
-                                    "Error while reading Non God-Potion effects from tab list"
-                                )
-                                continue
-                            }
-                            effectDuration[effect] = System.currentTimeMillis() + duration
-                            update()
+            val name = stack.name ?: continue
+            for (effect in NonGodPotEffect.entries) {
+                if (name != effect.displayName) continue
+                for (line in stack.getLore()) {
+                    if (line.contains("Remaining") &&
+                        line != "§7Time Remaining: §aCompleted!" &&
+                        !line.contains("Remaining Uses")
+                    ) {
+                        val duration = try {
+                            TimeUtils.getMillis(line.split("§f")[1])
+                        } catch (e: IndexOutOfBoundsException) {
+                            CopyErrorCommand.logError(
+                                Exception("'§f' not found in line '$line'", e),
+                                "Error while reading Non God-Potion effects from tab list"
+                            )
+                            continue
                         }
+                        effectDuration[effect] = Timer(duration.milliseconds)
+                        update()
                     }
+                }
             }
         }
     }
@@ -186,7 +190,7 @@ class NonGodPotEffectDisplay {
                     if (line.startsWith(effect.displayName)) {
                         try {
                             val duration = TimeUtils.getMillis(line.split("§f")[1])
-                            effectDuration[effect] = System.currentTimeMillis() + duration
+                            effectDuration[effect] = Timer(duration.milliseconds)
                             update()
                         } catch (e: IndexOutOfBoundsException) {
                             LorenzUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
@@ -214,7 +218,6 @@ class NonGodPotEffectDisplay {
         )
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
-    }
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SummoningMobManager {
+    private val config get() = SkyHanniMod.feature.combat.summonings
 
 
     private val summoningMobs = mutableMapOf<EntityLiving, SummoningMob>()
@@ -38,7 +40,7 @@ class SummoningMobManager {
 
         val message = event.message
         spawnPatter.matchMatcher(message) {
-            if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
+            if (config.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
             summoningsSpawned++
@@ -48,13 +50,13 @@ class SummoningMobManager {
 
         if (despawnPatter.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
             despawned()
-            if (SkyHanniMod.feature.summonings.summoningMobDisplay && !message.contains("☠")) {
+            if (config.summoningMobDisplay && !message.contains("☠")) {
                 event.blockedReason = "summoning_soul"
             }
         }
         if (message == "§cThe Seraph recalled your summoned ally!" || seraphRecallPattern.matcher(message).matches()) {
             despawned()
-            if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
+            if (config.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
         }
@@ -64,7 +66,7 @@ class SummoningMobManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
+        if (config.summoningMobDisplay) {
             if (event.repeatSeconds(1)) {
                 updateData()
             }
@@ -128,7 +130,7 @@ class SummoningMobManager {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.summonings.summoningMobDisplay) return
+        if (!config.summoningMobDisplay) return
         if (summoningMobs.isEmpty()) return
 
         val list = mutableListOf<String>()
@@ -140,7 +142,7 @@ class SummoningMobManager {
             id++
         }
 
-        SkyHanniMod.feature.summonings.summoningMobDisplayPos.renderStrings(list, posLabel = "Summoning Mob Display")
+        config.summoningMobDisplayPos.renderStrings(list, posLabel = "Summoning Mob Display")
     }
 
     @SubscribeEvent
@@ -151,7 +153,7 @@ class SummoningMobManager {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.summonings.summoningMobHideNametag) return
+        if (!config.summoningMobHideNametag) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -163,7 +165,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (SkyHanniMod.feature.summonings.summoningMobColored) {
+        if (config.summoningMobColored) {
             val entity = event.entity
             if (entity is EntityLiving && entity in summoningMobs.keys) {
                 event.color = LorenzColor.GREEN.toColor().withAlpha(127)
@@ -174,9 +176,14 @@ class SummoningMobManager {
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         val entity = event.entity
-        if (SkyHanniMod.feature.summonings.summoningMobColored && entity in summoningMobs.keys) {
+        if (config.summoningMobColored && entity in summoningMobs.keys) {
             event.shouldReset = true
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "summonings", "combat.summonings")
     }
 
     private fun despawned() {
@@ -188,7 +195,7 @@ class SummoningMobManager {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && (SkyHanniMod.feature.summonings.summoningMobDisplay || SkyHanniMod.feature.summonings.summoningMobHideNametag)
+        return LorenzUtils.inSkyBlock && (config.summoningMobDisplay || config.summoningMobHideNametag)
     }
 
     class SummoningMob(

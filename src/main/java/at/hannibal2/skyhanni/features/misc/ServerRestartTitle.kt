@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class ServerRestartTitle {
     private val config get() = SkyHanniMod.feature.misc
@@ -29,7 +30,7 @@ class ServerRestartTitle {
                     if (totalSeconds % 30 != 0) return
                 }
                 val time = TimeUtils.formatDuration(totalSeconds.toLong() * 1000)
-                TitleUtils.sendTitle("§cServer Restart in §b$time", 2_000)
+                TitleUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
             }
         }
     }

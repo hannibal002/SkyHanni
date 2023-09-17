@@ -100,19 +100,16 @@ object EntityUtils {
 
     //TODO remove baseMaxHealth
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        if (maxHealth == health) return true
+        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        if (maxHealth == health * derpyMultiplier) return true
 
-        //Derpy
-        if (maxHealth == health * 2) return true
-
-        // TODO runic support
-
-        if (!boss) {
+        if (!boss && !LorenzUtils.inDungeons) {
             //Corrupted
-            if (maxHealth == health * 3) return true
-
-            //Derpy + Corrupted
-            if (maxHealth == health * 2 * 3) return true
+            if (maxHealth == health * 3 * derpyMultiplier) return true
+            // Runic
+            if (maxHealth == health * 4 * derpyMultiplier) return true
+            // Corrupted+Runic
+            if (maxHealth == health * 12 * derpyMultiplier) return true
         }
 
         return false

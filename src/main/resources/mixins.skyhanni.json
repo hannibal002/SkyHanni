@@ -12,6 +12,8 @@
     "MixinItemStack",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
+    "MixinRendererLivingEntity",
+    "MixinRenderGlobal",
     "MixinRenderItem",
     "MixinRenderManager",
     "gui.AccessorGuiContainer",
@@ -19,7 +21,9 @@
     "renderer.MixinRendererLivingEntity"
   ],
   "client": [
+    "AccessorGuiEditSign",
     "AccessorKeyBinding",
+    "CustomRenderGlobal",
     "MixinEntityRenderer",
     "MixinGuiChat",
     "MixinGuiIngame",

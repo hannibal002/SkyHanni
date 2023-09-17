@@ -124,4 +124,43 @@ object StringUtils {
             } ?: text
         }
     }
+
+    fun optionalPlural(number: Int, singular: String, plural: String) =
+        "$number " + if (number == 1) singular else plural
+
+    fun progressBar(percentage: Double, steps: Int = 25): Any {
+        //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
+        val prefix = "§5§o§2"
+        val step = "§l§m "
+        val missing = "§f"
+        val end = "§r"
+
+        val builder = StringBuilder()
+        var inMissingArea = false
+        builder.append(prefix)
+        for (i in 0..steps) {
+            val toDouble = i.toDouble()
+            val stepPercentage = toDouble / steps
+            if (stepPercentage >= percentage) {
+                if (!inMissingArea) {
+                    builder.append(missing)
+                    inMissingArea = true
+                }
+            }
+            builder.append(step)
+        }
+        builder.append(end)
+        return builder.toString()
+    }
+
+    fun String.capAtMinecraftLength(limit: Int) =
+        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
+
+    private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
+        var i = 0
+        return takeWhile {
+            i += lengthJudger(it)
+            i < limit
+        }
+    }
 }

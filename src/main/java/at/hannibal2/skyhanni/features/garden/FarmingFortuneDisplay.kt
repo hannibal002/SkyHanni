@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
@@ -49,7 +49,7 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onInventoryUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.itemStack.getCropType() == null) return
         updateToolFortune(event.itemStack)
@@ -194,17 +194,18 @@ class FarmingFortuneDisplay {
         }
 
         fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
+            if (cropType == null) return 0.0
             val dedicationLevel = tool?.getEnchantments()?.get("dedication") ?: 0
             val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
-            val cropMilestone = GardenCropMilestones.getTierForCrops(
-                cropType?.getCounter() ?: 0
+            val cropMilestone = GardenCropMilestones.getTierForCropCount(
+                cropType.getCounter(), cropType
             )
             return dedicationMultiplier * cropMilestone
         }
 
         fun getSunderFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5 }
         fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
-        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0).toDouble()}
+        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0}
 
         fun getAbilityFortune(item: ItemStack?):  Double  {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
@@ -253,7 +254,14 @@ class FarmingFortuneDisplay {
             val accessoryFortune = accessoryFortune ?: 0.0
 
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
+            var carrotFortune = 0.0
+
+            if (currentCrop == CropType.CARROT) {
+                GardenAPI.config?.fortune?.let {
+                    if (it.carrotFortune) carrotFortune = 12.0
+                }
+            }
+            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + carrotFortune
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
