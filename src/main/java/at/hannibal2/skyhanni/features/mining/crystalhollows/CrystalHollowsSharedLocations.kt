@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.MiscConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -26,7 +25,7 @@ import java.net.URLEncoder
 
 class CrystalHollowsSharedLocations {
 
-    val config: MiscConfig.MiningConfig get() = SkyHanniMod.feature.misc.mining
+    val config get() = SkyHanniMod.feature.mining
     private val logger = LorenzLogger("crystal/locationSharing")
 
     var locations = listOf<CrystalHollowLocations>()

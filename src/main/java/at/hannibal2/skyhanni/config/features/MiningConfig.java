@@ -108,4 +108,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;
+
+    @Expose
+    @ConfigOption(name = "Share CH Locations", desc = "Share and receive Crystal Hollows locations")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean crystalHollowsShareLocations = false;
 }
