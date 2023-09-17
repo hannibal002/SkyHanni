@@ -145,7 +145,7 @@ public class CombatConfig {
     public static class GhostCounterConfig {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enable ghost counter.")
+        @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers in the Dwarven Mines The Mist area).")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
