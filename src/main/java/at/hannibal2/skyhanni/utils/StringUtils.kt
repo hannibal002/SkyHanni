@@ -13,6 +13,9 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+    private val playerChatPattern = ".*§[f7]: .*".toPattern()
+    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
@@ -194,5 +197,18 @@ object StringUtils {
             return@modifyFirstChatComponent false
         }
         return chatComponent
+    }
+
+    fun String.isPlayerMessage(): Boolean {
+        if (!playerChatPattern.matcher(this).matches()) return false
+
+        var username = this.removeColor().split(":")[0]
+
+        if (username.contains(">")) {
+            username = username.substring(username.indexOf('>') + 1).trim()
+        }
+
+        val matcher = chatUsernamePattern.matcher(username)
+        return matcher.matches()
     }
 }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.isPlayerMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.*
 import net.minecraft.event.ClickEvent
@@ -23,7 +24,6 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 class Translator {
-
     private val messageContentRegex = Regex(".*: (.*)")
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
@@ -32,11 +32,11 @@ class Translator {
     fun onGuiChat(e: LorenzChatEvent) {
         if (!SkyHanniMod.feature.chat.translator) return
 
-        val message = e.message.removeColor()
-        if (!messageContentRegex.matches(message.removeColor())) return
+        val message = e.message
+        if (!message.isPlayerMessage()) return
 
         if (e.chatComponent.siblings.size > 0) {
-            val clickStyle = createClickStyle(message)
+            val clickStyle = createClickStyle(message.removeColor())
             e.chatComponent.siblings.last().setChatStyle(clickStyle)
         }
     }
