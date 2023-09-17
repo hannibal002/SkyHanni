@@ -30,7 +30,7 @@ class EndermanSlayerFeatures {
     private val config get() = SkyHanniMod.feature.slayer
     private val beaconConfig get() = config.endermanBeaconConfig
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
-    private val flyingBeacons = mutableListOf<EntityArmorStand>()
+    private var flyingBeacons = listOf<EntityArmorStand>()
     private val nukekubiSkulls = mutableListOf<EntityArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
@@ -56,7 +56,9 @@ class EndermanSlayerFeatures {
             if (showBeacon()) {
                 val stack = entity.inventory[4] ?: return
                 if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                    flyingBeacons.add(entity)
+                    flyingBeacons = flyingBeacons.editCopy {
+                        add(entity)
+                    }
                     if (beaconConfig.showWarning)
                         TitleUtils.sendTitle("§4Beacon", 2.seconds)
                     logger.log("Added flying beacons at ${entity.getLorenzVec()}")
@@ -163,7 +165,11 @@ class EndermanSlayerFeatures {
         if (!event.repeatSeconds(1)) return
 
         nukekubiSkulls.also { skulls -> skulls.removeAll { it.isDead } }
-        flyingBeacons.also { beacons -> beacons.removeAll { it.isDead } }
+        if (flyingBeacons.any { it.isDead }) {
+            flyingBeacons = flyingBeacons.editCopy {
+                removeAll { it.isDead }
+            }
+        }
 
         // Removing the beacon if It's still there after 7 sesconds.
         // This is just a workaround for the cases where the ServerBlockChangeEvent don't detect the beacon despawn info.
@@ -184,7 +190,9 @@ class EndermanSlayerFeatures {
         if (event.new == "beacon") {
             val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
             if (armorStand != null) {
-                flyingBeacons.remove(armorStand)
+                flyingBeacons = flyingBeacons.editCopy {
+                    remove(armorStand)
+                }
                 sittingBeacon = sittingBeacon.editCopy { this[location] = SimpleTimeMark.now() }
                 logger.log("Replaced flying beacon with sitting beacon at $location")
             }
@@ -199,7 +207,7 @@ class EndermanSlayerFeatures {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         endermenWithBeacons.clear()
-        flyingBeacons.clear()
+        flyingBeacons = emptyList()
         nukekubiSkulls.clear()
         sittingBeacon = emptyMap()
         logger.log("Reset everything (world change)")

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -33,16 +32,8 @@ class SeaCreatureFeatures {
 
         val maxHealth = event.maxHealth
         for (creatureType in RareSeaCreatureType.entries) {
-            if (EntityGuardian::class.java.isInstance(entity) && entity.baseMaxHealth > 1000) {
-                LorenzUtils.consoleLog("FISHING CREATURE NAME: ${entity.baseMaxHealth} ${(entity as EntityGuardian).customNameTag}")
-            }
-
             if (!creatureType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) continue
             if (!creatureType.clazz.isInstance(entity)) continue
-
-            if (EntityPlayer::class.java.isInstance(entity)) {
-                LorenzUtils.consoleLog("FISHING CREATURE NAME: ${(entity as EntityPlayer).customNameTag}")
-            }
 
             if (creatureType.nametag.isNotBlank() && EntityPlayer::class.java.isInstance(entity) && (entity as EntityPlayer).name != creatureType.nametag) {
                 continue

@@ -106,7 +106,7 @@ public class Storage {
         public static class GardenStorage {
 
             @Expose
-            public int experience = -1;
+            public Long experience = null;
 
             @Expose
             public Map<CropType, Long> cropCounter = new HashMap<>();

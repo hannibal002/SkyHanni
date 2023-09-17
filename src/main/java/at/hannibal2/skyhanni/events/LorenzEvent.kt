@@ -12,7 +12,7 @@ abstract class LorenzEvent : Event() {
 
     fun postAndCatch(): Boolean {
         return runCatching {
-            MinecraftForge.EVENT_BUS.post(this)
+            postWithoutCatch()
         }.onFailure {
             CopyErrorCommand.logError(
                 it,
@@ -20,4 +20,6 @@ abstract class LorenzEvent : Event() {
             )
         }.getOrDefault(isCanceled)
     }
+
+    fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
 }

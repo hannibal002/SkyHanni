@@ -160,7 +160,7 @@ object GhostFormatting {
                 base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%"
                 openMenu = "§cOpen Bestiary Menu !"
                 maxed = "%currentKill% (&c&lMaxed!)"
-                showMax_progress = "%currentKill%/3M (%percentNumber%%)"
+                showMax_progress = "%currentKill%/250k (%percentNumber%%)"
                 progress = "%currentKill%/%killNeeded%"
             }
             with(killHourFormatting) {

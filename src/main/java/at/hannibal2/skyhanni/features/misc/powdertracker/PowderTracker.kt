@@ -169,7 +169,7 @@ class PowderTracker {
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§b§lPowder Tracker")
-        if (inventoryOpen) {
+        if (inventoryOpen){
             addSelector<DisplayMode>(
                 "§7Display Mode: ",
                 getName = { type -> type.displayName },
@@ -179,7 +179,10 @@ class PowderTracker {
                     saveAndUpdate()
                 }
             )
+        }else{
+            addAsSingletonList("")
         }
+
         val both = currentLog() ?: return@buildList
         val display = both.get(currentDisplayMode)
         val rewards = display.rewards
@@ -238,6 +241,8 @@ class PowderTracker {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
+
+
     }
 
     private fun calculateResourceHour(resourceInfo: ResourceInfo) {

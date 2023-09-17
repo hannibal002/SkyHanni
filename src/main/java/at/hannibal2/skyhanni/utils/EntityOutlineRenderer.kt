@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
@@ -33,15 +34,18 @@ import java.lang.reflect.Method
 object EntityOutlineRenderer {
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
     private var stopLookingForOptifine = false
+    private var isMissingMixin = false
     private var isFastRender: Method? = null
     private var isShaders: Method? = null
     private var isAntialiasing: Method? = null
     private var emptyLastTick = false
     private val swapBuffer by lazy { initSwapBuffer() }
     private val logger = LorenzLogger("entity_outline_renderer")
-    private val config get() = SkyHanniMod.feature.misc
     private val mc get() = Minecraft.getMinecraft()
     private val BUF_FLOAT_4: java.nio.FloatBuffer = org.lwjgl.BufferUtils.createFloatBuffer(4)
+
+    private val CustomRenderGlobal.frameBuffer get() = entityOutlineFramebuffer_skyhanni
+    private val CustomRenderGlobal.shader get() = entityOutlineShader_skyhanni
 
     /**
      * @return a new framebuffer with the size of the main framebuffer
@@ -60,11 +64,11 @@ object EntityOutlineRenderer {
         if (swapBuffer.framebufferWidth != width || swapBuffer.framebufferHeight != height) {
             swapBuffer.createBindFramebuffer(width, height)
         }
-        val rg = mc.renderGlobal as CustomRenderGlobal
-        val outlineBuffer = rg.entityOutlineFramebuffer_skyhanni
+        val renderGlobal = mc.renderGlobal as CustomRenderGlobal
+        val outlineBuffer = renderGlobal.frameBuffer
         if (outlineBuffer.framebufferWidth != width || outlineBuffer.framebufferHeight != height) {
             outlineBuffer.createBindFramebuffer(width, height)
-            rg.entityOutlineShader_skyhanni.createBindFramebuffers(width, height)
+            renderGlobal.shader.createBindFramebuffers(width, height)
         }
     }
 
@@ -91,8 +95,8 @@ object EntityOutlineRenderer {
         updateFramebufferSize()
 
         // Clear and bind the outline framebuffer
-        renderGlobal.entityOutlineFramebuffer_skyhanni.framebufferClear()
-        renderGlobal.entityOutlineFramebuffer_skyhanni.bindFramebuffer(false)
+        renderGlobal.frameBuffer.framebufferClear()
+        renderGlobal.frameBuffer.bindFramebuffer(false)
 
         // Vanilla options
         RenderHelper.disableStandardItemLighting()
@@ -148,10 +152,10 @@ object EntityOutlineRenderer {
                 }
 
                 // Copy the entire depth buffer of everything that might occlude outline to outline framebuffer
-                copyBuffers(swapBuffer, renderGlobal.entityOutlineFramebuffer_skyhanni, GL11.GL_DEPTH_BUFFER_BIT)
-                renderGlobal.entityOutlineFramebuffer_skyhanni.bindFramebuffer(false)
+                copyBuffers(swapBuffer, renderGlobal.frameBuffer, GL11.GL_DEPTH_BUFFER_BIT)
+                renderGlobal.frameBuffer.bindFramebuffer(false)
             } else {
-                copyBuffers(mc.framebuffer, renderGlobal.entityOutlineFramebuffer_skyhanni, GL11.GL_DEPTH_BUFFER_BIT)
+                copyBuffers(mc.framebuffer, renderGlobal.frameBuffer, GL11.GL_DEPTH_BUFFER_BIT)
             }
 
             // Xray disabled by re-enabling traditional depth testing
@@ -168,13 +172,15 @@ object EntityOutlineRenderer {
         }
 
         // Disable outline mode
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_RGB, GL11.GL_MODULATE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_RGB, GL11.GL_TEXTURE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_RGB, GL11.GL_SRC_COLOR);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_ALPHA, GL11.GL_MODULATE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_ALPHA, GL11.GL_TEXTURE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA);
+        with(GL11.GL_TEXTURE_ENV) {
+            GL11.glTexEnvi(this, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE)
+            GL11.glTexEnvi(this, GL13.GL_COMBINE_RGB, GL11.GL_MODULATE)
+            GL11.glTexEnvi(this, GL13.GL_SOURCE0_RGB, GL11.GL_TEXTURE)
+            GL11.glTexEnvi(this, GL13.GL_OPERAND0_RGB, GL11.GL_SRC_COLOR)
+            GL11.glTexEnvi(this, GL13.GL_COMBINE_ALPHA, GL11.GL_MODULATE)
+            GL11.glTexEnvi(this, GL13.GL_SOURCE0_ALPHA, GL11.GL_TEXTURE)
+            GL11.glTexEnvi(this, GL13.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA)
+        }
 
         // Vanilla options
         RenderHelper.enableStandardItemLighting()
@@ -182,7 +188,7 @@ object EntityOutlineRenderer {
 
         // Load the outline shader
         GlStateManager.depthMask(false)
-        renderGlobal.entityOutlineShader_skyhanni.loadShaderGroup(partialTicks)
+        renderGlobal.shader.loadShaderGroup(partialTicks)
         GlStateManager.depthMask(true)
 
         // Reset GL/framebuffers for next render layers
@@ -214,12 +220,7 @@ object EntityOutlineRenderer {
      */
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
-        val renderGlobal = mc.renderGlobal as CustomRenderGlobal
-
-        // Vanilla Conditions
-        if (renderGlobal.entityOutlineFramebuffer_skyhanni == null || renderGlobal.entityOutlineShader_skyhanni == null || mc.thePlayer == null) return false
-
-        // Skyblock Conditions
+        // SkyBlock Conditions
         if (!LorenzUtils.inSkyBlock) {
             return false
         }
@@ -228,6 +229,10 @@ object EntityOutlineRenderer {
         if (!isEnabled()) {
             return false
         }
+
+        // Vanilla Conditions
+        val renderGlobal = mc.renderGlobal as CustomRenderGlobal
+        if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || mc.thePlayer == null) return false
 
         // Optifine Conditions
         if (!stopLookingForOptifine && isFastRender == null) {
@@ -265,7 +270,10 @@ object EntityOutlineRenderer {
 
     // Add new features that need the entity outline logic here
     private fun isEnabled(): Boolean {
+        if (isMissingMixin) return false
         if (SkyHanniMod.feature.fishing.rareSeaCreatureHighlight) return true
+        if (SkyHanniMod.feature.misc.glowingDroppedItems.enabled) return true
+        if (SkyHanniMod.feature.dungeon.highlightTeammates) return true
 
         return false
     }
@@ -352,39 +360,43 @@ object EntityOutlineRenderer {
      */
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.phase == EventPriority.NORMAL) {
-            val rg = mc.renderGlobal as CustomRenderGlobal
+        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return;
 
-            if (mc.theWorld != null && shouldRenderEntityOutlines()) {
-                // These events need to be called in this specific order for the xray to have priority over the no xray
-                // Get all entities to render xray outlines
-                val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
-                xrayOutlineEvent.postAndCatch()
-                // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
-                val noxrayOutlineEvent = RenderEntityOutlineEvent(
-                    RenderEntityOutlineEvent.Type.NO_XRAY,
-                    xrayOutlineEvent.entitiesToChooseFrom
-                )
-                noxrayOutlineEvent.postAndCatch()
-                // Cache the entities for future use
-                entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
-                entityRenderCache.noXrayCache = noxrayOutlineEvent.entitiesToOutline
-                entityRenderCache.noOutlineCache = noxrayOutlineEvent.entitiesToChooseFrom
-                emptyLastTick = if (isCacheEmpty()) {
-                    if (!emptyLastTick) {
-                        rg.entityOutlineFramebuffer_skyhanni.framebufferClear()
-                    }
-                    true
-                } else {
-                    false
+        val renderGlobal = try {
+            mc.renderGlobal as CustomRenderGlobal
+        } catch (e: NoClassDefFoundError) {
+            CopyErrorCommand.logError(e, "Unable to enable entity outlines, the required mixin is not loaded")
+            isMissingMixin = true
+            return
+        }
+
+        if (mc.theWorld != null && shouldRenderEntityOutlines()) {
+            // These events need to be called in this specific order for the xray to have priority over the no xray
+            // Get all entities to render xray outlines
+            val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
+            xrayOutlineEvent.postAndCatch()
+            // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
+            val noxrayOutlineEvent = RenderEntityOutlineEvent(
+                RenderEntityOutlineEvent.Type.NO_XRAY,
+                xrayOutlineEvent.entitiesToChooseFrom
+            )
+            noxrayOutlineEvent.postAndCatch()
+            // Cache the entities for future use
+            entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
+            entityRenderCache.noXrayCache = noxrayOutlineEvent.entitiesToOutline
+            entityRenderCache.noOutlineCache = noxrayOutlineEvent.entitiesToChooseFrom
+            emptyLastTick = if (isCacheEmpty()) {
+                if (!emptyLastTick) {
+                    renderGlobal.frameBuffer.framebufferClear()
                 }
-            } else if (!emptyLastTick) {
-                entityRenderCache.xrayCache = null
-                entityRenderCache.noXrayCache = null
-                entityRenderCache.noOutlineCache = null
-                if (rg.entityOutlineFramebuffer_skyhanni != null) rg.entityOutlineFramebuffer_skyhanni.framebufferClear()
-                emptyLastTick = true
-            }
+                true
+            } else false
+        } else if (!emptyLastTick) {
+            entityRenderCache.xrayCache = null
+            entityRenderCache.noXrayCache = null
+            entityRenderCache.noOutlineCache = null
+            if (renderGlobal.frameBuffer != null) renderGlobal.frameBuffer.framebufferClear()
+            emptyLastTick = true
         }
     }
 

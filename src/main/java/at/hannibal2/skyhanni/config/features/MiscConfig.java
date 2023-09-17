@@ -26,7 +26,7 @@ public class MiscConfig {
     public boolean petDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Pet Experience Tooltip", desc = "Show the currently active pet.")
+    @ConfigOption(name = "Pet Experience Tooltip", desc = "")
     @ConfigAccordionId(id = 0)
     @Accordion
     public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
@@ -43,6 +43,11 @@ public class MiscConfig {
         @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
         @ConfigEditorBoolean
         public boolean showAlways = false;
+
+        @Expose
+        @ConfigOption(name = "GDrag 200", desc = "Show for Golden Dragon the exp needed for level 200.")
+        @ConfigEditorBoolean
+        public boolean goldenDragon200 = true;
 
     }
 
@@ -98,31 +103,19 @@ public class MiscConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Damage Splash", desc = "")
-    @ConfigEditorAccordion(id = 4)
-    public boolean damageSplash = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean hideDamageSplash = false;
-
-    @Expose
     @ConfigOption(name = "Potion Effects", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean potionEffects = false;
 
     @Expose
-    @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the god pot.")
+    @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the non god pot effects display.")
+    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the Non God Pot Effects display.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
@@ -132,46 +125,12 @@ public class MiscConfig {
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Crimson Reputation Helper", desc = "")
-    @ConfigEditorAccordion(id = 6)
-    public boolean reputationHelper = false;
-
-    @Expose
-    @ConfigOption(name = "Crimson Isle Reputation", desc = "Enable features around Reputation features in the Crimson Isle.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    @FeatureToggle
-    public boolean crimsonIsleReputationHelper = true;
-
-    @Expose
-    @ConfigOption(name = "Use Hotkey", desc = "Only show the reputation helper while pressing the hotkey.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    public boolean reputationHelperUseHotkey = false;
-
-    @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the reputation helper.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    @ConfigAccordionId(id = 6)
-    public int reputationHelperHotkey = Keyboard.KEY_NONE;
-
-
-    @Expose
-    public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
-    @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
-    @ConfigAccordionId(id = 6)
-    public int crimsonIsleReputationShowLocation = 1;
-
-    @Expose
     @ConfigOption(name = "Tia Relay", desc = "")
     @ConfigEditorAccordion(id = 7)
     public boolean tiaRelay = false;
 
     @Expose
-    @ConfigOption(name = "Tia Relay Waypoint", desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the abiphone network needs to be done.")
+    @ConfigOption(name = "Tia Relay Waypoint", desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the Abiphone network needs to be done.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     @FeatureToggle
@@ -218,14 +177,14 @@ public class MiscConfig {
     public boolean particleHider = false;
 
     @Expose
-    @ConfigOption(name = "Blaze Particles", desc = "Hide blaze particles.")
+    @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     @FeatureToggle
     public boolean hideBlazeParticles = false;
 
     @Expose
-    @ConfigOption(name = "Enderman Particles", desc = "Hide enderman particles.")
+    @ConfigOption(name = "Enderman Particles", desc = "Hide Enderman particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     @FeatureToggle
@@ -260,7 +219,7 @@ public class MiscConfig {
     public boolean hideFarParticles = true;
 
     @Expose
-    @ConfigOption(name = "Close Redstone Particles", desc = "Hide redstone particles around the player (appear for some potion effects).")
+    @ConfigOption(name = "Close Redstone Particles", desc = "Hide Redstone particles around the player (appear for some potion effects).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     @FeatureToggle
@@ -289,19 +248,19 @@ public class MiscConfig {
     public Position chickenHeadTimerPosition = new Position(-372, 73, false, true);
 
     @Expose
-    @ConfigOption(name = "Estimated Item Value", desc = "(Enchantments, reforging stone prices, gemstones, gemstones, drill parts and more)")
+    @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
     @ConfigEditorAccordion(id = 11)
     public boolean estimatedItemValue = false;
 
     @Expose
-    @ConfigOption(name = "Enable Estimated Price", desc = "Displays an estimated item value for the item you hover over.")
+    @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     @FeatureToggle
     public boolean estimatedIemValueEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this key to show the estimated item value.")
+    @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     @ConfigAccordionId(id = 11)
     public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
@@ -330,7 +289,7 @@ public class MiscConfig {
     public boolean estimatedIemValueExactPrice = false;
 
     @Expose
-    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the wardrobe inventory.")
+    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     @FeatureToggle
@@ -361,7 +320,7 @@ public class MiscConfig {
                 "Bits",
                 "Stats",
                 "Held Item",
-                "Skyblock Date",
+                "SkyBlock Date",
                 "Profile",
                 "Slayer",
                 "Custom",
@@ -380,7 +339,7 @@ public class MiscConfig {
                 "Bits",
                 "Stats",
                 "Held Item",
-                "Skyblock Date",
+                "SkyBlock Date",
                 "Profile",
                 "Slayer",
                 "Custom",
@@ -404,7 +363,7 @@ public class MiscConfig {
                 "Bits",
                 "Stats",
                 "Held Item",
-                "Skyblock Date",
+                "SkyBlock Date",
                 "Profile",
                 "Slayer",
                 "Custom",
@@ -449,6 +408,17 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean trapperTalkCooldown = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Trapper Cooldown GUI",
+                desc = "Show the cooldown on screen in an overlay (intended for Abiphone users)."
+        )
+        @ConfigEditorBoolean
+        public boolean trapperCooldownGui = false;
+
+        @Expose
+        public Position trapperCooldownPos = new Position(10, 10, false, true);
     }
 
     @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
@@ -530,7 +500,7 @@ public class MiscConfig {
         public boolean onlyBestFriends = false;
 
         @Expose
-        @ConfigOption(name = "Party", desc = "Tab complete party members.")
+        @ConfigOption(name = "Party", desc = "Tab complete Party Members.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean party = true;
@@ -540,6 +510,12 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean vipVisits = true;
+
+        @Expose
+        @ConfigOption(name = "/gfs Sack", desc = "Tab complete /gfs sack items.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean gfsSack = true;
     }
 
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
@@ -599,7 +575,7 @@ public class MiscConfig {
         @Expose
         @ConfigOption(
                 name = "Enabled",
-                desc = "Tracks all of your drops from frozen treasure in the Glacial Caves.\n" +
+                desc = "Tracks all of your drops from Frozen Treasure in the Glacial Caves.\n" +
                         "§eIce calculations are an estimate but are relatively accurate."
         )
         @ConfigEditorBoolean
@@ -740,7 +716,7 @@ public class MiscConfig {
 
     public static class BestiaryDataConfig {
         @Expose
-        @ConfigOption(name = "Enable", desc = "Show bestiary data overlay in the bestiary menu.")
+        @ConfigOption(name = "Enable", desc = "Show Bestiary Data overlay in the Bestiary menu.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
@@ -770,7 +746,7 @@ public class MiscConfig {
         public boolean hideMaxed = false;
 
         @Expose
-        @ConfigOption(name = "Replace romans", desc = "Replace romans numeral (IX) with regular number (9)")
+        @ConfigOption(name = "Replace Romans", desc = "Replace Roman numerals (IX) with regular numbers (9)")
         @ConfigEditorBoolean
         public boolean replaceRoman = false;
 
@@ -801,7 +777,7 @@ public class MiscConfig {
         public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
 
         @Expose
-        @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of crystal hollows.")
+        @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of Crystal Hollows.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean crystalHollowsNamesInCore = false;
@@ -838,6 +814,7 @@ public class MiscConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§b§lPowder Tracker",
+                        "§7Display Mode: §a[Total] §e[This Session]",
                         "§d852 Total chests Picked §7(950/h)",
                         "§bx2 Powder: §aActive!",
                         "§b250,420 §aMithril Powder §7(350,000/h)",
@@ -921,6 +898,32 @@ public class MiscConfig {
         }
     }
 
+
+    @Expose
+    @ConfigOption(name = "Glowing Dropped Items", desc = "")
+    @Accordion
+    public GlowingDroppedItems glowingDroppedItems = new GlowingDroppedItems();
+
+    public static class GlowingDroppedItems {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around all dropped items on the ground.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Showcase Items", desc = "Draws a glowing outline around showcase items.")
+        @ConfigEditorBoolean
+        public boolean highlightShowcase = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Fishing Bait", desc = "Draws a glowing outline around fishing bait.")
+        @ConfigEditorBoolean
+        public boolean highlightFishingBait = false;
+
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
@@ -937,7 +940,7 @@ public class MiscConfig {
     public boolean brewingStandOverlay = true;
 
     @Expose
-    @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers at the right side of the screen.")
+    @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideScoreboardNumbers = false;
@@ -982,7 +985,7 @@ public class MiscConfig {
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
-    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of pet candies used on a pet.")
+    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petCandyUsed = true;

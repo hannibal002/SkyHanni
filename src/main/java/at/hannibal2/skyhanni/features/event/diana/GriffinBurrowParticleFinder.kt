@@ -53,7 +53,7 @@ class GriffinBurrowParticleFinder {
 //
 //    @SubscribeEvent
 //    fun onChatPacket(event: ReceiveParticleEvent) {
-//        if (!LorenzUtils.inSkyblock) return
+//        if (!LorenzUtils.inSkyBlock) return
 //        if (!SkyHanniMod.feature.dev.debugEnabled) return
 //
 //            val particleType = getParticleType(event)
