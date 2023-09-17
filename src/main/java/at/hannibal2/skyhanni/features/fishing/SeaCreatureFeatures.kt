@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
+import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,10 +35,7 @@ class SeaCreatureFeatures {
         for (creatureType in RareSeaCreatureType.entries) {
             if (!creatureType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) continue
             if (!creatureType.clazz.isInstance(entity)) continue
-
-            if (creatureType.nametag.isNotBlank() && EntityPlayer::class.java.isInstance(entity) && (entity as EntityPlayer).name != creatureType.nametag) {
-                continue
-            }
+            if (!entity.hasNameTagWith(3, creatureType.nametag)) continue
 
             rareSeaCreatures = rareSeaCreatures.editCopy { add(entity) }
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
@@ -71,14 +69,14 @@ class SeaCreatureFeatures {
         val nametag: String,
         vararg val health: Int
     ) {
-        WATER_HYDRA(EntityZombie::class.java, "Water Hydra", 500_000, 1_500_000),
-        SEA_EMPEROR(EntityGuardian::class.java, "The Sea Emperors", 750_000, 800_000, 2_250_000, 2_400_000),
-        ZOMBIE_MINER(EntityPlayer::class.java, "", 2_000_000, 6_000_000),
-        PHANTOM_FISHERMAN(EntityPlayer::class.java, "Phantom Fisher", 1_000_000, 3_000_000),
-        GRIM_REAPER(EntityPlayer::class.java, "Grim Reaper", 3_000_000, 9_000_000),
-        YETI(EntityPlayer::class.java, "", 2_000_000, 6_000_000),
-        NUTCRACKER(EntityPlayer::class.java, "", 4_000_000, 12_000_000),
-        GREAT_WHITE_SHARK(EntityPlayer::class.java, "GWS ", 1_500_000, 4_500_000),
+        WATER_HYDRA(EntityZombie::class.java, "Water Hydra", 500_000),
+        SEA_EMPEROR(EntityGuardian::class.java, "Sea Emperor", 750_000, 800_000),
+        ZOMBIE_MINER(EntityPlayer::class.java, "Zombie Miner", 2_000_000),
+        PHANTOM_FISHERMAN(EntityPlayer::class.java, "Phantom Fisher", 1_000_000),
+        GRIM_REAPER(EntityPlayer::class.java, "Grim Reaper", 3_000_000),
+        YETI(EntityPlayer::class.java, "Yeti", 2_000_000),
+        NUTCRACKER(EntityZombie::class.java, "Nutcracker", 4_000_000),
+        GREAT_WHITE_SHARK(EntityPlayer::class.java, "Great White Shark", 1_500_000),
         ;
     }
 }
