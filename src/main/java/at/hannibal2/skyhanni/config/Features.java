@@ -44,7 +44,7 @@ public class Features extends Config {
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
     public GUIConfig gui = new GUIConfig();
 
     @Expose
@@ -62,10 +62,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
-
-    @Expose
-    @Category(name = "Summonings", desc = "Mobs you revive.")
-    public SummoningsConfig summonings = new SummoningsConfig();
 
     @Expose
     @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
@@ -92,8 +88,8 @@ public class Features extends Config {
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Diana", desc = "Diana's mythological event.")
-    public DianaConfig diana = new DianaConfig();
+    @Category(name = "Mining", desc = "Features that help you break blocks.")
+    public MiningConfig mining = new MiningConfig();
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
@@ -104,12 +100,8 @@ public class Features extends Config {
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
-    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
-    public BingoConfig bingo = new BingoConfig();
-
-    @Expose
-    @Category(name = "Mobs", desc = "Visual help for Mobs")
-    public MobsConfig mobs = new MobsConfig();
+    @Category(name = "Events", desc = "Stuff that is not avaliable all the time.")
+    public EventConfig event = new EventConfig();
 
     @Expose
     @Category(name = "Garden", desc = "Features on the Garden island.")

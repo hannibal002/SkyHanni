@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
@@ -18,6 +19,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 @OptIn(ExperimentalTime::class)
 class HighlightBonzoMasks {
+    private val config get() = SkyHanniMod.feature.itemAbilities
 
     val maskTimers = mutableMapOf<String, CooldownTimer>()
 
@@ -33,7 +35,7 @@ class HighlightBonzoMasks {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SkyHanniMod.feature.inventory.highlightDepletedBonzosMasks) return
+        if (!config.depletedBonzosMasks) return
         for (slot in event.gui.inventorySlots.inventorySlots) {
             val item = slot.stack ?: continue
             val maskType = maskType(item) ?: continue
@@ -69,10 +71,16 @@ class HighlightBonzoMasks {
         maskTimers.clear()
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "inventory.highlightDepletedBonzosMasks", "itemAbilities.depletedBonzosMasks")
+    }
+
     companion object {
         data class CooldownTimer(val timeMark: TimeMark, val duration: Duration) {
-            val percentComplete: Double get() =
-                timeMark.elapsedNow().toDouble(DurationUnit.SECONDS) / duration.toDouble(DurationUnit.SECONDS)
+            val percentComplete: Double
+                get() =
+                    timeMark.elapsedNow().toDouble(DurationUnit.SECONDS) / duration.toDouble(DurationUnit.SECONDS)
 
             val isActive: Boolean get() = timeMark.elapsedNow() < duration
 
