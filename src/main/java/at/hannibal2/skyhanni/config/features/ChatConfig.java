@@ -33,21 +33,21 @@ public class ChatConfig {
     public boolean empty = true;
 
     @Expose
-    @ConfigOption(name = "Warping", desc = "Block 'sending request to join...' and 'warping...' messages.")
+    @ConfigOption(name = "Warping", desc = "Block 'Sending request to join...' and 'Warping...' messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
     public boolean warping = true;
 
     @Expose
-    @ConfigOption(name = "Welcome", desc = "Hide the 'welcome to SkyBlock' message.")
+    @ConfigOption(name = "Welcome", desc = "Hide the 'Welcome to SkyBlock' message.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
     public boolean welcome = true;
 
     @Expose
-    @ConfigOption(name = "Guild Exp", desc = "Hide guild exp messages.")
+    @ConfigOption(name = "Guild Exp", desc = "Hide Guild EXP messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
@@ -61,14 +61,14 @@ public class ChatConfig {
     public boolean friendJoinLeft = false;
 
     @Expose
-    @ConfigOption(name = "Winter Gifts", desc = "Hide useless winter gift messages.")
+    @ConfigOption(name = "Winter Gifts", desc = "Hide useless Winter Gift messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
     public boolean winterGift = false;
 
     @Expose
-    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in crystal hollows. " +
+    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in Crystal Hollows. " +
             "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -76,7 +76,7 @@ public class ChatConfig {
     public boolean powderMining = true;
 
     @Expose
-    @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current kill combo from the Grandma Wolf Pet.")
+    @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current Kill Combo from the Grandma Wolf Pet.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
@@ -124,20 +124,20 @@ public class ChatConfig {
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in dungeons.")
+    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dungeonMessages = true;
 
     @Expose
-    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the watcher and bosses in the dungeon.")
+    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in the dungeon.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dungeonBossMessages = false;
 
     @Expose
     @ConfigOption(name = "Hide Far Deaths", desc = "Hide other players' death messages, " +
-            "except for players who are nearby or during dungeons/a Kuudra fight.")
+            "except for players who are nearby or during Dungeons/a Kuudra fight.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideFarDeathMessages = false;
@@ -150,7 +150,7 @@ public class ChatConfig {
     public boolean compactPotionMessage = true;
 
     @Expose
-    @ConfigOption(name = "Compact Bestiary Message", desc = "Shorten the bestiary level up message, showing additional information when hovering.")
+    @ConfigOption(name = "Compact Bestiary Message", desc = "Shorten the Bestiary level up message, showing additional information when hovering.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactBestiaryMessage = true;

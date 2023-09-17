@@ -11,7 +11,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class SummoningsConfig {
 
     @Expose
-    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped summoning souls laying on the ground. " +
+    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
             "§cNot working in dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
     @ConfigEditorBoolean
     @FeatureToggle

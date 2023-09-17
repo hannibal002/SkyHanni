@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
@@ -130,7 +131,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.18",
+    version = "0.20.Beta.20",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -187,7 +188,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
-        loadModule(SackAPI())
+        loadModule(SackAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -268,9 +269,10 @@ class SkyHanniMod {
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
+        loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyblockLevelGuideHelper())
+        loadModule(SkyBlockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -334,7 +336,7 @@ class SkyHanniMod {
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(CaptureFarmingGear())
-        loadModule(SackDisplay())
+        loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
@@ -421,7 +423,9 @@ class SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
-        Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
+        Runtime.getRuntime().addShutdownHook(Thread {
+            configManager.saveConfig("shutdown-hook")
+        })
         repo = RepoManager(configManager.configDirectory)
         try {
             repo.loadRepoInformation()
@@ -456,6 +460,7 @@ class SkyHanniMod {
 
         @JvmStatic
         val feature: Features get() = configManager.features
+        val sackData: SackData get() = configManager.sackData
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")

@@ -153,7 +153,7 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
-    fun ItemStack.getItemRarity() = getItemRarityOrNull() ?: error("item rarity not detected for item '$name'")
+    fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
         if (isPet(cleanName())) {
@@ -210,7 +210,12 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
-    fun readItemAmount(input: String): Pair<String, Int>? {
+    fun readItemAmount(originalInput: String): Pair<String, Int>? {
+        // This workaround fixes 'Tubto Cacti I Book'
+        val input = if (originalInput.endsWith(" Book")) {
+            originalInput.replace(" Book", "")
+        } else originalInput
+
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
         }

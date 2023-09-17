@@ -45,7 +45,7 @@ public class MobsConfig {
     @Expose
     @ConfigOption(
             name = "Special Zealots",
-            desc = "Highlight Special Zealots (the ones that drop summoning eyes) in the End."
+            desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -60,7 +60,7 @@ public class MobsConfig {
     public boolean corruptedMobHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Arachne Boss", desc = "Highlight the arachne boss in red and mini bosses in orange.")
+    @ConfigOption(name = "Arachne Boss", desc = "Highlight the Arachne boss in red and mini-bosses in orange.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle

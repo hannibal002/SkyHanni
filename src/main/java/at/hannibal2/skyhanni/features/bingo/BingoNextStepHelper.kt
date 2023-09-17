@@ -322,7 +322,7 @@ class BingoNextStepHelper {
 
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
-        // TODO add skyblock level requirement
+        // TODO add SkyBlock level requirement
 //        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
         IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
 

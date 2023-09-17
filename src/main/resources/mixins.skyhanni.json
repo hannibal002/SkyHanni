@@ -22,6 +22,7 @@
     "renderer.MixinRendererLivingEntity"
   ],
   "client": [
+    "AccessorGuiEditSign",
     "AccessorKeyBinding",
     "CustomRenderGlobal",
     "MixinEntityRenderer",
