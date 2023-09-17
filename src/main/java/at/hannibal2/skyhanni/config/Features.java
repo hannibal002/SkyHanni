@@ -64,10 +64,6 @@ public class Features extends Config {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @Category(name = "Summonings", desc = "Mobs you revive.")
-    public SummoningsConfig summonings = new SummoningsConfig();
-
-    @Expose
     @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
     public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
@@ -106,10 +102,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Bingo", desc = "Features for the Bingo mode.")
     public BingoConfig bingo = new BingoConfig();
-
-    @Expose
-    @Category(name = "Mobs", desc = "Visual help for Mobs")
-    public MobsConfig mobs = new MobsConfig();
 
     @Expose
     @Category(name = "Garden", desc = "Features on the Garden island.")
