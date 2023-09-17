@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.tiarelay
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TiaRelayHelper {
+    private val config get() = SkyHanniMod.feature.inventory.helper.tiaRelay
     private var inInventory = false
 
     private var lastClickSlot = 0
@@ -25,13 +27,13 @@ class TiaRelayHelper {
         if (!LorenzUtils.inSkyBlock) return
         val soundName = event.soundName
 
-        if (SkyHanniMod.feature.misc.tiaRelayMute) {
+        if (config.tiaRelayMute) {
             if (soundName == "mob.wolf.whine") {
                 event.isCanceled = true
             }
         }
 
-        if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
+        if (!config.soundHelper) return
         if (!inInventory) return
 
         val distance = event.distanceToPlayer
@@ -52,7 +54,7 @@ class TiaRelayHelper {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
+        if (!config.soundHelper) return
 
         if (event.repeatSeconds(1)) {
             if (InventoryUtils.openInventoryName().contains("Network Relay")) {
@@ -94,7 +96,7 @@ class TiaRelayHelper {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
+        if (!config.soundHelper) return
         if (!inInventory) return
 
         val slot = event.slot
@@ -125,7 +127,7 @@ class TiaRelayHelper {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
+        if (!config.soundHelper) return
         if (!inInventory) return
 
         // only listen to right clicks
@@ -133,6 +135,15 @@ class TiaRelayHelper {
 
         lastClickSlot = event.slotId
         lastClickTime = System.currentTimeMillis()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.tiaRelayMute", "inventory.helper.tiaRelay.tiaRelayMute")
+        event.move(2, "misc.tiaRelayHelper", "inventory.helper.tiaRelay.soundHelper")
+
+        event.move(2, "misc.tiaRelayNextWaypoint", "inventory.helper.tiaRelay.nextWaypoint")
+        event.move(2, "misc.tiaRelayAllWaypoints", "inventory.helper.tiaRelay.allWaypoints")
     }
 
     class Sound(val name: String, val pitch: Float)

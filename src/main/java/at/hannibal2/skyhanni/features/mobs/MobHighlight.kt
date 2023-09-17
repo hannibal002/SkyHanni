@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
-import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MobHighlight {
-    private val config get() = SkyHanniMod.feature.mobs
+    private val config get() = SkyHanniMod.feature.combat.mobs
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {

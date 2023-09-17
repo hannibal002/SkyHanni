@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class FrozenTreasureTracker {
-    private val config get() = SkyHanniMod.feature.misc.frozenTreasureTracker
+    private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
     private var display = emptyList<List<Any>>()
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
@@ -148,6 +149,11 @@ class FrozenTreasureTracker {
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return
         config.position.renderStringsAndItems(display, posLabel = "Frozen Treasure Tracker")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
     }
 
     private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)
