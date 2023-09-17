@@ -31,7 +31,6 @@ class Translator {
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     fun onGuiChat(e: LorenzChatEvent) {
         if (!SkyHanniMod.feature.chat.translator) return
-        if (e.type != 0.toByte()) return // If this is not a player-sent message, return
 
         val message = e.message.removeColor()
         if (!messageContentRegex.matches(message.removeColor())) return
