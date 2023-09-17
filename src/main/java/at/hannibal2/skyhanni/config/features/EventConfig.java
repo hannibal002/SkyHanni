@@ -329,5 +329,4 @@ public class EventConfig {
         public boolean enableActiveAlert = false;
     }
 
-
 }
