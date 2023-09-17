@@ -32,6 +32,7 @@ class ItemDisplayOverlayFeatures {
     private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
+    private val dungeonClassLevelPattern = "(?<class>[A-z]+)( )(?<level>[0-9]+)".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
@@ -163,12 +164,19 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(9)) {
-            if (chestName == "Your Skills") {
+            if (chestName == "Your Skills" || chestName == "Dungeoneering") {
                 if (item.getLore().any { it.contains("Click to view!") }) {
-                    if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
-                    if (!itemName.contains("Dungeon")) {
-                        val text = itemName.split(" ").last()
-                        return "" + text.romanToDecimalIfNeeded()
+                    if (chestName == "Your Skills") {
+                        if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
+                        if (!itemName.contains("Dungeon")) {
+                            val text = itemName.split(" ").last()
+                            return "" + text.romanToDecimalIfNeeded()
+                        }
+                    } else if (chestName == "Dungeoneering") {
+                        val noColorName = itemName.removeColor()
+                        dungeonClassLevelPattern.matchMatcher(noColorName) {
+                            return group("level")
+                        }
                     }
                 }
             }
@@ -537,7 +545,9 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(32)) {
             if (chestName == "Visitor's Logbook") {
                 if (item.getLore() != null) {
-                    return item.getLore().first().take(5)
+                    if (item.getLore().any { it.contains("Times Visited: ") }) {
+                        return item.getLore().first().take(5)
+                    }
                 }
             }
         }

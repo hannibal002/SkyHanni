@@ -303,7 +303,7 @@ public class InventoryConfig {
                 "§bCrimson Armor",
                 "§bSkyblock Level",
                 "§bKuudra Key",
-                "§bSkill Level",
+                "§bSkill Level + Dungeoneering Levels",
                 "§bCollection Level",
                 "§bRancher's Boots speed",
                 "§bLarva Hook",
