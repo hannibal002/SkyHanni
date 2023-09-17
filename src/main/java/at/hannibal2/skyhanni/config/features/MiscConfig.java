@@ -125,38 +125,6 @@ public class MiscConfig {
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Tia Relay", desc = "")
-    @ConfigEditorAccordion(id = 7)
-    public boolean tiaRelay = false;
-
-    @Expose
-    @ConfigOption(name = "Tia Relay Waypoint", desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the Abiphone network needs to be done.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    @FeatureToggle
-    public boolean tiaRelayNextWaypoint = true;
-
-    @Expose
-    @ConfigOption(name = "Tia Relay All", desc = "Show all relay waypoints at once.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    public boolean tiaRelayAllWaypoints = false;
-
-    @Expose
-    @ConfigOption(name = "Tia Relay Helper", desc = "Helps with solving the sound puzzle.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    @FeatureToggle
-    public boolean tiaRelayHelper = true;
-
-    @Expose
-    @ConfigOption(name = "Tia Relay Mute", desc = "Mutes the sound when close to the relay.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    @FeatureToggle
-    public boolean tiaRelayMute = true;
-
-    @Expose
     @ConfigOption(name = "Tps Display", desc = "")
     @ConfigEditorAccordion(id = 8)
     public boolean tpsDisplay = false;
@@ -836,17 +804,6 @@ public class MiscConfig {
     @FeatureToggle
     public boolean patcherSendCoordWaypoint = false;
 
-    @Expose
-    @ConfigOption(name = "Harp Keybinds", desc = "In Melody's Harp, press buttons with your number row on the keyboard instead of clicking.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean harpKeybinds = false;
-
-    @Expose
-    @ConfigOption(name = "Harp Numbers", desc = "In Melody's Harp, show buttons as stack size (intended to be used with Harp Keybinds).")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean harpNumbers = false;
 
     @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
@@ -868,6 +825,4 @@ public class MiscConfig {
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
-
-
 }

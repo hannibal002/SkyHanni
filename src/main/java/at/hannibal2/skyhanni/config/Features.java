@@ -44,7 +44,7 @@ public class Features extends Config {
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
     public GUIConfig gui = new GUIConfig();
 
     @Expose
