@@ -326,7 +326,7 @@ public class InventoryConfig {
                 "§bSkyblock Profile Name (Fruits)",
                 "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
                 "§bGarden Level",
-                "§bGarden Visitor's Logbook Accepted/Visited Ratio (per visitor)",
+                "§bGarden Visitor's Logbook NPC Rarities",
                 "§bFarming Contests Medal Inventory",
                 "§bVisitor's Logbook Countdown"
         }

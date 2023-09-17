@@ -527,33 +527,22 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(32)) {
-            if (chestName == "Visitor's Logbook") {
-                // var timesVisited = 0
-                // var timesAccepted = 0
-                // if (item.getLore().any { it.contains("Times Visited: ") }) {
-                //     for (line in item.getLore()) {
-                //         if (line.contains("Times Visited: ")) {
-                //             timesVisited = line.removeColor().replace("Times Visited: ", "").trim().toInt()
-                //         } else if (line.contains("Offers Accepted: ")) {
-                //             timesAccepted = line.removeColor().replace("Offers Accepted: ", "").trim().toInt()
-                //         }
-                //     }
-                //     if (timesVisited == 0) return ""
-                //     var theString = ((timesAccepted.toDouble() / timesVisited.toDouble()).toString().take(4).replace("0.",".").replace("1.00","1").replace("1.0","1"))
-                //     return theString
-                // }
-            }
-        }
-
         if (stackSizeConfig.contains(31)) {
             if ((chestName == "Farming Skill") && itemName.contains("Garden Level ")) {
                 if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
                 return itemName.replace("Garden Level ", "")
             }
         }
+        
+        if (stackSizeConfig.contains(32)) {
+            if (chestName == "Visitor's Logbook") {
+                if (item.getLore() != null) {
+                    return item.getLore().first().take(5)
+                }
+            }
+        }
 
-        if (stackSizeConfig.contains(31)) {
+        if (stackSizeConfig.contains(33)) {
             if ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!")) {
                 var gold = "§60"
                 var silver = "§f0"
@@ -568,7 +557,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(32)) {
+        if (stackSizeConfig.contains(34)) {
             if ((chestName == "Visitor's Logbook") && itemName == ("Logbook")) {
                 for (line in item.getLore()) {
                     if (line.contains("Next Visitor: ")) {
