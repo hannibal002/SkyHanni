@@ -54,24 +54,6 @@ public class MiscConfig {
     @Expose
     public Position petDisplayPos = new Position(-330, -15, false, true);
 
-    // rename this to just "time will cause a config reset
-    @ConfigOption(name = "Time Features", desc = "")
-    @Accordion
-    @Expose
-    public TimeConfig timeConfigs = new TimeConfig();
-
-    public static class TimeConfig {
-
-        @Expose
-        @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean realTime = false;
-
-        @Expose
-        public Position realTimePos = new Position(10, 10, false, true);
-    }
-
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
@@ -114,21 +96,6 @@ public class MiscConfig {
 
     @Expose
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Tps Display", desc = "")
-    @ConfigEditorAccordion(id = 8)
-    public boolean tpsDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Tps Display", desc = "Show the TPS of the current server, like in Soopy.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 8)
-    @FeatureToggle
-    public boolean tpsDisplayEnabled = false;
-
-    @Expose
-    public Position tpsDisplayPosition = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Particle Hider", desc = "")
@@ -378,35 +345,6 @@ public class MiscConfig {
         public boolean inventoryNumbers = false;
     }
 
-    @ConfigOption(name = "City Project", desc = "")
-    @Accordion
-    @Expose
-    public CityProject cityProject = new CityProject();
-
-    public static class CityProject {
-
-        @Expose
-        @ConfigOption(name = "Show Materials", desc = "Show materials needed for contributing to the City Project.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean showMaterials = true;
-
-        @Expose
-        @ConfigOption(name = "Show Ready", desc = "Mark contributions that are ready to participate.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean showReady = true;
-
-        @Expose
-        @ConfigOption(name = "Daily Reminder", desc = "Remind every 24 hours to participate.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean dailyReminder = true;
-
-        @Expose
-        public Position pos = new Position(150, 150, false, true);
-    }
-
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
     @Expose
@@ -505,29 +443,6 @@ public class MiscConfig {
                 }
         )
         public Property<List<Integer>> textFormat = Property.of(new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 23)));
-
-        @Expose
-        public Position position = new Position(10, 80, false, true);
-    }
-
-    @Expose
-    @ConfigOption(name = "Custom Text box", desc = "")
-    @Accordion
-    public TextBox textBox = new TextBox();
-
-    public static class TextBox {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Enables showing the textbox while in SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
-                "§eUse '&' as the colour code character.\n" +
-                "§eUse '\\n' as the line break character.")
-        @ConfigEditorText
-        public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
         @Expose
         public Position position = new Position(10, 80, false, true);

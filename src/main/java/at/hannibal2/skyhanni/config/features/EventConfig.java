@@ -277,6 +277,35 @@ public class EventConfig {
 
     }
 
+    @ConfigOption(name = "City Project", desc = "")
+    @Accordion
+    @Expose
+    public CityProjectConfig cityProject = new CityProjectConfig();
+
+    public static class CityProjectConfig {
+
+        @Expose
+        @ConfigOption(name = "Show Materials", desc = "Show materials needed for contributing to the City Project.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showMaterials = true;
+
+        @Expose
+        @ConfigOption(name = "Show Ready", desc = "Mark contributions that are ready to participate.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showReady = true;
+
+        @Expose
+        @ConfigOption(name = "Daily Reminder", desc = "Remind every 24 hours to participate.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean dailyReminder = true;
+
+        @Expose
+        public Position pos = new Position(150, 150, false, true);
+    }
+
     // comment in if the event is needed again
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion
