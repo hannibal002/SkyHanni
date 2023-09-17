@@ -25,6 +25,7 @@
     "AccessorKeyBinding",
     "CustomRenderGlobal",
     "MixinEntityRenderer",
+    "MixinFontRenderer",
     "MixinGuiChat",
     "MixinGuiIngame",
     "MixinGuiPlayerTabOverlay",

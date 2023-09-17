@@ -1246,7 +1246,7 @@ public class GardenConfig {
 
     @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
-    public Runnable positions = Commands::openFortuneGuide;
+    public Runnable open = Commands::openFortuneGuide;
 
     @Expose
     public Position farmingFortunePos = new Position(5, -180, false, true);

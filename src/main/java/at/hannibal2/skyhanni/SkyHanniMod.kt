@@ -401,6 +401,7 @@ class SkyHanniMod {
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
+        loadModule(ModifyVisualWords)
 
         init()
 

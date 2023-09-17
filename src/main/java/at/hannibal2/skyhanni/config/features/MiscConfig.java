@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
@@ -922,6 +923,31 @@ public class MiscConfig {
         @ConfigEditorBoolean
         public boolean highlightFishingBait = false;
 
+    }
+
+    @Expose
+    @ConfigOption(name = "Modify Visual Words", desc = "")
+    @Accordion
+    public ModifyWords modifyWords = new ModifyWords();
+
+    public static class ModifyWords {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enables replacing all instances of a word or phrase with another word or phrase.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Work Outside SkyBlock", desc = "Allows modifying visual words outside of SkyBlock.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean workOutside = false;
+
+        @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /placeholderrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+        @ConfigEditorButton(buttonText = "Open")
+        public Runnable open = Commands::openFortuneGuide;
+        //todo swap command
     }
 
     @Expose
