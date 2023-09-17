@@ -554,11 +554,5 @@ public class MiscConfig {
     public boolean superpairsClicksAlert = false;
 
     @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean configButtonOnPause = true;
-
-    @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 }

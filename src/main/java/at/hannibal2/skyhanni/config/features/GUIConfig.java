@@ -64,4 +64,10 @@ public class GUIConfig {
 
     @Expose
     public Position tpsDisplayPosition = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean configButtonOnPause = true;
 }
