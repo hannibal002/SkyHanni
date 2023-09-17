@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
-import at.hannibal2.skyhanni.features.event.anniversary.ActivePlayerTimer
 import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -151,7 +150,7 @@ class SkyHanniMod {
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
         loadModule(ItemClickData())
-        loadModule(ActivePlayerTimer)
+//        loadModule(Year300RaffleEvent)
         loadModule(MinecraftData())
         loadModule(TitleUtils())
         loadModule(ItemTipHelper())

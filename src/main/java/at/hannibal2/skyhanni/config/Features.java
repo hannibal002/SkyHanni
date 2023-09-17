@@ -88,10 +88,6 @@ public class Features extends Config {
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Diana", desc = "Diana's mythological event.")
-    public DianaConfig diana = new DianaConfig();
-
-    @Expose
     @Category(name = "Mining", desc = "Features that help you break blocks.")
     public MiningConfig mining = new MiningConfig();
 
@@ -104,8 +100,8 @@ public class Features extends Config {
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
-    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
-    public BingoConfig bingo = new BingoConfig();
+    @Category(name = "Events", desc = "Stuff that is not avaliable all the time.")
+    public EventConfig event = new EventConfig();
 
     @Expose
     @Category(name = "Garden", desc = "Features on the Garden island.")

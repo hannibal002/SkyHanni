@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GriffinBurrowParticleFinder {
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private val recentlyDugParticleBurrows = mutableListOf<LorenzVec>()
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
@@ -78,7 +79,7 @@ class GriffinBurrowParticleFinder {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
+        if (!config.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val packet = event.packet
 
@@ -149,7 +150,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
+        if (!config.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
@@ -171,7 +172,7 @@ class GriffinBurrowParticleFinder {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
+        if (!config.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
 
         val pos = event.position
