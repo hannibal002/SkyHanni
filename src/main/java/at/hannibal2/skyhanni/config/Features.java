@@ -92,6 +92,10 @@ public class Features extends Config {
     public DianaConfig diana = new DianaConfig();
 
     @Expose
+    @Category(name = "Mining", desc = "Features that help you break blocks.")
+    public MiningConfig mining = new MiningConfig();
+
+    @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsConfig commands = new CommandsConfig();
 
