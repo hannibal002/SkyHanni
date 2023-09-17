@@ -312,14 +312,14 @@ public class InventoryConfig {
         }
 
         @Expose
-        @ConfigOption(name = "Tia Relay", desc = "")
+        @ConfigOption(name = "Tia Relay Abiphone Network Maintenance", desc = "")
         @Accordion
         public TiaRelayConfig tiaRelay = new TiaRelayConfig();
 
         public static class TiaRelayConfig {
 
             @Expose
-            @ConfigOption(name = "Sound Puzzle Helper", desc = "Helps with solving the sound puzzle.")
+            @ConfigOption(name = "Sound Puzzle Helper", desc = "Helps with solving the sound puzzle for Tia (The 9 Operator Chips to do maintainance for the Abiphone Network).")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean soundHelper = true;
