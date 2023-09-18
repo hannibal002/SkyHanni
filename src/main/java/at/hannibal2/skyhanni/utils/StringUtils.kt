@@ -19,20 +19,17 @@ object StringUtils {
     }
 
     fun String.removeColor(): String {
-//        return replace("(?i)\\u00A7.", "")
-
         val builder = StringBuilder()
-        var skipNext = false
-        for (c in this.toCharArray()) {
-            if (c == '§') {
-                skipNext = true
+
+        var counter = 0
+        while (counter < this.length) {
+            if (this[counter] == '§') {
+                counter += 2
                 continue
+            } else {
+                builder.append(this[counter])
+                counter++
             }
-            if (skipNext) {
-                skipNext = false
-                continue
-            }
-            builder.append(c)
         }
 
         return builder.toString()
