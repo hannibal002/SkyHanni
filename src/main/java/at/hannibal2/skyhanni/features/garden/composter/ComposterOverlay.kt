@@ -422,8 +422,8 @@ class ComposterOverlay {
                     if(lastAttemptTime.passedSince()>0.5.seconds){
                         lastAttemptTime = SimpleTimeMark.now()
                         val sackData = fetchSackItem(internalName.asInternalName())
-                        val amountInSacks = sackData?.amount
-                        val sacksLoaded = sackData?.outdatedStatus
+                        val amountInSacks = sackData.amount
+                        val sacksLoaded = sackData.outdatedStatus
                         if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
                             if (config.composterOverlayGetType == 0) {
                                 inInventory = false
@@ -443,7 +443,7 @@ class ComposterOverlay {
                                     }
                                     clickableChat("§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!","sax")
                                 }
-                                if (amountInSacks != null && amountInSacks < itemsNeeded) {
+                                if (amountInSacks < itemsNeeded) {
                                     clickableChat("§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy on the Bazaar!","bz ${itemName.removeColor()}")
                                 }
                                 if (having < itemsNeeded) {
