@@ -28,21 +28,20 @@ class Translator {
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onGuiChat(e: LorenzChatEvent) {
         if (!SkyHanniMod.feature.chat.translator) return
 
         val message = e.message
         if (!message.isPlayerMessage()) return
 
-        if (e.chatComponent.siblings.size > 0) {
-            val clickStyle = createClickStyle(message.removeColor())
-            e.chatComponent.siblings.last().setChatStyle(clickStyle)
-        }
+        val editedComponent = if (e.chatComponent.siblings.size > 0) e.chatComponent.siblings.last() else e.chatComponent
+
+        val clickStyle = createClickStyle(message.removeColor(), editedComponent.chatStyle)
+        editedComponent.setChatStyle(clickStyle)
     }
 
-    private fun createClickStyle(message: String): ChatStyle {
-        val style = ChatStyle()
+    private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         style.setChatClickEvent(
             ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
@@ -212,5 +211,4 @@ class Translator {
             OSUtils.copyToClipboard(translation)
         }
     }
-
 }
