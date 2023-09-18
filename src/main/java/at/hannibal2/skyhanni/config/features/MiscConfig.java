@@ -7,6 +7,10 @@ import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MiscConfig {
 
     @Expose

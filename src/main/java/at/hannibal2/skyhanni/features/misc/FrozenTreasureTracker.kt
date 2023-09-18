@@ -67,6 +67,7 @@ class FrozenTreasureTracker {
                 icePerSecond.add(0)
             }
             icePerSecond.add(difference)
+            while (icePerSecond.size > 1200) icePerSecond.removeAt(0)
         }
         icePerHour = (icePerSecond.average() * 3600).toInt()
     }
