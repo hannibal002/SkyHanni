@@ -599,14 +599,14 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(36)) {
             if (itemName.contains("Necron's Ladder")) {
-                return item.getNecronHandlesFound().toString()
+                return item.getNecronHandlesFound().toString().replace("null","")
             }
         }
 
         if (stackSizeConfig.contains(37)) {
             if (itemName.contains("Fruit Bowl")) {
                 val lore = item.getLore()
-                if (lore.any { it.contains("Names Found:") }) {
+                if (lore.any { it.contains(" found:") }) {
                     var numFound = 0
                     for (line in lore) {
                         if (line.contains("§e")) {
