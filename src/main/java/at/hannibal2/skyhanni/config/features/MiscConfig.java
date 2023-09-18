@@ -944,10 +944,10 @@ public class MiscConfig {
         @FeatureToggle
         public boolean workOutside = false;
 
-        @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /placeholderrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+        @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /shwords")
         @ConfigEditorButton(buttonText = "Open")
-        public Runnable open = Commands::openFortuneGuide;
-        //todo swap command
+        public Runnable open = Commands::openVisualWords;
+
     }
 
     @Expose

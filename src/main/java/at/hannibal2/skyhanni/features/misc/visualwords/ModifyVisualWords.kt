@@ -16,6 +16,7 @@ object ModifyVisualWords {
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
         if (!LorenzUtils.inSkyBlock && !config.workOutside) return originalText
+        if (VisualWordGui.isInGui()) return originalText
 
         val cachedResult = textCache.getIfPresent(originalText)
         if (cachedResult != null) {

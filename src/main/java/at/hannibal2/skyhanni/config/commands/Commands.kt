@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -156,6 +157,7 @@ object Commands {
                     "Copies the translation for a given message to your clipboard. " +
                     "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun usersBugFix() {
@@ -308,6 +310,15 @@ object Commands {
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
+        }
+    }
+
+    @JvmStatic
+    fun openVisualWords() {
+        if (!LorenzUtils.onHypixel) {
+            LorenzUtils.chat("§cJoin Hypixel to use this feature!")
+        } else {
+            SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
 

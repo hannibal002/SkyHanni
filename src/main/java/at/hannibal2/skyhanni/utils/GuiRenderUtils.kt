@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
@@ -72,6 +71,10 @@ object GuiRenderUtils {
             true,
             0xffffff
         )
+    }
+
+    fun drawStringCentered(str: String?, x: Float, y: Float) {
+        drawStringCentered(str, x.toInt(), y.toInt())
     }
 
     fun renderItemStack(item: ItemStack, x: Int, y: Int) {
@@ -179,18 +182,19 @@ object GuiRenderUtils {
         )
     }
 
-    fun renderItemAndTip(item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
+    fun renderItemAndTip(list: MutableList<String>, item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
         if (item != null) {
             renderItemStack(item, x, y)
             if (isPointInRect(mouseX, mouseY, x, y, 16, 16)) {
                 val tt: List<String> = item.getTooltip(Minecraft.getMinecraft().thePlayer, false)
-                FFGuideGUI.tooltipToDisplay.addAll(tt)
+                list.addAll(tt)
             }
         }
     }
 
     fun renderItemAndTip(
+        list: MutableList<String>,
         item: ItemStack?,
         x: Float,
         y: Float,
@@ -198,7 +202,7 @@ object GuiRenderUtils {
         mouseY: Float,
         color: Int = 0xFF43464B.toInt()
     ) {
-        renderItemAndTip(item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
+        renderItemAndTip(list, item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
 
     // assuming 70% font size

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.misc.EnderNode;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -29,6 +30,12 @@ public class Storage {
 
     @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
+
+    @Expose
+    public List<VisualWord> modifiedWords = new ArrayList<>();
+
+    @Expose
+    public Boolean seenThis = false;
 
     @Expose
     public Boolean contestSendingAsked = false;
