@@ -384,7 +384,10 @@ public class InventoryConfig {
                 "§bGarden Level",
                 "§bGarden Visitor's Logbook NPC Rarities",
                 "§bFarming Contests Medal Inventory",
-                "§bVisitor's Logbook Countdown"
+                "§bVisitor's Logbook Countdown",
+                "§bMayor Perk Count",
+                "§bNecron's Ladder Progress",
+                "§bFruit Bowl Progress"
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -546,7 +547,7 @@ class ItemDisplayOverlayFeatures {
             if (chestName == "Visitor's Logbook") {
                 if (item.getLore() != null) {
                     if (item.getLore().any { it.contains("Times Visited: ") }) {
-                        return item.getLore().first().take(5)
+                        return item.getLore().first().take(5).replace("T", "☉")
                     }
                 }
             }
@@ -572,6 +573,47 @@ class ItemDisplayOverlayFeatures {
                 for (line in item.getLore()) {
                     if (line.contains("Next Visitor: ")) {
                         return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m","")
+                    }
+                }
+            }
+        }
+        
+        if (stackSizeConfig.contains(35)) {
+            if ((chestName == "Election") && itemName != ("")) {
+                if (itemName.lowercase().contains("dante")) return "§c§l✖"
+                val nameWithColor = item.name ?: return ""
+                val colorCode = nameWithColor.take(2)
+                var numPerks = 0
+                for (line in item.getLore()) {
+                    if (line.startsWith(colorCode) &&
+                        !(line.contains("You voted for this candidate!")) &&
+                        !(line.contains("Leading in votes!")) &&
+                        !(line.contains("Click to vote for ")) && 
+                        !(line.startsWith(colorCode + "§"))) {
+                            numPerks++
+                    }
+                }
+                return "" + colorCode + numPerks
+            }
+        }
+
+        if (stackSizeConfig.contains(36)) {
+            if (itemName.contains("Necron's Ladder")) {
+                return item.getNecronHandlesFound().toString()
+            }
+        }
+
+        if (stackSizeConfig.contains(37)) {
+            if (itemName.contains("Fruit Bowl")) {
+                val lore = item.getLore()
+                if (lore.any { it.contains("Names Found:") }) {
+                    var numFound = 0
+                    for (line in lore) {
+                        if (line.contains("§e")) {
+                            numFound += (line.split("§e").size - 1) //shoutout to IR42 for this one-liner: https://stackoverflow.com/a/61752225
+                        } else if (line.contains("Names missing:")) {
+                            return numFound.toString()
+                        }
                     }
                 }
             }
