@@ -56,6 +56,7 @@ class ComposterOverlay {
     private var maxLevel = false
     private var lastHovered = 0L
     private var lastAttemptTime = SimpleTimeMark.farPast()
+
     companion object {
         var currentOrganicMatterItem: String?
             get() = GardenAPI.config?.composterCurrentOrganicMatterItem
@@ -415,34 +416,40 @@ class ComposterOverlay {
                 if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
             val rawItemName = itemName.removeColor()
             val name = itemName.substring(0, 2) + selected + rawItemName
-            list.add(Renderable.link("$name§r §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
+            list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
                 if (LorenzUtils.isControlKeyDown()) {
                     if(lastAttemptTime.passedSince()>0.5.seconds){
                         lastAttemptTime = SimpleTimeMark.now()
-                        val amountInSacks = fetchSackItem(internalName.asInternalName())?.amount
-                        val sacksLoaded = fetchSackItem(internalName.asInternalName())?.outdatedStatus
+                        val sackData = fetchSackItem(internalName.asInternalName())
+                        val amountInSacks = sackData?.amount
+                        val sacksLoaded = sackData?.outdatedStatus
                         if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
                             if (config.composterOverlayGetType == 0) {
                                 inInventory = false
                                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
                             } else if (amountInSacks == 0 && sacksLoaded != -1) {
                                 SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
-                                chat("§e[SkyHanni] No $itemName §r§efound in sacks. Opening Bazaar.")
+                                chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
                                 inInventory = false
                                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
                             } else {
                                 val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
                                 if (sacksLoaded == -1) {
-                                    clickableChat("§e[SkyHanni] sacks could not be loaded. Open your sacks to update the data!.","sax")
+                                    val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") {
+                                        "Mining"
+                                    } else {
+                                        "Enchanted Agronomy"
+                                    }
+                                    clickableChat("§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!","sax")
                                 }
                                 if (amountInSacks != null && amountInSacks < itemsNeeded) {
-                                    clickableChat("§e[SkyHanni] You're out of $itemName §r§ein your sacks! Click here to buy on the Bazaar!","bz ${itemName.removeColor()}")
+                                    clickableChat("§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy on the Bazaar!","bz ${itemName.removeColor()}")
                                 }
                                 if (having < itemsNeeded) {
                                     LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
                                 } else {
-                                    chat("§e[SkyHanni] $itemName §r§8x${itemsNeeded.toInt()}§r§e already found in inventory!")
+                                    chat("§e[SkyHanni] $itemName §8x${itemsNeeded.toInt()} §ealready found in inventory!")
                                 }
                             }
                         }

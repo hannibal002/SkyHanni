@@ -1101,8 +1101,8 @@ public class GardenConfig {
     public int composterOverlayPriceType = 0;
 
     @Expose
-    @ConfigOption(name = "Getfromsacks or Bazaar", desc = "Toggle for getting materials from sacks or Bazaar in composter overlay.")
-    @ConfigEditorDropdown(values = {"Bazaar", "Getfromsacks"})
+    @ConfigOption(name = "Sacks/Bazaar", desc = "Toggle for getting materials from sacks or Bazaar in composter overlay.")
+    @ConfigEditorDropdown(values = {"Bazaar", "Sacks"})
     @ConfigAccordionId(id = 17)
     public int composterOverlayGetType = 0;
 
