@@ -95,7 +95,7 @@ object GhostUtil {
             lol
         } else {
             Utils.chromaStringByColourCode(this.replace("%value%", t)
-                .replace("%display%", "$level->${if (SkyHanniMod.feature.ghostCounter.showMax) "25" else nextLevel}"))
+                .replace("%display%", "$level->${if (SkyHanniMod.feature.combat.ghostCounter.showMax) "25" else nextLevel}"))
         }
     }
 

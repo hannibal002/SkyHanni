@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -50,7 +51,7 @@ import kotlin.math.roundToLong
 
 object GhostCounter {
 
-    val config get() = SkyHanniMod.feature.ghostCounter
+    val config get() = SkyHanniMod.feature.combat.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File =
@@ -475,6 +476,11 @@ object GhostCounter {
             chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
             hidden?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "ghostCounter", "combat.ghostCounter")
     }
 
     fun isEnabled(): Boolean {
