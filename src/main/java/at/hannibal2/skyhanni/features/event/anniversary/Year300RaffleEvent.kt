@@ -20,7 +20,7 @@ import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object ActivePlayerTimer {
+object Year300RaffleEvent {
     val displayItem by lazy { NEUItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
 
     private var lastTimerReceived = TimeMark.never()
