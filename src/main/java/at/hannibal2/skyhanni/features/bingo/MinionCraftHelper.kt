@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
+    private val config get() = SkyHanniMod.feature.event.bingo
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
@@ -36,7 +37,7 @@ class MinionCraftHelper {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
+        if (!config.minionCraftHelperEnabled) return
 
         if (event.isMod(10)) {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
@@ -241,9 +242,9 @@ class MinionCraftHelper {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
+        if (!config.minionCraftHelperEnabled) return
 
-        SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
+        config.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
     }
 
     private fun notify(minionName: String) {

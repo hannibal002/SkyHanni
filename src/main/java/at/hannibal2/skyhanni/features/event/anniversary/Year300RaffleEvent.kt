@@ -21,6 +21,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object Year300RaffleEvent {
+    private val config get() = SkyHanniMod.feature.event.century
     val displayItem by lazy { NEUItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
 
     private var lastTimerReceived = TimeMark.never()
@@ -35,16 +36,14 @@ object Year300RaffleEvent {
         }
     }
 
-    fun isEnabled(): Boolean {
-        return SkyHanniMod.feature.misc.century.enableActiveTimer &&
-                Instant.now().isBefore(SkyBlockTime(301).toInstant()) &&
-                LorenzUtils.inSkyBlock
-    }
+    fun isEnabled() = config.enableActiveTimer &&
+            Instant.now().isBefore(SkyBlockTime(301).toInstant()) &&
+            LorenzUtils.inSkyBlock
 
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        SkyHanniMod.feature.misc.century.activeTimerPosition.renderSingleLineWithItems(
+        config.activeTimerPosition.renderSingleLineWithItems(
             overlay ?: return,
             posLabel = "300þ Anniversary Active Timer"
         )
@@ -62,7 +61,7 @@ object Year300RaffleEvent {
         } else {
             20.minutes - p
         }
-        if (p.isFinite() && timeLeft < 1.seconds && lastTimeAlerted.passedTime() > 5.minutes && SkyHanniMod.feature.misc.century.enableActiveAlert) {
+        if (p.isFinite() && timeLeft < 1.seconds && lastTimeAlerted.passedTime() > 5.minutes && config.enableActiveAlert) {
             SoundUtils.centuryActiveTimerAlert.playSound()
             lastTimeAlerted = TimeMark.now()
         }
@@ -71,6 +70,4 @@ object Year300RaffleEvent {
             Renderable.string("§eTime Left: ${timeLeft.format()}")
         )
     }
-
-
 }

@@ -212,7 +212,7 @@ public class FishingConfig {
     public static class FishingHookDisplay {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Display the hypixel timer until the fishing hook can be pulled out of the water, only bigger and on your screen.")
+        @ConfigOption(name = "Enabled", desc = "Display the hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;

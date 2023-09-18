@@ -9,7 +9,7 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GetFromSacksTabComplete {
-    private val config get() = SkyHanniMod.feature.misc.tabCompleteCommands
+    private val config get() = SkyHanniMod.feature.commands.tabComplete
     private var sackList = emptyList<String>()
     private val commands = arrayOf("gfs", "getfromsacks")
 
