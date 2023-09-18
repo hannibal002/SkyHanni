@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
-import java.util.*
-
 class TabSection(column: TabColumn) {
 
     var columnValue = column
 
-    val lines: MutableList<String> = LinkedList()
+    val lines = mutableListOf<String>()
 
     fun addLine(line: String) {
         lines.add(line)

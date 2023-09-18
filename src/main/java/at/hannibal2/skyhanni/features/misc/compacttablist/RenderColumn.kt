@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
-import java.util.*
-
 class RenderColumn {
 
-    val lines: MutableList<TabLine> = LinkedList<TabLine>()
+    val lines = mutableListOf<TabLine>()
 
     fun size(): Int {
         return lines.size
@@ -15,10 +13,6 @@ class RenderColumn {
     }
 
     fun getMaxWidth(): Int {
-        var maxWidth = 0
-        for (tabLine in lines) {
-            maxWidth = maxWidth.coerceAtLeast(tabLine.getWidth())
-        }
-        return maxWidth
+        return lines.maxOfOrNull { it.getWidth() } ?: 0
     }
 }

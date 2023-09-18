@@ -43,7 +43,7 @@ class TabListData {
     private fun readTabList(): List<String>? {
         val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
-        val result: MutableList<String> = ArrayList()
+        val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
