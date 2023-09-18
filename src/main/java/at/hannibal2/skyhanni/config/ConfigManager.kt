@@ -21,6 +21,8 @@ import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.item.ItemStack
 import java.io.*
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
@@ -83,7 +85,6 @@ class ConfigManager {
 
     lateinit var features: Features
     lateinit var sackData: SackData
-
         private set
     private val logger = LorenzLogger("config_manager")
 
@@ -211,7 +212,12 @@ class ConfigManager {
                 writer.write(gson.toJson(SkyHanniMod.feature))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
-            unit.renameTo(file)
+            Files.move(
+                unit.toPath(),
+                file.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.ATOMIC_MOVE
+            )
         } catch (e: IOException) {
             logger.log("Could not save config file to $file")
             e.printStackTrace()
