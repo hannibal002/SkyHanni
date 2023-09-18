@@ -11,7 +11,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SkyblockLevelGuideHelper {
+class SkyBlockLevelGuideHelper {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {

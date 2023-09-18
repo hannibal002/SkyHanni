@@ -9,8 +9,6 @@ enum class VisitorReward(val displayName: String, val internalName: String, val 
     DEDICATION("§9Dedication IV", "DEDICATION;4", "Dedication (IV|4) Book".toPattern()),
     MUSIC_RUNE("§9Music Rune", "MUSIC_RUNE;1", "◆ Music Rune [1I]".toPattern()),
     SPACE_HELMET("§cSpace Helmet", "DCTR_SPACE_HELM", "Space Helmet".toPattern()),
-
-    // Pretty sure that the symbol is ◆ but not 100%
     CULTIVATING(
         "§9Cultivating I", "CULTIVATING;1",
         "Cultivating ([I1]) Book".toPattern()

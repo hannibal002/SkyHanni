@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -135,6 +136,22 @@ object TrevorFeatures {
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (!config.trapperCooldownGui) return
+        if (!onFarmingIsland()) return
+
+        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
+        else if (timeUntilNextReady == 1) "1 second left"
+        else "$timeUntilNextReady seconds left"
+
+        config.trapperCooldownPos.renderString(
+            "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
+            posLabel = "Trapper Cooldown GUI"
+        )
+    }
+
+
     private fun updateTrapper() {
         timeUntilNextReady -= 1
         if (trapperReady && timeUntilNextReady > 0) {
@@ -194,10 +211,8 @@ object TrevorFeatures {
             Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase) {
             if (config.trapperTalkCooldown) {
-                RenderLivingEntityHelper.setEntityColor(
-                    entityTrapper,
-                    currentStatus.color
-                ) { config.trapperTalkCooldown }
+                RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+                { config.trapperTalkCooldown }
                 entityTrapper.getLorenzVec().let {
                     if (it.distanceToPlayer() < 15) {
                         event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
@@ -273,10 +288,14 @@ object TrevorFeatures {
         inBetweenQuests = false
     }
 
-    enum class TrapperStatus(val color: Int) {
-        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75)),
-        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
-        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
+    enum class TrapperStatus(baseColor: LorenzColor) {
+        READY(LorenzColor.DARK_GREEN),
+        WAITING(LorenzColor.DARK_AQUA),
+        ACTIVE(LorenzColor.DARK_RED),
+        ;
+
+        val color = baseColor.toColor().withAlpha(75)
+        val colorCode = baseColor.getChatColor()
     }
 
     fun onFarmingIsland() =

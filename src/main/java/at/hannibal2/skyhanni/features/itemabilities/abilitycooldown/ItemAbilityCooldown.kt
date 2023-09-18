@@ -25,6 +25,7 @@ class ItemAbilityCooldown {
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
@@ -34,6 +35,11 @@ class ItemAbilityCooldown {
                 if (abilityScrolls.size != 3) return
 
                 ItemAbility.HYPERION.sound()
+            }
+        }
+        if (event.soundName == "liquid.lavapop") {
+            if (event.pitch == 1.0f && event.volume == 1f) {
+                ItemAbility.FIRE_FURY_STAFF.sound()
             }
         }
         if (event.soundName == "mob.enderdragon.growl") {
@@ -86,9 +92,17 @@ class ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
         }
-        if (event.soundName == "random.successful_hit") {
+        if (event.soundName == "random.successful_hit") { // Jinxed Voodoo Doll Hit
             if (event.volume == 1.0f && event.pitch == 0.7936508f) {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
+            }
+        }
+        if (event.soundName == "mob.ghast.scream") { // Jinxed Voodoo Doll Miss
+            if (event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7) {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if (VOODOO_DOLL_WILTED in recentItems) {
+                    ItemAbility.VOODOO_DOLL_WILTED.sound()
+                }
             }
         }
         if (event.soundName == "random.explode") {

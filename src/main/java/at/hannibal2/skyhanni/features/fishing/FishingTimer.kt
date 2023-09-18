@@ -65,17 +65,22 @@ class FishingTimer {
     private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
         .map { entity ->
             val name = entity.name
-            if (SeaCreatureManager.allFishingMobNames.any { name.contains(it) }) {
+            val isSummonedSoul = name.contains("'")
+            val hasFishingMobName = SeaCreatureManager.allFishingMobNames.any { name.contains(it) }
+            if (hasFishingMobName && !isSummonedSoul) {
                 if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
             } else 0
         }.sum()
 
     private fun isRightLocation(): Boolean {
+        inHollows = false
+
+        if (config.barnTimerForStranded && LorenzUtils.isStrandedProfile) return true
+
         if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             inHollows = true
             return true
         }
-        inHollows = false
 
         if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50

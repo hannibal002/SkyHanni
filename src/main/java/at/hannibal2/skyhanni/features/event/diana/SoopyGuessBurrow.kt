@@ -276,6 +276,6 @@ class SoopyGuessBurrow {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && SkyHanniMod.feature.diana.burrowsSoopyGuess
+        return LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
     }
 }

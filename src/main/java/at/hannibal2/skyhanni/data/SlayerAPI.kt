@@ -121,7 +121,11 @@ object SlayerAPI {
         }
 
         if (event.isMod(5)) {
-            isInSlayerArea = SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            isInSlayerArea = if (LorenzUtils.isStrandedProfile) {
+                true
+            } else {
+                SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            }
         }
     }
 }

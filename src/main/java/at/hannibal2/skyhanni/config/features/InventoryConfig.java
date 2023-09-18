@@ -52,21 +52,21 @@ public class InventoryConfig {
     public boolean rngMeter = false;
 
     @Expose
-    @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory.")
+    @ConfigOption(name = "Floor Names", desc = "Show the Floor names in the Catacombs RNG Meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
     public boolean rngMeterFloorName = false;
 
     @Expose
-    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory.")
+    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the Catacombs RNG Meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
     public boolean rngMeterNoDrop = false;
 
     @Expose
-    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory.")
+    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the Catacombs or Slayer RNG Meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
@@ -84,21 +84,21 @@ public class InventoryConfig {
     public boolean statsTuningSelectedStats = true;
 
     @Expose
-    @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected tuning points in the stats tuning inventory.")
+    @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected Tuning Points in the Stats Tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
     public boolean statsTuningPoints = true;
 
     @Expose
-    @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the stats tuning inventory.")
+    @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the Stats Tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
     public boolean statsTuningSelectedTemplate = true;
 
     @Expose
-    @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the tuning point templates.")
+    @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the Tuning Point templates.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
@@ -110,25 +110,39 @@ public class InventoryConfig {
     public boolean jacobFarmingContest = false;
 
     @Expose
-    @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the jacob inventory.")
+    @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the Jacob inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean jacobFarmingContestHighlightRewards = true;
 
     @Expose
-    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the inventory.")
+    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the Jacob inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean jacobFarmingContestHideDuplicates = true;
 
     @Expose
-    @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the contest description.")
+    @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean jacobFarmingContestRealTime = true;
+
+    @Expose
+    @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this Contest. " +
+            "§eIf you use a texture pack this may cause conflicting icons.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    @FeatureToggle
+    public boolean jacobFarmingContestMedalIcon = true;
+
+    @Expose
+    @ConfigOption(name = "Finnegan Icon", desc = "Uses a different indicator for when the Contest happened during Mayor Finnegan.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestFinneganIcon = true;
 
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
@@ -166,7 +180,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +
-                "in larger gui scale, like the nether sack.)")
+                "in larger GUI scales, like the nether sack.)")
         @ConfigEditorSlider(
                 minValue = 0,
                 maxValue = 45,
@@ -274,6 +288,62 @@ public class InventoryConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Helper", desc = "")
+    @Accordion
+    public HelperConfig helper = new HelperConfig();
+
+    public static class HelperConfig {
+        @Expose
+        @ConfigOption(name = "Melody's Hair Harp", desc = "")
+        @Accordion
+        public HarpConfig harp = new HarpConfig();
+
+        public static class HarpConfig {
+            @Expose
+            @ConfigOption(name = "Use Keybinds", desc = "In the Harp, press buttons with your number row on the keyboard instead of clicking.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean keybinds = false;
+
+            @Expose
+            @ConfigOption(name = "Show Numbers", desc = "In the Harp, show buttons as stack size (intended to be used with the Keybinds).")
+            @ConfigEditorBoolean
+            public boolean showNumbers = false;
+        }
+
+        @Expose
+        @ConfigOption(name = "Tia Relay Abiphone Network Maintenance", desc = "")
+        @Accordion
+        public TiaRelayConfig tiaRelay = new TiaRelayConfig();
+
+        public static class TiaRelayConfig {
+
+            @Expose
+            @ConfigOption(name = "Sound Puzzle Helper", desc = "Helps with solving the sound puzzle for Tia (The 9 Operator Chips to do maintainance for the Abiphone Network).")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean soundHelper = true;
+
+            @Expose
+            @ConfigOption(name = "Next Waypoint", desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the Abiphone network needs to be done.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean nextWaypoint = true;
+
+            @Expose
+            @ConfigOption(name = "All Waypoints", desc = "Show all relay waypoints at once (intended for debugging).")
+            @ConfigEditorBoolean
+            public boolean allWaypoints = false;
+
+            @Expose
+            @ConfigOption(name = "Mute Sound", desc = "Mutes the sound when close to the relay.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean tiaRelayMute = true;
+        }
+    }
+
+    @Expose
     @ConfigOption(
             name = "Item number",
             desc = "Showing the item number as a stack size for these items."
@@ -318,15 +388,8 @@ public class InventoryConfig {
     public boolean itemStars = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
-            desc = "Highlights used Bonzo's Masks with a background.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightDepletedBonzosMasks = false;
-
-    @Expose
     @ConfigOption(name = "Missing Tasks",
-            desc = "Highlight missing tasks in the SkyBlock level guide inventory.")
+            desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;

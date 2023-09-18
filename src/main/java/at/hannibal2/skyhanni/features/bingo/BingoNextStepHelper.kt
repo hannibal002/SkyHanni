@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoNextStepHelper {
-    private val config get() = SkyHanniMod.feature.bingo.bingoCard
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
 
     private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
@@ -322,7 +322,7 @@ class BingoNextStepHelper {
 
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
-        // TODO add skyblock level requirement
+        // TODO add SkyBlock level requirement
 //        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
         IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
 

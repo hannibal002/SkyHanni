@@ -17,7 +17,7 @@ class GriffinPetWarning {
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(20)) return
         if (!IslandType.HUB.isInIsland()) return
-        if (!SkyHanniMod.feature.diana.petWarning) return
+        if (!SkyHanniMod.feature.event.diana.petWarning) return
         if (!DianaAPI.isRitualActive()) return
         if (!DianaAPI.hasSpadeInHand()) return
 
