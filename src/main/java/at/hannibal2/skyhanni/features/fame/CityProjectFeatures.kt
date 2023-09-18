@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
@@ -27,7 +28,7 @@ class CityProjectFeatures {
     private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
 
     companion object {
-        private val config get() = SkyHanniMod.feature.misc.cityProject
+        private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
             LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
@@ -187,5 +188,10 @@ class CityProjectFeatures {
                 slot highlight LorenzColor.YELLOW
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.cityProject", "event.cityProject")
     }
 }

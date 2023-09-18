@@ -5,14 +5,16 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -21,6 +23,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
@@ -230,9 +233,17 @@ object LorenzUtils {
 
     fun setTextIntoSign(text: String) {
         val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
+        if (gui !is AccessorGuiEditSign) return
         gui.tileSign.signText[0] = ChatComponentText(text)
+    }
+
+    fun addTextIntoSign(addedText: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is AccessorGuiEditSign) return
+        val lines = gui.tileSign.signText
+        val index = gui.editLine
+        val text = lines[index].unformattedText + addedText
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
     fun clickableChat(message: String, command: String) {
@@ -283,6 +294,9 @@ object LorenzUtils {
     fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
 
     fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
+
+    // A mac-only key, represents Windows key on windows (but different key code)
+    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_LMETA)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -512,4 +526,11 @@ object LorenzUtils {
             }
         }, duration.inWholeMilliseconds)
     }
+
+    fun isPastingKeysDown(): Boolean {
+        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+        return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
+    }
+
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 }

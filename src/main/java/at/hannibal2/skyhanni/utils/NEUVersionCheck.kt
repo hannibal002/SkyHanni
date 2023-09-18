@@ -51,7 +51,7 @@ object NEUVersionCheck {
     private fun neuWarning(text: String) {
         openPopupWindow(
             text,
-            Pair("Join SkyHanni Discord", "https://discord.com/invite/8DXVN4BJz3"),
+            Pair("Join SkyHanni Discord", "https://discord.com/invite/skyhanni-997079228510117908"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
         )

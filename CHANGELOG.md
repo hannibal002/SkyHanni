@@ -82,6 +82,11 @@
 + Added icons for the medals received in a contest. - CalMWolfs
     + Different symbol for when it was a Finnegan contest.
 + Added Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
++ Added GUI Scale. - nea
+    + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
+    + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
++ Added Fishing Hook Display. - hannibal2
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
 
 ### Changes
 
@@ -135,6 +140,10 @@
 + Added support for slayer profit trackers on stranded. - hannibal2
 + Added Trapper Cooldown GUI. - NetheriteMiner
     + Show the cooldown on screen in an overlay (intended for abiphone users).
++ Made the fake garden level up message (after level 15) clickable. - J10a1n15
++ Moving many GUI elements in the config around. - hannibal2
+    + This will not reset anything.
+    + This includes the creation of new categories and regrouping.
 
 ### Fixes
 
@@ -216,6 +225,17 @@
 + Summoning souls should no longer be counted as sea creatures for the fishing timer. - hannibal2
 + Fixed Jacob Contests times needed display showing impossible FF values. - ReyMaratov
 + Fixed item cooldown issues with fire fury staff and jinxed voodoo doll. - Cad
++ Fixed the percentage going above 100% for bestiary progress. - HiZe
++ Fixed max kills from Ghost Counter using old bestiary data when resetting the config. - HiZe
++ Fixed part of Zealot Hideout area showing as The End. - Cad
++ Fixed many typos in the config. - schlaumeyer, oofy, CalMWolfs & hannibal2
++ Fixed a missing bracket in the reforge apply cost display from Estimated Item Value. - jaNI
++ Fixed a rare crash while doing enderman slayer. - hannibal2
++ Fixed pet exp tooltip doesn't show in pet inventory or Hypixel profile viewer (right-click a player). - hannibal2
++ Fixed turbo books price not getting detected in visitor rewards. - hannibal2
++ Fixed that the Paste Into Sign feature only pastes into the first line. - hannibal2 + nea
++ Hopefully fixed rare config reset cases. - nea
++ This should also fix problems with false positive detections in the crimson isle.
 
 ### Removed Features
 
@@ -264,16 +284,16 @@
     + This contains RNG Meter, Slayer quest warning and Items on ground
 + Added item ability cooldown support for **Weirder Tuba** and **Holy Ice** - HiZe
 + Added **Lazer Parkour** Solver - CalMWolfs
-    + Highlights the location of the invisible blocks in the MirrorVerse
+    + Highlights the location of the invisible blocks in the Mirrorverse
 + Added Mirrorverse **Dance Room Helper** - HiZe
-    + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+    + Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.
     + Change how many tasks you should see
     + Hide other players inside the dance room
     + Added timer before next instruction
     + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
     + Fully customize the description for now, next and later (with color)
 + Added **Upside Down** Parkour & **Lava Maze** - hannibal2
-    + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
+    + Helps to solve the Upside Down Parkour and Lava Maze in the Mirrorverse by showing the correct way
     + Change how many platforms should be shown in front of you
     + Rainbow color (optional) - nea
     + Hide other players while doing the parkour
@@ -617,7 +637,7 @@
     + Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires
       a tool with either a counter or cultivating enchantment)
 + Added **Best Crop Display**
-    + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
+    + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or SkyBlock level.
 + Added **Copper Price**
     + Show the price for copper inside the visitor gui.
 + Added **Amount and Time**
@@ -627,7 +647,7 @@
 + Added Desk shortcut in SkyBlock Menu.
 + Added **Garden Level Display**
     + Show the current garden level and progress to the next level.
-+ Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ Added **Farming Weight and Leaderboard**, provided by the Elite SkyBlock farmers.
 + Added farming weight next leaderboard position eta.
 + Added **Dicer Counter**
     + Count RNG drops for Melon Dicer and Pumpkin Dicer.
@@ -736,7 +756,7 @@
 
 ## Features
 
-+ Added highlight for stuff that is missing in the skyblock level guide inventory.
++ Added highlight for stuff that is missing in the SkyBlock level guide inventory.
 + Added Bingo Card display.
 + **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
@@ -826,7 +846,7 @@
 
 ### Removals
 
-- Removed additional settings for the chat design, like channel prefix and skyblock level
+- Removed additional settings for the chat design, like channel prefix and SkyBlock level
 
 ### Fixes
 
@@ -953,7 +973,7 @@
 
 + Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
-+ Added option to hide all damage splashes, from anywhere in Skyblock.
++ Added option to hide all damage splashes, from anywhere in SkyBlock.
 + Added highlight Thunder Sparks after killing a Thunder
 + Added Thunder to damage indicator
 + Mark the own player name (for Chat messages)
@@ -1003,8 +1023,8 @@
 
 ### Other Misc Features
 
-- Added option to hide the Skyblock Level from the chat messages (alpha only atm)
-- Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and
+- Added option to hide the SkyBlock Level from the chat messages (alpha only atm)
+- Added option to change the way the SkyBlock Level gets displayed in the chat (only working when SkyBlock level and
   fancy player message format are enabled)
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color

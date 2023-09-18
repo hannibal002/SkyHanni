@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -26,7 +25,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!reputationHelper.config.enabled) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
@@ -40,7 +39,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.KUUDRA_ARENA) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!reputationHelper.config.enabled) return
 
         val message = event.message
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return

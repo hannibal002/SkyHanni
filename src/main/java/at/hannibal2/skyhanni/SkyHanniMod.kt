@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
-import at.hannibal2.skyhanni.features.event.anniversary.ActivePlayerTimer
 import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -131,7 +130,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.19",
+    version = "0.20.Beta.21.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -151,7 +150,7 @@ class SkyHanniMod {
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
         loadModule(ItemClickData())
-        loadModule(ActivePlayerTimer)
+//        loadModule(Year300RaffleEvent)
         loadModule(MinecraftData())
         loadModule(TitleUtils())
         loadModule(ItemTipHelper())
@@ -269,9 +268,10 @@ class SkyHanniMod {
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
+        loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyblockLevelGuideHelper())
+        loadModule(SkyBlockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -423,7 +423,6 @@ class SkyHanniMod {
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread {
             configManager.saveConfig("shutdown-hook")
-            configManager.saveSackData("shutdown-hook")
         })
         repo = RepoManager(configManager.configDirectory)
         try {

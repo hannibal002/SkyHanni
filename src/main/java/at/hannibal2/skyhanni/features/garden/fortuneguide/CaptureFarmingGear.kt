@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 
@@ -44,7 +43,7 @@ class CaptureFarmingGear {
             val farmingItems = farmingItems ?: return
             val resultList = mutableListOf<String>()
 
-            val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
+            val itemStack = InventoryUtils.getItemInHand() ?: return
             val itemID = itemStack.getInternalName_old()
             resultList.add(itemStack.displayName.toString())
             resultList.add(itemID)
