@@ -100,7 +100,7 @@ class MenuItemDisplayOverlayCombat {
         }
 
         if ((stackSizeConfig.contains(3)) && (itemName.contains("Global Combat Wisdom"))) {
-            for (line in lore) {
+            for (line in item.getLore()) {
                 if (line.removeColor().contains("Total buff")) {
                     return "§3" + line.removeColor().replace("Total buff: +","").replace("☯ Combat Wisdom", "")
                 }
@@ -108,7 +108,7 @@ class MenuItemDisplayOverlayCombat {
         }
 
         if (stackSizeConfig.contains(4) && itemName.contains("RNG Meter")) {
-            for (line in lore) {
+            for (line in item.getLore()) {
                 if (line.removeColor().contains("Progress: ")) {
                     return lazilyGetPercent(line, "Progress: ")
                 }
