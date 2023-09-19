@@ -275,6 +275,17 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(9)) {
             if (itemName.isEmpty()) return ""
             val lore = item.getLore()
+            if (chestName.contains("Bazaar")) {
+                if (!(itemName == "Manage Orders")) return ""
+                for (line in lore) {
+                    if (itemName == "Manage Orders") {
+                        var result = ""
+                        if (line.removeColor().contains("items to claim!")) result = result + "§2☺"
+                        if (line.removeColor().contains("coins to claim!")) result = result + "§6☺"
+                        return result
+                    }
+                }
+            }
             if ((chestName == "Auction View")) {
                 if (!(itemName == "Bid History")) return ""
                 if (!(lore.first().contains("Total "))) return ""
@@ -284,7 +295,13 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
                 if ((lore.first().removeColor().contains(" top bid ")) && (itemName == "View Bids")) return "1"
                 if ((itemName == "View Bids")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","")
-                if ((itemName == "Manage Auctions")) return lore.first().removeColor().replace("You own ","").replace(" auction in","").replace(" auctions in","")
+                if ((itemName == "Manage Auctions")) {
+                    for (line in lore) {
+                        if (line.contains("Your auction")) {
+                            return line.removeColor().replace("Your auctions have ","").replace("Your auction has ","").replace(" bids","").replace(" bid","")
+                        }
+                    }
+                }
             }
             if (chestName == "Auctions Browser") {
                 if (!(itemName == "Item Tier") && !(itemName == "BIN Filter") && !(itemName == "Sort")) return ""
