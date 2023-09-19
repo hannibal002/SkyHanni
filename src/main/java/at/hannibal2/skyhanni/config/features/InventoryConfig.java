@@ -346,51 +346,124 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(
             name = "Item number",
-            desc = "Showing the item number as a stack size for these items. Some values may be truncated percentages or §a✔§r§7s."
+            desc = "Showing the item number as a stack size for these items." // Some values may be truncated percentages or §a✔§r§7s.
     )
     @ConfigEditorDraggableList(
         exampleText = {
                 "§bMaster Star Tier",
                 "§bMaster Skull Tier",
-                "§bDungeon Head Floor Number",
+                "§bGolden/Diamond Dungeon Head Floor Number",
                 "§bNew Year Cake",
                 "§bPet Level",
                 "§bMinion Tier",
                 "§bCrimson Armor",
-                "§bSkyblock Level",
                 "§bKuudra Key",
-                "§bSkill Level + Dungeoneering Levels",
-                "§bCollection Level",
-                "§bRancher's Boots speed",
+                "§bRancher's Boots Speed",
                 "§bLarva Hook",
                 "§bDungeon Potion Level",
-                "§bMuseum Donation Progress",
-                "§bDojo Progress",
-                "§bUnlocked Collections",
-                "§bUnlocked Recipes",
-                "§bSkill Average",
-                "§bWardrobe Slot #",
-                "§bBank Tier",
-                "§bHighest Crafted Minion Tier",
-                "§bProgress to Next Minion Slot",
-                "§bShortened Skyblock Stats",
-                "§bCollected Fairy Souls",
-                "§bCompleted Quests",
                 "§bArmadillo Blocks Walked Progress (%)",
-                "§bHeart of the Mountain Perk Levels",
-                "§bCrystal Hollows Crystal Progress",
-                "§bSkyblock Profile Name (Fruits)",
-                "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
-                "§bGarden Level",
-                "§bGarden Visitor's Logbook NPC Rarities",
-                "§bFarming Contests Medal Inventory",
-                "§bVisitor's Logbook Countdown",
-                "§bMayor Perk Count",
                 "§bNecron's Ladder Progress",
-                "§bFruit Bowl Progress"
+                "§bFruit Bowl Progress",
         }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
+
+    @Expose
+    @ConfigOption(
+            name = "Menu stack size (Player, General)",
+            desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+    )
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "§bSkyblock Level",
+                    "§bSkill Level + Garden Level + Dungeoneering Levels",
+                    "§bSkill Average",
+                    "§bCollection Level + Unlocked/Maxed Out Collections %",
+                    "§bHighest Crafted Minion Tier + Progress to Next Minion Slot",
+                    "§bMuseum Donation Progress %",
+                    "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
+            }
+    )
+    public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
+
+        @Expose
+        @ConfigOption(
+                name = "Menu stack size (Player, Advanced)",
+                desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§bUnlocked Recipes %",
+                        "§bCollected Fairy Souls + Completed Quests",
+                        "§bTrades Unlocked (%)",
+                        "§bWardrobe Slot #",
+                        "§bShortened Skyblock Stats",
+                        "§bShortened Skyblock Profile Name (Fruits)",
+                        "§bDojo Progress",
+                        "§bBank Tier",
+                        "§bMayor Perk Count",
+                }
+        )
+        public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+        @Expose
+        @ConfigOption(
+                name = "Menu stack size (Farming)",
+                desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§bFarming Contests Medal Inventory",
+                        "§bVisitor's Logbook Countdown",
+                        "§bGarden Visitor's Logbook NPC Rarities",
+                }
+        )
+        public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1));
+
+        @Expose
+        @ConfigOption(
+                name = "Menu stack size (Mining)",
+                desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {          
+                        "§bHeart of the Mountain Perk Levels",
+                        "§bCrystal Hollows Crystal Progress",
+                }
+        )
+        public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(0));
+
+        @Expose
+        @ConfigOption(
+                name = "Menu stack size (Combat)",
+                desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {          
+                        "§bBestiary Level",
+                        "§bDetailed Bestiary Progress",
+                        "§bCurrent Slayer Levels",
+                        "§bSlayer Combat Wisdom Buff",
+                        "§bRNG Meter Progress",
+                }
+        )
+        public List<Integer> menuItemNumberCombatAsStackSize = new ArrayList<>(Arrays.asList(0));
+
+
+        @Expose
+        @ConfigOption(
+                name = "Menu stack size (Skyblock Levels)",
+                desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§bSkyblock Guide Progress (%)",
+                        "§bSkyblock Ways To Level Up Tasks (%)",
+                        "§bSkyblock Leveling Rewards Progress (%)",
+                }
+        )
+        public List<Integer> menuItemNumberSBLevelingAsStackSize = new ArrayList<>(Arrays.asList(0));
+
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
