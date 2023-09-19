@@ -54,7 +54,7 @@ class MenuItemDisplayOverlaySBLeveling {
         //NOTE: IT'S String.length, NOT String.length()!
         
         if (stackSizeConfig.contains(0)) {
-            if ((chestName.contains("Guide ")) && (!(itemName.isEmpty()))) {
+            if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
                 if (lore.any { it.removeColor().contains("Total Progress") }) {
                     for (line in lore) {
@@ -62,7 +62,13 @@ class MenuItemDisplayOverlaySBLeveling {
                             return lazilyGetPercent(line, "Total Progress: ")
                         }
                     }
-                }
+                } else if (lore.any { it.removeColor().contains("Progress to ") }) {
+                    for (line in lore) {
+                        if (line.removeColor().contains("Progress to ")) {
+                            return lazilyGetPercent(line.removeColor().split(" ").last(), "")
+                        }
+                    }
+                } else if (itemName.contains("✔")) return "§a✔"
             }
         }
 
@@ -98,6 +104,14 @@ class MenuItemDisplayOverlaySBLeveling {
                         }
                     }
                 }
+            }
+        }
+
+        if (stackSizeConfig.contains(3)) {
+            val nameWithColor = item.name ?: return ""
+            if ((chestName.contains("Emblems")) && (!(itemName.isEmpty()) && (nameWithColor.contains("§a")) && !(itemName.contains(" ")))) {
+                val bruh = item.getLore().first().removeColor().split(" ").first().trim()
+                if (bruh.toInt() is Int) return bruh.toString()
             }
         }
 

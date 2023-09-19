@@ -460,6 +460,7 @@ public class InventoryConfig {
                         "§bSkyblock Guide Progress (%)",
                         "§bSkyblock Ways To Level Up Tasks (%)",
                         "§bSkyblock Leveling Rewards Progress (%)",
+                        "§bEmblems Unlocked",
                 }
         )
         public List<Integer> menuItemNumberSBLevelingAsStackSize = new ArrayList<>(Arrays.asList(0));
