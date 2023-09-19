@@ -294,7 +294,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if ((chestName.contains("Auction House"))) {
                 if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
                 if ((lore.first().removeColor().contains(" top bid ")) && (itemName == "View Bids")) return "1"
-                if ((itemName == "View Bids")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","")
+                if ((itemName == "View Bids")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","").trim().replace("a bid on a","1")
                 if ((itemName == "Manage Auctions")) {
                     for (line in lore) {
                         if (line.contains("Your auction")) {
