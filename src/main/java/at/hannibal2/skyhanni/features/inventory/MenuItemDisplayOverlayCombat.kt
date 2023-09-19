@@ -22,8 +22,12 @@ class MenuItemDisplayOverlayCombat {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun lazilyGetPercent(original: String, thingToExtract: String): String {
-        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".","").replace("a✔", "§a✔")
+    private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
+        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".","").replace("a✔", "§a✔").replace("%","")
+    }
+
+    private fun getTheLastWordNoColor(original: String): String {
+        return original.removeColor().split(" ").last()
     }
 
     private fun getStackTip(item: ItemStack): String {
@@ -82,7 +86,7 @@ class MenuItemDisplayOverlayCombat {
                 if (lore.any { it.removeColor().contains(" Slayer: ") }) {
                     for (line in lore) {
                         if (line.removeColor().contains(" Slayer: ")) {
-                            return lazilyGetPercent(line.removeColor().split(" ").last(), "")
+                            return lazilyGetPercent(getTheLastWordNoColor(line))
                         }
                     }
                 }
@@ -92,7 +96,7 @@ class MenuItemDisplayOverlayCombat {
                 if (lore.any { it.removeColor().contains("Current LVL: ") }) {
                     for (line in lore) {
                         if (line.removeColor().contains("Current LVL: ")) {
-                            return line.removeColor().split(" ").last()
+                            return getTheLastWordNoColor(line)
                         }
                     }
                 }
