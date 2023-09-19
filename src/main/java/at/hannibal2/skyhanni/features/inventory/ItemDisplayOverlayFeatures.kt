@@ -218,9 +218,7 @@ class ItemDisplayOverlayFeatures {
 
         return ""
     }
-
-    var done = false
-
+    
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
         val text = split[0]
