@@ -255,11 +255,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     return "" + colorCode + numPerks
                 }
             }
-            if ((chestName == "Calendar and Events") && (itemName.contains("Mayor "))) {
+            if (((chestName == "Calendar and Events") || (chestName.contains("Mayor "))) && (itemName.contains("Mayor "))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
                 val lore = item.getLore()
-                if (lore.any { it.contains(" mayor ") }) {
+                if (lore.any { it.contains(" the closing of") }) {
                     val colorCode = nameWithColor.take(2)
                     var numPerks = 0
                     for (line in item.getLore()) {
@@ -268,6 +268,50 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         }
                     }
                     return "" + colorCode + numPerks
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(9)) {
+            if (itemName.isEmpty()) return ""
+            val lore = item.getLore()
+            if ((chestName == "Auction View")) {
+                if (!(itemName == "Bid History")) return ""
+                if (!(lore.first().contains("Total "))) return ""
+                return lore.first().removeColor().replace("Total bids: ", "").replace(" bids", "").replace(" bid", "")
+            }
+            if ((chestName.contains("Auction House"))) {
+                if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
+                if ((lore.first().removeColor().contains(" top bid ")) && (itemName == "View Bids")) return "1"
+                if ((itemName == "View Bids")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","")
+                if ((itemName == "Manage Auctions")) return lore.first().removeColor().replace("You own ","").replace(" auction in","").replace(" auctions in","")
+            }
+            if (chestName == "Auctions Browser") {
+                if (!(itemName == "Item Tier") && !(itemName == "BIN Filter") && !(itemName == "Sort")) return ""
+                for (line in lore) {
+                    if (line.removeColor().contains("▶ ")) {
+                        val betterLine = line.removeColor().replace("▶ ", "")
+                        if (itemName == "Sort") {
+                            return when (betterLine) {
+                                "Highest Price" -> "§c§l⬆"
+                                "Lowest Price" -> "§a⬇"
+                                "Ending soon" -> "§e§l☉"
+                                "Random" -> "R"
+                                else -> ""
+                            }
+                        }
+                        if (itemName == "Item Tier") {
+                            return line.take(5).replace("▶ ","")
+                        }
+                        if (itemName == "BIN Filter") {
+                            return when (betterLine) {
+                                "Show All" -> "§2B§f+§6A"
+                                "BIN Only" -> "§2BIN"
+                                "Auctions Only" -> "§6Auc"
+                                else -> ""
+                            }
+                        }
+                    }
                 }
             }
         }

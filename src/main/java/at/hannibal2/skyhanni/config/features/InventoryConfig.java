@@ -399,12 +399,13 @@ public class InventoryConfig {
                         "§bWardrobe Slot #",
                         "§bShortened Skyblock Stats",
                         "§bShortened Skyblock Profile Name (Fruits)",
+                        "§bAuction House",
                         "§bDojo Progress",
                         "§bBank Tier",
                         "§bMayor Perk Count",
                 }
         )
-        public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
 
         @Expose
         @ConfigOption(
