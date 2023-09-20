@@ -96,14 +96,14 @@ class MenuItemDisplayOverlayPlayerTryhard {
         
         if (stackSizeConfig.contains(3)) {
             if (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop")) {
-                val line = item.getLore().last()
-                if (line.contains("§aCurrently ")) {
-                    val first = item.getLore().first()
-                    if (first.contains("Category") && (line.contains(" browsing!") && chestName.contains("Auction")) ||
-                    (line.contains(" viewing!") && chestName.contains("Bazaar"))) {
-                        return "§a➡"
-                    } else if (line.endsWith(" selected!") && chestName.contains("Community Shop")) {
-                        return "§a⬇⬇⬇"
+                val lore = item.getLore()
+                if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
+                    if (chestName.contains("Community Shop")) {
+                        if (lore.last().contains("§aCurrently selected!")) return "§a⬇"
+                    } else if (chestName.contains("Auction")) {
+                        if (lore.first().contains("Category") && lore.last().contains("§aCurrently ")) return "§a➡"
+                    } else if (chestName.contains("Bazaar")) {
+                        if (lore.first().contains("Category") && lore.last().contains("§aCurrently ")) return "§a➡"
                     }
                 }
             }
