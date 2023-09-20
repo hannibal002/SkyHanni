@@ -70,7 +70,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            if (chestName == "Recipe Book") {
+            if ((chestName == "Recipe Book") || (chestName.contains(" Recipes"))) {
                 if (itemName.contains(" Recipes")) {
                     for (line in item.getLore()) {
                         if (line.contains("Recipes Unlocked: ")) {
@@ -277,13 +277,13 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             val lore = item.getLore()
             if (chestName.contains("Bazaar")) {
                 if (!(itemName == "Manage Orders")) return ""
-                for (line in lore) {
-                    if (itemName == "Manage Orders") {
-                        var result = ""
+                if (itemName == "Manage Orders") {
+                    var result = ""
+                    for (line in lore) {
                         if (line.removeColor().contains("items to claim!")) result = result + "§2☺"
                         if (line.removeColor().contains("coins to claim!")) result = result + "§6☺"
-                        return result
                     }
+                    return result
                 }
             }
             if ((chestName == "Auction View")) {

@@ -21,7 +21,7 @@ class MenuItemDisplayOverlayPlayer {
     private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
     private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
     private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\.[0-9])?) Skill Avg\..*".toPattern()
-    private val collUnlockPattern = "..Collections Unlocked: §.(?<coll>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val collUnlockPattern = "..Collections .*: §.(?<coll>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val collMenuUnlockPattern = ".*Collections .*: §.(?<collMenu>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
     private val dungeonClassLevelPattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
