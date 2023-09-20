@@ -7,7 +7,7 @@ import com.google.common.cache.CacheBuilder
 import java.util.concurrent.TimeUnit
 
 object ModifyVisualWords {
-    private val config get() = SkyHanniMod.feature.misc.modifyWords
+    private val config get() = SkyHanniMod.feature.gui.modifyWords
     var textCache: Cache<String, String> = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build()
 
     var modifiedWords = mutableListOf<VisualWord>()
