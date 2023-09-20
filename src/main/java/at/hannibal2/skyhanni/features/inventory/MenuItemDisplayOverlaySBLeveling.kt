@@ -9,11 +9,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling {
+    private val genericPercentPattern = ".* (?<percent>[0-9]+)(\.[0-9]*)?%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -59,13 +62,13 @@ class MenuItemDisplayOverlaySBLeveling {
                 if (lore.any { it.removeColor().contains("Total Progress") }) {
                     for (line in lore) {
                         if (line.removeColor().contains("Total Progress")) {
-                            return lazilyGetPercent(line, "Total Progress: ")
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 } else if (lore.any { it.removeColor().contains("Progress to ") }) {
                     for (line in lore) {
                         if (line.removeColor().contains("Progress to ")) {
-                            return lazilyGetPercent(line.removeColor().split(" ").last(), "")
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 } else if (itemName.contains("✔")) return "§a✔"
@@ -76,7 +79,7 @@ class MenuItemDisplayOverlaySBLeveling {
             if ((chestName == "Ways to Level Up") && (itemName.contains(" Tasks"))) {
                 for (line in item.getLore()) {
                     if (line.removeColor().contains("Progress to Complete Category")) {
-                        return lazilyGetPercent(line, "Progress to Complete Category: ")
+                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
@@ -87,20 +90,8 @@ class MenuItemDisplayOverlaySBLeveling {
                 val lore = item.getLore()
                 if (lore.any { it.removeColor().contains("Progress to Unlock") }) {
                     for (line in lore) {
-                        if (line.removeColor().contains("Progress to Unlock")) {
-                            return lazilyGetPercent(line, "Progress to Unlock: ")
-                        }
-                    }
-                } else if (lore.any { it.removeColor().contains("Rewards Unlocked") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Rewards Unlocked")) {
-                            return lazilyGetPercent(line, "Rewards Unlocked: ")
-                        }
-                    }
-                } else if (lore.any { it.removeColor().contains("Progress to ") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Progress to ")) {
-                            return lazilyGetPercent(line.removeColor().split(" ").last(), "")
+                        if (line.removeColor().contains("Progress to Unlock") || line.removeColor().contains("Progress to ") || line.removeColor().contains("Rewards Unlocked")) {
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }

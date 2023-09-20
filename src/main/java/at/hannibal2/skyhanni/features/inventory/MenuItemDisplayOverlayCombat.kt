@@ -16,6 +16,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayCombat {
+    private val genericPercentPattern = ".* (?<percent>[0-9]+)(\.[0-9]*)?%".toPattern()
+
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -70,10 +72,8 @@ class MenuItemDisplayOverlayCombat {
                 val lore = item.getLore()
                 if (lore.any { it.removeColor().contains("Click to ") }) {
                     for (line in lore) {
-                        if (line.removeColor().contains("Families Completed: ")) {
-                            return lazilyGetPercent(line, "Families Completed: ")
-                        } else if (line.removeColor().contains("Overall Progress: ")) {
-                            return lazilyGetPercent(line, "Overall Progress: ")
+                        if (line.removeColor().contains("Families Completed: ") || line.removeColor().contains("Overall Progress: ")) {
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 } 
@@ -86,7 +86,7 @@ class MenuItemDisplayOverlayCombat {
                 if (lore.any { it.removeColor().contains(" Slayer: ") }) {
                     for (line in lore) {
                         if (line.removeColor().contains(" Slayer: ")) {
-                            return lazilyGetPercent(getTheLastWordNoColor(line))
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -114,7 +114,7 @@ class MenuItemDisplayOverlayCombat {
         if (stackSizeConfig.contains(4) && itemName.contains("RNG Meter")) {
             for (line in item.getLore()) {
                 if (line.removeColor().contains("Progress: ")) {
-                    return lazilyGetPercent(line, "Progress: ")
+                    return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }
         }

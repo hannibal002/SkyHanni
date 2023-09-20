@@ -18,8 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerAdvanced {
     private val dojoTestOfGradePattern = "§7(§6)?Your Rank: (?<grade>§.[A-Z]).*".toPattern()
-    private val recipeBookPattern = "..Recipe Book Unlocked: §.(?<recipe>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
-    private val recipeMenuPattern = ".*Recipes Unlocked: §.(?<specific>[0-9]{1,2}(\.[0-9])?)§.%".toPattern()
+    private val genericPercentPattern = ".* (?<percent>[0-9]+)(\.[0-9]*)?%".toPattern()
     private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
 
     @SubscribeEvent
@@ -65,7 +64,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName == "Recipe Book") {
                     for (line in item.getLore()) {
                         if (line.contains(" Book Unlocked: ")) {
-                            return recipeBookPattern.matchMatcher(line) { group("recipe").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
@@ -74,7 +73,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName.contains(" Recipes")) {
                     for (line in item.getLore()) {
                         if (line.contains("Recipes Unlocked: ")) {
-                            return recipeMenuPattern.matchMatcher(line) { group("specific").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
