@@ -109,7 +109,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (lore.any { it.removeColor().contains("lock Menu") }) {
                     for (line in lore) {
                         if (line.removeColor().contains("Trades Unlocked")) {
-                            return lazilyGetPercent(line, "Trades Unlocked: ")
+                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }

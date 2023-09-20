@@ -23,10 +23,6 @@ class MenuItemDisplayOverlaySBLeveling {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun lazilyGetPercent(original: String, thingToExtract: String): String {
-        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".","").replace("a✔", "§a✔").replace("%","")
-    }
-
     private fun getStackTip(item: ItemStack): String {
         if (SkyHanniMod.feature.inventory.menuItemNumberSBLevelingAsStackSize.isEmpty()) return ""
         val itemName = item.cleanName()
