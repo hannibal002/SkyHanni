@@ -130,7 +130,7 @@ class MenuItemDisplayOverlayPlayer {
                     }
                 }
             }
-            if (chestName.contains("Collections"))) {
+            if (chestName.contains("Collections")) {
                 if (itemName.contains("Collections")) {
                     for (line in item.getLore()) {
                         if (line.contains("Collections ") && line.contains(": §")) {
