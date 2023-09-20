@@ -303,7 +303,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            if (chestName == "Auctions Browser") {
+            if (chestName.contains("Auction")) {
                 if (!(itemName == "Item Tier") && !(itemName == "BIN Filter") && !(itemName == "Sort")) return ""
                 for (line in lore) {
                     if (line.removeColor().contains("▶ ")) {
