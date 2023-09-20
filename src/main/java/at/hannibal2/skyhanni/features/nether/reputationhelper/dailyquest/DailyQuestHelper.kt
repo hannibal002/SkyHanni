@@ -51,26 +51,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            checkInventoryForTrophyFish()
-        }
-
         if (event.repeatSeconds(3)) {
             checkInventoryForFetchItem()
         }
-    }
-
-    // TODO use OwnInventoryItemUpdateEvent
-    private fun checkInventoryForTrophyFish() {
-        val fishQuest = getQuest<TrophyFishQuest>() ?: return
-        if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
-
-        val fishName = fishQuest.fishName
-        val currentlyInInventory = InventoryUtils.countItemsInLowerInventory { it.name?.contains(fishName) ?: false }
-        val diff = currentlyInInventory - latestTrophyFishInInventory
-        if (diff < 1) return
-        latestTrophyFishInInventory = currentlyInInventory
-        updateProcessQuest(fishQuest, fishQuest.haveAmount + diff)
     }
 
     fun update() {
@@ -147,6 +130,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             val rescueMissionQuest = getQuest<RescueMissionQuest>() ?: return
             rescueMissionQuest.state = QuestState.READY_TO_COLLECT
             update()
+        }
+
+        if (message.contains("§6§lTROPHY FISH! §r§bYou caught a")) {
+            val fishQuest = getQuest<TrophyFishQuest>() ?: return
+            if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
+            val fishName = fishQuest.fishName
+
+            if (message.contains(fishName)) {
+                updateProcessQuest(fishQuest, fishQuest.haveAmount + 1)
+            }
         }
     }
 
