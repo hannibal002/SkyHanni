@@ -28,15 +28,17 @@ object ModifyVisualWords {
         }
 
         var modifiedText = originalText
+        var replacements = 0
 
         for (modifiedWord in modifiedWords) {
             if (!modifiedWord.enabled) continue
             // stop empty or 1 character replacements
             if (modifiedWord.phrase.length < 2) continue
+            replacements += 1
             modifiedText = modifiedText.replace(modifiedWord.phrase, modifiedWord.replacement)
         }
-
-        textCache.put(originalText, modifiedText)
+        // if not many are done it is better to not cache it
+        if (replacements > 2) textCache.put(originalText, modifiedText)
         return modifiedText
     }
 }
