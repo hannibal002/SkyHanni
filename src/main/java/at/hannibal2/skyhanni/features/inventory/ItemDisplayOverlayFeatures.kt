@@ -49,7 +49,7 @@ class ItemDisplayOverlayFeatures {
         This concludes the PSA. Happy writing! -Erymanthus
 
         PS: T'was all a joke. Just don't do stupid shit like
-        ` if (!(InventoryUtils.openInventoryName() == "Visitor's Logbook")) return "" `
+        ` if (!(chestName == "Visitor's Logbook")) return "" `
         and you *should* be fine for the most part.
         ----------------------------------------------------------------------------
         */

@@ -199,6 +199,7 @@ class SkyHanniMod {
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(MenuItemDisplayOverlayPlayer())
         loadModule(MenuItemDisplayOverlayPlayerAdvanced())
+        loadModule(MenuItemDisplayOverlayPlayerTryhard())
         loadModule(MenuItemDisplayOverlayFarming())
         loadModule(MenuItemDisplayOverlayMining())
         loadModule(MenuItemDisplayOverlayCombat())

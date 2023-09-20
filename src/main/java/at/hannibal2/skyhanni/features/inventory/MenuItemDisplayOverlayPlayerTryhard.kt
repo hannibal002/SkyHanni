@@ -8,30 +8,34 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayCombat {
+class MenuItemDisplayOverlayPlayerTryhard {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
-
+    private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
+    private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
+    private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getTheLastWordNoColor(original: String): String {
-        return original.removeColor().split(" ").last()
+    private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
+        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".","").replace("a✔", "§a✔").replace("%","")
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberCombatAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.menuItemNumberPlayerTryhardAsStackSize.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberCombatAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerTryhardAsStackSize
         val chestName = InventoryUtils.openInventoryName()
         /*
         -------------------------------IMPORTANT------------------------------------
@@ -56,59 +60,77 @@ class MenuItemDisplayOverlayCombat {
         */
 
         //NOTE: IT'S String.length, NOT String.length()!
-
+        
         if (stackSizeConfig.contains(0)) {
-            if ((chestName.contains("Bestiary")) && !(itemName.isEmpty()) && (itemName.contains("Bestiary Milestone "))) {
-                return itemName.split(" ").last()
+            if (itemName == "Previous Page" || itemName == "Next Page") {
+                val line = item.getLore().first()
+                if (chestName.contains("Auction")) { return auctionHousePagePattern.matchMatcher(line) { group("pagenumber") } ?: "" }
+                return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
         }
 
         if (stackSizeConfig.contains(1)) {
-            if ((chestName.contains("Bestiary")) && !(itemName.isEmpty())) {
+            if ((chestName.contains(" RNG Meter"))) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
-                        return genericPercentPattern.matchMatcher(line.replace(" (MAX!)","")) { group("percent").replace("100", "§a✔") } ?: ""
+                    if (line.contains("Odds: ")) {
+                        return rngMeterPattern.matchMatcher(line) { group("odds").take(3) } ?: ""
                     }
                 }
             }
         }
-
+        
         if (stackSizeConfig.contains(2)) {
-            if ((chestName.contains("Slayer")) && !(itemName.isEmpty())) {
+            if ((chestName.contains("Community Shop"))) {
                 val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains(" Slayer: ")) {
-                        return getTheLastWordNoColor(line)
+                if (!(lore.isEmpty())) {
+                    if ((lore.first().contains(" Upgrade")) ||
+                    (lore.last().contains(" to start!")) ||
+                    (lore.last().contains("Maxed out")) ||
+                    (lore.last().contains("upgrad"))) {
+                        return itemName.split(" ").last().romanToDecimalIfNeeded().toString()
                     }
                 }
-            }
-            if (itemName.contains("Boss Leveling Rewards")) {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("Current LVL: ")) {
-                        return getTheLastWordNoColor(line)
-                    }
+            }  
+        }
+        
+        if (stackSizeConfig.contains(3)) {
+            val line = item.getLore().last()
+            if (line.startsWith("§aCurrently ")) {
+                if ((line.endsWith(" browsing!") && chestName.contains("Auction")) ||
+                (line.endsWith(" viewing!") && chestName.contains("Bazaar"))) {
+                    return "§a➡\n§a➡\n§a➡\n"
+                } else if (line.endsWith(" selected!") && chestName.contains("Community Shop")) {
+                    return "§a⬇⬇⬇"
                 }
             }
         }
 
-        if ((stackSizeConfig.contains(3)) && (itemName.contains("Global Combat Wisdom"))) {
-            for (line in item.getLore()) {
-                if (line.contains("Total buff")) {
-                    return "§3" + line.removeColor().replace("Total buff: +","").replace("☯ Combat Wisdom", "")
-                }
-            }
+        
+        if (stackSizeConfig.contains(4)) {
+            
         }
 
-        if (stackSizeConfig.contains(4) && itemName.contains("RNG Meter")) {
-            for (line in item.getLore()) {
-                if (line.contains("Progress: ")) {
-                    return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                }
-            }
+        if (stackSizeConfig.contains(5)) {
+            
         }
 
+        if (stackSizeConfig.contains(6)) {
+            
+        }
+
+        if (stackSizeConfig.contains(7)) {
+            
+        }
+        
+        if (stackSizeConfig.contains(8)) {
+            
+        }
+
+        if (stackSizeConfig.contains(9)) {
+            
+        }
+        
         return ""
     }
 }

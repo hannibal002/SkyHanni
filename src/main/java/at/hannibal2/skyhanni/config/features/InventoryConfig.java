@@ -386,26 +386,47 @@ public class InventoryConfig {
     )
     public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
 
-        @Expose
+    @Expose
+    @ConfigOption(
+            name = "Menu stack size (Player, Advanced)",
+            desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
+    )
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "§bUnlocked Recipes (%)",
+                    "§bCollected Fairy Souls + Completed Quests",
+                    "§bTrades Unlocked (%)",
+                    "§bWardrobe Slot (#)",
+                    "§bShortened Skyblock Stats",
+                    "§bShortened Skyblock Profile Name (Fruits)",
+                    "§bAuction House + Bazaar",
+                    "§bDojo Progress",
+                    "§bBank Tier",
+                    "§bMayor Perk Count",
+            }
+    )
+    public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
+
+    @Expose
         @ConfigOption(
-                name = "Menu stack size (Player, Advanced)",
+                name = "Menu stack size (Player, Tryard)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§bUnlocked Recipes (%)",
-                        "§bCollected Fairy Souls + Completed Quests",
-                        "§bTrades Unlocked (%)",
-                        "§bWardrobe Slot (#)",
-                        "§bShortened Skyblock Stats",
-                        "§bShortened Skyblock Profile Name (Fruits)",
-                        "§bAuction House + Bazaar",
-                        "§bDojo Progress",
-                        "§bBank Tier",
-                        "§bMayor Perk Count",
+                        "§bMenu Pagination",
+                        "§bRNG Meter Drop Odds (Abbvs)",
+                        "§bCommunity Shop Upgrade Tiers",
+                        "§bSelected Tab (§a⬇§rs or §a➡§rs)",
+                        "§b",
+                        "§b",
+                        "§b",
+                        "§b",
+                        "§b",
+                        "§bBooster Cookie Duration\n§b(caps at 64 days)",
                 }
         )
-        public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
+        public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(0));
 
         @Expose
         @ConfigOption(
