@@ -419,10 +419,6 @@ public class InventoryConfig {
                         "§bCommunity Shop Upgrade Tiers",
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
                         "§bFame Rank",
-                        "§b",
-                        "§b",
-                        "§b",
-                        "§b",
                         "§bBooster Cookie Duration\n§b(caps at 64 days)",
                 }
         )

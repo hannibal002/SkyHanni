@@ -142,22 +142,6 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(5)) {
             
         }
-
-        if (stackSizeConfig.contains(6)) {
-            
-        }
-
-        if (stackSizeConfig.contains(7)) {
-            
-        }
-        
-        if (stackSizeConfig.contains(8)) {
-            
-        }
-
-        if (stackSizeConfig.contains(9)) {
-            
-        }
         
         return ""
     }
