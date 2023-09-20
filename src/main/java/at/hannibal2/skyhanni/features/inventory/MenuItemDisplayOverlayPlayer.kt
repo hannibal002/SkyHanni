@@ -146,7 +146,7 @@ class MenuItemDisplayOverlayPlayer {
                 val lore = item.getLore()
                 if (itemName == "Information") {
                     for (line in lore) {
-                        if (line.contains("Craft ") && line.contains(" more unique")) {
+                        if (line.contains("Craft ") && line.contains(" more")) {
                             return line.removeColor().replace("Craft ", "").replace(" more unique", "").trim()
                         }
                     }

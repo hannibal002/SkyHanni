@@ -277,8 +277,10 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName == "Manage Orders") {
                     var result = ""
                     for (line in lore) {
-                        if (line.contains("items to claim!")) result = result + "§2☺"
-                        if (line.contains("coins to claim!")) result = result + "§6☺"
+                        if (line.endsWith("to claim!")) {
+                            if (line.contains("§2") || line.contains("§a")) result += "§2☺"
+                            if (line.contains("§6") || line.contains("§e")) result += "§6☺"
+                        }
                     }
                     return result
                 }

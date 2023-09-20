@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling {
-    private val genericPercentPattern = ".* (§.)(?<percent>[0-9]+)(\.[0-9]*)?(§.)%".toPattern()
+    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -88,6 +88,9 @@ class MenuItemDisplayOverlaySBLeveling {
             if ((chestName.contains("Emblems")) && (!(itemName.isEmpty()) && (nameWithColor.contains("§a")) && !(itemName.contains(" ")))) {
                 val bruh = item.getLore().first().removeColor().split(" ").first().trim()
                 if (bruh.toInt() is Int) return bruh.toString()
+                //RE: above conditional
+                //VSCode and IntelliJ are gonna go "Check for instance is always 'true'".
+                //IGNORE THAT IF YOU RESPECT YOUR FPS PLEASE
             }
         }
 
