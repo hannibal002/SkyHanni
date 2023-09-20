@@ -79,7 +79,7 @@ class MenuItemDisplayOverlayCombat {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.removeColor().contains(" Slayer: ")) {
-                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
+                        return getTheLastWordNoColor(line)
                     }
                 }
             }
