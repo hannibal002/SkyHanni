@@ -67,7 +67,7 @@ class MenuItemDisplayOverlayCombat {
             if ((chestName.contains("Bestiary")) && !(itemName.isEmpty())) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains("Families Completed: ") || line.removeColor().contains("Overall Progress: ")) {
+                    if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
                         return genericPercentPattern.matchMatcher(line.removeColor().replace(" (MAX!)","")) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
@@ -78,7 +78,7 @@ class MenuItemDisplayOverlayCombat {
             if ((chestName.contains("Slayer")) && !(itemName.isEmpty())) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains(" Slayer: ")) {
+                    if (line.contains(" Slayer: ")) {
                         return getTheLastWordNoColor(line)
                     }
                 }
@@ -86,7 +86,7 @@ class MenuItemDisplayOverlayCombat {
             if (itemName.contains("Boss Leveling Rewards")) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains("Current LVL: ")) {
+                    if (line.contains("Current LVL: ")) {
                         return getTheLastWordNoColor(line)
                     }
                 }
@@ -95,7 +95,7 @@ class MenuItemDisplayOverlayCombat {
 
         if ((stackSizeConfig.contains(3)) && (itemName.contains("Global Combat Wisdom"))) {
             for (line in item.getLore()) {
-                if (line.removeColor().contains("Total buff")) {
+                if (line.contains("Total buff")) {
                     return "§3" + line.removeColor().replace("Total buff: +","").replace("☯ Combat Wisdom", "")
                 }
             }
@@ -103,7 +103,7 @@ class MenuItemDisplayOverlayCombat {
 
         if (stackSizeConfig.contains(4) && itemName.contains("RNG Meter")) {
             for (line in item.getLore()) {
-                if (line.removeColor().contains("Progress: ")) {
+                if (line.contains("Progress: ")) {
                     return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }

@@ -56,7 +56,7 @@ class MenuItemDisplayOverlaySBLeveling {
             if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains("Progress")) {
+                    if (line.contains("Progress")) {
                         return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
@@ -66,7 +66,7 @@ class MenuItemDisplayOverlaySBLeveling {
 
         if (stackSizeConfig.contains(1)) {
             for (line in item.getLore()) {
-                if (line.removeColor().contains("Progress to Complete Category")) {
+                if (line.contains("Progress to Complete Category")) {
                     return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }
@@ -76,7 +76,7 @@ class MenuItemDisplayOverlaySBLeveling {
             if ((chestName.contains("Rewards")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains("Progress to ") || line.removeColor().contains("Rewards Unlocked: ")) {
+                    if (line.contains("Progress to ") || line.contains("Rewards Unlocked: ")) {
                         return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }

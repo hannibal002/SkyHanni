@@ -107,7 +107,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (itemName == "Trades") {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains("Trades Unlocked")) {
+                    if (line.contains("Trades Unlocked")) {
                         return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
@@ -277,8 +277,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName == "Manage Orders") {
                     var result = ""
                     for (line in lore) {
-                        if (line.removeColor().contains("items to claim!")) result = result + "§2☺"
-                        if (line.removeColor().contains("coins to claim!")) result = result + "§6☺"
+                        if (line.contains("items to claim!")) result = result + "§2☺"
+                        if (line.contains("coins to claim!")) result = result + "§6☺"
                     }
                     return result
                 }
@@ -303,7 +303,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (chestName.contains("Auction")) {
                 if (!(itemName == "Item Tier") && !(itemName == "BIN Filter") && !(itemName == "Sort")) return ""
                 for (line in lore) {
-                    if (line.removeColor().contains("▶ ")) {
+                    if (line.contains("▶ ")) {
                         val betterLine = line.removeColor().replace("▶ ", "")
                         if (itemName == "Sort") {
                             return when (betterLine) {

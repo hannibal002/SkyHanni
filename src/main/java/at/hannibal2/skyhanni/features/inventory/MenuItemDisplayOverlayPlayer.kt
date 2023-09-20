@@ -100,7 +100,7 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Your Skills") {
                     for (line in item.getLore()) {
-                        if (line.removeColor().contains(" Skill Avg. ")) {
+                        if (line.contains(" Skill Avg. ")) {
                             return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
                         }
                     }
@@ -146,7 +146,7 @@ class MenuItemDisplayOverlayPlayer {
                 val lore = item.getLore()
                 if (itemName == "Information") {
                     for (line in lore) {
-                        if (line.removeColor().contains("Craft ") && line.removeColor().contains(" more unique")) {
+                        if (line.contains("Craft ") && line.contains(" more unique")) {
                             return line.removeColor().replace("Craft ", "").replace(" more unique", "").trim()
                         }
                     }
