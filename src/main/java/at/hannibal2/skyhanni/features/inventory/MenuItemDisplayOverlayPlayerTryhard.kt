@@ -22,6 +22,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
+    private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?([0-9]+y)? (?<days>[0-9]+)d [0-9]{0,2}h [0-9]{0,2}m [0-9]{0,2}s".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -140,7 +141,20 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
 
         if (stackSizeConfig.contains(5)) {
-            
+            if (!chestName.isEmpty() && !item.getLore().isEmpty() && !itemName.isEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie")))) {
+                for (line in item.getLore()) {
+                    if (line.contains("Duration:")) {
+                        boosterCookieLoreLinePattern.matchMatcher(line) {
+                            val daysString = group("days")
+                            if (daysString.toInt() is Int) {
+                                var days = daysString.toInt()
+                                if (days >= 100) return "§6§z:D"
+                                else return "§6§z" + days.toString()
+                            }
+                        }
+                    }
+                }
+            }
         }
         
         return ""
