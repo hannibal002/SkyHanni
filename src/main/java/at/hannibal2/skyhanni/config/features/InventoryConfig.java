@@ -378,10 +378,10 @@ public class InventoryConfig {
                     "§bSkyblock Level",
                     "§bSkill + Garden + Dungeoneering Levels",
                     "§bSkill Average",
-                    "§bCollection Level + Unlocked/Maxed Out Collections (%)",
+                    "§bCollection Level + Progress (%)",
                     "§bHighest Crafted Minion Tier + Progress to Next Minion Slot",
                     "§bMuseum Donation Progress %",
-                    "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
+                    "§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)",
             }
     )
     public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
@@ -397,8 +397,8 @@ public class InventoryConfig {
                         "§bCollected Fairy Souls + Completed Quests",
                         "§bTrades Unlocked (%)",
                         "§bWardrobe Slot (#)",
-                        "§bShortened Skyblock Stats (Abbrvs.)",
-                        "§bShortened Skyblock Profile Name (Abbrvs, Fruits)",
+                        "§bShortened Skyblock Stats",
+                        "§bShortened Skyblock Profile Name (Fruits)",
                         "§bAuction House + Bazaar",
                         "§bDojo Progress",
                         "§bBank Tier",
