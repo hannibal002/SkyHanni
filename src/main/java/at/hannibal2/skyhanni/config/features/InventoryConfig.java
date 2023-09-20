@@ -417,7 +417,7 @@ public class InventoryConfig {
                         "§bMenu Pagination",
                         "§bRNG Meter Drop Odds (Abbvs)",
                         "§bCommunity Shop Upgrade Tiers",
-                        "§bSelected Tab (§a⬇§rs or §a➡§rs)",
+                        "§bSelected Tab (§a⬇§bs or §a➡§bs)",
                         "§b",
                         "§b",
                         "§b",

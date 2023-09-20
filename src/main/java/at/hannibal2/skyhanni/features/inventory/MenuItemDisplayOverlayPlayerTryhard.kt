@@ -99,7 +99,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if (line.startsWith("§aCurrently ")) {
                 if ((line.endsWith(" browsing!") && chestName.contains("Auction")) ||
                 (line.endsWith(" viewing!") && chestName.contains("Bazaar"))) {
-                    return "§a➡\n§a➡\n§a➡\n"
+                    return "§a➡"
                 } else if (line.endsWith(" selected!") && chestName.contains("Community Shop")) {
                     return "§a⬇⬇⬇"
                 }
