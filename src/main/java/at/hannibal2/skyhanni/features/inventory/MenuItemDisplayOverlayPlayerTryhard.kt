@@ -95,20 +95,48 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
         
         if (stackSizeConfig.contains(3)) {
-            val line = item.getLore().last()
-            if (line.startsWith("§aCurrently ")) {
-                if ((line.endsWith(" browsing!") && chestName.contains("Auction")) ||
-                (line.endsWith(" viewing!") && chestName.contains("Bazaar"))) {
-                    return "§a➡"
-                } else if (line.endsWith(" selected!") && chestName.contains("Community Shop")) {
-                    return "§a⬇⬇⬇"
+            if (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop")) {
+                val line = item.getLore().last()
+                if (line.contains("§aCurrently ")) {
+                    val first = item.getLore().first()
+                    if (first.contains("Category") && (line.contains(" browsing!") && chestName.contains("Auction")) ||
+                    (line.contains(" viewing!") && chestName.contains("Bazaar"))) {
+                        return "§a➡"
+                    } else if (line.endsWith(" selected!") && chestName.contains("Community Shop")) {
+                        return "§a⬇⬇⬇"
+                    }
                 }
             }
         }
 
         
         if (stackSizeConfig.contains(4)) {
-            
+            if ((chestName == "Booster Cookie" && itemName == "Fame Rank") || (chestName == "Community Shop" && itemName == "Community Shop")) {
+                for (line in item.getLore()) {
+                    if (line.contains("Your rank: ") || line.contains("Fame Rank: ")) {
+                        return when (line.removeColor().split(" ").last()) {
+                            "Player" -> "NP"
+                            "Settler" -> "Str"
+                            "Citizen" -> "Ctz"
+                            "Contributor" -> "Ctb"
+                            "Philanthropist" -> "Phl"
+                            "Patron" -> "Ptn"
+                            "Famous Player" -> "FP"
+                            "Attaché" -> "Atc"
+                            "Ambassador" -> "Absd"
+                            "Statesperson" -> "Stp"
+                            "Senator" -> "Snt"
+                            "Dignitary" -> "Dgn"
+                            "Councilor" -> "Cnl"
+                            "Minister" -> "Mst"
+                            "Premier" -> "Pmr"
+                            "Chancellor" -> "Chr"
+                            "Supreme" -> "Sup"
+                            else -> "?"
+                        }
+                    }
+                }
+            }
         }
 
         if (stackSizeConfig.contains(5)) {

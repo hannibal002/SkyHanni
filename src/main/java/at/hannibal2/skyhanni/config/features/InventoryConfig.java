@@ -418,7 +418,7 @@ public class InventoryConfig {
                         "§bRNG Meter Drop Odds (Abbvs)",
                         "§bCommunity Shop Upgrade Tiers",
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
-                        "§b",
+                        "§bFame Rank",
                         "§b",
                         "§b",
                         "§b",
