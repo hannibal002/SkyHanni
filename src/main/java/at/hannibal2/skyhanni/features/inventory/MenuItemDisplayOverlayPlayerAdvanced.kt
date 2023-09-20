@@ -106,11 +106,9 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(2)) {
             if (itemName == "Trades") {
                 val lore = item.getLore()
-                if (lore.any { it.removeColor().contains("lock Menu") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Trades Unlocked")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.removeColor().contains("Trades Unlocked")) {
+                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }

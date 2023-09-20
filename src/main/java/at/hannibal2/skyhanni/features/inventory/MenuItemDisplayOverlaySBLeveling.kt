@@ -56,7 +56,7 @@ class MenuItemDisplayOverlaySBLeveling {
             if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.removeColor().contains("Total Progress") || line.removeColor().contains("Progress ")) {
+                    if (line.removeColor().contains("Progress")) {
                         return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
@@ -65,11 +65,9 @@ class MenuItemDisplayOverlaySBLeveling {
         }
 
         if (stackSizeConfig.contains(1)) {
-            if ((chestName == "Ways to Level Up") && (itemName.contains(" Tasks"))) {
-                for (line in item.getLore()) {
-                    if (line.removeColor().contains("Progress to Complete Category")) {
-                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                    }
+            for (line in item.getLore()) {
+                if (line.removeColor().contains("Progress to Complete Category")) {
+                    return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }
         }
@@ -77,11 +75,9 @@ class MenuItemDisplayOverlaySBLeveling {
         if (stackSizeConfig.contains(2)) {
             if ((chestName.contains("Rewards")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
-                if (lore.any { it.removeColor().contains("Progress to Unlock") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Progress to Unlock") || line.removeColor().contains("Progress to ") || line.removeColor().contains("Rewards Unlocked")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.removeColor().contains("Progress to ") || line.removeColor().contains("Rewards Unlocked: ")) {
+                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }

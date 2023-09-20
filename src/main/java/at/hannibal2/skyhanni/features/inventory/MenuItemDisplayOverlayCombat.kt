@@ -66,34 +66,28 @@ class MenuItemDisplayOverlayCombat {
         if (stackSizeConfig.contains(1)) {
             if ((chestName.contains("Bestiary")) && !(itemName.isEmpty())) {
                 val lore = item.getLore()
-                if (lore.any { it.removeColor().contains("Click to ") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Families Completed: ") || line.removeColor().contains("Overall Progress: ")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.removeColor().contains("Families Completed: ") || line.removeColor().contains("Overall Progress: ")) {
+                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
-                } 
+                }
             }
         }
 
         if (stackSizeConfig.contains(2)) {
             if ((chestName.contains("Slayer")) && !(itemName.isEmpty())) {
                 val lore = item.getLore()
-                if (lore.any { it.removeColor().contains(" Slayer: ") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains(" Slayer: ")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.removeColor().contains(" Slayer: ")) {
+                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
             if (itemName.contains("Boss Leveling Rewards")) {
                 val lore = item.getLore()
-                if (lore.any { it.removeColor().contains("Current LVL: ") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Current LVL: ")) {
-                            return getTheLastWordNoColor(line)
-                        }
+                for (line in lore) {
+                    if (line.removeColor().contains("Current LVL: ")) {
+                        return getTheLastWordNoColor(line)
                     }
                 }
             }
