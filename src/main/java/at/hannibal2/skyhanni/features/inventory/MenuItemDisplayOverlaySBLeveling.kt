@@ -55,19 +55,12 @@ class MenuItemDisplayOverlaySBLeveling {
         if (stackSizeConfig.contains(0)) {
             if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
-                if (lore.any { it.removeColor().contains("Total Progress") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Total Progress")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.removeColor().contains("Total Progress") || line.removeColor().contains("Progress ")) {
+                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
                     }
-                } else if (lore.any { it.removeColor().contains("Progress to ") }) {
-                    for (line in lore) {
-                        if (line.removeColor().contains("Progress to ")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
-                    }
-                } else if (itemName.contains("✔")) return "§a✔"
+                }
+                if (itemName.contains("✔")) return "§a✔"
             }
         }
 
