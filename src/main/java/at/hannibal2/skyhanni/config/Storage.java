@@ -35,9 +35,6 @@ public class Storage {
     public List<VisualWord> modifiedWords = new ArrayList<>();
 
     @Expose
-    public Boolean seenThis = false;
-
-    @Expose
     public Boolean contestSendingAsked = false;
 
     @Expose

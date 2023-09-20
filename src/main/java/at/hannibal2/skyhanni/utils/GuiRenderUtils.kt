@@ -278,4 +278,14 @@ object GuiRenderUtils {
         val color = Color(this)
         return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
     }
+
+    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, colour: Int, inverseScale: Float) {
+        GuiScreen.drawRect((left * inverseScale).toInt(), (top * inverseScale).toInt(),
+            (right * inverseScale).toInt(), (bottom * inverseScale).toInt(), colour)
+    }
+
+    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {
+        renderItemStack(item, x, y)
+        GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
+    }
 }

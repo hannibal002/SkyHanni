@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
+import com.google.gson.annotations.Expose
+
 data class VisualWord(
-    val phrase: String,
-    val replacement: String,
-    val enabled: Boolean
+    @Expose var phrase: String,
+    @Expose var replacement: String,
+    @Expose var enabled: Boolean
     )

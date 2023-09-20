@@ -2,9 +2,13 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Mouse
 import java.io.IOException
@@ -27,7 +31,15 @@ open class VisualWordGui : GuiScreen() {
     private var scrollVelocity = 0.0
     private val maxNoInputFrames = 100
 
-    private val modifiedWords = mutableListOf<VisualWord>()
+    private var lastClickedHeight = 0
+    private var lastClickedWidth = 0
+    private var changedIndex = -1
+    private var changedAction = ""
+
+    private var currentlyEditing = false
+    private var currentIndex = -1
+
+    private var modifiedWords = mutableListOf<VisualWord>()
 
     companion object {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
@@ -45,53 +57,173 @@ open class VisualWordGui : GuiScreen() {
 
         GlStateManager.pushMatrix()
         drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
+        val scale = 0.75f
+        val inverseScale = 1 / scale
 
-        val adjustedY = guiTop + 30 + pageScroll
-        val inverseScale = 1 / 0.75f
-        GlStateManager.scale(0.75f, 0.75f, 1f)
+        if (!currentlyEditing) {
+            val adjustedY = guiTop + 30 + pageScroll
 
-        GuiRenderUtils.drawStringCentered("§7Modify Words. Replace the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 10) * inverseScale)
-        GuiRenderUtils.drawString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
-        GuiRenderUtils.drawString("§1Status", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
+            val x = guiLeft + 180
+            val y = guiTop + 170
 
-        for ((index, phrase) in SkyHanniMod.feature.storage.modifiedWords.withIndex()) {
-            if (adjustedY + 30 * index < guiTop + 20) continue
-            if (adjustedY + 30 * index > guiTop + 155) continue
+            GuiRenderUtils.drawStringCentered("§aAdd New", x, y)
+            val colour =
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
-            val status = if (phrase.enabled) "§2Enabled" else "§4Disabled"
+            GlStateManager.scale(scale, scale, 1f)
 
-            GuiRenderUtils.drawString(phrase.phrase, (guiLeft + 15) * inverseScale, (adjustedY - 5 + 30 * index) * inverseScale)
-            GuiRenderUtils.drawString(phrase.replacement, (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
-            GuiRenderUtils.drawString(status, (guiLeft + 310) * inverseScale, (adjustedY + 30 * index) * inverseScale)
+            GuiRenderUtils.drawStringCentered(
+                "§7Modify Words. Replaces the top with the bottom",
+                (guiLeft + 180) * inverseScale,
+                (guiTop + 9) * inverseScale
+            )
+            GuiRenderUtils.drawString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
+            GuiRenderUtils.drawString("§1Status", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
+
+            for ((index, phrase) in modifiedWords.withIndex()) {
+                if (adjustedY + 30 * index < guiTop + 20) continue
+                if (adjustedY + 30 * index > guiTop + 125) continue
+
+                var inBox = false
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, adjustedY + 30 * index, sizeX, 30)) inBox = true
+
+                GuiRenderUtils.drawString("${index + 1}.", (guiLeft + 5) * inverseScale, (adjustedY + 10 + 30 * index) * inverseScale)
+
+                if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 335, adjustedY + 30 * index + 7, 16, 16)) {
+                    lastClickedWidth = 0
+                    lastClickedHeight = 0
+                    phrase.enabled = !phrase.enabled
+                    saveChanges()
+                    SoundUtils.playClickSound()
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 295,
+                        adjustedY + 30 * index + 7, 16, 16) && index != 0) {
+                    lastClickedWidth = 0
+                    lastClickedHeight = 0
+                    SoundUtils.playClickSound()
+                    changedIndex = index
+                    changedAction = "up"
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 315,
+                        adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1) {
+                    lastClickedWidth = 0
+                    lastClickedHeight = 0
+                    SoundUtils.playClickSound()
+                    changedIndex = index
+                    changedAction = "down"
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft, adjustedY + 30 * index, sizeX, 30)) {
+                    lastClickedWidth = 0
+                    lastClickedHeight = 0
+                    SoundUtils.playClickSound()
+                    currentlyEditing = true
+                    currentIndex = index
+                }
+
+                if (inBox) {
+                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, 0x50303030, inverseScale)
+                }
+
+                val statusBlock = if (phrase.enabled) {
+                    ItemStack(Blocks.stained_hardened_clay, 1, 13)
+                } else {
+                    ItemStack(Blocks.stained_hardened_clay, 1, 14)
+                }
+
+                GlStateManager.scale(inverseScale, inverseScale, 1f)
+
+                if (index != 0) {
+                    val skullItem = ItemUtils.createSkull("Up", "7f68dd73-1ff6-4193-b246-820975d6fab1", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0=")
+                    GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 295, adjustedY + 30 * index + 7, 0x50828282)
+                }
+                if (index != modifiedWords.size - 1) {
+                    val skullItem = ItemUtils.createSkull("Down", "e4ace6de-0629-4719-aea3-3e113314dd3f", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMzRmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0=")
+                    GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 315, adjustedY + 30 * index + 7, 0x50828282)
+                }
+
+                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, adjustedY + 30 * index + 7, 0x50828282)
+
+                GlStateManager.scale(scale, scale, 1f)
+
+                if (inBox) {
+                    GuiRenderUtils.drawString(phrase.phrase, (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
+                    GuiRenderUtils.drawString(phrase.replacement, (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
+                } else {
+                    GuiRenderUtils.drawString(phrase.phrase.replace("&&", "§"), (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
+                    GuiRenderUtils.drawString(phrase.replacement.replace("&&", "§"), (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
+                }
+            }
+
+            if (modifiedWords.size < 1) {
+                modifiedWords = SkyHanniMod.feature.storage.modifiedWords
+            }
+
+            GlStateManager.scale(inverseScale, inverseScale, 1f)
+
+            scrollScreen()
+        }
+        else {
+            val x = guiLeft + 180
+            var y = guiTop + 140
+            GuiRenderUtils.drawStringCentered("§cDelete", x, y)
+            var colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+            y += 30
+            GuiRenderUtils.drawStringCentered("§eBack", x, y)
+            colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+
+            if (currentIndex < modifiedWords.size && currentIndex != -1) {
+                y -= 150
+                val currentPhrase = modifiedWords[currentIndex]
+                val status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
+                GuiRenderUtils.drawStringCentered(status, x, y)
+                colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+
+                GuiRenderUtils.drawString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
+
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
+                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50303030)
+                }
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
+                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50303030)
+                }
+
+                GlStateManager.scale(0.75f, 0.75f, 1f)
+
+                GuiRenderUtils.drawString(currentPhrase.phrase.replace("&&", "§"), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale)
+                GuiRenderUtils.drawString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
+
+                GuiRenderUtils.drawString(currentPhrase.replacement.replace("&&", "§"), (guiLeft + 30) * inverseScale, (guiTop + 95) * inverseScale)
+                GuiRenderUtils.drawString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
+
+                GlStateManager.scale(inverseScale, inverseScale, 1f)
+
+                // text box stuff
+
+            }
         }
 
-        //todo remove
-        if (SkyHanniMod.feature.storage.modifiedWords.size < 1) {
-            modifiedWords.clear()
-            modifiedWords.add(0, VisualWord("§btesting", "Mouse.getX() * width / Minecraft.getMin§becraft().displayWidth", true))
-            modifiedWords.add(0, VisualWord("(adj§kustedY + 25 * index) * inverseScale)", "into", false))
-            modifiedWords.add(0, VisualWord("Hel§kp me decide if this rend§lering works", "§bDoes this redndering work", true))
-            modifiedWords.add(0, VisualWord("testing", "for ((index, phrase) in modifiedWords.wi§bthIndex())", true))
-            modifiedWords.add(0, VisualWord("Skipp§bing NEU Kotlin loading", "in develo§kpment environment.", false))
-            modifiedWords.add(0, VisualWord("for ((index, phrase) in modifiedWords.withIndex())", "(adjustedY + 25 * index) * inverseScale)", false))
-            modifiedWords.add(0, VisualWord("(ad§ujustedY + 25 * index) * inverseScale)", "GuiRenderUtils.drawTooltip(toolti§bpToDisplay, mouseX, mouseY, height)", false))
-            modifiedWords.add(0, VisualWord("for ((index, phrase) in modifi§bedWords.withIndex())", "GuiRe§lnderUtils.drawString(", true))
-            modifiedWords.add(0, VisualWord("§btesting", "Mouse.getX() * width / Minecraft.getMin§becraft().displayWidth", true))
-            modifiedWords.add(0, VisualWord("(adj§kustedY + 25 * index) * inverseScale)", "into", false))
-            modifiedWords.add(0, VisualWord("Hel§kp me decide if this rend§lering works", "§bDoes this redndering work", true))
-            modifiedWords.add(0, VisualWord("testing", "for ((index, phrase) in modifiedWords.wi§bthIndex())", true))
-            modifiedWords.add(0, VisualWord("Skipp§bing NEU Kotlin loading", "in develo§kpment environment.", false))
-            modifiedWords.add(0, VisualWord("for ((index, phrase) in modifiedWords.withIndex())", "(adjustedY + 25 * index) * inverseScale)", false))
-            modifiedWords.add(0, VisualWord("(ad§ujustedY + 25 * index) * inverseScale)", "GuiRenderUtils.drawTooltip(toolti§bpToDisplay, mouseX, mouseY, height)", false))
-            modifiedWords.add(0, VisualWord("for ((index, phrase) in modifi§bedWords.withIndex())", "GuiRe§lnderUtils.drawString(", false))
-            SkyHanniMod.feature.storage.modifiedWords = modifiedWords
-            SkyHanniMod.feature.storage.seenThis = true
+        if (changedIndex != -1) {
+            if (changedAction == "up") {
+                if (changedIndex > 0) {
+                    val temp = modifiedWords[changedIndex]
+                    modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
+                    modifiedWords[changedIndex - 1] = temp
+                }
+            }
+            else if (changedAction == "down") {
+                if (changedIndex < modifiedWords.size - 1) {
+                    val temp = modifiedWords[changedIndex]
+                    modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
+                    modifiedWords[changedIndex + 1] = temp
+                }
+            }
+
+            changedIndex = -1
+            changedAction = ""
+            saveChanges()
         }
 
-        GlStateManager.scale(inverseScale, inverseScale, 1f)
-
-        scrollScreen()
-        
         GlStateManager.popMatrix()
 
         if (tooltipToDisplay.isNotEmpty()) {
@@ -116,7 +248,43 @@ open class VisualWordGui : GuiScreen() {
 
     @Throws(IOException::class)
     fun mouseClickEvent() {
-
+        if (!currentlyEditing) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop, sizeX, sizeY - 25)) {
+                lastClickedWidth = mouseX
+                lastClickedHeight = mouseY
+            }
+        }
+        val x = guiLeft + 180
+        var y = guiTop + 140
+        if (currentlyEditing) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+                SoundUtils.playClickSound()
+                currentlyEditing = false
+                modifiedWords.removeAt(currentIndex)
+                currentIndex = -1
+                saveChanges()
+            }
+            if (currentIndex < modifiedWords.size && currentIndex != -1) {
+                y = guiTop + 20
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+                    SoundUtils.playClickSound()
+                    modifiedWords[currentIndex].enabled = !modifiedWords[currentIndex].enabled
+                    saveChanges()
+                }
+            }
+        }
+        y = guiTop + 170
+        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+            SoundUtils.playClickSound()
+            if (currentlyEditing) {
+                currentIndex = -1
+            } else {
+                modifiedWords.add(VisualWord("", "", true))
+                currentIndex = modifiedWords.size - 1
+                saveChanges()
+            }
+            currentlyEditing = !currentlyEditing
+        }
     }
 
     private fun scrollScreen() {
@@ -134,7 +302,13 @@ open class VisualWordGui : GuiScreen() {
             pageScroll = 0
         }
 
-        pageScroll = MathHelper.clamp_int(pageScroll, -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 140), 0)
+        pageScroll = MathHelper.clamp_int(pageScroll, -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100), 0)
         lastMouseScroll = 0
+    }
+
+    private fun saveChanges() {
+        ModifyVisualWords.modifiedWords = modifiedWords
+        ModifyVisualWords.textCache.invalidateAll()
+        SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 }

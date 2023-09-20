@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import java.util.concurrent.TimeUnit
 
 object ModifyVisualWords {
     private val config get() = SkyHanniMod.feature.misc.modifyWords
-    private var textCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build<String, String>()
+    var textCache: Cache<String, String> = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build()
 
-    private val replacements: Map<String, String> = mapOf(
-    )
+    var modifiedWords = mutableListOf<VisualWord>()
 
     fun modifyText(originalText: String): String {
         if (!LorenzUtils.onHypixel) return originalText
@@ -18,14 +18,22 @@ object ModifyVisualWords {
         if (!LorenzUtils.inSkyBlock && !config.workOutside) return originalText
         if (VisualWordGui.isInGui()) return originalText
 
+        if (modifiedWords.isEmpty()) {
+            modifiedWords = SkyHanniMod.feature.storage.modifiedWords
+        }
+
         val cachedResult = textCache.getIfPresent(originalText)
         if (cachedResult != null) {
             return cachedResult
         }
 
         var modifiedText = originalText
-        for ((word, replacement) in replacements) {
-            modifiedText = modifiedText.replace(word, replacement)
+
+        for (modifiedWord in modifiedWords) {
+            if (!modifiedWord.enabled) continue
+            // stop empty or 1 character replacements
+            if (modifiedWord.phrase.length < 2) continue
+            modifiedText = modifiedText.replace(modifiedWord.phrase, modifiedWord.replacement)
         }
 
         textCache.put(originalText, modifiedText)
