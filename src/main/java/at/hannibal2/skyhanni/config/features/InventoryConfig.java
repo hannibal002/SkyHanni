@@ -376,9 +376,9 @@ public class InventoryConfig {
     @ConfigEditorDraggableList(
             exampleText = {
                     "§bSkyblock Level",
-                    "§bSkill Level + Garden Level + Dungeoneering Levels",
+                    "§bSkill + Garden + Dungeoneering Levels",
                     "§bSkill Average",
-                    "§bCollection Level + Unlocked/Maxed Out Collections %",
+                    "§bCollection Level + Unlocked/Maxed Out Collections (%)",
                     "§bHighest Crafted Minion Tier + Progress to Next Minion Slot",
                     "§bMuseum Donation Progress %",
                     "§bSkyblock Profile Type (Classic/Ironman/Stranded/Bingo)",
@@ -393,13 +393,13 @@ public class InventoryConfig {
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§bUnlocked Recipes %",
+                        "§bUnlocked Recipes (%)",
                         "§bCollected Fairy Souls + Completed Quests",
                         "§bTrades Unlocked (%)",
-                        "§bWardrobe Slot #",
-                        "§bShortened Skyblock Stats",
-                        "§bShortened Skyblock Profile Name (Fruits)",
-                        "§bAuction House",
+                        "§bWardrobe Slot (#)",
+                        "§bShortened Skyblock Stats (Abbrvs.)",
+                        "§bShortened Skyblock Profile Name (Abbrvs, Fruits)",
+                        "§bAuction House + Bazaar",
                         "§bDojo Progress",
                         "§bBank Tier",
                         "§bMayor Perk Count",
@@ -442,10 +442,10 @@ public class InventoryConfig {
         @ConfigEditorDraggableList(
                 exampleText = {          
                         "§bBestiary Level",
-                        "§bDetailed Bestiary Progress",
+                        "§bOverall Bestiary Progress (per Family)",
                         "§bCurrent Slayer Levels",
                         "§bSlayer Combat Wisdom Buff",
-                        "§bRNG Meter Progress",
+                        "§bRNG Meter Progress (%)",
                 }
         )
         public List<Integer> menuItemNumberCombatAsStackSize = new ArrayList<>(Arrays.asList(0));
@@ -461,7 +461,7 @@ public class InventoryConfig {
                         "§bSkyblock Guide Progress (%)",
                         "§bSkyblock Ways To Level Up Tasks (%)",
                         "§bSkyblock Leveling Rewards Progress (%)",
-                        "§bEmblems Unlocked",
+                        "§bEmblems Unlocked (#)",
                 }
         )
         public List<Integer> menuItemNumberSBLevelingAsStackSize = new ArrayList<>(Arrays.asList(0));
