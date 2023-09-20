@@ -21,7 +21,7 @@ class MenuItemDisplayOverlayPlayer {
     private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
     private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
     private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\.[0-9])?) Skill Avg\..*".toPattern()
-    private val genericPercentPattern = ".* (?<percent>[0-9]+)(\.[0-9]*)?%".toPattern()
+    private val genericPercentPattern = ".* (§.)(?<percent>[0-9]+)(\.[0-9]*)?(§.)%".toPattern()
     private val dungeonClassLevelPattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
@@ -125,16 +125,16 @@ class MenuItemDisplayOverlayPlayer {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
                         if (line.contains("Collections Unlocked: ")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
+                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
             }
-            if (chestName == "Collections") {
-                if (itemName.contains(" Collections")) {
+            if (chestName.contains("Collections"))) {
+                if (itemName.contains("Collections")) {
                     for (line in item.getLore()) {
                         if (line.contains("Collections ") && line.contains(": §")) {
-                            return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
+                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }

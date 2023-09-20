@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling {
-    private val genericPercentPattern = ".* (?<percent>[0-9]+)(\.[0-9]*)?%".toPattern()
+    private val genericPercentPattern = ".* (§.)(?<percent>[0-9]+)(\.[0-9]*)?(§.)%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -57,7 +57,7 @@ class MenuItemDisplayOverlaySBLeveling {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains("Progress")) {
-                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
+                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
                 if (itemName.contains("✔")) return "§a✔"
@@ -67,7 +67,7 @@ class MenuItemDisplayOverlaySBLeveling {
         if (stackSizeConfig.contains(1)) {
             for (line in item.getLore()) {
                 if (line.contains("Progress to Complete Category")) {
-                    return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
+                    return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }
         }
@@ -77,7 +77,7 @@ class MenuItemDisplayOverlaySBLeveling {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains("Progress to ") || line.contains("Rewards Unlocked: ")) {
-                        return genericPercentPattern.matchMatcher(line.removeColor()) { group("percent").replace("100", "§a✔") } ?: ""
+                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
