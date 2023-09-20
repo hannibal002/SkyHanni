@@ -177,8 +177,18 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(6)) {
             if (chestName == "Profile Management") {
-                if (!itemName.contains("Profile: ")) return ""
-                profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
+                if (itemName.contains("Profile: ")) {
+                    profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(7)) {
+            if (chestName.contains("Pets")) {
+                if (itemName.contains("Pet Score Rewards") && !(item.getLore().isEmpty())) {
+                        return item.getLore().last().removeColor().split(" ").last()
+                    }
+                }
             }
         }
 
