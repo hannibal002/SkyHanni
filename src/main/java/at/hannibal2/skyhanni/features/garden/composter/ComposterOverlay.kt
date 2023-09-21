@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.SackAPI.fetchSackItem
+import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
@@ -33,8 +33,8 @@ import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
-import kotlin.time.Duration.Companion.seconds
 
 class ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
@@ -356,7 +356,8 @@ class ComposterOverlay {
 
         val priceCompost = getPrice("COMPOST")
         val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
-        val profitPreview = ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
+        val profitPreview =
+            ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
         val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + NumberUtil.format(profitPreview) else ""
         val profitFormat = " §7Profit per $timeText: §6${NumberUtil.format(profit)}$profitFormatPreview"
@@ -378,7 +379,7 @@ class ComposterOverlay {
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            LorenzUtils.chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
+            chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
@@ -418,42 +419,9 @@ class ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (LorenzUtils.isControlKeyDown()) {
-                    if(lastAttemptTime.passedSince()>0.5.seconds){
-                        lastAttemptTime = SimpleTimeMark.now()
-                        val sackData = fetchSackItem(internalName.asInternalName())
-                        val amountInSacks = sackData.amount
-                        val sacksLoaded = sackData.outdatedStatus
-                        if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
-                            if (config.composterOverlayGetType == 0) {
-                                inInventory = false
-                                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
-                            } else if (amountInSacks == 0 && sacksLoaded != -1) {
-                                SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
-                                chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
-                                inInventory = false
-                                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
-                            } else {
-                                val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
-                                if (sacksLoaded == -1) {
-                                    val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") {
-                                        "Mining"
-                                    } else {
-                                        "Enchanted Agronomy"
-                                    }
-                                    clickableChat("§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!","sax")
-                                }
-                                if (amountInSacks < itemsNeeded) {
-                                    clickableChat("§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy on the Bazaar!","bz ${itemName.removeColor()}")
-                                }
-                                if (having < itemsNeeded) {
-                                    LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
-                                } else {
-                                    chat("§e[SkyHanni] $itemName §8x${itemsNeeded.toInt()} §ealready found in inventory!")
-                                }
-                            }
-                        }
-                    }
+                if (LorenzUtils.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                    lastAttemptTime = SimpleTimeMark.now()
+                    gfsLogic(internalName, itemName, itemsNeeded)
                 }
             })
             bigList.add(list)
@@ -469,6 +437,44 @@ class ComposterOverlay {
         }
 
         return first ?: error("First is empty!")
+    }
+
+    private fun gfsLogic(internalName: String, itemName: String, itemsNeeded: Double) {
+        val sackData = fetchSackItem(internalName.asInternalName())
+        val amountInSacks = sackData.amount
+        val sacksLoaded = sackData.outdatedStatus
+        if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
+            if (config.composterOverlayGetType == 0) {
+                inInventory = false
+                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+            } else if (amountInSacks == 0 && sacksLoaded != -1) {
+                SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
+                chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
+                inInventory = false
+                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+            } else {
+                val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
+                if (sacksLoaded == -1) {
+                    val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining"
+                    else "Enchanted Agronomy"
+                    clickableChat(
+                        "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                        "sax"
+                    )
+                }
+                if (amountInSacks < itemsNeeded) {
+                    clickableChat(
+                        "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy on the Bazaar!",
+                        "bz ${itemName.removeColor()}"
+                    )
+                }
+                if (having < itemsNeeded) {
+                    LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
+                } else {
+                    chat("§e[SkyHanni] $itemName §8x${itemsNeeded.toInt()} §ealready found in inventory!")
+                }
+            }
+        }
     }
 
     private fun getPrice(internalName: String): Double {
