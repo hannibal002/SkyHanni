@@ -145,16 +145,16 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 for (line in item.getLore()) {
                     if (line.contains("Duration:")) {
                         boosterCookieLoreLinePattern.matchMatcher(line) {
-                            val yearsString = group("years")?
-                            val daysString = group("days")?
-                            val hoursString = group("hours")?
-                            val minutesString = group("minutes")?
-                            val secondsString = group("seconds")?
-                            if (yearsString != null && yearsString.toInt() > 0) return yearsString
-                            if (daysString != null && daysString.toInt() > 0) return daysString
-                            if (hoursString != null && hoursString.toInt() > 0) return hoursString
-                            if (minutesString != null && minutesString.toInt() > 0) return minutesString
-                            if (secondsString != null && secondsString.toInt() > 0) return secondsString
+                            val yearsString = group("years")?.value.toInt()
+                            val daysString = group("days")?.value.toInt()
+                            val hoursString = group("hours")?.value.toInt()
+                            val minutesString = group("minutes")?.value.toInt()
+                            val secondsString = group("seconds")?.value.toInt()
+                            if (yearsString != null && yearsString > 0) return "${yearsString}y"
+                            if (daysString != null && daysString > 0) return "${daysString}d"
+                            if (hoursString != null && hoursString > 0) return "${hoursString}h"
+                            if (minutesString != null && minutesString > 0) return "${minutesString}m"
+                            if (secondsString != null && secondsString > 0) return "${secondsString}s"
                         }
                     }
                 }
