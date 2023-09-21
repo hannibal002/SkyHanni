@@ -33,10 +33,12 @@ object ModifyVisualWords {
 
         for (modifiedWord in modifiedWords) {
             if (!modifiedWord.enabled) continue
-            // stop empty or 1 character replacements
-            if (modifiedWord.phrase.convertToFormatted().length < 2) continue
+            val phrase = modifiedWord.phrase.convertToFormatted()
+
+            if (phrase.length < 2) continue
+
             replacements += 1
-            modifiedText = modifiedText.replace(modifiedWord.phrase.convertToFormatted(), modifiedWord.replacement.convertToFormatted())
+            modifiedText = modifiedText.replace(phrase, modifiedWord.replacement.convertToFormatted())
         }
         // if not many are done it is better to not cache it
         if (replacements > 2) textCache.put(originalText, modifiedText)

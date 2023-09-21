@@ -157,7 +157,7 @@ object Commands {
                     "Copies the translation for a given message to your clipboard. " +
                     "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
+        registerCommand("shwords", "Opens the menu for modifying visual words") { openVisualWords() }
     }
 
     private fun usersBugFix() {
@@ -316,7 +316,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.chat("§cJoin Hypixel to use this feature!")
+            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
             SkyHanniMod.screenToOpen = VisualWordGui()
         }

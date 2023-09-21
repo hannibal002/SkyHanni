@@ -29,8 +29,6 @@ open class VisualWordGui : GuiScreen() {
     private var lastMouseScroll = 0
     private var noMouseScrollFrames = 0
 
-    private var tooltipToDisplay = mutableListOf<String>()
-
     private var pageScroll = 0
     private var scrollVelocity = 0.0
     private val maxNoInputFrames = 100
@@ -206,9 +204,6 @@ open class VisualWordGui : GuiScreen() {
                 GuiRenderUtils.drawString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
 
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
-
-                // text box stuff
-
             }
         }
 
@@ -234,11 +229,6 @@ open class VisualWordGui : GuiScreen() {
         }
 
         GlStateManager.popMatrix()
-
-        if (tooltipToDisplay.isNotEmpty()) {
-            GuiRenderUtils.drawTooltip(tooltipToDisplay, mouseX, mouseY, height)
-            tooltipToDisplay.clear()
-        }
     }
 
     override fun handleMouseInput() {
