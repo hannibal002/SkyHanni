@@ -296,6 +296,7 @@ open class VisualWordGui : GuiScreen() {
             SoundUtils.playClickSound()
             if (currentlyEditing) {
                 currentIndex = -1
+                currentTextBox = ""
             } else {
                 modifiedWords.add(VisualWord("", "", true))
                 currentTextBox = "phrase"
@@ -303,7 +304,6 @@ open class VisualWordGui : GuiScreen() {
                 saveChanges()
             }
             currentlyEditing = !currentlyEditing
-            currentTextBox = ""
         }
     }
 
