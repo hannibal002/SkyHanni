@@ -67,7 +67,9 @@ class FrozenTreasureTracker {
                 icePerSecond.add(0)
             }
             icePerSecond.add(difference)
-            while (icePerSecond.size > 1200) icePerSecond.removeAt(0)
+            val listCopy = icePerSecond
+            while (listCopy.size > 1200) listCopy.removeAt(0)
+            icePerSecond = listCopy
         }
         icePerHour = (icePerSecond.average() * 3600).toInt()
     }
