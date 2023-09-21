@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBloodGodKills
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -213,6 +214,30 @@ class ItemDisplayOverlayFeatures {
                         }
                     }
                 }
+            }
+        }
+
+        if (stackSizeConfig.contains(14)) {
+            if (itemName.contains("Beastmaster Crest")) {
+                for (line in item.getLore()) { //§7Your kills: §21,581§8/2,500
+                    if (line.contains("Your kills: ")) {
+                        val num = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").first()
+                        val denom = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").last()
+                        return (((num.toFloat() / denom.toFloat()) * 100).toString().take(2))
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(15)) {
+            if (item.getInternalName_old().contains("CAMPFIRE_TALISMAN_")) {
+                return ((item.getInternalName_old().replace("CAMPFIRE_TALISMAN_", "").toInt()) + 1).toString()
+            }
+        }
+
+        if (stackSizeConfig.contains(16)) {
+            if (item.getInternalName_old() == ("BLOOD_GOD_CREST")) {
+                return (item.getBloodGodKills().toString().length)
             }
         }
 

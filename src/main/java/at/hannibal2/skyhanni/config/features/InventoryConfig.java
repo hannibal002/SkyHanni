@@ -364,6 +364,9 @@ public class InventoryConfig {
                 "§bArmadillo Blocks Walked Progress (%)",
                 "§bNecron's Ladder Progress",
                 "§bFruit Bowl Progress",
+                "§bBeastmaster Crest Kill Progress",
+                "§bCampfire Talisman Tier",
+                "§bBlood God Crest Strength",
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));

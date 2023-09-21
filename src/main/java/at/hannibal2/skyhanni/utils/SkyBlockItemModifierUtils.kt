@@ -165,6 +165,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getNecronHandlesFound() = getAttributeInt("handles_found")
 
+    fun ItemStack.getBloodGodKills() = getAttributeInt("blood_god_kills")
+
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }

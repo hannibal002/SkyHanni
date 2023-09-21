@@ -186,8 +186,7 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(7)) {
             if (chestName.contains("Pets")) {
                 if (itemName.contains("Pet Score Rewards") && !(item.getLore().isEmpty())) {
-                        return item.getLore().last().removeColor().split(" ").last()
-                    }
+                    return item.getLore().last().removeColor().split(" ").last()
                 }
             }
         }
