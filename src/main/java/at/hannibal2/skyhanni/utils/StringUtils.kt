@@ -199,16 +199,25 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.isPlayerMessage(): Boolean {
-        if (!playerChatPattern.matcher(this).matches()) return false
+    fun String.getPlayerName(): String {
+        if (!playerChatPattern.matcher(this).matches()) return "-"
 
         var username = this.removeColor().split(":")[0]
 
         if (username.contains(">")) {
             username = username.substring(username.indexOf('>') + 1).trim()
         }
+        if (username.startsWith("From ")) {
+            username = username.removePrefix("From ")
+        }
+        if (username.startsWith("To ")) {
+            username = username.removePrefix("To ")
+        }
 
         val matcher = chatUsernamePattern.matcher(username)
-        return matcher.matches()
+
+        if (!matcher.matches()) return "-"
+        username = matcher.group("username")
+        return username
     }
 }

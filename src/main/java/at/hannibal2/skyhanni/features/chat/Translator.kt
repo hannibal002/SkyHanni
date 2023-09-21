@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.isPlayerMessage
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.*
 import net.minecraft.event.ClickEvent
@@ -33,7 +33,7 @@ class Translator {
         if (!SkyHanniMod.feature.chat.translator) return
 
         val message = e.message
-        if (!message.isPlayerMessage()) return
+        if (message.getPlayerName() == "-") return
 
         val editedComponent = if (e.chatComponent.siblings.size > 0) e.chatComponent.siblings.last() else e.chatComponent
 
