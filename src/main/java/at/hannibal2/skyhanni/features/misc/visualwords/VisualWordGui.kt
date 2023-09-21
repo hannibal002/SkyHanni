@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -202,6 +200,11 @@ open class VisualWordGui : GuiScreen() {
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
 
+                GuiRenderUtils.drawTwoLineString("§bThe top line of each section is the preview of the bottom text",
+                    (guiLeft + 10) * inverseScale, (guiTop + 17) * inverseScale)
+                GuiRenderUtils.drawTwoLineString("§bTo get the minecraft formatting sign use \"&&\"",
+                    (guiLeft + 220) * inverseScale, (guiTop + 17) * inverseScale)
+
                 GuiRenderUtils.drawString(currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale)
                 GuiRenderUtils.drawString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
@@ -344,6 +347,18 @@ open class VisualWordGui : GuiScreen() {
             currentText += typedChar
             saveTextChanges()
             return
+        }
+
+        if (LorenzUtils.isPastingKeysDown()) {
+            SkyHanniMod.coroutineScope.launch {
+                val clipboard = OSUtils.readFromClipboard() ?: ""
+                for (char in clipboard) {
+                    if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
+                        currentText += char
+                    }
+                }
+                saveTextChanges()
+            }
         }
     }
 

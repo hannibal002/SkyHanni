@@ -59,7 +59,6 @@ object GuiRenderUtils {
 
         Minecraft.getMinecraft().fontRendererObj.drawString(firstString, x, y - 5, 0xffffff, true)
         Minecraft.getMinecraft().fontRendererObj.drawString(secondString, x, y + 5, 0xffffff, true)
-
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
