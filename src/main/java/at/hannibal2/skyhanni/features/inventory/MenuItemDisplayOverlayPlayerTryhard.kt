@@ -115,8 +115,8 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if ((chestName == "Booster Cookie" && itemName == "Fame Rank") || (chestName == "Community Shop" && itemName == "Community Shop")) {
                 for (line in item.getLore()) {
                     if (line.contains("Your rank: ") || line.contains("Fame Rank: ")) {
-                        return when (line.removeColor().split(" ").last()) {
-                            "Player" -> "NP"
+                        return when (line.removeColor().replace("Your rank: ", "").replace("Fame Rank: ", "")) {
+                            "New Player" -> "NP"
                             "Settler" -> "Str"
                             "Citizen" -> "Ctz"
                             "Contributor" -> "Ctb"
