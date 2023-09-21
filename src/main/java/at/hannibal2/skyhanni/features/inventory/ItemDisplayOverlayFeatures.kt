@@ -237,7 +237,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(16)) {
             if (item.getInternalName_old() == ("BLOOD_GOD_CREST")) {
-                return (item.getBloodGodKills().toString().length)
+                return (item.getBloodGodKills().toString().length.toString())
             }
         }
 
