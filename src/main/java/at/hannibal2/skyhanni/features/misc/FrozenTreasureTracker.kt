@@ -26,7 +26,7 @@ class FrozenTreasureTracker {
     private var display = emptyList<List<Any>>()
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
-    private val icePerSecond = mutableListOf<Long>()
+    private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
     private var compactPattern = "COMPACT! You found an Enchanted Ice!".toPattern()
@@ -42,7 +42,7 @@ class FrozenTreasureTracker {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         icePerHour = 0
         stoppedChecks = 0
-        icePerSecond.clear()
+        icePerSecond = mutableListOf()
         saveAndUpdate()
     }
 
