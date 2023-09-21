@@ -187,12 +187,17 @@ open class VisualWordGui : GuiScreen() {
                 GuiRenderUtils.drawString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
-                    colour = if (currentTextBox == "phrase") 0x50828282 else 0x50303030
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colour)
+                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50303030)
                 }
+                if (currentTextBox == "phrase") {
+                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50828282)
+                }
+
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
-                    colour = if (currentTextBox == "replacement") 0x50828282 else 0x50303030
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colour)
+                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50303030)
+                }
+                if (currentTextBox == "replacement") {
+                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50828282)
                 }
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
@@ -318,6 +323,13 @@ open class VisualWordGui : GuiScreen() {
             if (currentText.isNotEmpty()) {
                 currentText = if (LorenzUtils.isControlKeyDown()) {
                     ""
+                } else if (LorenzUtils.isShiftKeyDown()) {
+                    val lastSpaceIndex = currentText.lastIndexOf(' ')
+                    if (lastSpaceIndex >= 0) {
+                        currentText.substring(0, lastSpaceIndex)
+                    } else {
+                        ""
+                    }
                 } else {
                     currentText.substring(0, currentText.length - 1)
                 }
