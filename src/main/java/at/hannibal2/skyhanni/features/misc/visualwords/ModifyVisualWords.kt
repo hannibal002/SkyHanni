@@ -35,7 +35,7 @@ object ModifyVisualWords {
             if (!modifiedWord.enabled) continue
             val phrase = modifiedWord.phrase.convertToFormatted()
 
-            if (phrase.length < 2) continue
+            if (phrase.isEmpty()) continue
 
             replacements += 1
             modifiedText = modifiedText.replace(phrase, modifiedWord.replacement.convertToFormatted())
