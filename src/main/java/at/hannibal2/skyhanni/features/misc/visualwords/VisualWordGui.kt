@@ -298,6 +298,7 @@ open class VisualWordGui : GuiScreen() {
                 currentIndex = -1
             } else {
                 modifiedWords.add(VisualWord("", "", true))
+                currentTextBox = "phrase"
                 currentIndex = modifiedWords.size - 1
                 saveChanges()
             }
