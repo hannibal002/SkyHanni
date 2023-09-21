@@ -65,6 +65,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (!currentlyEditing) {
             val adjustedY = guiTop + 30 + pageScroll
+            var toRemove = -1
 
             val x = guiLeft + 180
             val y = guiTop + 170
@@ -87,6 +88,10 @@ open class VisualWordGui : GuiScreen() {
             for ((index, phrase) in modifiedWords.withIndex()) {
                 if (adjustedY + 30 * index < guiTop + 20) continue
                 if (adjustedY + 30 * index > guiTop + 125) continue
+
+                if (phrase.phrase == "" && phrase.replacement == "") {
+                    toRemove = index
+                }
 
                 var inBox = false
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, adjustedY + 30 * index, sizeX, 30)) inBox = true
@@ -157,6 +162,11 @@ open class VisualWordGui : GuiScreen() {
 
             if (modifiedWords.size < 1) {
                 modifiedWords = SkyHanniMod.feature.storage.modifiedWords
+            }
+
+            if (toRemove != -1) {
+                modifiedWords.removeAt(toRemove)
+                saveChanges()
             }
 
             GlStateManager.scale(inverseScale, inverseScale, 1f)
