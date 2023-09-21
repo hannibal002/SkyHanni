@@ -22,7 +22,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
-    private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?([0-9]+y)? (?<days>[0-9]+)d [0-9]{0,2}h [0-9]{0,2}m [0-9]{0,2}s".toPattern()
+    private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?(?<years>[0-9]+)?y? (?<days>[0-9]{0,2})d (?<hours>[0-9]{0,2})h (?<minutes>[0-9]{0,2}m) (?<seconds>[0-9]{0,2})s".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -145,12 +145,16 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 for (line in item.getLore()) {
                     if (line.contains("Duration:")) {
                         boosterCookieLoreLinePattern.matchMatcher(line) {
-                            val daysString = group("days")
-                            if (daysString.toInt() is Int) {
-                                var days = daysString.toInt()
-                                if (days >= 100) return "§6§z:D"
-                                else return "§6§z" + days.toString()
-                            }
+                            val yearsString = group("years")?
+                            val daysString = group("days")?
+                            val hoursString = group("hours")?
+                            val minutesString = group("minutes")?
+                            val secondsString = group("seconds")?
+                            if (yearsString != null && yearsString.toInt() > 0) return yearsString
+                            if (daysString != null && daysString.toInt() > 0) return daysString
+                            if (hoursString != null && hoursString.toInt() > 0) return hoursString
+                            if (minutesString != null && minutesString.toInt() > 0) return minutesString
+                            if (secondsString != null && secondsString.toInt() > 0) return secondsString
                         }
                     }
                 }
