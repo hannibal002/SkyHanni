@@ -163,4 +163,8 @@ object StringUtils {
             i < limit
         }
     }
+
+    fun String.convertToFormatted(): String {
+        return this.replace("&&", "§")
+    }
 }

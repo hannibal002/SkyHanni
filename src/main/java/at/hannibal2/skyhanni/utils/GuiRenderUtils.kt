@@ -12,7 +12,7 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 /**
- * Taken from NotEnoughUpdates
+ * Some functions taken from NotEnoughUpdates
  */
 object GuiRenderUtils {
 

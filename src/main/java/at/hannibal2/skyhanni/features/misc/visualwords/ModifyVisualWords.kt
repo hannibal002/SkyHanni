@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import java.util.concurrent.TimeUnit
@@ -33,9 +34,9 @@ object ModifyVisualWords {
         for (modifiedWord in modifiedWords) {
             if (!modifiedWord.enabled) continue
             // stop empty or 1 character replacements
-            if (modifiedWord.phrase.length < 2) continue
+            if (modifiedWord.phrase.convertToFormatted().length < 2) continue
             replacements += 1
-            modifiedText = modifiedText.replace(modifiedWord.phrase, modifiedWord.replacement)
+            modifiedText = modifiedText.replace(modifiedWord.phrase.convertToFormatted(), modifiedWord.replacement.convertToFormatted())
         }
         // if not many are done it is better to not cache it
         if (replacements > 2) textCache.put(originalText, modifiedText)

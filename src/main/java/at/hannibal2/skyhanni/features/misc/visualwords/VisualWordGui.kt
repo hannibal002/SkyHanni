@@ -3,13 +3,16 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
+import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.io.IOException
 
@@ -19,6 +22,7 @@ open class VisualWordGui : GuiScreen() {
     private var screenHeight = 0
     private val sizeX = 360
     private val sizeY = 180
+    private val maxTextLength = 75
 
     private var mouseX = 0
     private var mouseY = 0
@@ -38,6 +42,9 @@ open class VisualWordGui : GuiScreen() {
 
     private var currentlyEditing = false
     private var currentIndex = -1
+
+    private var currentTextBox = ""
+    private var currentText = ""
 
     private var modifiedWords = mutableListOf<VisualWord>()
 
@@ -147,8 +154,8 @@ open class VisualWordGui : GuiScreen() {
                     GuiRenderUtils.drawString(phrase.phrase, (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
                     GuiRenderUtils.drawString(phrase.replacement, (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
                 } else {
-                    GuiRenderUtils.drawString(phrase.phrase.replace("&&", "§"), (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
-                    GuiRenderUtils.drawString(phrase.replacement.replace("&&", "§"), (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
+                    GuiRenderUtils.drawString(phrase.phrase.convertToFormatted(), (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
+                    GuiRenderUtils.drawString(phrase.replacement.convertToFormatted(), (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
                 }
             }
 
@@ -182,18 +189,20 @@ open class VisualWordGui : GuiScreen() {
                 GuiRenderUtils.drawString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50303030)
+                    colour = if (currentTextBox == "phrase") 0x50828282 else 0x50303030
+                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colour)
                 }
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50303030)
+                    colour = if (currentTextBox == "replacement") 0x50828282 else 0x50303030
+                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colour)
                 }
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
 
-                GuiRenderUtils.drawString(currentPhrase.phrase.replace("&&", "§"), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale)
+                GuiRenderUtils.drawString(currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale)
                 GuiRenderUtils.drawString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
-                GuiRenderUtils.drawString(currentPhrase.replacement.replace("&&", "§"), (guiLeft + 30) * inverseScale, (guiTop + 95) * inverseScale)
+                GuiRenderUtils.drawString(currentPhrase.replacement.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 95) * inverseScale)
                 GuiRenderUtils.drawString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
 
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
@@ -263,6 +272,7 @@ open class VisualWordGui : GuiScreen() {
                 modifiedWords.removeAt(currentIndex)
                 currentIndex = -1
                 saveChanges()
+                currentTextBox = ""
             }
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 y = guiTop + 20
@@ -270,6 +280,19 @@ open class VisualWordGui : GuiScreen() {
                     SoundUtils.playClickSound()
                     modifiedWords[currentIndex].enabled = !modifiedWords[currentIndex].enabled
                     saveChanges()
+                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
+                    SoundUtils.playClickSound()
+                    currentTextBox = "phrase"
+                    currentText = modifiedWords[currentIndex].phrase
+                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
+                    SoundUtils.playClickSound()
+                    currentTextBox = "replacement"
+                    currentText = modifiedWords[currentIndex].replacement
+                } else {
+                    if (currentTextBox != "") {
+                        SoundUtils.playClickSound()
+                        currentTextBox = ""
+                    }
                 }
             }
         }
@@ -284,7 +307,50 @@ open class VisualWordGui : GuiScreen() {
                 saveChanges()
             }
             currentlyEditing = !currentlyEditing
+            currentTextBox = ""
         }
+    }
+
+    @Throws(IOException::class)
+    override fun keyTyped(typedChar: Char, keyCode: Int) {
+        super.keyTyped(typedChar, keyCode)
+        if (!currentlyEditing) return
+        if (currentTextBox == "") return
+        if (currentIndex >= modifiedWords.size || currentIndex == -1) return
+
+        if (keyCode == Keyboard.KEY_ESCAPE) {
+            saveTextChanges()
+            currentTextBox = ""
+            return
+        }
+
+        if (keyCode == Keyboard.KEY_BACK) {
+            if (currentText.isNotEmpty()) {
+                currentText = if (LorenzUtils.isControlKeyDown()) {
+                    ""
+                } else {
+                    currentText.substring(0, currentText.length - 1)
+                }
+                saveTextChanges()
+            }
+
+            return
+        }
+
+        if (currentText.length < maxTextLength && !Character.isISOControl(typedChar)) {
+            currentText += typedChar
+            saveTextChanges()
+            return
+        }
+    }
+
+    private fun saveTextChanges() {
+        if (currentTextBox == "phrase") {
+            modifiedWords[currentIndex].phrase = currentText
+        } else if (currentTextBox == "replacement") {
+            modifiedWords[currentIndex].replacement = currentText
+        }
+        saveChanges()
     }
 
     private fun scrollScreen() {
