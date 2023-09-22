@@ -45,6 +45,7 @@ class FandomWikiIsSoMuchBetter {
         if ((itemInHand == "") || (event.slotId == 11 && itemName.contains("Wiki Command") && chestName.contains("Wiki"))) {
             LorenzUtils.clickableChat("§e[SkyHanni] Click here to visit the Hypixel Skyblock Fandom Wiki!", "shwiki")
         } else if (event.slotId == 15 && itemName.contains("Wikithis Command") && chestName.contains("Wiki")) {
+            LorenzUtils.chat("${itemInHand.removeColor()}")
             LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $itemInHand §eon the Hypixel Skyblock Fandom Wiki!", "shwiki ${itemInHand.removeColor()}")
         }
         event.isCanceled = true

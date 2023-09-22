@@ -57,7 +57,7 @@ public class CommandsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Fandom Wiki", desc = "Use Fandom wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7).")
+    @ConfigOption(name = "Fandom Wiki", desc = "Use Fandom wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7)\n§7Also enables the §e/shwiki§7 alias.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean useFandomWiki = false;

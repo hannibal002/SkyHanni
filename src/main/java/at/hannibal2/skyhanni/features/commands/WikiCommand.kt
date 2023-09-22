@@ -23,7 +23,7 @@ class WikiCommand {
                 LorenzUtils.chat("§e[SkyHanni] Opening the Fandom Wiki..")
             } else if (message.startsWith("/wiki ") || message.startsWith("/shwiki ")) {
                 event.isCanceled = true
-                val search = packet.message.substring(6)
+                val search = packet.message.substring(6).replace("i ", "")
                 LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §c$search")
                 val url = "https://hypixel-skyblock.fandom.com/wiki/Special:Search?query=$search&scope=internal"
                 OSUtils.openBrowser(url.replace(' ', '+'))
