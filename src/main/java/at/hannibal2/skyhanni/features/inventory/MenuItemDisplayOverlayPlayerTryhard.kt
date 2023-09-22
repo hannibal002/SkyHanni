@@ -64,7 +64,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         
         if (stackSizeConfig.contains(0)) {
             if (itemName == "Previous Page" || itemName == "Next Page") {
-                val line = item.getLore().first()
+                val line = item.getLore().first().replace(",", "")
                 if (chestName.contains("Auction")) { return auctionHousePagePattern.matchMatcher(line) { group("pagenumber") } ?: "" }
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
