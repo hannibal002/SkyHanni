@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -199,7 +200,7 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(8)) {
-            if ((chestName.contains(" Chest")) && ((LorenzUtils.inDungeons || LorenzUtils.inKuudraFight || LorenzUtils.skyBlockArea.contains("Dungeon Hub"))) && !(chestName.contains("Ender ")) && !(chestName.contains("Backpack"))) {
+            if ((chestName.contains(" Chest")) && ((LorenzUtils.inDungeons || LorenzUtils.inKuudraFight || LorenzUtils.skyBlockArea.contains("Dungeon Hub"))) && !((contains("Backpack") && contains("Slot #") || startsWith("Ender Chest (")) && !(LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND)) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
         }
