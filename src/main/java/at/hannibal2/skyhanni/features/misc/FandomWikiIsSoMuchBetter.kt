@@ -52,6 +52,3 @@ class FandomWikiIsSoMuchBetter {
     }
     private fun isEnabled() = SkyHanniMod.feature.commands.useFandomWiki
 }
-
-/*
-@ */
