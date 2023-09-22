@@ -68,7 +68,7 @@ class MenuItemDisplayOverlayCombat {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
-                        return genericPercentPattern.matchMatcher(line.replace(" (MAX!)", "")) { group("percent").replace("100", "§a✔") } ?: ""
+                        return genericPercentPattern.matchMatcher(line.removeColor().replace(" (MAX!)", "")) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }

@@ -13,7 +13,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.init.Items
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -59,7 +60,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         */
 
         //NOTE: IT'S String.length, NOT String.length()!
-
+        
         if (stackSizeConfig.contains(0)) {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Recipe Book") {
@@ -238,6 +239,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
                 val lore = item.getLore()
+                if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (!(lore.isEmpty())) {
                     if (lore.any { it.contains("Candidate") }) {
                         val colorCode = nameWithColor.take(2)
@@ -256,7 +258,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
                 
             }
-            if ((((chestName == "Calendar and Events") || (chestName.contains("Mayor "))) && (itemName.contains("Mayor "))) && item.getItem() == Items.skull) {
+            if (((chestName == "Calendar and Events") || (chestName.contains("Mayor "))) && (itemName.contains("Mayor "))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
                 val lore = item.getLore()
