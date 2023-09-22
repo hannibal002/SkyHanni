@@ -70,7 +70,7 @@ class MenuItemDisplayOverlayFarming {
             if ((chestName == "Visitor's Logbook") && itemName == ("Logbook")) {
                 for (line in item.getLore()) {
                     if (line.contains("Next Visitor: ")) {
-                        return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m","")
+                        return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m", "")
                     }
                 }
             }

@@ -27,7 +27,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     }
 
     private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
-        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".","").replace("a✔", "§a✔").replace("%","")
+        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".", "").replace("a✔", "§a✔").replace("%", "")
     }
 
     private fun getStackTip(item: ItemStack): String {
@@ -296,11 +296,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if ((chestName.contains("Auction House"))) {
                 if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
                 if ((lore.first().removeColor().contains(" top bid ")) && (itemName == "View Bids")) return "1"
-                if ((itemName == "View Bids") && lore.first().contains("You placed ")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","").trim().replace("a bid on a","1")
+                if ((itemName == "View Bids") && lore.first().contains("You placed ")) return lore.first().removeColor().replace("You placed ", "").replace(" bids on pending", "").trim().replace("a bid on a", "1")
                 if ((itemName == "Manage Auctions")) {
                     for (line in lore) {
                         if (line.contains("Your auction")) {
-                            return line.removeColor().replace("Your auctions have ","").replace("Your auction has ","").replace(" bids","").replace(" bid","")
+                            return line.removeColor().replace("Your auctions have ", "").replace("Your auction has ", "").replace(" bids", "").replace(" bid", "")
                         }
                     }
                 }
@@ -320,7 +320,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                             }
                         }
                         if (itemName == "Item Tier") {
-                            return line.take(5).replace("▶ ","")
+                            return line.take(5).replace("▶ ", "")
                         }
                         if (itemName == "BIN Filter") {
                             return when (betterLine) {

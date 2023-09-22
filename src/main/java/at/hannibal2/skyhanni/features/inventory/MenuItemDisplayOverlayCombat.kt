@@ -68,7 +68,7 @@ class MenuItemDisplayOverlayCombat {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
-                        return genericPercentPattern.matchMatcher(line.replace(" (MAX!)","")) { group("percent").replace("100", "§a✔") } ?: ""
+                        return genericPercentPattern.matchMatcher(line.replace(" (MAX!)", "")) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
@@ -96,7 +96,7 @@ class MenuItemDisplayOverlayCombat {
         if ((stackSizeConfig.contains(3)) && (itemName.contains("Global Combat Wisdom"))) {
             for (line in item.getLore()) {
                 if (line.contains("Total buff")) {
-                    return "§3" + line.removeColor().replace("Total buff: +","").replace("☯ Combat Wisdom", "")
+                    return "§3" + line.removeColor().replace("Total buff: +", "").replace("☯ Combat Wisdom", "")
                 }
             }
         }

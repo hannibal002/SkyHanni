@@ -197,7 +197,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(12)) {
             if (itemName.contains("Necron's Ladder")) {
-                return item.getNecronHandlesFound().toString().replace("null","")
+                return item.getNecronHandlesFound().toString().replace("null", "")
             }
         }
 

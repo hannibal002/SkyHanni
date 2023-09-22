@@ -59,7 +59,7 @@ class MenuItemDisplayOverlayMining {
                     var colorCode = ""
                     if (level.contains("/")) level = level.split("/")[0]
                     if (nameWithColor.startsWith("§a")) level = "✔"
-                    if (lore.last().removeColor().replace("Right click to ","").contains("enable")) colorCode = "§c"
+                    if (lore.last().removeColor().replace("Right click to ", "").contains("enable")) colorCode = "§c"
                     return "" + colorCode + level
                 }
             }
