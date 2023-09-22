@@ -233,24 +233,27 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
         
         if (stackSizeConfig.contains(8)) {
-            if ((chestName.contains("Election")) && (itemName != (""))) {
+            if ((chestName.contains("Election"))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
                 val lore = item.getLore()
-                if (lore.any { it.contains("Candidate") }) {
-                    val colorCode = nameWithColor.take(2)
-                    var numPerks = 0
-                    for (line in item.getLore()) {
-                        if (line.startsWith(colorCode) &&
-                            !(line.contains("You voted for this candidate!")) &&
-                            !(line.contains("Leading in votes!")) &&
-                            !(line.contains("Click to vote for ")) && 
-                            !(line.startsWith(colorCode + "§"))) {
-                                numPerks++
+                if (!(lore.isEmpty())) {
+                    if (lore.any { it.contains("Candidate") }) {
+                        val colorCode = nameWithColor.take(2)
+                        var numPerks = 0
+                        for (line in item.getLore()) {
+                            if (line.startsWith(colorCode) &&
+                                !(line.contains("You voted for this candidate!")) &&
+                                !(line.contains("Leading in votes!")) &&
+                                !(line.contains("Click to vote for ")) && 
+                                !(line.startsWith(colorCode + "§"))) {
+                                    numPerks++
+                            }
                         }
+                        return "" + colorCode + numPerks
                     }
-                    return "" + colorCode + numPerks
                 }
+                
             }
             if (((chestName == "Calendar and Events") || (chestName.contains("Mayor "))) && (itemName.contains("Mayor "))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
@@ -293,7 +296,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if ((chestName.contains("Auction House"))) {
                 if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
                 if ((lore.first().removeColor().contains(" top bid ")) && (itemName == "View Bids")) return "1"
-                if ((itemName == "View Bids")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","").trim().replace("a bid on a","1")
+                if ((itemName == "View Bids") && lore.first().contains("You placed ")) return lore.first().removeColor().replace("You placed ","").replace(" bids on pending","").trim().replace("a bid on a","1")
                 if ((itemName == "Manage Auctions")) {
                     for (line in lore) {
                         if (line.contains("Your auction")) {
