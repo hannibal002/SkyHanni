@@ -23,8 +23,7 @@ class MenuItemDisplayOverlayPlayer {
     private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\.[0-9])?) Skill Avg\..*".toPattern()
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
     private val dungeonClassLevelPattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
-    private val dungeonRewardsChestPattern = "^(?<chestType>Wood|Gold|Emerald|Diamond|Obsidian|Bedrock) (Chest)$".toPattern()
-    private val dungeonEssenceRewardPattern = "§.(?<essenceType>[A-z]+) (Essence) §.x(?<essenceAmount>[0-9]+)".toPattern()
+    private val dungeonEssenceRewardPattern = "(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
@@ -199,11 +198,9 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(8)) {
-            dungeonRewardsChestPattern.matchMatcher(chestName) {
-                dungeonEssenceRewardPattern.matchMatcher(itemName) {
-                    return group("essenceAmount")
-                } ?: return ""
-            } ?: return ""
+            if (chestName.contains(" Chest") && !(chestName.contains("Ender "))) {
+                dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
+            }
         }
 
         return ""
