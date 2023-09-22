@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -198,7 +199,7 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(8)) {
-            if (chestName.contains(" Chest") && !(chestName.contains("Ender "))) {
+            if ((chestName.contains(" Chest")) && ((LorenzUtils.inDungeons || LorenzUtils.inKuudraFight || LorenzUtils.skyBlockArea.contains("Dungeon Hub"))) && !(chestName.contains("Ender ")) && !(chestName.contains("Backpack"))) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
         }

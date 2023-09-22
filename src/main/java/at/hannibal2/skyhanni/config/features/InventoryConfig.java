@@ -424,7 +424,7 @@ public class InventoryConfig {
                         "§bCommunity Shop Upgrade Tiers",
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
                         "§bFame Rank",
-                        "§bBooster Cookie Duration\n§b(durations over 100d get Google Chrome \":D\" treatment)",
+                        "§bBooster Cookie Duration (highest unit of time only)\n§b[years ➡ days ➡ hours ➡ etc...]",
                 }
         )
         public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(0));
