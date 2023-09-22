@@ -233,7 +233,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
         
         if (stackSizeConfig.contains(8)) {
-            if ((chestName == "Election") && (itemName != (""))) {
+            if ((chestName.contains("Election")) && (itemName != (""))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
                 val lore = item.getLore()
