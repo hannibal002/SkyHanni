@@ -17,7 +17,7 @@ class WikiCommand {
 
         if (packet is C01PacketChatMessage) {
             val message = packet.message.lowercase()
-            if (message == "/wiki") {
+            if (message == "/wiki" || message == "/shwiki") {
                 event.isCanceled = true
                 OSUtils.openBrowser("https://hypixel-skyblock.fandom.com/wiki/Hypixel_SkyBlock_Wiki")
                 LorenzUtils.chat("§e[SkyHanni] Opening the Fandom Wiki..")
