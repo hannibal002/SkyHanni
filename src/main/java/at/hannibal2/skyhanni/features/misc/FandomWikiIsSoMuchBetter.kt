@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -38,11 +40,15 @@ class FandomWikiIsSoMuchBetter {
 
         val chestName = InventoryUtils.openInventoryName()
         val itemName = event.slot.stack.displayName
+        val itemInHand = InventoryUtils.getItemInHand()?.name ?: ""
 
-        if (event.slotId == 11 && itemName.contains("Wiki Command") && chestName.contains("Wiki")) {
+        if ((itemInHand == "") || (event.slotId == 11 && itemName.contains("Wiki Command") && chestName.contains("Wiki"))) {
             LorenzUtils.clickableChat("§e[SkyHanni] Click here to visit the Hypixel Skyblock Fandom Wiki!", "shwiki")
-            event.isCanceled = true
+        } else if (event.slotId == 15 && itemName.contains("Wikithis Command") && chestName.contains("Wiki")) {
+            LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $itemInHand §eon the Hypixel Skyblock Fandom Wiki!", "shwiki ${itemInHand.removeColor()}")
         }
+        event.isCanceled = true
+
     }
     private fun isEnabled() = SkyHanniMod.feature.commands.useFandomWiki
 }
