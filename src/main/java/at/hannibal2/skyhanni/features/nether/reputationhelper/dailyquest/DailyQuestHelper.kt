@@ -92,6 +92,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 if (slot == null) continue
                 if (slot.slotNumber != slot.slotIndex) continue
                 val stack = slot.stack ?: continue
+                if (stack.name!!.contains("Enchanted")) continue
+
                 if (stack.getLore().any { it.contains(fetchItem) }) {
                     slot highlight LorenzColor.AQUA
                 }
