@@ -425,6 +425,7 @@ public class InventoryConfig {
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
                         "§bFame Rank",
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[years ➡ days ➡ hours ➡ etc...]",
+                        "§bCurrently Active Potion Effects Count"
                 }
         )
         public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(0));

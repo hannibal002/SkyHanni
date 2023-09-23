@@ -160,6 +160,16 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
             }
         }
+
+        if (stackSizeConfig.contains(6)) {
+            if (chestName.contains("Equipment and Stats") && itemName.contains("Active Effects")) {
+                for (line in item.getLore()) {
+                    if (line.contains("Currently Active: ")) {
+                        return line.split(" ").last()
+                    }
+                }
+            }
+        }
         
         return ""
     }
