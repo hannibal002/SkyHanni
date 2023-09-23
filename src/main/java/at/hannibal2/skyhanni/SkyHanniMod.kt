@@ -230,6 +230,7 @@ class SkyHanniMod {
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
+        loadModule(WarpGdCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())

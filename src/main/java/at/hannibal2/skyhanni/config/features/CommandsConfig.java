@@ -74,4 +74,10 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;
+
+    @Expose
+    @ConfigOption(name = "Replace Warp Garden", desc = "Adds §e/gd §7alongside §e/warp garden§7. Idk why. Ask §bErymanthus")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean supplementWarpGarden = false;
 }

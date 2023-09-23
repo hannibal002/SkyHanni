@@ -6,17 +6,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class WarpIsCommand {
+class WarpGdCommand {
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.commands.supplementWarpGarden) return
+        if (!SkyHanniMod.feature.commands.replaceWarpIs) return
 
         val packet = event.packet
-        if (packet is C01PacketChatMessage && packet.message.lowercase() == "/warp is") {
+        if (packet is C01PacketChatMessage && packet.message.lowercase() == "/gd") {
             event.isCanceled = true
-            LorenzUtils.sendMessageToServer("/is")
+            LorenzUtils.sendMessageToServer("/warp garden")
         }
     }
 }
