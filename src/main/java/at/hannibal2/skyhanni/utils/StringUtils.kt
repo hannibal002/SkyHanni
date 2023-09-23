@@ -1,15 +1,21 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import org.intellij.lang.annotations.Language
 import java.util.*
+import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+    private val playerChatPattern = ".*§[f7]: .*".toPattern()
+    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
@@ -158,5 +164,56 @@ object StringUtils {
             i += lengthJudger(it)
             i < limit
         }
+    }
+
+    // recursively goes through the chat component until an action is completed
+    fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
+        if (action.test(chatComponent)) {
+            return true
+        }
+        for (sibling in chatComponent.siblings) {
+            if (modifyFirstChatComponent(sibling, action)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    // replaces a word without breaking any chat components
+    fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
+        modifyFirstChatComponent(chatComponent) { component ->
+            if (component is ChatComponentText) {
+                component as AccessorChatComponentText
+                if (component.text_skyhanni().contains(toReplace)) {
+                    component.setText_skyhanni(component.text_skyhanni().replace(toReplace, replacement))
+                    return@modifyFirstChatComponent true
+                }
+                return@modifyFirstChatComponent false
+            }
+            return@modifyFirstChatComponent false
+        }
+        return chatComponent
+    }
+
+    fun String.getPlayerName(): String {
+        if (!playerChatPattern.matcher(this).matches()) return "-"
+
+        var username = this.removeColor().split(":")[0]
+
+        if (username.contains(">")) {
+            username = username.substring(username.indexOf('>') + 1).trim()
+        }
+        if (username.startsWith("From ")) {
+            username = username.removePrefix("From ")
+        }
+        if (username.startsWith("To ")) {
+            username = username.removePrefix("To ")
+        }
+
+        val matcher = chatUsernamePattern.matcher(username)
+
+        if (!matcher.matches()) return "-"
+        username = matcher.group("username")
+        return username
     }
 }
