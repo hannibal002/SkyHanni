@@ -181,6 +181,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Chum/Chumcap Bucket.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
++ Added Fishing Hook Display. - hannibal2
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
 
 ## Damage Indicator
 
@@ -299,7 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visitor Display** - Show all items needed for the visitors.
 + **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs
   to checked what items it needs.
-+ **Show Price** - Show the bazaar price of the items required for the visitors.
++ **Show Price** - Show the Bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
@@ -318,8 +320,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Also available to select directly in the rancher boots overlay (contributed by nea)
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
++ **Fake garden level up** message: - hannibal2
+    + In 10k garden exp steps after level 15.
+    + Uses the overflow exp that hypixel still caluclates (maybe official upgrade with more garden levels in the
+      future?).
+    + Click on the message to open the garden level display. - J10a1n15
 + **Farming Weight and Leaderboard**
-    + provided by the Elite SkyBlock Farmers.
+    + provided by the Elite SkyBlock farmers.
     + next leaderboard position eta.
     + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
     + Chat message how many places you dropped in the farming weight lb when joining garden.
@@ -612,9 +619,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       super-pairs minigames.
 + Anniversary Event Active Player Ticket Timer. - nea
     + Option to play a sound as well.
-* **Travor Trapper** Features in Farming Islands
++ **Travor Trapper** Features in Farming Islands
     + Trapper Cooldown GUI. - NetheriteMiner
         + Show the cooldown on screen in an overlay (intended for abiphone users).
++ **GUI Scale**: - nea
+    + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
+    + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
 
 ## Cosmetics
 

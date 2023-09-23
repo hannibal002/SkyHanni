@@ -247,6 +247,10 @@ object Commands {
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
         ) { TestChatCommand.command(it) }
+        registerCommand(
+            "shcopyinternalname",
+            "Copies the internal name of the item in hand to the clipboard."
+        ) { SkyHanniDebugsAndTests.copyItemInternalName() }
     }
 
     private fun internalCommands() {

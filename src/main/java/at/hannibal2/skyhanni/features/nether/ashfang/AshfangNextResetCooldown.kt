@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -15,7 +16,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangNextResetCooldown {
-
+    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
     private var spawnTime = 1L
 
     @SubscribeEvent
@@ -37,7 +38,7 @@ class AshfangNextResetCooldown {
         val remainingTime = spawnTime + 46_100 - System.currentTimeMillis()
         if (remainingTime > 0) {
             val format = TimeUtils.formatDuration(remainingTime, TimeUnit.SECOND, showMilliSeconds = true)
-            SkyHanniMod.feature.ashfang.nextResetCooldownPos.renderString(
+            config.nextResetCooldownPos.renderString(
                 "§cAshfang next reset in: §a$format",
                 posLabel = "Ashfang Reset Cooldown"
             )
@@ -51,8 +52,14 @@ class AshfangNextResetCooldown {
         spawnTime = -1
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "ashfang.nextResetCooldown", "crimsonIsle.ashfang.nextResetCooldown")
+        event.move(2, "ashfang.nextResetCooldownPos", "crimsonIsle.ashfang.nextResetCooldownPos")
+    }
+
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.nextResetCooldown &&
+        return LorenzUtils.inSkyBlock && config.nextResetCooldown &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

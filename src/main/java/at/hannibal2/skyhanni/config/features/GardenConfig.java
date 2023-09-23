@@ -124,7 +124,7 @@ public class GardenConfig {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     @FeatureToggle
@@ -775,7 +775,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
-            "The calculation and API is provided by The Elite SkyBlock Farmers. " +
+            "The calculation and API is provided by The Elite SkyBlock farmers. " +
             "See §ehttps://elitebot.dev/info §7for more info.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
@@ -803,7 +803,7 @@ public class GardenConfig {
     @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining Garden how many spots you have dropped since last Garden join.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
-    public boolean eliteFarmingWeightoffScreenDropMessage = true;
+    public boolean eliteFarmingWeightOffScreenDropMessage = true;
 
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")

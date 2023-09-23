@@ -82,6 +82,11 @@
 + Added icons for the medals received in a contest. - CalMWolfs
     + Different symbol for when it was a Finnegan contest.
 + Added Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
++ Added GUI Scale. - nea
+    + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
+    + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
++ Added Fishing Hook Display. - hannibal2
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
 
 ### Changes
 
@@ -135,6 +140,10 @@
 + Added support for slayer profit trackers on stranded. - hannibal2
 + Added Trapper Cooldown GUI. - NetheriteMiner
     + Show the cooldown on screen in an overlay (intended for abiphone users).
++ Made the fake garden level up message (after level 15) clickable. - J10a1n15
++ Moving many GUI elements in the config around. - hannibal2
+    + This will not reset anything.
+    + This includes the creation of new categories and regrouping.
 
 ### Fixes
 
@@ -216,6 +225,17 @@
 + Summoning souls should no longer be counted as sea creatures for the fishing timer. - hannibal2
 + Fixed Jacob Contests times needed display showing impossible FF values. - ReyMaratov
 + Fixed item cooldown issues with fire fury staff and jinxed voodoo doll. - Cad
++ Fixed the percentage going above 100% for bestiary progress. - HiZe
++ Fixed max kills from Ghost Counter using old bestiary data when resetting the config. - HiZe
++ Fixed part of Zealot Hideout area showing as The End. - Cad
++ Fixed many typos in the config. - schlaumeyer, oofy, CalMWolfs & hannibal2
++ Fixed a missing bracket in the reforge apply cost display from Estimated Item Value. - jaNI
++ Fixed a rare crash while doing enderman slayer. - hannibal2
++ Fixed pet exp tooltip doesn't show in pet inventory or Hypixel profile viewer (right-click a player). - hannibal2
++ Fixed turbo books price not getting detected in visitor rewards. - hannibal2
++ Fixed that the Paste Into Sign feature only pastes into the first line. - hannibal2 + nea
++ Hopefully fixed rare config reset cases. - nea
++ This should also fix problems with false positive detections in the crimson isle.
 
 ### Removed Features
 
@@ -602,7 +622,7 @@
     + Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what
       items it needs
 + Added **Show Price**
-    + Show the bazaar price of the items required for the visitors.
+    + Show the Bazaar price of the items required for the visitors.
 + Added **Crop Milestone** Number
     + Show the number of the crop milestone in the inventory.
 + Added **Crop Upgrades** Number
@@ -627,7 +647,7 @@
 + Added Desk shortcut in SkyBlock Menu.
 + Added **Garden Level Display**
     + Show the current garden level and progress to the next level.
-+ Added **Farming Weight and Leaderboard**, provided by the Elite SkyBlock Farmers.
++ Added **Farming Weight and Leaderboard**, provided by the Elite SkyBlock farmers.
 + Added farming weight next leaderboard position eta.
 + Added **Dicer Counter**
     + Count RNG drops for Melon Dicer and Pumpkin Dicer.

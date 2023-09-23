@@ -47,19 +47,25 @@ public class DevConfig {
     public boolean showInternalName = false;
 
     @Expose
-    @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean showNpcPrice = false;
-
-    @Expose
     @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even for items with none.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showEmptyNames = false;
 
     @Expose
-    @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items. in the lore.")
+    @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 0)
+    public int copyInternalName = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showNpcPrice = false;
+
+    @Expose
+    @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showItemUuid = false;

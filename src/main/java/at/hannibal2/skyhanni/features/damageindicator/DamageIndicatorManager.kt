@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
@@ -40,7 +41,7 @@ class DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val config get() = SkyHanniMod.feature.damageIndicator
+    private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     companion object {
         private var data = mapOf<UUID, EntityData>()
@@ -661,7 +662,7 @@ class DamageIndicatorManager {
         health: Int,
         maxHealth: Int,
     ): String? {
-        val config = SkyHanniMod.feature.damageIndicator.vampireSlayer
+        val config = config.vampireSlayer
 
         if (config.percentage) {
             val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
@@ -857,6 +858,11 @@ class DamageIndicatorManager {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "damageIndicator", "combat.damageIndicator")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

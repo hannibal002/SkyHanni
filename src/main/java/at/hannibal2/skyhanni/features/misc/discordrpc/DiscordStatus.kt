@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
@@ -303,7 +302,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             } else item.getSubCompound("ExtraAttributes", false)
         }
 
-        val itemInHand = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()
+        val itemInHand = InventoryUtils.getItemInHand()
         val itemName = itemInHand?.displayName?.removeColor() ?: ""
 
         val extraAttributes = getExtraAttributes(itemInHand)
