@@ -19,17 +19,16 @@ object StringUtils {
     }
 
     fun String.removeColor(): String {
-        val builder = StringBuilder()
+        val builder = StringBuilder(this.length)
 
         var counter = 0
         while (counter < this.length) {
             if (this[counter] == '§') {
                 counter += 2
                 continue
-            } else {
-                builder.append(this[counter])
-                counter++
             }
+            builder.append(this[counter])
+            counter++
         }
 
         return builder.toString()
