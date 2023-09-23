@@ -367,6 +367,7 @@ public class InventoryConfig {
                 "§bBeastmaster Crest Kill Progress",
                 "§bCampfire Talisman Tier",
                 "§bBlood God Crest Strength",
+                "§bYeti Rod Bonus",
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
