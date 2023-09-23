@@ -44,7 +44,7 @@ object StringUtils {
     /**
      * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
      */
-    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
+    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): NavigableMap<String?, T>? {
         if ("" == prefix) return map
         val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
@@ -154,36 +154,6 @@ object StringUtils {
         }
         builder.append(end)
         return builder.toString()
-    }
-
-    // recursively goes through the component and siblings until an action = true
-    fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
-
-        if (action.test(chatComponent)) {
-            return true
-        }
-        for (sibling in chatComponent.siblings) {
-            if (modifyFirstChatComponent(sibling, action)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    // replaces without breaking any click or hover events (unless that whole text is removed)
-    fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
-        modifyFirstChatComponent(chatComponent) { component ->
-            if (component is ChatComponentText) {
-                component as AccessorChatComponentText
-                if (component.text_skyhanni().contains(toReplace)) {
-                    component.setText_skyhanni(component.text_skyhanni().replace(toReplace, replacement))
-                    return@modifyFirstChatComponent true
-                }
-                return@modifyFirstChatComponent false
-            }
-            return@modifyFirstChatComponent false
-        }
-        return chatComponent
     }
 
     fun removeResets(string: String): String = resetPattern.matcher(string).replaceAll("")

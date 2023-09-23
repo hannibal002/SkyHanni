@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
@@ -12,8 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatSymbols {
     private val config get() = SkyHanniMod.feature.misc.chatSymbols
-    private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
     private val tabUsernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
     private val nameSymbols = mutableMapOf<String, String>()
 
@@ -22,20 +21,11 @@ class PlayerChatSymbols {
     fun onChatReceived(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (event.type != 0.toByte()) return
 
         val message = event.message
-        if (!playerChatPattern.matcher(message).matches()) return
 
-        var username = message.removeColor().split(":")[0]
-
-        if (username.contains(">")) {
-            username = username.substring(username.indexOf('>') + 1).trim()
-        }
-
-        val matcher = chatUsernamePattern.matcher(username)
-        if (!matcher.matches()) return
-        username = matcher.group("username")
+        val username = message.getPlayerName()
+        if (username == "-") return
 
         val talkingPlayer = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(username)
 
