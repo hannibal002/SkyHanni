@@ -30,7 +30,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
-    private var latestTrophyFishInInventory = 0
 
 
     @SubscribeEvent
@@ -293,14 +292,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun reset() {
         quests.clear()
-        latestTrophyFishInInventory = 0
     }
 
     fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         reset()
 
         questLoader.loadConfig(storage)
-        latestTrophyFishInInventory = storage.latestTrophyFishInInventory
 
     }
 
@@ -327,8 +324,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             }
             storage.quests.add(builder.toString())
         }
-
-        storage.latestTrophyFishInInventory = latestTrophyFishInInventory
     }
 
     private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled

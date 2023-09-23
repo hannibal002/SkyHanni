@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.EnderNode;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
-import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
+import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -87,9 +87,6 @@ public class Storage {
 
             @Expose
             public List<String> quests = new ArrayList<>();
-
-            @Expose
-            public int latestTrophyFishInInventory = 0;
 
             @Expose
             public List<String> miniBossesDoneToday = new ArrayList<>();
