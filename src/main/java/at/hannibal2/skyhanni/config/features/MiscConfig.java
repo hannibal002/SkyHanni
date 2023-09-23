@@ -354,7 +354,7 @@ public class MiscConfig {
         public boolean acceptQuest = false;
 
         @Expose
-        @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den and to accept the quest." +
+        @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
                 "§eRequires the relevant above settings to be toggled")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int keyBindWarpTrapper = Keyboard.KEY_NONE;

@@ -29,7 +29,6 @@ object TrevorTracker {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         val difference = storage.peltsGained - lastPelts
         lastPelts = storage.peltsGained
-        println("last: $lastPelts stopped: $stoppedChecks difference: $difference length: ${peltsPerSecond.size}")
 
         if (difference == storage.peltsGained) return
 
