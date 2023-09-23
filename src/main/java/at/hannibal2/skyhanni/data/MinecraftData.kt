@@ -61,6 +61,8 @@ class MinecraftData {
 
     private var tick = 0
 
+    fun getTotalTicks() = tick
+
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return

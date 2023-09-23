@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.chroma
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
-import at.hannibal2.skyhanni.utils.TickUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
 import net.minecraft.client.Minecraft
@@ -22,7 +22,7 @@ object ChromaShader : Shader("chroma", "chroma") {
             SkyHanniMod.feature.chroma.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
-            val ticks = TickUtils.getTotalTicks() + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+            val ticks = (SkyHanniMod.modules.filterIsInstance<MinecraftData>()[0].getTotalTicks() / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
             val chromaSpeed = SkyHanniMod.feature.chroma.chromaSpeed / 360f
             ticks * chromaSpeed
         }
