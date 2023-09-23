@@ -33,6 +33,11 @@ public class ChromaConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.01f)
     public float chromaSaturation = 0.75f;
 
+    @Expose
+    @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
+    @ConfigEditorDropdown(values = {"Forward Slant + Right", "Forward Slant + Left", "Backward Slant + Right", "Backward Slant + Left"})
+    public int chromaDirection = 0;
+
     @ConfigOption(name = "Reset to Default", desc = "Resets all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable resetSettings = this::resetChromaSettings;

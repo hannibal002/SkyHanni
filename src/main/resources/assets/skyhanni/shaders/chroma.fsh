@@ -1,4 +1,5 @@
 // Chroma Fragment Shader
+// Modified from SkyblockAddons
 // Credit: https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/resources/assets/skyblockaddons/shaders/program/chroma_screen_textured.fsh
 
 #version 120
@@ -6,6 +7,7 @@
 uniform float chromaSize;
 uniform float timeOffset;
 uniform float saturation;
+uniform bool forwardDirection;
 
 uniform sampler2D outTexture;
 
@@ -25,8 +27,16 @@ vec3 hsb2rgb_smooth(vec3 c) {
 void main() {
     vec4 originalColor = texture2D(outTexture, outTextureCoords) * outColor;
 
+    // Determine the direction chroma moves
+    float fragCoord;
+    if (forwardDirection) {
+        fragCoord = gl_FragCoord.x - gl_FragCoord.y;
+    } else {
+        fragCoord = gl_FragCoord.x + gl_FragCoord.y;
+    }
+
     // The hue takes in account the position, chroma settings, and time
-    float hue = mod(((gl_FragCoord.x - gl_FragCoord.y) / chromaSize) - timeOffset, 1.0);
+    float hue = mod(((fragCoord) / chromaSize) - timeOffset, 1.0);
 
     // Set the color to use the new hue & original saturation/value/alpha values
     gl_FragColor = vec4(hsb2rgb_smooth(vec3(hue, saturation, rgb2b(originalColor.rgb))), originalColor.a);

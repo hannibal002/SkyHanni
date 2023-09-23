@@ -22,12 +22,26 @@ object ChromaShader : Shader("chroma", "chroma") {
             SkyHanniMod.feature.chroma.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
-            val ticks = (SkyHanniMod.modules.filterIsInstance<MinecraftData>()[0].getTotalTicks() / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+            var ticks = (SkyHanniMod.modules.filterIsInstance<MinecraftData>()[0].getTotalTicks() / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+
+            ticks = when (SkyHanniMod.feature.chroma.chromaDirection) {
+                0, 2 -> ticks
+                1, 3 -> -ticks
+                else -> ticks
+            }
+
             val chromaSpeed = SkyHanniMod.feature.chroma.chromaSpeed / 360f
             ticks * chromaSpeed
         }
         registerUniform(Uniform.UniformType.FLOAT, "saturation") {
             SkyHanniMod.feature.chroma.chromaSaturation
+        }
+        registerUniform(Uniform.UniformType.BOOL, "forwardDirection") {
+            when (SkyHanniMod.feature.chroma.chromaDirection) {
+                0, 1 -> true
+                2, 3 -> false
+                else -> true
+            }
         }
     }
 }
