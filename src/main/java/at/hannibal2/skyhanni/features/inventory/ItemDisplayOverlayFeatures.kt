@@ -257,7 +257,7 @@ class ItemDisplayOverlayFeatures {
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
         val text = split[0]
-        if (text == "Ink") return ""
+        if (text == "Ink") return "§k" //hotfix line because recursive functions are POG and we need to get rid of this false postive
         for (line in arrayOf("Large", "Medium", "Small", "Enchanted")) {
             if (text == line) return grabSackName(name.substring(text.length + 1))
         }
