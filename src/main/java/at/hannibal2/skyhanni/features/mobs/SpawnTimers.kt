@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SpawnTimers {
-    private val config get() = SkyHanniMod.feature.mobs
+    private val config get() = SkyHanniMod.feature.combat.mobs
 
     private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)
     private var arachneSpawnTime = SimpleTimeMark.farPast()
