@@ -352,8 +352,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val manager = DiscordDungeonManager() // moved into a separate class for clarity
         val floor = manager.getFloor() ?: -1 // -1 if not in dungeons/failed to find a floor
         val boss = manager.floorToBoss(floor)
-        if (floor == -1) AutoStatus.DUNGEONS.placeholderText
-        else "$boss Kills: ${manager.bossStorage?.get(boss) ?: "Unknown"} (${manager.getTime()})"
+        if (boss == null) {
+            "Unknown boss"
+        } else {
+            if (floor == -1) AutoStatus.DUNGEONS.placeholderText
+            else "$boss Kills: ${manager.bossStorage?.get(boss) ?: "Unknown"} (${manager.getTime()})"
+        }
     })
     ;
 
@@ -377,27 +381,26 @@ class DiscordDungeonManager {
     private val timePattern =
         "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
     val bossStorage: MutableMap<String, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
+    private val areaPattern = "The Catacombs \\((?<floor>.+)\\)".toPattern()
 
     fun getFloor(): Int? {
         val area = LorenzUtils.skyBlockArea
-        val areaPattern = "The Catacombs \\((?<floor>.+)\\)".toPattern()
         areaPattern.matchMatcher(area) {
             if (matches()) return group("floor").last().digitToInt()
         }
         return null
     }
 
-    fun floorToBoss(floor: Int): String {
-        return when (floor) {
-            1 -> "Bonzo"
-            2 -> "Scarf"
-            3 -> "The Professor"
-            4 -> "Thorn"
-            5 -> "Livid"
-            6 -> "Sadan"
-            7 -> "Necron"
-            else -> "Unknown boss"
-        }
+    fun floorToBoss(floor: Int) = when (floor) {
+        1 -> "Bonzo"
+        2 -> "Scarf"
+        3 -> "The Professor"
+        4 -> "Thorn"
+        5 -> "Livid"
+        6 -> "Sadan"
+        7 -> "Necron"
+
+        else -> null
     }
 
     fun getTime(): String {
