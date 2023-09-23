@@ -622,7 +622,7 @@
     + Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what
       items it needs
 + Added **Show Price**
-    + Show the bazaar price of the items required for the visitors.
+    + Show the Bazaar price of the items required for the visitors.
 + Added **Crop Milestone** Number
     + Show the number of the crop milestone in the inventory.
 + Added **Crop Upgrades** Number

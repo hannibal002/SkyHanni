@@ -301,7 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visitor Display** - Show all items needed for the visitors.
 + **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs
   to checked what items it needs.
-+ **Show Price** - Show the bazaar price of the items required for the visitors.
++ **Show Price** - Show the Bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
