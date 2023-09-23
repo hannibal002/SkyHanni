@@ -244,8 +244,8 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(17)) {
             if (item.getInternalName_old() == ("YETI_ROD")) {
-                // fishes_caught
                 val kills = item.getYetiRodFishesCaught().toString()
+                if (kills == "null") { return "" }
                 if (kills.length >= 4){ return "100" }
                 else { return (kills.dropLast(1)) }
             }
@@ -257,6 +257,7 @@ class ItemDisplayOverlayFeatures {
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
         val text = split[0]
+        if (text == "Ink") return ""
         for (line in arrayOf("Large", "Medium", "Small", "Enchanted")) {
             if (text == line) return grabSackName(name.substring(text.length + 1))
         }
