@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.*
 import net.minecraft.event.ClickEvent
@@ -23,27 +24,24 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 class Translator {
-
     private val messageContentRegex = Regex(".*: (.*)")
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
-
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onGuiChat(e: LorenzChatEvent) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onGuiChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.chat.translator) return
-        if (e.type != 0.toByte()) return // If this is not a player-sent message, return
 
-        val message = e.message.removeColor()
-        if (!messageContentRegex.matches(message.removeColor())) return
+        val message = event.message
+        if (message.getPlayerName() == "-") return
 
-        if (e.chatComponent.siblings.size > 0) {
-            val clickStyle = createClickStyle(message)
-            e.chatComponent.siblings.last().setChatStyle(clickStyle)
-        }
+        val editedComponent =
+            if (event.chatComponent.siblings.size > 0) event.chatComponent.siblings.last() else event.chatComponent
+
+        val clickStyle = createClickStyle(message.removeColor(), editedComponent.chatStyle)
+        editedComponent.setChatStyle(clickStyle)
     }
 
-    private fun createClickStyle(message: String): ChatStyle {
-        val style = ChatStyle()
+    private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         style.setChatClickEvent(
             ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
@@ -213,5 +211,4 @@ class Translator {
             OSUtils.copyToClipboard(translation)
         }
     }
-
 }

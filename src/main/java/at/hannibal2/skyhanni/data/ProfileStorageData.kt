@@ -149,7 +149,6 @@ object ProfileStorageData {
 
         profileSpecific?.crimsonIsle?.let {
             it.quests = oldHidden.crimsonIsleQuests
-            it.latestTrophyFishInInventory = oldHidden.crimsonIsleLatestTrophyFishInInventory
             it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
             it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
         }

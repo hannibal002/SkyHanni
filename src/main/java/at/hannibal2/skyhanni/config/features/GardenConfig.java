@@ -124,7 +124,7 @@ public class GardenConfig {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     @FeatureToggle

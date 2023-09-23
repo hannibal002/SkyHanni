@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -272,6 +273,9 @@ class SkyHanniDebugsAndTests {
         val internalName = itemStack.getInternalName()
         if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
+
+        val rarity = itemStack.getItemRarityOrNull(logError = false) ?: return
+        event.toolTip.add("rarity: $rarity")
     }
 
     @SubscribeEvent
