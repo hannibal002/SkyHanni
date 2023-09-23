@@ -13,9 +13,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBloodGodKills
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getYetiRodFishesCaught
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
