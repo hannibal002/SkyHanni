@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -29,7 +30,7 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
 
 
-class TrevorFeatures {
+object TrevorFeatures {
     private val trapperPattern =
         "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
     private val talbotPatternAbove =
@@ -44,6 +45,12 @@ class TrevorFeatures {
     private var trapperID: Int = 56
     private var backupTrapperID: Int = 17
     private var timeLastWarped: Long = 0
+    private var lastChatPrompt = ""
+    private var lastChatPromptTime = -1L
+    private var teleportBlock = -1L
+
+    var questActive = false
+    var inBetweenQuests = false
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
@@ -54,7 +61,9 @@ class TrevorFeatures {
                     if (config.trapperSolver) {
                         if (onFarmingIsland()) {
                             updateTrapper()
-                            TrevorSolver.findMob()
+                            TrevorTracker.saveAndUpdate()
+                            TrevorTracker.calculatePeltsPerHour()
+                            if (questActive) TrevorSolver.findMob()
                         }
                     }
                 } catch (error: Throwable) {
@@ -91,6 +100,9 @@ class TrevorFeatures {
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
+            TrevorTracker.startQuest(matcher)
+            updateTrapper()
+            lastChatPromptTime = -1L
         }
 
         matcher = talbotPatternAbove.matcher(event.message.removeColor())
@@ -104,7 +116,41 @@ class TrevorFeatures {
             val height = matcher.group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
         }
+
+        if (event.message.removeColor() == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
+            teleportBlock = System.currentTimeMillis()
+        }
+
+        if (event.message.contains("§r§7Click an option: §r§a§l[YES]§r§7 - §r§c§l[NO]")) {
+
+            val siblings = event.chatComponent.siblings
+
+            for (sibling in siblings) {
+                if (sibling.chatStyle.chatClickEvent != null) {
+                    if (sibling.chatStyle.chatClickEvent.value.contains("YES")) {
+                        lastChatPromptTime = System.currentTimeMillis()
+                        lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
+                    }
+                }
+            }
+        }
     }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (!config.trapperCooldownGui) return
+        if (!onFarmingIsland()) return
+
+        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
+        else if (timeUntilNextReady == 1) "1 second left"
+        else "$timeUntilNextReady seconds left"
+
+        config.trapperCooldownPos.renderString(
+            "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
+            posLabel = "Trapper Cooldown GUI"
+        )
+    }
+
 
     private fun updateTrapper() {
         timeUntilNextReady -= 1
@@ -148,10 +194,13 @@ class TrevorFeatures {
         if (!found) TrevorSolver.mobLocation = CurrentMobArea.NONE
         if (!active) {
             trapperReady = true
+        } else {
+            inBetweenQuests = true
         }
         if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
             TrevorSolver.mobLocation = previousLocation
         }
+        questActive = active
     }
 
     @SubscribeEvent
@@ -162,10 +211,8 @@ class TrevorFeatures {
             Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase) {
             if (config.trapperTalkCooldown) {
-                RenderLivingEntityHelper.setEntityColor(
-                    entityTrapper,
-                    currentStatus.color
-                ) { config.trapperTalkCooldown }
+                RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+                { config.trapperTalkCooldown }
                 entityTrapper.getLorenzVec().let {
                     if (it.distanceToPlayer() < 15) {
                         event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
@@ -181,9 +228,10 @@ class TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
+                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else TrevorSolver.currentMob!!.mobName
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
+                event.drawDynamicText(location.add(0, 1, 0), displayName, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
@@ -193,20 +241,30 @@ class TrevorFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!config.warpToTrapper) return
         if (!onFarmingIsland()) return
         if (!Keyboard.getEventKeyState()) return
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (config.keyBindWarpTrapper != key) return
 
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
         }
         if (NEUItems.neuHasFocus()) return
-
-        if (System.currentTimeMillis() - timeLastWarped < 3000) return
-        LorenzUtils.sendCommandToServer("warp trapper")
-        timeLastWarped = System.currentTimeMillis()
+        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
+        if (config.keyBindWarpTrapper == key) {
+            if (lastChatPromptTime != -1L && config.acceptQuest && !questActive) {
+                if (System.currentTimeMillis() - 200 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
+                    lastChatPromptTime = -1L
+                    LorenzUtils.sendCommandToServer(lastChatPrompt)
+                    lastChatPrompt = ""
+                    timeLastWarped = System.currentTimeMillis()
+                    return
+                }
+            }
+            if (System.currentTimeMillis() - timeLastWarped > 3000 && config.warpToTrapper) {
+                if (System.currentTimeMillis() < teleportBlock + 5000) return
+                LorenzUtils.sendCommandToServer("warp trapper")
+                timeLastWarped = System.currentTimeMillis()
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -226,16 +284,22 @@ class TrevorFeatures {
         TrevorSolver.resetLocation()
         currentStatus = TrapperStatus.READY
         currentLabel = "§2Ready"
+        questActive = false
+        inBetweenQuests = false
     }
 
-    enum class TrapperStatus(val color: Int) {
-        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75)),
-        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
-        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
+    enum class TrapperStatus(baseColor: LorenzColor) {
+        READY(LorenzColor.DARK_GREEN),
+        WAITING(LorenzColor.DARK_AQUA),
+        ACTIVE(LorenzColor.DARK_RED),
+        ;
+
+        val color = baseColor.toColor().withAlpha(75)
+        val colorCode = baseColor.getChatColor()
     }
 
-    private fun onFarmingIsland() =
+    fun onFarmingIsland() =
         LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS
 
-    private fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
+    fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
 }

@@ -24,7 +24,7 @@ public class Features extends Config {
     @Override
     public List<Social> getSocials() {
         return Arrays.asList(
-                Social.forLink("Join our Discord", DISCORD, "https://discord.gg/8DXVN4BJz3"),
+                Social.forLink("Join our Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
                 Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
         );
     }
@@ -44,7 +44,7 @@ public class Features extends Config {
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
     public GUIConfig gui = new GUIConfig();
 
     @Expose
@@ -64,12 +64,8 @@ public class Features extends Config {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @Category(name = "Summonings", desc = "Mobs you revive.")
-    public SummoningsConfig summonings = new SummoningsConfig();
-
-    @Expose
-    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
-    public AshfangConfig ashfang = new AshfangConfig();
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose
     @Category(name = "Minion", desc = "The minions at your private island.")
@@ -84,16 +80,16 @@ public class Features extends Config {
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
-    @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
+    @Category(name = "Combat", desc = "Everything combat and PVE related.")
+    public CombatConfig combat = new CombatConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Diana", desc = "Diana's mythological event.")
-    public DianaConfig diana = new DianaConfig();
+    @Category(name = "Mining", desc = "Features that help you break blocks.")
+    public MiningConfig mining = new MiningConfig();
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
@@ -104,12 +100,8 @@ public class Features extends Config {
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
-    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
-    public BingoConfig bingo = new BingoConfig();
-
-    @Expose
-    @Category(name = "Mobs", desc = "Visual help for Mobs")
-    public MobsConfig mobs = new MobsConfig();
+    @Category(name = "Events", desc = "Stuff that is not avaliable all the time.")
+    public EventConfig event = new EventConfig();
 
     @Expose
     @Category(name = "Garden", desc = "Features on the Garden island.")
@@ -118,10 +110,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")
     public RiftConfig rift = new RiftConfig();
-
-    @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
@@ -136,4 +124,8 @@ public class Features extends Config {
 
     @Expose
     public Storage storage = new Storage();
+
+    @Expose
+    public int lastVersion = ConfigUpdaterMigrator.INSTANCE.getConfigVersion();
+
 }

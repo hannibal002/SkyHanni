@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
-import net.minecraft.client.Minecraft
 
 object CopyItemCommand {
 
     fun command(args: Array<String>) {
         try {
             val resultList = mutableListOf<String>()
-            val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()!!
+            val itemStack = InventoryUtils.getItemInHand() ?: return
             resultList.add("ITEM LORE")
             resultList.add("display name: '" + itemStack.displayName.toString() + "'")
             val itemID = itemStack.getInternalName_old()
@@ -32,7 +32,7 @@ object CopyItemCommand {
                     resultList.add("")
                     resultList.add("ExtraAttributes")
                     val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                    SkyHanniTestCommand.runn(extraAttributes, "  .  ")
+                    SkyHanniDebugsAndTests.runn(extraAttributes, "  .  ")
                 }
             }
 

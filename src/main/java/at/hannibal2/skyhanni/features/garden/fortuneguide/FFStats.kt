@@ -183,7 +183,7 @@ object FFStats {
     }
 
     private fun getPetFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
-        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
+        val gardenLvl = GardenAPI.getGardenLevel()
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = getPetFF(item)
         out[FFTypes.PET_ITEM] = when (item.getPetItem()) {

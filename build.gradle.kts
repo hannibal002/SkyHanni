@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.20.Beta.15"
+version = "0.20.Beta.21.1"
 
 // Toolchains:
 java {
@@ -19,7 +19,7 @@ java {
 }
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/java/main"))
+    output.setResourcesDir(file("$buildDir/classes/kotlin/main"))
 }
 
 repositories {

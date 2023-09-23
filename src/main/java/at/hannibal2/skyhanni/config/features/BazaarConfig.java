@@ -34,4 +34,10 @@ public class BazaarConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean cancelledBuyOrderClipboard = false;
+
+    @Expose
+    @ConfigOption(name = "Price Website", desc = "Adds a button to the bazaar product inventory that will open the item page in §cskyblock.bz§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean openPriceWebsite = false;
 }

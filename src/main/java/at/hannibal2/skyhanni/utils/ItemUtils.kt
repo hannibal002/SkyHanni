@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -12,6 +15,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
 
@@ -152,20 +156,29 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
-    fun ItemStack.getItemRarity(): Int {
-        //todo make into an enum in future
-        return when (this.getLore().lastOrNull()?.take(4)) {
-            "§f§l" -> 0     // common
-            "§a§l" -> 1     // uncommon
-            "§9§l" -> 2     // rare
-            "§5§l" -> 3     // epic
-            "§6§l" -> 4     // legendary
-            "§d§l" -> 5     // mythic
-            "§b§l" -> 6     // divine
-            "§4§l" -> 7     // supreme
-            "§c§l" -> 8     // special/very special
-            else -> -1      // unknown
+    fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
+
+    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
+        val data = cachedData
+        if (data.itemRarityLastCheck.asTimeMark().passedSince() < 1.seconds) {
+            return data.itemRarity
         }
+        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+
+
+        if (isPet(cleanName())) {
+            return getPetRarity(this)
+        }
+
+        val rarity = LorenzRarity.readItemRarity(this)
+        data.itemRarity = rarity
+        if (rarity == null && logError) {
+            CopyErrorCommand.logErrorState(
+                "Could not read rarity for item $name",
+                "getItemRarityOrNull not found for: ${getInternalName()}, name:'$name''"
+            )
+        }
+        return rarity
     }
 
     //extra method for shorter name and kotlin nullability logic
@@ -189,7 +202,12 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
-    fun readItemAmount(input: String): Pair<String, Int>? {
+    fun readItemAmount(originalInput: String): Pair<String, Int>? {
+        // This workaround fixes 'Tubto Cacti I Book'
+        val input = if (originalInput.endsWith(" Book")) {
+            originalInput.replace(" Book", "")
+        } else originalInput
+
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
         }
@@ -234,10 +252,23 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
+    // TODO: Replace entirely some day
     fun getPetRarityOld(petStack: ItemStack?): Int {
-        val petInternalName = petStack?.getInternalName_old()
-        if (petInternalName == "NONE" || petInternalName == null) return -1
-        val split = petInternalName.split(";")
-        return split.last().toInt()
+        val rarity = petStack?.getItemRarityOrNull() ?: return -1
+
+        return rarity.id
+    }
+
+    private fun getPetRarity(pet: ItemStack): LorenzRarity? {
+        val rarityId = pet.getInternalName().asString().split(";").last().toInt()
+        val rarity = LorenzRarity.getById(rarityId)
+        val name = pet.name
+        if (rarity == null) {
+            CopyErrorCommand.logErrorState(
+                "Could not read rarity for pet $name",
+                "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
+            )
+        }
+        return rarity
     }
 }
