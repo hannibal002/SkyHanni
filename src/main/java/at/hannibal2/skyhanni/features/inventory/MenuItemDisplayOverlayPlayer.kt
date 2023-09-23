@@ -200,7 +200,7 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(8)) {
-            if ((chestName.contains(" Chest")) && ((LorenzUtils.inDungeons || LorenzUtils.inKuudraFight || LorenzUtils.skyBlockArea.contains("Dungeon Hub"))) && !((chestName.contains("Backpack") && chestName.contains("Slot #") || chestName.startsWith("Ender Chest (")) && !(LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND))) {
+            if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
         }

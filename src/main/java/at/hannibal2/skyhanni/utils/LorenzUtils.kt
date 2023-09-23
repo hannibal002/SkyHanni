@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -207,6 +208,14 @@ object LorenzUtils {
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
     fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+
+    fun isRewardChest(): Boolean {
+        val isCorrectIsland = skyBlockIsland.equalsOneOf(
+            IslandType.DUNGEON_HUB, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA
+        )
+        val isCorrectChest = InventoryUtils.openInventoryName().contains(" Chest") && !InventoryUtils.inStorage()
+        return isCorrectIsland && isCorrectChest
+    }
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
