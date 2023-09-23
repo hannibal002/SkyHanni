@@ -245,9 +245,9 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(17)) {
             if (item.getInternalName_old() == ("YETI_ROD")) {
                 // fishes_caught
-                val kills = item.getYetiRodFishesCaught()
-                if (kills >= 1000){ return "100" }
-                else { return ((kills/10).toString()) }
+                val kills = item.getYetiRodFishesCaught().toString()
+                if (kills.length >= 4){ return "100" }
+                else { return (kills.dropLast(1)) }
             }
         }
 
