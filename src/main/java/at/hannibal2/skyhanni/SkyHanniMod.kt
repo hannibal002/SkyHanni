@@ -67,10 +67,12 @@ import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
+import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
+import at.hannibal2.skyhanni.features.mobs.SpawnTimers
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -130,7 +132,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.21.1",
+    version = "0.20.Beta.22",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -241,6 +243,7 @@ class SkyHanniMod {
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
         loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
@@ -337,8 +340,9 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(InquisitorWaypointShare)
-        loadModule(TrevorFeatures())
+        loadModule(TrevorFeatures)
         loadModule(TrevorSolver)
+        loadModule(TrevorTracker)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(CaptureFarmingGear())

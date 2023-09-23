@@ -182,7 +182,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
 + Added Fishing Hook Display. - hannibal2
-    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
+      screen.
 
 ## Damage Indicator
 
@@ -293,6 +294,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ Added a countdown for Arachne spawn. - Cad
 + Option to hide the vanilla particles around enderman
 
 ## Garden Features
@@ -301,7 +303,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visitor Display** - Show all items needed for the visitors.
 + **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs
   to checked what items it needs.
-+ **Show Price** - Show the bazaar price of the items required for the visitors.
++ **Show Price** - Show the Bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
@@ -622,6 +624,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Travor Trapper** Features in Farming Islands
     + Trapper Cooldown GUI. - NetheriteMiner
         + Show the cooldown on screen in an overlay (intended for abiphone users).
+    + **Trevor the Trapper Tracker**. - CalMWolfs
+        + Quests done
+        + A breakdown of their rarity
+        + Animals killed vs. animals that kill themselves
+        + Pelts per hour
+    + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
 + **GUI Scale**: - nea
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
