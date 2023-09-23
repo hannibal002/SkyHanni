@@ -124,6 +124,11 @@ private fun String.removeSpam(): String {
         "at net.minecraft.client.Minecraft.addScheduledTask(",
         "at java.lang.reflect.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$",
+        "CopyErrorCommand.logErrorState(CopyErrorCommand.kt:46)",
+        "LorenzEvent.postWithoutCatch(LorenzEvent.kt:24)",
+        "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
+        "at net.minecraft.launchwrapper.",
+        "at net.fabricmc.devlaunchinjector.",
     )
     return split("\n").filter { line -> !ignored.any { line.contains(it) } }.joinToString("\n")
 }
