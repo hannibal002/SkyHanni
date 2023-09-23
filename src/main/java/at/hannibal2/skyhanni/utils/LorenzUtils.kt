@@ -209,10 +209,9 @@ object LorenzUtils {
 
     fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
 
+    // TODO: IMPLEMENT ISLANDTYPE.CATACOMBS, HANNI
     fun isRewardChest(): Boolean {
-        val isCorrectIsland = skyBlockIsland.equalsOneOf(
-            IslandType.DUNGEON_HUB, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA
-        )
+        val isCorrectIsland = (skyBlockIsland.equalsOneOf(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA) || inDungeons)
         val isCorrectChest = InventoryUtils.openInventoryName().contains(" Chest") && !InventoryUtils.inStorage()
         return isCorrectIsland && isCorrectChest
     }
