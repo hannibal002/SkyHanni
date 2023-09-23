@@ -12,6 +12,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TiaRelayWaypoints {
+    private val config get() = SkyHanniMod.feature.inventory.helper.tiaRelay
     private var waypoint: LorenzVec? = null
     private var waypointName: String? = null
     private var island = IslandType.NONE
@@ -19,7 +20,7 @@ class TiaRelayWaypoints {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.misc.tiaRelayNextWaypoint) return
+        if (!config.nextWaypoint) return
 
         val message = event.message
         for (relay in Relay.entries) {
@@ -41,7 +42,7 @@ class TiaRelayWaypoints {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (SkyHanniMod.feature.misc.tiaRelayAllWaypoints) {
+        if (config.allWaypoints) {
             for (relay in Relay.entries) {
                 if (relay.island == LorenzUtils.skyBlockIsland) {
                     event.drawWaypointFilled(relay.waypoint, LorenzColor.LIGHT_PURPLE.toColor())
@@ -51,7 +52,7 @@ class TiaRelayWaypoints {
             return
         }
 
-        if (!SkyHanniMod.feature.misc.tiaRelayNextWaypoint) return
+        if (!config.nextWaypoint) return
         if (LorenzUtils.skyBlockIsland != island) return
 
         waypoint?.let {

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
-import at.hannibal2.skyhanni.features.event.anniversary.ActivePlayerTimer
 import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -58,6 +58,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.misc.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
@@ -66,6 +67,7 @@ import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
+import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
@@ -130,7 +132,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.17",
+    version = "0.20.Beta.21.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -150,7 +152,7 @@ class SkyHanniMod {
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
         loadModule(ItemClickData())
-        loadModule(ActivePlayerTimer)
+//        loadModule(Year300RaffleEvent)
         loadModule(MinecraftData())
         loadModule(TitleUtils())
         loadModule(ItemTipHelper())
@@ -187,7 +189,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
-        loadModule(SackAPI())
+        loadModule(SackAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -269,9 +271,10 @@ class SkyHanniMod {
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
+        loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyblockLevelGuideHelper())
+        loadModule(SkyBlockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -330,12 +333,13 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(InquisitorWaypointShare)
-        loadModule(TrevorFeatures())
+        loadModule(TrevorFeatures)
         loadModule(TrevorSolver)
+        loadModule(TrevorTracker)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(CaptureFarmingGear())
-        loadModule(SackDisplay())
+        loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
@@ -345,6 +349,7 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
+        loadModule(GetFromSacksTabComplete)
         loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
@@ -398,6 +403,7 @@ class SkyHanniMod {
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
+        loadModule(DungeonTeammateOutlines())
 
         init()
 
@@ -419,7 +425,9 @@ class SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
-        Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
+        Runtime.getRuntime().addShutdownHook(Thread {
+            configManager.saveConfig("shutdown-hook")
+        })
         repo = RepoManager(configManager.configDirectory)
         try {
             repo.loadRepoInformation()
@@ -454,6 +462,7 @@ class SkyHanniMod {
 
         @JvmStatic
         val feature: Features get() = configManager.features
+        val sackData: SackData get() = configManager.sackData
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")

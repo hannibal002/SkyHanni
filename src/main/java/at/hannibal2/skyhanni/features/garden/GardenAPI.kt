@@ -38,6 +38,13 @@ object GardenAPI {
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val config get() = ProfileStorageData.profileSpecific?.garden
+    var gardenExp: Long?
+        get() = config?.experience
+        set(value) {
+            value?.let {
+                config?.experience = it
+            }
+        }
 
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
@@ -203,7 +210,8 @@ object GardenAPI {
         return 0
     }
 
-    fun getLevelForExp(gardenExp: Long): Int {
+    fun getGardenLevel(): Int {
+        val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
         for (tierExp in gardenExperience) {
