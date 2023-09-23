@@ -317,6 +317,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                             return when (betterLine) {
                                 "Highest Price" -> "§c§l⬆"
                                 "Lowest Price" -> "§a⬇"
+                                "Highest Bid" -> "§c§l⬆"
+                                "Lowest Bid" -> "§a⬇"
                                 "Ending soon" -> "§e§l☉"
                                 "Random" -> "R"
                                 else -> ""
