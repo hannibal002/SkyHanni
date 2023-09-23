@@ -142,7 +142,7 @@ class SkyHanniMod {
         loadModule(this)
         loadModule(ChatManager)
         loadModule(HypixelData())
-        loadModule(DungeonData())
+        loadModule(DungeonAPI())
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
@@ -176,7 +176,6 @@ class SkyHanniMod {
         loadModule(TitleData())
         loadModule(BlockData())
         loadModule(DefaultConfigFeatures)
-        loadModule(DungeonUtils())
         loadModule(EntityOutlineRenderer)
 
         // APIs

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -66,7 +66,7 @@ class MobFinder {
 
     internal fun tryAdd(entity: EntityLivingBase): EntityResult? {
         if (LorenzUtils.inDungeons) {
-            if (DungeonData.isOneOf("F1", "M1")) {
+            if (DungeonAPI.isOneOf("F1", "M1")) {
                 if (floor1bonzo1) {
                     if (entity is EntityOtherPlayerMP) {
                         if (entity.name == "Bonzo ") {
@@ -83,7 +83,7 @@ class MobFinder {
                 }
             }
 
-            if (DungeonData.isOneOf("F2", "M2")) {
+            if (DungeonAPI.isOneOf("F2", "M2")) {
                 if (entity.name == "Summon ") {
                     if (entity is EntityOtherPlayerMP) {
                         if (floor2summons1) {
@@ -112,7 +112,7 @@ class MobFinder {
                 }
             }
 
-            if (DungeonData.isOneOf("F3", "M3")) {
+            if (DungeonAPI.isOneOf("F3", "M3")) {
                 if (entity is EntityGuardian) {
                     if (floor3GuardianShield) {
                         if (guardians.size == 4) {
@@ -160,7 +160,7 @@ class MobFinder {
                 }
             }
 
-            if (DungeonData.isOneOf("F4", "M4")) {
+            if (DungeonAPI.isOneOf("F4", "M4")) {
                 if (entity is EntityGhast) {
                     return EntityResult(
                         bossType = BossType.DUNGEON_F4_THORN,
@@ -170,7 +170,7 @@ class MobFinder {
                 }
             }
 
-            if (DungeonData.isOneOf("F5", "M5")) {
+            if (DungeonAPI.isOneOf("F5", "M5")) {
                 if (entity is EntityOtherPlayerMP) {
                     if (entity == DungeonLividFinder.livid) {
                         return EntityResult(
@@ -182,7 +182,7 @@ class MobFinder {
                 }
             }
 
-            if (DungeonData.isOneOf("F6", "M6")) {
+            if (DungeonAPI.isOneOf("F6", "M6")) {
                 if (entity is EntityGiantZombie && !entity.isInvisible) {
                     if (floor6Giants && entity.posY > 68) {
                         val extraDelay = checkExtraF6GiantsDelay(entity)
@@ -252,7 +252,10 @@ class MobFinder {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
                     when {
                         entity.hasMaxHealth(300_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
-                        entity.hasMaxHealth(12_000_000, true -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+                        entity.hasMaxHealth(
+                            12_000_000,
+                            true
+                        ) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
                         entity.hasMaxHealth(50_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
                         entity.hasMaxHealth(210_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
                     }

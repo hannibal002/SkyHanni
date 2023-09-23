@@ -42,7 +42,7 @@ class DungeonHighlightClickedBlocks {
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
-        if (DungeonData.inBossRoom) return
+        if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val position = event.position

@@ -8,6 +8,9 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor.Companion.toBoss
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,7 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
@@ -349,15 +351,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     DUNGEONS({
-        val manager = DiscordDungeonManager() // moved into a separate class for clarity
-        val floor = manager.getFloor() ?: -1 // -1 if not in dungeons/failed to find a floor
-        val boss = manager.floorToBoss(floor)
-        if (boss == null) {
-            "Unknown boss"
-        } else {
-            if (floor == -1) AutoStatus.DUNGEONS.placeholderText
-            else "$boss Kills: ${manager.bossStorage?.get(boss) ?: "Unknown"} (${manager.getTime()})"
-        }
+        val floor = DungeonAPI.getFloor() ?: -1 // -1 if not in dungeons/failed to find a floor
+        val boss: DungeonFloor? = if (floor != -1) floor.toBoss() else null
+        if (floor == -1) AutoStatus.DUNGEONS.placeholderText
+        else if (boss == null) "Unknown boss"
+        else "$boss Kills: ${DungeonAPI.bossStorage?.get(boss) ?: "Unknown"} (${DungeonAPI.getTime()})"
+
     })
     ;
 
@@ -374,42 +373,4 @@ enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatu
     SLAYER("Planning to do a slayer quest", DiscordStatus.SLAYER),
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
     DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS);
-}
-
-class DiscordDungeonManager {
-
-    private val timePattern =
-        "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
-    val bossStorage: MutableMap<String, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-    private val areaPattern = "The Catacombs \\((?<floor>.+)\\)".toPattern()
-
-    fun getFloor(): Int? {
-        val area = LorenzUtils.skyBlockArea
-        areaPattern.matchMatcher(area) {
-            if (matches()) return group("floor").last().digitToInt()
-        }
-        return null
-    }
-
-    fun floorToBoss(floor: Int) = when (floor) {
-        1 -> "Bonzo"
-        2 -> "Scarf"
-        3 -> "The Professor"
-        4 -> "Thorn"
-        5 -> "Livid"
-        6 -> "Sadan"
-        7 -> "Necron"
-
-        else -> null
-    }
-
-    fun getTime(): String {
-        loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-            timePattern.matchMatcher(line.removeColor()) {
-                if (!matches()) continue@loop
-                return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-            }
-        }
-        return ""
-    }
 }
