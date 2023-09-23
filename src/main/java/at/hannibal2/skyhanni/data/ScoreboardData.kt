@@ -27,6 +27,7 @@ class ScoreboardData {
             "\uD83C\uDF81",
             "\uD83C\uDF89",
             "\uD83C\uDF82",
+            "\uD83D\uDD2B",
         )
 
         fun formatLines(rawList: List<String>): List<String> {
@@ -49,6 +50,7 @@ class ScoreboardData {
 
         var sidebarLines: List<String> = emptyList() // TODO rename to raw
         var sidebarLinesRaw: List<String> = emptyList() // TODO delete
+        var objectiveLine = ""
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -76,6 +78,7 @@ class ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
+        objectiveLine = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")
