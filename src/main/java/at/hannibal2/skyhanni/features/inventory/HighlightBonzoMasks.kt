@@ -53,6 +53,7 @@ class HighlightBonzoMasks {
             "STARRED_BONZO_MASK" -> "BONZO_MASK"
             "BONZO_MASK" -> "BONZO_MASK"
             "SPIRIT_MASK" -> "SPIRIT_MASK"
+            "STARRED_SPIRIT_MASK" -> "SPIRIT_MASK"
             else -> null
         }
     }
