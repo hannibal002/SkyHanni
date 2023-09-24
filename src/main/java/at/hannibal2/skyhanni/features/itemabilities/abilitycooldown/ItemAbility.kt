@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
+import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import kotlin.math.floor
 
 enum class ItemAbility(
     val abilityName: String,
@@ -14,15 +16,16 @@ enum class ItemAbility(
     var specialColor: LorenzColor? = null,
     var lastItemClick: Long = 0L,
     val actionBarDetection: Boolean = true,
+    private val ignoreMageCooldownReduction: Boolean = false,
 ) {
     //TODO add into repo
 
-    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA"),
+    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
     ICE_SPRAY_WAND(5),
-    ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA"),
+    ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA", ignoreMageCooldownReduction = true),
     RAGNAROCK_AXE(20),
     WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
 
@@ -60,7 +63,14 @@ enum class ItemAbility(
         cooldownInSeconds: Int,
         vararg alternateInternalNames: String,
         alternativePosition: Boolean = false,
-    ) : this("no name", cooldownInSeconds, actionBarDetection = false, alternativePosition = alternativePosition) {
+        ignoreMageCooldownReduction: Boolean = false,
+    ) : this(
+        "no name",
+        cooldownInSeconds,
+        actionBarDetection = false,
+        alternativePosition = alternativePosition,
+        ignoreMageCooldownReduction = ignoreMageCooldownReduction
+    ) {
         newVariant = true
         alternateInternalNames.forEach {
             internalNames.add(it.asInternalName())
@@ -73,19 +83,19 @@ enum class ItemAbility(
         lastActivation = System.currentTimeMillis() - ((cooldownInSeconds * 1000) - customCooldown)
     }
 
-    fun isOnCooldown(cooldownMultiplier: Double): Boolean = lastActivation + getCooldown(cooldownMultiplier) > System.currentTimeMillis()
+    fun isOnCooldown(): Boolean = lastActivation + getCooldown() > System.currentTimeMillis()
 
-    fun getCooldown(cooldownMultiplier: Double): Long {
+    fun getCooldown(): Long {
         // Some items aren't really a cooldown but an effect over time, so don't apply cooldown multipliers
         if (this == WAND_OF_ATONEMENT || this == RAGNAROCK_AXE) {
             return 1000L * cooldownInSeconds
         }
 
-        return (1000L * cooldownInSeconds * cooldownMultiplier).toLong()
+        return (1000L * cooldownInSeconds * getMultiplier()).toLong()
     }
 
-    fun getDurationText(cooldownMultiplier: Double): String {
-        var duration: Long = lastActivation + getCooldown(cooldownMultiplier) - System.currentTimeMillis()
+    fun getDurationText(): String {
+        var duration: Long = lastActivation + getCooldown() - System.currentTimeMillis()
         return if (duration < 1600) {
             duration /= 100
             var d = duration.toDouble()
@@ -106,6 +116,28 @@ enum class ItemAbility(
     companion object {
         fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
+        }
+
+        fun ItemAbility.getMultiplier(): Double {
+            return getMageCooldownReduction() ?: 1.0
+        }
+
+        private fun ItemAbility.getMageCooldownReduction(): Double? {
+            if (ignoreMageCooldownReduction) return null
+            if (!LorenzUtils.inDungeons) return null
+            if (DungeonData.playerClass != DungeonData.DungeonClass.MAGE) return null
+
+            var abilityCooldownMultiplier = 1.0
+            abilityCooldownMultiplier -= if (DungeonData.isUniqueClass) {
+                0.5 // 50% base reduction at level 0
+            } else {
+                0.25 // 25% base reduction at level 0
+            }
+
+            // 1% ability reduction every other level
+            abilityCooldownMultiplier -= 0.01 * floor(DungeonData.playerClassLevel / 2f)
+
+            return abilityCooldownMultiplier
         }
     }
 

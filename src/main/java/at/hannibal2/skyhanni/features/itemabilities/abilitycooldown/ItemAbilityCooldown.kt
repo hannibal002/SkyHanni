@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.floor
 import kotlin.math.max
 
 class ItemAbilityCooldown {
@@ -29,23 +28,6 @@ class ItemAbilityCooldown {
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
-
-    fun getAbilityCooldownMultiplier(): Double {
-        var abilityCooldownMultiplier = 1.0
-
-        if (LorenzUtils.inDungeons && DungeonData.playerClass == DungeonData.DungeonClass.MAGE) {
-            abilityCooldownMultiplier -= if (DungeonData.isUniqueClass) {
-                0.5 // 50% base reduction at level 0
-            } else {
-                0.25 // 25% base reduction at level 0
-            }
-
-            // 1% ability reduction every other level
-            abilityCooldownMultiplier -= 0.01 * floor(DungeonData.playerClassLevel / 2f)
-        }
-
-        return abilityCooldownMultiplier
-    }
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
@@ -208,7 +190,7 @@ class ItemAbilityCooldown {
         handleOldAbilities(message)
 
         if (message.contains("§lCASTING IN ")) {
-            if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown(getAbilityCooldownMultiplier())) {
+            if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
                 ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
             }
         } else if (message.contains("§lCASTING")) {
@@ -269,13 +251,12 @@ class ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
-        val cooldownMultiplier = getAbilityCooldownMultiplier()
-        return if (ability.isOnCooldown(cooldownMultiplier)) {
+        return if (ability.isOnCooldown()) {
             val duration: Long =
-                ability.lastActivation + ability.getCooldown(cooldownMultiplier) - System.currentTimeMillis()
+                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
             val color =
                 specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
-            ItemText(color, ability.getDurationText(cooldownMultiplier), true, ability.alternativePosition)
+            ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
                 ability.specialColor = null
@@ -294,7 +275,7 @@ class ItemAbilityCooldown {
         }
         if (ability == ItemAbility.RAGNAROCK_AXE) {
             if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, max((20_000 * getAbilityCooldownMultiplier()) - 13_000, 0.0).toInt())
+                ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
             }
         }
     }

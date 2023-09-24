@@ -12,7 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonData {
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
-    private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
+    private val uniqueClassBonus =
+        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
     companion object {
         var dungeonFloor: String? = null
@@ -68,7 +69,10 @@ class DungeonData {
             }
         }
         if (dungeonFloor != null && playerClass == null) {
-            val playerTeam = TabListData.getTabList().firstOrNull { it.contains(LorenzUtils.getPlayerName()) }?.removeColor() ?: ""
+            val playerTeam =
+                TabListData.getTabList().firstOrNull {
+                    it.contains(LorenzUtils.getPlayerName())
+                }?.removeColor() ?: ""
 
             DungeonClass.entries.forEach {
                 if (playerTeam.contains("(${it.scoreboardName} ")) {
@@ -104,7 +108,7 @@ class DungeonData {
         }
     }
 
-    enum class DungeonClass(public val scoreboardName: String) {
+    enum class DungeonClass(val scoreboardName: String) {
         ARCHER("Archer"),
         BERSERK("Berserk"),
         HEALER("Healer"),
