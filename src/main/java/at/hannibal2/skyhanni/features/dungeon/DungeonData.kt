@@ -2,18 +2,25 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonData {
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
+    private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
     companion object {
         var dungeonFloor: String? = null
         var started = false
         var inBossRoom = false
+        var playerClass: DungeonClass? = null
+        var playerClassLevel = -1
+        var isUniqueClass = false
 
         fun inDungeon() = dungeonFloor != null
 
@@ -60,6 +67,17 @@ class DungeonData {
                 }
             }
         }
+        if (dungeonFloor != null && playerClass == null) {
+            val playerTeam = TabListData.getTabList().firstOrNull { it.contains(LorenzUtils.getPlayerName()) }?.removeColor() ?: ""
+
+            DungeonClass.entries.forEach {
+                if (playerTeam.contains("(${it.scoreboardName} ")) {
+                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNeeded()
+                    playerClass = it
+                    playerClassLevel = level
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -67,6 +85,9 @@ class DungeonData {
         dungeonFloor = null
         started = false
         inBossRoom = false
+        isUniqueClass = false
+        playerClass = null
+        playerClassLevel = -1
     }
 
     @SubscribeEvent
@@ -77,6 +98,17 @@ class DungeonData {
                 started = true
                 DungeonStartEvent(floor).postAndCatch()
             }
+            if (event.message.removeColor().matches(uniqueClassBonus)) {
+                isUniqueClass = true
+            }
         }
+    }
+
+    enum class DungeonClass(public val scoreboardName: String) {
+        ARCHER("Archer"),
+        BERSERK("Berserk"),
+        HEALER("Healer"),
+        MAGE("Mage"),
+        TANK("Tank")
     }
 }

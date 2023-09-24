@@ -73,12 +73,19 @@ enum class ItemAbility(
         lastActivation = System.currentTimeMillis() - ((cooldownInSeconds * 1000) - customCooldown)
     }
 
-    fun isOnCooldown(): Boolean = lastActivation + getCooldown() > System.currentTimeMillis()
+    fun isOnCooldown(cooldownMultiplier: Double): Boolean = lastActivation + getCooldown(cooldownMultiplier) > System.currentTimeMillis()
 
-    fun getCooldown(): Long = 1000L * cooldownInSeconds
+    fun getCooldown(cooldownMultiplier: Double): Long {
+        // Some items aren't really a cooldown but an effect over time, so don't apply cooldown multipliers
+        if (this == WAND_OF_ATONEMENT || this == RAGNAROCK_AXE) {
+            return 1000L * cooldownInSeconds
+        }
 
-    fun getDurationText(): String {
-        var duration: Long = lastActivation + getCooldown() - System.currentTimeMillis()
+        return (1000L * cooldownInSeconds * cooldownMultiplier).toLong()
+    }
+
+    fun getDurationText(cooldownMultiplier: Double): String {
+        var duration: Long = lastActivation + getCooldown(cooldownMultiplier) - System.currentTimeMillis()
         return if (duration < 1600) {
             duration /= 100
             var d = duration.toDouble()
