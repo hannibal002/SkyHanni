@@ -169,6 +169,8 @@ object SkyBlockItemModifierUtils {
     
     fun ItemStack.getYetiRodFishesCaught() = getAttributeInt("fishes_caught")
 
+    fun ItemStack.getEdition() = getAttributeInt("edition")
+
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }

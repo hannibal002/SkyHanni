@@ -251,6 +251,15 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        if (stackSizeConfig.contains(18)) {
+            if (item.getLore().any { it.contains("Edition ") }) {
+                val edition = item.getEdition().toString()
+                if (edition == "null") { return "" }
+                if (edition.length >= 4){ return "" }
+                else { return (edition) }
+            }
+        }
+
         return ""
     }
     
