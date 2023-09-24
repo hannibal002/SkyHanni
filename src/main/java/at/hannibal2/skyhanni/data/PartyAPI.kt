@@ -1,15 +1,28 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 
 class PartyAPI {
     companion object {
+        fun listMembers() {
+            LorenzUtils.chat("§a[SkyHanni] Tracked party members §7(${partyMembers.size}) §f:")
+            for (member in partyMembers) {
+                LorenzUtils.chat(" §a- §7$member")
+            }
+
+            if (Random.nextDouble() < 0.1) OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
+        }
+
         val partyMembers = mutableListOf<String>()
     }
 
@@ -70,6 +83,7 @@ class PartyAPI {
         "Party (?:Leader|Moderators|Members): (?<names>.*)".toPattern().matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
+                if (playerName == Minecraft.getMinecraft().thePlayer.name) continue
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
             }
         }
