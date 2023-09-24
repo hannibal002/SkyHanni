@@ -81,6 +81,7 @@ class HideNotClickableItems {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (isDisabled()) return
+        if (SkyHanniMod.feature.inventory.notClickableItemsBypass && LorenzUtils.isControlKeyDown()) return
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
@@ -134,6 +135,7 @@ class HideNotClickableItems {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (isDisabled()) return
         if (!SkyHanniMod.feature.inventory.hideNotClickableItemsBlockClicks) return
+        if (SkyHanniMod.feature.inventory.notClickableItemsBypass && LorenzUtils.isControlKeyDown()) return
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 

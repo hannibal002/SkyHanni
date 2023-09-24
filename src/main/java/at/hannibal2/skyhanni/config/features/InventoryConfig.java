@@ -42,7 +42,13 @@ public class InventoryConfig {
     public int hideNotClickableOpacity = 180;
 
     @Expose
-    @ConfigOption(name = "Green line", desc = "Adds green line around items that are clickable.")
+    @ConfigOption(name = "Bypass With Control", desc = "Adds the ability to bypass not clickable items when holding the control key.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean notClickableItemsBypass = true;
+
+    @Expose
+    @ConfigOption(name = "Green Line", desc = "Adds green line around items that are clickable.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean hideNotClickableItemsGreenLine = true;
