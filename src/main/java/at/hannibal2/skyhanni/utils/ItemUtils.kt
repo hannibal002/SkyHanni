@@ -165,6 +165,12 @@ object ItemUtils {
         }
         data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
 
+        val internalName = getInternalName()
+        if (internalName == NEUInternalName.NONE) {
+            data.itemRarity = null
+            return null
+        }
+
 
         if (isPet(cleanName())) {
             return getPetRarity(this)
@@ -175,7 +181,7 @@ object ItemUtils {
         if (rarity == null && logError) {
             CopyErrorCommand.logErrorState(
                 "Could not read rarity for item $name",
-                "getItemRarityOrNull not found for: ${getInternalName()}, name:'$name''"
+                "getItemRarityOrNull not found for: $internalName, name:'$name''"
             )
         }
         return rarity

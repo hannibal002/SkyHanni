@@ -12,9 +12,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
@@ -317,7 +319,7 @@ object EstimatedItemValue {
             itemRarity = LorenzRarity.LEGENDARY
         } else {
             if (stack.isRecombobulated()) {
-                val oneBelow = itemRarity.oneBelow(logError = false)
+                val oneBelow = itemRarity.oneBelow()
                 if (oneBelow == null) {
                     CopyErrorCommand.logErrorState(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
@@ -537,8 +539,12 @@ object EstimatedItemValue {
         val internalName = stack.getHelmetSkin() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Skin: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -546,8 +552,12 @@ object EstimatedItemValue {
         val internalName = stack.getArmorDye() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Dye: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -555,9 +565,18 @@ object EstimatedItemValue {
         val internalName = stack.getRune() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Rune: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getItemNameOrNull()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Rune: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
+    }
+
+    private fun NEUInternalName.getNameOrRepoError(): String? {
+        val stack = getItemStackOrNull() ?: return null
+        return stack.nameWithEnchantment ?: "§cItem Name Error"
     }
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {

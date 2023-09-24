@@ -162,8 +162,24 @@ public class ChatConfig {
     public boolean hideArachneMessages = false;
 
     @Expose
-    @ConfigOption(name = "Translator", desc = "Click on a message to translate it into English. Use /shcopytranslation to get the translation from English. Translation is not guaranteed to be 100% accurate.")
+    @ConfigOption(
+            name = "Sacks Hider",
+            desc = "Hide the chat's sack change message with this, " +
+                    "not in Hypixel settings, for mods to access sack data in new features."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean translator = false;
+    public boolean hideSacksChange = false;
+
+    // TODO reenable once the translator is working again
+//    @Expose
+//    @ConfigOption(
+//            name = "Translator",
+//            desc = "Click on a message to translate it into English. " +
+//                    "Use /shcopytranslation to get the translation from English. " +
+//                    "Translation is not guaranteed to be 100% accurate."
+//    )
+//    @ConfigEditorBoolean
+//    @FeatureToggle
+//    public boolean translator = false;
 }

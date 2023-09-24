@@ -583,6 +583,16 @@ public class CombatConfig {
         public boolean areaBossRespawnTimer = false;
 
         @Expose
+        @ConfigOption(
+                name = "Arachne Spawn Timer",
+                desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long " +
+                        "until the boss will spawn. §cTimer may be 1-2 seconds off."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showArachneSpawnTimer = true;
+
+        @Expose
         @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
         @ConfigEditorBoolean
         @FeatureToggle
