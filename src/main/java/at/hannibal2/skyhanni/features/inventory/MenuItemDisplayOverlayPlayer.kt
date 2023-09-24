@@ -82,13 +82,13 @@ class MenuItemDisplayOverlayPlayer {
                 if (item.getLore().any { it.contains("Click to view!") }) {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
+                        if (itemName.removeColor().split(" ").size < 2) return ""
                         if (!itemName.contains("Dungeon")) {
-                            val text = itemName.split(" ").last()
+                            val text = itemName.removeColor().split(" ").last()
                             return "" + text.romanToDecimalIfNeeded()
                         }
                     } else if (chestName == "Dungeoneering") {
-                        val noColorName = itemName.removeColor()
-                        dungeonClassLevelPattern.matchMatcher(noColorName) {
+                        dungeonClassLevelPattern.matchMatcher(itemName.removeColor()) {
                             return group("level")
                         }
                     }

@@ -67,7 +67,7 @@ class CollectionAPI {
 
     companion object {
         val collectionValue = mutableMapOf<NEUInternalName, Long>()
-        private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
+        private val collectionTier0Pattern = "§7Progress to .* (I|1): .*".toPattern()
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
