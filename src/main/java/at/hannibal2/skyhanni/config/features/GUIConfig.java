@@ -57,6 +57,26 @@ public class GUIConfig {
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
+    @ConfigOption(name = "In-game Date", desc = "Show the in-game date of Skyblock (like in Apec, §ebut with mild delays§7).\n(Though this one includes the Skyblock year!)")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean inGameDateDisplay = true;
+
+    @Expose
+    public Position inGameDateDisplayPosition = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "In-game Date Refresh Rate", desc = "Change the amount of time in seconds you would like to refresh the in-game time display.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 60,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 2)
+    public int inGameDateDisplayRefreshSeconds = 10;
+
+
+    @Expose
     @ConfigOption(name = "Tps Display", desc = "Show the TPS of the current server, like in Soopy.")
     @ConfigEditorBoolean
     @FeatureToggle

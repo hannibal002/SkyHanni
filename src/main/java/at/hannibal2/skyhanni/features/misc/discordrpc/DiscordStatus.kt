@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils.getFormattedSkyblockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
@@ -166,23 +167,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     TIME({
-        fun formatNum(num: Int): Int {
-            val rem = num % 10
-            var returnNum = num - rem // floor()
-            if (returnNum == 0) {
-                returnNum = "0$num".toInt()
-                /**
-                 * and this is so that if the minute value is ever
-                 * a single digit (0 after being floored), it displays as 00 because 12:0pm looks bad
-                 */
-            }
-            return returnNum
-        }
-
-        val date: SkyBlockTime = SkyBlockTime.now()
-        val hour = if (date.hour > 12) date.hour - 12 else date.hour
-        val timeOfDay = if (date.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        "${SkyBlockTime.monthName(date.month)} ${date.day}${SkyBlockTime.daySuffix(date.day)}, $hour:${formatNum(date.minute)}$timeOfDay" // Early Winter 1st, 12:00pm
+        SkyBlockTime.now().getFormattedSkyblockTime()
     }),
 
     PROFILE({
