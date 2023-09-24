@@ -7,12 +7,16 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor.Companion.
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonAPI {
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
+    private val uniqueClassBonus =
+        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
     private val bossPattern =
         "View all your (?<name>\\w+) Collection".toPattern()
@@ -28,6 +32,10 @@ class DungeonAPI {
         var dungeonFloor: String? = null
         var started = false
         var inBossRoom = false
+        var playerClass: DungeonClass? = null
+        var playerClassLevel = -1
+        var isUniqueClass = false
+
         val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
         private val areaPattern = "The Catacombs \\((?<floor>.+)\\)".toPattern()
         private val timePattern =
@@ -96,6 +104,20 @@ class DungeonAPI {
                 }
             }
         }
+        if (dungeonFloor != null && playerClass == null) {
+            val playerTeam =
+                TabListData.getTabList().firstOrNull {
+                    it.contains(LorenzUtils.getPlayerName())
+                }?.removeColor() ?: ""
+
+            DungeonClass.entries.forEach {
+                if (playerTeam.contains("(${it.scoreboardName} ")) {
+                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNeeded()
+                    playerClass = it
+                    playerClassLevel = level
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -103,6 +125,9 @@ class DungeonAPI {
         dungeonFloor = null
         started = false
         inBossRoom = false
+        isUniqueClass = false
+        playerClass = null
+        playerClassLevel = -1
     }
 
     @SubscribeEvent
@@ -112,6 +137,9 @@ class DungeonAPI {
             if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
                 started = true
                 DungeonStartEvent(floor).postAndCatch()
+            }
+            if (event.message.removeColor().matches(uniqueClassBonus)) {
+                isUniqueClass = true
             }
         }
     }
@@ -175,5 +203,13 @@ class DungeonAPI {
                 return entries.firstOrNull { it.bossName == this }
             }
         }
+    }
+
+    enum class DungeonClass(val scoreboardName: String) {
+        ARCHER("Archer"),
+        BERSERK("Berserk"),
+        HEALER("Healer"),
+        MAGE("Mage"),
+        TANK("Tank")
     }
 }
