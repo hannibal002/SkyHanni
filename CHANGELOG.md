@@ -269,6 +269,7 @@
 + Fixed item rarity problems with very special. - hannibal2
 + Fixed party member detection issues for the tab complete feature. - CalMWolfs
 + Hide item rarity error message in /ff. - hannibal2
++ Fixed issue with Wheat Profit Display not showing the correct value when combined with Seeds. - Thunderblade73
 
 ### Removed Features
 
