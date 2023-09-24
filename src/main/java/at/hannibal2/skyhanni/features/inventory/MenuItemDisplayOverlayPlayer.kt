@@ -82,7 +82,7 @@ class MenuItemDisplayOverlayPlayer {
                 if (item.getLore().any { it.contains("Click to view!") }) {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
-                        if (itemName.removeColor().split(" ").size < 2) return ""
+                        if (itemName.removeColor().split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
                         if (!itemName.contains("Dungeon")) {
                             val text = itemName.removeColor().split(" ").last()
                             return "" + text.romanToDecimalIfNeeded()
