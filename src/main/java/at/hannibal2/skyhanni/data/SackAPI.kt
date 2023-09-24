@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackAPI {
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
+    private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
@@ -223,6 +224,9 @@ object SackAPI {
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
         SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved).postAndCatch()
+        if (chatConfig.hideSacksChange) {
+            event.blockedReason = "sacks_change"
+        }
     }
 
     @SubscribeEvent

@@ -182,7 +182,7 @@ class MinionFeatures {
     }
 
     private fun updateCoinsPerDay(): String {
-        val loc = lastMinion!!
+        val loc = lastMinion ?: return "§cNo last minion found! Try reopening the minion view."
         val slot = InventoryUtils.getItemsInOpenChest().find { it.slotNumber == 28 } ?: return ""
 
         val stack = slot.stack
