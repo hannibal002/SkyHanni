@@ -274,8 +274,15 @@ class SkyHanniDebugsAndTests {
         if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
 
-        val rarity = itemStack.getItemRarityOrNull(logError = false) ?: return
-        event.toolTip.add("rarity: $rarity")
+    }
+
+    @SubscribeEvent
+    fun showItemRarity(event: ItemTooltipEvent) {
+        if (!config.showItemRarity) return
+        val itemStack = event.itemStack ?: return
+
+        val rarity = itemStack.getItemRarityOrNull(logError = false)
+        event.toolTip.add("Item rarity: $rarity")
     }
 
     @SubscribeEvent
