@@ -42,9 +42,9 @@
     + No need to open the calendar every SkyBlock year again.
     + Grab Jacob Contest data from the elitebot.dev website.
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
-+ Added **SkyHanni Installer** - NetheriteMiner
++ Added SkyHanni **Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
-+ Added Chat Translator - NetheriteMiner
++ Added Chat **Translator** - NetheriteMiner
     + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
@@ -86,7 +86,18 @@
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
 + Added Fishing Hook Display. - hannibal2
-    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
+      screen.
++ Added **Trevor the Trapper Tracker**. - CalMWolfs
+    + Quests done
+    + A breakdown of their rarity
+    + Animals killed vs. animals that kill themselves
+    + Pelts per hour
++ Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
++ Added a countdown for Arachne spawn. - Cad
++ Added **Sack Change** chat message hider. - hannibal2
+    + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
+      data for future features.
 
 ### Changes
 
@@ -144,6 +155,11 @@
 + Moving many GUI elements in the config around. - hannibal2
     + This will not reset anything.
     + This includes the creation of new categories and regrouping.
++ Better Trevor the Trapper detection. - CalMWolfs
++ Show Trevor the Trapper's mob name next to the waypoint. - CalMWolfs
++ Small performance improvements when working with color codes. - brainage04
++ Added dungeon mage cooldown reduction support for item ability cooldown. - Cad
++ Improved the wording and fixed typos of the config category descriptions. - zapteryx
 
 ### Fixes
 
@@ -236,6 +252,23 @@
 + Fixed that the Paste Into Sign feature only pastes into the first line. - hannibal2 + nea
 + Hopefully fixed rare config reset cases. - nea
 + This should also fix problems with false positive detections in the crimson isle.
++ Fixed item rarity problems. - hannibal2
++ Fixed a rare error when opening minion inventory. - hannibal2
++ Fixed stuff in the **Trozen Treasure Tracker**. - CalMWolfs
+    + The ice/hour calculation
+    + Rate Timer
+    + Typos
++ Fixed a small typo in the config. - hannibal2
++ Fixed inconsistencies with Arachne brood highlighting. - Cad
++ Fixed Crimson Reputation Helper doesn't count trophy fish when sacks exist. - Fix3dll
++ Fixed a rare error when switching to a dicer farming tool too quickly. - Cad
++ Added workaround for new fire sale cosmetics (pet skin, helmet skin, rune) in estimated item value. - hannibal2
++ Fixed garden visitors not highlighting on status "new". - hannibal2
++ Fixed wrongly highlighting enchanted sacks for reputation helper fetch quests. - hannibal2
++ Fixed Fragged Spirit Mask not showing a cooldown after being triggered. - Cad
++ Fixed item rarity problems with very special. - hannibal2
++ Fixed party member detection issues for the tab complete feature. - CalMWolfs
++ Hide item rarity error message in /ff. - hannibal2
 
 ### Removed Features
 
@@ -622,7 +655,7 @@
     + Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what
       items it needs
 + Added **Show Price**
-    + Show the bazaar price of the items required for the visitors.
+    + Show the Bazaar price of the items required for the visitors.
 + Added **Crop Milestone** Number
     + Show the number of the crop milestone in the inventory.
 + Added **Crop Upgrades** Number

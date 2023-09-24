@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.*
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.http.client.config.RequestConfig
@@ -23,26 +24,25 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 class Translator {
-
     private val messageContentRegex = Regex(".*: (.*)")
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onGuiChat(e: ClientChatReceivedEvent) {
-        if (!SkyHanniMod.feature.chat.translator) return
-        if (e.type != 0.toByte()) return // If this is not a player-sent message, return
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onGuiChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
 
-        val chatComponent = e.message
-        val message = chatComponent.unformattedText
-        if (!messageContentRegex.matches(message.removeColor())) return
+        val message = event.message
+        if (message.getPlayerName() == "-") return
 
-        val clickStyle = createClickStyle(message)
-        chatComponent.siblings.last().setChatStyle(clickStyle)
+        val editedComponent =
+            if (event.chatComponent.siblings.size > 0) event.chatComponent.siblings.last() else event.chatComponent
+
+        val clickStyle = createClickStyle(message.removeColor(), editedComponent.chatStyle)
+        editedComponent.setChatStyle(clickStyle)
     }
 
-    private fun createClickStyle(message: String): ChatStyle {
-        val style = ChatStyle()
+    private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         style.setChatClickEvent(
             ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
@@ -60,6 +60,8 @@ class Translator {
 
 
     companion object {
+        private val config get() = SkyHanniMod.feature.chat
+
         // Using my own getJSONResponse because of 1 line of difference.
         private val parser = JsonParser()
         private val builder: HttpClientBuilder =
@@ -183,7 +185,7 @@ class Translator {
         }
 
         fun toEnglish(args: Array<String>) {
-            if (!SkyHanniMod.feature.chat.translator) return
+            if (!isEnabled()) return
             var message = ""
             for (i in args) {
                 message = "$message$i "
@@ -196,7 +198,7 @@ class Translator {
         }
 
         fun fromEnglish(args: Array<String>) {
-            if (!SkyHanniMod.feature.chat.translator) return
+            if (!isEnabled()) return
             if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
                 LorenzUtils.chat("§cUsage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
                 return
@@ -211,6 +213,10 @@ class Translator {
             LorenzUtils.chat("§e[SkyHanni] Copied translation to clipboard: $translation")
             OSUtils.copyToClipboard(translation)
         }
-    }
 
+
+        // TODO reenable once the translator is working again
+//        fun isEnabled() = config.translator
+        fun isEnabled() = false
+    }
 }

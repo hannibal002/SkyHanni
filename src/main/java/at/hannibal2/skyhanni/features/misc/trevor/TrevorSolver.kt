@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -13,13 +12,12 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.passive.EntityChicken
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
-    private val animalHealths = intArrayOf(100, 200, 400, 500, 1000, 2000, 5000, 10000, 20000) //future proofing for Derpy :)
+    private val animalHealths = intArrayOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
 
-    private var currentMob: TrevorMobs? = null
+    var currentMob: TrevorMobs? = null
     private var maxHeight: Double = 0.0
     private var minHeight: Double = 0.0
     private var foundID = -1
@@ -55,14 +53,6 @@ object TrevorSolver {
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMobs.entries.firstOrNull { it.mobName.contains(name) }
-            if (currentMob == TrevorMobs.CHICKEN) {
-                if (entity is EntityChicken) {
-                    if (entity.hasMaxHealth(20_000)) {
-                        // raider of the sea
-                        currentMob = null
-                    }
-                }
-            }
             if (animalHealths.any { it == entityHealth }) {
                 if (currentMob != null) {
                     if (foundID == entity.entityId) {
@@ -80,7 +70,7 @@ object TrevorSolver {
                         }
                         if (canSee) {
                             if (mobLocation != CurrentMobArea.FOUND) {
-                                TitleUtils.sendTitle("§2Saw Mob!", 3.seconds)
+                                TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
                             }
                             mobLocation = CurrentMobArea.FOUND
                             mobCoordinates = entity.position.toLorenzVec()

@@ -52,11 +52,11 @@ public class Features extends Config {
     public ChatConfig chat = new ChatConfig();
 
     @Expose
-    @Category(name = "Dungeon", desc = "Features that change the dungeon experience in catacombs.")
+    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
 
     @Expose
-    @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
+    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
     public InventoryConfig inventory = new InventoryConfig();
 
     @Expose
@@ -68,7 +68,7 @@ public class Features extends Config {
     public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose
-    @Category(name = "Minion", desc = "The minions at your private island.")
+    @Category(name = "Minion", desc = "The minions on your private island.")
     public MinionsConfig minions = new MinionsConfig();
 
     @Expose
@@ -80,7 +80,7 @@ public class Features extends Config {
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
-    @Category(name = "Combat", desc = "Everything combat and PVE related.")
+    @Category(name = "Combat", desc = "Everything combat and PvE related.")
     public CombatConfig combat = new CombatConfig();
 
     @Expose
@@ -96,15 +96,15 @@ public class Features extends Config {
     public CommandsConfig commands = new CommandsConfig();
 
     @Expose
-    @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer.")
+    @Category(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
-    @Category(name = "Events", desc = "Stuff that is not avaliable all the time.")
+    @Category(name = "Events", desc = "Stuff that is not always available.")
     public EventConfig event = new EventConfig();
 
     @Expose
-    @Category(name = "Garden", desc = "Features on the Garden island.")
+    @Category(name = "Garden", desc = "Features for the Garden island.")
     public GardenConfig garden = new GardenConfig();
 
     @Expose
