@@ -319,7 +319,7 @@ object EstimatedItemValue {
             itemRarity = LorenzRarity.LEGENDARY
         } else {
             if (stack.isRecombobulated()) {
-                val oneBelow = itemRarity.oneBelow(logError = false)
+                val oneBelow = itemRarity.oneBelow()
                 if (oneBelow == null) {
                     CopyErrorCommand.logErrorState(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
