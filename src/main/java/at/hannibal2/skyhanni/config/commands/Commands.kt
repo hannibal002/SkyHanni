@@ -254,7 +254,7 @@ object Commands {
         ) { SkyHanniDebugsAndTests.copyItemInternalName() }
         registerCommand(
             "shpartydebug",
-            "Lists person SkyHanni thinks is in your party into the chat."
+            "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
     }
 

@@ -20,7 +20,10 @@ class PartyAPI {
                 LorenzUtils.chat(" §a- §7$member")
             }
 
-            if (Random.nextDouble() < 0.1) OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
+            if (Random.nextDouble() < 0.1) {
+                OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
+                LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"))
+            }
         }
 
         val partyMembers = mutableListOf<String>()
