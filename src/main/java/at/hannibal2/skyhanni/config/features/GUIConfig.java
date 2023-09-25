@@ -57,7 +57,7 @@ public class GUIConfig {
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "In-game Date", desc = "Show the in-game date of Skyblock (like in Apec, §ebut with mild delays§7).\n(Though this one includes the Skyblock year!)")
+    @ConfigOption(name = "In-game Date", desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n(Though this one includes the SkyBlock year!)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean inGameDateDisplay = true;
