@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.max
 
 class ItemAbilityCooldown {
     private var lastAbility = ""
@@ -273,7 +275,7 @@ class ItemAbilityCooldown {
         }
         if (ability == ItemAbility.RAGNAROCK_AXE) {
             if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, 7_000)
+                ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
             }
         }
     }

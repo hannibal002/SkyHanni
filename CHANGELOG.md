@@ -95,6 +95,9 @@
     + Pelts per hour
 + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
 + Added a countdown for Arachne spawn. - Cad
++ Added **Sack Change** chat message hider. - hannibal2
+    + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
+      data for future features.
 
 ### Changes
 
@@ -155,6 +158,8 @@
 + Better Trevor the Trapper detection. - CalMWolfs
 + Show Trevor the Trapper's mob name next to the waypoint. - CalMWolfs
 + Small performance improvements when working with color codes. - brainage04
++ Added dungeon mage cooldown reduction support for item ability cooldown. - Cad
++ Improved the wording and fixed typos of the config category descriptions. - zapteryx
 
 ### Fixes
 
@@ -257,6 +262,13 @@
 + Fixed inconsistencies with Arachne brood highlighting. - Cad
 + Fixed Crimson Reputation Helper doesn't count trophy fish when sacks exist. - Fix3dll
 + Fixed a rare error when switching to a dicer farming tool too quickly. - Cad
++ Added workaround for new fire sale cosmetics (pet skin, helmet skin, rune) in estimated item value. - hannibal2
++ Fixed garden visitors not highlighting on status "new". - hannibal2
++ Fixed wrongly highlighting enchanted sacks for reputation helper fetch quests. - hannibal2
++ Fixed Fragged Spirit Mask not showing a cooldown after being triggered. - Cad
++ Fixed item rarity problems with very special. - hannibal2
++ Fixed party member detection issues for the tab complete feature. - CalMWolfs
++ Hide item rarity error message in /ff. - hannibal2
 
 ### Removed Features
 

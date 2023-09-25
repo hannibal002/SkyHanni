@@ -27,10 +27,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Compact Potion Effect Messages
 + **Arachne Chat Hider**
     + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
-
 + Option to shorten the **bestiary level-up** message.
 + Chat **Translator** - NetheriteMiner
     + After enabling, click on any chat message sent by another player to translate it to English.
++ **Sack Change** chat message hider. - hannibal2
+    + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
+      data for future features.
 
 ## Dungeon
 
@@ -106,10 +108,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Item Abilities
 
-- Show the cooldown of items in the inventory.
-- Option to change the item background according to the cooldown.
-- Hiding the flame particles when using the Fire Veil Wand ability.
-- Circle around the player when having the Fire Veil Wand ability active.
++ Show the **cooldown of items** in the inventory. - hannibal2
+    + Option to change the item background according to the cooldown.
+    + Supports dungeon mage cooldown reduction. - Cad
++ Hiding the flame particles when using the Fire Veil Wand ability.
++ Circle around the player when having the Fire Veil Wand ability active.
 
 ## Summoning Mobs
 

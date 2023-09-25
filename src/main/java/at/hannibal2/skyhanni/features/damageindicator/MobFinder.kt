@@ -252,7 +252,7 @@ class MobFinder {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
                     when {
                         entity.hasMaxHealth(300_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
-                        entity.hasMaxHealth(12_000_000, true -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+                        entity.hasMaxHealth(12_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
                         entity.hasMaxHealth(50_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
                         entity.hasMaxHealth(210_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
                     }

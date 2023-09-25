@@ -161,6 +161,16 @@ public class ChatConfig {
     @FeatureToggle
     public boolean hideArachneMessages = false;
 
+    @Expose
+    @ConfigOption(
+            name = "Sacks Hider",
+            desc = "Hide the chat's sack change message with this, " +
+                    "not in Hypixel settings, for mods to access sack data in new features."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideSacksChange = false;
+
     // TODO reenable once the translator is working again
 //    @Expose
 //    @ConfigOption(
