@@ -38,11 +38,5 @@ class InGameDateDisplay {
         config.inGameDateDisplayPosition.renderString(display, posLabel = "In-game Date Display")
     }
 
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(2, "misc.inGameDateDisplayEnabled", "gui.inGameDateDisplay")
-        event.move(2, "misc.inGameDateDisplayPosition", "gui.inGameDateDisplayPosition")
-    }
-
     fun isEnabled() = LorenzUtils.inSkyBlock && config.inGameDateDisplay
 }
