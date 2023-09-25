@@ -53,8 +53,9 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun readItemRarity(itemStack: ItemStack): LorenzRarity? {
             for (line in itemStack.getLore()) {
+                val string = line.replace("SHINY ", "")
                 for (rarity in LorenzRarity.entries) {
-                    if (line.startsWith(rarity.normalName) || line.startsWith(rarity.recombName)) {
+                    if (string.startsWith(rarity.normalName) || string.startsWith(rarity.recombName)) {
                         return rarity
                     }
                 }
