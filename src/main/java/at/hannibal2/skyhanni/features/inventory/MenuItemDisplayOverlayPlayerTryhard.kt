@@ -103,6 +103,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         if (lore.last().contains("§aCurrently selected!")) return "§a⬇"
                     } else if ((chestName.contains("Auction") || (chestName.contains("Bazaar"))) && (lore.first().contains("Category") && lore.last().contains("§aCurrently "))) {
                         return "§a➡"
+                    }
                 }
             }
         }
