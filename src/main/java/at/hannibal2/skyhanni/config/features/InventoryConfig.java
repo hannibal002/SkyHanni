@@ -369,6 +369,7 @@ public class InventoryConfig {
                 "§bBlood God Crest Strength",
                 "§bYeti Rod Bonus",
                 "§bItem Edition Number (if less than 1000)",
+                "§bShredder Bonus Damage",
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));

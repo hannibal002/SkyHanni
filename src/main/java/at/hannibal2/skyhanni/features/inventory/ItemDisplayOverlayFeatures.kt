@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
+    private val whyHaventTheAdminsAddedThisInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -258,6 +259,19 @@ class ItemDisplayOverlayFeatures {
                 if (edition == "null") { return "" }
                 if (edition.length >= 4){ return "" }
                 else { return (edition) }
+            }
+        }
+
+        if (stackSizeConfig.contains(19)) {
+            if (item.getInternalName_old() == ("THE_SHREDDER")) {
+                val lore = item.getLore()
+                if ((lore.any { it.contains("cap): ") }) && (lore.any { it.contains("Bonus Damage ") })) {
+                    for (line in lore) {
+                        whyHaventTheAdminsAddedThisInfoToItemNBTDataYetPattern.matchMatcher(line) {
+                            return group("dmgbonus")
+                        }
+                    }
+                }
             }
         }
 
