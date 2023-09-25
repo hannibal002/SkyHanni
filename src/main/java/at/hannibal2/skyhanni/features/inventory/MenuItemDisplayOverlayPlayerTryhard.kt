@@ -22,7 +22,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
-    private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?(?<years>[0-9]+)?y? (?<days>[0-9]{0,2})d (?<hours>[0-9]{0,2})h (?<minutes>[0-9]{0,2}m) (?<seconds>[0-9]{0,2})s".toPattern()
+    private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?((?<years>[0-9]+)?y)? ((?<days>[0-9]{0,2})d)? ((?<hours>[0-9]{0,2})h)? ((?<minutes>[0-9]{0,2})m)? ((?<seconds>[0-9]{0,2})s)?".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
