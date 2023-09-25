@@ -20,8 +20,9 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     ;
 
     private val chatColorCode by lazy { color.getChatColor() }
-    private val normalName by lazy { "$chatColorCode§l$name" }
-    private val recombName by lazy { "$chatColorCode§l§ka§r $chatColorCode§l$chatColorCode§l$name" }
+    private val rawName by lazy { name.replace("_", " ") }
+    private val normalName by lazy { "$chatColorCode§l$rawName" }
+    private val recombName by lazy { "$chatColorCode§l§ka§r $chatColorCode§l$chatColorCode§l$rawName" }
 
     //§d§l§ka§r §d§l§d§lMYTHIC
 
@@ -52,8 +53,9 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun readItemRarity(itemStack: ItemStack): LorenzRarity? {
             for (line in itemStack.getLore()) {
+                val string = line.replace("SHINY ", "")
                 for (rarity in LorenzRarity.entries) {
-                    if (line.startsWith(rarity.normalName) || line.startsWith(rarity.recombName)) {
+                    if (string.startsWith(rarity.normalName) || string.startsWith(rarity.recombName)) {
                         return rarity
                     }
                 }

@@ -53,6 +53,12 @@ public class DevConfig {
     public boolean showEmptyNames = false;
 
     @Expose
+    @ConfigOption(name = "Show Item Rarity", desc = "Show item rarities in item lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showItemRarity = false;
+
+    @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     @ConfigAccordionId(id = 0)
