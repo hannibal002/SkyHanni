@@ -370,13 +370,14 @@ public class InventoryConfig {
                 "§bYeti Rod Bonus",
                 "§bItem Edition Number (if less than 1000)",
                 "§bShredder Bonus Damage",
+                "§bBottle of Jyrre Intelligence Bonus",
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
 
     @Expose
     @ConfigOption(
-            name = "Menu stack size (Player, General)",
+            name = "Menu stack size (General)",
             desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
     )
     @ConfigEditorDraggableList(
@@ -396,7 +397,7 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-            name = "Menu stack size (Player, Advanced)",
+            name = "Menu stack size (Advanced)",
             desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
     )
     @ConfigEditorDraggableList(
@@ -417,7 +418,7 @@ public class InventoryConfig {
 
     @Expose
         @ConfigOption(
-                name = "Menu stack size (Player, Tryard)",
+                name = "Menu stack size (Tryard)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(
@@ -435,7 +436,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (Farming)",
+                name = "Menu stack size (§aFarmin§rg)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(
@@ -449,7 +450,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (Mining)",
+                name = "Menu stack size (§aMining§r)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(
@@ -462,7 +463,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (Combat)",
+                name = "Menu stack size (§aCombat§r)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(
@@ -479,7 +480,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (Skyblock Levels)",
+                name = "Menu stack size (SB Levels)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(

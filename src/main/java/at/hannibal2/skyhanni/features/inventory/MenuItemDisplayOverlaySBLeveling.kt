@@ -73,7 +73,7 @@ class MenuItemDisplayOverlaySBLeveling {
         }
 
         if (stackSizeConfig.contains(2)) {
-            if ((chestName.contains("Rewards")) && (!(itemName.isEmpty()))) {
+            if ((chestName.contains("Rewards") || chestName.lowercase().contains("skyblock leveling")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains("Progress to ") || line.contains("Rewards Unlocked: ")) {

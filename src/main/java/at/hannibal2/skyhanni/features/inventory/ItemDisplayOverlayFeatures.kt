@@ -25,6 +25,7 @@ class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val whyHaventTheAdminsAddedThisInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
+    private val iReallyHateTheBottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -269,6 +270,19 @@ class ItemDisplayOverlayFeatures {
                     for (line in lore) {
                         whyHaventTheAdminsAddedThisInfoToItemNBTDataYetPattern.matchMatcher(line) {
                             return group("dmgbonus")
+                        }
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(20)) {
+            if (item.getInternalName_old() == ("BOTTLE_OF_JYRRE")) {
+                val lore = item.getLore()
+                if (lore.any { it.contains("Intelligence Bonus: ")}) {
+                    for (line in lore) {
+                        iReallyHateTheBottleOfJerryPattern.matchMatcher(line) {
+                            return group("intelbonus")
                         }
                     }
                 }
