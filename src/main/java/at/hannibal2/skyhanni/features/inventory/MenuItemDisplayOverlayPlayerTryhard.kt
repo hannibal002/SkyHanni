@@ -101,11 +101,8 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
                     if (chestName.contains("Community Shop")) {
                         if (lore.last().contains("§aCurrently selected!")) return "§a⬇"
-                    } else if (chestName.contains("Auction")) {
-                        if (lore.first().contains("Category") && lore.last().contains("§aCurrently ")) return "§a➡"
-                    } else if (chestName.contains("Bazaar")) {
-                        if (lore.first().contains("Category") && lore.last().contains("§aCurrently ")) return "§a➡"
-                    }
+                    } else if ((chestName.contains("Auction") || (chestName.contains("Bazaar"))) && (lore.first().contains("Category") && lore.last().contains("§aCurrently "))) {
+                        return "§a➡"
                 }
             }
         }
