@@ -173,7 +173,7 @@ public class DungeonConfig {
     public static class TabListConfig {
 
         @Expose
-        @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list.")
+        @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in dungeon anyway?)")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean coloredClassLevel = true;
