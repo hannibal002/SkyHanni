@@ -21,8 +21,8 @@ object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun isSack(name: String): Boolean =
-        name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
+    fun isSack(stack: ItemStack): Boolean =
+        stack?.getInternalName_old()?.endsWith("_SACK") ?: false //TODO use item id or api or something? or dont, its working fine now
 
     fun ItemStack.getLore(): List<String> {
         val tagCompound = this.tagCompound ?: return emptyList()

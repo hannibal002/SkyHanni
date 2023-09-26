@@ -331,9 +331,8 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
-        val name = stack.cleanName()
         reverseColor = true
-        if (ItemUtils.isSack(name)) return false
+        if (ItemUtils.isSack(stack)) return false
 
 
         hideReason = "This item is not a sack!"
@@ -362,15 +361,13 @@ class HideNotClickableItems {
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be traded!"
             return true
-        }
-
-        val name = stack.cleanName()
-
-        if (ItemUtils.isSack(name)) {
+        }        
+        if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be traded!"
             return true
         }
-
+        
+        val name = stack.cleanName()
         val result = hidePlayerTradeFilter.match(name)
 
         if (result) hideReason = "This item cannot be traded!"
@@ -491,13 +488,12 @@ class HideNotClickableItems {
             return true
         }
 
-        val name = stack.cleanName()
-
-        if (ItemUtils.isSack(name)) {
+        if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be auctioned!"
             return true
         }
 
+        val name = stack.cleanName()
         val result = notAuctionableFilter.match(name)
         if (result) hideReason = "This item cannot be auctioned!"
         return result

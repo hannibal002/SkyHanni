@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val whyHaventTheAdminsAddedThisInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
+    private val whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
     private val iReallyHateTheBottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
 
     @SubscribeEvent
@@ -121,7 +121,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.displaySackName) {
-            if (ItemUtils.isSack(itemName)) {
+            if (ItemUtils.isSack(item)) {
                 val sackName = grabSackName(itemName)
                 return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
             }
@@ -268,7 +268,7 @@ class ItemDisplayOverlayFeatures {
                 val lore = item.getLore()
                 if ((lore.any { it.contains("cap): ") }) && (lore.any { it.contains("Bonus Damage ") })) {
                     for (line in lore) {
-                        whyHaventTheAdminsAddedThisInfoToItemNBTDataYetPattern.matchMatcher(line) {
+                        whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern.matchMatcher(line) {
                             return group("dmgbonus")
                         }
                     }
@@ -295,7 +295,6 @@ class ItemDisplayOverlayFeatures {
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
         val text = split[0]
-        if (text == "Ink") return "§k" //hotfix line because recursive functions are POG and we need to get rid of this false postive
         for (line in arrayOf("Large", "Medium", "Small", "Enchanted")) {
             if (text == line) return grabSackName(name.substring(text.length + 1))
         }
