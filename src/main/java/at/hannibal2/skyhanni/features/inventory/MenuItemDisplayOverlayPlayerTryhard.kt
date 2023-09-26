@@ -117,11 +117,11 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         val totalAsString = group("total").replace(",", "")
                         val usefulPartAsString = group("useful")
                         var suffix = when (totalAsString.length) {
-                            1..3 -> ""
-                            4..6 -> "k"
-                            7..9 -> "M"
-                            10..12 -> "B"
-                            13..15 -> "T"
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            in 10..12 -> "B"
+                            in 13..15 -> "T"
                             else -> "§b§z:)"
                         }
                         if (suffix == "§b§z:)") return suffix
