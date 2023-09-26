@@ -259,7 +259,19 @@ public class MiscConfig {
         public Property<String> customText = Property.of("");
 
         @Expose
-        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone, Slayer progress, or Stacking enchantment when possible, but this if you're doing none of them.")
+        @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "Crop Milestones",
+                        "Slayer",
+                        "Stacking Enchantment",
+                        "Dungeon",
+                }
+        )
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+
+        @Expose
+        @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
         @ConfigEditorDropdown(values = {
                 "Nothing",
                 "Location",

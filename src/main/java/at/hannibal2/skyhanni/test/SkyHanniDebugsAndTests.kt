@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -224,9 +224,9 @@ class SkyHanniDebugsAndTests {
                 if (LorenzUtils.inDungeons) {
                     builder.append("\n")
                     builder.append("in dungeon!\n")
-                    builder.append(" dungeonFloor: ${DungeonData.dungeonFloor}\n")
-                    builder.append(" started: ${DungeonData.started}\n")
-                    builder.append(" inBossRoom: ${DungeonData.inBossRoom}\n")
+                    builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
+                    builder.append(" started: ${DungeonAPI.started}\n")
+                    builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
                 }
 
             }

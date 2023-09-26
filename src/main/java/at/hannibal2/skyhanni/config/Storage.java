@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
@@ -425,6 +426,15 @@ public class Storage {
 
             @Expose
             public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities= new HashMap<>();
+        }
+
+        @Expose
+        public DungeonStorage dungeons = new DungeonStorage();
+
+        public static class DungeonStorage {
+
+            @Expose
+            public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
         }
     }
 }
