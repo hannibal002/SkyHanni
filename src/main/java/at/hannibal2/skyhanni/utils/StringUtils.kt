@@ -44,7 +44,7 @@ object StringUtils {
     /**
      * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
      */
-    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): NavigableMap<String?, T>? {
+    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
         if ("" == prefix) return map
         val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
