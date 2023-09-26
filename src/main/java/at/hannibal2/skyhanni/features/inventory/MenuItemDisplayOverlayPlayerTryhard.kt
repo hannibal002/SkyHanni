@@ -23,6 +23,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
     private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?((?<years>[0-9]+)?y)? ((?<days>[0-9]{0,2})d)? ((?<hours>[0-9]{0,2})h)? ((?<minutes>[0-9]{0,2})m)? ((?<seconds>[0-9]{0,2})s)?".toPattern()
+    private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -110,10 +111,28 @@ class MenuItemDisplayOverlayPlayerTryhard {
 
         
         if (stackSizeConfig.contains(4)) {
-            if ((chestName == "Booster Cookie" && itemName == "Fame Rank") || (chestName == "Community Shop" && itemName == "Community Shop")) {
+            if ((chestName == "Booster Cookie" && itemName == "Fame Rank")) {
                 for (line in item.getLore()) {
-                    if (line.contains("Your rank: ") || line.contains("Fame Rank: ")) {
-                        return when (line.removeColor().replace("Your rank: ", "").replace("Fame Rank: ", "")) {
+                    totalFamePattern.matchMatcher(line) {
+                        val totalAsString = group("total").replace(",", "")
+                        val usefulPartAsString = group("useful")
+                        var suffix = when (totalAsString.length) {
+                            1..3 -> ""
+                            4..6 -> "k"
+                            7..9 -> "M"
+                            10..12 -> "B"
+                            13..15 -> "T"
+                            else -> "§b§z:)"
+                        }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "" + usefulPartAsString + suffix
+                    }
+                }
+            }
+            if ((chestName == "Community Shop" && itemName == "Community Shop")) {
+                for (line in item.getLore()) {
+                    if (line.contains("Fame Rank: ")) {
+                        return when (line.removeColor().replace("Fame Rank: ", "")) {
                             "New Player" -> "NP"
                             "Settler" -> "Str"
                             "Citizen" -> "Ctz"

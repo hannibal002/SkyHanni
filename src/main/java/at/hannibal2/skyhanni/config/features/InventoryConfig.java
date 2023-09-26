@@ -427,7 +427,7 @@ public class InventoryConfig {
                         "§bRNG Meter Drop Odds (Abbvs)",
                         "§bCommunity Shop Upgrade Tiers",
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
-                        "§bFame Rank",
+                        "§bFame Rank + Abbv'd Fame Count",
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[years ➡ days ➡ hours ➡ etc...]",
                         "§bCurrently Active Potion Effects Count"
                 }
