@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.dungeon.getColor
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -23,11 +22,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -591,32 +588,6 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onTabListText(event: TabListLineRenderEvent) {
-        val t = event.text
-//        if (t.contains("Tank")) {
-//        if (Minecraft.getMinecraft().thePlayer.isSneaking) {
-        "§r(?<playerName>.*) §r§f\\(§r§d(?<className>.*) (?<classLevel>.*)§r§f\\)§r".toPattern().matchMatcher(t) {
-//                println("")
-//                println("t: '$t'")
-            val playerName = group("playerName")
-//                println("playerName: $playerName")
-            val split = playerName.split(" ")
-            val sbLevel = split[0]
-            val cleanName = split[1].cleanPlayerName()
-//                println("cleanName: $cleanName")
-
-            val className = group("className")
-//                println("className: $className")
-
-            val classLevel = group("classLevel")
-//                println("classLevel: $classLevel")
-            val lvl = classLevel.romanToDecimal()
-//                println("lvl: $lvl")
-            val lvlColor = getColor(lvl)
-
-            event.text = "$sbLevel §b$cleanName §7(§e$className $lvlColor$lvl§7)"
-//            }
-        }
-
         if (!GardenAPI.inGarden()) return
         if (!SkyHanniMod.feature.garden.visitorColoredName) return
         val text = event.text
