@@ -285,7 +285,8 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val list = items.filter { it.key.getItemUuid() == stack.getItemUuid() }
+        val uuid = stack.getItemUuid()
+        val list = items.filter { it.key.getItemUuid() == uuid }
             .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {

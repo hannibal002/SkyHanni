@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -207,16 +206,15 @@ class FarmingFortuneDisplay {
             return dedicationMultiplier * cropMilestone
         }
 
-        fun getSunderFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5 }
-        fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
-        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0}
+        fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
+        fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
+        fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
 
-        fun getAbilityFortune(item: ItemStack?):  Double  {
-            if (item == null) return 0.0
-            return getAbilityFortune(item.getInternalName(), item.getLore())
-        }
+        fun getAbilityFortune(item: ItemStack?) = item?.let {
+            getAbilityFortune(it.getInternalName(), it.getLore())
+        } ?: 0.0
 
-        fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>):  Double  {
+        fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
             // todo make it work on Melon and Cropie armor
             val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
