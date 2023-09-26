@@ -45,9 +45,9 @@ public class MiscConfig {
         public boolean showAlways = false;
 
         @Expose
-        @ConfigOption(name = "GDrag 200", desc = "Show for Golden Dragon the exp needed for level 200.")
+        @ConfigOption(name = "Dragon Egg", desc = "For an Golden Dragon Egg, show progress to level 100 instead of 200.")
         @ConfigEditorBoolean
-        public boolean goldenDragon200 = true;
+        public boolean showGoldenDragonEgg = true;
 
     }
 

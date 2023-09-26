@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -251,6 +252,10 @@ object Commands {
             "shcopyinternalname",
             "Copies the internal name of the item in hand to the clipboard."
         ) { SkyHanniDebugsAndTests.copyItemInternalName() }
+        registerCommand(
+            "shpartydebug",
+            "List persons into the chat SkyHanni thinks are in your party."
+        ) { PartyAPI.listMembers() }
     }
 
     private fun internalCommands() {

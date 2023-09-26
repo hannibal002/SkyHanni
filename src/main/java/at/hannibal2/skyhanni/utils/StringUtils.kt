@@ -16,6 +16,11 @@ object StringUtils {
     private val resetPattern = "(?i)§R".toPattern()
     private val playerChatPattern = ".*§[f7]: .*".toPattern()
     private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
+    private val resetPattern = "(?i)§R".toPattern()
+
+    fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
+    fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this

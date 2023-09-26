@@ -29,7 +29,7 @@ class Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onGuiChat(event: LorenzChatEvent) {
-        if (!SkyHanniMod.feature.chat.translator) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (message.getPlayerName() == "-") return
@@ -59,6 +59,8 @@ class Translator {
 
 
     companion object {
+        private val config get() = SkyHanniMod.feature.chat
+
         // Using my own getJSONResponse because of 1 line of difference.
         private val parser = JsonParser()
         private val builder: HttpClientBuilder =
@@ -182,7 +184,7 @@ class Translator {
         }
 
         fun toEnglish(args: Array<String>) {
-            if (!SkyHanniMod.feature.chat.translator) return
+            if (!isEnabled()) return
             var message = ""
             for (i in args) {
                 message = "$message$i "
@@ -195,7 +197,7 @@ class Translator {
         }
 
         fun fromEnglish(args: Array<String>) {
-            if (!SkyHanniMod.feature.chat.translator) return
+            if (!isEnabled()) return
             if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
                 LorenzUtils.chat("§cUsage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
                 return
@@ -210,5 +212,10 @@ class Translator {
             LorenzUtils.chat("§e[SkyHanni] Copied translation to clipboard: $translation")
             OSUtils.copyToClipboard(translation)
         }
+
+
+        // TODO reenable once the translator is working again
+//        fun isEnabled() = config.translator
+        fun isEnabled() = false
     }
 }
