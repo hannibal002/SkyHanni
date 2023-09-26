@@ -24,6 +24,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
     private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?((?<years>[0-9]+)?y)? ((?<days>[0-9]{0,2})d)? ((?<hours>[0-9]{0,2})h)? ((?<minutes>[0-9]{0,2})m)? ((?<seconds>[0-9]{0,2})s)?".toPattern()
     private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
+    private val bitsAvailablePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -114,6 +115,24 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if ((chestName == "Booster Cookie" && itemName == "Fame Rank")) {
                 for (line in item.getLore()) {
                     totalFamePattern.matchMatcher(line) {
+                        val totalAsString = group("total").replace(",", "")
+                        val usefulPartAsString = group("useful")
+                        var suffix = when (totalAsString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            in 10..12 -> "B"
+                            in 13..15 -> "T"
+                            else -> "§b§z:)"
+                        }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "" + usefulPartAsString + suffix
+                    }
+                }
+            }
+            if ((chestName == "Booster Cookie" && itemName == "Bits")) {
+                for (line in item.getLore()) {
+                    bitsAvailablePattern.matchMatcher(line) {
                         val totalAsString = group("total").replace(",", "")
                         val usefulPartAsString = group("useful")
                         var suffix = when (totalAsString.length) {
