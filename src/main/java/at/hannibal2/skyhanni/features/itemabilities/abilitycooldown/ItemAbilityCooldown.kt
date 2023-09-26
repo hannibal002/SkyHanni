@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
@@ -285,8 +286,8 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val uuid = stack.getItemUuid()
-        val list = items.filter { it.key.getItemUuid() == uuid }
+        val uuid = stack.getItemUuid() ?: stack.getItemId() ?: return
+        val list = items.filter { (it.key.getItemUuid() ?: it.key.getItemId()) == uuid }
             .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
