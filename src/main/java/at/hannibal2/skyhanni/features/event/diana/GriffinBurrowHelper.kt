@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.*
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object GriffinBurrowHelper {
-    private val config get() = SkyHanniMod.feature.diana
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private var guessLocation: LorenzVec? = null
     private var targetLocation: LorenzVec? = null
@@ -137,7 +138,7 @@ object GriffinBurrowHelper {
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()
-        if (SkyHanniMod.feature.diana.inquisitorSharing.enabled) {
+        if (config.inquisitorSharing.enabled) {
             for (inquis in InquisitorWaypointShare.waypoints.values) {
                 val playerName = inquis.fromPlayer
                 val location = inquis.location
@@ -163,7 +164,7 @@ object GriffinBurrowHelper {
         }
 
         if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
-            if (SkyHanniMod.feature.diana.inquisitorSharing.focusInquisitor) {
+            if (config.inquisitorSharing.focusInquisitor) {
                 return
             }
         }
@@ -190,6 +191,11 @@ object GriffinBurrowHelper {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "diana", "event.diana")
     }
 
     private fun sendTip(event: RenderWorldLastEvent) {

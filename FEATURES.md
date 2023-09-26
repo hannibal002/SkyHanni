@@ -27,10 +27,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Compact Potion Effect Messages
 + **Arachne Chat Hider**
     + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
-
 + Option to shorten the **bestiary level-up** message.
 + Chat **Translator** - NetheriteMiner
     + After enabling, click on any chat message sent by another player to translate it to English.
++ **Sack Change** chat message hider. - hannibal2
+    + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
+      data for future features.
 
 ## Dungeon
 
@@ -106,10 +108,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Item Abilities
 
-- Show the cooldown of items in the inventory.
-- Option to change the item background according to the cooldown.
-- Hiding the flame particles when using the Fire Veil Wand ability.
-- Circle around the player when having the Fire Veil Wand ability active.
++ Show the **cooldown of items** in the inventory. - hannibal2
+    + Option to change the item background according to the cooldown.
+    + Supports dungeon mage cooldown reduction. - Cad
++ Hiding the flame particles when using the Fire Veil Wand ability.
++ Circle around the player when having the Fire Veil Wand ability active.
 
 ## Summoning Mobs
 
@@ -181,6 +184,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Chum/Chumcap Bucket.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
++ Added Fishing Hook Display. - hannibal2
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
+      screen.
 
 ## Damage Indicator
 
@@ -291,6 +297,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ Added a countdown for Arachne spawn. - Cad
 + Option to hide the vanilla particles around enderman
 
 ## Garden Features
@@ -299,7 +306,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visitor Display** - Show all items needed for the visitors.
 + **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs
   to checked what items it needs.
-+ **Show Price** - Show the bazaar price of the items required for the visitors.
++ **Show Price** - Show the Bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
@@ -620,6 +627,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Travor Trapper** Features in Farming Islands
     + Trapper Cooldown GUI. - NetheriteMiner
         + Show the cooldown on screen in an overlay (intended for abiphone users).
+    + **Trevor the Trapper Tracker**. - CalMWolfs
+        + Quests done
+        + A breakdown of their rarity
+        + Animals killed vs. animals that kill themselves
+        + Pelts per hour
+    + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
 + **GUI Scale**: - nea
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.moveEntryToTop
@@ -134,7 +135,7 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.itemInHandId.contains("DICER") && config.moneyPerHourDicer) {
+            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.moneyPerHourDicer) {
                 val (dicerDrops, internalName) = when (it) {
                     CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
                     CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
@@ -338,7 +339,7 @@ object CropMoneyDisplay {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
                         val factor = NEUItems.getMultiplier(internalName).second
-                        npcPrice += internalName.getNpcPrice() * seedsPerHour / factor
+                        npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
                         sellOffer += it.buyPrice * seedsPerHour
                         instantSell += it.sellPrice * seedsPerHour
                     }

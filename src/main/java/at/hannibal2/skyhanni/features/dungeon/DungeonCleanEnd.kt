@@ -63,7 +63,7 @@ class DungeonCleanEnd {
         if (event.entity.entityId != lastBossId) return
 
         if (event.health <= 0) {
-            val dungeonFloor = DungeonData.dungeonFloor
+            val dungeonFloor = DungeonAPI.dungeonFloor
             LorenzUtils.chat("§eFloor $dungeonFloor done!")
             bossDone = true
         }
@@ -78,7 +78,7 @@ class DungeonCleanEnd {
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
         if (SkyHanniMod.feature.dungeon.cleanEndF3IgnoreGuardians) {
-            if (DungeonData.isOneOf("F3", "M3")) {
+            if (DungeonAPI.isOneOf("F3", "M3")) {
                 if (entity is EntityGuardian) {
                     if (entity.entityId != lastBossId) {
                         if (Minecraft.getMinecraft().thePlayer.isSneaking) {

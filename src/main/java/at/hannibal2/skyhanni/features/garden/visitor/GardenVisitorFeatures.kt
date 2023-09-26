@@ -669,7 +669,8 @@ class GardenVisitorFeatures {
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
+        for (entity in EntityUtils.getAllEntities()) {
+            if (entity is EntityArmorStand) continue
             if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
 
             visitor.entityId = entity.entityId

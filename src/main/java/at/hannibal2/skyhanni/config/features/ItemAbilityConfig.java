@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -36,4 +37,34 @@ public class ItemAbilityConfig {
     @ConfigEditorColour
     @ConfigAccordionId(id = 1)
     public String fireVeilWandDisplayColor = "0:245:255:85:85";
+
+    @ConfigOption(name = "Chicken Head", desc = "")
+    @Accordion
+    @Expose
+    public ChickenHeadConfig chickenHead = new ChickenHeadConfig();
+
+    public static class ChickenHeadConfig {
+
+        @Expose
+        @ConfigOption(name = "Checken Head Timer", desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean displayTimer = false;
+
+        @Expose
+        public Position position = new Position(-372, 73, false, true);
+
+        @Expose
+        @ConfigOption(name = "Hide Chat", desc = "Hide the 'You laid an egg!' chat message.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideChat = true;
+    }
+
+    @Expose
+    @ConfigOption(name = "Depleted Bonzo's Masks",
+            desc = "Highlights used Bonzo's Masks and Spirit Masks with a background.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean depletedBonzosMasks = false;
 }

@@ -124,7 +124,7 @@ public class GardenConfig {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     @FeatureToggle
@@ -1383,9 +1383,9 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Garden Plot Icon", desc = "")
     @Accordion
-    public PlotIcon plotIcon = new PlotIcon();
+    public PlotIconConfig plotIcon = new PlotIconConfig();
 
-    public static class PlotIcon {
+    public static class PlotIconConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Enable icon replacement in the Configure Plots menu.")
         @ConfigEditorBoolean

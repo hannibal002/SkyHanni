@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.utils.*
@@ -370,7 +370,7 @@ class DamageIndicatorManager {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
-                    val floor = DungeonData.dungeonFloor
+                    val floor = DungeonAPI.dungeonFloor
                     LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
                 }
                 return thorn
@@ -661,7 +661,7 @@ class DamageIndicatorManager {
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
-    ): String? {
+    ): String {
         val config = config.vampireSlayer
 
         if (config.percentage) {
@@ -699,7 +699,7 @@ class DamageIndicatorManager {
         println(" ")
         println("realHealth: $realHealth")
         println("realMaxHealth: $realMaxHealth")
-        val health = if (DungeonData.isOneOf("F4")) {
+        val health = if (DungeonAPI.isOneOf("F4")) {
             maxHealth = 4
 
             if (realMaxHealth == 300_000L) {
@@ -725,7 +725,7 @@ class DamageIndicatorManager {
                     else -> return null
                 }
             }
-        } else if (DungeonData.isOneOf("M4")) {
+        } else if (DungeonAPI.isOneOf("M4")) {
             maxHealth = 6
 
             if (realMaxHealth == 900_000L) {

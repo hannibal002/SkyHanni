@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -19,7 +20,7 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMiningCommissionMobs {
-    private val config get() = SkyHanniMod.feature.misc.mining
+    private val config get() = SkyHanniMod.feature.mining
     private var active = listOf<MobType>()
 
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
@@ -81,6 +82,11 @@ class HighlightMiningCommissionMobs {
                 { isEnabled() && type in active }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.mining", "mining")
     }
 
     fun isEnabled() = config.highlightCommissionMobs &&
