@@ -3,10 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 
 public class DungeonConfig {
 
@@ -167,6 +164,20 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean partyFinderColoredClassLevel = true;
+
+    @Expose
+    @ConfigOption(name = "Tab List", desc = "")
+    @Accordion
+    public TabListConfig tabList = new TabListConfig();
+
+    public static class TabListConfig {
+
+        @Expose
+        @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in dungeon anyway?)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean coloredClassLevel = true;
+    }
 
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +

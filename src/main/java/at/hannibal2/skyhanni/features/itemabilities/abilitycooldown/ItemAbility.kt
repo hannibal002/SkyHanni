@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -125,17 +125,17 @@ enum class ItemAbility(
         private fun ItemAbility.getMageCooldownReduction(): Double? {
             if (ignoreMageCooldownReduction) return null
             if (!LorenzUtils.inDungeons) return null
-            if (DungeonData.playerClass != DungeonData.DungeonClass.MAGE) return null
+            if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
 
             var abilityCooldownMultiplier = 1.0
-            abilityCooldownMultiplier -= if (DungeonData.isUniqueClass) {
+            abilityCooldownMultiplier -= if (DungeonAPI.isUniqueClass) {
                 0.5 // 50% base reduction at level 0
             } else {
                 0.25 // 25% base reduction at level 0
             }
 
             // 1% ability reduction every other level
-            abilityCooldownMultiplier -= 0.01 * floor(DungeonData.playerClassLevel / 2f)
+            abilityCooldownMultiplier -= 0.01 * floor(DungeonAPI.playerClassLevel / 2f)
 
             return abilityCooldownMultiplier
         }

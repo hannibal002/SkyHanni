@@ -1375,9 +1375,9 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Garden Plot Icon", desc = "")
     @Accordion
-    public PlotIcon plotIcon = new PlotIcon();
+    public PlotIconConfig plotIcon = new PlotIconConfig();
 
-    public static class PlotIcon {
+    public static class PlotIconConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Enable icon replacement in the Configure Plots menu.")
         @ConfigEditorBoolean

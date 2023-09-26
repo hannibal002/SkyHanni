@@ -45,9 +45,9 @@ public class MiscConfig {
         public boolean showAlways = false;
 
         @Expose
-        @ConfigOption(name = "GDrag 200", desc = "Show for Golden Dragon the exp needed for level 200.")
+        @ConfigOption(name = "Dragon Egg", desc = "For an Golden Dragon Egg, show progress to level 100 instead of 200.")
         @ConfigEditorBoolean
-        public boolean goldenDragon200 = true;
+        public boolean showGoldenDragonEgg = true;
 
     }
 
@@ -259,7 +259,19 @@ public class MiscConfig {
         public Property<String> customText = Property.of("");
 
         @Expose
-        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone, Slayer progress, or Stacking enchantment when possible, but this if you're doing none of them.")
+        @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "Crop Milestones",
+                        "Slayer",
+                        "Stacking Enchantment",
+                        "Dungeon",
+                }
+        )
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+
+        @Expose
+        @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
         @ConfigEditorDropdown(values = {
                 "Nothing",
                 "Location",

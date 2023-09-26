@@ -36,30 +36,31 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Dungeon
 
-- Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
-- Current milestone display.
-- Death Counter (Changing color depending on amount, hidden at 0 deaths)
-- Clean Ending (After the last dungeon boss has died, all entities and particles are no longer displayed and the music
++ Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
++ Current milestone display.
++ Death Counter (Changing color depending on amount, hidden at 0 deaths)
++ Clean Ending (After the last dungeon boss has died, all entities and particles are no longer displayed and the music
   stops playing, but the dungeon chests are still displayed)
-- Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
-- Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
-- Highlight deathmites in red color.
-- Hide Superboom TNT lying around in dungeon.
-- Hide Blessings lying around in dungeon.
-- Hide Revive Stones lying around in dungeon.
-- Hide Premium Flesh lying around in dungeon.
-- Hide Journal Entry pages lying around in dungeon.
-- Dungeon Copilot (Suggests to you what to do next in dungeon)
-- Option to hide key pickup and door open messages in dungeon.
-- Hide Skeleton Skulls lying around in dungeon.
-- Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature
++ Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
++ Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
++ Highlight deathmites in red color.
++ Hide Superboom TNT lying around in dungeon.
++ Hide Blessings lying around in dungeon.
++ Hide Revive Stones lying around in dungeon.
++ Hide Premium Flesh lying around in dungeon.
++ Hide Journal Entry pages lying around in dungeon.
++ Dungeon Copilot (Suggests to you what to do next in dungeon)
++ Option to hide key pickup and door open messages in dungeon.
++ Hide Skeleton Skulls lying around in dungeon.
++ Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature
   Hide Skeleton Skull)
-- Hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs.
-- Hide the golden fairy that follows the healer in dungeon.
-- Catacombs class level color in party finder inventory.
-- Visual highlight chests that have not yet been opened in the Croesus inventory.
-
++ Hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs.
++ Hide the golden fairy that follows the healer in dungeon.
++ Catacombs class level color in party finder inventory.
++ Visual highlight chests that have not yet been opened in the Croesus inventory.
 + Outline Dungeon Teammates. - Cad
++ Dungeon Colored Class Level. - hannibal2
+    + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
 
 ## Inventory
 
@@ -554,6 +555,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Works with Gemstone Slot unlock costs. - Fix3dll
 + **Discord RPC** - NetheriteMiner
     + Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence.
+    + Show dungeon information.
+        + Show the current floor name.
+        + Time since the dungeon started.
+        + Number of boss collections of the current boss.
+    + Dynamic Priority Box.
+        + Change the order or disable dynamically rendered features (e.g. Slayer, Dungeon, Crop Milestone, Stacking
+          Enchantment)
 + Server Restart Title
 + **City Project Features**
     + Show missing items to contribute inside the inventory

@@ -132,7 +132,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.23",
+    version = "0.20.Beta.24",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -143,7 +143,7 @@ class SkyHanniMod {
         loadModule(this)
         loadModule(ChatManager)
         loadModule(HypixelData())
-        loadModule(DungeonData())
+        loadModule(DungeonAPI())
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
@@ -411,6 +411,7 @@ class SkyHanniMod {
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
+        loadModule(DungeonRankTabListColor())
 
         init()
 

@@ -66,7 +66,10 @@ class PartyAPI {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
-
+        "The party was transferred to .* because (?<name>.*) left".toPattern().matchMatcher(message.removeColor()) {
+            val name = group("name").cleanPlayerName()
+            partyMembers.remove(name)
+        }
 
         // party disbanded
         ".* §ehas disbanded the party!".toPattern().matchMatcher(message) {
@@ -83,6 +86,10 @@ class PartyAPI {
         }
 
         // party list
+        "§6Party Members \\(\\d+\\)".toPattern().matchMatcher(message.removeResets()) {
+            partyMembers.clear()
+        }
+
         "Party (?:Leader|Moderators|Members): (?<names>.*)".toPattern().matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
