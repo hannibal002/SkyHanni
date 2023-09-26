@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor.Companion.toBoss
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -351,14 +349,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     DUNGEONS({
-        val floor = DungeonAPI.getFloor() ?: -1 // -1 if not in dungeons/failed to find a floor
-        val boss: DungeonFloor? = if (floor != -1) floor.toBoss() else null
-        if (floor == -1) AutoStatus.DUNGEONS.placeholderText
-        else if (boss == null) "Unknown boss"
-        else {
+        val boss = DungeonAPI.getCurrentBoss()
+        if (boss == null) {
+            "Unknown boss"
+        } else {
+            val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
             val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
             val time = DungeonAPI.getTime()
-            "$boss Kills: $amountKills ($time)"
+            "$floor Kills: $amountKills ($time)"
         }
     })
     ;

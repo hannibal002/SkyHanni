@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor.Companion.toFloor
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -39,7 +38,6 @@ class DungeonAPI {
         var isUniqueClass = false
 
         val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-        private val areaPattern = "The Catacombs \\((?<floor>.+)\\)".toPattern()
         private val timePattern =
             "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
 
@@ -76,14 +74,6 @@ class DungeonAPI {
             return bossName.endsWith(correctBoss)
         }
 
-        fun getFloor(): Int? {
-            val area = LorenzUtils.skyBlockArea
-            areaPattern.matchMatcher(area) {
-                if (matches()) return group("floor").last().digitToInt()
-            }
-            return null
-        }
-
         fun getTime(): String {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 timePattern.matchMatcher(line.removeColor()) {
@@ -92,6 +82,11 @@ class DungeonAPI {
                 }
             }
             return ""
+        }
+
+        fun getCurrentBoss(): DungeonFloor? {
+            val floor = dungeonFloor ?: return null
+            return DungeonFloor.valueOf(floor.replace("M", "F"))
         }
     }
 
@@ -168,7 +163,7 @@ class DungeonAPI {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                        val floor = name.toFloor() ?: return
+                        val floor = DungeonFloor.byBossName(name) ?: return
                         val lore = inventoryItems[4]?.getLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
@@ -202,7 +197,7 @@ class DungeonAPI {
                     }
                 }
             }
-            val floor = name.toFloor() ?: continue
+            val floor = DungeonFloor.byBossName(name) ?: continue
             bossCollections[floor] = kills
         }
     }
@@ -212,7 +207,7 @@ class DungeonAPI {
         if (!LorenzUtils.inDungeons) return
         killPattern.matchMatcher(event.message.removeColor()) {
             val bossCollections = bossStorage ?: return
-            val boss = group("boss").toFloor()
+            val boss = DungeonFloor.byBossName(group("boss"))
             if (matches() && boss != null && boss !in bossCollections) {
                 bossCollections.addOrPut(boss, 1)
             }
@@ -230,13 +225,7 @@ class DungeonAPI {
         F7("Necron");
 
         companion object {
-            fun Int.toBoss(): DungeonFloor {
-                return entries[this]
-            }
-
-            fun String.toFloor(): DungeonFloor? {
-                return entries.firstOrNull { it.bossName == this }
-            }
+            fun byBossName(bossName: String) = DungeonFloor.entries.firstOrNull { it.bossName == bossName }
         }
     }
 
