@@ -166,7 +166,7 @@ public class DungeonConfig {
     public boolean partyFinderColoredClassLevel = true;
 
     @Expose
-    @ConfigOption(name = "Garden Plot Icon", desc = "")
+    @ConfigOption(name = "Tab List", desc = "")
     @Accordion
     public TabListConfig tabList = new TabListConfig();
 
