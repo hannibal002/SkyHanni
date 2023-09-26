@@ -442,7 +442,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aFarmin§rg)",
+                name = "Menu stack size (§aFarming§r)",
                 desc = "Showing various pieces of information as a stack size for these menu items. Some values may be truncated percentages or §a✔§r§7s."
         )
         @ConfigEditorDraggableList(
