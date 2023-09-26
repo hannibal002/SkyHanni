@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -49,7 +50,7 @@ class PlayerChatSymbols {
 
             val split = usernameWithSymbols.split("$username ")
             var emblemText = if (split.size > 1) split[1] else ""
-            emblemText = StringUtils.removeResets(emblemText)
+            emblemText = emblemText.removeResets()
 
             if (emblemText != "") {
                 event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")

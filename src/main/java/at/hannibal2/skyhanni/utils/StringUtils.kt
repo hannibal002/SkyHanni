@@ -159,8 +159,6 @@ object StringUtils {
         builder.append(end)
         return builder.toString()
     }
-
-    fun removeResets(string: String): String = resetPattern.matcher(string).replaceAll("")
     
     fun String.capAtMinecraftLength(limit: Int) =
         capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
