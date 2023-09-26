@@ -409,7 +409,7 @@ public class InventoryConfig {
     @ConfigEditorDraggableList(
             exampleText = {
                     "§bUnlocked Recipes (%)",
-                    "§bCollected Fairy Souls + Completed Quests",
+                    "§bCollected Fairy/Enigma Souls + Completed Quests",
                     "§bTrades Unlocked (%)",
                     "§bWardrobe Slot (#)",
                     "§bShortened Skyblock Stats",

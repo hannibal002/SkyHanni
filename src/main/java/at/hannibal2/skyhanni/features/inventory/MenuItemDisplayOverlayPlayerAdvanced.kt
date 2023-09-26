@@ -22,6 +22,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     private val dojoTestOfGradePattern = "§7(§6)?Your Rank: (?<grade>§.[A-Z]).*".toPattern()
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
     private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
+    private val enigmaSoulsPattern = "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?\/(§.)?.*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -83,9 +84,10 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
 
         if (stackSizeConfig.contains(1)) {
+            val lore = item.getLore()
             if (chestName == "Quest Log") {
                 if (itemName == "Find all Fairy Souls") {
-                    for (line in item.getLore()) {
+                    for (line in lore) {
                         val newLine = line.removeColor()
                         val totalFairySouls = "242" //change this whenever hypixel adds more fairy souls
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
@@ -96,9 +98,22 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
                 if (itemName == "Completed Quests") {
-                    for (line in item.getLore()) {
+                    for (line in lore) {
                         if (line.contains("§7Completed: §a")) {
                             return "§a" + line.removeColor().replace("Completed: ", "")
+                        }
+                    }
+                }
+            }
+            if (chestName == "Rift Guide") {
+                if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
+                    if (lore.any { it.contains("Enigma Souls: ") }) {
+                        for (line in lore) {
+                            if (line.contains("Enigma Souls: ")) {
+                                enigmaSoulsPattern.matchMatcher(line) {
+                                    return group("useful")
+                                }
+                            }
                         }
                     }
                 }
@@ -249,6 +264,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                                 !(line.contains("You voted for this candidate!")) &&
                                 !(line.contains("Leading in votes!")) &&
                                 !(line.contains("Click to vote for ")) && 
+                                !(line.contains("SPECIAL ")) && 
                                 !(line.startsWith(colorCode + "§"))) {
                                     numPerks++
                             }
