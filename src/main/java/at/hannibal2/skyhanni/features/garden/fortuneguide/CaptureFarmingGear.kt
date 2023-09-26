@@ -60,7 +60,7 @@ class CaptureFarmingGear {
                     }
                 }
             }
-            for (armor in InventoryUtils.getArmor(0)) {
+            for (armor in InventoryUtils.getArmor()) {
                 if (armor == null) continue
                 val split = armor.getInternalName_old().split("_")
                 if (split.first() in farmingSets) {

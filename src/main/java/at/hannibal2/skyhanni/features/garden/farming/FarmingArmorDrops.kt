@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -93,7 +93,7 @@ class FarmingArmorDrops {
     }
 
     private fun checkArmor() {
-        val armorPieces = InventoryUtils.getArmor(1500)
+        val armorPieces = InventoryUtils.getArmor()
             .mapNotNull { it?.getInternalName_old() }
             .count { armorPattern.matcher(it).matches() }
         hasArmor = armorPieces > 1
@@ -102,8 +102,8 @@ class FarmingArmorDrops {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
-            armorDropJson = event.getConstant("ArmorDrops") ?: error("ArmorDrops not found in repo")
-
+            val data = event.getConstant<ArmorDropsJson>("ArmorDrops") ?: error("ArmorDrops not found in repo")
+            armorDropInfo = data.specialCrops
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -111,7 +111,7 @@ class FarmingArmorDrops {
     }
 
     companion object {
-        var armorDropJson = JsonObject()
+        var armorDropInfo = mapOf<String, ArmorDropsJson.DropInfo>()
         private var currentArmorDropChance = 0.0
         private var lastCalculationTime = SimpleTimeMark.farPast()
 
@@ -122,17 +122,15 @@ class FarmingArmorDrops {
                 lastCalculationTime = SimpleTimeMark.now()
 
                 val armorDropName = crop.specialDropType
-                val specialDropObject = armorDropJson[armorDropName].asJsonObject
-                val armorName = specialDropObject["armor_type"].asString
-                val pieceCount = InventoryUtils.getArmor(1500)
+                val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
+                val pieceCount = InventoryUtils.getArmor()
                     .mapNotNull { it?.getInternalName_old() }
                     .count { it.contains(armorName) || it.contains("FERMENTO") }
 
-
-                val dropRates = specialDropObject["chance"].asJsonArray
+                val dropRates = armorDropInfo[armorDropName]?.chances ?: return 0.0
                 var dropRate = 0.0
-                if (pieceCount > 0 && dropRates.size() >= pieceCount) {
-                    dropRate = dropRates[pieceCount - 1].asDouble
+                if (pieceCount > 0 && dropRates.size >= pieceCount) {
+                    dropRate = dropRates[pieceCount - 1].toDouble()
                 }
                 currentArmorDropChance = (dropRate * 60 * 60.0) / 100
             }

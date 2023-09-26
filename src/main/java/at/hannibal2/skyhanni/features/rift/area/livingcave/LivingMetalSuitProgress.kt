@@ -61,7 +61,7 @@ class LivingMetalSuitProgress {
         if (!event.repeatSeconds(1)) return
         val old = progressMap
         progressMap = buildMap {
-            for (armor in InventoryUtils.getArmor(1000).filterNotNull()) {
+            for (armor in InventoryUtils.getArmor().filterNotNull()) {
                 put(armor, armor.getLivingMetalProgress()?.toDouble()?.let {
                     it.coerceAtMost(100.0) / 100
                 })
