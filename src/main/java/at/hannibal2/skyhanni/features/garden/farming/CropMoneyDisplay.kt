@@ -331,7 +331,7 @@ object CropMoneyDisplay {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
                         val factor = NEUItems.getMultiplier(internalName).second
-                        npcPrice += internalName.getNpcPrice() * seedsPerHour / factor
+                        npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
                         sellOffer += it.buyPrice * seedsPerHour
                         instantSell += it.sellPrice * seedsPerHour
                     }
