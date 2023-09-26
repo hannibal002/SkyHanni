@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HideNotClickableItems {
+    private val config get() = SkyHanniMod.feature.inventory
 
     private var hideReason = ""
     private var reverseColor = false
@@ -81,7 +82,7 @@ class HideNotClickableItems {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (isDisabled()) return
-        if (SkyHanniMod.feature.inventory.notClickableItemsBypass && LorenzUtils.isControlKeyDown()) return
+        if (bypasssActive()) return
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
@@ -94,10 +95,10 @@ class HideNotClickableItems {
             if (slot.stack == null) continue
 
             if (hide(chestName, slot.stack)) {
-                val opacity = SkyHanniMod.feature.inventory.hideNotClickableOpacity
+                val opacity = config.hideNotClickableOpacity
                 val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
                 slot.stack.background = color.rgb
-            } else if (reverseColor && SkyHanniMod.feature.inventory.hideNotClickableItemsGreenLine) {
+            } else if (reverseColor && config.hideNotClickableItemsGreenLine) {
                 val color = LorenzColor.GREEN.addOpacity(200)
                 slot.stack.borderLine = color.rgb
             }
@@ -108,6 +109,7 @@ class HideNotClickableItems {
     fun onTooltip(event: ItemTooltipEvent) {
         if (isDisabled()) return
         if (event.toolTip == null) return
+        if (bypasssActive()) return
 
         val guiChest = Minecraft.getMinecraft().currentScreen
         if (guiChest !is GuiChest) return
@@ -127,6 +129,9 @@ class HideNotClickableItems {
                 LorenzUtils.warning("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
+                if (config.notClickableItemsBypass) {
+                    event.toolTip.add("  §7(Disable with holding the control key)")
+                }
             }
         }
     }
@@ -134,8 +139,8 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (isDisabled()) return
-        if (!SkyHanniMod.feature.inventory.hideNotClickableItemsBlockClicks) return
-        if (SkyHanniMod.feature.inventory.notClickableItemsBypass && LorenzUtils.isControlKeyDown()) return
+        if (!config.hideNotClickableItemsBlockClicks) return
+        if (bypasssActive()) return
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 
@@ -156,10 +161,12 @@ class HideNotClickableItems {
         }
     }
 
+    private fun bypasssActive() = config.notClickableItemsBypass && LorenzUtils.isControlKeyDown()
+
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true
 
-        return !SkyHanniMod.feature.inventory.hideNotClickableItems
+        return !config.hideNotClickableItems
     }
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
