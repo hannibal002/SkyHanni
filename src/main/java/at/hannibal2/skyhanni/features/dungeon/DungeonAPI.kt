@@ -5,12 +5,17 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonFloor.Companion.toFloor
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.LorenzUtils.getOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonAPI {
@@ -23,10 +28,7 @@ class DungeonAPI {
     private val levelPattern =
         " +(?<kills>\\d+).*".toPattern()
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
-    private val bossList = listOf("Bonzo", "Scarf", "The Professor", "Thorn", "Livid", "Sadan", "Necron")
-
-    private var bossCollections: MutableMap<DungeonFloor, Int> = mutableMapOf()
-
+    private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
     companion object {
         var dungeonFloor: String? = null
@@ -147,8 +149,43 @@ class DungeonAPI {
     // This returns a map of boss name to the integer for the amount of kills the user has in the collection
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Boss Collections") return
-        nextItem@ for ((_, stack) in event.inventoryItems) {
+        val bossCollections = bossStorage ?: return
+
+        if (event.inventoryName == "Boss Collections") {
+            readallCollections(bossCollections, event.inventoryItems)
+        } else if (event.inventoryName.endsWith(" Collection")) {
+            readOneMaxCollection(bossCollections, event.inventoryItems, event.inventoryName)
+        }
+    }
+
+    private fun readOneMaxCollection(
+        bossCollections: MutableMap<DungeonFloor, Int>,
+        inventoryItems: Map<Int, ItemStack>,
+        inventoryName: String
+    ) {
+        inventoryItems[48]?.let { item ->
+            if (item.name == "§aGo Back") {
+                item.getLore().getOrNull(0)?.let { firstLine ->
+                    if (firstLine == "§7To Boss Collections") {
+                        val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
+                        val floor = name.toFloor() ?: return
+                        val lore = inventoryItems[4]?.getLore() ?: return
+                        val line = lore.find { it.contains("Total Kills:") } ?: return
+                        val kills = totalKillsPattern.matchMatcher(line) {
+                            group("kills").formatNumber().toInt()
+                        } ?: return
+                        bossCollections[floor] = kills
+                    }
+                }
+            }
+        }
+    }
+
+    private fun readallCollections(
+        bossCollections: MutableMap<DungeonFloor, Int>,
+        inventoryItems: Map<Int, ItemStack>,
+    ) {
+        nextItem@ for (stack in inventoryItems.values) {
             var name = ""
             var kills = 0
             nextLine@ for (line in stack.getLore()) {
@@ -156,7 +193,6 @@ class DungeonAPI {
                 bossPattern.matchMatcher(colorlessLine) {
                     if (matches()) {
                         name = group("name")
-                        if (!bossList.contains(name)) continue@nextItem // to avoid kuudra, etc.
                     }
                 }
                 levelPattern.matchMatcher(colorlessLine) {
@@ -166,20 +202,19 @@ class DungeonAPI {
                     }
                 }
             }
-            val floor = name.toFloor()
-            if (floor != null) bossCollections[floor] = kills
+            val floor = name.toFloor() ?: continue
+            bossCollections[floor] = kills
         }
-        ProfileStorageData.profileSpecific?.dungeons?.bosses = bossCollections
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
         killPattern.matchMatcher(event.message.removeColor()) {
+            val bossCollections = bossStorage ?: return
             val boss = group("boss").toFloor()
-            if (matches() && boss != null && bossCollections[boss] != null) {
-                bossCollections[boss] = bossCollections[boss]!! + 1
-                ProfileStorageData.profileSpecific?.dungeons?.bosses = bossCollections
+            if (matches() && boss != null && boss !in bossCollections) {
+                bossCollections.addOrPut(boss, 1)
             }
         }
     }

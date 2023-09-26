@@ -355,8 +355,11 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val boss: DungeonFloor? = if (floor != -1) floor.toBoss() else null
         if (floor == -1) AutoStatus.DUNGEONS.placeholderText
         else if (boss == null) "Unknown boss"
-        else "$boss Kills: ${DungeonAPI.bossStorage?.get(boss) ?: "Unknown"} (${DungeonAPI.getTime()})"
-
+        else {
+            val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+            val time = DungeonAPI.getTime()
+            "$boss Kills: $amountKills ($time)"
+        }
     })
     ;
 
