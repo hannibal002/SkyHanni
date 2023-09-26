@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -25,7 +26,11 @@ class CroesusUnopenedChestTracker {
                 val lore = stack.getLore()
                 if ("§eClick to view chests!" in lore) {
                     if ("§aNo more Chests to open!" !in lore) {
-                        slot highlight LorenzColor.DARK_PURPLE
+                        slot highlight if(lore.any { it.contains("Opened Chest") }){
+                            LorenzColor.DARK_AQUA
+                        }else {
+                            LorenzColor.DARK_PURPLE
+                        }
                     }
                 }
             }

@@ -176,6 +176,7 @@
     + The item flickering for ability cooldown background should be less/gone completely.
 + Added the ability to bypass not clickable items when holding the control key. - CalMWolfs
 + Added toggle for 12hr/24hr in real time hud - Thunderblade73
++ Croesus Chest Tracker can now determine chest that only can be open with a dungeon key - Thunderblade73
 
 ### Fixes
 
