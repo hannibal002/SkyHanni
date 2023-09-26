@@ -16,10 +16,15 @@ object CopyErrorCommand {
     private var cache =
         CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build<Pair<String, Int>, Unit>()
 
+    fun skyHanniError(message: String): Nothing {
+        val exception = IllegalStateException(message)
+        logError(exception, message)
+        throw exception
+    }
+
     fun command(array: Array<String>) {
         if (array.size != 1) {
             LorenzUtils.chat("§cUse /shcopyerror <error id>")
-
             return
         }
 
@@ -35,6 +40,10 @@ object CopyErrorCommand {
             OSUtils.copyToClipboard(it)
             "§e[SkyHanni] $name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "§c[SkyHanni] Error id not found!")
+    }
+
+    fun logErrorState(userMessage: String, internalMessage: String) {
+        logError(IllegalStateException(internalMessage), userMessage)
     }
 
     fun logError(throwable: Throwable, message: String) {
@@ -115,6 +124,11 @@ private fun String.removeSpam(): String {
         "at net.minecraft.client.Minecraft.addScheduledTask(",
         "at java.lang.reflect.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$",
+        "CopyErrorCommand.logErrorState(CopyErrorCommand.kt:46)",
+        "LorenzEvent.postWithoutCatch(LorenzEvent.kt:24)",
+        "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
+        "at net.minecraft.launchwrapper.",
+        "at net.fabricmc.devlaunchinjector.",
     )
     return split("\n").filter { line -> !ignored.any { line.contains(it) } }.joinToString("\n")
 }

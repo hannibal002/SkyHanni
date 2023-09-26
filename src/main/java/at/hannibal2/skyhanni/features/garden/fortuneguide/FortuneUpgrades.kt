@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.c
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -46,7 +46,7 @@ object FortuneUpgrades {
             genericUpgrades.add(
                 FortuneUpgrade(
                     "§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
-                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 2.0
+                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 4.0
                 )
             )
         }
@@ -198,7 +198,7 @@ object FortuneUpgrades {
                 )
             )
         }
-        val cropMilestone = GardenCropMilestones.getTierForCrops(crop.getCounter())
+        val cropMilestone = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
         if (dedicationLvl != 4 && cropMilestone > 0) {
             val dedicationMultiplier = listOf(0.5, 0.75, 1.0, 2.0)[dedicationLvl]
             val dedicationIncrease =
@@ -221,7 +221,7 @@ object FortuneUpgrades {
         }
         if (cultivatingLvl == 0) {
             cropSpecificUpgrades.add(
-                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 6.0)
+                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 12.0)
             )
         }
         if (turboCropLvl != 5) {
@@ -254,7 +254,7 @@ object FortuneUpgrades {
         } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getItemRarityOrCommon().id + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(
             FortuneUpgrade("§7Recombobulate your ${item.displayName}", null, "RECOMBOBULATOR_3000", 1, increase)
         )
@@ -267,7 +267,7 @@ object FortuneUpgrades {
         copperPrice: Int? = null
     ) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getItemRarityOrCommon().id, FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(
             FortuneUpgrade(
                 "§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",

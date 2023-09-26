@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.utils.*
@@ -40,7 +41,7 @@ class DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val config get() = SkyHanniMod.feature.damageIndicator
+    private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     companion object {
         private var data = mapOf<UUID, EntityData>()
@@ -369,7 +370,7 @@ class DamageIndicatorManager {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
-                    val floor = DungeonData.dungeonFloor
+                    val floor = DungeonAPI.dungeonFloor
                     LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
                 }
                 return thorn
@@ -637,16 +638,18 @@ class DamageIndicatorManager {
         }
 
         //Laser phase
-        if (entity.ridingEntity != null) {
-            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            //val remainingTicks = 8 * 20 - ticksAlive
-            val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+        if (config.enderSlayer.laserPhaseTimer) {
+            if (entity.ridingEntity != null) {
+                val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+                //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+                //val remainingTicks = 8 * 20 - ticksAlive
+                val remainingTicks = (7.4 * 20).toLong() - ticksAlive
 
-            if (config.showHealthDuringLaser) {
-                entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
-            } else {
-                return formatDelay(remainingTicks * 50)
+                if (config.enderSlayer.showHealthDuringLaser) {
+                    entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
+                } else {
+                    return formatDelay(remainingTicks * 50)
+                }
             }
         }
 
@@ -658,8 +661,8 @@ class DamageIndicatorManager {
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
-    ): String? {
-        val config = SkyHanniMod.feature.damageIndicator.vampireSlayer
+    ): String {
+        val config = config.vampireSlayer
 
         if (config.percentage) {
             val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
@@ -696,7 +699,7 @@ class DamageIndicatorManager {
         println(" ")
         println("realHealth: $realHealth")
         println("realMaxHealth: $realMaxHealth")
-        val health = if (DungeonData.isOneOf("F4")) {
+        val health = if (DungeonAPI.isOneOf("F4")) {
             maxHealth = 4
 
             if (realMaxHealth == 300_000L) {
@@ -722,7 +725,7 @@ class DamageIndicatorManager {
                     else -> return null
                 }
             }
-        } else if (DungeonData.isOneOf("M4")) {
+        } else if (DungeonAPI.isOneOf("M4")) {
             maxHealth = 6
 
             if (realMaxHealth == 900_000L) {
@@ -855,6 +858,11 @@ class DamageIndicatorManager {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "damageIndicator", "combat.damageIndicator")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

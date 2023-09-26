@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
@@ -9,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -67,7 +67,7 @@ object SlayerAPI {
         val displayName = getNameWithEnchantmentFor(internalName)
 
         val price = internalName.getPrice()
-        val npcPrice = internalName.getBazaarData()?.npcPrice ?: 0.0
+        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         val maxPrice = npcPrice.coerceAtLeast(price)
         val totalPrice = maxPrice * amount
 
@@ -121,7 +121,11 @@ object SlayerAPI {
         }
 
         if (event.isMod(5)) {
-            isInSlayerArea = SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            isInSlayerArea = if (LorenzUtils.isStrandedProfile) {
+                true
+            } else {
+                SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            }
         }
     }
 }

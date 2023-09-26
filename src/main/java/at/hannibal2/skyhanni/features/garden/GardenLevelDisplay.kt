@@ -13,18 +13,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
+import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private val expToNextLevelPattern = "(?:.*) §e(?<nextLevelExp>.*)§6\\/(?:.*)".toPattern()
+    private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
-    private var gardenExp
-        get() = GardenAPI.config?.experience ?: -1
-        set(value) {
-            GardenAPI.config?.experience = value
-        }
     private var display = ""
     private var visitorRewardPattern = " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience".toPattern()
 
@@ -43,15 +39,19 @@ class GardenLevelDisplay {
     }
 
     private fun addExp(moreExp: Int) {
-        val oldLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
-        gardenExp += moreExp
-        val newLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
+        val gardenExp = GardenAPI.gardenExp ?: return
+        val oldLevel = GardenAPI.getGardenLevel()
+        GardenAPI.gardenExp = gardenExp + moreExp
+        val newLevel = GardenAPI.getGardenLevel()
         if (newLevel == oldLevel + 1) {
             if (newLevel > 15) {
-                LorenzUtils.chat(
-                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                            " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "
-                )
+                LorenzUtils.runDelayed(50.milliseconds) {
+                    LorenzUtils.clickableChat(
+                        " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
+                                " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
+                        "/gardenlevels"
+                    )
+                }
             }
         }
         update()
@@ -65,20 +65,20 @@ class GardenLevelDisplay {
 
         namePattern.matchMatcher(item.name!!.removeColor()) {
             val currentLevel = group("currentLevel").romanToDecimalIfNeeded()
-            var nextLevelExp = 0
+            var nextLevelExp = 0L
             for (line in item.getLore()) {
                 expToNextLevelPattern.matchMatcher(line) {
-                    nextLevelExp = group("nextLevelExp").replace(",", "").toDouble().roundToInt()
+                    nextLevelExp = group("nextLevelExp").replace(",", "").toDouble().roundToLong()
                 }
                 overflowPattern.matchMatcher(line) {
-                    val overflow = group("overflow").replace(",", "").toDouble().roundToInt()
-                    gardenExp = overflow
+                    val overflow = group("overflow").replace(",", "").toDouble().roundToLong()
+                    GardenAPI.gardenExp = overflow
                     update()
                     return
                 }
             }
             val expForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
-            gardenExp = expForLevel + nextLevelExp
+            GardenAPI.gardenExp = expForLevel + nextLevelExp
             update()
         }
     }
@@ -88,8 +88,8 @@ class GardenLevelDisplay {
     }
 
     private fun drawDisplay(): String {
-        if (gardenExp == -1) return "§aGarden Level ? §cOpen the desk!"
-        val currentLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
+        val gardenExp = GardenAPI.gardenExp ?: return "§aGarden Level ? §cOpen the desk!"
+        val currentLevel = GardenAPI.getGardenLevel()
         val needForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
         val nextLevel = currentLevel + 1
         val needForNextLevel = GardenAPI.getExpForLevel(nextLevel).toInt()

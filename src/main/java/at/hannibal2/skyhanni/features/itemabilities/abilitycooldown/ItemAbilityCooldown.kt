@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -14,17 +15,21 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.max
 
 class ItemAbilityCooldown {
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
+    private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
@@ -34,6 +39,11 @@ class ItemAbilityCooldown {
                 if (abilityScrolls.size != 3) return
 
                 ItemAbility.HYPERION.sound()
+            }
+        }
+        if (event.soundName == "liquid.lavapop") {
+            if (event.pitch == 1.0f && event.volume == 1f) {
+                ItemAbility.FIRE_FURY_STAFF.sound()
             }
         }
         if (event.soundName == "mob.enderdragon.growl") {
@@ -46,8 +56,12 @@ class ItemAbilityCooldown {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
             }
             if (event.pitch == 1f && event.volume == 1f) {
-                val internalName = InventoryUtils.getItemInHand()?.getInternalName_old() ?: return
-                if (!internalName.equalsOneOf("SHADOW_FURY", "STARRED_SHADOW_FURY")) return
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (!internalName.equalsOneOf(
+                        "SHADOW_FURY".asInternalName(),
+                        "STARRED_SHADOW_FURY".asInternalName()
+                    )
+                ) return
 
                 ItemAbility.SHADOW_FURY.sound()
             }
@@ -82,9 +96,17 @@ class ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
         }
-        if (event.soundName == "random.successful_hit") {
+        if (event.soundName == "random.successful_hit") { // Jinxed Voodoo Doll Hit
             if (event.volume == 1.0f && event.pitch == 0.7936508f) {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
+            }
+        }
+        if (event.soundName == "mob.ghast.scream") { // Jinxed Voodoo Doll Miss
+            if (event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7) {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if (VOODOO_DOLL_WILTED in recentItems) {
+                    ItemAbility.VOODOO_DOLL_WILTED.sound()
+                }
             }
         }
         if (event.soundName == "random.explode") {
@@ -139,7 +161,7 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "random.drink") {
-            if (event.pitch.round(1) == 1.8 && event.volume == 1.0f) {
+            if (event.pitch.round(1) == 1.8f && event.volume == 1.0f) {
                 ItemAbility.HOLY_ICE.sound()
             }
         }
@@ -157,7 +179,7 @@ class ItemAbilityCooldown {
 
     private fun handleItemClick(itemInHand: ItemStack?) {
         if (!LorenzUtils.inSkyBlock) return
-        itemInHand?.getInternalName_old()?.run {
+        itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
         }
     }
@@ -214,19 +236,15 @@ class ItemAbilityCooldown {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.isMod(2)) {
-            checkHotBar()
-        }
+        checkHotBar(event.isMod(10))
     }
 
-    private fun checkHotBar() {
-        val items = mutableMapOf<ItemStack, MutableList<ItemText>>()
-        for ((stack, _) in ItemUtils.getItemsInInventoryWithSlots(true)) {
-            for (ability in hasAbility(stack)) {
-                items.getOrPut(stack) { mutableListOf() }.add(createItemText(ability))
-            }
+    private fun checkHotBar(recheckInventorySlots: Boolean = false) {
+        if (recheckInventorySlots || abilityItems.isEmpty()) {
+            abilityItems = ItemUtils.getItemsInInventory(true).associateWith { hasAbility(it) }
         }
-        this.items = items
+
+        items = abilityItems.mapValues { kp -> kp.value.map { createItemText(it) } }
     }
 
     private fun createItemText(ability: ItemAbility): ItemText {
@@ -255,7 +273,7 @@ class ItemAbilityCooldown {
         }
         if (ability == ItemAbility.RAGNAROCK_AXE) {
             if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, 7_000)
+                ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
             }
         }
     }
@@ -267,7 +285,8 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val list = items.filter { it.key == stack }
+        val uuid = stack.getItemUuid()
+        val list = items.filter { it.key.getItemUuid() == uuid }
             .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
@@ -321,7 +340,7 @@ class ItemAbilityCooldown {
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
-        val internalName = stack.getInternalName_old()
+        val internalName = stack.getInternalName()
 
         val list = mutableListOf<ItemAbility>()
         for (ability in ItemAbility.entries) {

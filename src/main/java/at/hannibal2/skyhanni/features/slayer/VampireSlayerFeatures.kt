@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
@@ -127,8 +128,12 @@ object VampireSlayerFeatures {
                                     if (shouldSendSound)
                                         playTwinclawsSound()
                                     if (shouldSendTitle)
-                                        TitleUtils.sendTitle("§6§lTWINCLAWS", (1750 - config.twinclawsDelay), 2.6)
-                                    nextClawSend = System.currentTimeMillis() + 5000
+                                        TitleUtils.sendTitle(
+                                            "§6§lTWINCLAWS",
+                                            (1750 - config.twinclawsDelay).milliseconds,
+                                            2.6
+                                        )
+                                    nextClawSend = System.currentTimeMillis() + 5_000
                                 }
                             }
                         }
@@ -178,7 +183,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle)
-                TitleUtils.sendTitle("§c§lSTEAK!", 300, 2.6)
+                TitleUtils.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
 
             if (shouldRender) {
                 RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }
@@ -278,9 +283,13 @@ object VampireSlayerFeatures {
                     val vec = event.exactLocation(it)
                     val distance = start.distance(vec)
                     if (distance <= 15) {
-                        val p = Minecraft.getMinecraft().thePlayer
-                        val add = if (p.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-                        event.draw3DLine(event.exactLocation(p).add(add), vec.add(0.0, 1.54, 0.0), config.lineColor.toChromaColor(), config.lineWidth, true)
+                        event.draw3DLine(
+                            event.exactPlayerEyeLocation(),
+                            vec.add(0.0, 1.54, 0.0),
+                            config.lineColor.toChromaColor(),
+                            config.lineWidth,
+                            true
+                        )
                     }
                 }
             }
@@ -300,10 +309,20 @@ object VampireSlayerFeatures {
                             color
                         ) { isEnabled() }
 
-                        val linesColorStart = (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
+                        val linesColorStart =
+                            (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
-                        event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
-                        event.drawDynamicText(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), text, 1.5, ignoreBlocks = false)
+                        event.drawColor(
+                            stand.position.toLorenzVec().add(0.0, 2.0, 0.0),
+                            LorenzColor.DARK_RED,
+                            alpha = 1f
+                        )
+                        event.drawDynamicText(
+                            stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
+                            text,
+                            1.5,
+                            ignoreBlocks = false
+                        )
                         for ((player, stand2) in standList) {
                             if ((configBloodIcor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
                                 event.draw3DLine(
@@ -312,7 +331,8 @@ object VampireSlayerFeatures {
                                     // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
                                     linesColorStart,
                                     3,
-                                    true)
+                                    true
+                                )
                         }
                     }
                     if (configBloodIcor.renderBeam && isIchor) {

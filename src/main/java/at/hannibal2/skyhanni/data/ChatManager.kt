@@ -156,8 +156,8 @@ object ChatManager {
         val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
 
         @Suppress("UNCHECKED_CAST")
-        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
-        if (!chatLines.removeIf { it.chatComponent === message }) return
+        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
+        if (!chatLines.removeIf { it?.chatComponent === message }) return
         chatGUI.refreshChat()
 
         val history = messageHistory[IdentityCharacteristics(message)] ?: return

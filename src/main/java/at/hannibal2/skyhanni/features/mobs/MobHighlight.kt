@@ -11,12 +11,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MobHighlight {
-    private val config get() = SkyHanniMod.feature.mobs
+    private val config get() = SkyHanniMod.feature.combat.mobs
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
@@ -40,7 +41,7 @@ class MobHighlight {
         val entity = event.entity
         val maxHealth = event.maxHealth
         if (config.arachneKeeperHighlight) {
-            if (maxHealth == 3_000 && entity is EntitySpider) {
+            if ((maxHealth == 3_000 || maxHealth == 12_000) && entity is EntityCaveSpider) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_BLUE.toColor().withAlpha(127))
                 { config.arachneKeeperHighlight }
                 RenderLivingEntityHelper.setNoHurtTime(entity) { config.arachneKeeperHighlight }
@@ -56,7 +57,9 @@ class MobHighlight {
         }
 
         if (config.zealotBruiserHighlighter) {
-            if ((maxHealth == 65_000 || maxHealth == 13_000) && entity is EntityEnderman) {
+            val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 3 // runic
+            val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 3 // runic
+            if ((isZealot || isBruiser) && entity is EntityEnderman) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_AQUA.toColor().withAlpha(127))
                 { config.zealotBruiserHighlighter }
                 RenderLivingEntityHelper.setNoHurtTime(entity) { config.zealotBruiserHighlighter }
@@ -85,10 +88,9 @@ class MobHighlight {
             !entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) return
 
-        val maxHealth = entity.baseMaxHealth
-        if (maxHealth == 12 || maxHealth == 4000) {
+        if (entity is EntityCaveSpider) {
             markArachneMinis(entity)
-        } else {
+        } else if (entity.baseMaxHealth == 20_000 || entity.baseMaxHealth == 100_000) {
             markArachne(entity)
         }
     }

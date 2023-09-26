@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.OwnInventorItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class WildStrawberryDyeNotification {
     var lastCloseTime = 0L
@@ -23,7 +24,7 @@ class WildStrawberryDyeNotification {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!SkyHanniMod.feature.garden.wildStrawberryDyeNotification) return
 
@@ -36,7 +37,7 @@ class WildStrawberryDyeNotification {
             val internalName = event.itemStack.getInternalName_old()
             if (internalName == "DYE_WILD_STRAWBERRY") {
                 val name = event.itemStack.name!!
-                TitleUtils.sendTitle(name, 5_000)
+                TitleUtils.sendTitle(name, 5.seconds)
                 LorenzUtils.chat("§e[SkyHanni] You found a $name§e!")
                 SoundUtils.playBeepSound()
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("DYE_WILD_STRAWBERRY"), 5_000)

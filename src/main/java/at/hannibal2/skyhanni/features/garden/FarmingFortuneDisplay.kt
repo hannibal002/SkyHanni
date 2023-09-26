@@ -3,16 +3,18 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -49,7 +51,7 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onInventoryUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.itemStack.getCropType() == null) return
         updateToolFortune(event.itemStack)
@@ -157,14 +159,15 @@ class FarmingFortuneDisplay {
         var itemBaseFortune = 0.0
         var greenThumbFortune = 0.0
 
-        fun getToolFortune(tool: ItemStack?): Double {
-            val internalName = tool?.getInternalName_old() ?: return 0.0
-            if (internalName == "THEORETICAL_HOE") {
+        fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
+        fun getToolFortune(internalName: NEUInternalName?): Double {
+            if (internalName == null) return 0.0
+            if (internalName.equals("THEORETICAL_HOE")) {
                 return 0.0
             }
             return if (internalName.startsWith("THEORETICAL_HOE")) {
-                listOf(10.0, 25.0, 50.0)[internalName.last().digitToInt() - 1]
-            } else when (internalName) {
+                listOf(10.0, 25.0, 50.0)[internalName.toString().last().digitToInt() - 1]
+            } else when (internalName.toString()) {
                 "FUNGI_CUTTER" -> 30.0
                 "COCO_CHOPPER" -> 20.0
                 else -> 0.0
@@ -194,25 +197,31 @@ class FarmingFortuneDisplay {
         }
 
         fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
+            if (cropType == null) return 0.0
             val dedicationLevel = tool?.getEnchantments()?.get("dedication") ?: 0
             val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
-            val cropMilestone = GardenCropMilestones.getTierForCrops(
-                cropType?.getCounter() ?: 0
+            val cropMilestone = GardenCropMilestones.getTierForCropCount(
+                cropType.getCounter(), cropType
             )
             return dedicationMultiplier * cropMilestone
         }
 
-        fun getSunderFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5 }
-        fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
-        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0).toDouble()}
+        fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
+        fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
+        fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
 
-        fun getAbilityFortune(item: ItemStack?):  Double  {
+        fun getAbilityFortune(item: ItemStack?) = item?.let {
+            getAbilityFortune(it.getInternalName(), it.getLore())
+        } ?: 0.0
+
+        fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
             // todo make it work on Melon and Cropie armor
             val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
             var pieces = 0
-            for (line in item?.getLore()!!) {
-                if (item.getInternalName_old().contains("LOTUS")) {
+
+            lore.forEach { line ->
+                if (internalName.contains("LOTUS")) {
                     lotusAbilityPattern.matchMatcher(line) {
                         return group("bonus").toDouble()
                     }
@@ -225,6 +234,7 @@ class FarmingFortuneDisplay {
                     return if (pieces < 2) 0.0 else group("bonus").toDouble() / pieces
                 }
             }
+
             return 0.0
         }
 
@@ -253,7 +263,14 @@ class FarmingFortuneDisplay {
             val accessoryFortune = accessoryFortune ?: 0.0
 
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
+            var carrotFortune = 0.0
+
+            if (currentCrop == CropType.CARROT) {
+                GardenAPI.config?.fortune?.let {
+                    if (it.carrotFortune) carrotFortune = 12.0
+                }
+            }
+            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + carrotFortune
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)

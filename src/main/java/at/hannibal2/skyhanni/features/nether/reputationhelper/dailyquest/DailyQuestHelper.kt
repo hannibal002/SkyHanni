@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.*
@@ -15,6 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -30,7 +30,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
-    private var latestTrophyFishInInventory = 0
 
 
     @SubscribeEvent
@@ -51,26 +50,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            checkInventoryForTrophyFish()
-        }
-
         if (event.repeatSeconds(3)) {
             checkInventoryForFetchItem()
         }
-    }
-
-    // TODO use OwnInventorItemUpdateEvent
-    private fun checkInventoryForTrophyFish() {
-        val fishQuest = getQuest<TrophyFishQuest>() ?: return
-        if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
-
-        val fishName = fishQuest.fishName
-        val currentlyInInventory = InventoryUtils.countItemsInLowerInventory { it.name?.contains(fishName) ?: false }
-        val diff = currentlyInInventory - latestTrophyFishInInventory
-        if (diff < 1) return
-        latestTrophyFishInInventory = currentlyInInventory
-        updateProcessQuest(fishQuest, fishQuest.haveAmount + diff)
     }
 
     fun update() {
@@ -110,6 +92,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 if (slot == null) continue
                 if (slot.slotNumber != slot.slotIndex) continue
                 val stack = slot.stack ?: continue
+                if (stack.name!!.contains("Enchanted")) continue
+
                 if (stack.getLore().any { it.contains(fetchItem) }) {
                     slot highlight LorenzColor.AQUA
                 }
@@ -148,6 +132,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             rescueMissionQuest.state = QuestState.READY_TO_COLLECT
             update()
         }
+
+        if (message.contains("§6§lTROPHY FISH! §r§bYou caught a")) {
+            val fishQuest = getQuest<TrophyFishQuest>() ?: return
+            if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
+            val fishName = fishQuest.fishName
+
+            if (message.contains(fishName)) {
+                updateProcessQuest(fishQuest, fishQuest.haveAmount + 1)
+            }
+        }
     }
 
     inline fun <reified T : Quest> getQuest() = quests.filterIsInstance<T>().firstOrNull()
@@ -179,7 +173,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (!reputationHelper.showLocations()) return
 
         for (quest in quests) {
             if (quest is MiniBossQuest) continue
@@ -300,14 +294,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun reset() {
         quests.clear()
-        latestTrophyFishInInventory = 0
     }
 
     fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         reset()
 
         questLoader.loadConfig(storage)
-        latestTrophyFishInInventory = storage.latestTrophyFishInInventory
 
     }
 
@@ -334,10 +326,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             }
             storage.quests.add(builder.toString())
         }
-
-        storage.latestTrophyFishInInventory = latestTrophyFishInInventory
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE &&
-            SkyHanniMod.feature.misc.crimsonIsleReputationHelper
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
 }

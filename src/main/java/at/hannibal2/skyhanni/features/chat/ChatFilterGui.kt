@@ -62,7 +62,8 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
                     LorenzUtils.chat("Copied structured chat line to clipboard")
                 } else {
-                    OSUtils.copyToClipboard(msg.message.formattedText)
+                    val message = LorenzUtils.stripVanillaMessage(msg.message.formattedText)
+                    OSUtils.copyToClipboard(message)
                     LorenzUtils.chat("Copied chat line to clipboard")
                 }
             }
