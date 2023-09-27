@@ -202,7 +202,7 @@ class MenuItemDisplayOverlayPlayer {
             if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
-            if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence"))) {
+            if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) || (chestName.endsWith(" Essence"))) {
                 val lore = item.getLore()
                 if ((lore.any { it.contains("Your ") }) && (lore.any { it.contains(" Essence: ") })) {
                     for (line in lore) {

@@ -23,6 +23,9 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
     private val bitsAvailablePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
     private val magicalPowerPattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val magicalPowerSecondPattern = "Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*) Magical Power".toPattern()
+    private val tuningPointsPattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val slotSourcePattern = "(§.)(?<category>.*)?: (§.)?(\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -232,6 +235,59 @@ class MenuItemDisplayOverlayPlayerTryhard {
                             if (suffix == "§b§z:)") return suffix
                             else return "" + usefulAsString + suffix
                         }
+                    }
+                }
+            }
+            if (chestName.contains("Accessory Bag Upgrades") && itemName == ("Accessory Bag Upgrades")) {
+                var totalSlotsResult = 0
+                for (line in lore) {
+                    if (line.contains(" Slots") && (line.contains("Elizabeth") || line.contains("Redstone ") || line.contains("Jacobus"))) {
+                        slotSourcePattern.matchMatcher(line){
+                            totalSlotsResult += group("slots").toInt()
+                        }
+                    }
+                }
+                return "${totalSlotsResult}"
+            }
+            if (chestName.contains("Stats Tuning") && itemName == ("Stats Tuning")) {
+                if (item.getLore().any { it.contains("Tuning Points: ") }) {
+                    for (line in lore) {
+                        if (line.contains("Tuning Points: ")) {
+                            tuningPointsPattern.matchMatcher(line) {
+                                val usefulAsString = group("useful")
+                                val totalAsString = group("total").replace(",", "")
+                                var suffix = when (totalAsString.length) {
+                                    in 1..3 -> ""
+                                    in 4..6 -> "k"
+                                    else -> "§b§z:)"
+                                }
+                                if (suffix == "§b§z:)") return suffix
+                                else return "" + usefulAsString + suffix
+                            }
+                        }
+                    }
+                }
+            }
+            if (chestName.contains("Power Stones Guide")) {
+                if (!(item.getLore().isEmpty()) && item.getLore().last().contains("Learned: ")) {
+                    val symbol = item.getLore().last().split(" ").last()
+                    if (symbol == "✖") return "§c" + symbol
+                    else return "§a" + symbol
+                }
+            }
+            if (chestName.contains("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
+                if (item.getLore().last().contains(" Magical Power")) {
+                    magicalPowerSecondPattern.matchMatcher(line) {
+                        val usefulAsString = group("useful")
+                        val totalAsString = group("total").replace(",", "")
+                        var suffix = when (totalAsString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            else -> "§b§z:)"
+                        }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "" + usefulAsString + suffix
                     }
                 }
             }

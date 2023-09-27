@@ -444,7 +444,7 @@ public class InventoryConfig {
                         "§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)",
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",
                         "§bCurrently Active Potion Effects Count (#)",
-                        "§bAccessory Bag Magical Power (Abbv)",
+                        "§bAccessory Bag Utilities (Various)",
                         "§bSkyBlock Achievements Points (%)",
                 }
         )
