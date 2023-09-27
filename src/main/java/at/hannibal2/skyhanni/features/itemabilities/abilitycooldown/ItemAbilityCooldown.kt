@@ -293,9 +293,9 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val uuid = stack.getItemUuid() ?: stack.getItemId() ?: return
-        val list = items.filter { (it.key.getItemUuid() ?: it.key.getItemId()) == uuid }
-            .firstNotNullOfOrNull { it.value } ?: return
+        val uuid = stack.getIdentifier() ?: return
+        val list = items.filter { (it.key.getIdentifier()) == uuid }
+             .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
             if (guiOpen && !itemText.onCooldown) continue
@@ -317,6 +317,8 @@ class ItemAbilityCooldown {
             }
         }
     }
+
+    private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
