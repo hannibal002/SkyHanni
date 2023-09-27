@@ -450,12 +450,12 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aFarming§r)",
+                name = "Menu stack size (§aFarming§7)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§bFarming Contests Medal Inventory (§6G§fS§cB§b)",
+                        "§bFarming Contests Medal Inventory (§6§l§rG§f§l§rS§c§l§rB§r§b)",
                         "§bVisitor's Logbook Countdown (#, highest unit of time only)",
                         "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
                 }
@@ -464,7 +464,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aMining§r)",
+                name = "Menu stack size (§aMining§7)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
@@ -477,7 +477,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aCombat§r)",
+                name = "Menu stack size (§aCombat§7)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
@@ -494,7 +494,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aSB Levels§r)",
+                name = "Menu stack size (§aSB Levels§7)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
@@ -509,7 +509,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aAb§9ip§5ho§6ne§ds§r)",
+                name = "Menu stack size (§aAb§9ip§5ho§6ne§ds§7)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
@@ -518,7 +518,7 @@ public class InventoryConfig {
                         "§bDND Indicator (§c§l✖§b)",
                         "§bRelays Finished (#)",
                         "§bSelected Ringtone (Abbv)",
-                        "§bTic Tac Toe Stats (§aW§eT§cL§r)",
+                        "§bTic Tac Toe Stats (§aW§eT§cL§b)",
                         "§bSnake Highest Score (#)",
                 }
         )
