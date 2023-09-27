@@ -535,8 +535,8 @@ object LorenzUtils {
 
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
-    fun <T> T.transformIf(condition: Boolean, transofmration: T.() -> T) =
-        if (condition) transofmration(this) else this
+    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
+        if (condition()) transofmration(this) else this
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
