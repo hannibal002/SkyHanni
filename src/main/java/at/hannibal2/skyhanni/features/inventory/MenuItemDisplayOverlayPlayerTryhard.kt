@@ -23,7 +23,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
     private val bitsAvailablePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
     private val magicalPowerPattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
-    private val magicalPowerSecondPattern = "(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val magicalPowerSecondPattern = ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
     private val tuningPointsPattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
     private val slotSourcePattern = "(§.)(?<category>.*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
 
@@ -276,20 +276,20 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     else return "§a" + symbol
                 }
             }
-            if (chestName.contains("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
+            if (chestName.contains(" Thaumaturgy") && itemName.contains(" Breakdown")) {
                 for (line in lore) {
                     if (line.contains("Total: ")) {
-                        magicalPowerSecondPattern.matchMatcher(lore.last()) {
-                            val usefulAsString = group("useful")
-                            val totalAsString = group("total").replace(",", "")
-                            var suffix = when (totalAsString.length) {
+                        magicalPowerSecondPattern.matchMatcher(line) {
+                            val usefulString = group("useful")
+                            val totalString = group("total").replace(",", "")
+                            var suffix = when (totalString.length) {
                                 in 1..3 -> ""
                                 in 4..6 -> "k"
                                 in 7..9 -> "M"
                                 else -> "§b§z:)"
                             }
                             if (suffix == "§b§z:)") return suffix
-                            else return "" + usefulAsString + suffix
+                            else return "" + usefulString + suffix
                         }
                     }
                 }
