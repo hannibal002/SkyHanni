@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils

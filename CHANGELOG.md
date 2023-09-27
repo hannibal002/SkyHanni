@@ -98,6 +98,15 @@
 + Added **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
++ Added dungeon information to the Discord RPC. - NetheriteMiner
+    + Show the current floor name.
+    + Time since the dungeon started.
+    + Number of boss collections of the current boss.
++ Added a Dynamic Priority Box to Discord RPC. - NetheriteMiner
+    + Change the order or disable dynamically rendered features (e.g. Slayer, Dungeon, Crop Milestone, Stacking
+      Enchantment)
++ Dungeon Colored Class Level. - hannibal2
+    + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
 
 ### Changes
 
@@ -160,6 +169,12 @@
 + Small performance improvements when working with color codes. - brainage04
 + Added dungeon mage cooldown reduction support for item ability cooldown. - Cad
 + Improved the wording and fixed typos of the config category descriptions. - zapteryx
++ Changed the option in the pet experience tooltip to show progress to level 100 for golden dragon eggs (can be
+  disabled). - hannibal2
++ Replaces the word Tps to TPS. - Erymanthus
++ Improved performance of item ability cooldown and farming fortune display data. - Cad
+    + The item flickering for ability cooldown background should be less/gone completely.
++ Added the ability to bypass not clickable items when holding the control key. - CalMWolfs
 
 ### Fixes
 
@@ -269,7 +284,8 @@
 + Fixed item rarity problems with very special. - hannibal2
 + Fixed party member detection issues for the tab complete feature. - CalMWolfs
 + Hide item rarity error message in /ff. - hannibal2
-+ Fixed issue with Wheat Profit Display not showing the correct value when combined with Seeds. - Thunderblade73
++ Fixed an issue with the Wheat Profit Display not showing the correct value when combined with seeds. - Thunderblade73
++ Tab complte party members now also detects if the party leader leaves. - CalMWolfs
 
 ### Removed Features
 

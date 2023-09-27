@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import java.util.*
+import java.util.Locale
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")

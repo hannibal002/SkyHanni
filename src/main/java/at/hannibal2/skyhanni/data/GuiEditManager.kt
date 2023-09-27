@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
-import java.util.*
+import java.util.UUID
 
 class GuiEditManager {
 

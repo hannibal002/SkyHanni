@@ -9,7 +9,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import java.util.*
+import java.util.IdentityHashMap
 
 object GardenCustomKeybinds {
     private val shConfig get() = SkyHanniMod.feature.garden

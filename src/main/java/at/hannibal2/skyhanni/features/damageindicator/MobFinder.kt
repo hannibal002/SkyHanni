@@ -22,10 +22,21 @@ import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.monster.*
+import net.minecraft.entity.monster.EntityBlaze
+import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.monster.EntityGhast
+import net.minecraft.entity.monster.EntityGiantZombie
+import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntityIronGolem
+import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.monster.EntityPigZombie
+import net.minecraft.entity.monster.EntitySkeleton
+import net.minecraft.entity.monster.EntitySlime
+import net.minecraft.entity.monster.EntitySpider
+import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
-import java.util.*
+import java.util.UUID
 
 class MobFinder {
 

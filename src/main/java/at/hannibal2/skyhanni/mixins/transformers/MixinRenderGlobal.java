@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.mixins.hooks.RenderGlobalHook;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
-import at.hannibal2.skyhanni.utils.EntityOutlineRenderer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
