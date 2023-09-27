@@ -63,7 +63,18 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(0)) {
             if (itemName == "Previous Page" || itemName == "Next Page") {
                 val line = item.getLore().first().replace(",", "")
-                if (chestName.contains("Auction")) { return auctionHousePagePattern.matchMatcher(line) { group("pagenumber") } ?: "" }
+                if (chestName.contains("Auction")) {
+                    auctionHousePagePattern.matchMatcher(line) {
+                        var pageNum = group("pagenumber").toInt()
+                        if (itemName == "Previous Page") {
+                            pageNum--
+                        } else if (itemName == "Next Page") {
+                            pageNum++
+                        }
+                        if (pageNum > 999) return "1k+"
+                        else return "${pageNum}"
+                    }
+                }
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
         }
