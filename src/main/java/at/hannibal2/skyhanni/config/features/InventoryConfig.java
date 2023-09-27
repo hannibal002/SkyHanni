@@ -403,8 +403,8 @@ public class InventoryConfig {
                     "§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)",
                     "§bMuseum Donation Progress (%, # for Special Items)",
                     "§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)",
-                    "§bPet Score + Pet Status (Various)",
-                    "§bCrimson/Dungeons Essence (#)",
+                    "§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)",
+                    "§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)",
             }
     )
     public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));

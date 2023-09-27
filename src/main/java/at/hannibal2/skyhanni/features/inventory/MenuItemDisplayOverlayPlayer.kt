@@ -24,6 +24,7 @@ class MenuItemDisplayOverlayPlayer {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
     private val dungeonClassLevelPattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
     private val dungeonEssenceRewardPattern = "(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)".toPattern()
+    private val essenceCountPattern = "(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>([0-9]+)?(?<useless>,[0-9]+))*)".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
@@ -200,6 +201,29 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(8)) {
             if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
+            }
+            if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence"))) {
+                val lore = item.getLore()
+                if ((lore.any { it.contains("Your ") }) && (lore.any { it.contains(" Essence: ") })) {
+                    for (line in lore) {
+                        if (line.contains("Your ") && line.contains(" Essence: ")) {
+                            essenceCountPattern.matchMatcher(line) {
+                                val usefulAsString = group("useful")
+                                val totalAsString = group("total").replace(",", "")
+                                var suffix = when (totalAsString.length) {
+                                    in 1..3 -> ""
+                                    in 4..6 -> "k"
+                                    in 7..9 -> "M"
+                                    in 10..12 -> "B"
+                                    in 13..15 -> "T"
+                                    else -> "§b§z:)"
+                                }
+                                if (suffix == "§b§z:)") return suffix
+                                else return "" + usefulAsString + suffix
+                            }
+                        }
+                    }
+                }
             }
         }
 

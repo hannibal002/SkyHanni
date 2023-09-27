@@ -51,7 +51,7 @@ class MenuItemDisplayOverlaySBLeveling {
         //NOTE: IT'S String.length, NOT String.length()!
         
         if (stackSizeConfig.contains(0)) {
-            if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {
+            if (((chestName.contains("Guide ")) || (chestName.contains(" Rewards")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains("Progress")) {
