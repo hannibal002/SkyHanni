@@ -26,7 +26,8 @@
 + Api error messages are now formatted more helpful.
 + Added option to only show the reputation helper while pressing a hotkey.
 + Garden **Money per Hour** now uses the **dicer drops** from melon and pumpkins as well. - CalMWolfs
-+ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
++ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0 
++ Added toggle for 12hr/24hr in real time hud - Thunderblade73
 
 ### Fixes
 + Removed `Simple Carrot Candy` from composter overlay.

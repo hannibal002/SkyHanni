@@ -15,7 +15,8 @@ import kotlin.time.Duration.Companion.seconds
 class RealTimeFeatures {
     private val config get() = SkyHanniMod.feature.misc
 
-    private val timeFormat = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
 
     private var latestSkyblockJoin = SimpleTimeMark.farPast()
     private var previousTime = 0.seconds
@@ -26,7 +27,7 @@ class RealTimeFeatures {
         if (!isEnabled()) return
 
         if (config.realTime) {
-            val currentTime = timeFormat.format(System.currentTimeMillis())
+            val currentTime = (if(config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
             config.realTimePos.renderString(currentTime, posLabel = "Real Time")
         }
 
