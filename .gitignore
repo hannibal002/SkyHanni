@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 run/
+run/logs/
 build/
 bin/
 
@@ -11,3 +12,4 @@ gradle.properties
 
 #other
 .DS_STORE
+.gitignore
