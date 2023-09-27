@@ -220,8 +220,9 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
 
         if (stackSizeConfig.contains(7)) {
+            val lore = item.getLore()
             if (chestName.contains("Your Bags") && itemName.contains("Accessory Bag")) {
-                for (line in item.getLore()) {
+                for (line in lore) {
                     if (line.contains("Magical Power: ")) {
                         magicalPowerPattern.matchMatcher(line) {
                             val usefulAsString = group("useful")
@@ -250,7 +251,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 return "${totalSlotsResult}"
             }
             if (chestName.contains("Stats Tuning") && itemName == ("Stats Tuning")) {
-                if (item.getLore().any { it.contains("Tuning Points: ") }) {
+                if (lore.any { it.contains("Tuning Points: ") }) {
                     for (line in lore) {
                         if (line.contains("Tuning Points: ")) {
                             tuningPointsPattern.matchMatcher(line) {
@@ -269,14 +270,14 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
             }
             if (chestName.contains("Power Stones Guide")) {
-                if (!(item.getLore().isEmpty()) && item.getLore().last().contains("Learned: ")) {
-                    val symbol = item.getLore().last().split(" ").last()
+                if (!(lore.isEmpty()) && item.getLore().last().contains("Learned: ")) {
+                    val symbol = lore.last().split(" ").last()
                     if (symbol == "✖") return "§c" + symbol
                     else return "§a" + symbol
                 }
             }
             if (chestName.contains("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
-                if (item.getLore().last().contains(" Magical Power")) {
+                if (lore.last().contains(" Magical Power")) {
                     magicalPowerSecondPattern.matchMatcher(line) {
                         val usefulAsString = group("useful")
                         val totalAsString = group("total").replace(",", "")
