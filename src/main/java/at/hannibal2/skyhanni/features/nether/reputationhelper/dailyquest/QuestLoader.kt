@@ -2,7 +2,16 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData

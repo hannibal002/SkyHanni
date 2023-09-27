@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object CopyErrorCommand {
