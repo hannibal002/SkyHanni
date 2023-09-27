@@ -287,7 +287,8 @@ object EstimatedItemValue {
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        var rawReforgeName = stack.getReforgeName() ?: return 0.0
+        if (rawReforgeName.equals("pitchin")) rawReforgeName = "pitchin_koi" // exception
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
             val stoneJson = values.asJsonObject
