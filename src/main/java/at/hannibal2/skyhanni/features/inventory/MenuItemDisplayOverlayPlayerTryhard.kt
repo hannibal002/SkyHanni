@@ -25,7 +25,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val magicalPowerPattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
     private val magicalPowerSecondPattern = "Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*) Magical Power".toPattern()
     private val tuningPointsPattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
-    private val slotSourcePattern = "(§.)(?<category>.*)?: (§.)?(\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
+    private val slotSourcePattern = "(§.)(?<category>.*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
