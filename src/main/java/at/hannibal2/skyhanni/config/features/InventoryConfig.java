@@ -501,7 +501,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (§aSB Levels§r)",
+                name = "Menu stack size (§aAb§9ip§5ho§6ne§ds§r)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
