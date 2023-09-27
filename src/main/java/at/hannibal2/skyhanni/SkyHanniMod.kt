@@ -144,6 +144,13 @@ import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayAbiphone
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayer
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayerAdvanced
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayerTryhard
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayFarming
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayMining
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlaySBLeveling
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
