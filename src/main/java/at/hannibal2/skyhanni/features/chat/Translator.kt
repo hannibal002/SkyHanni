@@ -11,6 +11,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
