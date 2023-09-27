@@ -113,9 +113,10 @@ class ItemDisplayOverlayFeatures {
             if (InventoryUtils.openInventoryName() == "Your Skills") {
                 if (item.getLore().any { it.contains("Click to view!") }) {
                     if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
-                    if (itemName.removeColor().split(" ").size < 2) return "0" //thanks to watchdogshelper we had to add this hotfix line
+                    val split = itemName.split(" ")
+                    if (split.size < 2) return "0"
                     if (!itemName.contains("Dungeon")) {
-                        val text = itemName.split(" ").last()
+                        val text = split.last()
                         return "" + text.romanToDecimalIfNeeded()
                     }
                 }
