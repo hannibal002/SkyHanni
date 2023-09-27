@@ -378,7 +378,7 @@ public class InventoryConfig {
                 "§bArmadillo Blocks Walked Progress (%)",
                 "§bNecron's Ladder Progress",
                 "§bFruit Bowl Progress",
-                "§bBeastmaster Crest Kill Progress",
+                "§bBeastmaster Crest Kill Progress (%)",
                 "§bCampfire Talisman Tier",
                 "§bBlood God Crest Strength",
                 "§bYeti Rod Bonus",
@@ -396,15 +396,15 @@ public class InventoryConfig {
     )
     @ConfigEditorDraggableList(
             exampleText = {
-                    "§bSkyblock Level",
-                    "§bSkill + Garden + Dungeoneering Levels",
-                    "§bSkill Average",
+                    "§bSkyblock Level (#)",
+                    "§bSkill + Garden + Dungeoneering Levels (#)",
+                    "§bSkill Average (#)",
                     "§bCollection Level + Progress (%)",
-                    "§bHighest Crafted Minion Tier + Progress to Next Minion Slot",
-                    "§bMuseum Donation Progress %",
+                    "§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)",
+                    "§bMuseum Donation Progress (%, # for Special Items)",
                     "§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)",
-                    "§bPet Score + Pet Status",
-                    "§bDungeons Essence (in Rewards Chests)",
+                    "§bPet Score + Pet Status (Various)",
+                    "§bCrimson/Dungeons Essence (#)",
             }
     )
     public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
@@ -417,33 +417,33 @@ public class InventoryConfig {
     @ConfigEditorDraggableList(
             exampleText = {
                     "§bUnlocked Recipes (%)",
-                    "§bCollected Fairy/Enigma Souls + Completed Quests",
+                    "§bCollected Fairy/Enigma Souls + Completed Quests (#)",
                     "§bTrades Unlocked (%)",
                     "§bWardrobe Slot (#)",
                     "§bShortened Skyblock Stats",
                     "§bShortened Skyblock Profile Name (Fruits)",
-                    "§bAuction House + Bazaar",
-                    "§bDojo Progress",
-                    "§bBank Tier",
-                    "§bMayor Perk Count",
+                    "§bAuction House + Bazaar (Various)",
+                    "§bDojo Progress (Abbv)",
+                    "§bBank Tier (Abbv)",
+                    "§bMayor Perk Count (#)",
             }
     )
     public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
 
     @Expose
         @ConfigOption(
-                name = "Menu stack size (Tryard)",
+                name = "Menu stack size (Tryhard)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§bMenu Pagination",
+                        "§bMenu Pagination (#)",
                         "§bRNG Meter Drop Odds (Abbvs)",
-                        "§bCommunity Shop Upgrade Tiers",
+                        "§bCommunity Shop Upgrade Tiers (#)",
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
-                        "§bFame Rank, Abbv'd Fame Count, Bits Available",
-                        "§bBooster Cookie Duration (highest unit of time only)\n§b[years ➡ days ➡ hours ➡ etc...]",
-                        "§bCurrently Active Potion Effects Count"
+                        "§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)",
+                        "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",
+                        "§bCurrently Active Potion Effects Count (#)"
                 }
         )
         public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(0));
@@ -455,9 +455,9 @@ public class InventoryConfig {
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§bFarming Contests Medal Inventory",
-                        "§bVisitor's Logbook Countdown",
-                        "§bGarden Visitor's Logbook NPC Rarities",
+                        "§bFarming Contests Medal Inventory (§6G§fS§cB§b)",
+                        "§bVisitor's Logbook Countdown (#, highest unit of time only)",
+                        "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
                 }
         )
         public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1));
@@ -469,8 +469,8 @@ public class InventoryConfig {
         )
         @ConfigEditorDraggableList(
                 exampleText = {          
-                        "§bHeart of the Mountain Perk Levels",
-                        "§bCrystal Hollows Crystal Progress",
+                        "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
+                        "§bCrystal Hollows Crystal Progress (%)",
                 }
         )
         public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(0));
@@ -482,10 +482,10 @@ public class InventoryConfig {
         )
         @ConfigEditorDraggableList(
                 exampleText = {          
-                        "§bBestiary Level",
-                        "§bOverall Bestiary Progress (per Family)",
-                        "§bCurrent Slayer Levels",
-                        "§bSlayer Combat Wisdom Buff",
+                        "§bBestiary Level (#)",
+                        "§bBestiary Progress (%, Overall + per Family)",
+                        "§bCurrent Slayer Levels (#)",
+                        "§bSlayer Combat Wisdom Buff (#)",
                         "§bRNG Meter Progress (%)",
                 }
         )
@@ -515,13 +515,14 @@ public class InventoryConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§bContacts Directory (#)",
+                        "§bDND Indicator (§c☒§b)",
                         "§bRelays Finished (#)",
                         "§bSelected Ringtone (Abbv)",
                         "§bTic Tac Toe Stats (§aW§eT§cL§r)",
                         "§bSnake Highest Score (#)",
                 }
         )
-        public List<Integer> menuItemNumberAbiphoneAsStackSize = new ArrayList<>(Arrays.asList(0));
+        public List<Integer> menuItemNumberAbiphoneAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2));
 
 
     @Expose

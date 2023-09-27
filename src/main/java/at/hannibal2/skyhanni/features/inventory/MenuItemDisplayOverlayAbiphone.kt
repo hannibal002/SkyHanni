@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -56,7 +57,13 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(1)) && ((chestName.contains("Abiphone"))) && (itemName.contains(" Operator Chip"))) {
+        if ((stackSizeConfig.contains(1)) && (chestName.contains("Abiphone")) && (item.name.startsWith("§f§"))) {
+            if ((lore.any { it.lowercase().contains("§cdo not disturb") }) && lore.any { it.lowercase().contains("enabled!") }) {
+                return "§c☒"
+            }
+        }
+
+        if ((stackSizeConfig.contains(2)) && ((chestName.contains("Abiphone"))) && (itemName.contains(" Operator Chip"))) {
             val maxRelays = "9" //edit this line whenever they add more relays
             for (line in item.getLore()) {
                 if (line.contains("Progress to Complete Category")) {
@@ -66,7 +73,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(2)) && ((chestName.contains("Abiphone"))) && (itemName.contains("Ringtones"))) {
+        if ((stackSizeConfig.contains(3)) && ((chestName.contains("Abiphone"))) && (itemName.contains("Ringtones"))) {
             for (line in item.getLore()) {
                 if (line.contains("Selected Ringtone: ")) {
                     val ringtone = item.getLore().first().removeColor().split(" ").last()
@@ -85,7 +92,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(3)) && (chestName.contains("Abiphone")) && (itemName == ("Tic Tac Toe"))) {
+        if ((stackSizeConfig.contains(4)) && (chestName.contains("Abiphone")) && (itemName == ("Tic Tac Toe"))) {
             var finalString = ""
             for (line in item.getLore()) {
                 if (line.contains("Wins: ") || line.contains("Draws: ") || line.contains("Losses: ")) {
@@ -95,7 +102,7 @@ class MenuItemDisplayOverlayAbiphone {
             return finalString
         }
 
-        if ((stackSizeConfig.contains(4)) && (chestName.contains("Abiphone")) && (itemName == ("Snake"))) {
+        if ((stackSizeConfig.contains(5)) && (chestName.contains("Abiphone")) && (itemName == ("Snake"))) {
             for (line in item.getLore()) {
                 if (line.contains(" Score: ")) {
                     return line.removeColor().split(" ").last()
