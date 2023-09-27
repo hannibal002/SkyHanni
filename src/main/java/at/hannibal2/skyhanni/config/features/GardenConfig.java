@@ -328,7 +328,7 @@ public class GardenConfig {
         public boolean displayIcons = false;
 
         @Expose
-        @ConfigOption(name = "Only On Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+        @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
         @ConfigEditorBoolean
         public boolean onlyOnBarn = true;
 
@@ -478,7 +478,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only show top", desc = "Only show the top # crops.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
     @ConfigEditorSlider(
             minValue = 1,
             maxValue = 10,
@@ -488,7 +488,7 @@ public class GardenConfig {
     public int cropMilestoneShowOnlyBest = 10;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneShowCurrent = true;
@@ -861,7 +861,7 @@ public class GardenConfig {
     public boolean moneyPerHour = false;
 
     @Expose
-    @ConfigOption(name = "Show money per Hour",
+    @ConfigOption(name = "Show Money per Hour",
             desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
                     "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
@@ -871,7 +871,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only show top", desc = "Only show the best # items.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the best # items.")
     @ConfigEditorSlider(
             minValue = 1,
             maxValue = 25,
@@ -881,7 +881,7 @@ public class GardenConfig {
     public int moneyPerHourShowOnlyBest = 5;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourShowCurrent = true;
@@ -1146,7 +1146,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(
-            name = "Composter warning",
+            name = "Composter Warning",
             desc = "Warn when the Composter gets close to empty, even outside Garden."
     )
     @ConfigEditorBoolean
