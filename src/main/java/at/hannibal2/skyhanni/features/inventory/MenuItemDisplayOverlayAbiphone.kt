@@ -57,7 +57,8 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(1)) && (chestName.contains("Abiphone")) && (item.name.startsWith("§f§"))) {
+        if ((stackSizeConfig.contains(1)) && (chestName.contains("Abiphone")) && (item.name?.startsWith("§f§"))) {
+            val lore = item.getLore()
             if ((lore.any { it.lowercase().contains("§cdo not disturb") }) && lore.any { it.lowercase().contains("enabled!") }) {
                 return "§c☒"
             }
