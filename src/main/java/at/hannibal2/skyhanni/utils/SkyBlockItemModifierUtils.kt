@@ -178,6 +178,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemUuid() = getAttributeString("uuid")
 
+    fun ItemStack.getItemId() = getAttributeString("id")
+
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
         for (attributes in it.keySet) {
