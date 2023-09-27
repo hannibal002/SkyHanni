@@ -486,7 +486,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Menu stack size (SB Levels)",
+                name = "Menu stack size (§aSB Levels§r)",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
@@ -498,6 +498,22 @@ public class InventoryConfig {
                 }
         )
         public List<Integer> menuItemNumberSBLevelingAsStackSize = new ArrayList<>(Arrays.asList(0));
+
+        @Expose
+        @ConfigOption(
+                name = "Menu stack size (§aSB Levels§r)",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§bContacts Directory (#)",
+                        "§bRelays Finished (#)",
+                        "§bSelected Ringtone (Abbv)",
+                        "§bTic Tac Toe Stats (§aW§eT§cL§r)",
+                        "§bSnake Highest Score (#)",
+                }
+        )
+        public List<Integer> menuItemNumberAbiphoneAsStackSize = new ArrayList<>(Arrays.asList(0));
 
 
     @Expose

@@ -199,6 +199,7 @@ class SkyHanniMod {
         loadModule(DungeonChatFilter())
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures())
+        loadModule(MenuItemDisplayOverlayAbiphone())
         loadModule(MenuItemDisplayOverlayPlayer())
         loadModule(MenuItemDisplayOverlayPlayerAdvanced())
         loadModule(MenuItemDisplayOverlayPlayerTryhard())
