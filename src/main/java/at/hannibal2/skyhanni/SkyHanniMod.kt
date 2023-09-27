@@ -148,6 +148,7 @@ import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayAbiphone
 import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayer
 import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayerAdvanced
 import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayerTryhard
+import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayCombat
 import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayFarming
 import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayMining
 import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlaySBLeveling
