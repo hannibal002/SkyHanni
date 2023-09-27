@@ -470,7 +470,7 @@ public class InventoryConfig {
         @ConfigEditorDraggableList(
                 exampleText = {          
                         "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
-                        "§bCrystal Hollows Crystal Progress (%)",
+                        "§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)",
                 }
         )
         public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(0));
@@ -515,7 +515,7 @@ public class InventoryConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§bContacts Directory (#)",
-                        "§bDND Indicator (§c☒§b)",
+                        "§bDND Indicator (§c§l✖§b)",
                         "§bRelays Finished (#)",
                         "§bSelected Ringtone (Abbv)",
                         "§bTic Tac Toe Stats (§aW§eT§cL§r)",

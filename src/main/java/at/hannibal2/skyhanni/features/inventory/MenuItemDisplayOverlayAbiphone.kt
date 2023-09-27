@@ -61,7 +61,7 @@ class MenuItemDisplayOverlayAbiphone {
             val nameWithColor = item.name ?: return ""
             val lore = item.getLore()
             if ((nameWithColor.startsWith("§f§")) && (lore.any { it.lowercase().contains("§cdo not disturb") }) && lore.any { it.lowercase().contains("enabled!") }) {
-                return "§c☒"
+                return "§c§l✖"
             }
         }
 
