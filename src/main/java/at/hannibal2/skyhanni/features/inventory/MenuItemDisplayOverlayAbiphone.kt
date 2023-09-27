@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayAbiphone {
-    private val xoutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\/(?<total>[0-9]+)".toPattern()
+    private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\/(?<total>[0-9]+)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -51,7 +51,7 @@ class MenuItemDisplayOverlayAbiphone {
         if ((stackSizeConfig.contains(0)) && (chestName.contains("Abiphone")) && (itemName == ("Contacts Directory"))) {
             for (line in item.getLore()) {
                 if (line.contains("Your contacts: ")) {
-                    return xoutOfYNoColorRequiredPattern.matchMatcher(line) { group("useful") } ?: ""
+                    return xOutOfYNoColorRequiredPattern.matchMatcher(line) { group("useful") } ?: ""
                 }
             }
         }
@@ -61,7 +61,7 @@ class MenuItemDisplayOverlayAbiphone {
             for (line in item.getLore()) {
                 if (line.contains("Progress to Complete Category")) {
                     if (line.contains("ALL!")) return maxRelays
-                    else return xoutOfYNoColorRequiredPattern.matchMatcher(line) { group("useful") } ?: ""
+                    else return xOutOfYNoColorRequiredPattern.matchMatcher(line) { group("useful") } ?: ""
                 }
             }
         }
