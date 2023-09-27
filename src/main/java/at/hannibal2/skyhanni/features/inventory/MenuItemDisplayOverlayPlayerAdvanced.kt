@@ -341,7 +341,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         }
                         if (itemName == "BIN Filter") {
                             return when (betterLine) {
-                                "Show All" -> "§2B§f+§6A"
+                                "Show All" -> "All"
                                 "BIN Only" -> "§2BIN"
                                 "Auctions Only" -> "§6Auc"
                                 else -> ""

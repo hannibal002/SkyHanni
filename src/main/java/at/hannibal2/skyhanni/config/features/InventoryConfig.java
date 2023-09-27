@@ -443,7 +443,9 @@ public class InventoryConfig {
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
                         "§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)",
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",
-                        "§bCurrently Active Potion Effects Count (#)"
+                        "§bCurrently Active Potion Effects Count (#)",
+                        "§bAccessory Bag Magical Power (Abbv)",
+                        "§bSkyBlock Achievements Points (%)",
                 }
         )
         public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(0));

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -21,6 +22,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?((?<years>[0-9]+)?y)? ((?<days>[0-9]{0,2})d)? ((?<hours>[0-9]{0,2})h)? ((?<minutes>[0-9]{0,2})m)? ((?<seconds>[0-9]{0,2})s)?".toPattern()
     private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
     private val bitsAvailablePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
+    private val magicalPowerPattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -209,6 +211,37 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 for (line in item.getLore()) {
                     if (line.contains("Currently Active: ")) {
                         return line.split(" ").last()
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(7)) {
+            if (chestName.contains("Your Bags") && itemName.contains("Accessory Bag")) {
+                for (line in item.getLore()) {
+                    if (line.contains("Magical Power: ")) {
+                        magicalPowerPattern.matchMatcher(line) {
+                            val usefulAsString = group("useful")
+                            val totalAsString = group("total").replace(",", "")
+                            var suffix = when (totalAsString.length) {
+                                in 1..3 -> ""
+                                in 4..6 -> "k"
+                                in 7..9 -> "M"
+                                else -> "§b§z:)"
+                            }
+                            if (suffix == "§b§z:)") return suffix
+                            else return "" + usefulAsString + suffix
+                        }
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(8)) {
+            if (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements")) {
+                for (line in item.getLore()) {
+                    if (line.contains("Points: ")) {
+                        return line.removeColor().split(" ").last().between("(", "%)")
                     }
                 }
             }
