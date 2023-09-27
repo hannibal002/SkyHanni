@@ -13,7 +13,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.FileReader
-import java.util.*
+import java.util.UUID
 
 class FriendAPI {
     private val file = File("config/skyhanni/friends.json")

@@ -7,7 +7,9 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import org.intellij.lang.annotations.Language
-import java.util.*
+import java.util.Base64
+import java.util.NavigableMap
+import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern

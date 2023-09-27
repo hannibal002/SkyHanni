@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.*
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
@@ -13,7 +15,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
 import java.io.IOException
-import java.util.*
 
 open class FFGuideGUI : GuiScreen() {
     companion object {
