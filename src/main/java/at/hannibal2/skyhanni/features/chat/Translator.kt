@@ -2,11 +2,15 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -96,7 +100,7 @@ class Translator {
          *     ]
          *   ],
          *   null,
-         *   'target language as a two letter code following ISO 639-1',
+         *   '"target language as a two letter code following ISO 639-1"',
          * ]
          */
 
@@ -119,8 +123,8 @@ class Translator {
 
                             } else {
                                 CopyErrorCommand.logError(
-                                    Error("Hypixel API error for url: '$urlString'", e),
-                                    "Failed to load data from Hypixel API"
+                                    Error("Google Translate API error for url: '$urlString'", e),
+                                    "Failed to load data from Google API"
                                 )
                             }
                         }
@@ -131,8 +135,8 @@ class Translator {
                     throw throwable
                 } else {
                     CopyErrorCommand.logError(
-                        Error("Hypixel API error for url: '$urlString'", throwable),
-                        "Failed to load data from Hypixel API"
+                        Error("Google Translate API error for url: '$urlString'", throwable),
+                        "Failed to load data from Google API"
                     )
                 }
             } finally {
@@ -141,51 +145,69 @@ class Translator {
             return JsonObject()
         }
 
-        private fun getTranslationToEnglish(message: String): String {
-            val url =
-                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=" + URLEncoder.encode(
-                    message,
-                    "UTF-8"
-                )
+        private fun getTranslationToEnglish(message: String): CompletableDeferred<String> {
+            val returnValue = CompletableDeferred<String>()
+            coroutineScope.launch {
+                val url =
+                    "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=" + URLEncoder.encode(
+                        message,
+                        "UTF-8"
+                    )
 
-            var messageToSend = ""
-            val layer1 = getJSONResponse(url).asJsonArray
-            val language = layer1[2].toString()
-            if (language == "en") return "Unable to translate!"
+                var messageToSend = ""
+                val layer1 = getJSONResponse(url).asJsonArray
+                if (layer1.size() <= 2) returnValue.complete("Error!")
 
-            val layer2 = layer1[0] as JsonArray
+                val language = layer1[2].toString()
+                if (language == "\"en\"") returnValue.complete("Unable to translate!")
+                if (language.length != 4) returnValue.complete("Error!")
 
-            for (layer3 in layer2) {
-                val arrayLayer3 = layer3 as JsonArray
-                val sentence = arrayLayer3[0].toString()
-                val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
-                messageToSend = "$messageToSend$sentenceWithoutQuotes"
+                var layer2 = JsonArray()
+                try {
+                    layer2 = layer1[0] as JsonArray
+                } catch (_: Exception) {
+                    returnValue.complete("Error!")
+                }
+
+                for (layer3 in layer2) {
+                    val arrayLayer3 = layer3 as? JsonArray ?: continue
+                    val sentence = arrayLayer3[0].toString()
+                    val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
+                    messageToSend = "$messageToSend$sentenceWithoutQuotes"
+                }
+                messageToSend = "$messageToSend §7(Language: $language)"
+
+                returnValue.complete(URLDecoder.decode(messageToSend, "UTF-8").replace("\\", ""))
             }
-            messageToSend = "$messageToSend §7(Language: $language)"
-
-            return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
-
+            return returnValue
         }
 
-        private fun getTranslationFromEnglish(message: String, lang: String): String {
-            val url =
-                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$lang&dt=t&q=" + URLEncoder.encode(
-                    message,
-                    "UTF-8"
-                )
+        private fun getTranslationFromEnglish(message: String, lang: String): CompletableDeferred<String> {
+            val returnValue = CompletableDeferred<String>()
+            coroutineScope.launch {
+                val url =
+                    "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$lang&dt=t&q=" + URLEncoder.encode(
+                        message,
+                        "UTF-8"
+                    )
 
-            val layer1 = getJSONResponse(url).asJsonArray
-            val layer2 = layer1[0] as JsonArray
+                val layer1 = getJSONResponse(url).asJsonArray
+                if (layer1.size() < 1) returnValue.complete("Error!")
+                val layer2 = layer1[0] as? JsonArray
 
-            val firstSentence = (layer2[0] as JsonArray).get(0).toString()
-            var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
-            for (sentenceIndex in 1..<layer2.size()) {
-                val sentence = (layer2[sentenceIndex] as JsonArray).get(0).toString()
-                val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
-                messageToSend = "$messageToSend$sentenceWithoutQuotes"
-            } // The first translated sentence only has 1 extra char at the end, but sentences after it need 1 at the front and 1 at the end removed in the substring
-            messageToSend = messageToSend.substring(1, messageToSend.length)
-            return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
+                val firstSentence = (layer2?.get(0) as? JsonArray)?.get(0).toString()
+                var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
+                if (layer2 != null) {
+                    for (sentenceIndex in 1..<layer2.size()) {
+                        val sentence = (layer2.get(sentenceIndex) as JsonArray).get(0).toString()
+                        val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
+                        messageToSend = "$messageToSend$sentenceWithoutQuotes"
+                    }
+                } // The first translated sentence only has 1 extra char at the end, but sentences after it need 1 at the front and 1 at the end removed in the substring
+                messageToSend = messageToSend.substring(1, messageToSend.length)
+                returnValue.complete(URLDecoder.decode(messageToSend, "UTF-8").replace("\\", ""))
+            }
+            return returnValue
         }
 
         fun toEnglish(args: Array<String>) {
@@ -195,10 +217,11 @@ class Translator {
                 message = "$message$i "
             }
 
-            val translation = getTranslationToEnglish(message)
-
-            if (translation == "Unable to translate!") LorenzUtils.chat("§c[SkyHanni] Unable to translate message :(")
-            else LorenzUtils.chat("§e[SkyHanni] Found translation: §f$translation")
+            coroutineScope.launch {
+                val translation = getTranslationToEnglish(message).await()
+                if (translation == "Unable to translate!") LorenzUtils.chat("§c[SkyHanni] Unable to translate message :( (is it in English?)")
+                else LorenzUtils.chat("§e[SkyHanni] Found translation: §f$translation")
+            }
         }
 
         fun fromEnglish(args: Array<String>) {
@@ -213,14 +236,14 @@ class Translator {
                 message = "$message${args[i]} "
             }
 
-            val translation = getTranslationFromEnglish(message, language)
-            LorenzUtils.chat("§e[SkyHanni] Copied translation to clipboard: $translation")
-            OSUtils.copyToClipboard(translation)
+            coroutineScope.launch {
+                val translation = getTranslationFromEnglish(message, language).await()
+                LorenzUtils.chat("§e[SkyHanni] Copied translation to clipboard: $translation")
+                OSUtils.copyToClipboard(translation)
+            }
         }
 
 
-        // TODO reenable once the translator is working again
-//        fun isEnabled() = config.translator
-        fun isEnabled() = false
+        fun isEnabled() = config.translator
     }
 }
