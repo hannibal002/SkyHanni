@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class ArmorDropsJson {
     @Expose
-    public Map<String, DropInfo> specialCrops;
+    public Map<String, DropInfo> special_crops;
 
     public static class DropInfo {
         @Expose
-        public String armorType;
+        public String armor_type;
         @Expose
-        public List<Integer> chances;
+        public List<Double> chance;
     }
 }

@@ -103,7 +103,7 @@ class FarmingArmorDrops {
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
             val data = event.getConstant<ArmorDropsJson>("ArmorDrops") ?: error("ArmorDrops not found in repo")
-            armorDropInfo = data.specialCrops
+            armorDropInfo = data.special_crops
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -122,15 +122,15 @@ class FarmingArmorDrops {
                 lastCalculationTime = SimpleTimeMark.now()
 
                 val armorDropName = crop.specialDropType
-                val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
+                val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
                 val pieceCount = InventoryUtils.getArmor()
                     .mapNotNull { it?.getInternalName_old() }
                     .count { it.contains(armorName) || it.contains("FERMENTO") }
 
-                val dropRates = armorDropInfo[armorDropName]?.chances ?: return 0.0
+                val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
                 var dropRate = 0.0
                 if (pieceCount > 0 && dropRates.size >= pieceCount) {
-                    dropRate = dropRates[pieceCount - 1].toDouble()
+                    dropRate = dropRates[pieceCount - 1]
                 }
                 currentArmorDropChance = (dropRate * 60 * 60.0) / 100
             }
