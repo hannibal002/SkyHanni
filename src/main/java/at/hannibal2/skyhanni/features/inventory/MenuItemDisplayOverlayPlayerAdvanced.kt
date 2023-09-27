@@ -310,7 +310,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
             if ((chestName.contains("Auction House"))) {
                 if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
-                if ((itemName == "View Bids") && (lore.first().removeColor().contains(" top bid "))) return "1"
+                if ((itemName == "View Bids") && (lore.first().removeColor().contains(" top bid ") || lore.first().removeColor().contains("a bid "))) return "1"
                 if ((itemName == "View Bids") && lore.first().contains("You placed ")) "(§.)?You placed (§.)?(?<bids>[0-9]+) bid(.{0,3}) (§.)?on pending".toPattern().matchMatcher(lore.first()) { return group("bids") }
                 if ((itemName == "Manage Auctions")) {
                     for (line in lore) {
