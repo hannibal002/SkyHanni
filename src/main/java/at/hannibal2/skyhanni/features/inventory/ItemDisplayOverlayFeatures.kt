@@ -140,40 +140,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-<<<<<<< HEAD
         if (stackSizeConfig.contains(8)) {
-=======
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
-            if (InventoryUtils.openInventoryName() == "Your Skills") {
-                if (item.getLore().any { it.contains("Click to view!") }) {
-                    if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
-                    val split = itemName.split(" ")
-                    if (split.size < 2) return "0"
-                    if (!itemName.contains("Dungeon")) {
-                        val text = split.last()
-                        return "" + text.romanToDecimalIfNeeded()
-                    }
-                }
-            }
-        }
-
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
-            if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
-                val lore = item.getLore()
-                if (lore.any { it.contains("Click to view!") }) {
-                    if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                    item.name?.let {
-                        if (it.startsWith("§e")) {
-                            val text = it.split(" ").last()
-                            return "" + text.romanToDecimalIfNeeded()
-                        }
-                    }
-                }
-            }
-        }
-
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
->>>>>>> f34defd6c42f762ce8eaf753998139e8b2714b0e
             if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
                     rancherBootsSpeedCapPattern.matchMatcher(line) {
