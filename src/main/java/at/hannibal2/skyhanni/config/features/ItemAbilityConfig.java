@@ -3,7 +3,13 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class ItemAbilityConfig {
 
