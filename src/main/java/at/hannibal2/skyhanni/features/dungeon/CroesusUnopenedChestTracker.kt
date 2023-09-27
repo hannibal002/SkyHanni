@@ -26,9 +26,9 @@ class CroesusUnopenedChestTracker {
                 val lore = stack.getLore()
                 if ("§eClick to view chests!" in lore) {
                     if ("§aNo more Chests to open!" !in lore) {
-                        slot highlight if(lore.any { it.contains("Opened Chest") }){
+                        slot highlight if (lore.any { it.contains("Opened Chest") }) {
                             LorenzColor.DARK_AQUA
-                        }else {
+                        } else {
                             LorenzColor.DARK_PURPLE
                         }
                     }
