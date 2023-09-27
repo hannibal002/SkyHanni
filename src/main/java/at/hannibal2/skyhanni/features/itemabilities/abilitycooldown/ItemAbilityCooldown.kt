@@ -2,7 +2,14 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -15,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
@@ -285,9 +293,9 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val uuid = stack.getItemUuid()
-        val list = items.filter { it.key.getItemUuid() == uuid }
-            .firstNotNullOfOrNull { it.value } ?: return
+        val uuid = stack.getIdentifier() ?: return
+        val list = items.filter { (it.key.getIdentifier()) == uuid }
+             .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
             if (guiOpen && !itemText.onCooldown) continue
@@ -309,6 +317,8 @@ class ItemAbilityCooldown {
             }
         }
     }
+
+    private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

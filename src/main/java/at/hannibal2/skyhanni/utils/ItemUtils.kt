@@ -14,7 +14,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
-import java.util.*
+import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {

@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 @SuppressWarnings("deprecation")
@@ -171,15 +175,14 @@ public class ChatConfig {
     @FeatureToggle
     public boolean hideSacksChange = false;
 
-    // TODO reenable once the translator is working again
-//    @Expose
-//    @ConfigOption(
-//            name = "Translator",
-//            desc = "Click on a message to translate it into English. " +
-//                    "Use /shcopytranslation to get the translation from English. " +
-//                    "Translation is not guaranteed to be 100% accurate."
-//    )
-//    @ConfigEditorBoolean
-//    @FeatureToggle
-//    public boolean translator = false;
+    @Expose
+    @ConfigOption(
+            name = "Translator",
+            desc = "Click on a message to translate it into English. " +
+                    "Use /shcopytranslation to get the translation from English. " +
+                    "Translation is not guaranteed to be 100% accurate."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean translator = false;
 }

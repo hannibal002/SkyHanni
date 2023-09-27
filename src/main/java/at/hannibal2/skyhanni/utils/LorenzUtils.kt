@@ -31,8 +31,9 @@ import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Collections
 import java.util.Timer
+import java.util.TimerTask
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -534,8 +535,8 @@ object LorenzUtils {
 
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
-    fun <T> T.transformIf(condition: Boolean, transofmration: T.() -> T) =
-        if (condition) transofmration(this) else this
+    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
+        if (condition()) transofmration(this) else this
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
