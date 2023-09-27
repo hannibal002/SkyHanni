@@ -11,7 +11,22 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.server.*
+import net.minecraft.network.play.server.S04PacketEntityEquipment
+import net.minecraft.network.play.server.S0BPacketAnimation
+import net.minecraft.network.play.server.S0CPacketSpawnPlayer
+import net.minecraft.network.play.server.S0EPacketSpawnObject
+import net.minecraft.network.play.server.S0FPacketSpawnMob
+import net.minecraft.network.play.server.S12PacketEntityVelocity
+import net.minecraft.network.play.server.S14PacketEntity
+import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.network.play.server.S19PacketEntityHeadLook
+import net.minecraft.network.play.server.S19PacketEntityStatus
+import net.minecraft.network.play.server.S1BPacketEntityAttach
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
+import net.minecraft.network.play.server.S1DPacketEntityEffect
+import net.minecraft.network.play.server.S20PacketEntityProperties
+import net.minecraft.network.play.server.S28PacketEffect
+import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
