@@ -278,7 +278,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
             if (chestName.contains("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
                 if (lore.last().contains(" Magical Power")) {
-                    magicalPowerSecondPattern.matchMatcher(line) {
+                    magicalPowerSecondPattern.matchMatcher(lore.last()) {
                         val usefulAsString = group("useful")
                         val totalAsString = group("total").replace(",", "")
                         var suffix = when (totalAsString.length) {
