@@ -14,7 +14,7 @@ object CopyTabListCommand {
         val resultList = mutableListOf<String>()
         val noColor = args.size == 1 && args[0] == "true"
         for (line in TabListData.getTabList()) {
-            val tabListLine = line.transformIf(noColor) { removeColor() }
+            val tabListLine = line.transformIf({ noColor }) { removeColor() }
             if (tabListLine != "") resultList.add("'$tabListLine'")
         }
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay

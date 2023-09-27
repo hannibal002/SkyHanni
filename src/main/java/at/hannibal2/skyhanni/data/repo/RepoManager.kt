@@ -8,7 +8,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import org.apache.commons.io.FileUtils
-import java.io.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.CompletableFuture
