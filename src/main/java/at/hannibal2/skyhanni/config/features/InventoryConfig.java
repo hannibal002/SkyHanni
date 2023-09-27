@@ -488,7 +488,8 @@ public class InventoryConfig {
                         "§bBestiary Progress (%, Overall + per Family)",
                         "§bCurrent Slayer Levels (#)",
                         "§bSlayer Combat Wisdom Buff (#)",
-                        "§bRNG Meter Progress (%)",
+                        "§bSlayer/Catacombs RNG Meter Progress (%)",
+                        "§bUnlocked Slayer Recipes (#)",
                 }
         )
         public List<Integer> menuItemNumberCombatAsStackSize = new ArrayList<>(Arrays.asList(0));

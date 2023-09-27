@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -101,6 +102,14 @@ class MenuItemDisplayOverlayCombat {
             for (line in item.getLore()) {
                 if (line.contains("Progress: ")) {
                     return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(5) && itemName.contains("Slayer Recipes")) {
+            for (line in item.getLore()) {
+                if (line.contains("Unlocked: ")) {
+                    return line.removeColor().lowercase().between("unlocked: ", " recipes") //hanni i need to use lowercase here because one day the admins are going to capitalize the word "recipes" in "Unlocked: 26 Recipes" and it'll break this feature i may as well futureproof it right now
                 }
             }
         }
