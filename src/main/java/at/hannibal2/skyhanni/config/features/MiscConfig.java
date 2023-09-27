@@ -55,7 +55,7 @@ public class MiscConfig {
         public boolean showAlways = false;
 
         @Expose
-        @ConfigOption(name = "Dragon Egg", desc = "For an Golden Dragon Egg, show progress to level 100 instead of 200.")
+        @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
         @ConfigEditorBoolean
         public boolean showGoldenDragonEgg = true;
 
@@ -180,7 +180,7 @@ public class MiscConfig {
     public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Show always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
