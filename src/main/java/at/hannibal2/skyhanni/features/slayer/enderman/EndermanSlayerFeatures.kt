@@ -53,13 +53,9 @@ class EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman) {
-            if (showBeacon()) {
-                if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                    endermenWithBeacons.add(entity)
-                    logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
-                }
-            }
+        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+            endermenWithBeacons.add(entity)
+            logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
 
         if (entity is EntityArmorStand) {
@@ -75,13 +71,9 @@ class EndermanSlayerFeatures {
                 }
             }
 
-            if (config.endermanHighlightNukekebi) {
-                if (entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture }) {
-                    if (entity !in nukekubiSkulls) {
-                        nukekubiSkulls.add(entity)
-                        logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
-                    }
-                }
+            if (config.endermanHighlightNukekebi && entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture } && entity !in nukekubiSkulls) {
+                nukekubiSkulls.add(entity)
+                logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
             }
         }
     }
