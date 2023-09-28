@@ -458,13 +458,13 @@ public class InventoryConfig {
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§bFarming Contests Medal Inventory (§6§l§rG§f§l§rS§c§l§rB§r§b)",
+                        "§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)",
                         "§bVisitor's Logbook Countdown (#, highest unit of time only)",
-                        "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
                         "§bVisitor Milestones Progress (%)",
+                        "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
                 }
         )
-        public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1));
+        public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2));
 
         @Expose
         @ConfigOption(

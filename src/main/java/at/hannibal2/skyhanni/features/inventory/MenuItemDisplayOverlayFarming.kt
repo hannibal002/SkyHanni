@@ -86,6 +86,16 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
+        if (stackSizeConfig.contains(3)) {
+            if (chestName == "Visitor's Logbook") {
+                if (item.getLore() != null) {
+                    if (item.getLore().any { it.contains("Times Visited: ") }) {
+                        return item.getLore().first().take(5).replace("T", "☉")
+                    }
+                }
+            }
+        }
+
         return ""
     }
 }
