@@ -58,10 +58,8 @@ class LorenzLogger(filePath: String) {
 
     private fun createParent(file: File) {
         val parent = file.parentFile
-        if (parent != null) {
-            if (!parent.isDirectory) {
-                parent.mkdirs()
-            }
+        if (parent != null && !parent.isDirectory) {
+            parent.mkdirs()
         }
     }
 
