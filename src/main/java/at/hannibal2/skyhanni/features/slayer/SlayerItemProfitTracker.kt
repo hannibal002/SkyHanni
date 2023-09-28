@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
@@ -138,6 +139,22 @@ object SlayerItemProfitTracker {
         update()
     }
 
+    @SubscribeEvent
+    fun onSackChange(event: SackChangeEvent) {
+        if (!isEnabled()) return
+        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.hasActiveSlayerQuest()) return
+
+        for (sackChange in event.sackChanges) {
+            val change = sackChange.delta
+            if (change > 0) {
+                val internalName = sackChange.internalName
+                println("added: $internalName +$change")
+                addItem(internalName, change)
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
@@ -158,13 +175,17 @@ object SlayerItemProfitTracker {
         val name = itemStack.name ?: return
         if (SlayerAPI.ignoreSlayerDrop(name)) return
         val internalName = itemStack.getInternalNameOrNull() ?: return
+        addItem(internalName, itemStack.stackSize)
+    }
+
+    private fun addItem(internalName: NEUInternalName, amount: Int) {
         if (!isAllowedItem(internalName)) {
             LorenzUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
             return
         }
 
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
-        addItemPickup(internalName, itemStack.stackSize)
+        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
+        addItemPickup(internalName, amount)
         logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
         if (config.priceInChat) {
             if (price > config.minimumPrice) {
