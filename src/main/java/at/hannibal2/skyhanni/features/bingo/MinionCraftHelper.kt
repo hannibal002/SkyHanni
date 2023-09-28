@@ -59,7 +59,6 @@ class MinionCraftHelper {
         }
 
         if (!event.isMod(3)) return
-//        if (!event.isMod(60)) return
 
         val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
 
@@ -159,10 +158,8 @@ class MinionCraftHelper {
 
                     for (ingredient in recipe.ingredients) {
                         val id = ingredient.internalItemId
-                        if (!id.contains("_GENERATOR_")) {
-                            if (!allIngredients.contains(id)) {
-                                allIngredients.add(id)
-                            }
+                        if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
+                            allIngredients.add(id)
                         }
                     }
                 }
