@@ -42,9 +42,7 @@ class ParkourWaypointSaver {
         }
         if (config.saveKey == key) {
             val newLocation = LorenzVec.getBlockBelowPlayer()
-            if (locations.isNotEmpty()) {
-                if (newLocation == locations.last()) return
-            }
+            if (locations.isNotEmpty() && newLocation == locations.last()) return
             locations.add(newLocation)
             update()
         }
