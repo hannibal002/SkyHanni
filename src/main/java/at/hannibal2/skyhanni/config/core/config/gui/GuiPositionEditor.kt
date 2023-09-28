@@ -190,6 +190,8 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             Keyboard.KEY_RIGHT -> position.moveX(dist, elementWidth)
             Keyboard.KEY_MINUS -> position.scale -= .1F
             Keyboard.KEY_EQUALS -> position.scale += .1F
+            Keyboard.KEY_SUBTRACT -> position.scale -= .1F
+            Keyboard.KEY_ADD -> position.scale += .1F
         }
     }
 
