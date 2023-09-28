@@ -63,12 +63,14 @@ object ChatManager {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet as? S02PacketChat ?: return
+        val packet = event.packet
+        if (packet !is S02PacketChat) return
         val messageComponent = packet.chatComponent
 
         val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
         if (packet.type.toInt() == 2) {
-            LorenzActionBarEvent(message).postAndCatch()
+            val actionBarEvent = LorenzActionBarEvent(message)
+            actionBarEvent.postAndCatch()
         }
     }
 

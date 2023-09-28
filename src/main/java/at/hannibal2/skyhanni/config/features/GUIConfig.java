@@ -64,7 +64,6 @@ public class GUIConfig {
     @ConfigEditorBoolean
     public boolean realTimeFormatToggle = false;
 
-
     @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
 
