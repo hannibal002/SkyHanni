@@ -343,9 +343,6 @@ class BingoNextStepHelper {
             "Combat",
             12
         ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
-
-//        enchantedCharcoal(7)
-//        compactor(7)
     }
 
     private fun compactor(amount: Long) {
