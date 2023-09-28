@@ -154,20 +154,16 @@ class DamageIndicatorManager {
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
-            if (!data.ignoreBlocks) {
-                if (!player.canEntityBeSeen(data.entity)) continue
-            }
+            if (!data.ignoreBlocks && !player.canEntityBeSeen(data.entity)) continue
             if (data.bossType.bossTypeToggle !in config.bossesToShow) continue
 
             val entity = data.entity
 
             var healthText = data.healthText
             val delayedStart = data.delayedStart
-            if (delayedStart != -1L) {
-                if (delayedStart > System.currentTimeMillis()) {
+            if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
                     val delay = delayedStart - System.currentTimeMillis()
                     healthText = formatDelay(delay)
-                }
             }
 
 //            val partialTicks = event.partialTicks
@@ -650,18 +646,16 @@ class DamageIndicatorManager {
         }
 
         //Laser phase
-        if (config.enderSlayer.laserPhaseTimer) {
-            if (entity.ridingEntity != null) {
-                val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-                //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-                //val remainingTicks = 8 * 20 - ticksAlive
-                val remainingTicks = (7.4 * 20).toLong() - ticksAlive
+        if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
+            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+            //val remainingTicks = 8 * 20 - ticksAlive
+            val remainingTicks = (7.4 * 20).toLong() - ticksAlive
 
-                if (config.enderSlayer.showHealthDuringLaser) {
-                    entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
-                } else {
-                    return formatDelay(remainingTicks * 50)
-                }
+            if (config.enderSlayer.showHealthDuringLaser) {
+                entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
+            } else {
+                return formatDelay(remainingTicks * 50)
             }
         }
 
@@ -778,11 +772,9 @@ class DamageIndicatorManager {
     private fun checkDamage(entityData: EntityData, health: Long, lastHealth: Long) {
         val damage = lastHealth - health
         val healing = health - lastHealth
-        if (damage > 0) {
-            if (entityData.bossType != BossType.DUMMY) {
-                val damageCounter = entityData.damageCounter
-                damageCounter.currentDamage += damage
-            }
+        if (damage > 0 && entityData.bossType != BossType.DUMMY) {
+            val damageCounter = entityData.damageCounter
+            damageCounter.currentDamage += damage
         }
         if (healing > 0) {
             //Hide auto heal every 10 ticks (with rounding errors)
@@ -857,17 +849,13 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            if (entityData != null) {
-                if (isEnabled()) {
-                    if (config.hideVanillaNametag) {
-                        val name = entity.name
-                        if (name.contains("Plaesmaflux")) return
-                        if (name.contains("Overflux")) return
-                        if (name.contains("Mana Flux")) return
-                        if (name.contains("Radiant")) return
-                        event.isCanceled = true
-                    }
-                }
+            if (entityData != null && isEnabled() && config.hideVanillaNametag) {
+                val name = entity.name
+                if (name.contains("Plaesmaflux")) return
+                if (name.contains("Overflux")) return
+                if (name.contains("Mana Flux")) return
+                if (name.contains("Radiant")) return
+                event.isCanceled = true
             }
         }
     }
