@@ -92,7 +92,7 @@ class MenuItemDisplayOverlayPlayer {
                         }
                     }
                 }
-            } else if ((chestName == "Farming Skill") && itemName.contains("Garden Level ")) {
+            } else if (((chestName == "Farming Skill") || (chestName == "Desk")) && itemName.contains("Garden Level ")) {
                 if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
                 return itemName.replace("Garden Level ", "")
             }

@@ -26,6 +26,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val magicalPowerSecondPattern = ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
     private val tuningPointsPattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
     private val slotSourcePattern = "(§.)(?<category>.*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
+    private val countdownPattern = "[^\d]*(?<years>(?:([0-9]+)y)?) ?(?<days>(?:([0-9]+)d)?) ?(?<hours>(?:([0-9]+)h)?) ?(?<minutes>(?:([0-9]+)m)?) ?(?<seconds>(?:([0-9]+)s)?).*".toPattern() //shoutout to nea for this regex in particular, remember that one time i struggled so hard with kotlin -ery
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -302,6 +303,24 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     if (line.contains("Points: ")) {
                         return line.removeColor().split(" ").last().between("(", "%)")
                     }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(9) && chestName == ("Calendar and Events")) {
+            val lore = item.getLore()
+            if (lore.first().contains("Starts in: ")) {
+                countdownPattern.matchMatcher(lore.first()) {
+                    val yearsString = group("years")?.toInt()
+                        val daysString = group("days")?.toInt()
+                        val hoursString = group("hours")?.toInt()
+                        val minutesString = group("minutes")?.toInt()
+                        val secondsString = group("seconds")?.toInt()
+                        if (yearsString != null && yearsString > 0) return "${yearsString}y"
+                        if (daysString != null && daysString > 0) return "${daysString}d"
+                        if (hoursString != null && hoursString > 0) return "${hoursString}h"
+                        if (minutesString != null && minutesString > 0) return "${minutesString}m"
+                        if (secondsString != null && secondsString > 0) return "${secondsString}s"
                 }
             }
         }

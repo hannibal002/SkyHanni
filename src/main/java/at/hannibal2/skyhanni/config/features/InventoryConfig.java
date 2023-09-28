@@ -445,6 +445,7 @@ public class InventoryConfig {
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",
                         "§bCurrently Active Potion Effects Count (#)",
                         "§bAccessory Bag Utilities (Various)",
+                        "§b\"Calendar and Events\" Countdowns Abbvs",
                         "§bSkyBlock Achievements Points (%)",
                 }
         )
