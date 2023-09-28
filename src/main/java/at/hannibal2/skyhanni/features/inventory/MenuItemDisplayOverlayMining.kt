@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -67,7 +69,7 @@ class MenuItemDisplayOverlayMining {
         //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
         //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
         if (stackSizeConfig.contains(1) && chestName == "Heart of the Mountain") {
-            if (itemName.contains("Tier ")) {
+            if (item.cleanName().contains("Tier ")) {
                 val nameWithColor = item.name ?: return ""
                 if (nameWithColor.contains("§a")) return ""
                 val lore = item.getLore()
