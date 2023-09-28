@@ -439,7 +439,7 @@ public class InventoryConfig {
                 exampleText = {
                         "§bMenu Pagination (#)",
                         "§bRNG Meter Drop Odds (Abbvs)",
-                        "§bCommunity Shop Upgrade Tiers (#)",
+                        "§bCommunity Shop + Essence Shop Upgrade Tiers (#)",
                         "§bSelected Tab (§a⬇§bs or §a➡§bs)",
                         "§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)",
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",

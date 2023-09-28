@@ -97,17 +97,18 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
         
         if (stackSizeConfig.contains(2)) {
-            if ((chestName.contains("Community Shop"))) {
+            if ((chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
                 val lore = item.getLore()
                 if (!(lore.isEmpty())) {
-                    if ((lore.first().contains(" Upgrade")) ||
+                    if (((chestName.contains("Community Shop")) &&
+                    ((lore.first().contains(" Upgrade")) ||
                     (lore.last().contains(" to start!")) ||
                     (lore.last().contains("Maxed out")) ||
-                    (lore.last().contains("upgrad"))) {
+                    (lore.last().contains("upgrad")))) || ((chestName.contains(" Essence Shop")) && (lore.last().lowercase().contains("unlock")))) { //the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
                         return itemName.split(" ").last().romanToDecimalIfNeeded().toString()
                     }
                 }
-            }  
+            }
         }
         
         if (stackSizeConfig.contains(3)) {
