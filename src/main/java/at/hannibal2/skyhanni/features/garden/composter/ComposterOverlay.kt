@@ -101,14 +101,9 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (inComposterUpgrades) {
-            if (extraComposterUpgrade != null) {
-//                if (System.currentTimeMillis() > lastHovered + 30) {
-                if (System.currentTimeMillis() > lastHovered + 200) {
-                    extraComposterUpgrade = null
-                    update()
-                }
-            }
+        if (inComposterUpgrades && extraComposterUpgrade != null && System.currentTimeMillis() > lastHovered + 200) {
+            extraComposterUpgrade = null
+            update()
         }
     }
 
