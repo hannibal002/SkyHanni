@@ -81,9 +81,9 @@ class HypixelData {
         if (event.isMod(2)) {
             if (LorenzUtils.inSkyBlock) {
                 val originalLocation = ScoreboardData.sidebarLinesFormatted
-                                               .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                                               ?.substring(5)?.removeColor()
-                                       ?: "?"
+                       .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
+                       ?.substring(5)?.removeColor()
+                       ?: "?"
 
                 skyBlockArea = when {
                     skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
@@ -209,6 +209,6 @@ class HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
-              scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+                scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
     }
 }
