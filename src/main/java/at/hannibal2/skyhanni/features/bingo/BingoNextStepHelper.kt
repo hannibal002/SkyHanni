@@ -84,10 +84,8 @@ class BingoNextStepHelper {
                 }
             }
 
-            if (!step.done && !parentDone && requirementsToDo == 0) {
-                if (!currentSteps.contains(step)) {
+            if (!step.done && !parentDone && requirementsToDo == 0 && !currentSteps.contains(step)) {
                     currentSteps = currentSteps.editCopy { add(step) }
-                }
             }
         }
 
