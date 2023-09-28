@@ -76,11 +76,9 @@ object SlayerItemProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL) {
-            if (SlayerAPI.isInSlayerArea) {
-                logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
-                addMobKillCoins(coins.toInt())
-            }
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInSlayerArea) {
+            logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
+            addMobKillCoins(coins.toInt())
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
             logger.log("Coins paid for starting slayer quest: ${coins.addSeparators()}")
@@ -187,15 +185,11 @@ object SlayerItemProfitTracker {
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
         addItemPickup(internalName, amount)
         logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
-        if (config.priceInChat) {
-            if (price > config.minimumPrice) {
-                LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
-            }
+        if (config.priceInChat && price > config.minimumPrice) {
+            LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
         }
-        if (config.titleWarning) {
-            if (price > config.minimumPriceWarning) {
-                TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
-            }
+        if (config.titleWarning && price > config.minimumPriceWarning) {
+            TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
 
@@ -408,13 +402,11 @@ object SlayerItemProfitTracker {
             return
         }
 
-        if (args.size == 1) {
-            if (args[0].lowercase() == "confirm") {
-                resetData(DisplayMode.TOTAL)
-                update()
-                LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
-                return
-            }
+        if (args.size == 1 && args[0].lowercase() == "confirm") {
+            resetData(DisplayMode.TOTAL)
+            update()
+            LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
+            return
         }
 
         LorenzUtils.clickableChat(
