@@ -335,7 +335,6 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
-        val name = stack.cleanName()
         reverseColor = true
         if (ItemUtils.isSack(stack)) return false
 
