@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayFarming {
+    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -71,11 +72,14 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(2)) {
-            if (chestName == "Visitor's Logbook") {
-                if (item.getLore() != null) {
-                    if (item.getLore().any { it.contains("Times Visited: ") }) {
-                        return item.getLore().first().take(5).replace("T", "☉")
+        if (stackSizeConfig.contains(2) && (chestName == "Visitor Milestones")) {
+            val lore = item.getLore()
+            if (lore != null && !(lore.isEmpty())) {
+                if ((lore.any { it.contains("Progress ") }) && (lore.any { it.contains(": ") }) && (lore.any { it.contains("%") })) {
+                    for (line in lore) {
+                        if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
+                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+                        }
                     }
                 }
             }

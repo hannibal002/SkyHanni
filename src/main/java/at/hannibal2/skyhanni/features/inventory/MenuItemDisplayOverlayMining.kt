@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayMining {
+    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -63,7 +64,26 @@ class MenuItemDisplayOverlayMining {
             }
         }
 
-        if (stackSizeConfig.contains(1)) {
+        //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
+        //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
+        if (stackSizeConfig.contains(1) && chestName == "Heart of the Mountain") {
+            if (itemName.contains("Tier ")) {
+                val nameWithColor = item.name ?: return ""
+                if (nameWithColor.contains("§a")) return ""
+                val lore = item.getLore()
+                if (lore != null && !(lore.isEmpty())) {
+                    if ((lore.any { it.contains("Progress: ") }) && (lore.any { it.contains("%") })) {
+                        for (line in lore) {
+                            if (line.contains("Progress: ") && line.contains("%")) {
+                                return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(2)) {
             if (chestName == "Heart of the Mountain") {
                 val nameWithColor = item.name ?: return ""
                 if (nameWithColor != "§5Crystal Hollows Crystals") return ""
@@ -79,6 +99,7 @@ class MenuItemDisplayOverlayMining {
                 return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
             }
         }
+
 
         return ""
     }

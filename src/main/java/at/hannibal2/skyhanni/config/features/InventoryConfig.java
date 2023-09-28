@@ -461,6 +461,7 @@ public class InventoryConfig {
                         "§bFarming Contests Medal Inventory (§6§l§rG§f§l§rS§c§l§rB§r§b)",
                         "§bVisitor's Logbook Countdown (#, highest unit of time only)",
                         "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
+                        "§bVisitor Milestones Progress (%)",
                 }
         )
         public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1));
@@ -473,10 +474,11 @@ public class InventoryConfig {
         @ConfigEditorDraggableList(
                 exampleText = {          
                         "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
+                        "§bHOTM Tiers Progress (%)",
                         "§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)",
                 }
         )
-        public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(0));
+        public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(0, 1));
 
         @Expose
         @ConfigOption(
