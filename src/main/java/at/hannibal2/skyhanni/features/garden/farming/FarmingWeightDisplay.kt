@@ -29,10 +29,8 @@ class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (isEnabled()) {
-            if (config.eliteFarmingWeightIgnoreLow || weight >= 200) {
-                config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
-            }
+        if (isEnabled() && config.eliteFarmingWeightIgnoreLow || weight >= 200) {
+            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
         }
     }
 
