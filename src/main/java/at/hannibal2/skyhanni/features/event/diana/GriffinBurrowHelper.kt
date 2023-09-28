@@ -96,10 +96,8 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (event.distance > 10) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                teleportedLocation = event.newLocation
-            }
+        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+            teleportedLocation = event.newLocation
         }
     }
 
@@ -172,10 +170,8 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
-            if (config.inquisitorSharing.focusInquisitor) {
-                return
-            }
+        if (InquisitorWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+            return
         }
 
         if (config.burrowsNearbyDetection) {
