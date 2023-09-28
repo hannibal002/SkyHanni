@@ -1,13 +1,19 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
@@ -18,7 +24,8 @@ import java.util.concurrent.TimeUnit
 object SlayerAPI {
 
     private var nameCache =
-        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build<Pair<String, Int>, Pair<String, Double>>()
+        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+            .build<Pair<NEUInternalName, Int>, Pair<String, Double>>()
 
     var questStartTime = 0L
     var isInSlayerArea = false
@@ -63,8 +70,8 @@ object SlayerAPI {
         val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
         val displayName = getNameWithEnchantmentFor(internalName)
 
-        val price = NEUItems.getPrice(internalName)
-        val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
+        val price = internalName.getPrice()
+        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         val maxPrice = npcPrice.coerceAtLeast(price)
         val totalPrice = maxPrice * amount
 
@@ -76,11 +83,11 @@ object SlayerAPI {
         return result
     }
 
-    fun getNameWithEnchantmentFor(internalName: String): String? {
-        if (internalName == "WISP_POTION") {
+    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
+        if (internalName.asString() == "WISP_POTION") {
             return "§fWisp's Ice-Flavored Water"
         }
-        return NEUItems.getItemStack(internalName).nameWithEnchantment
+        return internalName.getItemStack().nameWithEnchantment ?: error("Could not find name for $internalName")
     }
 
     @SubscribeEvent
@@ -118,7 +125,11 @@ object SlayerAPI {
         }
 
         if (event.isMod(5)) {
-            isInSlayerArea = SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            isInSlayerArea = if (LorenzUtils.isStrandedProfile) {
+                true
+            } else {
+                SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            }
         }
     }
 }

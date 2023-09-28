@@ -13,7 +13,7 @@ class DungeonBossMessages {
         if (!LorenzUtils.inDungeons) return
         if (!isBoss(event.message)) return
 
-        DungeonData.handleBossMessage(event.message)
+        DungeonAPI.handleBossMessage(event.message)
 
         if (SkyHanniMod.feature.chat.dungeonBossMessages) {
             event.blockedReason = "dungeon_boss"

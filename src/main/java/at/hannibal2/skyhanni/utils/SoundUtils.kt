@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation
 object SoundUtils {
     private val beepSound by lazy { createSound("random.orb", 1f) }
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
+    val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
         Minecraft.getMinecraft().addScheduledTask {
@@ -51,6 +52,6 @@ object SoundUtils {
     }
 
     fun playClickSound() {
-       clickSound.playSound()
+        clickSound.playSound()
     }
 }

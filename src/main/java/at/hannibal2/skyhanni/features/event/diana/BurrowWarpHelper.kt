@@ -20,11 +20,11 @@ class BurrowWarpHelper {
     fun onKeyBindPressed(event: KeyInputEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
-        if (!SkyHanniMod.feature.diana.burrowNearestWarp) return
+        if (!config.burrowNearestWarp) return
 
         if (!Keyboard.getEventKeyState()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (SkyHanniMod.feature.diana.keyBindWarp == key) {
+        if (config.keyBindWarp == key) {
             currentWarp?.let {
                 if (System.currentTimeMillis() > lastWarpTime + 5_000) {
                     lastWarpTime = System.currentTimeMillis()
@@ -43,7 +43,7 @@ class BurrowWarpHelper {
             val time = System.currentTimeMillis() - lastWarpTime
             if (time < 1_000) {
                 lastWarp?.let {
-                    it.enabled = false
+                    it.unlocked = false
                     LorenzUtils.chat(
                         "§e[SkyHanni] Detected not having access to warp point §b${it.displayName}§e!\n" +
                                 "§e[SkyHanni] Use §c/shresetburrowwarps §eonce you have activated this travel scroll."
@@ -57,6 +57,7 @@ class BurrowWarpHelper {
     }
 
     companion object {
+        private val config get() = SkyHanniMod.feature.event.diana
         var currentWarp: WarpPoint? = null
 
         fun shouldUseWarps(target: LorenzVec) {
@@ -65,10 +66,6 @@ class BurrowWarpHelper {
 
             val playerDistance = playerLocation.distance(target)
             val warpDistance = warpPoint.distance(target)
-//            println(" ")
-//            println("shouldUseWarps")
-//            println("playerDistance: ${playerDistance.round(1)}")
-//            println("warpDistance: ${warpDistance.round(1)}")
             val difference = playerDistance - warpDistance
             currentWarp = if (difference > 10) {
                 warpPoint
@@ -77,13 +74,12 @@ class BurrowWarpHelper {
             }
         }
 
-        private fun getNearestWarpPoint(location: LorenzVec): WarpPoint {
-            val map = WarpPoint.values().filter { it.enabled }.map { it to it.distance(location) }
-            return map.sorted().first().first
-        }
+        private fun getNearestWarpPoint(location: LorenzVec) =
+            WarpPoint.entries.filter { it.unlocked && !it.ignored() }.map { it to it.distance(location) }
+                .sorted().first().first
 
         fun resetDisabledWarps() {
-            WarpPoint.values().forEach { it.enabled = true }
+            WarpPoint.entries.forEach { it.unlocked = true }
             LorenzUtils.chat("§e[SkyHanni] Reset disabled burrow warps.")
         }
     }
@@ -92,15 +88,15 @@ class BurrowWarpHelper {
         val displayName: String,
         private val location: LorenzVec,
         private val extraBlocks: Int,
-        var enabled: Boolean = true,
+        val ignored: () -> Boolean = { false },
+        var unlocked: Boolean = true,
     ) {
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-
-        //        CRYPT("Crypt", LorenzVec(-190, 74, -88), 25),
+        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5),
+        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks

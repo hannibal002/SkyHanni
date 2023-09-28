@@ -5,18 +5,29 @@ import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.SlayerProfitList
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PurseChangeCause
+import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.test.PriceSource
-import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.common.cache.CacheBuilder
@@ -27,6 +38,7 @@ import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object SlayerItemProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
@@ -80,7 +92,7 @@ object SlayerItemProfitTracker {
         update()
     }
 
-    private fun addItemPickup(internalName: String, stackSize: Int) {
+    private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
         val itemLog = currentLog() ?: return
 
         itemLog.modify {
@@ -134,8 +146,7 @@ object SlayerItemProfitTracker {
         val itemStack = item.entityItem
         val name = itemStack.name ?: return
         if (SlayerAPI.ignoreSlayerDrop(name)) return
-        val internalName = itemStack.getInternalName()
-        if (internalName == "") return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
         addItemPickup(internalName, itemStack.stackSize)
@@ -147,7 +158,7 @@ object SlayerItemProfitTracker {
         }
         if (config.titleWarning) {
             if (price > config.minimumPriceWarning) {
-                TitleUtils.sendTitle("§a+ $itemName", 5_000)
+                TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
             }
         }
     }
@@ -162,13 +173,15 @@ object SlayerItemProfitTracker {
 
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
         if (inventoryOpen) {
-            addSelector("§7Display Mode: ", DisplayMode.values(),
+            addSelector<DisplayMode>(
+                "§7Display Mode: ",
                 getName = { type -> type.displayName },
                 isCurrent = { it == currentDisplayMode },
                 onChange = {
                     currentDisplayMode = it
                     update()
-                })
+                }
+            )
         }
 
         var profit = 0.0
@@ -178,7 +191,7 @@ object SlayerItemProfitTracker {
 
             val price = (getPrice(internalName) * amount).toLong()
 
-            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
+            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName)
             var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
@@ -265,13 +278,15 @@ object SlayerItemProfitTracker {
         addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per boss: $profitPrefix$profitPerBossFormat")))
 
         if (inventoryOpen) {
-            addSelector("", PriceSource.values(),
+            addSelector<PriceSource>(
+                "",
                 getName = { type -> type.displayName },
                 isCurrent = { it.ordinal == config.priceFrom },
                 onChange = {
                     config.priceFrom = it.ordinal
                     update()
-                })
+                }
+            )
         }
         if (inventoryOpen && currentDisplayMode == DisplayMode.CURRENT) {
             addAsSingletonList(
@@ -294,18 +309,14 @@ object SlayerItemProfitTracker {
         list.slayerCompletedCount = 0
     }
 
-    private fun getPrice(internalName: String): Double {
-        val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-        return bazaarData?.let { getPrice(it) } ?: NEUItems.getPrice(internalName)
-    }
+    private fun getPrice(internalName: NEUInternalName) =
+        internalName.getBazaarData()?.let { getPrice(internalName, it) } ?: internalName.getPrice()
 
-    private fun getPrice(bazaarData: BazaarData): Double {
-        return when (config.priceFrom) {
-            0 -> bazaarData.sellPrice
-            1 -> bazaarData.buyPrice
+    private fun getPrice(internalName: NEUInternalName, bazaarData: BazaarData) = when (config.priceFrom) {
+        0 -> bazaarData.sellPrice
+        1 -> bazaarData.buyPrice
 
-            else -> bazaarData.npcPrice
-        }
+        else -> internalName.getNpcPrice()
     }
 
     @SubscribeEvent

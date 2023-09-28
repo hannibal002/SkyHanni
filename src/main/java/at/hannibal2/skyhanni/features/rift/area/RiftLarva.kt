@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,7 +31,7 @@ class RiftLarva {
     }
 
     private fun checkHand() {
-        hasHookInHand = InventoryUtils.getItemInHand()?.getInternalName() == "LARVA_HOOK"
+        hasHookInHand = InventoryUtils.getItemInHand()?.getInternalName_old() == "LARVA_HOOK"
     }
 
     private fun findLarvas() {

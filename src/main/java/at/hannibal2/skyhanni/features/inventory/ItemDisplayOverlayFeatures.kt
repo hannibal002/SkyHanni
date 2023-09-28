@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -19,9 +18,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
-
-    private val wishingCompassPattern = "§7Remaining Uses: §e(?<amount>.*)§8/§e3".toPattern()
-    private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
+    private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
 
     @SubscribeEvent
@@ -99,19 +96,6 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
-            if (itemName.contains("Wishing Compass")) {
-                for (line in item.getLore()) {
-                    wishingCompassPattern.matchMatcher(line) {
-                        val uses = group("amount")
-                        if (uses != "3") {
-                            return uses
-                        }
-                    }
-                }
-            }
-        }
-
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(8)) {
             if (itemName.contains("Kuudra Key")) {
                 return when (itemName) {
@@ -129,8 +113,10 @@ class ItemDisplayOverlayFeatures {
             if (InventoryUtils.openInventoryName() == "Your Skills") {
                 if (item.getLore().any { it.contains("Click to view!") }) {
                     if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
+                    val split = itemName.split(" ")
+                    if (split.size < 2) return "0"
                     if (!itemName.contains("Dungeon")) {
-                        val text = itemName.split(" ").last()
+                        val text = split.last()
                         return "" + text.romanToDecimalIfNeeded()
                     }
                 }
@@ -155,7 +141,7 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
             if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
-                    rangerBootsSpeedCapPattern.matchMatcher(line) {
+                    rancherBootsSpeedCapPattern.matchMatcher(line) {
                         return group("cap")
                     }
                 }
@@ -163,7 +149,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
-            if (item.getInternalName() == "LARVA_HOOK") {
+            if (itemName.contains("Larva Hook")) {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
                         val amount = group("amount").toInt()
@@ -178,7 +164,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
-            if (item.getInternalName() == "POTION") {
+            if (itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
                 item.name?.let {
                     "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                         return when (val level = group("level").romanToDecimal()) {

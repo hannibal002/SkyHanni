@@ -16,39 +16,39 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGuiContainer extends GuiScreen {
 
     @Unique
-    private final GuiContainerHook hook = new GuiContainerHook(this);
+    private final GuiContainerHook skyHanni$hook = new GuiContainerHook(this);
 
     @Shadow
     private Slot theSlot;
 
     @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(CallbackInfo ci) {
-        hook.closeWindowPressed(ci);
+        skyHanni$hook.closeWindowPressed(ci);
     }
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        hook.backgroundDrawn(mouseX, mouseY, partialTicks, ci);
+        skyHanni$hook.backgroundDrawn(mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        hook.foregroundDrawn(mouseX, mouseY, partialTicks, ci);
+        skyHanni$hook.foregroundDrawn(mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(Slot slot, CallbackInfo ci) {
-        hook.onDrawSlot(slot, ci);
+        skyHanni$hook.onDrawSlot(slot, ci);
     }
 
-    @Inject(method = "drawSlot", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "drawSlot", at = @At("RETURN"))
     private void onDrawSlotPost(Slot slot, CallbackInfo ci) {
-        hook.onDrawSlotPost(slot, ci);
+        skyHanni$hook.onDrawSlotPost(slot);
     }
 
     @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
-        hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
+        skyHanni$hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
 
     @Inject(method = "drawScreen",
@@ -59,7 +59,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
             )
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        hook.onDrawScreenAfter(mouseX, mouseY, ci);
+        skyHanni$hook.onDrawScreenAfter(mouseX, mouseY, ci);
         ToolTipData.Companion.setLastSlot(theSlot);
     }
 }

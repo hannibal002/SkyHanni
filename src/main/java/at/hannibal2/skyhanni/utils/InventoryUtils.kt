@@ -7,10 +7,9 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 object InventoryUtils {
-    var itemInHandId = ""
-    var recentItemsInHand = mutableMapOf<Long, String>()
+    var itemInHandId = NEUInternalName.NONE
+    var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
-
     fun getItemsInOpenChest() = buildList<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
         val inventorySlots = guiChest.inventorySlots.inventorySlots
@@ -40,10 +39,14 @@ object InventoryUtils {
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
-
     fun inStorage() =
-        openInventoryName().let { (it.contains("Storage") && !it.contains("Rift Storage")) || it.contains("Ender Chest") || it.contains("Backpack")}
+        openInventoryName().let {
+            (it.contains("Storage") && !it.contains("Rift Storage")) || it.contains("Ender Chest") || it.contains(
+                "Backpack"
+            )
+        }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
+
+    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
 }

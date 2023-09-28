@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -24,14 +29,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BestiaryData {
 
-    private val config get() = SkyHanniMod.feature.misc.bestiaryData
+    private val config get() = SkyHanniMod.feature.combat.bestiary
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val catList = mutableListOf<Category>()
     private val progressPattern = "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+$)".toPattern()
     private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
-    private var lastclicked = 0L
     private var inInventory = false
     private var isCategory = false
     private var indexes = listOf(
@@ -58,30 +62,29 @@ object BestiaryData {
     fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inInventory) {
-            val inventoryName = InventoryUtils.openInventoryName()
-            if (isBestiaryGui(InventoryUtils.getItemsInOpenChest()[4].stack, inventoryName)) {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    val lore = stack.getLore()
-                    if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100§6% §7(§c§lMAX!§7)" }) {
-                        slot highlight LorenzColor.GREEN
-                    }
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                val lore = stack.getLore()
+                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
+                    slot highlight LorenzColor.GREEN
                 }
             }
         }
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
+        val stack = event.inventoryItems[4] ?: return
         if ((inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") || isBestiaryGui(
-                event.inventoryItems[4],
+                stack,
                 inventoryName
             )
         ) {
             isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
             stackList.putAll(event.inventoryItems)
+            inInventory = true
             update()
         }
     }
@@ -91,6 +94,11 @@ object BestiaryData {
         mobList.clear()
         stackList.clear()
         inInventory = false
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.bestiaryData", "combat.bestiary")
     }
 
     private fun update() {
@@ -231,23 +239,23 @@ object BestiaryData {
             if (isMaxed && config.hideMaxed) continue
             val text = getMobLine(mob, isMaxed)
             val tips = getMobHover(mob)
-            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips, false) { true })
+            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips) { true })
         }
     }
 
     private fun getMobHover(mob: BestiaryMob) = listOf(
         "§6Name: §b${mob.name}",
         "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNeeded()})" else ""}",
-        "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
-        "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
-        "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
-        "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
-        "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
-        "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
+        "§6Total Kills: §b${mob.actualRealTotalKill.formatNumber()}",
+        "§6Kills needed to max: §b${mob.killNeededToMax().formatNumber()}",
+        "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().formatNumber()}",
+        "§6Current kill to next level: §b${mob.currentKillToNextLevel.formatNumber()}",
+        "§6Kill needed for next level: §b${mob.killNeededForNextLevel.formatNumber()}",
+        "§6Current kill to max: §b${mob.killToMax.formatNumber()}",
         "§6Percent to max: §b${mob.percentToMaxFormatted()}",
         "§6Percent to tier: §b${mob.percentToTierFormatted()}",
         "",
-        "§7More infos thing"
+        "§7More info thing"
     )
 
     private fun getMobLine(
@@ -259,7 +267,7 @@ object BestiaryData {
         text += " §7- "
         text += "${mob.name} ${mob.level.romanOrInt()} "
         text += if (isMaxed) {
-            "§c§lMAXED! §7(§b${mob.actualRealTotalKill.addSeparators()}§7 kills)"
+            "§c§lMAXED! §7(§b${mob.actualRealTotalKill.formatNumber()}§7 kills)"
         } else {
             when (displayType) {
                 0, 1 -> {
@@ -318,17 +326,17 @@ object BestiaryData {
 
         newDisplay.addButton(
             prefix = "§7Number Type: ",
-            getName = NumberType.entries[config.replaceRoman.toInt()].type,
+            getName = NumberType.entries[if (config.replaceRoman) 0 else 1].type,
             onChange = {
-                config.replaceRoman = ((config.replaceRoman.toInt() + 1) % 2).toBoolean()
+                config.replaceRoman = !config.replaceRoman
                 update()
             }
         )
         newDisplay.addButton(
             prefix = "§7Hide Maxed: ",
-            getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
+            getName = HideMaxed.entries[if (config.hideMaxed) 1 else 0].type,
             onChange = {
-                config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
+                config.hideMaxed = !config.hideMaxed
                 update()
             }
         )
@@ -340,13 +348,15 @@ object BestiaryData {
             for (cat in catList) {
                 newDisplay.add(buildList {
                     add(" §7- ${cat.name}§7: ")
-                    if (cat.familiesCompleted == cat.totalFamilies) {
-                        add("§c§lCompleted!")
-                    } else if (cat.familiesFound == cat.totalFamilies) {
-                        add("§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
-                    } else if (cat.familiesFound < cat.totalFamilies) {
-                        add("§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
+                    val element = when {
+                        cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                        cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                        cat.familiesFound < cat.totalFamilies ->
+                            "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+
+                        else -> continue
                     }
+                    add(element)
                 })
             }
         }
@@ -401,7 +411,7 @@ object BestiaryData {
         HIGHEST_NEEDED_TIER("Highest kills needed to next tier"),
     }
 
-    enum class HideMaxed(val b: String) {
+    enum class HideMaxed(val type: String) {
         NO("Show"),
         YES("Hide")
     }
@@ -411,9 +421,6 @@ object BestiaryData {
         1 -> this.addSeparators()
         else -> "0"
     }
-
-    private fun Int.toBoolean() = this != 0
-    private fun Boolean.toInt() = if (!this) 0 else 1
 
     data class Category(
         val name: String,
@@ -451,33 +458,9 @@ object BestiaryData {
         fun getNextLevel() = level.getNextLevel()
     }
 
-    private fun MutableList<List<Any>>.addButton(
-        prefix: String,
-        getName: String,
-        onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                lastclicked = System.currentTimeMillis()
-            }
-        }
-        add(buildList {
-            add(prefix)
-            add("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            add("§a]")
-        })
-    }
 
-    fun String.romanOrInt() = romanToDecimalIfNeeded().let {
-        if (config.replaceRoman) it.toString() else it.toRoman()
+    private fun String.romanOrInt() = romanToDecimalIfNeeded().let {
+        if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
     fun Any.getNextLevel(): String {

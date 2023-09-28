@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
 
 class KingTalismanHelper {
-    private val config get() = SkyHanniMod.feature.misc.mining
+    private val config get() = SkyHanniMod.feature.mining
 
     private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
     private val kingCircles = listOf(
@@ -102,7 +102,7 @@ class KingTalismanHelper {
                     farDisplay_ = "§cNext missing king: §7$king §eNow $missingTimeFormat"
                 }
 
-                val timeString = if (missing) " §cMissing " + missingTimeFormat else ""
+                val timeString = if (missing) " §cMissing $missingTimeFormat" else ""
 
                 add("§7$currentString$king$missingString$timeString")
             }
@@ -123,9 +123,9 @@ class KingTalismanHelper {
         val oneSbDay = 1000 * 60 * 20
         val oneCircleTime = oneSbDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
-        for ((index, king) in kingCircles.reversed().withIndex()) {
+        for ((index, king) in kingCircles.withIndex()) {
 
-            val startTime = SkyBlockTime(day = index + 1)
+            val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
             var timeNext = startTime.toMillis()
             while (timeNext < System.currentTimeMillis()) {
                 timeNext += oneCircleTime

@@ -2,9 +2,14 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -15,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GriffinBurrowParticleFinder {
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private val recentlyDugParticleBurrows = mutableListOf<LorenzVec>()
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
@@ -53,7 +59,7 @@ class GriffinBurrowParticleFinder {
 //
 //    @SubscribeEvent
 //    fun onChatPacket(event: ReceiveParticleEvent) {
-//        if (!LorenzUtils.inSkyblock) return
+//        if (!LorenzUtils.inSkyBlock) return
 //        if (!SkyHanniMod.feature.dev.debugEnabled) return
 //
 //            val particleType = getParticleType(event)
@@ -78,7 +84,7 @@ class GriffinBurrowParticleFinder {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
+        if (!config.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val packet = event.packet
 
@@ -131,7 +137,7 @@ class GriffinBurrowParticleFinder {
 
             fun getParticleType(packet: S2APacketParticles): ParticleType? {
                 if (!packet.isLongDistance) return null
-                for (type in values()) {
+                for (type in entries) {
                     if (type.check(packet)) {
                         return type
                     }
@@ -149,7 +155,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
+        if (!config.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
@@ -171,7 +177,7 @@ class GriffinBurrowParticleFinder {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
+        if (!config.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
 
         val pos = event.position
@@ -183,7 +189,7 @@ class GriffinBurrowParticleFinder {
     }
 
     private val ItemStack.isSpade
-        get() = this.getInternalName() == "ANCESTRAL_SPADE"
+        get() = getInternalName_old() == "ANCESTRAL_SPADE"
 
     class Burrow(
         var location: LorenzVec,

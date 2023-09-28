@@ -3,7 +3,16 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.CropClickEvent
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
@@ -12,13 +21,14 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,6 +47,13 @@ object GardenAPI {
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val config get() = ProfileStorageData.profileSpecific?.garden
+    var gardenExp: Long?
+        get() = config?.experience
+        set(value) {
+            value?.let {
+                config?.experience = it
+            }
+        }
 
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
@@ -103,7 +120,7 @@ object GardenAPI {
     private fun getToolInHand(toolItem: ItemStack?, crop: CropType?): String? {
         if (crop != null) return crop.cropName
 
-        val internalName = toolItem?.getInternalName() ?: return null
+        val internalName = toolItem?.getInternalName_old() ?: return null
         return if (isOtherTool(internalName)) internalName else null
     }
 
@@ -126,8 +143,8 @@ object GardenAPI {
     fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
     fun ItemStack.getCropType(): CropType? {
-        val internalName = getInternalName()
-        return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
+        val internalName = getInternalName_old()
+        return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
@@ -191,10 +208,19 @@ object GardenAPI {
                 return totalExp
             }
         }
+
+        while (tier < requestedLevel) {
+            totalExp += gardenOverflowExp
+            tier++
+            if (tier == requestedLevel) {
+                return totalExp
+            }
+        }
         return 0
     }
 
-    fun getLevelForExp(gardenExp: Long): Int {
+    fun getGardenLevel(): Int {
+        val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
         for (tierExp in gardenExperience) {
@@ -204,51 +230,21 @@ object GardenAPI {
             }
             tier++
         }
+        totalExp += gardenOverflowExp
+
+        while (totalExp < gardenExp) {
+            tier++
+            totalExp += gardenOverflowExp
+        }
         return tier
     }
 
-    private val gardenExperience = listOf(
-        0,
-        70,
-        100,
-        140,
-        240,
-        600,
-        1500,
-        2000,
-        2500,
-        3000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000, // level 15
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden") ?: return
+        gardenExperience = data.garden_exp
+    }
 
-        // overflow levels till 40 for now, in 10k steps
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-    )
+    private var gardenExperience = listOf<Int>()
+    private const val gardenOverflowExp = 10000 // can be changed I guess
 }

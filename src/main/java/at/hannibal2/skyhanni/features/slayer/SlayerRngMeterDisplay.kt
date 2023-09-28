@@ -5,8 +5,12 @@ import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,6 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.seconds
 
 class SlayerRngMeterDisplay {
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
@@ -74,7 +79,7 @@ class SlayerRngMeterDisplay {
             if (!hasItemSelected) {
                 if (config.warnEmpty) {
                     LorenzUtils.warning("§c[Skyhanni] No Slayer RNG Meter Item selected!")
-                    TitleUtils.sendTitle("§cNo RNG Meter Item!", 3_000)
+                    TitleUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
                 }
             }
             var blockChat = config.hideChat && hasItemSelected
@@ -127,7 +132,7 @@ class SlayerRngMeterDisplay {
         } else {
             storage.itemGoal = selectedItem.nameWithEnchantment
             val jsonObject = Constants.RNGSCORE["slayer"].asJsonObject.get(getCurrentSlayer()).asJsonObject
-            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName()).asLong
+            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName_old()).asLong
         }
         update()
     }

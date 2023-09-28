@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class BlazeSlayerFirePitsWarning {
     private val config get() = SkyHanniMod.feature.slayer
@@ -18,7 +19,7 @@ class BlazeSlayerFirePitsWarning {
         private var lastFirePitsWarning = 0L
 
         fun fireFirePits() {
-            TitleUtils.sendTitle("§cFire Pits!", 2_000)
+            TitleUtils.sendTitle("§cFire Pits!", 2.seconds)
         }
     }
 
@@ -28,14 +29,8 @@ class BlazeSlayerFirePitsWarning {
 
         val difference = System.currentTimeMillis() - lastFirePitsWarning
 
-        if (difference > 0) {
-            if (difference <= 2_000) {
-                if (event.isMod(10)) {
-                    if (config.firePitsWarning) {
-                        SoundUtils.createSound("random.orb", 0.8f).playSound()
-                    }
-                }
-            }
+        if (difference in 1..2_000 && event.isMod(10) && config.firePitsWarning) {
+            SoundUtils.createSound("random.orb", 0.8f).playSound()
         }
     }
 

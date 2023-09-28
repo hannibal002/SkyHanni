@@ -23,8 +23,7 @@ class BrewingStandOverlay {
             13, // Ingredient input
             21, // Progress
             42, // Output right side
-            -> {
-            }
+            -> Unit
 
             else -> return
         }

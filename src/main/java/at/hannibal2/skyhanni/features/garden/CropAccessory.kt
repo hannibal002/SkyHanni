@@ -1,14 +1,27 @@
 package at.hannibal2.skyhanni.features.garden
 
-enum class CropAccessory(val internalName: String, private val affectedCrops: Set<CropType>, private val fortune: Double,  val upgradeCost: Pair<String, Int>?) {
-    NONE("NONE", emptySet(), 0.0, null),
-    CROPIE("CROPIE_TALISMAN", setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT), 10.0, Pair("CROPIE", 256)),
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+
+enum class CropAccessory(
+    val internalName: NEUInternalName?,
+    private val affectedCrops: Set<CropType>,
+    private val fortune: Double,
+    val upgradeCost: Pair<String, Int>?
+) {
+    NONE(null, emptySet(), 0.0, null),
+    CROPIE(
+        "CROPIE_TALISMAN".asInternalName(),
+        setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT),
+        10.0,
+        Pair("CROPIE", 256)
+    ),
     SQUASH(
-        "SQUASH_RING",
+        "SQUASH_RING".asInternalName(),
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT, CropType.COCOA_BEANS, CropType.MELON, CropType.PUMPKIN),
         20.0, Pair("SQUASH", 128)
     ),
-    FERMENTO("FERMENTO_ARTIFACT", CropType.values().toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
+    FERMENTO("FERMENTO_ARTIFACT".asInternalName(), CropType.entries.toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
     ;
 
     fun getFortune(cropType: CropType): Double {
@@ -16,6 +29,6 @@ enum class CropAccessory(val internalName: String, private val affectedCrops: Se
     }
 
     companion object {
-        fun getByName(internalName: String) = values().firstOrNull { it.internalName == internalName }
+        fun getByName(internalName: NEUInternalName) = entries.firstOrNull { internalName == it.internalName }
     }
 }

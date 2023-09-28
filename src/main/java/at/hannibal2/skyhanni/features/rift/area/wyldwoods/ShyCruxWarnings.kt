@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 class ShyCruxWarnings {
     private val config get() = RiftAPI.config.area.wyldWoodsConfig
@@ -21,7 +22,7 @@ class ShyCruxWarnings {
 
     private fun checkForShy() {
         if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
-            TitleUtils.sendTitle("§eLook away!", 150)
+            TitleUtils.sendTitle("§eLook away!", 150.milliseconds)
         }
     }
 }

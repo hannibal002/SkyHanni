@@ -11,6 +11,7 @@ object MinecraftDispatcher : MainCoroutineDispatcher() {
     override fun isDispatchNeeded(context: CoroutineContext): Boolean {
         return !Minecraft.getMinecraft().isCallingFromMinecraftThread
     }
+
     override fun dispatch(context: CoroutineContext, block: Runnable) {
         Minecraft.getMinecraft().addScheduledTask(block)
     }

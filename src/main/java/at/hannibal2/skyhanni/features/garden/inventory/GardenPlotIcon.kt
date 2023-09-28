@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -118,7 +118,7 @@ object GardenPlotIcon {
                     return
                 }
                 val copyStack = copyStack ?: return
-                plotList[event.slotId] = copyStack.getInternalName()
+                plotList[event.slotId] = copyStack.getInternalName_old()
                 cachedStack[event.slotId] = copyStack
             }
         }

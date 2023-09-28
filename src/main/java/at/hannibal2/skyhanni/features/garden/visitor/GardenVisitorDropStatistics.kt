@@ -30,6 +30,9 @@ object GardenVisitorDropStatistics {
     private var copper = 0
     private var gardenExp = 0
     private var farmingExp = 0L
+    private var bits = 0
+    private var mithrilPowder = 0
+    private var gemstonePowder = 0
     var coinsSpent = 0L
 
     var lastAccept = 0L
@@ -38,6 +41,9 @@ object GardenVisitorDropStatistics {
     private val copperPattern = "[+](?<amount>.*) Copper".toPattern()
     private val gardenExpPattern = "[+](?<amount>.*) Garden Experience".toPattern()
     private val farmingExpPattern = "[+](?<amount>.*) Farming XP".toPattern()
+    private val bitsPattern = "[+](?<amount>.*) Bits".toPattern()
+    private val mithrilPowderPattern = "[+](?<amount>.*) Mithril Powder".toPattern()
+    private val gemstonePowderPattern = "[+](?<amount>.*) Gemstone Powder".toPattern()
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -76,12 +82,27 @@ object GardenVisitorDropStatistics {
                 gardenExp += amount
                 saveAndUpdate()
             }
+            bitsPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                bits += amount
+                saveAndUpdate()
+            }
+            mithrilPowderPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                mithrilPowder += amount
+                saveAndUpdate()
+            }
+            gemstonePowderPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                gemstonePowder += amount
+                saveAndUpdate()
+            }
             acceptPattern.matchMatcher(message) {
                 setRarities(group("rarity"))
                 saveAndUpdate()
             }
 
-            for (reward in VisitorReward.values()) {
+            for (reward in VisitorReward.entries) {
                 reward.pattern.matchMatcher(message) {
                     val old = rewardsCount[reward] ?: 0
                     rewardsCount = rewardsCount.editCopy { this[reward] = old + 1 }
@@ -129,8 +150,8 @@ object GardenVisitorDropStatistics {
         //8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
-        //9 – 14
-        for (reward in VisitorReward.values()) {
+        //9 – 16
+        for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
                 val stack = NEUItems.getItemStack(reward.internalName, true)
@@ -141,10 +162,16 @@ object GardenVisitorDropStatistics {
                 addAsSingletonList(format(count, reward.displayName, "§b"))
             }
         }
-        //15
+        //17
         addAsSingletonList("")
-        //16
+        //18
         addAsSingletonList(format(gardenExp, "Garden EXP", "§2", "§7"))
+        //19
+        addAsSingletonList(format(bits, "Bits", "§b", "§b"))
+        //20
+        addAsSingletonList(format(mithrilPowder, "Mithril Powder", "§2", "§2"))
+        //21
+        addAsSingletonList(format(gemstonePowder, "Gemstone Powder", "§d", "§d"))
     }
 
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =

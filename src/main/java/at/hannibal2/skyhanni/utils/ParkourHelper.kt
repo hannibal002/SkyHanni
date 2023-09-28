@@ -86,8 +86,7 @@ class ParkourHelper(
                     next.value.offsetCenter(),
                     colorForIndex(prev.index),
                     5,
-                    false,
-                    colorForIndex(next.index)
+                    false
                 )
             }
             val nextShortcuts = current until current + lookAhead
@@ -114,7 +113,7 @@ class ParkourHelper(
                     val aabb = axisAlignedBB(location).expandBlock()
                     event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), .6f)
                 } else {
-                  val aabb = axisAlignedBB(location)
+                    val aabb = axisAlignedBB(location)
                     event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), 1f)
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }

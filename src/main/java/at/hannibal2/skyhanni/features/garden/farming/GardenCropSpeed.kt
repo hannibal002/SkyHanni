@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -12,8 +12,9 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
@@ -28,7 +29,7 @@ object GardenCropSpeed {
 
     var averageBlocksPerSecond = 0.0
 
-    private val blocksSpeedList = mutableListOf<Int>()
+    private var blocksSpeedList = listOf<Int>()
     private var blocksBroken = 0
     private var secondsStopped = 0
 
@@ -81,27 +82,29 @@ object GardenCropSpeed {
         this.blocksBroken = 0
 
         if (blocksBroken == 0) {
-            if (blocksSpeedList.size == 0) return
+            if (blocksSpeedList.isEmpty()) return
             secondsStopped++
         } else {
             if (secondsStopped >= config.blocksBrokenResetTime) {
                 resetSpeed()
             }
-            while (secondsStopped > 0) {
-                blocksSpeedList.add(0)
-                secondsStopped -= 1
-            }
-            blocksSpeedList.add(blocksBroken)
-            if (blocksSpeedList.size == 2) {
-                blocksSpeedList.removeFirst()
-                blocksSpeedList.add(blocksBroken)
+            blocksSpeedList = blocksSpeedList.editCopy {
+                while (secondsStopped > 0) {
+                    this.add(0)
+                    secondsStopped -= 1
+                }
+                this.add(blocksBroken)
+                if (this.size == 2) {
+                    this.removeFirst()
+                    this.add(blocksBroken)
+                }
             }
             averageBlocksPerSecond = if (blocksSpeedList.size > 1) {
                 blocksSpeedList.dropLast(1).average()
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 val heldTool = InventoryUtils.getItemInHand()
-                val toolName = heldTool?.getInternalName()
+                val toolName = heldTool?.getInternalName_old()
                 if (toolName?.contains("DICER") == true) {
                     val lastCrop = lastBrokenCrop?.cropName?.lowercase() ?: "NONE"
                     if (toolName.lowercase().contains(lastCrop)) {
@@ -170,7 +173,7 @@ object GardenCropSpeed {
 
     private fun resetSpeed() {
         averageBlocksPerSecond = 0.0
-        blocksSpeedList.clear()
+        blocksSpeedList = emptyList()
         secondsStopped = 0
     }
 

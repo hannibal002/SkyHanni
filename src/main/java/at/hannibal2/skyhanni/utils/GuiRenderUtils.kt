@@ -49,7 +49,7 @@ object GuiRenderUtils {
         if (splitIndex == -1) {
             splitIndex = desiredSplitIndex
         }
-        for (i in 0 until  desiredSplitIndex) {
+        for (i in 0 until desiredSplitIndex) {
             if (str[i] == '§' && i + 1 < str.length) {
                 lastColorCode = str.substring(i, i + 2)
             }
@@ -115,21 +115,32 @@ object GuiRenderUtils {
             GlStateManager.translate(0f, 0f, 100f)
             if (tooltipY + tooltipHeight + 6 > screenHeight) tooltipY = screenHeight - tooltipHeight - 6
             // main background
-            GuiScreen.drawRect(tooltipX - 3, tooltipY - 3,
-                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0)
+            GuiScreen.drawRect(
+                tooltipX - 3, tooltipY - 3,
+                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0
+            )
 
             // borders
-            GuiScreen.drawRect(tooltipX - 3, tooltipY - 3 + 1,
-                tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor)
+            GuiScreen.drawRect(
+                tooltipX - 3, tooltipY - 3 + 1,
+                tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor
 
-            GuiScreen.drawRect(tooltipX + tooltipTextWidth + 2, tooltipY - 3 + 1,
-                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3 - 1, borderColor)
+            )
 
-            GuiScreen.drawRect(tooltipX - 3, tooltipY - 3,
-                tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor)
+            GuiScreen.drawRect(
+                tooltipX + tooltipTextWidth + 2, tooltipY - 3 + 1,
+                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3 - 1, borderColor
+            )
 
-            GuiScreen.drawRect(tooltipX - 3, tooltipY + tooltipHeight + 2,
-                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColor)
+            GuiScreen.drawRect(
+                tooltipX - 3, tooltipY - 3,
+                tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor
+            )
+
+            GuiScreen.drawRect(
+                tooltipX - 3, tooltipY + tooltipHeight + 2,
+                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColor
+            )
             GlStateManager.translate(0f, 0f, -100f)
             GlStateManager.disableDepth()
 
@@ -159,7 +170,13 @@ object GuiRenderUtils {
         GuiScreen.drawRect(x, y, x + barWidth, y + 6, 0xFF43464B.toInt())
         val width = barWidth * progress
         GuiScreen.drawRect(x + 1, y + 1, (x + width).toInt() + 1, y + 5, 0xFF00FF00.toInt())
-        if (progress != 1f) GuiScreen.drawRect((x + width).toInt() + 1, y + 1, x + barWidth - 1, y + 5, 0xFF013220.toInt())
+        if (progress != 1f) GuiScreen.drawRect(
+            (x + width).toInt() + 1,
+            y + 1,
+            x + barWidth - 1,
+            y + 5,
+            0xFF013220.toInt()
+        )
     }
 
     fun renderItemAndTip(item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
@@ -173,7 +190,14 @@ object GuiRenderUtils {
         }
     }
 
-    fun renderItemAndTip(item: ItemStack?, x: Float, y: Float, mouseX: Float, mouseY: Float, color: Int = 0xFF43464B.toInt()) {
+    fun renderItemAndTip(
+        item: ItemStack?,
+        x: Float,
+        y: Float,
+        mouseX: Float,
+        mouseY: Float,
+        color: Int = 0xFF43464B.toInt()
+    ) {
         renderItemAndTip(item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
 
@@ -211,14 +235,24 @@ object GuiRenderUtils {
 
         GlStateManager.scale(textScale, textScale, 1f)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
-        drawString("§2$current / ${DecimalFormat("0.#").format(maxValue)}☘", xPos * inverseScale, (yPos + 8) * inverseScale)
-        drawString("§2$progressPercentage%", (xPos + width - textWidth * textScale) * inverseScale, (yPos + 8) * inverseScale)
+        drawString(
+            "§2$current / ${DecimalFormat("0.##").format(maxValue)}☘",
+            xPos * inverseScale,
+            (yPos + 8) * inverseScale
+        )
+        drawString(
+            "§2$progressPercentage%",
+            (xPos + width - textWidth * textScale) * inverseScale,
+            (yPos + 8) * inverseScale
+        )
         GlStateManager.scale(inverseScale, inverseScale, 1f)
 
         GuiScreen.drawRect(xPos, yPos + 16, xPos + width, yPos + 20, 0xFF43464B.toInt())
         GuiScreen.drawRect(xPos + 1, yPos + 17, xPos + width - 1, yPos + 19, barColor.darkenColor())
-        GuiScreen.drawRect(xPos + 1, yPos + 17,
-            if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor)
+        GuiScreen.drawRect(
+            xPos + 1, yPos + 17,
+            if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor
+        )
 
         if (tooltip != "") {
             if (isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {

@@ -12,16 +12,13 @@ import java.io.IOException
 @Suppress("unused")
 class ConfigGuiForgeInterop : IModGuiFactory {
     override fun initialize(minecraft: Minecraft) {}
-    override fun mainConfigGuiClass(): Class<out GuiScreen> {
-        return WrappedSkyHanniConfig::class.java
-    }
+    override fun mainConfigGuiClass() = WrappedSkyHanniConfig::class.java
 
     override fun runtimeGuiCategories(): Set<RuntimeOptionCategoryElement>? = null
 
-    override fun getHandlerFor(runtimeOptionCategoryElement: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? =
-        null
+    override fun getHandlerFor(element: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? = null
 
-    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.configEditor) {
+    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.editor) {
         @Throws(IOException::class)
         override fun handleKeyboardInput() {
             if (Keyboard.getEventKeyState() && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {

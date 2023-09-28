@@ -9,10 +9,10 @@ enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
     ;
 
     companion object {
-        private fun regexValues() = values().joinToString("|") { it.displayName }
+        private fun regexValues() = entries.joinToString("|") { it.displayName }
 
         val regex = "§a(?<name>${regexValues()})(?: (?<level>.*))?".toPattern()
 
-        fun getByName(name: String) = values().firstOrNull { it.displayName == name }
+        fun getByName(name: String) = entries.firstOrNull { it.displayName == name }
     }
 }

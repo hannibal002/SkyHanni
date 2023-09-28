@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -14,20 +13,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (?<skill>.*) \\((?<overflow>.*)\\/(?<needed>.*)\\)(?:.*)".toPattern()
-    private val inventoryPattern = "(?:.*) §e(?<number>.*)§6\\/(?:.*)".toPattern()
-
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-        for ((key, value) in profileData.entrySet()) {
-            if (key.startsWith("experience_skill_")) {
-                val label = key.substring(17)
-                val exp = value.asLong
-                skillExp[label] = exp
-            }
-        }
-    }
+    private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
+    private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

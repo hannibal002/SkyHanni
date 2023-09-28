@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -34,7 +39,7 @@ class KloonHacking {
     }
 
     private fun checkHelmet() {
-        wearingHelmet = InventoryUtils.getArmor()[3]?.getInternalName() == "RETRO_ENCABULATING_VISOR"
+        wearingHelmet = InventoryUtils.getArmor()[3]?.getInternalName_old() == "RETRO_ENCABULATING_VISOR"
     }
 
     @SubscribeEvent
@@ -109,7 +114,7 @@ class KloonHacking {
         if (!config.waypoints) return
         if (!wearingHelmet) return
         val hidden = ProfileStorageData.profileSpecific?.rift ?: return
-        for (terminal in KloonTerminal.values()) {
+        for (terminal in KloonTerminal.entries) {
             if (terminal !in hidden.completedKloonTerminals) {
                 event.drawWaypointFilled(terminal.location, LorenzColor.DARK_RED.toColor(), true, true)
             }
@@ -124,7 +129,7 @@ class KloonHacking {
         "You've set the color of this terminal to (?<colour>.*)!".toPattern().matchMatcher(event.message.removeColor()) {
             val hidden = ProfileStorageData.profileSpecific?.rift ?: return
             val colour = group("colour")
-            val completedTerminal = KloonTerminal.values().firstOrNull { it.name == colour } ?: return
+            val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == colour } ?: return
             if (completedTerminal != nearestTerminal) return
             hidden.completedKloonTerminals.add(completedTerminal)
         }
@@ -146,7 +151,7 @@ class KloonHacking {
         var closestTerminal: KloonTerminal? = null
         var closestDistance = 8.0
 
-        for (terminal in KloonTerminal.values()) {
+        for (terminal in KloonTerminal.entries) {
             val distance = terminal.location.distanceToPlayer()
             if (distance < closestDistance) {
                 closestTerminal = terminal

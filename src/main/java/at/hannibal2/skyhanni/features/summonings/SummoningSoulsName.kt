@@ -92,7 +92,5 @@ class SummoningSoulsName {
         mobsName.clear()
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.summonings.summoningSoulDisplay
-    }
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.combat.summonings.summoningSoulDisplay
 }

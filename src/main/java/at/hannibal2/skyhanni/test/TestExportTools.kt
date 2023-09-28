@@ -1,7 +1,13 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
+import at.hannibal2.skyhanni.utils.KSerializable
+import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NBTTypeAdapter
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -9,7 +15,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.io.Reader
 
@@ -41,8 +46,8 @@ object TestExportTools {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent) {
-        if (!Keyboard.getEventKeyState() || Keyboard.getEventKey() != SkyHanniMod.feature.dev.copyNBTDataCompressed) return
+    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return

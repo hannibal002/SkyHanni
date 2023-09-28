@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -28,18 +30,17 @@ import kotlin.time.DurationUnit
 
 object RenderUtils {
 
-    val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+    private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
 
     infix fun Slot.highlight(color: Color) {
-        val lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
-
-        GlStateManager.disableLighting()
         GlStateManager.color(1f, 1f, 1f, 1f)
-
+        GlStateManager.pushAttrib()
+        GL11.glDisable(GL11.GL_LIGHTING)
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
         GlStateManager.pushMatrix()
         // TODO don't use z
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
@@ -51,13 +52,21 @@ object RenderUtils {
             color.rgb
         )
         GlStateManager.popMatrix()
-
-        if (lightingState) GlStateManager.enableLighting()
+        GlStateManager.popAttrib()
     }
 
     fun RenderWorldLastEvent.drawColor(
         location: LorenzVec,
         color: LorenzColor,
+        beacon: Boolean = false,
+        alpha: Float = -1f,
+    ) {
+        drawColor(location, color.toColor(), beacon, alpha)
+    }
+
+    fun RenderWorldLastEvent.drawColor(
+        location: LorenzVec,
+        color: Color,
         beacon: Boolean = false,
         alpha: Float = -1f,
     ) {
@@ -75,11 +84,11 @@ object RenderUtils {
         GlStateManager.disableCull()
         drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
-            color.toColor(),
+            color,
             realAlpha
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.toColor().rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
@@ -346,6 +355,15 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
+
+    fun Position.transform(): Pair<Int, Int> {
+        GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
+        GlStateManager.scale(effectiveScale, effectiveScale, 1F)
+        val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()
+        val y = ((Utils.getMouseY() - getAbsY()) / effectiveScale).toInt()
+        return x to y
+    }
+
     fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string == null) return
         if (string == "") return
@@ -356,12 +374,12 @@ object RenderUtils {
     private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
-
+        transform()
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
 
-        val x = getAbsX() + offsetX
-        val y = getAbsY() + offsetY
+        val x = offsetX
+        val y = offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
@@ -435,14 +453,17 @@ object RenderUtils {
 
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(getAbsX().toFloat(), (getAbsY() + offsetY).toFloat(), 0F)
+        val (x, y) = transform()
+        GlStateManager.translate(0f, offsetY.toFloat(), 0F)
         var offsetX = 0
-        for (any in line) {
-            val renderable = Renderable.fromAny(any, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: ${any}")
-
-            renderable.render(getAbsX() + offsetX, getAbsY() + offsetY)
-            offsetX += renderable.width
-            GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
+        Renderable.withMousePosition(x, y) {
+            for (any in line) {
+                val renderable = Renderable.fromAny(any, itemScale = itemScale)
+                    ?: throw RuntimeException("Unknown render object: $any")
+                renderable.render(offsetX, offsetY)
+                offsetX += renderable.width
+                GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
+            }
         }
         GlStateManager.popMatrix()
         return offsetX
@@ -571,7 +592,7 @@ object RenderUtils {
     ) {
         val strLen = fr.getStringWidth(str)
         var factor = len / strLen.toFloat()
-        factor = Math.min(1f, factor)
+        factor = 1f.coerceAtMost(factor)
         TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, colour, factor)
     }
 
@@ -671,7 +692,6 @@ object RenderUtils {
     }
 
     fun RenderWorldLastEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
         val render = Minecraft.getMinecraft().renderViewEntity
@@ -709,8 +729,12 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
-        return exactLocation(entity, partialTicks)
+    fun RenderWorldLastEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
+
+    fun RenderWorldLastEvent.exactPlayerEyeLocation(): LorenzVec {
+        val player = Minecraft.getMinecraft().thePlayer
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player).add(add)
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
@@ -719,7 +743,6 @@ object RenderUtils {
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
         return LorenzVec(x, y, z)
     }
-
 
 
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
@@ -905,8 +928,7 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun RenderWorldLastEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null,
-        seeThroughBlocks: Boolean = true
+        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean
     ) {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
@@ -960,5 +982,31 @@ object RenderUtils {
                 brightness
             )
         )
+    }
+
+    fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float
+    ) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableBlend()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
+        GlStateManager.scale(scale, scale, 1f)
+        fontRenderer.drawStringWithShadow(text, 0f, 0f, 16777215)
+
+        val reverseScale = 1 / scale
+
+        GlStateManager.scale(reverseScale, reverseScale, 1f)
+        GlStateManager.popMatrix()
+
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
     }
 }

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.TabListLineRenderEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.reflect.KProperty
 
-var tabListGuard by object : ThreadLocal<Boolean>()  {
+var tabListGuard by object : ThreadLocal<Boolean>() {
     override fun initialValue(): Boolean {
         return false
     }
