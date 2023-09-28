@@ -166,16 +166,10 @@ class DamageIndicatorManager {
                     healthText = formatDelay(delay)
             }
 
-//            val partialTicks = event.partialTicks
             val location = if (data.dead && data.deathLocation != null) {
                 data.deathLocation!!
             } else {
                 val loc = entity.getLorenzVec()
-//                val loc = LorenzVec(
-//                    RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
-//                    RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
-//                    RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
-//                )
                 if (data.dead) data.deathLocation = loc
                 loc
             }.add(-0.5, 0.0, -0.5)
