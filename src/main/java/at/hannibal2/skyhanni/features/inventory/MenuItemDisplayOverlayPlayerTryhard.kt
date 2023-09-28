@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -19,14 +20,13 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
-    private val boosterCookieLoreLinePattern = "(§.)?Duration: (§.)?((?<years>[0-9]+)?y)? ((?<days>[0-9]{0,2})d)? ((?<hours>[0-9]{0,2})h)? ((?<minutes>[0-9]{0,2})m)? ((?<seconds>[0-9]{0,2})s)?".toPattern()
+    private val genericDurationPattern = "(§.)?(([A-z ])+): (§.)?(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?".toPattern()
     private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
     private val bitsAvailablePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
     private val magicalPowerPattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
     private val magicalPowerSecondPattern = ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
     private val tuningPointsPattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
     private val slotSourcePattern = "(§.)(?<category>.*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
-    private val countdownPattern = "[^\d]*(?<years>(?:([0-9]+)y)?) ?(?<days>(?:([0-9]+)d)?) ?(?<hours>(?:([0-9]+)h)?) ?(?<minutes>(?:([0-9]+)m)?) ?(?<seconds>(?:([0-9]+)s)?).*".toPattern() //shoutout to nea for this regex in particular, remember that one time i struggled so hard with kotlin -ery
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -193,17 +193,17 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if (!chestName.isEmpty() && !item.getLore().isEmpty() && !itemName.isEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie")))) {
                 for (line in item.getLore()) {
                     if (line.contains("Duration:")) {
-                        boosterCookieLoreLinePattern.matchMatcher(line) {
-                            val yearsString = group("years")?.toInt()
-                            val daysString = group("days")?.toInt()
-                            val hoursString = group("hours")?.toInt()
-                            val minutesString = group("minutes")?.toInt()
-                            val secondsString = group("seconds")?.toInt()
-                            if (yearsString != null && yearsString > 0) return "${yearsString}y"
-                            if (daysString != null && daysString > 0) return "${daysString}d"
-                            if (hoursString != null && hoursString > 0) return "${hoursString}h"
-                            if (minutesString != null && minutesString > 0) return "${minutesString}m"
-                            if (secondsString != null && secondsString > 0) return "${secondsString}s"
+                        genericDurationPattern.matchMatcher(line) {
+                            val yString = group("years") ?: ""
+                            val dString = group("days") ?: ""
+                            val hString = group("hours") ?: ""
+                            val mString = group("minutes") ?: ""
+                            val sString = group("seconds") ?: ""
+                            if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return yString
+                            if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return dString
+                            if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return hString
+                            if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return mString
+                            if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return sString
                         }
                     }
                 }
@@ -298,29 +298,42 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
 
         if (stackSizeConfig.contains(8)) {
+            val lore = item.getLore()
+            var theStringToUse = ""
+            if (!(lore.isEmpty()) && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
+                if (lore.any { it.contains(" in: ") }) {
+                    for (line in lore) {
+                        if (line.contains(" in: ")) {
+                            theStringToUse = line
+                        }
+                    }
+                }
+            }
+            if (!(lore.isEmpty()) && lore.first().contains(" in: ") && chestName == ("Calendar and Events")) {
+                theStringToUse = lore.first()
+            }
+                genericDurationPattern.matchMatcher(theStringToUse) {
+                    val yString = group("years") ?: ""
+                    val dString = group("days") ?: ""
+                    val hString = group("hours") ?: ""
+                    val mString = group("minutes") ?: ""
+                    val sString = group("seconds") ?: ""
+                    if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return yString
+                    if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return dString
+                    if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return hString
+                    if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return mString
+                    if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return sString
+                }
+        }
+
+        
+
+        if (stackSizeConfig.contains(9)) {
             if (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements")) {
                 for (line in item.getLore()) {
                     if (line.contains("Points: ")) {
                         return line.removeColor().split(" ").last().between("(", "%)")
                     }
-                }
-            }
-        }
-
-        if (stackSizeConfig.contains(9) && chestName == ("Calendar and Events")) {
-            val lore = item.getLore()
-            if (lore.first().contains("Starts in: ")) {
-                countdownPattern.matchMatcher(lore.first()) {
-                    val yearsString = group("years")?.toInt()
-                        val daysString = group("days")?.toInt()
-                        val hoursString = group("hours")?.toInt()
-                        val minutesString = group("minutes")?.toInt()
-                        val secondsString = group("seconds")?.toInt()
-                        if (yearsString != null && yearsString > 0) return "${yearsString}y"
-                        if (daysString != null && daysString > 0) return "${daysString}d"
-                        if (hoursString != null && hoursString > 0) return "${hoursString}h"
-                        if (minutesString != null && minutesString > 0) return "${minutesString}m"
-                        if (secondsString != null && secondsString > 0) return "${secondsString}s"
                 }
             }
         }
