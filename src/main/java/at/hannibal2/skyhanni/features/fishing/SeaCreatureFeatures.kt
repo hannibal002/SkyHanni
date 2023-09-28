@@ -59,7 +59,7 @@ class SeaCreatureFeatures {
     private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
-        if (EntityLivingBase::class.java.isInstance(entity) && entity in rareSeaCreatures && entity.distanceToPlayer() < 30) {
+        if (entity is EntityLivingBase && entity in rareSeaCreatures && entity.distanceToPlayer() < 30) {
             LorenzColor.GREEN.toColor().rgb
         } else null
     }
