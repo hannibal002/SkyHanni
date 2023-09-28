@@ -365,7 +365,10 @@ class HideNotClickableItems {
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be traded!"
             return true
-        }        
+        }
+
+        val name = stack.cleanName()
+
         if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be traded!"
             return true
@@ -491,6 +494,8 @@ class HideNotClickableItems {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
         }
+
+        val name = stack.cleanName()
 
         if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be auctioned!"

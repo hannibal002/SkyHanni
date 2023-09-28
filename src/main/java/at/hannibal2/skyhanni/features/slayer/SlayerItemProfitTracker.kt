@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.LorenzUtils.get
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
@@ -29,6 +31,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.jsonobjects.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
@@ -58,6 +61,14 @@ object SlayerItemProfitTracker {
             it.slayerSpawnCost += price
         }
         update()
+    }
+
+    private var allowedItems = mapOf<String, List<NEUInternalName>>()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val items = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems") ?: return
+        allowedItems = items.slayers
     }
 
     @SubscribeEvent
@@ -147,6 +158,10 @@ object SlayerItemProfitTracker {
         val name = itemStack.name ?: return
         if (SlayerAPI.ignoreSlayerDrop(name)) return
         val internalName = itemStack.getInternalNameOrNull() ?: return
+        if (!isAllowedItem(internalName)) {
+            LorenzUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
+            return
+        }
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
         addItemPickup(internalName, itemStack.stackSize)
@@ -161,6 +176,11 @@ object SlayerItemProfitTracker {
                 TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
             }
         }
+    }
+
+    private fun isAllowedItem(internalName: NEUInternalName): Boolean {
+        val allowedList = allowedItems.get { itemLogCategory.startsWith(it) } ?: return false
+        return internalName in allowedList
     }
 
     fun update() {

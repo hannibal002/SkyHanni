@@ -175,6 +175,7 @@
 + Improved performance of item ability cooldown and farming fortune display data. - Cad
     + The item flickering for ability cooldown background should be less/gone completely.
 + Added the ability to bypass not clickable items when holding the control key. - CalMWolfs
++ Croesus Chest Tracker can now determine chest that only can be open with a dungeon key - Thunderblade73
 
 ### Fixes
 
