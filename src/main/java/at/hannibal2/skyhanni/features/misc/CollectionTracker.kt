@@ -169,21 +169,17 @@ class CollectionTracker {
 
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
-        if (diff != 0) {
-            if (diff > 0) {
+        if (diff != 0 && diff > 0) {
                 gainItems(diff)
-            }
         }
 
         lastAmountInInventory = currentlyInInventory
     }
 
     private fun updateGain() {
-        if (recentGain != 0) {
-            if (System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
-                recentGain = 0
-                updateDisplay()
-            }
+        if (recentGain != 0 && System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
+            recentGain = 0
+            updateDisplay()
         }
     }
 
