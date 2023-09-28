@@ -149,7 +149,6 @@ object SlayerItemProfitTracker {
             val change = sackChange.delta
             if (change > 0) {
                 val internalName = sackChange.internalName
-                println("added: $internalName +$change")
                 addItem(internalName, change)
             }
         }
