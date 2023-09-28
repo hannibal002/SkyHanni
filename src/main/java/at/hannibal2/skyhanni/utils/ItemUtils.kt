@@ -69,12 +69,8 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem) {
-            if (player.inventory != null) {
-                if (player.inventory.itemStack != null) {
-                    list.add(player.inventory.itemStack)
-                }
-            }
+        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
+                list.add(player.inventory.itemStack)
         }
         return list
     }
@@ -92,14 +88,9 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem) {
-            if (player.inventory != null) {
-                if (player.inventory.itemStack != null) {
-                    map[player.inventory.itemStack] = -1
-                }
-            }
+        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
+            map[player.inventory.itemStack] = -1
         }
-
         return map
     }
 
