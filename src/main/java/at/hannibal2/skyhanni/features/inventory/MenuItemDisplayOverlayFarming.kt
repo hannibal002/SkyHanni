@@ -75,7 +75,7 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(2) && (chestName == "Visitor Milestones")) {
             val lore = item.getLore()
-            if (lore != null && !(lore.isEmpty())) {
+            if (!(lore.isEmpty())) {
                 if ((lore.any { it.contains("Progress ") }) && (lore.any { it.contains(": ") }) && (lore.any { it.contains("%") })) {
                     for (line in lore) {
                         if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
@@ -87,10 +87,11 @@ class MenuItemDisplayOverlayFarming {
         }
 
         if (stackSizeConfig.contains(3)) {
+            val lore = item.getLore()
             if (chestName == "Visitor's Logbook") {
-                if (item.getLore() != null) {
-                    if (item.getLore().any { it.contains("Times Visited: ") }) {
-                        return item.getLore().first().take(5).replace("T", "☉")
+                if (!(lore.isEmpty())) {
+                    if (lore.any { it.contains("Times Visited: ") }) {
+                        return lore.first().take(5).replace("T", "☉")
                     }
                 }
             }
