@@ -50,15 +50,12 @@ class CollectionTracker {
             val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
                 LorenzUtils.chat("§c[SkyHanni] Gemstone collection is not supported!")
-//                setNewCollection("GEMSTONE_COLLECTION", "Gemstone")
                 return
             } else if (rawName == "mushroom") {
                 LorenzUtils.chat("§c[SkyHanni] Mushroom collection is not supported!")
-//                setNewCollection("MUSHROOM_COLLECTION", "Mushroom")
                 return
             }
 
-//            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName) ?: rawName.replace(" ", "_")
             val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
             if (foundInternalName == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
