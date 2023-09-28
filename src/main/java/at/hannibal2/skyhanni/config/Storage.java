@@ -328,10 +328,11 @@ public class Storage {
         @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
 
+
         public static class SlayerProfitList {
 
             @Expose
-            public Map<NEUInternalName, SlayerItemProfit> items = new HashMap<>();
+            public Map<NEUInternalName, ProfitTrackerItem> items = new HashMap<>();
 
             @Expose
             public long mobKillCoins = 0;
@@ -342,7 +343,7 @@ public class Storage {
             @Expose
             public int slayerCompletedCount = 0;
 
-            public static class SlayerItemProfit {
+            public static class ProfitTrackerItem {
                 @Expose
                 public NEUInternalName internalName;
                 @Expose
