@@ -41,8 +41,6 @@ class HypixelData {
         var joinedWorld = 0L
 
         var skyBlockArea = "?"
-
-        var wasOnSkyBlock = false
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -83,9 +81,9 @@ class HypixelData {
         if (event.isMod(2)) {
             if (LorenzUtils.inSkyBlock) {
                 val originalLocation = ScoreboardData.sidebarLinesFormatted
-                    .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                    ?.substring(5)?.removeColor()
-                    ?: "?"
+                                               .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
+                                               ?.substring(5)?.removeColor()
+                                       ?: "?"
 
                 skyBlockArea = when {
                     skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
@@ -118,9 +116,6 @@ class HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
-        if (skyBlock) {
-            wasOnSkyBlock = true
-        }
     }
 
     private fun checkProfileName(): Boolean {
@@ -213,14 +208,7 @@ class HypixelData {
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
-        val isSkyBlock = scoreboardTitle.contains("SKYBLOCK") ||
-                scoreboardTitle.contains("SKIBLOCK")
-        if (!isSkyBlock) {
-            if (wasOnSkyBlock) {
-                wasOnSkyBlock = false
-                SkyBlockLeaveEvent().postAndCatch()
-            }
-        }
-        return isSkyBlock // April 1st jokes are so funny
+        return scoreboardTitle.contains("SKYBLOCK") ||
+               scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
     }
 }

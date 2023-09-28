@@ -60,6 +60,12 @@ public class GUIConfig {
     public boolean realTime = false;
 
     @Expose
+    @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
+    @ConfigEditorBoolean
+    public boolean realTimeFormatToggle = false;
+
+
+    @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
