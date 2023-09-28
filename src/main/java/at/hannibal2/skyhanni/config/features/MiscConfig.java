@@ -98,7 +98,7 @@ public class MiscConfig {
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the Non God Pot Effects display.")
+    @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
@@ -320,7 +320,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Show Between Quests",
                 desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                        "Will show in the Trapper's Den regardless. Global toggle above"
+                        "Will show in the Trapper's Den regardless. §cRequires Enable Data Tracker above."
         )
         @ConfigEditorBoolean
         public boolean displayType = true;
@@ -488,7 +488,7 @@ public class MiscConfig {
             public boolean enabled = false;
 
             @Expose
-            @ConfigOption(name = "Line color", desc = "Color of the line.")
+            @ConfigOption(name = "Line Color", desc = "Color of the line.")
             @ConfigEditorColour
             public String lineColor = "0:255:255:255:255";
 
