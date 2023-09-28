@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
 
@@ -49,9 +47,6 @@ object SlayerAPI {
 
         // Spider
         "Cobweb" -> true
-        "String" -> true
-        "Spider Eye" -> true
-        "Bone" -> true
 
         // Blaze
         "Water Bottle" -> true
@@ -59,9 +54,7 @@ object SlayerAPI {
         else -> false
     }
 
-    fun getItemNameAndPrice(stack: ItemStack): Pair<String, Double> {
-        val internalName = stack.getInternalName()
-        val amount = stack.stackSize
+    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
         val key = internalName to amount
         nameCache.getIfPresent(key)?.let {
             return it
