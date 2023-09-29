@@ -21,7 +21,7 @@ object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK")
+    fun isSack(stack: ItemStack) = (stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack"))
 
     fun ItemStack.getLore(): List<String> {
         val tagCompound = this.tagCompound ?: return emptyList()
