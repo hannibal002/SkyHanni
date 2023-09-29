@@ -164,7 +164,7 @@ public class SlayerConfig {
         public static class OwnBoss {
 
             @Expose
-            @ConfigOption(name = "Highlight Your Boss", desc = "Highlight your own vampire slayer boss.")
+            @ConfigOption(name = "Highlight Your Boss", desc = "Highlight your own Vampire Slayer boss.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean highlight = true;
@@ -298,13 +298,13 @@ public class SlayerConfig {
         public int twinclawsDelay = 0;
 
         @Expose
-        @ConfigOption(name = "Draw line", desc = "Draw a line starting at your crosshair to the boss head.")
+        @ConfigOption(name = "Draw Line", desc = "Draw a line starting at your crosshair to the boss head.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean drawLine = false;
 
         @Expose
-        @ConfigOption(name = "Line color", desc = "Color of the line.")
+        @ConfigOption(name = "Line Color", desc = "Color of the line.")
         @ConfigEditorColour
         public String lineColor = "0:255:255:0:88";
 
