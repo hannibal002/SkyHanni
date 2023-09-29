@@ -35,6 +35,7 @@ class ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: ItemStack): String {
+        val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
         if (stackSizeConfig.isEmpty()) return ""
         val itemName = item.cleanName()
         val stackSizeConfig = stackSizeConfig
