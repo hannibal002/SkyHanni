@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -131,28 +135,6 @@ object CopyNearbyEntitiesCommand {
 
                         val skinTexture = entity.getSkinTexture()
                         resultList.add("-  skin texture: $skinTexture")
-
-//                        val gameProfile = entity.gameProfile
-//                        if (gameProfile == null) {
-//                            resultList.add("-  gameProfile is null!")
-//                        } else {
-//                            val id = gameProfile.id
-//                            val name = gameProfile.name
-//
-//                            resultList.add("-  gameProfile id: $id")
-//                            resultList.add("-  gameProfile name: $name")
-//                            val properties = gameProfile.properties
-//                            resultList.add("-  gameProfile properties: (${properties.size()})")
-//                            for (entry in properties.entries()) {
-//                                val key = entry.key
-//                                val property = entry.value
-//                                resultList.add("-     key: '$key'")
-//                                val name1 = property.name
-//                                val value = property.value
-//                                resultList.add("-        property name: '$name1'")
-//                                resultList.add("-        property value: '$value'")
-//                            }
-//                        }
                     }
                 }
                 resultList.add("")

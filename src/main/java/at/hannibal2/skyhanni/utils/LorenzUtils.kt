@@ -4,15 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -21,6 +23,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
@@ -28,8 +31,9 @@ import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Collections
 import java.util.Timer
+import java.util.TimerTask
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -45,7 +49,7 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
-    val inDungeons get() = inSkyBlock && DungeonData.inDungeon()
+    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
@@ -54,6 +58,8 @@ object LorenzUtils {
     val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
     val noTradeMode get() = HypixelData.noTrade
+
+    val isStrandedProfile get() = HypixelData.stranded
 
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
@@ -64,10 +70,8 @@ object LorenzUtils {
     var lastButtonClicked = 0L
 
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled) {
-            if (internalChat(DEBUG_PREFIX + message)) {
-                consoleLog("[Debug] $message")
-            }
+        if (SkyHanniMod.feature.dev.debugEnabled && internalChat(DEBUG_PREFIX + message)) {
+            consoleLog("[Debug] $message")
         }
     }
 
@@ -145,7 +149,6 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
-//        NumberFormat.getPercentInstance().format(percentage)
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
     fun formatInteger(i: Int): String = formatInteger(i.toLong())
@@ -228,9 +231,17 @@ object LorenzUtils {
 
     fun setTextIntoSign(text: String) {
         val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
+        if (gui !is AccessorGuiEditSign) return
         gui.tileSign.signText[0] = ChatComponentText(text)
+    }
+
+    fun addTextIntoSign(addedText: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is AccessorGuiEditSign) return
+        val lines = gui.tileSign.signText
+        val index = gui.editLine
+        val text = lines[index].unformattedText + addedText
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
     fun clickableChat(message: String, command: String) {
@@ -281,6 +292,9 @@ object LorenzUtils {
     fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
 
     fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
+
+    // A mac-only key, represents Windows key on windows (but different key code)
+    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_RMETA)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -510,4 +524,17 @@ object LorenzUtils {
             }
         }, duration.inWholeMilliseconds)
     }
+
+    fun isPastingKeysDown(): Boolean {
+        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+        return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
+    }
+
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
+
+    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
+        if (condition()) transofmration(this) else this
+
+    fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
+        if (condition) ifTrue(this) else ifFalse(this)
 }

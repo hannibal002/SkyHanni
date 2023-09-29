@@ -60,15 +60,13 @@ class ChumBucketHider {
         }
 
         // Chum Bucket
-        if (config.hideBucket.get()) {
-            if (entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket")}) {
-                val entityLocation = entity.getLorenzVec()
-                for (title in titleEntity) {
-                    if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
-                        hiddenEntities.add(entity)
-                        event.isCanceled = true
-                        return
-                    }
+        if (config.hideBucket.get() && entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket") }) {
+            val entityLocation = entity.getLorenzVec()
+            for (title in titleEntity) {
+                if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
+                    hiddenEntities.add(entity)
+                    event.isCanceled = true
+                    return
                 }
             }
         }

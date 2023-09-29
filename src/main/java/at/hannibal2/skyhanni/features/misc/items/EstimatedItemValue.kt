@@ -11,8 +11,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
@@ -55,6 +59,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
@@ -63,7 +68,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
-import java.util.*
+import java.util.Locale
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -282,23 +287,64 @@ object EstimatedItemValue {
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        var rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
-            val stone = values.asJsonObject
-            val reforgeName = stone.get("reforgeName").asString
+            val stoneJson = values.asJsonObject
+            val reforgeName = stoneJson.get("reforgeName").asString
             if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
                 val internalName = rawInternalName.asInternalName()
-                val price = internalName.getPrice()
-                val name = internalName.getItemName()
+                val reforgeStonePrice = internalName.getPrice()
+                val reforgeStoneName = internalName.getItemName()
+
+                val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
+                val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
+
                 val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
                 list.add("§7Reforge: §9$realReforgeName")
-                list.add("  §7($name §6" + NumberUtil.format(price) + "§7)")
-                return price
+                list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
+                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
+                return reforgeStonePrice + applyCost
             }
         }
 
         return 0.0
+    }
+
+    private fun getReforgeStoneApplyCost(
+        stack: ItemStack,
+        reforgeCosts: JsonObject,
+        reforgeStone: NEUInternalName
+    ): Int? {
+        var itemRarity = stack.getItemRarityOrNull() ?: return null
+
+        // Catch cases of special or very special
+        if (itemRarity > LorenzRarity.MYTHIC) {
+            itemRarity = LorenzRarity.LEGENDARY
+        } else {
+            if (stack.isRecombobulated()) {
+                val oneBelow = itemRarity.oneBelow()
+                if (oneBelow == null) {
+                    CopyErrorCommand.logErrorState(
+                        "Wrong item rarity detected in estimated item value for item ${stack.name}",
+                        "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
+                    )
+                    return null
+                }
+                itemRarity = oneBelow
+            }
+        }
+        val rarityName = itemRarity.name
+        if (!reforgeCosts.has(rarityName)) {
+            val reforgesFound = reforgeCosts.entrySet().map { it.key }
+            CopyErrorCommand.logErrorState(
+                "Can not calculate reforge cost for item ${stack.name}",
+                "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
+            )
+            return null
+        }
+
+        return reforgeCosts[rarityName].asInt
     }
 
     private fun addRecomb(stack: ItemStack, list: MutableList<String>): Double {
@@ -497,8 +543,12 @@ object EstimatedItemValue {
         val internalName = stack.getHelmetSkin() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Skin: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -506,8 +556,12 @@ object EstimatedItemValue {
         val internalName = stack.getArmorDye() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Dye: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -515,9 +569,18 @@ object EstimatedItemValue {
         val internalName = stack.getRune() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Rune: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getItemNameOrNull()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Rune: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
+    }
+
+    private fun NEUInternalName.getNameOrRepoError(): String? {
+        val stack = getItemStackOrNull() ?: return null
+        return stack.nameWithEnchantment ?: "§cItem Name Error"
     }
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
@@ -579,8 +642,8 @@ object EstimatedItemValue {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5) {
-                if (internalName in hasAlwaysScavenger) continue
+            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
             }
 
             var level = rawLevel
@@ -674,7 +737,8 @@ object EstimatedItemValue {
         val internalName = stack.getInternalName()
 
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+        val unlockedSlots =
+            stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
 
         // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0

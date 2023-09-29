@@ -44,25 +44,21 @@ object TestCopyBestiaryValues {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
         if (!SkyHanniMod.feature.dev.copyBestiaryData) return
-        SkyHanniTestCommand.displayLine = ""
+        SkyHanniDebugsAndTests.displayLine = ""
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3]
         if (backItem == null) {
-//            println("first is null!")
             return
         }
         if (backItem.getLore().none { it.contains("Bestiary Milestone") }) {
-//            println("wrong first: ${backItem.getLore()}")
             return
         }
 
         val rankingItem = event.inventoryItems[3 + 9 * 5 + 2]
         if (rankingItem == null) {
-//            println("second is null!")
             return
         }
         if (rankingItem.getLore().none { it.contains("Ranking") }) {
-//            println("wrong second: ${rankingItem.getLore()}")
             return
         }
 
@@ -112,6 +108,6 @@ object TestCopyBestiaryValues {
         val text = gson.toJson(obj)
         OSUtils.copyToClipboard(text)
 
-        SkyHanniTestCommand.displayLine = "Bestiary for $titleName"
+        SkyHanniDebugsAndTests.displayLine = "Bestiary for $titleName"
     }
 }

@@ -4,26 +4,42 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -34,12 +50,32 @@ class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
     private var lastMinion: LorenzVec? = null
+    private var newMinion: LorenzVec? = null
+    private var newMinionName: String? = null
     private var lastMinionOpened = 0L
     private var minionInventoryOpen = false
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+
+    @SubscribeEvent
+    fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
+
+        val lookingAt = event.pos.offset(event.face).toLorenzVec()
+        val equipped = InventoryUtils.getItemInHand() ?: return
+
+        if (equipped.displayName.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.air) {
+            newMinion = lookingAt.add(0.5, 0.0, 0.5)
+            newMinionName = getMinionName(equipped.cleanName())
+        } else {
+            newMinion = null
+            newMinionName = null
+        }
+    }
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
@@ -141,10 +177,8 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (coinsPerDay != "") return
 
-        if (Minecraft.getMinecraft().currentScreen is GuiChest) {
-            if (config.hopperProfitDisplay) {
-                coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
-            }
+        if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
+            coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
         }
     }
 
@@ -158,7 +192,7 @@ class MinionFeatures {
     }
 
     private fun updateCoinsPerDay(): String {
-        val loc = lastMinion!!
+        val loc = lastMinion ?: return "§cNo last minion found! Try reopening the minion view."
         val slot = InventoryUtils.getItemsInOpenChest().find { it.slotNumber == 28 } ?: return ""
 
         val stack = slot.stack
@@ -196,21 +230,27 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
-            if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
                 minions?.get(lastMinion)?.let {
-                    it.lastClicked = System.currentTimeMillis()
-                }
+                it.lastClicked = System.currentTimeMillis()
             }
 
         }
-        if (message.startsWith("§aYou picked up a minion!")) {
-            if (lastMinion != null) {
-                minions = minions?.editCopy { remove(lastMinion) }
-                lastClickedEntity = null
-                lastMinion = null
-                lastMinionOpened = 0L
-            }
+        if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
+            minions = minions?.editCopy { remove(lastMinion) }
+            lastClickedEntity = null
+            lastMinion = null
+            lastMinionOpened = 0L
+        }
+        if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
+                minions = minions?.editCopy {
+                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                        displayName = newMinionName
+                        lastClicked = 0
+                    }
+                }
+                newMinion = null
+                newMinionName = null
         }
 
         minionUpgradePattern.matchMatcher(message) {
@@ -245,13 +285,11 @@ class MinionFeatures {
                 event.drawString(location.add(0.0, 0.65, 0.0), name, true)
             }
 
-            if (config.emptiedTimeDisplay) {
-                if (lastEmptied != 0L) {
-                    val duration = System.currentTimeMillis() - lastEmptied
-                    val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
-                    val text = "§eHopper Emptied: $format"
-                    event.drawString(location.add(0.0, 1.15, 0.0), text, true)
-                }
+            if (config.emptiedTimeDisplay && lastEmptied != 0L) {
+                val duration = System.currentTimeMillis() - lastEmptied
+                val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
+                val text = "§eHopper Emptied: $format"
+                event.drawString(location.add(0.0, 1.15, 0.0), text, true)
             }
         }
     }

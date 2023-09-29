@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -10,15 +11,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class JacobFarmingContestsInventory {
-
     private val duplicateSlots = mutableListOf<Int>()
     private val realTime = mutableMapOf<Int, String>()
 
@@ -28,6 +29,7 @@ class JacobFarmingContestsInventory {
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
+    private val contestEarnedPattern = "§7You earned a §(?<medalColour>.*)§l.* §7medal!".toPattern()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -124,13 +126,11 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val slot = event.slot.slotNumber
-        if (config.jacobFarmingContestHideDuplicates) {
-            if (duplicateSlots.contains(slot)) {
-                event.toolTip.clear()
-                event.toolTip.add("§7Duplicate contest")
-                event.toolTip.add("§7hidden by SkyHanni!")
-                return
-            }
+        if (config.jacobFarmingContestHideDuplicates && duplicateSlots.contains(slot)) {
+            event.toolTip.clear()
+            event.toolTip.add("§7Duplicate contest")
+            event.toolTip.add("§7hidden by SkyHanni!")
+            return
         }
 
         if (config.jacobFarmingContestRealTime) {
@@ -139,6 +139,39 @@ class JacobFarmingContestsInventory {
                 if (toolTip.size > 1) {
                     toolTip.add(1, it)
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.jacobFarmingContestMedalIcon) return
+        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+
+        val stack = event.stack ?: return
+        var finneganContest = false
+
+        for (line in stack.getLore()) {
+            if (line.contains("Contest boosted by Finnegan!")) finneganContest = true
+
+            val matcher = contestEarnedPattern.matcher(line)
+            if (matcher.matches()) {
+                val medalEarned = ContestBracket.entries.find { it.color == matcher.group("medalColour") } ?: return
+
+                var stackTip = "§${medalEarned.color}✦"
+                var x = event.x + 9
+                var y = event.y + 1
+                var scale = .7f
+
+                if (finneganContest && config.jacobFarmingContestFinneganIcon) {
+                    stackTip = "§${medalEarned.color}▲"
+                    x = event.x + 5
+                    y = event.y - 2
+                    scale = 1.3f
+                }
+
+                event.drawSlotText(x, y, stackTip, scale)
             }
         }
     }

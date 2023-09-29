@@ -1,8 +1,16 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -16,6 +24,10 @@ object ProfileStorageData {
     private var noTabListTime = -1L
 
     private var nextProfile: String? = null
+
+
+    private var sackPlayers: SackData.PlayerSpecific? = null
+    var sackProfiles: SackData.ProfileSpecific? = null
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onChat(event: LorenzChatEvent) {
@@ -32,25 +44,35 @@ object ProfileStorageData {
         nextProfile = null
 
         val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
         if (playerSpecific == null) {
             LorenzUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
             return
         }
-        loadProfileSpecific(playerSpecific, profileName, "profile swap (chat message)")
+        if (sackPlayers == null) {
+            LorenzUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
+            return
+        }
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName, "profile swap (chat message)")
         ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
         if (playerSpecific == null) {
             LorenzUtils.error("playerSpecific is null in ProfileJoinEvent!")
+            return
+        }
+        if (sackPlayers == null) {
+            LorenzUtils.error("sackPlayers is null in sackPlayers!")
             return
         }
 
         if (profileSpecific == null) {
             val profileName = event.name
-            loadProfileSpecific(playerSpecific, profileName, "first join (chat message)")
+            loadProfileSpecific(playerSpecific, sackPlayers, profileName, "first join (chat message)")
         }
     }
 
@@ -58,11 +80,12 @@ object ProfileStorageData {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (profileSpecific != null) return
         val playerSpecific = playerSpecific ?: return
+        val sackPlayers = sackPlayers ?: return
         for (line in event.tabList) {
             val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
             pattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
-                loadProfileSpecific(playerSpecific, profileName, "tab list")
+                loadProfileSpecific(playerSpecific, sackPlayers, profileName, "tab list")
                 nextProfile = null
                 return
             }
@@ -87,18 +110,20 @@ object ProfileStorageData {
         }
     }
 
-    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, profileName: String, reason: String) {
+    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, sackProfile: SackData.PlayerSpecific, profileName: String, reason: String) {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
+        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         tryMigrateProfileSpecific()
-        ConfigLoadEvent().postAndCatch()
         loaded = true
+        ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
+        sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         migratePlayerSpecific()
         ConfigLoadEvent().postAndCatch()
     }
@@ -131,13 +156,12 @@ object ProfileStorageData {
 
         profileSpecific?.crimsonIsle?.let {
             it.quests = oldHidden.crimsonIsleQuests
-            it.latestTrophyFishInInventory = oldHidden.crimsonIsleLatestTrophyFishInInventory
             it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
             it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
         }
 
         profileSpecific?.garden?.let {
-            it.experience = oldHidden.gardenExp
+            it.experience = oldHidden.gardenExp.toLong()
             it.cropCounter = oldHidden.gardenCropCounter
             it.cropUpgrades = oldHidden.gardenCropUpgrades
 
