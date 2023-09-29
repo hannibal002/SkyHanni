@@ -141,14 +141,12 @@ class ComposterDisplay {
         if (!config.composterNotifyLowEnabled) return
         val hidden = hidden ?: return
 
-        if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter) {
-            if (System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
-                if (config.composterNotifyLowTitle) {
-                    TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
-                }
-                LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
-                hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
+        if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter && System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
+            if (config.composterNotifyLowTitle) {
+                TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
+            LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
+            hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
         if (ComposterAPI.getFuel() <= config.composterNotifyLowFuel &&

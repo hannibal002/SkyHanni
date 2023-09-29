@@ -185,9 +185,8 @@ object GardenAPI {
 
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return
-        if (cropBroken.multiplier == 1) {
-            if (blockState.isBabyCrop()) return
-        }
+        if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
+
 
         val position = event.position
         if (lastLocation == position) {

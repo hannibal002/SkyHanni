@@ -182,11 +182,9 @@ class SkyHanniDebugsAndTests {
             val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
             val y = LorenzUtils.formatDouble(location.y + 0.001).replace(",", ".")
             val z = LorenzUtils.formatDouble(location.z + 0.001).replace(",", ".")
-            if (args.size == 1) {
-                if (args[0].equals("json", false)) {
-                    OSUtils.copyToClipboard("\"$x:$y:$z\"")
-                    return
-                }
+            if (args.size == 1 && args[0].equals("json", false)) {
+                OSUtils.copyToClipboard("\"$x:$y:$z\"")
+                return
             }
 
             OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
@@ -197,12 +195,10 @@ class SkyHanniDebugsAndTests {
         }
 
         fun debugData(args: Array<String>) {
-            if (args.size == 2) {
-                if (args[0] == "profileName") {
-                    HypixelData.profileName = args[1].lowercase()
-                    LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
-                    return
-                }
+            if (args.size == 2 && args[0] == "profileName") {
+                HypixelData.profileName = args[1].lowercase()
+                LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
+                return
             }
             val builder = StringBuilder()
             builder.append("```\n")

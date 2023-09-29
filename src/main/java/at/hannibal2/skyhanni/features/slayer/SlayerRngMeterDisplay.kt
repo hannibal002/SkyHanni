@@ -37,13 +37,9 @@ class SlayerRngMeterDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            if (lastItemDroppedTime != 0L) {
-                if (System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
-                    lastItemDroppedTime = 0L
-                    update()
-                }
-            }
+        if (event.repeatSeconds(1) && lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
+            lastItemDroppedTime = 0L
+            update()
         }
     }
 
@@ -57,11 +53,9 @@ class SlayerRngMeterDisplay {
 
         if (!isEnabled()) return
 
-        if (config.hideChat) {
-            if (SlayerAPI.isInSlayerArea) {
-                changedItemPattern.matchMatcher(event.message) {
-                    event.blockedReason = "slayer_rng_meter"
-                }
+        if (config.hideChat && SlayerAPI.isInSlayerArea) {
+            changedItemPattern.matchMatcher(event.message) {
+                event.blockedReason = "slayer_rng_meter"
             }
         }
 
@@ -76,11 +70,9 @@ class SlayerRngMeterDisplay {
         if (old != -1L) {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
-            if (!hasItemSelected) {
-                if (config.warnEmpty) {
-                    LorenzUtils.warning("§c[Skyhanni] No Slayer RNG Meter Item selected!")
-                    TitleUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
-                }
+            if (!hasItemSelected && config.warnEmpty) {
+                LorenzUtils.warning("§c[Skyhanni] No Slayer RNG Meter Item selected!")
+                TitleUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old

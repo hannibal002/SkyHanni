@@ -35,8 +35,8 @@ class GuiEditManager {
         if (NEUItems.neuHasFocus()) return
 
         val screen = Minecraft.getMinecraft().currentScreen
-        if (screen is GuiEditSign) {
-            if (!screen.isRancherSign()) return
+        if (screen is GuiEditSign && !screen.isRancherSign()) {
+            return
         }
 
         if (isInGui()) return

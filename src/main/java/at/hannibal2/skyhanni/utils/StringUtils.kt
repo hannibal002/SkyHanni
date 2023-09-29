@@ -150,11 +150,9 @@ object StringUtils {
         for (i in 0..steps) {
             val toDouble = i.toDouble()
             val stepPercentage = toDouble / steps
-            if (stepPercentage >= percentage) {
-                if (!inMissingArea) {
-                    builder.append(missing)
-                    inMissingArea = true
-                }
+            if (stepPercentage >= percentage && !inMissingArea) {
+                builder.append(missing)
+                inMissingArea = true
             }
             builder.append(step)
         }

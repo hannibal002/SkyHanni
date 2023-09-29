@@ -177,10 +177,8 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (coinsPerDay != "") return
 
-        if (Minecraft.getMinecraft().currentScreen is GuiChest) {
-            if (config.hopperProfitDisplay) {
-                coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
-            }
+        if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
+            coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
         }
     }
 
@@ -232,24 +230,19 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
-            if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
                 minions?.get(lastMinion)?.let {
-                    it.lastClicked = System.currentTimeMillis()
-                }
+                it.lastClicked = System.currentTimeMillis()
             }
 
         }
-        if (message.startsWith("§aYou picked up a minion!")) {
-            if (lastMinion != null) {
-                minions = minions?.editCopy { remove(lastMinion) }
-                lastClickedEntity = null
-                lastMinion = null
-                lastMinionOpened = 0L
-            }
+        if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
+            minions = minions?.editCopy { remove(lastMinion) }
+            lastClickedEntity = null
+            lastMinion = null
+            lastMinionOpened = 0L
         }
-        if (message.startsWith("§bYou placed a minion!")) {
-            if (newMinion != null) {
+        if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
                 minions = minions?.editCopy {
                     this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
                         displayName = newMinionName
@@ -258,7 +251,6 @@ class MinionFeatures {
                 }
                 newMinion = null
                 newMinionName = null
-            }
         }
 
         minionUpgradePattern.matchMatcher(message) {
@@ -293,13 +285,11 @@ class MinionFeatures {
                 event.drawString(location.add(0.0, 0.65, 0.0), name, true)
             }
 
-            if (config.emptiedTimeDisplay) {
-                if (lastEmptied != 0L) {
-                    val duration = System.currentTimeMillis() - lastEmptied
-                    val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
-                    val text = "§eHopper Emptied: $format"
-                    event.drawString(location.add(0.0, 1.15, 0.0), text, true)
-                }
+            if (config.emptiedTimeDisplay && lastEmptied != 0L) {
+                val duration = System.currentTimeMillis() - lastEmptied
+                val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
+                val text = "§eHopper Emptied: $format"
+                event.drawString(location.add(0.0, 1.15, 0.0), text, true)
             }
         }
     }

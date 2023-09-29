@@ -335,7 +335,6 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
-        val name = stack.cleanName()
         reverseColor = true
         if (ItemUtils.isSack(stack)) return false
 
@@ -398,11 +397,9 @@ class HideNotClickableItems {
             return true
         }
 
-        if (!ItemUtils.isRecombobulated(stack)) {
-            if (LorenzUtils.noTradeMode) {
-                if (BazaarApi.isBazaarItem(stack)) {
-                    return false
-                }
+        if (!ItemUtils.isRecombobulated(stack) && LorenzUtils.noTradeMode) {
+            if (BazaarApi.isBazaarItem(stack)) {
+                return false
             }
 
             if (hideNpcSellFilter.match(name)) return false

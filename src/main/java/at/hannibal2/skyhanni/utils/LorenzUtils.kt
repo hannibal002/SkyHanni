@@ -70,10 +70,8 @@ object LorenzUtils {
     var lastButtonClicked = 0L
 
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled) {
-            if (internalChat(DEBUG_PREFIX + message)) {
-                consoleLog("[Debug] $message")
-            }
+        if (SkyHanniMod.feature.dev.debugEnabled && internalChat(DEBUG_PREFIX + message)) {
+            consoleLog("[Debug] $message")
         }
     }
 
@@ -151,7 +149,6 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
-//        NumberFormat.getPercentInstance().format(percentage)
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
     fun formatInteger(i: Int): String = formatInteger(i.toLong())
@@ -297,7 +294,7 @@ object LorenzUtils {
     fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
 
     // A mac-only key, represents Windows key on windows (but different key code)
-    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_LMETA)
+    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_RMETA)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
