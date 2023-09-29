@@ -46,10 +46,8 @@ class DungeonHideItems {
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
         val itemStack = entity.inventory[4]
-        if (itemStack != null) {
-            if (itemStack.cleanName() == "Skeleton Skull") {
-                return true
-            }
+        if (itemStack != null && itemStack.cleanName() == "Skeleton Skull") {
+            return true
         }
 
         return false
@@ -63,16 +61,12 @@ class DungeonHideItems {
 
         if (entity is EntityItem) {
             val stack = entity.entityItem
-            if (SkyHanniMod.feature.dungeon.hideReviveStone) {
-                if (stack.cleanName() == "Revive Stone") {
-                    event.isCanceled = true
-                }
+            if (SkyHanniMod.feature.dungeon.hideReviveStone && stack.cleanName() == "Revive Stone") {
+                event.isCanceled = true
             }
 
-            if (SkyHanniMod.feature.dungeon.hideJournalEntry) {
-                if (stack.cleanName() == "Journal Entry") {
-                    event.isCanceled = true
-                }
+            if (SkyHanniMod.feature.dungeon.hideJournalEntry && stack.cleanName() == "Journal Entry") {
+                event.isCanceled = true
             }
         }
 
@@ -84,11 +78,9 @@ class DungeonHideItems {
             }
 
             val itemStack = entity.inventory[4]
-            if (itemStack != null) {
-                if (itemStack.cleanName() == "Superboom TNT") {
-                    event.isCanceled = true
-                    hideParticles[entity] = System.currentTimeMillis()
-                }
+            if (itemStack != null && itemStack.cleanName() == "Superboom TNT") {
+                event.isCanceled = true
+                hideParticles[entity] = System.currentTimeMillis()
             }
         }
 
@@ -98,10 +90,8 @@ class DungeonHideItems {
             }
 
             val itemStack = entity.inventory[4]
-            if (itemStack != null) {
-                if (itemStack.getSkullTexture() == blessingTexture) {
-                    event.isCanceled = true
-                }
+            if (itemStack != null && itemStack.getSkullTexture() == blessingTexture) {
+                event.isCanceled = true
             }
         }
 
@@ -111,11 +101,9 @@ class DungeonHideItems {
             }
 
             val itemStack = entity.inventory[4]
-            if (itemStack != null) {
-                if (itemStack.getSkullTexture() == reviveStoneTexture) {
-                    event.isCanceled = true
-                    hideParticles[entity] = System.currentTimeMillis()
-                }
+            if (itemStack != null && itemStack.getSkullTexture() == reviveStoneTexture) {
+                event.isCanceled = true
+                hideParticles[entity] = System.currentTimeMillis()
             }
         }
 
@@ -126,10 +114,8 @@ class DungeonHideItems {
             }
 
             val itemStack = entity.inventory[4]
-            if (itemStack != null) {
-                if (itemStack.getSkullTexture() == premiumFleshTexture) {
-                    event.isCanceled = true
-                }
+            if (itemStack != null && itemStack.getSkullTexture() == premiumFleshTexture) {
+                event.isCanceled = true
             }
         }
 
@@ -168,11 +154,9 @@ class DungeonHideItems {
 
         if (SkyHanniMod.feature.dungeon.hideHealerFairy) {
             val itemStack = entity.inventory[0]
-            if (itemStack != null) {
-                if (itemStack.getSkullTexture() == healerFairyTexture) {
-                    event.isCanceled = true
-                    return
-                }
+            if (itemStack != null && itemStack.getSkullTexture() == healerFairyTexture) {
+                event.isCanceled = true
+                return
             }
         }
     }
@@ -213,12 +197,10 @@ class DungeonHideItems {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
         val entity = event.entity
-        if (entity is EntityArmorStand) {
-            if (isSkeletonSkull(entity)) {
-                val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-                if (lastMove + 200 > System.currentTimeMillis()) {
-                    event.color = LorenzColor.GOLD.toColor().withAlpha(60)
-                }
+        if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
+            val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
+            if (lastMove + 200 > System.currentTimeMillis()) {
+                event.color = LorenzColor.GOLD.toColor().withAlpha(60)
             }
         }
     }
@@ -228,12 +210,10 @@ class DungeonHideItems {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
         val entity = event.entity
-        if (entity is EntityArmorStand) {
-            if (isSkeletonSkull(entity)) {
-                val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-                if (lastMove + 200 > System.currentTimeMillis()) {
-                    event.shouldReset = true
-                }
+        if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
+            val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
+            if (lastMove + 200 > System.currentTimeMillis()) {
+                event.shouldReset = true
             }
         }
     }

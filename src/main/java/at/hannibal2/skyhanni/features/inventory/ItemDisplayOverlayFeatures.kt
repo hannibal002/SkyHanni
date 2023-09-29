@@ -78,7 +78,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(2)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2)) {
             if (itemName.contains("Golden ") || itemName.contains("Diamond ")) {
                 when {
                     itemName.contains("Bonzo") -> return "1"
@@ -92,13 +92,14 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(3)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(3)) {
             if (itemName.startsWith("New Year Cake (")) {
                 return "§b" + itemName.between("(Year ", ")")
             }
         }
 
-        if (stackSizeConfig.contains(4)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(4)) {
+            val chestName = InventoryUtils.openInventoryName()
             if (!chestName.endsWith("Sea Creature Guide")) {
                 if (ItemUtils.isPet(itemName)) {
                     petLevelPattern.matchMatcher(itemName) {
@@ -111,7 +112,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(5)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5)) {
             if (itemName.contains(" Minion ")) {
                 if (item.getLore().any { it.contains("Place this minion") }) {
                     val array = itemName.split(" ")
@@ -121,15 +122,12 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.displaySackName) {
-            if (ItemUtils.isSack(item)) {
-                val sackName = grabSackName(itemName)
-                return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
-            }
+        if (SkyHanniMod.feature.inventory.displaySackName && ItemUtils.isSack(item)) {
+            val sackName = grabSackName(itemName)
+            return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
         }
 
-        
-        if (stackSizeConfig.contains(7)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(8)) {
             if (itemName.contains("Kuudra Key")) {
                 return when (itemName) {
                     "Kuudra Key" -> "§a1"
@@ -142,7 +140,36 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(8)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
+            if (InventoryUtils.openInventoryName() == "Your Skills") {
+                if (item.getLore().any { it.contains("Click to view!") }) {
+                    if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
+                    val split = itemName.split(" ")
+                    if (split.size < 2) return "0"
+                    if (!itemName.contains("Dungeon")) {
+                        val text = split.last()
+                        return "" + text.romanToDecimalIfNeeded()
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
+            if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
+                val lore = item.getLore()
+                if (lore.any { it.contains("Click to view!") }) {
+                    if (CollectionAPI.isCollectionTier0(lore)) return "0"
+                    item.name?.let {
+                        if (it.startsWith("§e")) {
+                            val text = it.split(" ").last()
+                            return "" + text.romanToDecimalIfNeeded()
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
             if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
                     rancherBootsSpeedCapPattern.matchMatcher(line) {
@@ -152,8 +179,8 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(9)) {
-            if (item.getInternalName_old() == "LARVA_HOOK") {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
+            if (itemName.contains("Larva Hook")) {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
                         val amount = group("amount").toInt()
@@ -167,8 +194,8 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(10)) {
-            if (item.getInternalName_old() == "POTION") {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
+            if (itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
                 item.name?.let {
                     "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                         return when (val level = group("level").romanToDecimal()) {

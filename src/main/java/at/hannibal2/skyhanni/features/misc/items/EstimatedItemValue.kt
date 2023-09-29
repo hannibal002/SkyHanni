@@ -642,8 +642,8 @@ object EstimatedItemValue {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5) {
-                if (internalName in hasAlwaysScavenger) continue
+            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
             }
 
             var level = rawLevel

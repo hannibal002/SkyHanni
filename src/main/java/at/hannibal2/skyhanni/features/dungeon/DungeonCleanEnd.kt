@@ -83,27 +83,16 @@ class DungeonCleanEnd {
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
-        if (SkyHanniMod.feature.dungeon.cleanEndF3IgnoreGuardians) {
-            if (DungeonAPI.isOneOf("F3", "M3")) {
-                if (entity is EntityGuardian) {
-                    if (entity.entityId != lastBossId) {
-                        if (Minecraft.getMinecraft().thePlayer.isSneaking) {
-                            return
-                        }
-                    }
-                }
-            }
+        if (SkyHanniMod.feature.dungeon.cleanEndF3IgnoreGuardians
+            && DungeonAPI.isOneOf("F3", "M3")
+            && entity is EntityGuardian
+            && entity.entityId != lastBossId
+            && Minecraft.getMinecraft().thePlayer.isSneaking) {
+            return
         }
 
-        if (chestsSpawned) {
-            if (entity is EntityArmorStand) {
-                if (!entity.hasCustomName()) {
-                    return
-                }
-            }
-            if (entity is EntityOtherPlayerMP) {
-                return
-            }
+        if (chestsSpawned && ((entity is EntityArmorStand && !entity.hasCustomName()) || entity is EntityOtherPlayerMP)) {
+            return
         }
 
         event.isCanceled = true
@@ -118,10 +107,8 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (shouldBlock() && !chestsSpawned) {
-            if (event.soundName.startsWith("note.")) {
-                event.isCanceled = true
-            }
+        if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
+            event.isCanceled = true
         }
     }
 }

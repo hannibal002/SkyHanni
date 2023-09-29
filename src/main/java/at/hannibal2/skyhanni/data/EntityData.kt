@@ -68,10 +68,8 @@ class EntityData {
 
             val health = (any as Float).toInt()
 
-            if (entity is EntityWither) {
-                if (health == 300) {
-                    if (entityId < 0) return
-                }
+            if (entity is EntityWither && health == 300 && entityId < 0) {
+                return
             }
 
             if (entity is EntityLivingBase) {

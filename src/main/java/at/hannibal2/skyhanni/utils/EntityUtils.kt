@@ -133,14 +133,6 @@ object EntityUtils {
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
-//    fun WorldClient.getEntitiesNearby(
-//        clazz: Class<EntityBlaze>,
-//        location: LorenzVec,
-//        radius: Double
-//    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
-//        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
-//    }
-
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
         if (inventory == null) return false
         return inventory.any { it != null && it.getSkullTexture() == skin }

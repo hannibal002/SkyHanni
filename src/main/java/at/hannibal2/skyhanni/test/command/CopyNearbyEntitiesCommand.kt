@@ -135,28 +135,6 @@ object CopyNearbyEntitiesCommand {
 
                         val skinTexture = entity.getSkinTexture()
                         resultList.add("-  skin texture: $skinTexture")
-
-//                        val gameProfile = entity.gameProfile
-//                        if (gameProfile == null) {
-//                            resultList.add("-  gameProfile is null!")
-//                        } else {
-//                            val id = gameProfile.id
-//                            val name = gameProfile.name
-//
-//                            resultList.add("-  gameProfile id: $id")
-//                            resultList.add("-  gameProfile name: $name")
-//                            val properties = gameProfile.properties
-//                            resultList.add("-  gameProfile properties: (${properties.size()})")
-//                            for (entry in properties.entries()) {
-//                                val key = entry.key
-//                                val property = entry.value
-//                                resultList.add("-     key: '$key'")
-//                                val name1 = property.name
-//                                val value = property.value
-//                                resultList.add("-        property name: '$name1'")
-//                                resultList.add("-        property value: '$value'")
-//                            }
-//                        }
                     }
                 }
                 resultList.add("")

@@ -350,14 +350,12 @@ object VampireSlayerFeatures {
                                 )
                         }
                     }
-                    if (configBloodIcor.renderBeam && isIchor) {
-                        if (stand.isEntityAlive) {
-                            event.drawWaypointFilled(
-                                event.exactLocation(stand).add(0, -2, 0),
-                                configBloodIcor.color.toChromaColor(),
-                                beacon = true
-                            )
-                        }
+                    if (configBloodIcor.renderBeam && isIchor && stand.isEntityAlive) {
+                        event.drawWaypointFilled(
+                            event.exactLocation(stand).add(0, -2, 0),
+                            configBloodIcor.color.toChromaColor(),
+                            beacon = true
+                        )
                     }
                 }
             }
@@ -378,12 +376,10 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
         val loc = event.location
         EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {
-            if (it.isHighlighted()) {
-                if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
-                    EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
-                        if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
-                            standList = standList.editCopy { this[stand] = it }
-                        }
+            if (it.isHighlighted() && event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
+                EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
+                    if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
+                        standList = standList.editCopy { this[stand] = it }
                     }
                 }
             }

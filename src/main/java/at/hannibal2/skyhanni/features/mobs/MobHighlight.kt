@@ -25,12 +25,10 @@ class MobHighlight {
 
         val entity = event.entity
         val baseMaxHealth = entity.baseMaxHealth
-        if (config.corruptedMobHighlight) {
-            if (event.health == baseMaxHealth * 3) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(127))
-                { config.corruptedMobHighlight }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.corruptedMobHighlight }
-            }
+        if (config.corruptedMobHighlight && event.health == baseMaxHealth * 3) {
+            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(127))
+            { config.corruptedMobHighlight }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { config.corruptedMobHighlight }
         }
     }
 
@@ -40,20 +38,16 @@ class MobHighlight {
 
         val entity = event.entity
         val maxHealth = event.maxHealth
-        if (config.arachneKeeperHighlight) {
-            if ((maxHealth == 3_000 || maxHealth == 12_000) && entity is EntityCaveSpider) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_BLUE.toColor().withAlpha(127))
-                { config.arachneKeeperHighlight }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.arachneKeeperHighlight }
-            }
+        if (config.arachneKeeperHighlight && (maxHealth == 3_000 || maxHealth == 12_000) && entity is EntityCaveSpider) {
+            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_BLUE.toColor().withAlpha(127))
+            { config.arachneKeeperHighlight }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { config.arachneKeeperHighlight }
         }
 
-        if (config.corleoneHighlighter) {
-            if (maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(127))
-                { config.corleoneHighlighter }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.corleoneHighlighter }
-            }
+        if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
+            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(127))
+            { config.corleoneHighlighter }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { config.corleoneHighlighter }
         }
 
         if (config.zealotBruiserHighlighter) {
@@ -66,18 +60,14 @@ class MobHighlight {
             }
         }
 
-        if (config.specialZealotHighlighter) {
-            if (maxHealth == 2_000 && entity is EntityEnderman) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_RED.toColor().withAlpha(50))
-                { config.specialZealotHighlighter }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.specialZealotHighlighter }
-            }
+        if (config.specialZealotHighlighter && maxHealth == 2_000 && entity is EntityEnderman) {
+            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_RED.toColor().withAlpha(50))
+            { config.specialZealotHighlighter }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { config.specialZealotHighlighter }
         }
 
-        if (config.arachneBossHighlighter) {
-            if (entity is EntitySpider) {
-                checkArachne(entity)
-            }
+        if (config.arachneBossHighlighter && entity is EntitySpider) {
+            checkArachne(entity)
         }
     }
 

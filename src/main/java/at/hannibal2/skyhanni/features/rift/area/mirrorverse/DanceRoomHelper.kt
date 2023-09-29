@@ -151,10 +151,8 @@ object DanceRoomHelper {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
-            if (entity is EntityOtherPlayerMP) {
-                if (inRoom) {
-                    event.isCanceled = true
-                }
+            if (entity is EntityOtherPlayerMP && inRoom) {
+                event.isCanceled = true
             }
         }
     }
