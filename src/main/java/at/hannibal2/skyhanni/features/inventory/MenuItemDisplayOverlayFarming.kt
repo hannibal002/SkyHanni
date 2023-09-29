@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -97,13 +98,18 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(4)) {
+        if (stackSizeConfig.contains(4) && (chestName == "Composter")) {
             val lore = item.getLore()
-            if ((chestName == "Composter") && itemName == "Insert Crops from Sacks") {
-                if ((lore.any { it.contains("In your sacks: ") }) && !(lore.isEmpty())) {
+            if (itemName.contains("Insert") && itemName.contains("from Sacks")) {
+                if ((lore.any { it.contains("In your sacks: ") }) && !(lore.any { it.contains("No") }))) {
                     for (line in lore) {
-                        if (line.contains("In your sacks: ")) {
-                            return line.removeColor().between("In your sacks: ", "Organic Matter")
+                        if (line.contains("In your sacks: ") && !line.contains("No")) {
+                            if (itemName.contains(" Crops ")) {
+                                line.removeColor().between("In your sacks: ", "Organic Matter")
+                            }
+                            if (itemName.contains(" Fuel ")) {
+                                line.removeColor().between("In your sacks: ", "Fuel")
+                            }
                         }
                     }
                 }
