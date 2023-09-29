@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -286,19 +285,6 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(18)) {
-            var thatNumber = ""
-            if (item.getLore().any { it.contains("Auction ") }) {
-                thatNumber = item.getAuctionNumber().toString()
-            }
-            if (item.getLore().any { it.contains("Edition ") }) {
-                thatNumber = item.getEdition().toString()
-            }
-            if (thatNumber == "null" || thatNumber == "") { return "" }
-            if (thatNumber.length >= 4){ return "" }
-            else { return (thatNumber) }
-        }
-
-        if (stackSizeConfig.contains(19)) {
             if (item.getInternalName_old() == ("THE_SHREDDER")) {
                 val lore = item.getLore()
                 if ((lore.any { it.contains("cap): ") }) && (lore.any { it.contains("Bonus Damage ") })) {
@@ -311,7 +297,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(20)) {
+        if (stackSizeConfig.contains(19)) {
             if (item.getInternalName_old() == ("BOTTLE_OF_JYRRE")) {
                 val lore = item.getLore()
                 if (lore.any { it.contains("Intelligence Bonus: ")}) {
@@ -324,28 +310,41 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(21) && item.getInternalName_old().startsWith("SOULFLOW_") && chestName.contains("Accessory Bag")) {
-            LorenzUtils.chat("item found! let's fucking do this shit")
-            //§7Internalized: §316,493⸎ Soulflow
-            //Internalized: 16,493⸎ Soulflow
-            val line = item.getLore().first()
-            LorenzUtils.chat("line found! let's fucking do this shit: ${line}")
-            if (line.contains("Internalized: ") && line.contains(" Soulflow")) {
-                val soulflowCount = line.removeColor().between("Internalized: 16,493", "⸎ Soulflow")
-                val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
-                val usefulAsString = "(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})*".toPattern().matchMatcher(soulflowCount) { group("leading") } ?: ""
-                val suffix = when (soulflowCountWithoutCommas.length) {
-                    in 1..3 -> ""
-                    in 4..6 -> "k"
-                    in 7..9 -> "M"
-                    in 10..12 -> "B"
-                    in 13..15 -> "T"
-                    else -> "§b§z:)"
+        if (stackSizeConfig.contains(20)) {
+            if (item.getInternalName_old().contains("SOULFLOW_")) {
+                //§7Internalized: §316,493⸎ Soulflow
+                //Internalized: 16,493⸎ Soulflow
+                val line = item.getLore().first()
+                if (line.contains("Internalized: ") && line.contains(" Soulflow")) {
+                    val soulflowCount = line.removeColor().between("Internalized: ", "⸎ Soulflow")
+                    val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
+                    val usefulAsString = "(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})*".toPattern().matchMatcher(soulflowCount) { group("leading") } ?: ""
+                    val suffix = when (soulflowCountWithoutCommas.length) {
+                        in 1..3 -> ""
+                        in 4..6 -> "k"
+                        in 7..9 -> "M"
+                        in 10..12 -> "B"
+                        in 13..15 -> "T"
+                        else -> "§b§z:)"
+                    }
+                    if (usefulAsString.isEmpty()) return ""
+                    if (suffix == "§b§z:)") return suffix
+                    else return "" + usefulAsString + suffix
                 }
-                if (usefulAsString.isEmpty()) return ""
-                if (suffix == "§b§z:)") return suffix
-                else return "" + usefulAsString + suffix
             }
+        }
+		
+		if (stackSizeConfig.contains(21)) {
+            var thatNumber = ""
+            if (item.getLore().any { it.contains("Auction ") }) {
+                thatNumber = item.getAuctionNumber().toString()
+            }
+            if (item.getLore().any { it.contains("Edition ") }) {
+                thatNumber = item.getEdition().toString()
+            }
+            if (thatNumber == "null") { return "" }
+            if (thatNumber.length >= 4){ return "" }
+            else { return (thatNumber) }
         }
 
         return ""

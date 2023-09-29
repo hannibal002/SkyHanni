@@ -382,10 +382,10 @@ public class InventoryConfig {
                 "§bCampfire Talisman Tier",
                 "§bBlood God Crest Strength",
                 "§bYeti Rod Bonus",
-                "§bItem Edition/Auction Number (if less than 1000)",
                 "§bShredder Bonus Damage",
                 "§bBottle of Jyrre Intelligence Bonus",
                 "§bInternalized Soulflow Count (Abbv, only in Accessory Bag)",
+                "§bItem Edition/Auction Number (if less than 1000)",
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
