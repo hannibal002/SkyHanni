@@ -498,6 +498,8 @@
 + Fixed ability cooldown not working for some items. - Cad
 + Fixed Bazaar item category "Ink Sack" gets wrongly detected as an item sack. - Erymanthus
 + Fixed reforge stone "Pitchin' Koi" not detected in the Estimated Item Value. - Fix3dll
++ Minion Craft Helper now ignores Inferno and Vampire minions as well. - walker
++ Better wording in the auto updater. - zapteryx
 
 ## Version 0.18 (2023-06-19)
 
