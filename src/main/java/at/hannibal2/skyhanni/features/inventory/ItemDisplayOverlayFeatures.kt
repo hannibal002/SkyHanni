@@ -37,10 +37,9 @@ class ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
-        if (stackSizeConfig.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = stackSizeConfig
+        val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
         val chestName = InventoryUtils.openInventoryName()
         /*
         -------------------------------IMPORTANT------------------------------------
