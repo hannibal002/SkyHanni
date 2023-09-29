@@ -109,10 +109,10 @@ class MenuItemDisplayOverlayFarming {
                             //Totalling 615 Organic Matter.
                             //Totalling 844 Organic Matter.
                             if (itemName.contains(" Crops ")) {
-                                line.removeColor().between("Totalling ", " Organic Matter.")
+                                return line.removeColor().between("Totalling ", " Organic Matter.")
                             }
                             if (itemName.contains(" Fuel ")) {
-                                line.removeColor().between("Totalling ", " Fuel.")
+                                return line.removeColor().between("Totalling ", " Fuel.")
                             }
                         }
                     }
