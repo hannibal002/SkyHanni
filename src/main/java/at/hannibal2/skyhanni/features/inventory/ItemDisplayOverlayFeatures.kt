@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAuctionNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBloodGodKills
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
@@ -255,12 +256,16 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(18)) {
-            if (item.getLore().any { it.contains("Edition ") }) {
-                val edition = item.getEdition().toString()
-                if (edition == "null") { return "" }
-                if (edition.length >= 4){ return "" }
-                else { return (edition) }
+            var thatNumber = ""
+            if (item.getLore().any { it.contains("Auction ") }) {
+                thatNumber = item.getAuctionNumber().toString()
             }
+            if (item.getLore().any { it.contains("Edition ") }) {
+                thatNumber = item.getEdition().toString()
+            }
+            if (auctionNumber == "null" || auctionNumber == "") { return "" }
+            if (auctionNumber.length >= 4){ return "" }
+            else { return (auctionNumber) }
         }
 
         if (stackSizeConfig.contains(19)) {

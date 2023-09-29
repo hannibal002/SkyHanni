@@ -175,6 +175,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
 
+    fun ItemStack.getAuctionNumber() = getAttributeInt("auction")
+
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }

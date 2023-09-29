@@ -382,7 +382,7 @@ public class InventoryConfig {
                 "§bCampfire Talisman Tier",
                 "§bBlood God Crest Strength",
                 "§bYeti Rod Bonus",
-                "§bItem Edition Number (if less than 1000)",
+                "§bItem Edition/Auction Number (if less than 1000)",
                 "§bShredder Bonus Damage",
                 "§bBottle of Jyrre Intelligence Bonus",
         }
