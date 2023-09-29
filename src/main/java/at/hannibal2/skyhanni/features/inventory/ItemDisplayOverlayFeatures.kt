@@ -310,7 +310,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(20) && item.getInternalName_old().contains("SOULFLOW_") && !((chestName.contains("Auction"))) {
+        if (stackSizeConfig.contains(20) && item.getInternalName_old().contains("SOULFLOW_") && !(chestName.contains("Auction"))) {
             //§7Internalized: §316,493⸎ Soulflow
             //Internalized: 16,493⸎ Soulflow
             val line = item.getLore().first()
