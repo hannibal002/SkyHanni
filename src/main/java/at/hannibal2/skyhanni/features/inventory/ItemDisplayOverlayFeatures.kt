@@ -310,27 +310,25 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(20)) {
-            if (item.getInternalName_old().contains("SOULFLOW_")) {
-                //§7Internalized: §316,493⸎ Soulflow
-                //Internalized: 16,493⸎ Soulflow
-                val line = item.getLore().first()
-                if (line.contains("Internalized: ") && line.contains(" Soulflow")) {
-                    val soulflowCount = line.removeColor().between("Internalized: ", "⸎ Soulflow")
-                    val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
-                    val usefulAsString = "(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})*".toPattern().matchMatcher(soulflowCount) { group("leading") } ?: ""
-                    val suffix = when (soulflowCountWithoutCommas.length) {
-                        in 1..3 -> ""
-                        in 4..6 -> "k"
-                        in 7..9 -> "M"
-                        in 10..12 -> "B"
-                        in 13..15 -> "T"
-                        else -> "§b§z:)"
-                    }
-                    if (usefulAsString.isEmpty()) return ""
-                    if (suffix == "§b§z:)") return suffix
-                    else return "" + usefulAsString + suffix
+        if (stackSizeConfig.contains(20) && item.getInternalName_old().contains("SOULFLOW_") && !((chestName.contains("Auction"))) {
+            //§7Internalized: §316,493⸎ Soulflow
+            //Internalized: 16,493⸎ Soulflow
+            val line = item.getLore().first()
+            if (line.contains("Internalized: ") && line.contains(" Soulflow")) {
+                val soulflowCount = line.removeColor().between("Internalized: ", "⸎ Soulflow")
+                val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
+                val usefulAsString = "(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})*".toPattern().matchMatcher(soulflowCount) { group("leading") } ?: ""
+                val suffix = when (soulflowCountWithoutCommas.length) {
+                    in 1..3 -> ""
+                    in 4..6 -> "k"
+                    in 7..9 -> "M"
+                    in 10..12 -> "B"
+                    in 13..15 -> "T"
+                    else -> "§b§z:)"
                 }
+                if (usefulAsString.isEmpty()) return ""
+                if (suffix == "§b§z:)") return suffix
+                else return "" + usefulAsString + suffix
             }
         }
 		

@@ -384,7 +384,7 @@ public class InventoryConfig {
                 "§bYeti Rod Bonus",
                 "§bShredder Bonus Damage",
                 "§bBottle of Jyrre Intelligence Bonus",
-                "§bInternalized Soulflow Count (Abbv, only in Accessory Bag)",
+                "§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)",
                 "§bItem Edition/Auction Number (if less than 1000)",
         }
     )
