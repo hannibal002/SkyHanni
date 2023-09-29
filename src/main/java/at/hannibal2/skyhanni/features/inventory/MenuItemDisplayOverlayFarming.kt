@@ -97,6 +97,19 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
+        if (stackSizeConfig.contains(4)) {
+            val lore = item.getLore()
+            if ((chestName == "Composter") && itemName == "Insert Crops from Sacks") {
+                if ((lore.any { it.contains("In your sacks: ") }) && !(lore.isEmpty())) {
+                    for (line in lore) {
+                        if (line.contains("In your sacks: ")) {
+                            return line.removeColor().between("In your sacks: ", "Organic Matter")
+                        }
+                    }
+                }
+            }
+        }
+
         return ""
     }
 }
