@@ -90,7 +90,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.displaySackName) {
-            if (ItemUtils.isSack(item)) {
+            if (ItemUtils.isSack(item, itemName)) {
                 val sackName = grabSackName(itemName)
                 return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
             }
