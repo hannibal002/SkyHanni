@@ -294,6 +294,28 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        if (stackSizeConfig.contains(21) && item.getInternalName_old().startsWith("SOULFLOW_") && chestName.contains("Accessory Bag")) {
+            //§7Internalized: §316,493⸎ Soulflow
+            //Internalized: 16,493⸎ Soulflow
+            val line = item.getLore().first()
+            if (line.contains("Internalized: ") & line.contains(" Soulflow")) {
+                val soulflowCount = line.removeColor().between("Internalized: 16,493", "⸎ Soulflow")
+                val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
+                val usefulAsString = "(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})*".toPattern().matchMatcher(soulflowCount) { group("leading") } ?: ""
+                val suffix = when (soulflowCountWithoutCommas.length) {
+                    in 1..3 -> ""
+                    in 4..6 -> "k"
+                    in 7..9 -> "M"
+                    in 10..12 -> "B"
+                    in 13..15 -> "T"
+                    else -> "§b§z:)"
+                }
+                if (usefulAsString.isEmpty()) return ""
+                if (suffix == "§b§z:)") return suffix
+                else return "" + usefulPartAsString + suffix
+            }
+        }
+
         return ""
     }
     

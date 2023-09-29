@@ -385,6 +385,7 @@ public class InventoryConfig {
                 "§bItem Edition/Auction Number (if less than 1000)",
                 "§bShredder Bonus Damage",
                 "§bBottle of Jyrre Intelligence Bonus",
+                "§bInternalized Soulflow Count (Abbv, only in Accessory Bag)",
         }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
