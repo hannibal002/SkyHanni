@@ -98,14 +98,16 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(4) && (chestName == "Composter")) {
+        if (stackSizeConfig.contains(4) && (chestName.contains("Composter"))) {
             val lore = item.getLore()
-            if (itemName.contains("Insert") && itemName.contains("from ")) {
-                if ((lore.any { (it.contains("Totalling")) })) {
+            if (itemName.contains("Insert ") && itemName.contains(" from ")) {
+                if ((lore.any { (it.contains("Totalling ")) })) {
                     for (line in lore) {
-                        if (line.contains("Totalling")) {
-                            //§7Totalling §e§e908 Organic Matter§7.
-                            //Totalling 908 Organic Matter.
+                        if (line.contains("Totalling ")) {
+                            //§7Totalling §e§e615 Organic Matter§7.
+                            //§7Totalling §e§e844 Organic Matter§7.
+                            //Totalling 615 Organic Matter.
+                            //Totalling 844 Organic Matter.
                             if (itemName.contains(" Crops ")) {
                                 line.removeColor().between("Totalling ", " Organic Matter.")
                             }
