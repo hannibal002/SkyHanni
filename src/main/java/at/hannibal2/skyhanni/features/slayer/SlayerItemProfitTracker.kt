@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.get
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
@@ -49,6 +48,7 @@ object SlayerItemProfitTracker {
     private var collectedCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.SECONDS).build<Int, Unit>()
 
     private var itemLogCategory = ""
+    private var baseSlayerType = ""
     private var display = emptyList<List<Any>>()
     private val logger = LorenzLogger("slayer/item_profit_tracker")
     private var inventoryOpen = false
@@ -92,6 +92,7 @@ object SlayerItemProfitTracker {
     fun onSlayerChange(event: SlayerChangeEvent) {
         val newSlayer = event.newSlayer
         itemLogCategory = newSlayer.removeColor()
+        baseSlayerType = itemLogCategory.substringBeforeLast(" ")
         update()
     }
 
@@ -199,7 +200,7 @@ object SlayerItemProfitTracker {
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean {
-        val allowedList = allowedItems.get { itemLogCategory.startsWith(it) } ?: return false
+        val allowedList = allowedItems[baseSlayerType] ?: return false
         return internalName in allowedList
     }
 
