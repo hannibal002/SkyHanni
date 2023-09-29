@@ -104,7 +104,7 @@ public class MiningConfig {
     public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
 
     @Expose
-    @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of Crystal Hollows.")
+    @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;

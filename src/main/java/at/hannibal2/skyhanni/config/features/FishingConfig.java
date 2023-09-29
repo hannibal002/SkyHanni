@@ -3,7 +3,15 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -43,7 +51,7 @@ public class FishingConfig {
             public int design = 0;
 
             @Expose
-            @ConfigOption(name = "Show total amount", desc = "Show total amount of all rarities at the end of the chat message.")
+            @ConfigOption(name = "Show Total Amount", desc = "Show total amount of all rarities at the end of the chat message.")
             @ConfigEditorBoolean
             public boolean totalAmount = false;
 
@@ -88,14 +96,14 @@ public class FishingConfig {
     public boolean thunderSpark = false;
 
     @Expose
-    @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder")
+    @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
     public boolean thunderSparkHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Thunder Spark Color", desc = "Color of the Thunder Sparks")
+    @ConfigOption(name = "Thunder Spark Color", desc = "Color of the Thunder Sparks.")
     @ConfigEditorColour
     @ConfigAccordionId(id = 1)
     public String thunderSparkColor = "0:255:255:255:255";
@@ -212,13 +220,13 @@ public class FishingConfig {
     public static class FishingHookDisplay {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Display the hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.")
+        @ConfigOption(name = "Enabled", desc = "Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Hide Armor Stand", desc = "Hide the original armor stand from hypixel when the Skyhanni display is enabled.")
+        @ConfigOption(name = "Hide Armor Stand", desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled.")
         @ConfigEditorBoolean
         public boolean hideArmorStand = true;
 
@@ -227,7 +235,7 @@ public class FishingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Rare", desc = "Highlight rare sea creatures in blue color.")
+    @ConfigOption(name = "Highlight Rare", desc = "Highlight Rare Sea Creatures in blue color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean rareSeaCreatureHighlight = false;
@@ -235,7 +243,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(
             name = "Shark Fish Counter",
-            desc = "Counts how many sharks have been caught."
+            desc = "Counts how many Sharks have been caught."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -245,13 +253,13 @@ public class FishingConfig {
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of sea creature you have fished.")
+    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of Sea Creature you have fished.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shortenFishingMessage = false;
 
     @Expose
-    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the sea creature chat message instead of in a previous line.")
+    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the Sea Creature chat message instead of in a previous line.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactDoubleHook = true;

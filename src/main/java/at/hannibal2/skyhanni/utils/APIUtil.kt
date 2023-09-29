@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import org.apache.http.client.config.RequestConfig
@@ -38,7 +39,10 @@ object APIUtil {
             )
             .useSystemProperties()
 
-    fun getJSONResponse(urlString: String, silentError: Boolean = false): JsonObject {
+    fun getJSONResponse(urlString: String, silentError: Boolean = false) =
+            getJSONResponseAsElement(urlString, silentError) as JsonObject
+
+    fun getJSONResponseAsElement(urlString: String, silentError: Boolean = false, apiName: String = "Hypixel API"): JsonElement {
         val client = builder.build()
         try {
             client.execute(HttpGet(urlString)).use { response ->
@@ -46,14 +50,14 @@ object APIUtil {
                 if (entity != null) {
                     val retSrc = EntityUtils.toString(entity)
                     try {
-                        return ConfigManager.gson.fromJson<JsonObject>(retSrc)
+                        return ConfigManager.gson.fromJson<JsonElement>(retSrc)
                     } catch (e: JsonSyntaxException) {
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")
                             println(" - getJSONResponse: '$urlString'")
                             LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
                         } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                            if (showApiErrors) {
+                            if (showApiErrors && apiName == "Hypixel API") {
                                 LorenzUtils.clickableChat(
                                     "[SkyHanni] Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
                                     "shtogglehypixelapierrors"
@@ -63,8 +67,8 @@ object APIUtil {
 
                         } else {
                             CopyErrorCommand.logError(
-                                Error("Hypixel API error for url: '$urlString'", e),
-                                "Failed to load data from Hypixel API"
+                                Error("$apiName error for url: '$urlString'", e),
+                                "Failed to load data from $apiName"
                             )
                         }
                     }
@@ -75,8 +79,8 @@ object APIUtil {
                 throw throwable
             } else {
                 CopyErrorCommand.logError(
-                    Error("Hypixel API error for url: '$urlString'", throwable),
-                    "Failed to load data from Hypixel API"
+                    Error("$apiName error for url: '$urlString'", throwable),
+                    "Failed to load data from $apiName"
                 )
             }
         } finally {

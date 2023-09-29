@@ -34,15 +34,11 @@ class WrongFungiCutterWarning {
         if (event.crop != CropType.MUSHROOM) return
 
         val toString = event.blockState.toString()
-        if (toString == "minecraft:red_mushroom") {
-            if (mode == FungiMode.BROWN) {
-                notifyWrong()
-            }
+        if (toString == "minecraft:red_mushroom" && mode == FungiMode.BROWN) {
+            notifyWrong()
         }
-        if (toString == "minecraft:brown_mushroom") {
-            if (mode == FungiMode.RED) {
-                notifyWrong()
-            }
+        if (toString == "minecraft:brown_mushroom" && mode == FungiMode.RED) {
+            notifyWrong()
         }
     }
 

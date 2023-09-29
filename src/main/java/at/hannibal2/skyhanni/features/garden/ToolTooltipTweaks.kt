@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.get
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -32,8 +33,10 @@ class ToolTooltipTweaks {
         if (!LorenzUtils.inSkyBlock) return
 
         val itemStack = event.itemStack
+        val itemLore = itemStack.getLore()
+        val internalName = itemStack.getInternalName()
         val crop = itemStack.getCropType()
-        val toolFortune = FarmingFortuneDisplay.getToolFortune(itemStack)
+        val toolFortune = FarmingFortuneDisplay.getToolFortune(internalName)
         val counterFortune = FarmingFortuneDisplay.getCounterFortune(itemStack)
         val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(itemStack)
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
@@ -44,7 +47,7 @@ class ToolTooltipTweaks {
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)
         val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(itemStack)
         val cultivatingFortune = FarmingFortuneDisplay.getCultivatingFortune(itemStack)
-        val abilityFortune = getAbilityFortune(itemStack)
+        val abilityFortune = getAbilityFortune(internalName, itemLore)
 
         val ffdFortune = itemStack.getFarmingForDummiesCount() ?: 0
         val hiddenFortune =
@@ -137,7 +140,7 @@ class ToolTooltipTweaks {
         }
 
         // Fixing a hypixel bug. TODO remove once hypixel fixes it. use disabled features repo maybe?
-        if (itemStack.getInternalName().contains("LOTUS")) {
+        if (internalName.contains("LOTUS")) {
             event.toolTip.replaceAll { it.replace("Kills:", "Visitors:") }
         }
     }

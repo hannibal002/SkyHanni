@@ -27,10 +27,8 @@ class TiaRelayHelper {
         if (!LorenzUtils.inSkyBlock) return
         val soundName = event.soundName
 
-        if (config.tiaRelayMute) {
-            if (soundName == "mob.wolf.whine") {
-                event.isCanceled = true
-            }
+        if (config.tiaRelayMute && soundName == "mob.wolf.whine") {
+            event.isCanceled = true
         }
 
         if (!config.soundHelper) return
@@ -114,13 +112,11 @@ class TiaRelayHelper {
             return
         }
 
-        if (!sounds.contains(slotNumber)) {
-            if (stack.getLore().any { it.contains("Hear!") }) {
-                event.stackTip = "Hear!"
-                event.offsetX = 5
-                event.offsetY = -5
-                return
-            }
+        if (!sounds.contains(slotNumber) && stack.getLore().any { it.contains("Hear!") }) {
+            event.stackTip = "Hear!"
+            event.offsetX = 5
+            event.offsetY = -5
+            return
         }
     }
 
