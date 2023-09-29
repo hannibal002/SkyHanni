@@ -35,7 +35,7 @@ class PocketSackInASackDisplay {
         val itemStack = event.itemStack
         val applied = itemStack.getAppliedPocketSackInASack() ?: return
 
-        if (!ItemUtils.isSack(itemStack.displayName)) return
+        if (!ItemUtils.isSack(itemStack)) return
         val iterator = event.toolTip.listIterator()
         var next = false
         for (line in iterator) {

@@ -29,10 +29,8 @@ class JoinCrystalHollows {
                 LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
-        if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!") {
-            if (inTime()) {
-                LorenzUtils.clickableChat("§e[SkyHanni] Click here to warp to Crystal Hollows!", "warp ch")
-            }
+        if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!" && inTime()) {
+            LorenzUtils.clickableChat("§e[SkyHanni] Click here to warp to Crystal Hollows!", "warp ch")
         }
     }
 
@@ -40,10 +38,8 @@ class JoinCrystalHollows {
     fun onIslandChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
 
-        if (event.newIsland == IslandType.DWARVEN_MINES) {
-            if (inTime()) {
+        if (event.newIsland == IslandType.DWARVEN_MINES && inTime()) {
                 LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn§e!")
-            }
         }
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
             lastWrongPassTime = 0

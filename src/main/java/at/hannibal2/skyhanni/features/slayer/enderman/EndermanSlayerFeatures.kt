@@ -3,22 +3,32 @@ package at.hannibal2.skyhanni.features.slayer.enderman
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
@@ -43,13 +53,9 @@ class EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman) {
-            if (showBeacon()) {
-                if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                    endermenWithBeacons.add(entity)
-                    logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
-                }
-            }
+        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+            endermenWithBeacons.add(entity)
+            logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
 
         if (entity is EntityArmorStand) {
@@ -65,13 +71,9 @@ class EndermanSlayerFeatures {
                 }
             }
 
-            if (config.endermanHighlightNukekebi) {
-                if (entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture }) {
-                    if (entity !in nukekubiSkulls) {
-                        nukekubiSkulls.add(entity)
-                        logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
-                    }
-                }
+            if (config.endermanHighlightNukekebi && entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture } && entity !in nukekubiSkulls) {
+                nukekubiSkulls.add(entity)
+                logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
             }
         }
     }

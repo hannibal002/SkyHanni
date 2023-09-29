@@ -27,37 +27,40 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Compact Potion Effect Messages
 + **Arachne Chat Hider**
     + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
-
 + Option to shorten the **bestiary level-up** message.
 + Chat **Translator** - NetheriteMiner
-    + After enabling, click on any chat message sent by another player to translate it to English.
+    + Click on any chat message sent by another player to translate it to English.
++ **Sack Change** chat message hider. - hannibal2
+    + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
+      data for future features.
 
 ## Dungeon
 
-- Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
-- Current milestone display.
-- Death Counter (Changing color depending on amount, hidden at 0 deaths)
-- Clean Ending (After the last dungeon boss has died, all entities and particles are no longer displayed and the music
++ Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, Wither Essence or a lever)
++ Current milestone display.
++ Death Counter (Changing color depending on amount, hidden at 0 deaths)
++ Clean Ending (After the last dungeon boss has died, all entities and particles are no longer displayed and the music
   stops playing, but the dungeon chests are still displayed)
-- Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
-- Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
-- Highlight deathmites in red color.
-- Hide Superboom TNT lying around in dungeon.
-- Hide Blessings lying around in dungeon.
-- Hide Revive Stones lying around in dungeon.
-- Hide Premium Flesh lying around in dungeon.
-- Hide Journal Entry pages lying around in dungeon.
-- Dungeon Copilot (Suggests to you what to do next in dungeon)
-- Option to hide key pickup and door open messages in dungeon.
-- Hide Skeleton Skulls lying around in dungeon.
-- Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature
++ Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
++ Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
++ Highlight deathmites in red color.
++ Hide Superboom TNT lying around in dungeon.
++ Hide Blessings lying around in dungeon.
++ Hide Revive Stones lying around in dungeon.
++ Hide Premium Flesh lying around in dungeon.
++ Hide Journal Entry pages lying around in dungeon.
++ Dungeon Copilot (Suggests to you what to do next in dungeon)
++ Option to hide key pickup and door open messages in dungeon.
++ Hide Skeleton Skulls lying around in dungeon.
++ Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature
   Hide Skeleton Skull)
-- Hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs.
-- Hide the golden fairy that follows the healer in dungeon.
-- Catacombs class level color in party finder inventory.
-- Visual highlight chests that have not yet been opened in the Croesus inventory.
-
++ Hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs.
++ Hide the golden fairy that follows the healer in dungeon.
++ Catacombs class level color in party finder inventory.
++ Visual highlight chests that have not yet been opened in the Croesus inventory.
 + Outline Dungeon Teammates. - Cad
++ Dungeon Colored Class Level. - hannibal2
+    + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
 
 ## Inventory
 
@@ -106,10 +109,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Item Abilities
 
-- Show the cooldown of items in the inventory.
-- Option to change the item background according to the cooldown.
-- Hiding the flame particles when using the Fire Veil Wand ability.
-- Circle around the player when having the Fire Veil Wand ability active.
++ Show the **cooldown of items** in the inventory. - hannibal2
+    + Option to change the item background according to the cooldown.
+    + Supports dungeon mage cooldown reduction. - Cad
++ Hiding the flame particles when using the Fire Veil Wand ability.
++ Circle around the player when having the Fire Veil Wand ability active.
 
 ## Summoning Mobs
 
@@ -182,7 +186,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
 + Added Fishing Hook Display. - hannibal2
-    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
+      screen.
 
 ## Damage Indicator
 
@@ -293,6 +298,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ Added a countdown for Arachne spawn. - Cad
 + Option to hide the vanilla particles around enderman
 
 ## Garden Features
@@ -336,6 +342,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Money per Hour**
     + Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
     + Suppports the dicer drops from melon and pumpkins as well. - CalMWolfs
+    + Supports armor drops. - CalMWolfs
 + Farming contest timer.
 + Wrong fungi cutter mode warning.
 + Show the price per garden experience inside the visitor gui.
@@ -549,6 +556,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Works with Gemstone Slot unlock costs. - Fix3dll
 + **Discord RPC** - NetheriteMiner
     + Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence.
+    + Show dungeon information.
+        + Show the current floor name.
+        + Time since the dungeon started.
+        + Number of boss collections of the current boss.
+    + Dynamic Priority Box.
+        + Change the order or disable dynamically rendered features (e.g. Slayer, Dungeon, Crop Milestone, Stacking
+          Enchantment)
 + Server Restart Title
 + **City Project Features**
     + Show missing items to contribute inside the inventory
@@ -622,9 +636,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Travor Trapper** Features in Farming Islands
     + Trapper Cooldown GUI. - NetheriteMiner
         + Show the cooldown on screen in an overlay (intended for abiphone users).
+    + **Trevor the Trapper Tracker**. - CalMWolfs
+        + Quests done
+        + A breakdown of their rarity
+        + Animals killed vs. animals that kill themselves
+        + Pelts per hour
+    + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
 + **GUI Scale**: - nea
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
+    + Change the scale with plus and minus keys. - CalMWolfs
 
 ## Cosmetics
 

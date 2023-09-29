@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
@@ -10,15 +11,19 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.EnderNode;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
-import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
+import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class Storage {
 
@@ -87,9 +92,6 @@ public class Storage {
 
             @Expose
             public List<String> quests = new ArrayList<>();
-
-            @Expose
-            public int latestTrophyFishInInventory = 0;
 
             @Expose
             public List<String> miniBossesDoneToday = new ArrayList<>();
@@ -428,6 +430,15 @@ public class Storage {
 
             @Expose
             public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities= new HashMap<>();
+        }
+
+        @Expose
+        public DungeonStorage dungeons = new DungeonStorage();
+
+        public static class DungeonStorage {
+
+            @Expose
+            public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
         }
     }
 }

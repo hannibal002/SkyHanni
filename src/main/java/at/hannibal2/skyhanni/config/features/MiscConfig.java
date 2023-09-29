@@ -3,7 +3,17 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -45,9 +55,9 @@ public class MiscConfig {
         public boolean showAlways = false;
 
         @Expose
-        @ConfigOption(name = "GDrag 200", desc = "Show for Golden Dragon the exp needed for level 200.")
+        @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
         @ConfigEditorBoolean
-        public boolean goldenDragon200 = true;
+        public boolean showGoldenDragonEgg = true;
 
     }
 
@@ -88,7 +98,7 @@ public class MiscConfig {
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the Non God Pot Effects display.")
+    @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
@@ -170,7 +180,7 @@ public class MiscConfig {
     public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Show always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
@@ -259,7 +269,19 @@ public class MiscConfig {
         public Property<String> customText = Property.of("");
 
         @Expose
-        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone, Slayer progress, or Stacking enchantment when possible, but this if you're doing none of them.")
+        @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "Crop Milestones",
+                        "Slayer",
+                        "Stacking Enchantment",
+                        "Dungeon",
+                }
+        )
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+
+        @Expose
+        @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
         @ConfigEditorDropdown(values = {
                 "Nothing",
                 "Location",
@@ -288,7 +310,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Enable Data Tracker",
                 desc = "Tracks all of your data from doing Trevor Quests.\n" +
-                        "Shows based on the setting below"
+                        "Shows based on the setting below."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -298,7 +320,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Show Between Quests",
                 desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                        "Will show in the Trapper's Den regardless. Global toggle above"
+                        "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
         )
         @ConfigEditorBoolean
         public boolean displayType = true;
@@ -466,7 +488,7 @@ public class MiscConfig {
             public boolean enabled = false;
 
             @Expose
-            @ConfigOption(name = "Line color", desc = "Color of the line.")
+            @ConfigOption(name = "Line Color", desc = "Color of the line.")
             @ConfigEditorColour
             public String lineColor = "0:255:255:255:255";
 

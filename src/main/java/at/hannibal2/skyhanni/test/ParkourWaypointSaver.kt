@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
@@ -37,9 +42,7 @@ class ParkourWaypointSaver {
         }
         if (config.saveKey == key) {
             val newLocation = LorenzVec.getBlockBelowPlayer()
-            if (locations.isNotEmpty()) {
-                if (newLocation == locations.last()) return
-            }
+            if (locations.isNotEmpty() && newLocation == locations.last()) return
             locations.add(newLocation)
             update()
         }

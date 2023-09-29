@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
+import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-import kotlin.math.floor
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -141,14 +141,12 @@ class ComposterDisplay {
         if (!config.composterNotifyLowEnabled) return
         val hidden = hidden ?: return
 
-        if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter) {
-            if (System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
-                if (config.composterNotifyLowTitle) {
-                    TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
-                }
-                LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
-                hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
+        if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter && System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
+            if (config.composterNotifyLowTitle) {
+                TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
+            LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
+            hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
         if (ComposterAPI.getFuel() <= config.composterNotifyLowFuel &&

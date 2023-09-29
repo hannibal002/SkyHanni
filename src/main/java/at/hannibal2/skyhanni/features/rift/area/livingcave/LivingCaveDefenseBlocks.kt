@@ -55,10 +55,8 @@ class LivingCaveDefenseBlocks {
             }
             return
         }
-        if (config.hideParticles) {
-            if (movingBlocks.keys.any { it.location.distance(location) < 3 }) {
-                event.isCanceled = true
-            }
+        if (config.hideParticles && movingBlocks.keys.any { it.location.distance(location) < 3 }) {
+            event.isCanceled = true
         }
 
         if (event.type == EnumParticleTypes.CRIT_MAGIC) {

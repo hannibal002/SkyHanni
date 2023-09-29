@@ -22,73 +22,67 @@ class StatsTuning {
 
         val stack = event.stack
 
-        if (SkyHanniMod.feature.inventory.statsTuningTemplateStats) {
-            if (inventoryName == "Stats Tuning") {
-                val name = stack.name ?: return
-                if (name == "§aLoad") {
-                    var grab = false
-                    val list = mutableListOf<String>()
-                    for (line in stack.getLore()) {
-                        if (line == "§7You are loading:") {
-                            grab = true
-                            continue
-                        }
-                        if (grab) {
-                            if (line == "") {
-                                grab = false
-                                continue
-                            }
-                            val text = line.split(":")[0]
-                            list.add(text)
-                        }
-                    }
-                    if (list.isNotEmpty()) {
-                        event.stackTip = list.joinToString(" + ")
-                        event.offsetX = 20
-                        event.offsetY = -5
-                        event.alignLeft = false
-                        return
-                    }
-                }
-            }
-        }
-        if (SkyHanniMod.feature.inventory.statsTuningSelectedStats) {
-            if (inventoryName == "Accessory Bag Thaumaturgy") {
-                val name = stack.name ?: return
-                if (name == "§aStats Tuning") {
-                    var grab = false
-                    val list = mutableListOf<String>()
-                    for (line in stack.getLore()) {
-                        if (line == "§7Your tuning:") {
-                            grab = true
-                            continue
-                        }
-                        if (grab) {
-                            if (line == "") {
-                                grab = false
-                                continue
-                            }
-                            val text = line.split(":")[0].split(" ")[0] + "§7"
-                            list.add(text)
-                        }
-                    }
-                    if (list.isNotEmpty()) {
-                        event.stackTip = list.joinToString(" + ")
-                        event.offsetX = 3
-                        event.offsetY = -5
-                        event.alignLeft = false
-                        return
-                    }
-                }
-            }
-        }
-        if (SkyHanniMod.feature.inventory.statsTuningPoints) {
-            if (inventoryName == "Stats Tuning") {
+        if (SkyHanniMod.feature.inventory.statsTuningTemplateStats && inventoryName == "Stats Tuning") {
+            val name = stack.name ?: return
+            if (name == "§aLoad") {
+                var grab = false
+                val list = mutableListOf<String>()
                 for (line in stack.getLore()) {
-                    patternStatPoints.matchMatcher(line) {
-                        val points = group("amount")
-                        event.stackTip = points
+                    if (line == "§7You are loading:") {
+                        grab = true
+                        continue
                     }
+                    if (grab) {
+                        if (line == "") {
+                            grab = false
+                            continue
+                        }
+                        val text = line.split(":")[0]
+                        list.add(text)
+                    }
+                }
+                if (list.isNotEmpty()) {
+                    event.stackTip = list.joinToString(" + ")
+                    event.offsetX = 20
+                    event.offsetY = -5
+                    event.alignLeft = false
+                    return
+                }
+            }
+        }
+        if (SkyHanniMod.feature.inventory.statsTuningSelectedStats && inventoryName == "Accessory Bag Thaumaturgy") {
+            val name = stack.name ?: return
+            if (name == "§aStats Tuning") {
+                var grab = false
+                val list = mutableListOf<String>()
+                for (line in stack.getLore()) {
+                    if (line == "§7Your tuning:") {
+                        grab = true
+                        continue
+                    }
+                    if (grab) {
+                        if (line == "") {
+                            grab = false
+                            continue
+                        }
+                        val text = line.split(":")[0].split(" ")[0] + "§7"
+                        list.add(text)
+                    }
+                }
+                if (list.isNotEmpty()) {
+                    event.stackTip = list.joinToString(" + ")
+                    event.offsetX = 3
+                    event.offsetY = -5
+                    event.alignLeft = false
+                    return
+                }
+            }
+        }
+        if (SkyHanniMod.feature.inventory.statsTuningPoints && inventoryName == "Stats Tuning") {
+            for (line in stack.getLore()) {
+                patternStatPoints.matchMatcher(line) {
+                    val points = group("amount")
+                    event.stackTip = points
                 }
             }
         }
@@ -100,15 +94,13 @@ class StatsTuning {
         if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()
-        if (SkyHanniMod.feature.inventory.statsTuningSelectedTemplate) {
-            if (chestName == "Stats Tuning") {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    val lore = stack.getLore()
+        if (SkyHanniMod.feature.inventory.statsTuningSelectedTemplate && chestName == "Stats Tuning") {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                val lore = stack.getLore()
 
-                    if (lore.any { it == "§aCurrently selected!" }) {
-                        slot highlight LorenzColor.GREEN
-                    }
+                if (lore.any { it == "§aCurrently selected!" }) {
+                    slot highlight LorenzColor.GREEN
                 }
             }
         }

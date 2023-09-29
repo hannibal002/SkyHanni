@@ -26,9 +26,7 @@ class ServerRestartTitle {
                 val minutes = group("minutes").toInt()
                 val seconds = group("seconds").toInt()
                 val totalSeconds = minutes * 60 + seconds
-                if (totalSeconds > 120) {
-                    if (totalSeconds % 30 != 0) return
-                }
+                if (totalSeconds > 120 && totalSeconds % 30 != 0) return
                 val time = TimeUtils.formatDuration(totalSeconds.toLong() * 1000)
                 TitleUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
             }

@@ -13,10 +13,8 @@ fun drawString(
     y: Int,
     color: Int,
 ): Int {
-    if (SkyHanniMod.feature.misc.hideScoreboardNumbers) {
-        if (text.startsWith("§c") && text.length <= 4) {
-            return 0
-        }
+    if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+        return 0
     }
     if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
         piggyPattern.matchMatcher(text) {

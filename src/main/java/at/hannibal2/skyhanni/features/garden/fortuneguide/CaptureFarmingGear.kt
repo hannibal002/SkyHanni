@@ -136,33 +136,25 @@ class CaptureFarmingGear {
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName_old().split(";")
-                if (split.first() == "ELEPHANT") {
-                    if (split.last().toInt() > highestElephantRarity) {
-                        farmingItems[FarmingItems.ELEPHANT] = item
-                        outdatedItems[FarmingItems.ELEPHANT] = false
-                        highestElephantRarity = split.last().toInt()
-                    }
+                if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
+                    farmingItems[FarmingItems.ELEPHANT] = item
+                    outdatedItems[FarmingItems.ELEPHANT] = false
+                    highestElephantRarity = split.last().toInt()
                 }
-                if (split.first() == "MOOSHROOM_COW") {
-                    if (split.last().toInt() > highestMooshroomRarity) {
-                        farmingItems[FarmingItems.MOOSHROOM_COW] = item
-                        outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                        highestMooshroomRarity = split.last().toInt()
-                    }
+                if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
+                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                    outdatedItems[FarmingItems.MOOSHROOM_COW] = false
+                    highestMooshroomRarity = split.last().toInt()
                 }
-                if (split.first() == "RABBIT") {
-                    if (split.last().toInt() > highestRabbitRarity) {
-                        farmingItems[FarmingItems.RABBIT] = item
-                        outdatedItems[FarmingItems.RABBIT] = false
-                        highestRabbitRarity = split.last().toInt()
-                    }
+                if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
+                    farmingItems[FarmingItems.RABBIT] = item
+                    outdatedItems[FarmingItems.RABBIT] = false
+                    highestRabbitRarity = split.last().toInt()
                 }
-                if (split.first() == "BEE") {
-                    if (split.last().toInt() > highestBeeRarity) {
+                if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
                         farmingItems[FarmingItems.BEE] = item
                         outdatedItems[FarmingItems.BEE] = false
                         highestBeeRarity = split.last().toInt()
-                    }
                 }
             }
         }

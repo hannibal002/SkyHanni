@@ -66,9 +66,7 @@ object TimeUtils {
                 }
 
                 count++
-                if (maxUnits != -1) {
-                    if (count == maxUnits) break
-                }
+                if (maxUnits != -1 && count == maxUnits) break
             }
         }
         return builder.toString().trim()

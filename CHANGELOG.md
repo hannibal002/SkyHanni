@@ -42,9 +42,9 @@
     + No need to open the calendar every SkyBlock year again.
     + Grab Jacob Contest data from the elitebot.dev website.
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
-+ Added **SkyHanni Installer** - NetheriteMiner
++ Added SkyHanni **Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
-+ Added Chat Translator - NetheriteMiner
++ Added Chat **Translator** - NetheriteMiner
     + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
@@ -86,7 +86,27 @@
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
 + Added Fishing Hook Display. - hannibal2
-    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.
+    + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
+      screen.
++ Added **Trevor the Trapper Tracker**. - CalMWolfs
+    + Quests done
+    + A breakdown of their rarity
+    + Animals killed vs. animals that kill themselves
+    + Pelts per hour
++ Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
++ Added a countdown for Arachne spawn. - Cad
++ Added **Sack Change** chat message hider. - hannibal2
+    + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
+      data for future features.
++ Added dungeon information to the Discord RPC. - NetheriteMiner
+    + Show the current floor name.
+    + Time since the dungeon started.
+    + Number of boss collections of the current boss.
++ Added a Dynamic Priority Box to Discord RPC. - NetheriteMiner
+    + Change the order or disable dynamically rendered features (e.g. Slayer, Dungeon, Crop Milestone, Stacking
+      Enchantment)
++ Dungeon Colored Class Level. - hannibal2
+    + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
 
 ### Changes
 
@@ -144,6 +164,25 @@
 + Moving many GUI elements in the config around. - hannibal2
     + This will not reset anything.
     + This includes the creation of new categories and regrouping.
++ Better Trevor the Trapper detection. - CalMWolfs
++ Show Trevor the Trapper's mob name next to the waypoint. - CalMWolfs
++ Small performance improvements when working with color codes. - brainage04
++ Added dungeon mage cooldown reduction support for item ability cooldown. - Cad
++ Improved the wording and fixed typos of the config category descriptions. - zapteryx
++ Changed the option in the pet experience tooltip to show progress to level 100 for golden dragon eggs (can be
+  disabled). - hannibal2
++ Replaces the word Tps to TPS. - Erymanthus
++ Improved performance of item ability cooldown and farming fortune display data. - Cad
+    + The item flickering for ability cooldown background should be less/gone completely.
++ Added the ability to bypass not clickable items when holding the control key. - CalMWolfs
++ Croesus Chest Tracker can now determine chest that only can be open with a dungeon key - Thunderblade73
++ Added armor drops to the Money per Hour display. - CalMWolfs
++ Croesus chest highlight now uses different colors for Dungeon Chest Key-only chests. - Thunderblade73
++ Added support to change the scale of GUI elements with plus and minus keys. - CalMWolfs
++ Ignoring non-slayer drops in the slayer profit tracker. - hannibal2
++ Added support for slayer drops that go directly into the sack. - hannibal2
+    + This still does not work for items that land directly in your inventory. (e.g., Netherrack-Looking Sunshade,
+    Summoning Eye, etc.)
 
 ### Fixes
 
@@ -236,6 +275,25 @@
 + Fixed that the Paste Into Sign feature only pastes into the first line. - hannibal2 + nea
 + Hopefully fixed rare config reset cases. - nea
 + This should also fix problems with false positive detections in the crimson isle.
++ Fixed item rarity problems. - hannibal2
++ Fixed a rare error when opening minion inventory. - hannibal2
++ Fixed stuff in the **Trozen Treasure Tracker**. - CalMWolfs
+    + The ice/hour calculation
+    + Rate Timer
+    + Typos
++ Fixed a small typo in the config. - hannibal2
++ Fixed inconsistencies with Arachne brood highlighting. - Cad
++ Fixed Crimson Reputation Helper doesn't count trophy fish when sacks exist. - Fix3dll
++ Fixed a rare error when switching to a dicer farming tool too quickly. - Cad
++ Added workaround for new fire sale cosmetics (pet skin, helmet skin, rune) in estimated item value. - hannibal2
++ Fixed garden visitors not highlighting on status "new". - hannibal2
++ Fixed wrongly highlighting enchanted sacks for reputation helper fetch quests. - hannibal2
++ Fixed Fragged Spirit Mask not showing a cooldown after being triggered. - Cad
++ Fixed item rarity problems with very special. - hannibal2
++ Fixed party member detection issues for the tab complete feature. - CalMWolfs
++ Hide item rarity error message in /ff. - hannibal2
++ Fixed an issue with the Wheat Profit Display not showing the correct value when combined with seeds. - Thunderblade73
++ Tab complte party members now also detects if the party leader leaves. - CalMWolfs
 
 ### Removed Features
 
@@ -436,6 +494,12 @@
 + Fixed farming contest calendar reading going above 100% - Contrabass26
 + Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
 + Fixed rare bug with Damage Indicator
++ Fixed showing skill level as item stack being broken for level 0. - Erymanthus
++ Fixed ability cooldown not working for some items. - Cad
++ Fixed Bazaar item category "Ink Sack" gets wrongly detected as an item sack. - Erymanthus
++ Fixed reforge stone "Pitchin' Koi" not detected in the Estimated Item Value. - Fix3dll
++ Minion Craft Helper now ignores Inferno and Vampire minions as well. - walker
++ Better wording in the auto updater. - zapteryx
 
 ## Version 0.18 (2023-06-19)
 

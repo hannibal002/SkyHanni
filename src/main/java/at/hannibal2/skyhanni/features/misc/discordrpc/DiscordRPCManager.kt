@@ -17,7 +17,8 @@ import com.jagrosh.discordipc.entities.RichPresence
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit

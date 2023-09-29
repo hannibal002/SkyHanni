@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
+import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -14,6 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PetExpTooltip {
     private val config get() = SkyHanniMod.feature.misc.petExperienceToolTip
+    private val level100Common = 5_624_785
+    private val level100Legendary = 25_353_230
+    private val level200 = 210_255_385
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onItemTooltipLow(event: ItemTooltipEvent) {
@@ -27,8 +33,7 @@ class PetExpTooltip {
 
         val index = findIndex(event.toolTip) ?: return
 
-        val maxLevel = ItemUtils.maxPetLevel(name)
-        val maxXp = maxPetExp(name) // lvl 100 legendary
+        val (maxLevel, maxXp) = getMaxValues(name, petExperience)
 
         val percentage = petExperience / maxXp
         val percentageFormat = LorenzUtils.formatPercentage(percentage)
@@ -60,10 +65,20 @@ class PetExpTooltip {
         return null
     }
 
-    private fun maxPetExp(petName: String) = when {
-        petName.contains("Golden Dragon") && config.goldenDragon200 -> 210_255_385 // lvl 200 legendary
-        petName.contains("Bingo") -> 5_624_785 // lvl 100 common
+    private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {
+        val useGoldenDragonLevels =
+            petName.contains("Golden Dragon") && (!config.showGoldenDragonEgg || petExperience >= level100Legendary)
 
-        else -> 25_353_230 // lvl 100 legendary
+        val maxLevel = if (useGoldenDragonLevels) 200 else 100
+
+        val maxXp = when {
+            useGoldenDragonLevels -> level200 // lvl 200 legendary
+            petName.contains("Bingo") -> level100Common
+
+            else -> level100Legendary
+        }
+
+        return Pair(maxLevel, maxXp)
     }
+
 }
