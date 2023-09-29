@@ -3,14 +3,13 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
+import at.hannibal2.skyhanni.utils.OSUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
-import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import java.util.*
+import java.util.IdentityHashMap
 
 object GardenCustomKeybinds {
     private val shConfig get() = SkyHanniMod.feature.garden
@@ -49,21 +48,12 @@ object GardenCustomKeybinds {
         return true
     }
 
-    private fun isHeld(keyCode: Int): Boolean {
-        if (keyCode == 0) return false
-        return if (keyCode < 0) {
-            Mouse.isButtonDown(keyCode + 100)
-        } else {
-            Keyboard.isKeyDown(keyCode)
-        }
-    }
-
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
         val override = map[keyBinding] ?: return
         val keyCode = override()
-        cir.returnValue = isHeld(keyCode)
+        cir.returnValue = OSUtils.isKeyHeld(keyCode)
     }
 
     @JvmStatic

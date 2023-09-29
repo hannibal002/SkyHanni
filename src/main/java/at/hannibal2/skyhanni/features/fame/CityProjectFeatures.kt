@@ -1,18 +1,27 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -28,7 +37,7 @@ class CityProjectFeatures {
     private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
 
     companion object {
-        private val config get() = SkyHanniMod.feature.misc.cityProject
+        private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
             LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
@@ -150,12 +159,10 @@ class CityProjectFeatures {
             if (line == "") break
             if (line.contains("Bits")) break
 
-            val (name, amount) = ItemUtils.readItemAmount(line)
-            if (name != null) {
-                val internalName = NEUItems.getRawInternalName(name)
-                val old = materials.getOrPut(internalName) { 0 }
-                materials[internalName] = old + amount
-            }
+            val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
+            val internalName = NEUItems.getRawInternalName(name)
+            val old = materials.getOrPut(internalName) { 0 }
+            materials[internalName] = old + amount
         }
     }
 
@@ -190,5 +197,10 @@ class CityProjectFeatures {
                 slot highlight LorenzColor.YELLOW
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.cityProject", "event.cityProject")
     }
 }

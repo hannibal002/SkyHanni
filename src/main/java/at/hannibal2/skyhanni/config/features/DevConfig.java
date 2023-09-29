@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
@@ -25,7 +30,7 @@ public class DevConfig {
     public boolean debugEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Command Logging", desc = "Logs stack trace information into the console when a command gets sent to hypixel. (by any mod or the player)")
+    @ConfigOption(name = "Command Logging", desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean commandLogs = false;
@@ -33,7 +38,7 @@ public class DevConfig {
     @Expose
     @ConfigOption(
             name = "Mod Menu Log",
-            desc = "Enables debug messages when the currently opened gui changes, with the path to the gui class. " +
+            desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
                     "Useful for adding more mods to quick mod menu switch."
     )
     @ConfigEditorBoolean
@@ -41,37 +46,55 @@ public class DevConfig {
     public boolean modMenuLog = false;
 
     @Expose
-    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lore.")
+    @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showInternalName = false;
 
     @Expose
-    @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even for items with none.")
+    @ConfigOption(name = "Show Empty Internal Names", desc = "Shows internal name even for items with none.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showEmptyNames = false;
 
     @Expose
-    @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items. in the lore.")
+    @ConfigOption(name = "Show Item Rarity", desc = "Show item rarities in item lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showItemRarity = false;
+
+    @Expose
+    @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 0)
+    public int copyInternalName = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showNpcPrice = false;
+
+    @Expose
+    @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showItemUuid = false;
 
     @Expose
-    @ConfigOption(name = "Copy NBT data", desc = "Copies compressed NBT data on key press in a GUI")
+    @ConfigOption(name = "Copy NBT Data", desc = "Copies compressed NBT data on key press in a GUI")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     @ConfigAccordionId(id = 0)
     public int copyNBTDataCompressed = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed xp needed from rng meter inventories in json format into the clipboard.")
+    @ConfigOption(name = "Copy RNG Meter", desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyRngMeter = false;
 
     @Expose
-    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the besiary data from the inventory as json in clipboard.")
+    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the besiary data from the inventory as json to clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyBestiaryData = false;
@@ -113,6 +136,9 @@ public class DevConfig {
 
     @Expose
     public Position debugPos = new Position(10, 10, false, true);
+
+    @Expose
+    public Position debugLocationPos = new Position(1, 160, false, true);
 
     @Expose
     @ConfigOption(name = "Minecraft Console", desc = "")

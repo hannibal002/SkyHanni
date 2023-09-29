@@ -236,7 +236,7 @@ object GuiRenderUtils {
         GlStateManager.scale(textScale, textScale, 1f)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
         drawString(
-            "§2$current / ${DecimalFormat("0.#").format(maxValue)}☘",
+            "§2$current / ${DecimalFormat("0.##").format(maxValue)}☘",
             xPos * inverseScale,
             (yPos + 8) * inverseScale
         )
@@ -254,12 +254,10 @@ object GuiRenderUtils {
             if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor
         )
 
-        if (tooltip != "") {
-            if (isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
-                val split = tooltip.split("\n")
-                for (line in split) {
-                    output.add(line)
-                }
+        if (tooltip != "" && isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
+            val split = tooltip.split("\n")
+            for (line in split) {
+                output.add(line)
             }
         }
     }

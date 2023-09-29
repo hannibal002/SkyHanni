@@ -6,7 +6,16 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.bingo.nextstep.*
+import at.hannibal2.skyhanni.features.bingo.nextstep.ChatMessageStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.CollectionStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.CraftStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.IslandVisitStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.ItemsStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.NextStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.ObtainCrystalStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.PartialProgressItemsStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.ProgressionStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.SkillLevelStep
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,7 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoNextStepHelper {
-    private val config get() = SkyHanniMod.feature.bingo.bingoCard
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
 
     private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
@@ -75,10 +84,8 @@ class BingoNextStepHelper {
                 }
             }
 
-            if (!step.done && !parentDone && requirementsToDo == 0) {
-                if (!currentSteps.contains(step)) {
+            if (!step.done && !parentDone && requirementsToDo == 0 && !currentSteps.contains(step)) {
                     currentSteps = currentSteps.editCopy { add(step) }
-                }
             }
         }
 
@@ -322,7 +329,7 @@ class BingoNextStepHelper {
 
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
-        // TODO add skyblock level requirement
+        // TODO add SkyBlock level requirement
 //        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
         IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
 
@@ -336,7 +343,6 @@ class BingoNextStepHelper {
             "Combat",
             12
         ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
-
 //        enchantedCharcoal(7)
 //        compactor(7)
     }

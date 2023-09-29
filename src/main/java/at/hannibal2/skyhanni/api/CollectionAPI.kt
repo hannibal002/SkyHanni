@@ -71,7 +71,7 @@ class CollectionAPI {
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
-        fun getCollectionCounter(internalName: NEUInternalName) = collectionValue[internalName]
+        fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 
         // TODO add support for replenish (higher collection than actual items in inv)
         fun addFromInventory(internalName: NEUInternalName, amount: Int) {

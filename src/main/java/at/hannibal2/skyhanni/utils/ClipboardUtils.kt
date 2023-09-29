@@ -11,8 +11,6 @@ import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
-import java.util.*
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 object ClipboardUtils {
@@ -26,20 +24,12 @@ object ClipboardUtils {
         return result
     }
 
-    private fun runDelayed(duration: Duration, runnable: () -> Unit) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runnable()
-            }
-        }, duration.inWholeMilliseconds)
-    }
-
     private suspend fun getClipboard(): Clipboard? {
         val deferred = CompletableDeferred<Clipboard?>()
         if (canAccessClibpard()) {
             deferred.complete(Toolkit.getDefaultToolkit().systemClipboard)
         } else {
-            runDelayed(5.milliseconds) {
+            LorenzUtils.runDelayed(5.milliseconds) {
                 SkyHanniMod.coroutineScope.launch {
                     deferred.complete(getClipboard())
                 }

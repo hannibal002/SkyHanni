@@ -14,7 +14,6 @@ class RenderGuiData {
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
-//        if (!ProfileStorage.loaded) return
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui()) return
 
@@ -23,7 +22,6 @@ class RenderGuiData {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
-//        if (!ProfileStorage.loaded) return
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return

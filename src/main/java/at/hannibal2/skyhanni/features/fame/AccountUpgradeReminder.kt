@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -72,9 +76,10 @@ class AccountUpgradeReminder {
         if (!inInventory) return
         val clickedItemLore = event.slot?.stack?.getLore() ?: return
         if (clickedItemLore.getOrNull(0) != "§8Account Upgrade") return
-        duration = clickedItemLore.firstNotNullOf {
+        val result = clickedItemLore.firstNotNullOfOrNull {
             durationRegex.matchEntire(it)
-        }.groups[1]!!.value.toInt().days
+        } ?: return
+        duration = result.groups[1]!!.value.toInt().days
     }
 
     @SubscribeEvent

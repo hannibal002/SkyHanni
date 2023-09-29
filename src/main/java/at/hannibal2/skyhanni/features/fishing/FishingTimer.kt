@@ -4,12 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
 class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing
@@ -33,7 +39,7 @@ class FishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
-        if (Keyboard.isKeyDown(config.manualResetTimer)) startTime = System.currentTimeMillis()
+        if (OSUtils.isKeyHeld(config.manualResetTimer)) startTime = System.currentTimeMillis()
     }
 
     private fun tryPlaySound() {
@@ -64,14 +70,24 @@ class FishingTimer {
     }
 
     private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
-        .count { entity -> SeaCreatureManager.allFishingMobNames.any { entity.name.contains(it) } }
+        .map { entity ->
+            val name = entity.name
+            val isSummonedSoul = name.contains("'")
+            val hasFishingMobName = SeaCreatureManager.allFishingMobNames.any { name.contains(it) }
+            if (hasFishingMobName && !isSummonedSoul) {
+                if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
+            } else 0
+        }.sum()
 
     private fun isRightLocation(): Boolean {
+        inHollows = false
+
+        if (config.barnTimerForStranded && LorenzUtils.isStrandedProfile) return true
+
         if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             inHollows = true
             return true
         }
-        inHollows = false
 
         if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50

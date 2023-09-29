@@ -1,15 +1,22 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
@@ -19,15 +26,19 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.GemstoneSlotType
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
@@ -48,11 +59,16 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.moulconfig.internal.KeybindHelper
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
+import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
+import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.File
+import java.util.Locale
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -60,12 +76,28 @@ object EstimatedItemValue {
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
+    private var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
+
+        if (data != null)
+        // item_internal_names -> gemstone_slots -> ingredients_array
+            gemstoneUnlockCosts =
+                ConfigManager.gson.fromJson(
+                    data,
+                    object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+                )
+        else
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
-        if (!KeybindHelper.isKeyDown(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
+        if (!OSUtils.isKeyHeld(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
@@ -188,6 +220,7 @@ object EstimatedItemValue {
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
         totalPrice += addDrillUpgrades(stack, list)
+        totalPrice += addGemstoneSlotUnlockCost(stack, list)
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
         return Pair(totalPrice, basePrice)
@@ -254,23 +287,64 @@ object EstimatedItemValue {
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        var rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
-            val stone = values.asJsonObject
-            val reforgeName = stone.get("reforgeName").asString
+            val stoneJson = values.asJsonObject
+            val reforgeName = stoneJson.get("reforgeName").asString
             if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
                 val internalName = rawInternalName.asInternalName()
-                val price = internalName.getPrice()
-                val name = internalName.getItemName()
+                val reforgeStonePrice = internalName.getPrice()
+                val reforgeStoneName = internalName.getItemName()
+
+                val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
+                val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
+
                 val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
                 list.add("§7Reforge: §9$realReforgeName")
-                list.add("  §7($name §6" + NumberUtil.format(price) + "§7)")
-                return price
+                list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
+                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
+                return reforgeStonePrice + applyCost
             }
         }
 
         return 0.0
+    }
+
+    private fun getReforgeStoneApplyCost(
+        stack: ItemStack,
+        reforgeCosts: JsonObject,
+        reforgeStone: NEUInternalName
+    ): Int? {
+        var itemRarity = stack.getItemRarityOrNull() ?: return null
+
+        // Catch cases of special or very special
+        if (itemRarity > LorenzRarity.MYTHIC) {
+            itemRarity = LorenzRarity.LEGENDARY
+        } else {
+            if (stack.isRecombobulated()) {
+                val oneBelow = itemRarity.oneBelow()
+                if (oneBelow == null) {
+                    CopyErrorCommand.logErrorState(
+                        "Wrong item rarity detected in estimated item value for item ${stack.name}",
+                        "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
+                    )
+                    return null
+                }
+                itemRarity = oneBelow
+            }
+        }
+        val rarityName = itemRarity.name
+        if (!reforgeCosts.has(rarityName)) {
+            val reforgesFound = reforgeCosts.entrySet().map { it.key }
+            CopyErrorCommand.logErrorState(
+                "Can not calculate reforge cost for item ${stack.name}",
+                "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
+            )
+            return null
+        }
+
+        return reforgeCosts[rarityName].asInt
     }
 
     private fun addRecomb(stack: ItemStack, list: MutableList<String>): Double {
@@ -383,8 +457,8 @@ object EstimatedItemValue {
     private fun addSilex(stack: ItemStack, list: MutableList<String>): Double {
         val tier = stack.getSilexCount() ?: return 0.0
 
-        val internalName = stack.getInternalName_old()
-        val maxTier = if (internalName == "STONK_PICKAXE") 4 else 5
+        val internalName = stack.getInternalName()
+        val maxTier = if (internalName == "STONK_PICKAXE".asInternalName()) 4 else 5
 
         val wtfHardcodedSilex = "SIL_EX".asInternalName()
         val price = wtfHardcodedSilex.getPrice() * tier
@@ -469,8 +543,12 @@ object EstimatedItemValue {
         val internalName = stack.getHelmetSkin() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Skin: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -478,8 +556,12 @@ object EstimatedItemValue {
         val internalName = stack.getArmorDye() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Dye: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -487,9 +569,18 @@ object EstimatedItemValue {
         val internalName = stack.getRune() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Rune: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getItemNameOrNull()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Rune: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
+    }
+
+    private fun NEUInternalName.getNameOrRepoError(): String? {
+        val stack = getItemStackOrNull() ?: return null
+        return stack.nameWithEnchantment ?: "§cItem Name Error"
     }
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
@@ -551,8 +642,8 @@ object EstimatedItemValue {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5) {
-                if (internalName in hasAlwaysScavenger) continue
+            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
             }
 
             var level = rawLevel
@@ -639,6 +730,60 @@ object EstimatedItemValue {
             list.add("§7Gemstones: §6" + NumberUtil.format(totalPrice))
             list += priceMap.sortedDesc().keys
         }
+        return totalPrice
+    }
+
+    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalName()
+
+        // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
+        val unlockedSlots =
+            stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+
+        // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
+//        if (unlockedSlots == "null") return 0.0
+
+        val priceMap = mutableMapOf<String, Double>()
+        if (gemstoneUnlockCosts.isEmpty()) return 0.0
+
+        if (internalName !in gemstoneUnlockCosts) {
+            CopyErrorCommand.logErrorState(
+                "Could not find gemstone slot price for ${stack.name}",
+                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
+            )
+            return 0.0
+        }
+
+        var totalPrice = 0.0
+        val slots = gemstoneUnlockCosts[internalName] ?: return 0.0
+        for (slot in slots) {
+            if (!unlockedSlots.contains(slot.key)) continue
+
+            val previousTotal = totalPrice
+            for (ingredients in slot.value) {
+                val ingredient = Ingredient(manager, ingredients)
+
+                totalPrice += if (ingredient.isCoins) {
+                    ingredient.count
+                } else {
+                    getPrice(ingredient.internalItemId) * ingredient.count
+                }
+            }
+
+            val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
+            val colorCode = GemstoneSlotType.getColorCode(splitSlot[0])
+            val formattedPrice = NumberUtil.format(totalPrice - previousTotal)
+
+            // eg. SAPPHIRE_1 -> Sapphire Slot 2
+            val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
+                    // If the slot index is 0, we don't need to specify
+                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+
+            priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
+        }
+
+        list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
+        list += priceMap.sortedDesc().keys
         return totalPrice
     }
 }

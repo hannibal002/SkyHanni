@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
@@ -26,7 +31,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -96,14 +101,9 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (inComposterUpgrades) {
-            if (extraComposterUpgrade != null) {
-//                if (System.currentTimeMillis() > lastHovered + 30) {
-                if (System.currentTimeMillis() > lastHovered + 200) {
-                    extraComposterUpgrade = null
-                    update()
-                }
-            }
+        if (inComposterUpgrades && extraComposterUpgrade != null && System.currentTimeMillis() > lastHovered + 200) {
+            extraComposterUpgrade = null
+            update()
         }
     }
 
@@ -201,9 +201,9 @@ class ComposterOverlay {
         val matterPer = ComposterAPI.organicMatterRequiredPer(null)
         val matterPerPreview = ComposterAPI.organicMatterRequiredPer(upgrade)
 
-        val matterMaxDuration = ComposterAPI.timePerCompost(null) * (maxOrganicMatter / matterPer)
+        val matterMaxDuration = ComposterAPI.timePerCompost(null) * floor(maxOrganicMatter / matterPer)
         val matterMaxDurationPreview =
-            ComposterAPI.timePerCompost(upgrade) * (maxOrganicMatterPreview / matterPerPreview)
+            ComposterAPI.timePerCompost(upgrade) * floor(maxOrganicMatterPreview / matterPerPreview)
 
         var format = formatTime(matterMaxDuration)
         var formatPreview =
@@ -217,9 +217,9 @@ class ComposterOverlay {
         val fuelRequiredPer = ComposterAPI.fuelRequiredPer(null)
         val fuelRequiredPerPreview = ComposterAPI.fuelRequiredPer(upgrade)
 
-        val fuelMaxDuration = ComposterAPI.timePerCompost(null) * (maxFuel / fuelRequiredPer)
+        val fuelMaxDuration = ComposterAPI.timePerCompost(null) * floor(maxFuel / fuelRequiredPer)
         val fuelMaxDurationPreview =
-            ComposterAPI.timePerCompost(upgrade) * (maxFuelPreview / fuelRequiredPerPreview)
+            ComposterAPI.timePerCompost(upgrade) * floor(maxFuelPreview / fuelRequiredPerPreview)
 
         format = formatTime(fuelMaxDuration)
         formatPreview =
@@ -350,8 +350,8 @@ class ComposterOverlay {
 
 
         val priceCompost = getPrice("COMPOST")
-        val profit = (priceCompost - (fuelPricePer + organicMatterPricePer)) * multiplier
-        val profitPreview = (priceCompost - (fuelPricePerPreview + organicMatterPricePerPreview)) * multiplierPreview
+        val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
+        val profitPreview = ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
         val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + NumberUtil.format(profitPreview) else ""
         val profitFormat = " §7Profit per $timeText: §6${NumberUtil.format(profit)}$profitFormatPreview"

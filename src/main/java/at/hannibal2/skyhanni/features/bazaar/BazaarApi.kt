@@ -1,11 +1,20 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
@@ -20,6 +29,8 @@ class BazaarApi {
         val holder = BazaarDataHolder()
         var inBazaarInventory = false
         private var currentSearchedItem = ""
+
+        var currentlyOpenedProduct: NEUInternalName? = null
 
         fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
 
@@ -45,6 +56,21 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
+        if (inBazaarInventory) {
+            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+            currentlyOpenedProduct = openedProduct
+            BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
+        }
+    }
+
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+        val buyInstantly = inventoryItems[10] ?: return null
+
+        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        val bazaarItem = inventoryItems[13] ?: return null
+
+        val itemName = bazaarItem.displayName
+        return NEUItems.getInternalNameOrNull(itemName)
     }
 
     @SubscribeEvent
@@ -118,5 +144,6 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
+        currentlyOpenedProduct = null
     }
 }

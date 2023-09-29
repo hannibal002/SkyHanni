@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -28,7 +28,7 @@ class GardenCropMilestoneFix {
 
             val tier = group("tier").romanToDecimalIfNeeded()
 
-            val crops = GardenCropMilestones.getCropsForTier(tier)
+            val crops = GardenCropMilestones.getCropsForTier(tier, crop)
             changedValue(crop, crops, "level up chat message", 0)
         }
     }
@@ -49,12 +49,6 @@ class GardenCropMilestoneFix {
 
     private fun check(cropName: String, tier: Int, percentage: Double) {
         if (!ProfileStorageData.loaded) return
-        val baseCrops = GardenCropMilestones.getCropsForTier(tier)
-        val next = GardenCropMilestones.getCropsForTier(tier + 1)
-        val progressCrops = next - baseCrops
-
-        val progress = progressCrops * (percentage / 100)
-        val smallestPercentage = progressCrops * 0.0005
 
         val crop = CropType.getByNameOrNull(cropName)
         if (crop == null) {
@@ -62,13 +56,18 @@ class GardenCropMilestoneFix {
             return
         }
 
+        val baseCrops = GardenCropMilestones.getCropsForTier(tier, crop)
+        val next = GardenCropMilestones.getCropsForTier(tier + 1, crop)
+        val progressCrops = next - baseCrops
+
+        val progress = progressCrops * (percentage / 100)
+        val smallestPercentage = progressCrops * 0.0005
+
         val tabListValue = baseCrops + progress - smallestPercentage
 
         val newValue = tabListValue.toLong()
-        if (tabListCropProgress[crop] != newValue) {
-            if (tabListCropProgress.containsKey(crop)) {
-                changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
-            }
+        if (tabListCropProgress[crop] != newValue && tabListCropProgress.containsKey(crop)) {
+            changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
         }
         tabListCropProgress[crop] = newValue
     }

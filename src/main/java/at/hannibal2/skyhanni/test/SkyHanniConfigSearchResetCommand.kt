@@ -220,12 +220,8 @@ object SkyHanniConfigSearchResetCommand {
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
-            if (newObj != null) {
-                if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double) {
-                    if (newObj !is Position && !newObj.javaClass.isEnum) {
-                        map.putAll(loadAllFields(fieldName, newObj, depth + 1))
-                    }
-                }
+            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum) {
+                map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }
 
@@ -263,7 +259,8 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Position) {
             val x = javaClass.getDeclaredField("x").makeAccessible().get(this)
             val y = javaClass.getDeclaredField("y").makeAccessible().get(this)
-            return "($x, $y)"
+            val scale = javaClass.getDeclaredField("scale").makeAccessible().get(this)
+            return "($x, $y, $scale)"
         }
 
         if (this is String) {

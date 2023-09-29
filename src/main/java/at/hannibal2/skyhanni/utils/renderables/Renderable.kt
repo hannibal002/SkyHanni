@@ -8,6 +8,7 @@ import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -17,12 +18,13 @@ import kotlin.math.max
 interface Renderable {
     val width: Int
     val height: Int
-    fun isHovered(posX: Int, posY: Int) =
-        Utils.getMouseX() in (posX..posX + width)
-            && Utils.getMouseY() in (posY..posY + height) // TODO: adjust for variable height?
+    fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (posX..posX + width)
+                && y in (posY..posY + height) // TODO: adjust for variable height?
+    } ?: false
 
     /**
-     * N.B.: the offset is absolute, not relative to the position and shouldn't be used for rendering
+     * Pos x and pos y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
      */
     fun render(posX: Int, posY: Int)
@@ -30,6 +32,19 @@ interface Renderable {
     companion object {
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
+
+        var currentRenderPassMousePosition: Pair<Int, Int>? = null
+            private set
+
+        fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
+            val last = currentRenderPassMousePosition
+            try {
+                currentRenderPassMousePosition = Pair(posX, posY)
+                return block()
+            } finally {
+                currentRenderPassMousePosition = last
+            }
+        }
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -90,17 +105,22 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
-                    if (isDown > wasDown && isHovered(posX, posY)) {
-                        if (condition() && shouldAllowLink(true, bypassChecks)) {
-                            onClick()
-                        }
+                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                        onClick()
                     }
                     wasDown = isDown
                     render.render(posX, posY)
                 }
             }
 
-        fun hoverTips(text: String, tips: List<String>, indexes: List<Int> = listOf(), stack: ItemStack? = null, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+        fun hoverTips(
+            text: String,
+            tips: List<String>,
+            indexes: List<Int> = listOf(),
+            stack: ItemStack? = null,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable {
 
             val render = string(text)
             return object : Renderable {
@@ -113,7 +133,16 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             list[Pair(posX, posY)] = indexes
-                            RenderLineTooltips.drawHoveringText(posX, posY, tips, stack)
+                            GlStateManager.pushMatrix()
+                            GlStateManager.translate(0F, 0F, 400F)
+
+                            RenderLineTooltips.drawHoveringText(
+                                posX, posY, tips,
+                                stack,
+                                currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
+                                currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                            )
+                            GlStateManager.popMatrix()
                         }
                     } else {
                         if (list.contains(Pair(posX, posY))) {
@@ -190,7 +219,11 @@ interface Renderable {
             override val height = 10
 
             override fun render(posX: Int, posY: Int) {
+                GlStateManager.pushMatrix()
+                if (Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen is GuiChat)
+                    GlStateManager.translate(0F, 0F, -145F)
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
+                GlStateManager.popMatrix()
             }
         }
 
