@@ -463,7 +463,7 @@ public class InventoryConfig {
                         "§bVisitor's Logbook Countdown (#, highest unit of time only)",
                         "§bVisitor Milestones Progress (%)",
                         "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
-                        "§bComposter \"Insert from Sack\" Utilities (Abbv)"
+                        "§bComposter \"Insert from \" Counts (Abbv)"
                 }
         )
         public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2));

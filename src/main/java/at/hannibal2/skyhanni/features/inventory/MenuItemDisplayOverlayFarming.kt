@@ -100,15 +100,17 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(4) && (chestName == "Composter")) {
             val lore = item.getLore()
-            if (itemName.contains("Insert") && itemName.contains("from Sacks")) {
-                if ((lore.any { it.contains("In your sacks: ") }) && !(lore.any { it.contains("No") })) {
+            if (itemName.contains("Insert") && itemName.contains("from ")) {
+                if ((lore.any { (it.contains("Totalling")) })) {
                     for (line in lore) {
-                        if (line.contains("In your sacks: ") && !line.contains("No")) {
+                        if (line.contains("Totalling")) {
+                            //§7Totalling §e§e908 Organic Matter§7.
+                            //Totalling 908 Organic Matter.
                             if (itemName.contains(" Crops ")) {
-                                line.removeColor().between("In your sacks: ", "Organic Matter")
+                                line.removeColor().between("Totalling ", " Organic Matter.")
                             }
                             if (itemName.contains(" Fuel ")) {
-                                line.removeColor().between("In your sacks: ", "Fuel")
+                                line.removeColor().between("Totalling ", " Fuel.")
                             }
                         }
                     }
