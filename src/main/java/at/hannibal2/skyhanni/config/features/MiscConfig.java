@@ -310,7 +310,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Enable Data Tracker",
                 desc = "Tracks all of your data from doing Trevor Quests.\n" +
-                        "Shows based on the setting below"
+                        "Shows based on the setting below."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -320,7 +320,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Show Between Quests",
                 desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                        "Will show in the Trapper's Den regardless. §cRequires Enable Data Tracker above."
+                        "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
         )
         @ConfigEditorBoolean
         public boolean displayType = true;
