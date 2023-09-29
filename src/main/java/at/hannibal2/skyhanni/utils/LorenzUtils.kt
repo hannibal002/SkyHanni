@@ -547,6 +547,4 @@ object LorenzUtils {
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
-
-    fun <K, V> Map<K, V>.get(function: (K) -> Boolean) = entries.firstOrNull { function(it.key) }?.value
 }
