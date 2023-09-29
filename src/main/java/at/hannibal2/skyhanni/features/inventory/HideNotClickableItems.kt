@@ -337,7 +337,7 @@ class HideNotClickableItems {
 
         val name = stack.cleanName()
         reverseColor = true
-        if (ItemUtils.isSack(stack, name)) return false
+        if (ItemUtils.isSack(stack)) return false
 
 
         hideReason = "This item is not a sack!"
@@ -370,7 +370,7 @@ class HideNotClickableItems {
 
         val name = stack.cleanName()
 
-        if (ItemUtils.isSack(stack, name)) {
+        if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be traded!"
             return true
         }
@@ -497,7 +497,7 @@ class HideNotClickableItems {
 
         val name = stack.cleanName()
 
-        if (ItemUtils.isSack(stack, name)) {
+        if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be auctioned!"
             return true
         }
