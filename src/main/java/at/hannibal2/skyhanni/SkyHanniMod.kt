@@ -220,6 +220,7 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangGravityOrbs
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideDamageIndicator
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraChestWaypoints
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva

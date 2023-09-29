@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.config.features.GUIConfig;
 import at.hannibal2.skyhanni.config.features.GardenConfig;
 import at.hannibal2.skyhanni.config.features.InventoryConfig;
 import at.hannibal2.skyhanni.config.features.ItemAbilityConfig;
+import at.hannibal2.skyhanni.config.features.KuudraConfig;
 import at.hannibal2.skyhanni.config.features.MarkedPlayerConfig;
 import at.hannibal2.skyhanni.config.features.MiningConfig;
 import at.hannibal2.skyhanni.config.features.MinionsConfig;
