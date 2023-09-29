@@ -19,6 +19,8 @@ value class SimpleTimeMark(private val millis: Long) {
 
     fun isInPast() = timeUntil().isNegative()
 
+    fun isFarPast() = millis == 0L
+
     override fun toString(): String {
         if (millis == 0L) return "The Far Past"
         return Instant.ofEpochMilli(millis).toString()
