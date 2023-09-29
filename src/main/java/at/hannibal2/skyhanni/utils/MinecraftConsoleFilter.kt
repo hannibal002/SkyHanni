@@ -11,15 +11,6 @@ import org.apache.logging.log4j.core.Logger
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.message.Message
 
-// Constant values for filters to improve readability.
-// Format: CLASS_LINE (when applicable)
-private const val SCOREBOARD_229 = "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)"
-private const val SCOREBOARD_262 = "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
-private const val SCOREBOARD_218 = "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)"
-private const val SCOREBOARD_179 = "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)"
-private const val SCOREBOARD_198 = "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
-private const val SCOREBOARD_TEAM_EXISTS = "java.lang.IllegalArgumentException: A team with the name '"
-
 class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
@@ -122,30 +113,31 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
 
-        if (thrown != null && SkyHanniMod.feature.dev.filterScoreboardErrors) {
+        if (thrown != null) {
             val cause = thrown.cause
             if (cause != null && cause.stackTrace.isNotEmpty()) {
                 val first = cause.stackTrace[0]
                 if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
                     val firstName = first.toString()
-                    // Function: removeTeam
-                    if (firstName == SCOREBOARD_229 || firstName == SCOREBOARD_262) {
+                    if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
+                        firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
+                    ) {
                         filterConsole("NullPointerException at Scoreboard.removeTeam")
                         return Filter.Result.DENY
                     }
-                    // Function: createTeam
-                    if (firstName == SCOREBOARD_218) {
+                    if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
                         filterConsole("IllegalArgumentException at Scoreboard.createTeam")
                         return Filter.Result.DENY
                     }
-                    // Function: removeObjective
-                    if (firstName == SCOREBOARD_179 || firstName == SCOREBOARD_198) {
+                    if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
+                        firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
+                    ) {
                         filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
                         return Filter.Result.DENY
                     }
                 }
             }
-            if (thrown.toString().contains(SCOREBOARD_TEAM_EXISTS)) {
+            if (SkyHanniMod.feature.dev.filterScoreboardErrors && thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
                 filterConsole("IllegalArgumentException because scoreboard team already exists")
                 return Filter.Result.DENY
             }
