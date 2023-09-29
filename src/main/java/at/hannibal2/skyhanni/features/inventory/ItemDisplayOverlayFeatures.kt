@@ -263,9 +263,9 @@ class ItemDisplayOverlayFeatures {
             if (item.getLore().any { it.contains("Edition ") }) {
                 thatNumber = item.getEdition().toString()
             }
-            if (auctionNumber == "null" || auctionNumber == "") { return "" }
-            if (auctionNumber.length >= 4){ return "" }
-            else { return (auctionNumber) }
+            if (thatNumber == "null" || thatNumber == "") { return "" }
+            if (thatNumber.length >= 4){ return "" }
+            else { return (thatNumber) }
         }
 
         if (stackSizeConfig.contains(19)) {
