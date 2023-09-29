@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -351,9 +350,6 @@ class ItemDisplayOverlayFeatures {
                 }
                 val totalKillsNecessary = currentKillThresholdPerMobFamily * numberOfLines
                 val percent = (((killCount.toFloat()) / (totalKillsNecessary.toFloat())) * 100)
-                LorenzUtils.chat("kills necessary: ${totalKillsNecessary}")
-                LorenzUtils.chat("kills recorded: ${killCount}")
-                LorenzUtils.chat("the damn kill count percent: ${percent}")
                 return percent.toInt().toString()
             }
         }
