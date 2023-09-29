@@ -144,7 +144,9 @@ object SkyBlockItemModifierUtils {
             }.sortedBy { it.first }
         }
 
-    fun ItemStack.getReforgeName() = getAttributeString("modifier")
+    fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
+        if (it == "pitchin") "pitchin_koi" else it
+    }
 
     fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")
 

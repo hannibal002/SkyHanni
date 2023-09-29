@@ -175,6 +175,14 @@
 + Improved performance of item ability cooldown and farming fortune display data. - Cad
     + The item flickering for ability cooldown background should be less/gone completely.
 + Added the ability to bypass not clickable items when holding the control key. - CalMWolfs
++ Croesus Chest Tracker can now determine chest that only can be open with a dungeon key - Thunderblade73
++ Added armor drops to the Money per Hour display. - CalMWolfs
++ Croesus chest highlight now uses different colors for Dungeon Chest Key-only chests. - Thunderblade73
++ Added support to change the scale of GUI elements with plus and minus keys. - CalMWolfs
++ Ignoring non-slayer drops in the slayer profit tracker. - hannibal2
++ Added support for slayer drops that go directly into the sack. - hannibal2
+    + This still does not work for items that land directly in your inventory. (e.g., Netherrack-Looking Sunshade,
+    Summoning Eye, etc.)
 
 ### Fixes
 
@@ -486,6 +494,10 @@
 + Fixed farming contest calendar reading going above 100% - Contrabass26
 + Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
 + Fixed rare bug with Damage Indicator
++ Fixed showing skill level as item stack being broken for level 0. - Erymanthus
++ Fixed ability cooldown not working for some items. - Cad
++ Fixed Bazaar item category "Ink Sack" gets wrongly detected as an item sack. - Erymanthus
++ Fixed reforge stone "Pitchin' Koi" not detected in the Estimated Item Value. - Fix3dll
 
 ## Version 0.18 (2023-06-19)
 
