@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -221,6 +222,19 @@ class MenuItemDisplayOverlayPlayer {
                                 if (suffix == "§b§z:)") return suffix
                                 else return "" + usefulAsString + suffix
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(9)) {
+            if ((chestName.contains(" Minion ")) && itemName.contains("Quick Upgrade Minion")) {
+                val lore = item.getLore()
+                if ((lore.any {it.contains("You need ")}) && (lore.any {it.contains("more")})) {
+                    for (line in lore) {
+                        if (line.contains("You need ") && line.contains("more")) {
+                            return line.removeColor().between("You need ", " more")
                         }
                     }
                 }

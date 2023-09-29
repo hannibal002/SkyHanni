@@ -405,6 +405,7 @@ public class InventoryConfig {
                     "§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)",
                     "§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)",
                     "§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)",
+                    "§bQuick Upgrade Missing Count",
             }
     )
     public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
