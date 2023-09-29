@@ -150,6 +150,8 @@ class MinionCraftHelper {
                 if (internalId == "REVENANT_GENERATOR_1") continue
                 if (internalId == "TARANTULA_GENERATOR_1") continue
                 if (internalId == "VOIDLING_GENERATOR_1") continue
+                if (internalId == "INFERNO_GENERATOR_1") continue
+                if (internalId == "VAMPIRE_GENERATOR_1") continue
                 tierOneMinions.add(internalId)
             }
 
