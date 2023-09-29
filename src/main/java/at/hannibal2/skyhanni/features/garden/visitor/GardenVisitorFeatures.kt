@@ -338,14 +338,12 @@ class GardenVisitorFeatures {
             GardenVisitorDropStatistics.saveAndUpdate()
             return
         }
-        if (event.slotId == 29) {
-            if (event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
-                changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
-                update()
-                GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-                GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
-                return
-            }
+        if (event.slotId == 29 && event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
+            changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
+            update()
+            GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
+            GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
+            return
         }
     }
 
@@ -358,10 +356,8 @@ class GardenVisitorFeatures {
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         val entity = event.entity
-        if (entity is EntityArmorStand) {
-            if (entity.name == "§e§lCLICK") {
-                event.isCanceled = true
-            }
+        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+            event.isCanceled = true
         }
     }
 
@@ -502,7 +498,6 @@ class GardenVisitorFeatures {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
         if (!event.isMod(10)) return
-//            if (!event.isMod(300)) return
 
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()
@@ -624,18 +619,12 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (config.visitorHypixelArrivedMessage) {
-            if (newVisitorArrivedMessage.matcher(event.message).matches()) {
-                event.blockedReason = "new_visitor_arrived"
-            }
+        if (config.visitorHypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+            event.blockedReason = "new_visitor_arrived"
         }
 
-        if (GardenAPI.inGarden()) {
-            if (config.visitorHideChat) {
-                if (hideVisitorMessage(event.message)) {
+        if (GardenAPI.inGarden() && config.visitorHideChat && hideVisitorMessage(event.message)) {
                     event.blockedReason = "garden_visitor_message"
-                }
-            }
         }
     }
 
@@ -669,18 +658,16 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if (config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) {
-                if (entity is EntityLivingBase) {
-                    val color = visitor.status.color
-                    if (color != -1) {
-                        RenderLivingEntityHelper.setEntityColor(
-                            entity,
-                            color
-                        ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
-                    }
-                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
-                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
+            if ((config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) && entity is EntityLivingBase) {
+                val color = visitor.status.color
+                if (color != -1) {
+                    RenderLivingEntityHelper.setEntityColor(
+                        entity,
+                        color
+                    ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
                 }
+                // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
             }
         }
     }
@@ -777,10 +764,8 @@ class GardenVisitorFeatures {
     }
 
     private fun showGui(): Boolean {
-        if (config.visitorNeedsInBazaarAlley) {
-            if (LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
-                return true
-            }
+        if (config.visitorNeedsInBazaarAlley && LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+            return true
         }
 
         if (GardenAPI.hideExtraGuis()) return false

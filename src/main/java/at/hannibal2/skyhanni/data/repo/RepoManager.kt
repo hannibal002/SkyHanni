@@ -62,14 +62,12 @@ class RepoManager(private val configLocation: File) {
                     e.printStackTrace()
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
-                if (File(configLocation, "repo").exists()) {
-                    if (currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
-                        if (command) {
-                            LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
-                            atomicShouldManuallyReload.set(false)
-                        }
-                        return@supplyAsync false
+                if (File(configLocation, "repo").exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
+                    if (command) {
+                        LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
+                        atomicShouldManuallyReload.set(false)
                     }
+                    return@supplyAsync false
                 }
                 RepoUtils.recursiveDelete(repoLocation)
                 repoLocation.mkdirs()

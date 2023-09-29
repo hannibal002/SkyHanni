@@ -32,7 +32,7 @@ class Translator {
         val message = event.message
         if (message.getPlayerName() == "-") return
 
-        val editedComponent = event.chatComponent.transformIf({ siblings.size > 0 }) { siblings.last() }
+        val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
 
         val clickStyle = createClickStyle(message.removeColor(), editedComponent.chatStyle)
         editedComponent.setChatStyle(clickStyle)

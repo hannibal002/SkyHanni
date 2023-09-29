@@ -64,10 +64,8 @@ object EnigmaSoulWaypoints {
 
         for (stack in event.inventoryItems.values) {
             val split = stack.displayName.split("Enigma: ")
-            if (split.size == 2) {
-                if (stack.getLore().last() == "§8✖ Not completed yet!") {
-                    inventoryUnfound.add(split.last())
-                }
+            if (split.size == 2 && stack.getLore().last() == "§8✖ Not completed yet!") {
+                inventoryUnfound.add(split.last())
             }
         }
     }

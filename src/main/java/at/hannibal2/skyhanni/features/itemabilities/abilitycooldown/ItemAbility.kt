@@ -109,7 +109,6 @@ enum class ItemAbility(
     }
 
     fun setItemClick() {
-//        println("newClick $this")
         lastItemClick = System.currentTimeMillis()
     }
 

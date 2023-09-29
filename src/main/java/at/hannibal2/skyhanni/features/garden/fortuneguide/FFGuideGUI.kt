@@ -207,11 +207,9 @@ open class FFGuideGUI : GuiScreen() {
         if (Mouse.getEventButtonState()) {
             mouseClickEvent()
         }
-        if (!Mouse.getEventButtonState()) {
-            if (Mouse.getEventDWheel() != 0) {
-                lastMouseScroll = Mouse.getEventDWheel()
-                noMouseScrollFrames = 0
-            }
+        if (!Mouse.getEventButtonState() && Mouse.getEventDWheel() != 0) {
+            lastMouseScroll = Mouse.getEventDWheel()
+            noMouseScrollFrames = 0
         }
     }
 
@@ -271,22 +269,18 @@ open class FFGuideGUI : GuiScreen() {
 
         x = guiLeft - 28
         y = guiTop + 15
-        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25)) {
-            if (selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW) {
+        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25) && selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW) {
                 SoundUtils.playClickSound()
                 selectedPage = if (currentCrop == null) {
                     FortuneGuidePage.OVERVIEW
                 } else {
                     FortuneGuidePage.CROP
                 }
-            }
         }
         y += 30
-        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25)) {
-            if (selectedPage != FortuneGuidePage.UPGRADES) {
+        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25) && selectedPage != FortuneGuidePage.UPGRADES) {
                 selectedPage = FortuneGuidePage.UPGRADES
                 SoundUtils.playClickSound()
-            }
         }
 
         if (selectedPage != FortuneGuidePage.UPGRADES) {

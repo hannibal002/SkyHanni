@@ -112,10 +112,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        if (config.useHotkey) {
-            if (!OSUtils.isKeyHeld(config.hotkey)) {
-                return
-            }
+        if (config.useHotkey && !OSUtils.isKeyHeld(config.hotkey)) {
+            return
         }
 
         config.position.renderStringsAndItems(

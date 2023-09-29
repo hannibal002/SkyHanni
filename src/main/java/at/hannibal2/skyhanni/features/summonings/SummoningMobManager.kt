@@ -77,10 +77,8 @@ class SummoningMobManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (config.summoningMobDisplay) {
-            if (event.repeatSeconds(1)) {
-                updateData()
-            }
+        if (config.summoningMobDisplay && event.repeatSeconds(1)) {
+            updateData()
         }
 
         if (searchArmorStands) {

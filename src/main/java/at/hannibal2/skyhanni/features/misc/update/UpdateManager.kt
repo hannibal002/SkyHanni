@@ -96,8 +96,8 @@ object UpdateManager {
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
                     LorenzUtils.clickableChat(
-                        "§e[SkyHanni] §aSkyhanni found a new update: ${it.update.versionName}. " +
-                                "Go check §b/sh download update §afor more info.",
+                        "§e[SkyHanni] §aSkyHanni found a new update: ${it.update.versionName}. " +
+                                "Check §b/sh download update §afor more info.",
                         "sh"
                     )
                 }

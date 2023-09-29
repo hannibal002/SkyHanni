@@ -48,10 +48,8 @@ class CompactBingoChat {
             return false
         }
 
-        if (inSkillLevelUp) {
-            if (!message.contains("Access to") && !message.endsWith(" Enchantment")) {
-                return true
-            }
+        if (inSkillLevelUp && !message.contains("Access to") && !message.endsWith(" Enchantment")) {
+            return true
         }
 
         return false

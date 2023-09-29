@@ -20,7 +20,8 @@ class TimeFeatures {
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter
 
-    private val format = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
 
     private val startOfNextYear = RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
@@ -31,7 +32,8 @@ class TimeFeatures {
         if (!LorenzUtils.inSkyBlock) return
 
         if (config.realTime) {
-            config.realTimePosition.renderString(format.format(System.currentTimeMillis()), posLabel = "Real Time")
+            val currentTime = (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
+            config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
