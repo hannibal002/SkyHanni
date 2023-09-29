@@ -30,7 +30,7 @@ public class SlayerConfig {
 
         @Expose
         @ConfigOption(name = "Highlight Beacon",
-                desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added an timer when he explodes. " +
+                desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
                         "Supports beacon in hand and beacon flying.")
         @ConfigEditorBoolean
         @FeatureToggle
@@ -54,7 +54,7 @@ public class SlayerConfig {
         public boolean showLine = false;
 
         @Expose
-        @ConfigOption(name = "Line color", desc = "Color of the line.")
+        @ConfigOption(name = "Line Color", desc = "Color of the line.")
         @ConfigEditorColour
         public String lneColor = "0:255:255:0:88";
 
@@ -78,7 +78,7 @@ public class SlayerConfig {
     public boolean endermanPhaseDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide particles around Enderman Slayer bosses and mini bosses.")
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around Enderman Slayer bosses and Mini-Bosses.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
@@ -96,7 +96,7 @@ public class SlayerConfig {
     public boolean blazeHellion = false;
 
     @Expose
-    @ConfigOption(name = "Colored Mobs", desc = "Color the blaze slayer boss and the demons in the right hellion shield color.")
+    @ConfigOption(name = "Colored Mobs", desc = "Color the Blaze Slayer boss and the demons in the right hellion shield color.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
@@ -110,7 +110,7 @@ public class SlayerConfig {
     public boolean blazeDaggers = false;
 
     @Expose
-    @ConfigOption(name = "Right Dagger", desc = "Mark the right dagger to use for blaze slayer in the dagger overlay.")
+    @ConfigOption(name = "Right Dagger", desc = "Mark the right dagger to use for Blaze Slayer in the dagger overlay.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
@@ -123,7 +123,7 @@ public class SlayerConfig {
     public int blazeFirstDagger = 0;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Remove the wrong blaze slayer dagger messages from chat.")
+    @ConfigOption(name = "Hide Chat", desc = "Remove the wrong Blaze Slayer dagger messages from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
@@ -137,13 +137,13 @@ public class SlayerConfig {
     public boolean firePitsWarning = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the blaze slayer.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Blaze Slayer boss.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean blazePhaseDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Clear View", desc = "Hide particles and fireballs near blaze slayer bosses and demons.")
+    @ConfigOption(name = "Clear View", desc = "Hide particles and fireballs near Blaze Slayer bosses and demons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
@@ -164,7 +164,7 @@ public class SlayerConfig {
         public static class OwnBoss {
 
             @Expose
-            @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")
+            @ConfigOption(name = "Highlight Your Boss", desc = "Highlight your own Vampire Slayer boss.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean highlight = true;
@@ -201,7 +201,7 @@ public class SlayerConfig {
         public static class OthersBoss {
 
             @Expose
-            @ConfigOption(name = "Highlight Others people boss", desc = "Highlight others players boss.\nYou need to hit them first.")
+            @ConfigOption(name = "Highlight Others Boss", desc = "Highlight others players boss.\nYou need to hit them first.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean highlight = true;
@@ -277,7 +277,7 @@ public class SlayerConfig {
         public int withAlpha = 80;
 
         @Expose
-        @ConfigOption(name = "See Through Blocs", desc = "Highlight even when behind others mobs/players")
+        @ConfigOption(name = "See Through Blocks", desc = "Highlight even when behind others mobs/players.")
         @ConfigEditorBoolean
         public boolean seeThrough = false;
 
@@ -298,13 +298,13 @@ public class SlayerConfig {
         public int twinclawsDelay = 0;
 
         @Expose
-        @ConfigOption(name = "Draw line", desc = "Draw a line starting at your crosshair to the boss head.")
+        @ConfigOption(name = "Draw Line", desc = "Draw a line starting at your crosshair to the boss head.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean drawLine = false;
 
         @Expose
-        @ConfigOption(name = "Line color", desc = "Color of the line.")
+        @ConfigOption(name = "Line Color", desc = "Color of the line.")
         @ConfigEditorColour
         public String lineColor = "0:255:255:0:88";
 
@@ -321,7 +321,7 @@ public class SlayerConfig {
 
         public static class BloodIchor {
             @Expose
-            @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor.")
+            @ConfigOption(name = "Highlight Blood Ichor", desc = "Highlight the Blood Ichor.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean highlight = false;
@@ -338,13 +338,13 @@ public class SlayerConfig {
             public String color = "0:199:100:0:88";
 
             @Expose
-            @ConfigOption(name = "Show lines", desc = "Draw lines that start from the head of the boss and end on the Blood Ichor.")
+            @ConfigOption(name = "Show Lines", desc = "Draw lines that start from the head of the boss and end on the Blood Ichor.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean showLines = false;
 
             @Expose
-            @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
+            @ConfigOption(name = "Lines Start Color", desc = "Starting color of the lines.")
             @ConfigEditorColour
             public String linesColor = "0:255:255:13:0";
 
@@ -368,13 +368,13 @@ public class SlayerConfig {
             public String color = "0:199:100:0:88";
 
             @Expose
-            @ConfigOption(name = "Show lines", desc = "Draw lines that start from the head of the boss and end on the Killer Spring tower.")
+            @ConfigOption(name = "Show Lines", desc = "Draw lines that start from the head of the boss and end on the Killer Spring tower.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean showLines = false;
 
             @Expose
-            @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
+            @ConfigOption(name = "Lines Start Color", desc = "Starting color of the lines.")
             @ConfigEditorColour
             public String linesColor = "0:255:255:13:0";
         }
@@ -415,13 +415,13 @@ public class SlayerConfig {
         public int minimumPrice = 100_000;
 
         @Expose
-        @ConfigOption(name = "Title Warning", desc = "Show an title for expensive item pickups.")
+        @ConfigOption(name = "Title Warning", desc = "Show a title for expensive item pickups.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean titleWarning = false;
 
         @Expose
-        @ConfigOption(name = "Title Price", desc = "Items above this price will show up as title.")
+        @ConfigOption(name = "Title Price", desc = "Items above this price will show up as a title.")
         @ConfigEditorSlider(minValue = 1, maxValue = 20_000_000, minStep = 1)
         public int minimumPriceWarning = 500_000;
     }
@@ -453,7 +453,7 @@ public class SlayerConfig {
     public static class RngMeterDisplay {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Display amount of bosses needed until next rng meter drop.")
+        @ConfigOption(name = "Enabled", desc = "Display amount of bosses needed until next RNG meter drop.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
@@ -464,7 +464,7 @@ public class SlayerConfig {
         public boolean warnEmpty = false;
 
         @Expose
-        @ConfigOption(name = "Hide Chat", desc = "Hide the rng meter message from chat if current item is selected.")
+        @ConfigOption(name = "Hide Chat", desc = "Hide the RNG meter message from chat if current item is selected.")
         @ConfigEditorBoolean
         public boolean hideChat = true;
 
@@ -498,13 +498,13 @@ public class SlayerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color.")
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Line to Miniboss", desc = "Adds a line to every slayer miniboss around you.")
+    @ConfigOption(name = "Line to Miniboss", desc = "Adds a line to every Slayer Mini-Boss around you.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossLine = false;
@@ -516,13 +516,13 @@ public class SlayerConfig {
     public boolean hideMobNames = false;
 
     @Expose
-    @ConfigOption(name = "Quest Warning", desc = "Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.")
+    @ConfigOption(name = "Quest Warning", desc = "Warning when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarning = true;
 
     @Expose
-    @ConfigOption(name = "Quest Warning Title", desc = "Sends a Title when warning.")
+    @ConfigOption(name = "Quest Warning Title", desc = "Sends a title when warning.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarningTitle = true;
