@@ -34,9 +34,9 @@ class ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.isEmpty()) return ""
+        if (stackSizeConfig.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
+        val stackSizeConfig = stackSizeConfig
         val chestName = InventoryUtils.openInventoryName()
         /*
         -------------------------------IMPORTANT------------------------------------
@@ -78,7 +78,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2)) {
+        if (stackSizeConfig.contains(2)) {
             if (itemName.contains("Golden ") || itemName.contains("Diamond ")) {
                 when {
                     itemName.contains("Bonzo") -> return "1"
@@ -92,13 +92,13 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(3)) {
+        if (stackSizeConfig.contains(3)) {
             if (itemName.startsWith("New Year Cake (")) {
                 return "§b" + itemName.between("(Year ", ")")
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(4)) {
+        if (stackSizeConfig.contains(4)) {
             val chestName = InventoryUtils.openInventoryName()
             if (!chestName.endsWith("Sea Creature Guide")) {
                 if (ItemUtils.isPet(itemName)) {
@@ -112,7 +112,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5)) {
+        if (stackSizeConfig.contains(5)) {
             if (itemName.contains(" Minion ")) {
                 if (item.getLore().any { it.contains("Place this minion") }) {
                     val array = itemName.split(" ")
@@ -127,7 +127,7 @@ class ItemDisplayOverlayFeatures {
             return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(8)) {
+        if (stackSizeConfig.contains(8)) {
             if (itemName.contains("Kuudra Key")) {
                 return when (itemName) {
                     "Kuudra Key" -> "§a1"
@@ -140,7 +140,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
+        if (stackSizeConfig.contains(9)) {
             if (InventoryUtils.openInventoryName() == "Your Skills") {
                 if (item.getLore().any { it.contains("Click to view!") }) {
                     if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
@@ -154,7 +154,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
+        if (stackSizeConfig.contains(10)) {
             if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
                 val lore = item.getLore()
                 if (lore.any { it.contains("Click to view!") }) {
@@ -169,7 +169,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
+        if (stackSizeConfig.contains(11)) {
             if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
                     rancherBootsSpeedCapPattern.matchMatcher(line) {
@@ -179,7 +179,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
+        if (stackSizeConfig.contains(12)) {
             if (itemName.contains("Larva Hook")) {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
@@ -194,7 +194,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
+        if (stackSizeConfig.contains(13)) {
             if (itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
                 item.name?.let {
                     "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
