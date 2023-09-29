@@ -229,7 +229,7 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(9)) {
-            if ((chestName.contains(" Minion ")) && itemName.contains("Quick Upgrade Minion")) {
+            if ((chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) { //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
                 val lore = item.getLore()
                 if ((lore.any {it.contains("You need ")}) && (lore.any {it.contains("more")})) {
                     for (line in lore) {
