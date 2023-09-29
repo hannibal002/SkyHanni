@@ -1,12 +1,22 @@
 package at.hannibal2.skyhanni.features.misc.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PurseChangeCause
+import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option.*
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option.KILLS
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.bestiaryData
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatBestiary
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatText
@@ -41,17 +51,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 object GhostCounter {
 
-    val config get() = SkyHanniMod.feature.ghostCounter
+    val config get() = SkyHanniMod.feature.combat.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File =
@@ -112,13 +121,13 @@ object GhostCounter {
 
     private fun drawDisplay() = buildList<List<Any>> {
         val textFormatting = config.textFormatting
-        val ghostKillPerSorrow: Int = when (SORROWCOUNT.get()) {
+        val ghostKillPerSorrow: Int = when (Option.SORROWCOUNT.get()) {
             0.0 -> 0
-            else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}".toInt()
+            else -> "${((((KILLS.get() / Option.SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}".toInt()
         }
-        val avgMagicFind = when (TOTALDROPS.get()) {
+        val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((hidden?.totalMF!! / TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> "${((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting
@@ -205,18 +214,18 @@ object GhostCounter {
 
         addAsSingletonList(Utils.chromaStringByColourCode(textFormatting.titleFormat.replace("&", "§")))
         addAsSingletonList(textFormatting.ghostKilledFormat.formatText(KILLS))
-        addAsSingletonList(textFormatting.sorrowsFormat.formatText(SORROWCOUNT))
-        addAsSingletonList(textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
+        addAsSingletonList(textFormatting.sorrowsFormat.formatText(Option.SORROWCOUNT))
+        addAsSingletonList(textFormatting.ghostSinceSorrowFormat.formatText(Option.GHOSTSINCESORROW.getInt()))
         addAsSingletonList(textFormatting.ghostKillPerSorrowFormat.formatText(ghostKillPerSorrow))
-        addAsSingletonList(textFormatting.voltasFormat.formatText(VOLTACOUNT))
-        addAsSingletonList(textFormatting.plasmasFormat.formatText(PLASMACOUNT))
-        addAsSingletonList(textFormatting.ghostlyBootsFormat.formatText(GHOSTLYBOOTS))
-        addAsSingletonList(textFormatting.bagOfCashFormat.formatText(BAGOFCASH))
+        addAsSingletonList(textFormatting.voltasFormat.formatText(Option.VOLTACOUNT))
+        addAsSingletonList(textFormatting.plasmasFormat.formatText(Option.PLASMACOUNT))
+        addAsSingletonList(textFormatting.ghostlyBootsFormat.formatText(Option.GHOSTLYBOOTS))
+        addAsSingletonList(textFormatting.bagOfCashFormat.formatText(Option.BAGOFCASH))
         addAsSingletonList(textFormatting.avgMagicFindFormat.formatText(avgMagicFind))
-        addAsSingletonList(textFormatting.scavengerCoinsFormat.formatText(SCAVENGERCOINS))
-        addAsSingletonList(textFormatting.killComboFormat.formatText(MAXKILLCOMBO))
-        addAsSingletonList(textFormatting.highestKillComboFormat.formatText(MAXKILLCOMBO))
-        addAsSingletonList(textFormatting.skillXPGainFormat.formatText(SKILLXPGAINED))
+        addAsSingletonList(textFormatting.scavengerCoinsFormat.formatText(Option.SCAVENGERCOINS))
+        addAsSingletonList(textFormatting.killComboFormat.formatText(Option.MAXKILLCOMBO))
+        addAsSingletonList(textFormatting.highestKillComboFormat.formatText(Option.MAXKILLCOMBO))
+        addAsSingletonList(textFormatting.skillXPGainFormat.formatText(Option.SKILLXPGAINED))
         addAsSingletonList(
             bestiaryFormatting.base.preFormat(bestiary, nextLevel - 1, nextLevel)
                 .formatBestiary(currentKill, killNeeded)
@@ -233,12 +242,12 @@ object GhostCounter {
         val voltaValue = VOLTA.getBazaarData()?.buyPrice?.toLong() ?: 0L
         var moneyMade: Long = 0
         val priceMap = listOf(
-            Triple("Sorrow", SORROWCOUNT.getInt(), sorrowValue),
-            Triple("Plasma", PLASMACOUNT.getInt(), plasmaValue),
-            Triple("Volta", VOLTACOUNT.getInt(), voltaValue),
-            Triple("Bag Of Cash", BAGOFCASH.getInt(), 1_000_000),
-            Triple("Scavenger Coins", SCAVENGERCOINS.getInt(), 1),
-            Triple("Ghostly Boots", GHOSTLYBOOTS.getInt(), 77_777)
+            Triple("Sorrow", Option.SORROWCOUNT.getInt(), sorrowValue),
+            Triple("Plasma", Option.PLASMACOUNT.getInt(), plasmaValue),
+            Triple("Volta", Option.VOLTACOUNT.getInt(), voltaValue),
+            Triple("Bag Of Cash", Option.BAGOFCASH.getInt(), 1_000_000),
+            Triple("Scavenger Coins", Option.SCAVENGERCOINS.getInt(), 1),
+            Triple("Ghostly Boots", Option.GHOSTLYBOOTS.getInt(), 77_777)
         )
         val moneyMadeTips = buildList {
             for ((name, count, value) in priceMap) {
@@ -267,18 +276,14 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0..450.0) {
-                        if (lastXp != "0") {
-                            if (num >= 0) {
-                                KILLS.add(num)
-                                KILLS.add(num, true)
-                                GHOSTSINCESORROW.add(num)
-                                KILLCOMBO.add(num)
-                                SKILLXPGAINED.add(gained * num.roundToLong())
-                                SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
-                            }
-                        }
+                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
+                        KILLS.add(num)
+                        KILLS.add(num, true)
+                        Option.GHOSTSINCESORROW.add(num)
+                        Option.KILLCOMBO.add(num)
+                        Option.SKILLXPGAINED.add(gained * num.roundToLong())
+                        Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                        hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
                     }
                     lastXp = res
                 }
@@ -292,8 +297,7 @@ object GhostCounter {
                     )
                 }
             }
-            // some area don't show as 'The Mist' in the scoreboard
-            inMist = Minecraft.getMinecraft().thePlayer.posY <= 110
+            inMist = LorenzUtils.skyBlockArea == "The Mist"
             update()
         }
         if (event.repeatSeconds(2)) {
@@ -374,29 +378,29 @@ object GhostCounter {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) return
-        for (opt in entries) {
+        for (opt in Option.entries) {
             val pattern = opt.pattern ?: continue
             pattern.matchMatcher(event.message) {
                 when (opt) {
-                    SORROWCOUNT, VOLTACOUNT, PLASMACOUNT, GHOSTLYBOOTS -> {
+                    Option.SORROWCOUNT, Option.VOLTACOUNT, Option.PLASMACOUNT, Option.GHOSTLYBOOTS -> {
                         opt.add(1.0)
                         opt.add(1.0, true)
                         hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
                             ?: group("mf").substring(4).toDouble()
-                        TOTALDROPS.add(1.0)
-                        if (opt == SORROWCOUNT)
-                            GHOSTSINCESORROW.set(0.0)
+                        Option.TOTALDROPS.add(1.0)
+                        if (opt == Option.SORROWCOUNT)
+                            Option.GHOSTSINCESORROW.set(0.0)
                         update()
                     }
 
-                    BAGOFCASH -> {
-                        BAGOFCASH.add(1.0)
-                        BAGOFCASH.add(1.0, true)
+                    Option.BAGOFCASH -> {
+                        Option.BAGOFCASH.add(1.0)
+                        Option.BAGOFCASH.add(1.0, true)
                         update()
                     }
 
-                    KILLCOMBOCOINS -> {
-                        KILLCOMBOCOINS.set(KILLCOMBOCOINS.get() + group("coin").toDouble())
+                    Option.KILLCOMBOCOINS -> {
+                        Option.KILLCOMBOCOINS.set(Option.KILLCOMBOCOINS.get() + group("coin").toDouble())
                         update()
                     }
 
@@ -405,14 +409,14 @@ object GhostCounter {
             }
         }
         killComboExpiredPattern.matchMatcher(event.message) {
-            if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()) {
-                MAXKILLCOMBO.set(group("combo").formatNumber().toDouble())
+            if (Option.KILLCOMBO.getInt() > Option.MAXKILLCOMBO.getInt()) {
+                Option.MAXKILLCOMBO.set(group("combo").formatNumber().toDouble())
             }
-            if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt(true)) {
-                MAXKILLCOMBO.set(group("combo").formatNumber().toDouble(), true)
+            if (Option.KILLCOMBO.getInt() > Option.MAXKILLCOMBO.getInt(true)) {
+                Option.MAXKILLCOMBO.set(group("combo").formatNumber().toDouble(), true)
             }
-            KILLCOMBOCOINS.set(0.0)
-            KILLCOMBO.set(0.0)
+            Option.KILLCOMBOCOINS.set(0.0)
+            Option.KILLCOMBO.set(0.0)
             update()
         }
         //replace with BestiaryLevelUpEvent ?
@@ -441,8 +445,8 @@ object GhostCounter {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockArea != "The Mist") return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        SCAVENGERCOINS.add(event.coins, true)
-        SCAVENGERCOINS.add(event.coins)
+        Option.SCAVENGERCOINS.add(event.coins, true)
+        Option.SCAVENGERCOINS.add(event.coins)
     }
 
     @SubscribeEvent
@@ -453,7 +457,8 @@ object GhostCounter {
         val stacks = event.inventoryItems
         val ghostStack = stacks[10] ?: return
         val bestiaryNextLevel =
-            if (ghostStack.displayName == "§cGhost") 1 else ghostStack.displayName.substring(8).romanToDecimal() + 1
+            if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8)
+                .romanToDecimal() + 1
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         var kills = 0.0
         for (line in ghostStack.getLore()) {
@@ -476,6 +481,11 @@ object GhostCounter {
             chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
             hidden?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "ghostCounter", "combat.ghostCounter")
     }
 
     fun isEnabled(): Boolean {

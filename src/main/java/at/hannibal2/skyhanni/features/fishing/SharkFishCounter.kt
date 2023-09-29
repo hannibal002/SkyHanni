@@ -24,7 +24,7 @@ class SharkFishCounter {
 
         val displayName = event.seaCreature.displayName
         if (displayName.contains("Shark")) {
-            counter++
+            counter += if (event.doubleHook) 2 else 1
             display = "§7Sharks caught: §e${counter.addSeparators()}"
         }
     }

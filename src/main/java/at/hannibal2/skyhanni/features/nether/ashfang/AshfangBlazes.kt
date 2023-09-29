@@ -1,7 +1,13 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -16,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangBlazes {
+    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
     private val blazeColor = mutableMapOf<EntityBlaze, LorenzColor>()
     private val blazeArmorStand = mutableMapOf<EntityBlaze, EntityArmorStand>()
@@ -73,7 +80,7 @@ class AshfangBlazes {
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.ashfang.highlightBlazes) return
+        if (!config.highlightBlazes) return
         val entity = event.entity
         event.color = blazeColor[entity]?.toColor()?.withAlpha(40) ?: 0
     }
@@ -81,7 +88,7 @@ class AshfangBlazes {
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.ashfang.highlightBlazes) return
+        if (!config.highlightBlazes) return
         val entity = event.entity
         if (entity in blazeColor) {
             event.shouldReset = true
@@ -91,7 +98,7 @@ class AshfangBlazes {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.ashfang.hideNames) return
+        if (!config.hide.fullNames) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -106,6 +113,13 @@ class AshfangBlazes {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         blazeColor.clear()
         blazeArmorStand.clear()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "ashfang.nextResetCooldown", "crimsonIsle.ashfang.nextResetCooldown")
+        event.move(2, "ashfang.highlightBlazes", "crimsonIsle.ashfang.highlightBlazes")
+        event.move(2, "ashfang.hideNames", "crimsonIsle.ashfang.hide.fullNames")
     }
 
     private fun isEnabled(): Boolean {

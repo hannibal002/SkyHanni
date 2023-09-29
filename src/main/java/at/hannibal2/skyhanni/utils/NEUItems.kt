@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
@@ -135,32 +136,30 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound) =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
-        val price = getPrice(useSellingPrice)
-        if (price == -1.0) {
-            return null
-        }
-        return price
-    }
+    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
+
+    fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
+
+    fun NEUInternalName.getNpcPriceOrNull() = BazaarDataHolder.getNpcPrice(this)
 
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false): Double {
+    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
         if (equals("WISP_POTION")) {
             return 20_000.0
         }
         val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
-        if (result == -1.0) {
-            if (equals("JACK_O_LANTERN")) {
-                return getPrice("PUMPKIN", useSellingPrice) + 1
-            }
-            if (equals("GOLDEN_CARROT")) {
-                // 6.8 for some players
-                return 7.0 // NPC price
-            }
+        if (result != -1.0) return result
+
+        if (equals("JACK_O_LANTERN")) {
+            return getPrice("PUMPKIN", useSellingPrice) + 1
         }
-        return result
+        if (equals("GOLDEN_CARROT")) {
+            // 6.8 for some players
+            return 7.0 // NPC price
+        }
+        return getNpcPriceOrNull()
     }
 
     fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
@@ -178,7 +177,7 @@ object NEUItems {
 
     fun NEUInternalName.getItemStack(definite: Boolean = false): ItemStack =
         getItemStackOrNull() ?: run {
-            if (getPrice() == -1.0) return@run fallbackItem
+            if (getPriceOrNull() == null) return@run fallbackItem
 
             if (definite) {
                 Utils.showOutdatedRepoNotification()
@@ -247,36 +246,24 @@ object NEUItems {
                 val count = ingredient.count.toInt()
                 var internalItemId = ingredient.internalItemId
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN") {
-                    if (internalItemId == "INK_SACK-2") {
-                        internalItemId = "CACTUS"
-                    }
+                if (internalName == "ENCHANTED_CACTUS_GREEN" && internalItemId == "INK_SACK-2") {
+                    internalItemId = "CACTUS"
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE") {
-                    if (internalItemId == "WHEAT") {
+                if (internalName == "ENCHANTED_COOKIE" && internalItemId == "WHEAT") {
                         continue
-                    }
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT") {
-                    if (internalItemId == "GOLDEN_CARROT") {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT" && internalItemId == "GOLDEN_CARROT") {
                         continue
-                    }
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER") {
-                    if (internalItemId == "RABBIT_HIDE") {
+                if (internalName == "LEATHER" && internalItemId == "RABBIT_HIDE") {
                         continue
-                    }
                 }
-
-//                println("")
-//                println("rawId: $rawId")
-//                println("internalItemId: $internalItemId")
 
                 val old = map.getOrDefault(internalItemId, 0)
                 map[internalItemId] = old + count
@@ -333,9 +320,7 @@ object NEUItems {
         if (!jsonObject.has("internalname")) {
             jsonObject.add("internalname", JsonPrimitive("_"))
         }
-        if (removeLore) {
-            if (jsonObject.has("lore")) jsonObject.remove("lore")
-        }
+        if (removeLore && jsonObject.has("lore")) jsonObject.remove("lore")
         val jsonString = jsonObject.toString()
         return StringUtils.encodeBase64(jsonString)
     }

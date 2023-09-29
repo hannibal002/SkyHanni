@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -142,14 +140,6 @@ object ChatManager {
         return false
     }
 
-    @SubscribeEvent
-    fun onChatMessage(chatEvent: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
-        val seaCreature = SeaCreatureManager.getSeaCreature(chatEvent.message) ?: return
-        SeaCreatureFishEvent(seaCreature, chatEvent).postAndCatch()
-    }
-
     fun openChatFilterGUI() {
         SkyHanniMod.screenToOpen = ChatFilterGui(getRecentMessageHistory())
     }
@@ -166,8 +156,8 @@ object ChatManager {
         val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
 
         @Suppress("UNCHECKED_CAST")
-        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
-        if (!chatLines.removeIf { it.chatComponent === message }) return
+        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
+        if (!chatLines.removeIf { it?.chatComponent === message }) return
         chatGUI.refreshChat()
 
         val history = messageHistory[IdentityCharacteristics(message)] ?: return

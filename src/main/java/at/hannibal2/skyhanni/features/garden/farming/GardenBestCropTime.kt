@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.isMaxed
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -31,11 +31,11 @@ class GardenBestCropTime {
                 if (crop.isMaxed()) continue
 
                 val counter = crop.getCounter()
-                val currentTier = GardenCropMilestones.getTierForCrops(counter)
+                val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
 
-                val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
+                val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
                 val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
-                val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
+                val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop)
 
                 val have = counter - cropsForCurrentTier
                 val need = cropsForNextTier - cropsForCurrentTier
@@ -59,7 +59,7 @@ class GardenBestCropTime {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
                 if (crop.isMaxed()) continue
-                val currentTier = GardenCropMilestones.getTierForCrops(crop.getCounter())
+                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime
@@ -107,7 +107,7 @@ class GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = GardenCropMilestones.getTierForCrops(crop.getCounter())
+            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
             val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
 
 

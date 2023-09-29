@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -13,15 +14,15 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMini
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
-    val config get() = SkyHanniMod.feature.misc
+    val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     val questHelper = DailyQuestHelper(this)
     val miniBossHelper = DailyMiniBossHelper(this)
@@ -64,7 +65,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!config.crimsonIsleReputationHelper) return
+        if (!config.enabled) return
         if (!dirty && display.isEmpty()) {
             dirty = true
         }
@@ -106,21 +107,28 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!config.crimsonIsleReputationHelper) return
+        if (!config.enabled) return
 
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        if (config.reputationHelperUseHotkey) {
-            if (!Keyboard.isKeyDown(config.reputationHelperHotkey)) {
-                return
-            }
+        if (config.useHotkey && !OSUtils.isKeyHeld(config.hotkey)) {
+            return
         }
 
-        config.crimsonIsleReputationHelperPos.renderStringsAndItems(
+        config.position.renderStringsAndItems(
             display,
             posLabel = "Crimson Isle Reputation Helper"
         )
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.crimsonIsleReputationHelper", "crimsonIsle.reputationHelper.enabled")
+        event.move(2, "misc.reputationHelperUseHotkey", "crimsonIsle.reputationHelper.useHotkey")
+        event.move(2, "misc.reputationHelperHotkey", "crimsonIsle.reputationHelper.hotkey")
+        event.move(2, "misc.crimsonIsleReputationHelperPos", "crimsonIsle.reputationHelper.position")
+        event.move(2, "misc.crimsonIsleReputationShowLocation", "crimsonIsle.reputationHelper.showLocation")
     }
 
     fun update() {
@@ -150,5 +158,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         val y = locationData[1].asDouble
         val z = locationData[2].asDouble - 1
         return LorenzVec(x, y, z)
+    }
+
+    fun showLocations() = when (config.showLocation) {
+        0 -> true
+        1 -> OSUtils.isKeyHeld(config.hotkey)
+        else -> false
     }
 }

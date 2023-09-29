@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
+import java.util.TreeMap
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -35,23 +36,35 @@ object NumberUtil {
     )
 
     /**
-     * This code was unmodified and taken under CC BY-SA 3.0 license
+     * This code was modified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
+
     @JvmStatic
-    fun format(value: Number): String {
+    fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        //Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
-        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1)
-        if (value < 0) return "-" + format(-value)
+        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
+        if (value < 0) return "-" + format(-value, preciseBillions)
+
         if (value < 1000) return value.toString() //deal with small numbers
+
         val (divideBy, suffix) = suffixes.floorEntry(value)
+
         val truncated = value / (divideBy / 10) //the number part of the output times 10
-        val truncatedAt = if (suffix == "M") 1000 else 100
+
+        val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
+
         val hasDecimal = truncated < truncatedAt && truncated / 10.0 != (truncated / 10).toDouble()
-        return if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
+
+        return if (value > 1_000_000_000 && hasDecimal && preciseBillions) {
+            val decimalPart = (value % 1_000_000_000) / 1_000_000
+            "${truncated / 10}.$decimalPart$suffix"
+        } else {
+            if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
+        }
     }
 
     /**

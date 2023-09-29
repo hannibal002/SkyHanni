@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -27,7 +26,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!reputationHelper.config.enabled) return
 
         val message = event.message
         for (miniBoss in miniBosses) {
@@ -41,8 +40,8 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (!reputationHelper.config.enabled) return
+        if (!reputationHelper.showLocations()) return
 
         val playerLocation = LocationUtils.playerLocation()
         for (miniBoss in miniBosses) {
@@ -57,12 +56,8 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss): Boolean {
         val bossQuest = reputationHelper.questHelper.getQuest<MiniBossQuest>()
-        if (bossQuest != null) {
-            if (bossQuest.miniBoss == miniBoss) {
-                if (bossQuest.state == QuestState.ACCEPTED) {
-                    return true
-                }
-            }
+        if (bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED) {
+            return true
         }
 
         return false

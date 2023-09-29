@@ -5,13 +5,17 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -72,8 +76,7 @@ class AnitaMedalProfit {
         val fullCost = getFullCost(getRequiredItems(item))
         if (fullCost < 0) return
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName)
-        if (name == null) return
+        val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
         var internalName = NEUItems.getInternalNameOrNull(name)
         if (internalName == null) {
@@ -93,12 +96,13 @@ class AnitaMedalProfit {
         val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
-            val (name, amount) = ItemUtils.readItemAmount(rawItemName)
-            if (name == null) {
+            val pair = ItemUtils.readItemAmount(rawItemName)
+            if (pair == null) {
                 LorenzUtils.error("§c[SkyHanni] Could not read item '$rawItemName'")
                 continue
             }
 
+            val (name, amount) = pair
             val medal = getMedal(name)
             otherItemsPrice += if (medal != null) {
                 val bronze = medal.factorBronze * amount

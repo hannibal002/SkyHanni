@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import io.github.moulberry.moulconfig.internal.KeybindHelper
 import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
 import java.awt.Desktop
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
-import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
 import java.net.URI
 
@@ -28,23 +26,15 @@ object OSUtils {
     }
 
     fun copyToClipboard(text: String) {
-        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+        ClipboardUtils.copyToClipboard(text)
     }
 
-    fun readFromClipboard(): String? {
-        val systemClipboard = Toolkit.getDefaultToolkit().systemClipboard ?: return null
-        try {
-            val data = systemClipboard.getData(DataFlavor.stringFlavor) ?: return null
-            return data.toString()
-        } catch (e: UnsupportedFlavorException) {
-            return null
-        }
-    }
+    suspend fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
     fun KeyBinding.isActive(): Boolean {
         if (!Keyboard.isCreated()) return false
         try {
-            if (Keyboard.isKeyDown(this.keyCode)) return true
+            if (isKeyHeld(keyCode)) return true
         } catch (e: IndexOutOfBoundsException) {
             println("KeyBinding isActive caused an IndexOutOfBoundsException with keyCode: $keyCode")
             e.printStackTrace()
@@ -52,4 +42,15 @@ object OSUtils {
         }
         return this.isKeyDown || this.isPressed
     }
+
+    fun isKeyHeld(keyCode: Int): Boolean {
+        if (keyCode == 0) return false
+        return if (keyCode < 0) {
+            Mouse.isButtonDown(keyCode + 100)
+        } else {
+            KeybindHelper.isKeyDown(keyCode)
+        }
+    }
+
+    fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
 }

@@ -2,11 +2,15 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.isMaxed
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
+import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -22,7 +26,8 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
+import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
@@ -33,15 +38,6 @@ object GardenCropMilestoneDisplay {
 
     private var lastPlaySoundTime = 0L
     private var needsInventory = false
-
-    @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-        // TODO remove this once hypixel counts 64x pumpkin drops to cultivating
-        if (event.message == "§a§lUNCOMMON DROP! §r§eDicer dropped §r§f64x §r§fPumpkin§r§e!") {
-            CropType.PUMPKIN.setCounter(CropType.PUMPKIN.getCounter() + 64)
-        }
-    }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -91,7 +87,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
 
         try {
@@ -112,7 +108,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            LorenzUtils.error("[SkyHanni] Error in OwnInventorItemUpdateEvent")
+            LorenzUtils.error("[SkyHanni] Error in OwnInventoryItemUpdateEvent")
             e.printStackTrace()
         }
     }
@@ -126,10 +122,8 @@ object GardenCropMilestoneDisplay {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.cropMilestoneBestDisplay) {
-            if (config.cropMilestoneBestAlwaysOn || currentCrop != null) {
-                bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
-            }
+        if (config.cropMilestoneBestDisplay && config.cropMilestoneBestAlwaysOn || currentCrop != null) {
+            bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
         }
     }
 
@@ -138,7 +132,7 @@ object GardenCropMilestoneDisplay {
         val lineMap = HashMap<Int, List<Any>>()
         lineMap[0] = Collections.singletonList("§6Crop Milestones")
 
-        val currentTier = GardenCropMilestones.getTierForCrops(counter)
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
         val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
 
         val list = mutableListOf<Any>()
@@ -150,11 +144,11 @@ object GardenCropMilestoneDisplay {
         }
         lineMap[1] = list
 
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop)
         val (have, need) = if (config.cropMilestoneBestShowMaxedNeeded.get()) {
             Pair(counter, cropsForNextTier)
         } else {
-            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
+            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
             val have = counter - cropsForCurrentTier
             val need = cropsForNextTier - cropsForCurrentTier
             Pair(have, need)
@@ -224,7 +218,7 @@ object GardenCropMilestoneDisplay {
             SoundUtils.playBeepSound()
         }
         if (!needsInventory) {
-            TitleUtils.sendTitle(title, 1_500)
+            TitleUtils.sendTitle(title, 1.5.seconds)
         }
     }
 
@@ -247,11 +241,11 @@ object GardenCropMilestoneDisplay {
         val lineMap = HashMap<Int, List<Any>>()
         val counter = CropType.MUSHROOM.getCounter()
 
-        val currentTier = GardenCropMilestones.getTierForCrops(counter)
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, CropType.MUSHROOM)
         val nextTier = currentTier + 1
 
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, CropType.MUSHROOM)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, CropType.MUSHROOM)
 
         val have = counter - cropsForCurrentTier
         val need = cropsForNextTier - cropsForCurrentTier

@@ -14,14 +14,22 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -108,6 +116,7 @@ object CropMoneyDisplay {
 
         var extraMushroomCowPerkCoins = 0.0
         var extraDicerCoins = 0.0
+        var extraArmorCoins = 0.0
         GardenAPI.getCurrentlyFarmedCrop()?.let {
             val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
             toolHasBountiful?.put(it, reforgeName == "bountiful")
@@ -116,8 +125,8 @@ object CropMoneyDisplay {
                 val redMushroom = "ENCHANTED_RED_MUSHROOM".asInternalName()
                 val brownMushroom = "ENCHANTED_BROWN_MUSHROOM".asInternalName()
                 val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
-                    val redPrice = (redMushroom.getBazaarData()?.npcPrice ?: 160.0) / 160
-                    val brownPrice = (brownMushroom.getBazaarData()?.npcPrice ?: 160.0) / 160
+                    val redPrice = (redMushroom.getNpcPriceOrNull() ?: 160.0) / 160
+                    val brownPrice = (brownMushroom.getNpcPriceOrNull() ?: 160.0) / 160
                     redPrice to brownPrice
                 } else {
                     val redPrice = redMushroom.getPrice() / 160
@@ -130,22 +139,23 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.itemInHandId.contains("DICER") && config.moneyPerHourDicer) {
-                var dicerDrops = 0.0
-                var bazaarData: BazaarData? = null
-                if (it == CropType.MELON) {
-                    dicerDrops = GardenCropSpeed.latestMelonDicer
-                    bazaarData = "ENCHANTED_MELON".asInternalName().getBazaarData()
+            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.moneyPerHourDicer) {
+                val (dicerDrops, internalName) = when (it) {
+                    CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
+                    CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
+
+                    else -> CopyErrorCommand.skyHanniError("Unknown dicer: $it")
                 }
-                if (it == CropType.PUMPKIN) {
-                    dicerDrops = GardenCropSpeed.latestPumpkinDicer
-                    bazaarData = "ENCHANTED_PUMPKIN".asInternalName().getBazaarData()
-                }
-                if (bazaarData != null) {
-                    val price =
-                        if (LorenzUtils.noTradeMode) bazaarData.npcPrice / 160 else (bazaarData.sellPrice + bazaarData.buyPrice) / 320
-                    extraDicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
-                }
+                val bazaarData = internalName.getBazaarData()
+                val price =
+                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.sellPrice + bazaarData.buyPrice) / 320
+                extraDicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
+            }
+
+            if (config.moneyPerHourArmor) {
+                val amountPerHour =
+                    it.multiplier * GardenCropSpeed.getRecentBPS() * FarmingArmorDrops.getDropsPerHour(it)
+                extraArmorCoins = amountPerHour * it.specialDropType.asInternalName().getNpcPrice()
             }
         }
 
@@ -183,13 +193,13 @@ object CropMoneyDisplay {
 
             try {
                 if (isSeeds(internalName)) {
-                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS", true))
+                    list.add(getItemStack("BOX_OF_SEEDS", true))
                 } else {
                     list.add(internalName.getItemStack())
                 }
 
                 if (cropNames[internalName] == CropType.WHEAT && config.moneyPerHourMergeSeeds) {
-                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS", true))
+                    list.add(getItemStack("BOX_OF_SEEDS", true))
                 }
             } catch (e: NullPointerException) {
                 e.printStackTrace()
@@ -206,12 +216,13 @@ object CropMoneyDisplay {
             val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
-                val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins
+                val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins + extraArmorCoins
                 val format = format(finalPrice)
                 if (debug) {
                     newDisplay.addAsSingletonList(" price: ${price.addSeparators()}")
                     newDisplay.addAsSingletonList(" extraMushroomCowPerkCoins: ${extraMushroomCowPerkCoins.addSeparators()}")
-                    newDisplay.addAsSingletonList(" existing extraDicerCoins: ${extraDicerCoins.addSeparators()}")
+                    newDisplay.addAsSingletonList(" extraArmorCoins: ${extraArmorCoins.addSeparators()}")
+                    newDisplay.addAsSingletonList(" extraDicerCoins: ${extraDicerCoins.addSeparators()}")
                     newDisplay.addAsSingletonList(" finalPrice: ${finalPrice.addSeparators()}")
                 }
                 list.add("$coinsColor$format")
@@ -312,7 +323,7 @@ object CropMoneyDisplay {
 
             val bazaarData = internalName.getBazaarData() ?: continue
 
-            var npcPrice = bazaarData.npcPrice * cropsPerHour
+            var npcPrice = internalName.getNpcPrice() * cropsPerHour
             var sellOffer = bazaarData.buyPrice * cropsPerHour
             var instantSell = bazaarData.sellPrice * cropsPerHour
             if (debug) {
@@ -331,7 +342,8 @@ object CropMoneyDisplay {
                         if (debug) {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
-                        npcPrice += it.npcPrice * seedsPerHour
+                        val factor = NEUItems.getMultiplier(internalName).second
+                        npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
                         sellOffer += it.buyPrice * seedsPerHour
                         instantSell += it.sellPrice * seedsPerHour
                     }

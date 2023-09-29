@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -13,7 +16,7 @@ import net.minecraft.nbt.CompressedStreamTools
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.ByteArrayInputStream
-import java.util.*
+import java.util.Base64
 
 class CropAccessoryData {
     private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toRegex()
@@ -30,17 +33,6 @@ class CropAccessoryData {
         loadedAccessoryThisProfile = false
 
         accessoryPage.clear()
-    }
-
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        if (loadedAccessoryThisProfile) return
-        val inventoryData = event.profileData["inv_contents"] ?: return
-        val accessories = getCropAccessories(event.profileData["talisman_bag"]).also {
-            it.addAll(getCropAccessories(inventoryData))
-        }
-        cropAccessory = accessories.maxOrNull() ?: CropAccessory.NONE
-        loadedAccessoryThisProfile = true
     }
 
     // Handle accessory bag detection

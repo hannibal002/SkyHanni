@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
 
 class KingTalismanHelper {
-    private val config get() = SkyHanniMod.feature.misc.mining
+    private val config get() = SkyHanniMod.feature.mining
 
     private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
     private val kingCircles = listOf(

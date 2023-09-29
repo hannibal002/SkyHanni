@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class BlazeSlayerFirePitsWarning {
     private val config get() = SkyHanniMod.feature.slayer
@@ -18,7 +19,7 @@ class BlazeSlayerFirePitsWarning {
         private var lastFirePitsWarning = 0L
 
         fun fireFirePits() {
-            TitleUtils.sendTitle("§cFire Pits!", 2_000)
+            TitleUtils.sendTitle("§cFire Pits!", 2.seconds)
         }
     }
 
@@ -43,17 +44,14 @@ class BlazeSlayerFirePitsWarning {
         val lastHealth = event.lastHealth
 
         val percentHealth = maxHealth * 0.33
-        if (health < percentHealth) {
-            if (lastHealth > percentHealth) {
-                when (entityData.bossType) {
-                    BossType.SLAYER_BLAZE_3,
-                    BossType.SLAYER_BLAZE_4,
-                    -> {
-                        fireFirePits()
-                    }
-
-                    else -> {}
+        if (health < percentHealth && lastHealth > percentHealth) {
+            when (entityData.bossType) {
+                BossType.SLAYER_BLAZE_3,
+                BossType.SLAYER_BLAZE_4,
+                -> {
+                    fireFirePits()
                 }
+                else -> {}
             }
         }
     }

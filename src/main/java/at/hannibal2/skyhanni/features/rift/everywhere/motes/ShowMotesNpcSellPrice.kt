@@ -1,6 +1,11 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -52,9 +57,12 @@ class ShowMotesNpcSellPrice {
         if (!isInventoryValueEnabled()) return
         val name = InventoryUtils.openInventoryName()
         if (!name.contains("Rift Storage")) return
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slotList.contains(slot.slotIndex))
-                slot highlight LorenzColor.GREEN
+        for ((_, indexes) in Renderable.list) {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                if (indexes.contains(slot.slotIndex)) {
+                    slot highlight LorenzColor.GREEN
+                }
+            }
         }
     }
 
@@ -90,6 +98,7 @@ class ShowMotesNpcSellPrice {
         itemMap.clear()
         slotList.clear()
         inInventory = false
+        Renderable.list.clear()
     }
 
     private fun processItems() {
@@ -132,28 +141,19 @@ class ShowMotesNpcSellPrice {
         for ((internalName, pair) in sorted) {
             newDisplay.add(buildList {
                 val (index, value) = pair
-                val dashColor = if (slotList.containsAll(index)) "§a" else "§7"
-                add("  $dashColor- ")
+                add("  §7- ")
                 val stack = NEUItems.getItemStack(internalName)
                 add(stack)
                 val price = value.formatPrice()
                 val valuePer = stack.motesNpcPrice() ?: continue
                 val tips = buildList {
-                    add("§eClick to highlight in the chest !")
+                    add("§6Item: ${stack.displayName}")
                     add("§6Value per: §d$valuePer Motes")
                     add("§6Total in chest: §d${(value / valuePer).toInt()}")
+                    add("")
+                    add("§6Total value: §d$price")
                 }
-                add(Renderable.clickAndHover("§6${stack.displayName}: §b$price", tips) {
-                    for (slot in InventoryUtils.getItemsInOpenChest()) {
-                        if (index.contains(slot.slotIndex)) {
-                            if (slotList.contains(slot.slotIndex)) {
-                                slotList.remove(slot.slotIndex)
-                            } else {
-                                slotList.add(slot.slotIndex)
-                            }
-                        }
-                    }
-                })
+                add(Renderable.hoverTips("§6${stack.displayName}: §b$price", tips, indexes = index, stack = stack))
             })
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
