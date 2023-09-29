@@ -230,7 +230,6 @@ object RenderUtils {
         GlStateManager.translate(0f, -0.25f, 0f)
         GlStateManager.rotate(-renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-//    RenderUtil.drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
 
@@ -333,9 +332,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
-//        GlStateManager.scale(scale, scale, scale)
         GlStateManager.scale(finalScale, finalScale, finalScale)
-//        GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
 
 class CollectionTracker {
 
@@ -50,15 +50,12 @@ class CollectionTracker {
             val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
                 LorenzUtils.chat("§c[SkyHanni] Gemstone collection is not supported!")
-//                setNewCollection("GEMSTONE_COLLECTION", "Gemstone")
                 return
             } else if (rawName == "mushroom") {
                 LorenzUtils.chat("§c[SkyHanni] Mushroom collection is not supported!")
-//                setNewCollection("MUSHROOM_COLLECTION", "Mushroom")
                 return
             }
 
-//            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName) ?: rawName.replace(" ", "_")
             val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
             if (foundInternalName == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
@@ -172,21 +169,17 @@ class CollectionTracker {
 
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
-        if (diff != 0) {
-            if (diff > 0) {
+        if (diff != 0 && diff > 0) {
                 gainItems(diff)
-            }
         }
 
         lastAmountInInventory = currentlyInInventory
     }
 
     private fun updateGain() {
-        if (recentGain != 0) {
-            if (System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
-                recentGain = 0
-                updateDisplay()
-            }
+        if (recentGain != 0 && System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
+            recentGain = 0
+            updateDisplay()
         }
     }
 

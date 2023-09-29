@@ -6,7 +6,17 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -124,7 +134,7 @@ public class GardenConfig {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     @FeatureToggle
@@ -318,7 +328,7 @@ public class GardenConfig {
         public boolean displayIcons = false;
 
         @Expose
-        @ConfigOption(name = "Only On Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+        @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
         @ConfigEditorBoolean
         public boolean onlyOnBarn = true;
 
@@ -468,7 +478,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only show top", desc = "Only show the top # crops.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
     @ConfigEditorSlider(
             minValue = 1,
             maxValue = 10,
@@ -478,7 +488,7 @@ public class GardenConfig {
     public int cropMilestoneShowOnlyBest = 10;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneShowCurrent = true;
@@ -851,9 +861,9 @@ public class GardenConfig {
     public boolean moneyPerHour = false;
 
     @Expose
-    @ConfigOption(name = "Show money per Hour",
-            desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to Bazaar. " +
-                    "Supports Bountiful, Mooshroom Cow Perk and Dicer drops. Their toggles are below.")
+    @ConfigOption(name = "Show Money per Hour",
+            desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
+                    "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     @FeatureToggle
@@ -861,7 +871,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only show top", desc = "Only show the best # items.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the best # items.")
     @ConfigEditorSlider(
             minValue = 1,
             maxValue = 25,
@@ -871,7 +881,7 @@ public class GardenConfig {
     public int moneyPerHourShowOnlyBest = 5;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourShowCurrent = true;
@@ -947,6 +957,14 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourMooshroom = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Armor Drops",
+            desc = "Includes the average coins/hr from your armor.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourArmor = true;
 
     @Expose
     @ConfigOption(
@@ -1128,7 +1146,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(
-            name = "Composter warning",
+            name = "Composter Warning",
             desc = "Warn when the Composter gets close to empty, even outside Garden."
     )
     @ConfigEditorBoolean
@@ -1375,9 +1393,9 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Garden Plot Icon", desc = "")
     @Accordion
-    public PlotIcon plotIcon = new PlotIcon();
+    public PlotIconConfig plotIcon = new PlotIconConfig();
 
-    public static class PlotIcon {
+    public static class PlotIconConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Enable icon replacement in the Configure Plots menu.")
         @ConfigEditorBoolean

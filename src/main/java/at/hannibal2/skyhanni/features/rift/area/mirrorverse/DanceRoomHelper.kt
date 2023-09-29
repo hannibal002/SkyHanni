@@ -1,13 +1,24 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -140,10 +151,8 @@ object DanceRoomHelper {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
-            if (entity is EntityOtherPlayerMP) {
-                if (inRoom) {
-                    event.isCanceled = true
-                }
+            if (entity is EntityOtherPlayerMP && inRoom) {
+                event.isCanceled = true
             }
         }
     }

@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
-import java.util.*
+import java.util.UUID
 
 class GuiEditManager {
 
@@ -35,8 +35,8 @@ class GuiEditManager {
         if (NEUItems.neuHasFocus()) return
 
         val screen = Minecraft.getMinecraft().currentScreen
-        if (screen is GuiEditSign) {
-            if (!screen.isRancherSign()) return
+        if (screen is GuiEditSign && !screen.isRancherSign()) {
+            return
         }
 
         if (isInGui()) return

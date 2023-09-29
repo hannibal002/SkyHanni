@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
@@ -64,10 +68,8 @@ class EntityData {
 
             val health = (any as Float).toInt()
 
-            if (entity is EntityWither) {
-                if (health == 300) {
-                    if (entityId < 0) return
-                }
+            if (entity is EntityWither && health == 300 && entityId < 0) {
+                return
             }
 
             if (entity is EntityLivingBase) {
