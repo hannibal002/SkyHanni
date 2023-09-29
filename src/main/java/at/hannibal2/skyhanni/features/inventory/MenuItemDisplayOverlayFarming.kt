@@ -101,7 +101,7 @@ class MenuItemDisplayOverlayFarming {
         if (stackSizeConfig.contains(4) && (chestName == "Composter")) {
             val lore = item.getLore()
             if (itemName.contains("Insert") && itemName.contains("from Sacks")) {
-                if ((lore.any { it.contains("In your sacks: ") }) && !(lore.any { it.contains("No") }))) {
+                if ((lore.any { it.contains("In your sacks: ") }) && !(lore.any { it.contains("No") })) {
                     for (line in lore) {
                         if (line.contains("In your sacks: ") && !line.contains("No")) {
                             if (itemName.contains(" Crops ")) {
