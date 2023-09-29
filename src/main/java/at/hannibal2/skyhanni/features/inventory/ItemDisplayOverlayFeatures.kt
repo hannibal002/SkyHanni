@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -29,6 +30,7 @@ class ItemDisplayOverlayFeatures {
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
     private val iReallyHateTheBottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
+    private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\/(§.)?(?<total>[0-9]+).*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -310,7 +312,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(20) && item.getInternalName_old().contains("SOULFLOW_") && !(chestName.contains("Auction"))) {
+        if (stackSizeConfig.contains(20) && item.getInternalName_old().startsWith("SOULFLOW_") && !(chestName.contains("Auction"))) {
             //§7Internalized: §316,493⸎ Soulflow
             //Internalized: 16,493⸎ Soulflow
             val line = item.getLore().first()
@@ -331,8 +333,32 @@ class ItemDisplayOverlayFeatures {
                 else return "" + usefulAsString + suffix
             }
         }
+
+        if (stackSizeConfig.contains(21) && item.getInternalName_old().startsWith("CRUX_")) {
+            val lore = item.getLore()
+            var numberOfLines = 0 //"zoMG ERY WHY NOT JUST REPLACE "CRUX_TALISMAN"?!?!?" yeah i considered that too but then realized hypixel might change that one day
+            var killCount = 0
+            val currentKillThresholdPerMobFamily = 100 //change this in case hypixel increases the kill count to max a crux accessory
+            if (lore.any {it.endsWith("kills")}) {
+                for (line in lore) {
+                    if (line.endsWith("kills")) {
+                        numberOfLines++
+                        xOutOfYNoColorRequiredPattern.matchMatcher(line) {
+                            val mobSpecificKillCount = group("useful").toInt() ?: 0
+                            killCount += mobSpecificKillCount
+                        }
+                    }
+                }
+                val totalKillsNecessary = currentKillThresholdPerMobFamily * numberOfLines
+                val percent = (((killCount.toFloat()) / (totalKillsNecessary.toFloat())) * 100)
+                LorenzUtils.chat("kills necessary: ${totalKillsNecessary}")
+                LorenzUtils.chat("kills recorded: ${killCount}")
+                LorenzUtils.chat("the damn kill count percent: ${percent}")
+                return percent.toInt().toString()
+            }
+        }
 		
-		if (stackSizeConfig.contains(21)) {
+		if (stackSizeConfig.contains(22)) {
             var thatNumber = ""
             if (item.getLore().any { it.contains("Auction ") }) {
                 thatNumber = item.getAuctionNumber().toString()

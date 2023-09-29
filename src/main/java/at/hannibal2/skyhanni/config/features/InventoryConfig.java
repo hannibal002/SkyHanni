@@ -385,6 +385,7 @@ public class InventoryConfig {
                 "§bShredder Bonus Damage",
                 "§bBottle of Jyrre Intelligence Bonus",
                 "§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)",
+                "§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)",
                 "§bItem Edition/Auction Number (if less than 1000)",
         }
     )
