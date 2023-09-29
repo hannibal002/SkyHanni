@@ -298,7 +298,7 @@ class ItemDisplayOverlayFeatures {
             //§7Internalized: §316,493⸎ Soulflow
             //Internalized: 16,493⸎ Soulflow
             val line = item.getLore().first()
-            if (line.contains("Internalized: ") & line.contains(" Soulflow")) {
+            if (line.contains("Internalized: ") && line.contains(" Soulflow")) {
                 val soulflowCount = line.removeColor().between("Internalized: 16,493", "⸎ Soulflow")
                 val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
                 val usefulAsString = "(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})*".toPattern().matchMatcher(soulflowCount) { group("leading") } ?: ""
@@ -312,7 +312,7 @@ class ItemDisplayOverlayFeatures {
                 }
                 if (usefulAsString.isEmpty()) return ""
                 if (suffix == "§b§z:)") return suffix
-                else return "" + usefulPartAsString + suffix
+                else return "" + usefulAsString + suffix
             }
         }
 
