@@ -485,6 +485,15 @@ public class RiftConfig {
             }
         }
 
+//        @Expose
+//        @ConfigOption(name = "Village Plaza", desc = "")
+//        @Accordion
+//        public VillagePlazaConfig villagePlazaConfig = new VillagePlazaConfig();
+//
+//        public static class VillagePlazaConfig {
+//
+//        }
+
         @Expose
         @ConfigOption(name = "Living Cave", desc = "")
         @Accordion
@@ -618,6 +627,16 @@ public class RiftConfig {
                 public boolean unknownTime = false;
             }
         }
+
+//        @Expose
+//        @ConfigOption(name = "Mountaintop", desc = "")
+//        @Accordion
+//        public MountaintopConfig mountaintopConfig = new MountaintopConfig();
+//
+//        public static class MountaintopConfig {
+//
+//        }
+
     }
 
     @Expose
