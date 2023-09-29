@@ -17,7 +17,7 @@ value class SimpleTimeMark(private val millis: Long) {
 
     fun timeUntil() = -passedSince()
 
-    fun isInPast() = timeUntil().isNegative(
+    fun isInPast() = timeUntil().isNegative()
 
     fun isFarPast() = millis == 0L
 

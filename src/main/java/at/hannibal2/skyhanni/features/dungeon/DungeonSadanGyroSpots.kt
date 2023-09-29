@@ -27,8 +27,8 @@ class DungeonSadanGyroSpots {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (event.repeatSeconds(1)) {
-            val inSadan = DungeonData.dungeonFloor?.equalsOneOf("F6", "M6") ?: false
-            active = LorenzUtils.inDungeons && DungeonData.inBossRoom && inSadan
+            val inSadan = DungeonAPI.dungeonFloor?.equalsOneOf("F6", "M6") ?: false
+            active = LorenzUtils.inDungeons && DungeonAPI.inBossRoom && inSadan
         }
     }
 
@@ -124,7 +124,7 @@ class DungeonSadanGyroSpots {
         first: LorenzVec,
         event: RenderWorldLastEvent,
     ) = if (!firstTime.isInPast()) {
-        val duration = firstTime.durationUntil()
+        val duration = firstTime.timeUntil()
         val timeFormat = duration.format(showMilliSeconds = true)
         event.drawWaypointFilled(first, LorenzColor.WHITE.toColor())
         event.drawDynamicText(first, "$name $timeFormat", 1.5)

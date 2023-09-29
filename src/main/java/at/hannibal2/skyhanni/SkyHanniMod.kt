@@ -76,6 +76,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonLevelColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
+import at.hannibal2.skyhanni.features.dungeon.DungeonSadanGyroSpots
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
