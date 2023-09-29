@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -322,9 +323,11 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(21) && item.getInternalName_old().startsWith("SOULFLOW_") && chestName.contains("Accessory Bag")) {
+            LorenzUtils.chat("item found! let's fucking do this shit")
             //§7Internalized: §316,493⸎ Soulflow
             //Internalized: 16,493⸎ Soulflow
             val line = item.getLore().first()
+            LorenzUtils.chat("line found! let's fucking do this shit: ${line}")
             if (line.contains("Internalized: ") && line.contains(" Soulflow")) {
                 val soulflowCount = line.removeColor().between("Internalized: 16,493", "⸎ Soulflow")
                 val soulflowCountWithoutCommas = soulflowCount.replace(",", "")
