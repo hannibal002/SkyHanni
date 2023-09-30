@@ -74,11 +74,11 @@ class ComposterOverlay {
 
         fun onCommand(args: Array<String>) {
             if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+                chat("§cUsage: /shtestcomposter <offset>")
                 return
             }
             testOffset = args[0].toInt()
-            LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+            chat("§e[SkyHanni] Composter test offset set to $testOffset.")
         }
 
         var inInventory = false
@@ -413,15 +413,14 @@ class ComposterOverlay {
             }
             list.add(item)
             val format = NumberUtil.format(totalPrice)
-            val selected =
-                if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
+            val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
             val rawItemName = itemName.removeColor()
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
                 if (LorenzUtils.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
-                    gfsLogic(internalName, itemName, itemsNeeded)
+                    getMaterials(internalName, itemName, itemsNeeded)
                 }
             })
             bigList.add(list)
@@ -439,42 +438,46 @@ class ComposterOverlay {
         return first ?: error("First is empty!")
     }
 
-    private fun gfsLogic(internalName: String, itemName: String, itemsNeeded: Double) {
+    private fun getMaterials(internalName: String, itemName: String, itemsNeeded: Double) {
         val sackData = fetchSackItem(internalName.asInternalName())
         val amountInSacks = sackData.amount
         val sacksLoaded = sackData.outdatedStatus
-        if (itemsNeeded.toInt() != 0 && itemName.removeColor() != "Biofuel") {
-            if (config.composterOverlayGetType == 0) {
-                inInventory = false
-                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
-            } else if (amountInSacks == 0 && sacksLoaded != -1) {
-                SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
-                chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
-                inInventory = false
-                BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
-            } else {
-                val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
-                if (sacksLoaded == -1) {
-                    val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining"
-                    else "Enchanted Agronomy"
-                    clickableChat(
-                        "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                        "sax"
-                    )
-                }
-                if (amountInSacks < itemsNeeded) {
-                    clickableChat(
-                        "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy on the Bazaar!",
-                        "bz ${itemName.removeColor()}"
-                    )
-                }
-                if (having < itemsNeeded) {
-                    LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
-                } else {
-                    chat("§e[SkyHanni] $itemName §8x${itemsNeeded.toInt()} §ealready found in inventory!")
-                }
-            }
+        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
+
+        if (itemsNeeded.toInt() == 0 || itemName.removeColor() == "Biofuel") return
+
+        if (config.composterOverlayGetType == 0) {
+            inInventory = false
+            BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+            return
         }
+
+        if (sacksLoaded == -1) {
+            val sackType =
+                if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy"
+            clickableChat(
+                "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                "sax"
+            )
+            return
+        } else if (amountInSacks == 0 && having == 0) {
+            SoundUtils.createSound("mob.endermen.portal", 0F).playSound()
+            chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
+            inInventory = false
+            BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
+            return
+        }
+
+        if (having < itemsNeeded) {
+            LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded.toInt() - having}")
+
+            if (amountInSacks <= (itemsNeeded - having)) {
+                clickableChat(
+                    "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    "bz ${itemName.removeColor()}"
+                )
+            }
+        } else chat("§e[SkyHanni] $itemName §8x${itemsNeeded.toInt()} §ealready found in inventory!")
     }
 
     private fun getPrice(internalName: String): Double {
