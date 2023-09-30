@@ -112,9 +112,9 @@ public class CrimsonIsleConfig {
     @ConfigOption(name = "Reputation Helper", desc = "")
     @Accordion
     @Expose
-    public ReputatioHelperConfig reputationHelper = new ReputatioHelperConfig();
+    public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
-    public static class ReputatioHelperConfig {
+    public static class ReputationHelperConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Enable features around Reputation features in the Crimson Isle.")
