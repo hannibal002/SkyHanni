@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -47,7 +48,7 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.debug.copyNBTDataCompressed)) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
@@ -60,5 +61,10 @@ object TestExportTools {
     inline fun <reified T> getTestData(category: Key<T>, name: String): T {
         val reader = InputStreamReader(javaClass.getResourceAsStream("/testdata/${category.name}/$name.json")!!)
         return fromJson(category, reader)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
     }
 }
