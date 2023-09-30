@@ -87,7 +87,7 @@ class MenuItemDisplayOverlayAbiphone {
                         "Notkia" -> "Nka"
                         "Techy" -> "Tec"
                         "Scrapper" -> "Scr"
-                        "Elise" -> "WTF"
+                        "Elise" -> "WTF" // f*** fur elise it is such a sh**** song
                         "Bells" -> "Jbl"
                         "Vibrate" -> "Vib"
                         else -> "?"
