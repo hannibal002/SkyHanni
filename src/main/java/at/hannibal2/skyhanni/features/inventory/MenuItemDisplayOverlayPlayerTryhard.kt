@@ -66,60 +66,51 @@ class MenuItemDisplayOverlayPlayerTryhard {
 
         //NOTE: IT'S String.length, NOT String.length()!
         
-        if (stackSizeConfig.contains(0)) {
-            if (itemName == "Previous Page" || itemName == "Next Page") {
-                val line = item.getLore().first().replace(",", "")
-                if (chestName.contains("Auction")) {
-                    auctionHousePagePattern.matchMatcher(line) {
-                        var pageNum = group("pagenumber").toInt()
-                        if (itemName == "Previous Page") {
-                            pageNum--
-                        } else if (itemName == "Next Page") {
-                            pageNum++
-                        }
-                        if (pageNum > 999) return "1k+"
-                        else return "${pageNum}"
+        if (stackSizeConfig.contains(0) && (itemName == "Previous Page" || itemName == "Next Page")) {
+            val line = item.getLore().first().replace(",", "")
+            if (chestName.contains("Auction")) {
+                auctionHousePagePattern.matchMatcher(line) {
+                    var pageNum = group("pagenumber").toInt()
+                    if (itemName == "Previous Page") {
+                        pageNum--
+                    } else if (itemName == "Next Page") {
+                        pageNum++
                     }
+                    if (pageNum > 999) return "1k+"
+                    else return "${pageNum}"
                 }
-                return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
+            return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
         }
 
-        if (stackSizeConfig.contains(1)) {
-            if ((chestName.contains(" RNG Meter"))) {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("Odds: ")) {
-                        return rngMeterPattern.matchMatcher(line) { group("odds").take(3) } ?: ""
-                    }
+        if (stackSizeConfig.contains(1) && (chestName.contains(" RNG Meter"))) {
+            for (line in item.getLore()) {
+                if (line.contains("Odds: ")) {
+                    return rngMeterPattern.matchMatcher(line) { group("odds").take(3) } ?: ""
                 }
             }
         }
         
-        if (stackSizeConfig.contains(2)) {
-            if ((chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
-                val lore = item.getLore()
-                if (!(lore.isEmpty())) {
-                    if (((chestName.contains("Community Shop")) &&
-                    ((lore.first().contains(" Upgrade")) ||
-                    (lore.last().contains(" to start!")) ||
-                    (lore.last().contains("Maxed out")) ||
-                    (lore.last().contains("upgrad")))) || ((chestName.contains(" Essence Shop")) && (lore.last().lowercase().contains("unlock")))) { //the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
-                        return itemName.split(" ").last().romanToDecimalIfNeeded().toString()
-                    }
+        if (stackSizeConfig.contains(2) && (chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
+            val lore = item.getLore()
+            if (!(lore.isEmpty())) {
+                if (((chestName.contains("Community Shop")) &&
+                ((lore.first().contains(" Upgrade")) ||
+                (lore.last().contains(" to start!")) ||
+                (lore.last().contains("Maxed out")) ||
+                (lore.last().contains("upgrad")))) || ((chestName.contains(" Essence Shop")) && (lore.last().lowercase().contains("unlock")))) { //the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
+                    return itemName.split(" ").last().romanToDecimalIfNeeded().toString()
                 }
             }
         }
         
-        if (stackSizeConfig.contains(3)) {
-            if (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop")) {
-                val lore = item.getLore()
-                if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
-                    if (chestName.contains("Community Shop")) {
-                        if (lore.last().contains("§aCurrently selected!")) return "§a⬇"
-                    } else if ((chestName.contains("Auction") || (chestName.contains("Bazaar"))) && (lore.first().contains("Category") && lore.last().contains("§aCurrently "))) {
-                        return "§a➡"
-                    }
+        if (stackSizeConfig.contains(3) && (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop"))) {
+            val lore = item.getLore()
+            if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
+                if (chestName.contains("Community Shop")) {
+                    if (lore.last().contains("§aCurrently selected!")) return "§a⬇"
+                } else if ((chestName.contains("Auction") || (chestName.contains("Bazaar"))) && (lore.first().contains("Category") && lore.last().contains("§aCurrently "))) {
+                    return "§a➡"
                 }
             }
         }
@@ -190,33 +181,29 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(5)) {
-            if (!chestName.isEmpty() && !item.getLore().isEmpty() && !itemName.isEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie")))) {
-                for (line in item.getLore()) {
-                    if (line.contains("Duration:")) {
-                        genericDurationPattern.matchMatcher(line) {
-                            val yString = group("years") ?: ""
-                            val dString = group("days") ?: ""
-                            val hString = group("hours") ?: ""
-                            val mString = group("minutes") ?: ""
-                            val sString = group("seconds") ?: ""
-                            if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return yString
-                            if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return dString
-                            if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return hString
-                            if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return mString
-                            if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return sString
-                        }
+        if (stackSizeConfig.contains(5) && (!chestName.isEmpty() && !item.getLore().isEmpty() && !itemName.isEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
+            for (line in item.getLore()) {
+                if (line.contains("Duration:")) {
+                    genericDurationPattern.matchMatcher(line) {
+                        val yString = group("years") ?: ""
+                        val dString = group("days") ?: ""
+                        val hString = group("hours") ?: ""
+                        val mString = group("minutes") ?: ""
+                        val sString = group("seconds") ?: ""
+                        if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return yString
+                        if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return dString
+                        if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return hString
+                        if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return mString
+                        if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return sString
                     }
                 }
             }
         }
 
-        if (stackSizeConfig.contains(6)) {
-            if (chestName.contains("Equipment and Stats") && itemName.contains("Active Effects")) {
-                for (line in item.getLore()) {
-                    if (line.contains("Currently Active: ")) {
-                        return line.split(" ").last()
-                    }
+        if (stackSizeConfig.contains(6) && (chestName.contains("Equipment and Stats") && itemName.contains("Active Effects"))) {
+            for (line in item.getLore()) {
+                if (line.contains("Currently Active: ")) {
+                    return line.split(" ").last()
                 }
             }
         }
@@ -327,14 +314,10 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
         }
 
-        
-
-        if (stackSizeConfig.contains(9)) {
-            if (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements")) {
-                for (line in item.getLore()) {
-                    if (line.contains("Points: ")) {
-                        return line.removeColor().split(" ").last().between("(", "%)")
-                    }
+        if (stackSizeConfig.contains(9) && (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements"))) {
+            for (line in item.getLore()) {
+                if (line.contains("Points: ")) {
+                    return line.removeColor().split(" ").last().between("(", "%)")
                 }
             }
         }

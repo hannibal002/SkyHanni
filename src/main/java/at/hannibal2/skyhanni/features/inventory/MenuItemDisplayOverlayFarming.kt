@@ -49,27 +49,23 @@ class MenuItemDisplayOverlayFarming {
 
         //NOTE: IT'S String.length, NOT String.length()!
 
-        if (stackSizeConfig.contains(0)) {
-            if ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!")) {
-                var gold = "§60"
-                var silver = "§f0"
-                var bronze = "§c0"
-                for (line in item.getLore()) {
-                    var noColorLine = line.removeColor()
-                    if (noColorLine.contains("GOLD")) gold = "§6" + noColorLine.split(" ").last()
-                    if (noColorLine.contains("SILVER")) silver = "§f" + noColorLine.split(" ").last()
-                    if (noColorLine.contains("BRONZE")) bronze = "§c" + noColorLine.split(" ").last()
-                }
-                return gold + silver + bronze
+        if (stackSizeConfig.contains(0) && ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!"))) {
+            var gold = "§60"
+            var silver = "§f0"
+            var bronze = "§c0"
+            for (line in item.getLore()) {
+                var noColorLine = line.removeColor()
+                if (noColorLine.contains("GOLD")) gold = "§6" + noColorLine.split(" ").last()
+                if (noColorLine.contains("SILVER")) silver = "§f" + noColorLine.split(" ").last()
+                if (noColorLine.contains("BRONZE")) bronze = "§c" + noColorLine.split(" ").last()
             }
+            return gold + silver + bronze
         }
 
-        if (stackSizeConfig.contains(1)) {
-            if ((chestName == "Visitor's Logbook") && itemName == ("Logbook")) {
-                for (line in item.getLore()) {
-                    if (line.contains("Next Visitor: ")) {
-                        return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m", "")
-                    }
+        if (stackSizeConfig.contains(1) && ((chestName == "Visitor's Logbook") && itemName == ("Logbook"))) {
+            for (line in item.getLore()) {
+                if (line.contains("Next Visitor: ")) {
+                    return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m", "")
                 }
             }
         }
@@ -87,34 +83,26 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(3)) {
+        if (stackSizeConfig.contains(3) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
-            if (chestName == "Visitor's Logbook") {
-                if (!(lore.isEmpty())) {
-                    if (lore.any { it.contains("Times Visited: ") }) {
-                        return lore.first().take(5).replace("T", "☉")
-                    }
-                }
+            if (!(lore.isEmpty()) && (lore.any { it.contains("Times Visited: ") })) {
+                return lore.first().take(5).replace("T", "☉")
             }
         }
 
-        if (stackSizeConfig.contains(4) && (chestName.contains("Composter"))) {
+        if (stackSizeConfig.contains(4) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from ")) && (item.getLore().any { (it.contains("Totalling ")) })) {
             val lore = item.getLore()
-            if (itemName.contains("Insert ") && itemName.contains(" from ")) {
-                if ((lore.any { (it.contains("Totalling ")) })) {
-                    for (line in lore) {
-                        if (line.contains("Totalling ")) {
-                            //§7Totalling §e§e615 Organic Matter§7.
-                            //§7Totalling §e§e844 Organic Matter§7.
-                            //Totalling 615 Organic Matter.
-                            //Totalling 844 Organic Matter.
-                            if (itemName.contains(" Crops ")) {
-                                return line.removeColor().between("Totalling ", " Organic Matter.")
-                            }
-                            if (itemName.contains(" Fuel ")) {
-                                return line.removeColor().between("Totalling ", " Fuel.")
-                            }
-                        }
+            for (line in lore) {
+                if (line.contains("Totalling ")) {
+                    //§7Totalling §e§e615 Organic Matter§7.
+                    //§7Totalling §e§e844 Organic Matter§7.
+                    //Totalling 615 Organic Matter.
+                    //Totalling 844 Organic Matter.
+                    if (itemName.contains(" Crops ")) {
+                        return line.removeColor().between("Totalling ", " Organic Matter.")
+                    }
+                    if (itemName.contains(" Fuel ")) {
+                        return line.removeColor().between("Totalling ", " Fuel.")
                     }
                 }
             }

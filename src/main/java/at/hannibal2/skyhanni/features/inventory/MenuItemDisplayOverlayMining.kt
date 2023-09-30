@@ -48,58 +48,52 @@ class MenuItemDisplayOverlayMining {
 
         //NOTE: IT'S String.length, NOT String.length()!
 
-        if (stackSizeConfig.contains(0)) {
-            if (chestName == "Heart of the Mountain") {
-                val nameWithColor = item.name ?: return ""
-                if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
-                    val lore = item.getLore()
-                    if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
-                    if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
-                    if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
-                    var level = lore.first().removeColor().replace("Level ", "")
-                    var colorCode = ""
-                    if (level.contains("/")) level = level.split("/")[0]
-                    if (nameWithColor.startsWith("§a")) level = "✔"
-                    if (lore.last().removeColor().replace("Right click to ", "").contains("enable")) colorCode = "§c"
-                    return "" + colorCode + level
-                }
+        if (stackSizeConfig.contains(0) && (chestName == "Heart of the Mountain")) {
+            val nameWithColor = item.name ?: return ""
+            if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
+                val lore = item.getLore()
+                if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
+                if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
+                if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
+                var level = lore.first().removeColor().replace("Level ", "")
+                var colorCode = ""
+                if (level.contains("/")) level = level.split("/")[0]
+                if (nameWithColor.startsWith("§a")) level = "✔"
+                if (lore.last().removeColor().replace("Right click to ", "").contains("enable")) colorCode = "§c"
+                return "" + colorCode + level
             }
         }
 
         //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
         //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
-        if (stackSizeConfig.contains(1) && chestName == "Heart of the Mountain") {
-            if (item.cleanName().contains("Tier ")) {
-                val nameWithColor = item.name ?: return ""
-                if (nameWithColor.contains("§a")) return ""
-                val lore = item.getLore()
-                if (lore != null && !(lore.isEmpty())) {
-                    if ((lore.any { it.contains("Progress: ") }) && (lore.any { it.contains("%") })) {
-                        for (line in lore) {
-                            if (line.contains("Progress: ") && line.contains("%")) {
-                                return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                            }
+        if (stackSizeConfig.contains(1) && chestName == ("Heart of the Mountain") && item.cleanName().contains("Tier ")) {
+            val nameWithColor = item.name ?: return ""
+            if (nameWithColor.contains("§a")) return ""
+            val lore = item.getLore()
+            if (lore != null && !(lore.isEmpty())) {
+                if ((lore.any { it.contains("Progress: ") }) && (lore.any { it.contains("%") })) {
+                    for (line in lore) {
+                        if (line.contains("Progress: ") && line.contains("%")) {
+                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                         }
                     }
                 }
             }
         }
 
-        if (stackSizeConfig.contains(2)) {
-            if (chestName == "Heart of the Mountain") {
-                val nameWithColor = item.name ?: return ""
-                if (nameWithColor != "§5Crystal Hollows Crystals") return ""
-                val lore = item.getLore()
-                var crystalsNotPlaced = 0
-                var crystalsNotFound = 0
-                val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
-                for (line in lore) {
-                    if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
-                    else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
-                }
-                var crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
-                return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
+        if (stackSizeConfig.contains(2) && (chestName == "Heart of the Mountain")) {
+            val nameWithColor = item.name ?: return ""
+            if (nameWithColor != "§5Crystal Hollows Crystals") return ""
+            val lore = item.getLore()
+            var crystalsNotPlaced = 0
+            var crystalsNotFound = 0
+            val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
+            for (line in lore) {
+                if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
+                else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
             }
+            var crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
+            return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
         }
 
 

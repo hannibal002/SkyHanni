@@ -63,15 +63,11 @@ class MenuItemDisplayOverlayPlayer {
 
         //NOTE: IT'S String.length, NOT String.length()!
 
-        if (stackSizeConfig.contains(0)) {
-            if (chestName.lowercase() == "skyblock menu") {
-                if (itemName.endsWith(" Leveling")) {
-                    for (line in item.getLore()) {
-                        if (line.contains(" Level: ")) {
-                            skyblockLevelPattern.matchMatcher(line) {
-                                return group("sblvl").toInt().toString()
-                            }
-                        }
+        if (stackSizeConfig.contains(0) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
+            for (line in item.getLore()) {
+                if (line.contains(" Level: ")) {
+                    skyblockLevelPattern.matchMatcher(line) {
+                        return group("sblvl").toInt().toString()
                     }
                 }
             }
@@ -99,14 +95,10 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(2)) {
-            if (chestName.lowercase() == "skyblock menu") {
-                if (itemName == "Your Skills") {
-                    for (line in item.getLore()) {
-                        if (line.contains(" Skill Avg. ")) {
-                            return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
-                        }
-                    }
+        if (stackSizeConfig.contains(2) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
+            for (line in item.getLore()) {
+                if (line.contains(" Skill Avg. ")) {
+                    return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
                 }
             }
         }
@@ -144,46 +136,36 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(4)) {
-            if (chestName.startsWith("Crafted Minions")) {
-                val lore = item.getLore()
-                if (itemName == "Information") {
-                    for (line in lore) {
-                        if (line.contains("Craft ") && line.contains(" more")) {
-                            return line.removeColor().replace("Craft ", "").replace(" more unique", "").trim()
-                        }
+        if (stackSizeConfig.contains(4) && chestName.startsWith("Crafted Minions")) {
+            val lore = item.getLore()
+            if (itemName == "Information") {
+                for (line in lore) {
+                    if (line.contains("Craft ") && line.contains(" more")) {
+                        return line.removeColor().replace("Craft ", "").replace(" more unique", "").trim()
                     }
                 }
-                if (lore.any { it.contains("Click to view ") }) {
-                    var tiersToSubtract = 0
-                    var totalTiers = 0
-                    for (line in lore) {
-                        if (line.contains(" Tier ")) { totalTiers++ }
-                        if (line.contains(" Tier ") && line.contains("§c")) { tiersToSubtract++ }
-                    }
-                    return (totalTiers - tiersToSubtract).toString().replace(totalTiers.toString(), "§a✔")
+            }
+            if (lore.any { it.contains("Click to view ") }) {
+                var tiersToSubtract = 0
+                var totalTiers = 0
+                for (line in lore) {
+                    if (line.contains(" Tier ")) { totalTiers++ }
+                    if (line.contains(" Tier ") && line.contains("§c")) { tiersToSubtract++ }
+                }
+                return (totalTiers - tiersToSubtract).toString().replace(totalTiers.toString(), "§a✔")
+            }
+        }
+
+        if (stackSizeConfig.contains(5) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
+            for (line in item.getLore()) {
+                if (line.contains("Items Donated")) {
+                    return museumDonationPattern.matchMatcher(line) { group("amount").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
                 }
             }
         }
 
-        if (stackSizeConfig.contains(5)) {
-            if (chestName.endsWith("Your Museum")) {
-                if (hannibalInsistedOnThisList.contains(itemName)) {
-                    for (line in item.getLore()) {
-                        if (line.contains("Items Donated")) {
-                            return museumDonationPattern.matchMatcher(line) { group("amount").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
-                        }
-                    }
-                }
-            }
-        }
-
-        if (stackSizeConfig.contains(6)) {
-            if (chestName == "Profile Management") {
-                if (itemName.contains("Profile: ")) {
-                    profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
-                }
-            }
+        if (stackSizeConfig.contains(6) && chestName == ("Profile Management") && itemName.contains("Profile: ")) {
+            profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
         }
 
         if (stackSizeConfig.contains(7)) {
@@ -228,14 +210,13 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(9)) {
-            if ((chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) { //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
-                val lore = item.getLore()
-                if ((lore.any {it.contains("You need ")}) && (lore.any {it.contains("more")})) {
-                    for (line in lore) {
-                        if (line.contains("You need ") && line.contains("more")) {
-                            return line.removeColor().between("You need ", " more")
-                        }
+        if (stackSizeConfig.contains(9) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
+            //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
+            val lore = item.getLore()
+            if ((lore.any {it.contains("You need ")}) && (lore.any {it.contains("more")})) {
+                for (line in lore) {
+                    if (line.contains("You need ") && line.contains("more")) {
+                        return line.removeColor().between("You need ", " more")
                     }
                 }
             }

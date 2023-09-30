@@ -59,21 +59,17 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         //NOTE: IT'S String.length, NOT String.length()!
         
         if (stackSizeConfig.contains(0)) {
-            if (chestName.lowercase() == "skyblock menu") {
-                if (itemName == "Recipe Book") {
-                    for (line in item.getLore()) {
-                        if (line.contains(" Book Unlocked: ")) {
-                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+            if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
+                for (line in item.getLore()) {
+                    if (line.contains(" Book Unlocked: ")) {
+                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
-            if ((chestName == "Recipe Book") || (chestName.contains(" Recipes"))) {
-                if (itemName.contains(" Recipes")) {
-                    for (line in item.getLore()) {
-                        if (line.contains("Recipes Unlocked: ")) {
-                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+            if (((chestName == "Recipe Book") || (chestName.contains(" Recipes"))) && (itemName.contains(" Recipes"))) {
+                for (line in item.getLore()) {
+                    if (line.contains("Recipes Unlocked: ")) {
+                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
@@ -116,131 +112,113 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(2)) {
-            if (itemName == "Trades") {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("Trades Unlocked")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                    }
+        if (stackSizeConfig.contains(2) && (itemName == "Trades")) {
+            val lore = item.getLore()
+            for (line in lore) {
+                if (line.contains("Trades Unlocked")) {
+                    return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }
         }
         
-        if (stackSizeConfig.contains(3)) {
-            if (chestName.startsWith("Wardrobe")) {
-                if (itemName.startsWith("Slot ") && itemName.contains(":")) {
-                    return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
-                }
-            }
+        if (stackSizeConfig.contains(3) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
+            return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
         }
 
         
-        if (stackSizeConfig.contains(4)) {
-            if (chestName.startsWith("Your Stats Breakdown")) {
-                val statName = item.name ?: return ""
-                if (!(statName.isEmpty())) {
-                    skyblockStatBreakdownPattern.matchMatcher(statName) {
-                        val name = group("name")
-                        val color = group("color")
-                        val icon = group("icon")
-                        val me = when (name) {
-                            "Health" -> "HP"
-                            "Defense" -> "Def"
-                            "Strength" -> "Str"
-                            "Intelligence" -> "Int"
-                            "Crit Damage" -> "CD"
-                            "Crit Chance" -> "CC"
-                            "Ferocity" -> "Fer"
-                            "Vitality" -> "Vit"
-                            "Mending" -> "Mnd"
-                            "Speed" -> "Spd"
-                            "Sea Creature Chance" -> "SCC"
-                            "Magic Find" -> "MF"
-                            "Fishing Speed" -> "FiS"
-                            "Combat Wisdom" -> "CoW"
-                            "Mining Wisdom" -> "MiW"
-                            "Farming Wisdom" -> "FaW"
-                            "Foraging Wisdom" -> "FoW"
-                            "Fishing Wisdom" -> "FiW"
-                            "Enchanting Wisdom" -> "EnW"
-                            "Alchemy Wisdom" -> "AlW"
-                            "Carpentry Wisdom" -> "CaW"
-                            "Runecrafting Wisdom" -> "RuW"
-                            "Social Wisdom" -> "SoW"
-                            "Mining Speed" -> "MiS"
-                            "Breaking Power" -> "BP"
-                            "Foraging Fortune" -> "FoF"
-                            "Farming Fortune" -> "FaF"
-                            "Mining Fortune" -> "MiF"
-                            else -> "[icon]"
-                        }
-                        return "" + "§" + color + me.replace("[icon]", icon)
+        if (stackSizeConfig.contains(4) && chestName.startsWith("Your Stats Breakdown")) {
+            val statName = item.name ?: return ""
+            if (!(statName.isEmpty())) {
+                skyblockStatBreakdownPattern.matchMatcher(statName) {
+                    val name = group("name")
+                    val color = group("color")
+                    val icon = group("icon")
+                    val me = when (name) {
+                        "Health" -> "HP"
+                        "Defense" -> "Def"
+                        "Strength" -> "Str"
+                        "Intelligence" -> "Int"
+                        "Crit Damage" -> "CD"
+                        "Crit Chance" -> "CC"
+                        "Ferocity" -> "Fer"
+                        "Vitality" -> "Vit"
+                        "Mending" -> "Mnd"
+                        "Speed" -> "Spd"
+                        "Sea Creature Chance" -> "SCC"
+                        "Magic Find" -> "MF"
+                        "Fishing Speed" -> "FiS"
+                        "Combat Wisdom" -> "CoW"
+                        "Mining Wisdom" -> "MiW"
+                        "Farming Wisdom" -> "FaW"
+                        "Foraging Wisdom" -> "FoW"
+                        "Fishing Wisdom" -> "FiW"
+                        "Enchanting Wisdom" -> "EnW"
+                        "Alchemy Wisdom" -> "AlW"
+                        "Carpentry Wisdom" -> "CaW"
+                        "Runecrafting Wisdom" -> "RuW"
+                        "Social Wisdom" -> "SoW"
+                        "Mining Speed" -> "MiS"
+                        "Breaking Power" -> "BP"
+                        "Foraging Fortune" -> "FoF"
+                        "Farming Fortune" -> "FaF"
+                        "Mining Fortune" -> "MiF"
+                        else -> "[icon]"
+                    }
+                    return "" + "§" + color + me.replace("[icon]", icon)
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(5) && (chestName.lowercase() == ("skyblock menu"))) {
+            val nameWithColor = item.name ?: return ""
+            if (nameWithColor != "§aProfile Management") return ""
+            val lore = item.getLore()
+            for (line in lore) {
+                if (line.contains("§7Playing on: §a")) {
+                    val profileName = line.replace("§7Playing on: §a", "").removeColor().trim()
+                    return when (profileName) {
+                        "Apple" -> "Apl"
+                        "Banana" -> "Bna"
+                        "Blueberry" -> "Blu"
+                        "Coconut" -> "Ccn"
+                        "Cucumber" -> "Ccb"
+                        "Grapes" -> "Grp"
+                        "Kiwi" -> "Kwi"
+                        "Lemon" -> "Lmn"
+                        "Lime" -> "Lim"
+                        "Mango" -> "Mng"
+                        "Not Allowed To Quit Skyblock Ever Again" -> "Akin"
+                        "Orange" -> "Org"
+                        "Papaya" -> "Ppy"
+                        "Pear" -> "Pr"
+                        "Peach" -> "Pch"
+                        "Pineapple" -> "Pnp"
+                        "Pomegranate" -> "Pom"
+                        "Raspberry" -> "Rsp"
+                        "Strawberry" -> "Stb"
+                        "Tomato" -> "Tmt"
+                        "Watermelon" -> "Wlm"
+                        "Zucchini" -> "Zch"
+                        else -> profileName.take(3)
                     }
                 }
             }
         }
 
-        if (stackSizeConfig.contains(5)) {
-            if (chestName.lowercase() == "skyblock menu") {
-                val nameWithColor = item.name ?: return ""
-                if (nameWithColor != "§aProfile Management") return ""
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("§7Playing on: §a")) {
-                        val profileName = line.replace("§7Playing on: §a", "").removeColor().trim()
-                        return when (profileName) {
-                            "Apple" -> "Apl"
-                            "Banana" -> "Bna"
-                            "Blueberry" -> "Blu"
-                            "Coconut" -> "Ccn"
-                            "Cucumber" -> "Ccb"
-                            "Grapes" -> "Grp"
-                            "Kiwi" -> "Kwi"
-                            "Lemon" -> "Lmn"
-                            "Lime" -> "Lim"
-                            "Mango" -> "Mng"
-                            "Not Allowed To Quit Skyblock Ever Again" -> "Akin"
-                            "Orange" -> "Org"
-                            "Papaya" -> "Ppy"
-                            "Pear" -> "Pr"
-                            "Peach" -> "Pch"
-                            "Pineapple" -> "Pnp"
-                            "Pomegranate" -> "Pom"
-                            "Raspberry" -> "Rsp"
-                            "Strawberry" -> "Stb"
-                            "Tomato" -> "Tmt"
-                            "Watermelon" -> "Wlm"
-                            "Zucchini" -> "Zch"
-                            else -> profileName.take(3)
-                        }
-                    }
-                }  
-            }
-        }
-
-        if (stackSizeConfig.contains(6)) {
-            if (chestName.endsWith("Challenges")) {
-                if (itemName.startsWith("Test of ") || itemName == "Rank") {
-                    for (line in item.getLore()) {
-                        if (line.contains("Your Rank:")) {
-                            dojoTestOfGradePattern.matchMatcher(line) {
-                                return group("grade").removeColor()
-                            }
-                        }
+        if (stackSizeConfig.contains(6) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
+            for (line in item.getLore()) {
+                if (line.contains("Your Rank:")) {
+                    dojoTestOfGradePattern.matchMatcher(line) {
+                        return group("grade").removeColor()
                     }
                 }
             }
         }
 
-        if (stackSizeConfig.contains(7)) {
-            if (chestName == "Bank") {
-                if (itemName == "Bank Upgrades") {
-                    for (line in item.getLore()) {
-                        if (line.startsWith("§7Current account: ")) {
-                            return line.removeColor().replace("Current account: ", "").substring(0,1)
-                        }
-                    }
+        if (stackSizeConfig.contains(7) && (chestName == "Bank") && (itemName == "Bank Upgrades")) {
+            for (line in item.getLore()) {
+                if (line.startsWith("§7Current account: ")) {
+                    return line.removeColor().replace("Current account: ", "").substring(0,1)
                 }
             }
         }
@@ -268,7 +246,6 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         return "" + colorCode + numPerks
                     }
                 }
-                
             }
             if (((chestName == "Calendar and Events") || (chestName.contains("Mayor "))) && (itemName.contains("Mayor "))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"

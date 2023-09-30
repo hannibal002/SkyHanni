@@ -54,19 +54,15 @@ class MenuItemDisplayOverlayCombat {
 
         //NOTE: IT'S String.length, NOT String.length()!
 
-        if (stackSizeConfig.contains(0)) {
-            if ((chestName.contains("Bestiary")) && !(itemName.isEmpty()) && (itemName.contains("Bestiary Milestone "))) {
-                return itemName.split(" ").last()
-            }
+        if (stackSizeConfig.contains(0) && ((chestName.contains("Bestiary")) && !(itemName.isEmpty()) && (itemName.contains("Bestiary Milestone ")))) {
+            return itemName.split(" ").last()
         }
 
-        if (stackSizeConfig.contains(1)) {
-            if ((chestName.contains("Bestiary")) && !(itemName.isEmpty())) {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
-                        return genericPercentPattern.matchMatcher(line.removeColor().replace(" (MAX!)", "")) { group("percent").replace("100", "§a✔") } ?: ""
-                    }
+        if (stackSizeConfig.contains(1) && ((chestName.contains("Bestiary")) && !(itemName.isEmpty()))) {
+            val lore = item.getLore()
+            for (line in lore) {
+                if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
+                    return genericPercentPattern.matchMatcher(line.removeColor().replace(" (MAX!)", "")) { group("percent").replace("100", "§a✔") } ?: ""
                 }
             }
         }
