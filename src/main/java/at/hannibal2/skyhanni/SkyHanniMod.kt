@@ -5,13 +5,55 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
-import at.hannibal2.skyhanni.data.*
+import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.BlockData
+import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.CropAccessoryData
+import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.FriendAPI
+import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
+import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropUpgrades
+import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ItemClickData
+import at.hannibal2.skyhanni.data.ItemRenderBackground
+import at.hannibal2.skyhanni.data.ItemTipHelper
+import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.data.OwnInventoryData
+import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.RenderGuiData
+import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SkillExperience
+import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.TitleData
+import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
-import at.hannibal2.skyhanni.features.bazaar.*
-import at.hannibal2.skyhanni.features.bingo.*
-import at.hannibal2.skyhanni.features.chat.*
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
+import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
+import at.hannibal2.skyhanni.features.bazaar.BazaarOpenPriceWebsite
+import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
+import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
+import at.hannibal2.skyhanni.features.bingo.BingoCardTips
+import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.bingo.CompactBingoChat
+import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper
+import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
+import at.hannibal2.skyhanni.features.chat.ChatFilter
+import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
+import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
@@ -20,29 +62,93 @@ import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.features.dungeon.*
-import at.hannibal2.skyhanni.features.event.diana.*
+import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages
+import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter
+import at.hannibal2.skyhanni.features.dungeon.DungeonCleanEnd
+import at.hannibal2.skyhanni.features.dungeon.DungeonCopilot
+import at.hannibal2.skyhanni.features.dungeon.DungeonDeathCounter
+import at.hannibal2.skyhanni.features.dungeon.DungeonHideItems
+import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
+import at.hannibal2.skyhanni.features.dungeon.DungeonLevelColor
+import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
+import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
+import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
+import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
+import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
+import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
+import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
+import at.hannibal2.skyhanni.features.event.diana.GriffinPetWarning
+import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
-import at.hannibal2.skyhanni.features.fishing.*
+import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
+import at.hannibal2.skyhanni.features.fishing.FishingTimer
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
+import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
+import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
-import at.hannibal2.skyhanni.features.garden.*
+import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
+import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
+import at.hannibal2.skyhanni.features.garden.GardenLevelDisplay
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.GardenOptimalSpeed
+import at.hannibal2.skyhanni.features.garden.GardenPlotBorders
+import at.hannibal2.skyhanni.features.garden.GardenYawAndPitch
+import at.hannibal2.skyhanni.features.garden.ToolTooltipTweaks
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures
-import at.hannibal2.skyhanni.features.garden.contest.*
-import at.hannibal2.skyhanni.features.garden.farming.*
+import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
+import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
+import at.hannibal2.skyhanni.features.garden.contest.JacobContestStatsSummary
+import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
+import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
+import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
+import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropCounter
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops
+import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
+import at.hannibal2.skyhanni.features.garden.farming.GardenBurrowingSporesNotifier
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
+import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.WildStrawberryDyeNotification
+import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
-import at.hannibal2.skyhanni.features.garden.inventory.*
+import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
+import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
+import at.hannibal2.skyhanni.features.garden.inventory.GardenDeskInSBMenu
+import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
+import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
+import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
+import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
-import at.hannibal2.skyhanni.features.inventory.*
+import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
+import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
+import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
+import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
+import at.hannibal2.skyhanni.features.inventory.ItemStars
+import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
+import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
+import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
@@ -50,7 +156,40 @@ import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.*
+import at.hannibal2.skyhanni.features.misc.BestiaryData
+import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
+import at.hannibal2.skyhanni.features.misc.ButtonOnPause
+import at.hannibal2.skyhanni.features.misc.ChestValue
+import at.hannibal2.skyhanni.features.misc.ChickenHeadTimer
+import at.hannibal2.skyhanni.features.misc.ChumBucketHider
+import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.CompactSplashPotionMessage
+import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
+import at.hannibal2.skyhanni.features.misc.CustomTextBox
+import at.hannibal2.skyhanni.features.misc.EnderNodeTracker
+import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
+import at.hannibal2.skyhanni.features.misc.FrozenTreasureTracker
+import at.hannibal2.skyhanni.features.misc.HarpFeatures
+import at.hannibal2.skyhanni.features.misc.HideArmor
+import at.hannibal2.skyhanni.features.misc.HideDamageSplash
+import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.MiscFeatures
+import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
+import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
+import at.hannibal2.skyhanni.features.misc.ParticleHider
+import at.hannibal2.skyhanni.features.misc.PasteIntoSigns
+import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
+import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
+import at.hannibal2.skyhanni.features.misc.PetExpTooltip
+import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
+import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
+import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
+import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
+import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
+import at.hannibal2.skyhanni.features.misc.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.misc.TimeFeatures
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -67,11 +206,19 @@ import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
+import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
-import at.hannibal2.skyhanni.features.nether.ashfang.*
+import at.hannibal2.skyhanni.features.mobs.SpawnTimers
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazes
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazingSouls
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangGravityOrbs
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideDamageIndicator
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva
@@ -90,10 +237,21 @@ import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigi
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
-import at.hannibal2.skyhanni.features.rift.everywhere.*
+import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
+import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints
+import at.hannibal2.skyhanni.features.rift.everywhere.HighlightRiftGuide
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
-import at.hannibal2.skyhanni.features.slayer.*
+import at.hannibal2.skyhanni.features.slayer.HideMobNames
+import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
+import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
+import at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround
+import at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures
+import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning
+import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterDisplay
+import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
@@ -103,7 +261,16 @@ import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticle
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.*
+import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
+import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.ParkourWaypointSaver
+import at.hannibal2.skyhanni.test.ShowItemUuid
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.TestCopyBestiaryValues
+import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
+import at.hannibal2.skyhanni.test.TestExportTools
+import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -130,7 +297,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.21.1",
+    version = "0.20.Beta.25.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -141,7 +308,7 @@ class SkyHanniMod {
         loadModule(this)
         loadModule(ChatManager)
         loadModule(HypixelData())
-        loadModule(DungeonData())
+        loadModule(DungeonAPI())
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
@@ -234,6 +401,7 @@ class SkyHanniMod {
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
         loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
@@ -331,8 +499,9 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(InquisitorWaypointShare)
-        loadModule(TrevorFeatures())
+        loadModule(TrevorFeatures)
         loadModule(TrevorSolver)
+        loadModule(TrevorTracker)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(CaptureFarmingGear())
@@ -401,6 +570,7 @@ class SkyHanniMod {
         loadModule(PowderTracker())
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
+        loadModule(DungeonRankTabListColor())
 
         init()
 

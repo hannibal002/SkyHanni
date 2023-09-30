@@ -21,10 +21,8 @@ class JacobContestStatsSummary {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
-        if (FarmingContestAPI.inContest) {
-            if (event.crop == FarmingContestAPI.contestCrop) {
-                blocksBroken++
-            }
+        if (FarmingContestAPI.inContest && event.crop == FarmingContestAPI.contestCrop) {
+            blocksBroken++
         }
     }
 

@@ -7,7 +7,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Base64
 
 object GhostFormatting {
 

@@ -66,10 +66,8 @@ class SlayerQuestWarning {
     fun onTick(event: LorenzTickEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
 
-        if (dirtySidebar) {
-            if (event.repeatSeconds(3)) {
-                checkSidebar()
-            }
+        if (dirtySidebar && event.repeatSeconds(3)) {
+            checkSidebar()
         }
     }
 
@@ -144,10 +142,8 @@ class SlayerQuestWarning {
         if (!(LorenzUtils.inSkyBlock)) return
 
         val entity = event.entity
-        if (entity.getLorenzVec().distanceToPlayer() < 6) {
-            if (isSlayerMob(entity)) {
-                tryWarn()
-            }
+        if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
+            tryWarn()
         }
     }
 

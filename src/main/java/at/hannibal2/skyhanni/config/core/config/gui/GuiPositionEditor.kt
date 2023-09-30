@@ -58,10 +58,8 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         GuiRenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
 
         var displayPos = -1
-        if (clickedPos != -1) {
-            if (positions[clickedPos].clicked) {
-                displayPos = clickedPos
-            }
+        if (clickedPos != -1 && positions[clickedPos].clicked) {
+            displayPos = clickedPos
         }
         if (displayPos == -1) {
             displayPos = hoveredPos
@@ -149,25 +147,24 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize().y
             val x = position.getAbsX()
             val y = position.getAbsY()
-            if (!position.clicked) {
-                if (GuiRenderUtils.isPointInRect(
+            if (!position.clicked &&
+                GuiRenderUtils.isPointInRect(
 
-                        mouseX,
-                        mouseY,
-                        x - border,
-                        y - border,
-                        elementWidth + border * 2,
-                        elementHeight + border * 2
+                    mouseX,
+                    mouseY,
+                    x - border,
+                    y - border,
+                    elementWidth + border * 2,
+                    elementHeight + border * 2
 
-                    )
+                )
 
-                ) {
-                    clickedPos = i
-                    position.clicked = true
-                    grabbedX = mouseX
-                    grabbedY = mouseY
-                    break
-                }
+            ) {
+                clickedPos = i
+                position.clicked = true
+                grabbedX = mouseX
+                grabbedY = mouseY
+                break
             }
         }
     }
@@ -188,6 +185,10 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             Keyboard.KEY_UP -> position.moveY(-dist, elementHeight)
             Keyboard.KEY_LEFT -> position.moveX(-dist, elementWidth)
             Keyboard.KEY_RIGHT -> position.moveX(dist, elementWidth)
+            Keyboard.KEY_MINUS -> position.scale -= .1F
+            Keyboard.KEY_EQUALS -> position.scale += .1F
+            Keyboard.KEY_SUBTRACT -> position.scale -= .1F
+            Keyboard.KEY_ADD -> position.scale += .1F
         }
     }
 

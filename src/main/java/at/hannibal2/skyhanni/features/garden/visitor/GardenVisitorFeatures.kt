@@ -3,30 +3,54 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.TabListLineRenderEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.VisitorArrivalEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemBlink
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
@@ -314,14 +338,12 @@ class GardenVisitorFeatures {
             GardenVisitorDropStatistics.saveAndUpdate()
             return
         }
-        if (event.slotId == 29) {
-            if (event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
-                changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
-                update()
-                GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-                GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
-                return
-            }
+        if (event.slotId == 29 && event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
+            changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
+            update()
+            GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
+            GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
+            return
         }
     }
 
@@ -334,10 +356,8 @@ class GardenVisitorFeatures {
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         val entity = event.entity
-        if (entity is EntityArmorStand) {
-            if (entity.name == "§e§lCLICK") {
-                event.isCanceled = true
-            }
+        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+            event.isCanceled = true
         }
     }
 
@@ -478,7 +498,6 @@ class GardenVisitorFeatures {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
         if (!event.isMod(10)) return
-//            if (!event.isMod(300)) return
 
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()
@@ -600,18 +619,12 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (config.visitorHypixelArrivedMessage) {
-            if (newVisitorArrivedMessage.matcher(event.message).matches()) {
-                event.blockedReason = "new_visitor_arrived"
-            }
+        if (config.visitorHypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+            event.blockedReason = "new_visitor_arrived"
         }
 
-        if (GardenAPI.inGarden()) {
-            if (config.visitorHideChat) {
-                if (hideVisitorMessage(event.message)) {
+        if (GardenAPI.inGarden() && config.visitorHideChat && hideVisitorMessage(event.message)) {
                     event.blockedReason = "garden_visitor_message"
-                }
-            }
         }
     }
 
@@ -645,18 +658,16 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if (config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) {
-                if (entity is EntityLivingBase) {
-                    val color = visitor.status.color
-                    if (color != -1) {
-                        RenderLivingEntityHelper.setEntityColor(
-                            entity,
-                            color
-                        ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
-                    }
-                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
-                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
+            if ((config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) && entity is EntityLivingBase) {
+                val color = visitor.status.color
+                if (color != -1) {
+                    RenderLivingEntityHelper.setEntityColor(
+                        entity,
+                        color
+                    ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
                 }
+                // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
             }
         }
     }
@@ -669,7 +680,8 @@ class GardenVisitorFeatures {
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
+        for (entity in EntityUtils.getAllEntities()) {
+            if (entity is EntityArmorStand) continue
             if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
 
             visitor.entityId = entity.entityId
@@ -752,10 +764,8 @@ class GardenVisitorFeatures {
     }
 
     private fun showGui(): Boolean {
-        if (config.visitorNeedsInBazaarAlley) {
-            if (LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
-                return true
-            }
+        if (config.visitorNeedsInBazaarAlley && LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+            return true
         }
 
         if (GardenAPI.hideExtraGuis()) return false
