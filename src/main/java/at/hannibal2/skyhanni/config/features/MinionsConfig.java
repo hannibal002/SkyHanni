@@ -18,6 +18,7 @@ public class MinionsConfig {
     @ConfigEditorBoolean
     public boolean nameOnlyTier = false;
 
+    @Expose
     @ConfigOption(name = "Last Clicked", desc = "")
     @Accordion
     public LastClickedMinionConfig lastClickedMinion = new LastClickedMinionConfig();
@@ -49,8 +50,7 @@ public class MinionsConfig {
         public int time = 20;
     }
 
-
-
+    @Expose
     @ConfigOption(name = "Emptied Time", desc = "")
     @Accordion
     public EmptiedTimeConfig emptiedTime = new EmptiedTimeConfig();

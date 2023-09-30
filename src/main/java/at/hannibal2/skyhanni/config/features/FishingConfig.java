@@ -106,6 +106,7 @@ public class FishingConfig {
         public String color = "0:255:255:255:255";
     }
 
+    @Expose
     @ConfigOption(name = "Barn Fishing Timer", desc = "")
     @Accordion
     public BarnTimerConfig barnTimer = new BarnTimerConfig();
