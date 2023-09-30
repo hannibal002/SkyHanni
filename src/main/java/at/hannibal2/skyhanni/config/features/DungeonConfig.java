@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -11,13 +12,13 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class DungeonConfig {
 
     @Expose
-    @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and wither essence when clicked in dungeons.")
+    @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightClickedBlocks = false;
 
     @Expose
-    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in dungeons.")
+    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showMilestonesDisplay = false;
@@ -26,7 +27,7 @@ public class DungeonConfig {
     public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeon.")
+    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current Dungeon.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean deathCounterDisplay = false;
@@ -39,7 +40,7 @@ public class DungeonConfig {
     public boolean cleanEnd = false;
 
     @Expose
-    @ConfigOption(name = "Clean Ending", desc = "After the last dungeon boss has died, all entities and " +
+    @ConfigOption(name = "Clean Ending", desc = "After the last Dungeon boss has died, all entities and " +
             "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
@@ -47,7 +48,7 @@ public class DungeonConfig {
     public boolean cleanEndToggle = false;
 
     @Expose
-    @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 guardians from the clean end feature when " +
+    @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 Guardians from the clean end feature when " +
             "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
@@ -60,73 +61,73 @@ public class DungeonConfig {
     public boolean damageSplashBoss = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color.")
+    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight Deathmites in Dungeons in red color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightDeathmites = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Teammates", desc = "Highlight dungeon teammates with a glowing outline.")
+    @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightTeammates = true;
 
 
-    @ConfigOption(name = "Object Hider", desc = "Hide various things in dungeons.")
+    @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
     @ConfigEditorAccordion(id = 3)
     public boolean objectHider = false;
 
     @Expose
-    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeons.")
+    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideSuperboomTNT = false;
 
     @Expose
-    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeons.")
+    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideBlessing = false;
 
     @Expose
-    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeons.")
+    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideReviveStone = false;
 
     @Expose
-    @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeons.")
+    @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hidePremiumFlesh = false;
 
     @Expose
-    @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in dungeons.")
+    @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideJournalEntry = false;
 
     @Expose
-    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeons.")
+    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideSkeletonSkull = true;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the healer kills mobs.")
+    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideHealerOrbs = false;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the golden fairy that follows the healer in dungeons.")
+    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the Golden Fairy that follows the Healer in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
@@ -137,7 +138,7 @@ public class DungeonConfig {
     public boolean messageFilter = false;
 
     @Expose
-    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeons.")
+    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     @FeatureToggle
@@ -148,7 +149,7 @@ public class DungeonConfig {
     public boolean dungeonCopilot = false;
 
     @Expose
-    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeons.")
+    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
@@ -162,11 +163,25 @@ public class DungeonConfig {
     public boolean partyFinder = false;
 
     @Expose
-    @ConfigOption(name = "Colored Class Level", desc = "Color class levels in party finder.")
+    @ConfigOption(name = "Colored Class Level", desc = "Color class levels in Party Finder.")
     @ConfigAccordionId(id = 6)
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean partyFinderColoredClassLevel = true;
+
+    @Expose
+    @ConfigOption(name = "Tab List", desc = "")
+    @Accordion
+    public TabListConfig tabList = new TabListConfig();
+
+    public static class TabListConfig {
+
+        @Expose
+        @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in Dungeons anyway?)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean coloredClassLevel = true;
+    }
 
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +

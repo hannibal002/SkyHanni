@@ -3,94 +3,107 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class FishingConfig {
 
+    @Expose
     @ConfigOption(name = "Trophy Fishing", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean trophyFishing = false;
+    @Accordion
+    public TrophyFishingConfig trophyFishing = new TrophyFishingConfig();
 
-    @Expose
-    @ConfigOption(
-            name = "Trophy Counter",
-            desc = "Counts Trophy messages from chat and tells you how many you have found."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean trophyCounter = false;
+    public static class TrophyFishingConfig {
 
-    @Expose
-    @ConfigOption(
-            name = "Trophy Counter Design",
-            desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
-                    "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
-                    "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
-    )
-    @ConfigEditorDropdown(values = {"Style 1", "Style 2", "Style 3"})
-    @ConfigAccordionId(id = 0)
-    public int trophyDesign = 0;
+        @Expose
+        @ConfigOption(name = "Trophy Fishing Chat Messages", desc = "")
+        @Accordion
+        public ChatMessagesConfig chatMessages = new ChatMessagesConfig();
 
-    @Expose
-    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same trophy fish from chat.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean trophyFishDuplicateHider = false;
+        public static class ChatMessagesConfig {
 
-    @Expose
-    @ConfigOption(name = "Show total amount", desc = "Show total amount of all rarities at the end of the chat message.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean trophyFishTotalAmount = false;
+            @Expose
+            @ConfigOption(
+                    name = "Trophy Counter",
+                    desc = "Counts Trophy messages from chat and tells you how many you have found."
+            )
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = false;
 
-    @Expose
-    @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a trophy fish when hovering over a catch message in chat.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean trophyFishTooltip = true;
+            @Expose
+            @ConfigOption(
+                    name = "Trophy Counter Design",
+                    desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
+                            "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
+                            "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
+            )
+            @ConfigEditorDropdown(values = {"Style 1", "Style 2", "Style 3"})
+            public int design = 0;
 
-    @Expose
-    @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean trophyFishBronzeHider = false;
+            @Expose
+            @ConfigOption(name = "Show Total Amount", desc = "Show total amount of all rarities at the end of the chat message.")
+            @ConfigEditorBoolean
+            public boolean totalAmount = false;
 
-    @Expose
-    @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver trophy fishes from chat.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean trophyFishSilverHider = false;
+            @Expose
+            @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a Trophy Fish when hovering over a catch message in chat.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean tooltip = true;
 
-    @Expose
-    @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of trophy fish in tooltip.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean trophyFilletTooltip = true;
+            @Expose
+            @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same Trophy Fish from chat.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean duplicateHider = false;
 
-    @Expose
-    @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean odgerLocation = true;
+            @Expose
+            @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze Trophy Fishes from chat.")
+            @ConfigEditorBoolean
+            public boolean bronzeHider = false;
+
+            @Expose
+            @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver Trophy Fishes from chat.")
+            @ConfigEditorBoolean
+            public boolean silverHider = false;
+        }
+
+        @Expose
+        @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean filletTooltip = true;
+
+        @Expose
+        @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean odgerLocation = true;
+    }
 
     @ConfigOption(name = "Thunder Spark", desc = "")
     @ConfigEditorAccordion(id = 1)
     public boolean thunderSpark = false;
 
     @Expose
-    @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder")
+    @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
     public boolean thunderSparkHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Thunder Spark Color", desc = "Color of the Thunder Sparks")
+    @ConfigOption(name = "Thunder Spark Color", desc = "Color of the Thunder Sparks.")
     @ConfigEditorColour
     @ConfigAccordionId(id = 1)
     public String thunderSparkColor = "0:255:255:255:255";
@@ -115,7 +128,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(
             name = "Worm Fishing",
-            desc = "Show the barn fishing timer even for worms or other sea creatures in the crystal hollows."
+            desc = "Show the Barn Fishing Timer even for worms or other sea creatures in the Crystal Hollows."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
@@ -124,7 +137,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(
             name = "Stranded Fishing",
-            desc = "Show the barn fishing timer even on all the different islands stranded players can visit."
+            desc = "Show the Barn Fishing Timer even on all the different islands Stranded players can visit."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
@@ -200,7 +213,29 @@ public class FishingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Rare", desc = "Highlight rare sea creatures in blue color.")
+    @ConfigOption(name = "Fishing Hook Display", desc = "")
+    @Accordion
+    public FishingHookDisplay fishingHookDisplay = new FishingHookDisplay();
+
+    public static class FishingHookDisplay {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Armor Stand", desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled.")
+        @ConfigEditorBoolean
+        public boolean hideArmorStand = true;
+
+        @Expose
+        public Position position = new Position(460, -240, 3.4f);
+    }
+
+    @Expose
+    @ConfigOption(name = "Highlight Rare", desc = "Highlight Rare Sea Creatures in blue color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean rareSeaCreatureHighlight = false;
@@ -208,7 +243,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(
             name = "Shark Fish Counter",
-            desc = "Counts how many sharks have been caught."
+            desc = "Counts how many Sharks have been caught."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -218,13 +253,13 @@ public class FishingConfig {
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of sea creature you have fished.")
+    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of Sea Creature you have fished.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shortenFishingMessage = false;
 
     @Expose
-    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the sea creature chat message instead of in a previous line.")
+    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the Sea Creature chat message instead of in a previous line.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactDoubleHook = true;

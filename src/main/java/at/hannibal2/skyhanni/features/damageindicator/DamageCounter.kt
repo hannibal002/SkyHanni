@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
-import java.util.*
+import java.util.LinkedList
 
 class DamageCounter {
 

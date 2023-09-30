@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.jsonobjects.WarpsJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object WarpTabComplete {
-    private val config get() = SkyHanniMod.feature.misc.tabCompleteCommands
+    private val config get() = SkyHanniMod.feature.commands.tabComplete
     private var warpsJson: WarpsJson? = null
 
     @SubscribeEvent

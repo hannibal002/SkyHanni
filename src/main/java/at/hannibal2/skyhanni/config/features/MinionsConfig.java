@@ -3,7 +3,12 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class MinionsConfig {
 
@@ -14,7 +19,7 @@ public class MinionsConfig {
     public boolean nameDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Only Tier", desc = "Show only the tier number over the minion. (Useful for bingo)")
+    @ConfigOption(name = "Only Tier", desc = "Show only the tier number over the minion. (Useful for Bingo)")
     @ConfigEditorBoolean
     public boolean nameOnlyTier = false;
 

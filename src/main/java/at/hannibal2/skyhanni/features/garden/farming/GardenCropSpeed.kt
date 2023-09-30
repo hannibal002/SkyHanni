@@ -114,7 +114,7 @@ object GardenCropSpeed {
                             toolName.endsWith("DICER_3") -> 2
                             else -> -1
                         }
-                        if (tier != -1 && melonDicer.size > 0 && pumpkinDicer.size > 0) {
+                        if (tier != -1 && melonDicer.isNotEmpty() && pumpkinDicer.isNotEmpty()) {
                             if (it == CropType.MELON) {
                                 latestMelonDicer = melonDicer[tier]
                             } else if (it == CropType.PUMPKIN) {

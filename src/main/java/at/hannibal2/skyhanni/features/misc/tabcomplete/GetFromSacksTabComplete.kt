@@ -9,7 +9,7 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GetFromSacksTabComplete {
-    private val config get() = SkyHanniMod.feature.misc.tabCompleteCommands
+    private val config get() = SkyHanniMod.feature.commands.tabComplete
     private var sackList = emptyList<String>()
     private val commands = arrayOf("gfs", "getfromsacks")
 
@@ -34,10 +34,10 @@ object GetFromSacksTabComplete {
         if (commands.any { message.startsWith("/$it ") }) {
             val rawName = message.split(" ")[1]
             val realName = rawName.replace("_", " ")
-            if (realName in sackList) {
-                event.isCanceled = true
-                LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
-            }
+            if (realName == rawName) return
+            if (realName !in sackList) return
+            event.isCanceled = true
+            LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
         }
     }
 

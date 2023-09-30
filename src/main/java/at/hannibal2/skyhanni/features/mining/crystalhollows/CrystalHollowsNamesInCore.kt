@@ -12,8 +12,8 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrystalHollowsNamesInCore {
-    val config get() = SkyHanniMod.feature.misc.mining
-    val coreLocations = mapOf(
+    val config get() = SkyHanniMod.feature.mining
+    private val coreLocations = mapOf(
         LorenzVec(550, 116, 550) to "§8Precursor City",
         LorenzVec(552, 116, 474) to "§bMithril Deposits",
         LorenzVec(477, 116, 476) to "§aJungle",

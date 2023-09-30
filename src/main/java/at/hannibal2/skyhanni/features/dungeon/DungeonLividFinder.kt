@@ -25,9 +25,9 @@ object DungeonLividFinder {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inDungeons || !DungeonData.inBossRoom) return
-        if (DungeonData.dungeonFloor != "F5" && DungeonData.dungeonFloor != "M5") return
-        if (DungeonData.dungeonFloor == "F5" && livid != null) return
+        if (!LorenzUtils.inDungeons || !DungeonAPI.inBossRoom) return
+        if (DungeonAPI.dungeonFloor != "F5" && DungeonAPI.dungeonFloor != "M5") return
+        if (DungeonAPI.dungeonFloor == "F5" && livid != null) return
         if (!event.repeatSeconds(2)) return
         if (!gotBlinded) {
             gotBlinded = Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.blindness)

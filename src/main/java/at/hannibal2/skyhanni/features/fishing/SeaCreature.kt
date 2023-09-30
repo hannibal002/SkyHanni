@@ -8,7 +8,7 @@ data class SeaCreature(
 ) {
 
     override fun toString(): String {
-        return  chatColor + rare() + displayName
+        return chatColor + rare() + displayName
     }
 
     private fun rare(): String {
