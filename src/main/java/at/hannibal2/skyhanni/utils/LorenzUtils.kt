@@ -70,7 +70,7 @@ object LorenzUtils {
     var lastButtonClicked = 0L
 
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled && internalChat(DEBUG_PREFIX + message)) {
+        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
             consoleLog("[Debug] $message")
         }
     }
