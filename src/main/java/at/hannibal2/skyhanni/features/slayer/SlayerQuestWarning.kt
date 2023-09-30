@@ -39,6 +39,7 @@ class SlayerQuestWarning {
         }
         if (message == "  §r§5§lSLAYER QUEST STARTED!") {
             needSlayerQuest = false
+            dirtySidebar = true
         }
 
         //no auto slayer

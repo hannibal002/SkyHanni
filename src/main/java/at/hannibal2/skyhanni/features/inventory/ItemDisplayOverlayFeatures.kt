@@ -75,42 +75,31 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(1)) {
-            if (itemName.matchRegex("(.*)Master Skull - Tier .")) {
-                return itemName.substring(itemName.length - 1)
+        if (stackSizeConfig.contains(1) && itemName.matchRegex("(.*)Master Skull - Tier .")) {
+            return itemName.substring(itemName.length - 1)
+        }
+
+        if (stackSizeConfig.contains(2) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
+            when {
+                itemName.contains("Bonzo") -> return "1"
+                itemName.contains("Scarf") -> return "2"
+                itemName.contains("Professor") -> return "3"
+                itemName.contains("Thorn") -> return "4"
+                itemName.contains("Livid") -> return "5"
+                itemName.contains("Sadan") -> return "6"
+                itemName.contains("Necron") -> return "7"
             }
         }
 
-        if (stackSizeConfig.contains(2)) {
-            if (itemName.contains("Golden ") || itemName.contains("Diamond ")) {
-                when {
-                    itemName.contains("Bonzo") -> return "1"
-                    itemName.contains("Scarf") -> return "2"
-                    itemName.contains("Professor") -> return "3"
-                    itemName.contains("Thorn") -> return "4"
-                    itemName.contains("Livid") -> return "5"
-                    itemName.contains("Sadan") -> return "6"
-                    itemName.contains("Necron") -> return "7"
-                }
-            }
+        if (stackSizeConfig.contains(3) && (itemName.startsWith("New Year Cake ("))) {
+            return "§b" + itemName.between("(Year ", ")")
         }
 
-        if (stackSizeConfig.contains(3)) {
-            if (itemName.startsWith("New Year Cake (")) {
-                return "§b" + itemName.between("(Year ", ")")
-            }
-        }
-
-        if (stackSizeConfig.contains(4)) {
-            val chestName = InventoryUtils.openInventoryName()
-            if (!chestName.endsWith("Sea Creature Guide")) {
-                if (ItemUtils.isPet(itemName)) {
-                    petLevelPattern.matchMatcher(itemName) {
-                        val level = group("level").toInt()
-                        if (level != ItemUtils.maxPetLevel(itemName)) {
-                            return "$level"
-                        }
-                    }
+        if (stackSizeConfig.contains(4) && (!chestName.endsWith("Sea Creature Guide")) && (ItemUtils.isPet(itemName))) {
+            petLevelPattern.matchMatcher(itemName) {
+                val level = group("level").toInt()
+                if (level != ItemUtils.maxPetLevel(itemName)) {
+                    return "$level"
                 }
             }
         }

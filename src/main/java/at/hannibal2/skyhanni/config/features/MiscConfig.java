@@ -633,5 +633,11 @@ public class MiscConfig {
     public boolean superpairsClicksAlert = false;
 
     @Expose
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixNeuHeavyPearls = true;
+
+    @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 }
