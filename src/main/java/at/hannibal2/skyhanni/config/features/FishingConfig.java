@@ -157,10 +157,12 @@ public class FishingConfig {
                 minStep = 10
         )
         public int alertTime = 330;
+
+        @Expose
+        public Position pos = new Position(10, 10, false, true);
     }
 
-    @Expose
-    public Position barnTimerPos = new Position(10, 10, false, true);
+
 
 
 
