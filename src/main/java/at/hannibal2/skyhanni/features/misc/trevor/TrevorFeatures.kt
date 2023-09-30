@@ -4,18 +4,29 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -58,13 +69,11 @@ object TrevorFeatures {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
             Minecraft.getMinecraft().addScheduledTask {
                 try {
-                    if (config.trapperSolver) {
-                        if (onFarmingIsland()) {
-                            updateTrapper()
-                            TrevorTracker.saveAndUpdate()
-                            TrevorTracker.calculatePeltsPerHour()
-                            if (questActive) TrevorSolver.findMob()
-                        }
+                    if (config.trapperSolver && onFarmingIsland()) {
+                        updateTrapper()
+                        TrevorTracker.saveAndUpdate()
+                        TrevorTracker.calculatePeltsPerHour()
+                        if (questActive) TrevorSolver.findMob()
                     }
                 } catch (error: Throwable) {
                     CopyErrorCommand.logError(error, "Encountered an error when updating the trapper solver")
@@ -126,11 +135,9 @@ object TrevorFeatures {
             val siblings = event.chatComponent.siblings
 
             for (sibling in siblings) {
-                if (sibling.chatStyle.chatClickEvent != null) {
-                    if (sibling.chatStyle.chatClickEvent.value.contains("YES")) {
-                        lastChatPromptTime = System.currentTimeMillis()
-                        lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
-                    }
+                if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
+                    lastChatPromptTime = System.currentTimeMillis()
+                    lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
                 }
             }
         }
@@ -209,14 +216,12 @@ object TrevorFeatures {
         var entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper =
             Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
-        if (entityTrapper is EntityLivingBase) {
-            if (config.trapperTalkCooldown) {
-                RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
-                { config.trapperTalkCooldown }
-                entityTrapper.getLorenzVec().let {
-                    if (it.distanceToPlayer() < 15) {
-                        event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
-                    }
+        if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
+            RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+            { config.trapperTalkCooldown }
+            entityTrapper.getLorenzVec().let {
+                if (it.distanceToPlayer() < 15) {
+                    event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
                 }
             }
         }
@@ -250,14 +255,12 @@ object TrevorFeatures {
         if (NEUItems.neuHasFocus()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (config.keyBindWarpTrapper == key) {
-            if (lastChatPromptTime != -1L && config.acceptQuest && !questActive) {
-                if (System.currentTimeMillis() - 200 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
-                    lastChatPromptTime = -1L
-                    LorenzUtils.sendCommandToServer(lastChatPrompt)
-                    lastChatPrompt = ""
-                    timeLastWarped = System.currentTimeMillis()
-                    return
-                }
+            if (lastChatPromptTime != -1L && config.acceptQuest && !questActive && System.currentTimeMillis() - 200 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
+                lastChatPromptTime = -1L
+                LorenzUtils.sendCommandToServer(lastChatPrompt)
+                lastChatPrompt = ""
+                timeLastWarped = System.currentTimeMillis()
+                return
             }
             if (System.currentTimeMillis() - timeLastWarped > 3000 && config.warpToTrapper) {
                 if (System.currentTimeMillis() < teleportBlock + 5000) return
@@ -272,10 +275,8 @@ object TrevorFeatures {
         if (!inTrapperDen()) return
         if (!config.trapperTalkCooldown) return
         val entity = event.entity
-        if (entity is EntityArmorStand) {
-            if (entity.name == "§e§lCLICK") {
-                event.isCanceled = true
-            }
+        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+            event.isCanceled = true
         }
     }
 

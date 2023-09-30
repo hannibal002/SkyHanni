@@ -53,33 +53,31 @@ object TrevorSolver {
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMobs.entries.firstOrNull { it.mobName.contains(name) }
-            if (animalHealths.any { it == entityHealth }) {
-                if (currentMob != null) {
-                    if (foundID == entity.entityId) {
-                        val dist = entity.position.toLorenzVec().distanceToPlayer()
-                        if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
-                            println("This is unfortunate")
-                        } else canSee = LocationUtils.canSee(
-                            LocationUtils.playerEyeLocation(),
-                            entity.position.toLorenzVec().add(0.0, 0.5, 0.0)
-                        ) && dist < currentMob!!.renderDistance
+            if (animalHealths.any { it == entityHealth } && currentMob != null) {
+                if (foundID == entity.entityId) {
+                    val dist = entity.position.toLorenzVec().distanceToPlayer()
+                    if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
+                        println("This is unfortunate")
+                    } else canSee = LocationUtils.canSee(
+                        LocationUtils.playerEyeLocation(),
+                        entity.position.toLorenzVec().add(0.0, 0.5, 0.0)
+                    ) && dist < currentMob!!.renderDistance
 
-                        if (!canSee) {
-                            val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
-                            if (nameTagEntity is EntityArmorStand) canSee = true
-                        }
-                        if (canSee) {
-                            if (mobLocation != CurrentMobArea.FOUND) {
-                                TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
-                            }
-                            mobLocation = CurrentMobArea.FOUND
-                            mobCoordinates = entity.position.toLorenzVec()
-                        }
-                    } else {
-                        foundID = entity.entityId
+                    if (!canSee) {
+                        val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
+                        if (nameTagEntity is EntityArmorStand) canSee = true
                     }
-                    return
+                    if (canSee) {
+                        if (mobLocation != CurrentMobArea.FOUND) {
+                            TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
+                        }
+                        mobLocation = CurrentMobArea.FOUND
+                        mobCoordinates = entity.position.toLorenzVec()
+                    }
+                } else {
+                    foundID = entity.entityId
                 }
+                return
             }
         }
         if (foundID != -1) {

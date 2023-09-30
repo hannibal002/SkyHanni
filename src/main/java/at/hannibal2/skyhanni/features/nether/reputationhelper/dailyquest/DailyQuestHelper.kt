@@ -2,19 +2,37 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestCategory
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -275,10 +293,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
-        if (miniBossQuest.miniBoss == miniBoss) {
-            if (miniBossQuest.state == QuestState.ACCEPTED) {
-                updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
-            }
+        if (miniBossQuest.miniBoss == miniBoss && miniBossQuest.state == QuestState.ACCEPTED) {
+            updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
         }
     }
 

@@ -7,7 +7,9 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import org.intellij.lang.annotations.Language
-import java.util.*
+import java.util.Base64
+import java.util.NavigableMap
+import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -148,11 +150,9 @@ object StringUtils {
         for (i in 0..steps) {
             val toDouble = i.toDouble()
             val stepPercentage = toDouble / steps
-            if (stepPercentage >= percentage) {
-                if (!inMissingArea) {
-                    builder.append(missing)
-                    inMissingArea = true
-                }
+            if (stepPercentage >= percentage && !inMissingArea) {
+                builder.append(missing)
+                inMissingArea = true
             }
             builder.append(step)
         }

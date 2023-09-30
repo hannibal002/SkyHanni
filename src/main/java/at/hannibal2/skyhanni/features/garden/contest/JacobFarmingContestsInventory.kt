@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -13,7 +17,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class JacobFarmingContestsInventory {
     private val duplicateSlots = mutableListOf<Int>()
@@ -122,13 +126,11 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val slot = event.slot.slotNumber
-        if (config.jacobFarmingContestHideDuplicates) {
-            if (duplicateSlots.contains(slot)) {
-                event.toolTip.clear()
-                event.toolTip.add("§7Duplicate contest")
-                event.toolTip.add("§7hidden by SkyHanni!")
-                return
-            }
+        if (config.jacobFarmingContestHideDuplicates && duplicateSlots.contains(slot)) {
+            event.toolTip.clear()
+            event.toolTip.add("§7Duplicate contest")
+            event.toolTip.add("§7hidden by SkyHanni!")
+            return
         }
 
         if (config.jacobFarmingContestRealTime) {

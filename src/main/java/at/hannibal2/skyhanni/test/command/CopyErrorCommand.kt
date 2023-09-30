@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object CopyErrorCommand {
@@ -86,11 +86,9 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
 
     for (traceElement in stackTrace) {
         var text = "\tat $traceElement"
-        if (!full) {
-            if (text in parent) {
-                println("broke at: $text")
-                break
-            }
+        if (!full && text in parent) {
+            println("broke at: $text")
+            break
         }
         if (!full) {
             for ((from, to) in replace) {
@@ -98,11 +96,9 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
             }
         }
         add(text)
-        if (!full) {
-            if (breakAfter.any { text.contains(it) }) {
-                println("breakAfter: $text")
-                break
-            }
+        if (!full && breakAfter.any { text.contains(it) }) {
+            println("breakAfter: $text")
+            break
         }
     }
 
