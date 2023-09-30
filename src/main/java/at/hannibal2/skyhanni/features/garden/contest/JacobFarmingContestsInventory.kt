@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -25,7 +26,7 @@ class JacobFarmingContestsInventory {
 
     private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)
     private val formatTime = SimpleDateFormat("HH:mm", Locale.US)
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.jacobFarmingContest
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
@@ -53,7 +54,7 @@ class JacobFarmingContestsInventory {
             val name = item.name!!
 
             if (foundEvents.contains(name)) {
-                if (config.jacobFarmingContestHideDuplicates) {
+                if (config.hideDuplicates) {
                     duplicateSlots.add(slot)
                 }
             } else {
@@ -61,7 +62,7 @@ class JacobFarmingContestsInventory {
             }
             val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
             FarmingContestAPI.addContest(time, item)
-            if (config.jacobFarmingContestRealTime) {
+            if (config.realTime) {
                 readRealTime(time, slot)
             }
         }
@@ -79,10 +80,10 @@ class JacobFarmingContestsInventory {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
-        if (!config.jacobFarmingContestHighlightRewards) return
+        if (!config.highlightRewards) return
 
         // hide green border for a tick
-        if (config.jacobFarmingContestHideDuplicates && hideEverything) return
+        if (config.hideDuplicates && hideEverything) return
 
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
@@ -102,7 +103,7 @@ class JacobFarmingContestsInventory {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.jacobFarmingContestHideDuplicates) return
+        if (!config.hideDuplicates) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         if (hideEverything) {
@@ -126,14 +127,14 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val slot = event.slot.slotNumber
-        if (config.jacobFarmingContestHideDuplicates && duplicateSlots.contains(slot)) {
+        if (config.hideDuplicates && duplicateSlots.contains(slot)) {
             event.toolTip.clear()
             event.toolTip.add("§7Duplicate contest")
             event.toolTip.add("§7hidden by SkyHanni!")
             return
         }
 
-        if (config.jacobFarmingContestRealTime) {
+        if (config.realTime) {
             realTime[slot]?.let {
                 val toolTip = event.toolTip
                 if (toolTip.size > 1) {
@@ -146,7 +147,7 @@ class JacobFarmingContestsInventory {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.jacobFarmingContestMedalIcon) return
+        if (!config.medalIcon) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val stack = event.stack ?: return
@@ -164,7 +165,7 @@ class JacobFarmingContestsInventory {
                 var y = event.y + 1
                 var scale = .7f
 
-                if (finneganContest && config.jacobFarmingContestFinneganIcon) {
+                if (finneganContest && config.finneganIcon) {
                     stackTip = "§${medalEarned.color}▲"
                     x = event.x + 5
                     y = event.y - 2
@@ -174,5 +175,13 @@ class JacobFarmingContestsInventory {
                 event.drawSlotText(x, y, stackTip, scale)
             }
         }
+    }
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"inventory.jacobFarmingContestHighlightedRewards","inventory.jacobFarmingContest.highlightRewards")
+        event.move(3,"inventory.jacobFarmingContestHideDuplicates","inventory.jacobFarmingContest.hideDuplicates")
+        event.move(3,"inventory.jacobFarmingContestRealTime","inventory.jacobFarmingContest.realTime")
+        event.move(3,"inventory.jacobFarmingContestFinneganIcon","inventory.jacobFarmingContest.finneganIcon")
+        event.move(3,"inventory.jacobFarmingContestMedalIcon","inventory.jacobFarmingContest.medalIcon")
     }
 }
