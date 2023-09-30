@@ -17,6 +17,7 @@ import java.util.List;
 
 public class InventoryConfig {
 
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
@@ -57,6 +58,7 @@ public class InventoryConfig {
 
     }
 
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
@@ -80,6 +82,7 @@ public class InventoryConfig {
         public boolean selectedDrop = false;
     }
 
+    @Expose
     @ConfigOption(name = "Stats Tuning", desc = "")
     @Accordion
     public StatsTuningConfig statsTuning = new StatsTuningConfig();
