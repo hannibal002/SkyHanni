@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -28,9 +27,9 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Bingo Card", desc = "")
         @Accordion
-        public BingoCard bingoCard = new BingoCard();
+        public BingoCardConfig bingoCard = new BingoCardConfig();
 
-        public static class BingoCard {
+        public static class BingoCardConfig {
             @Expose
             @ConfigOption(name = "Enable", desc = "Displays the Bingo Card.")
             @ConfigEditorBoolean
@@ -70,9 +69,9 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Compact Chat Messages", desc = "")
         @Accordion
-        public CompactChat compactChat = new CompactChat();
+        public CompactChatConfig compactChat = new CompactChatConfig();
 
-        public static class CompactChat {
+        public static class CompactChatConfig {
 
             @Expose
             @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
@@ -160,10 +159,9 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
         @Accordion
-        @ConfigAccordionId(id = 9)
-        public InquisitorSharing inquisitorSharing = new InquisitorSharing();
+        public InquisitorSharingConfig inquisitorSharing = new InquisitorSharingConfig();
 
-        public static class InquisitorSharing {
+        public static class InquisitorSharingConfig {
 
             @Expose
             @ConfigOption(name = "Enabled", desc = "Shares your Inquisitor and receiving other Inquisitors via Party Chat.")
@@ -315,9 +313,9 @@ public class EventConfig {
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion
     @Expose
-    public Century century = new Century();
+    public CenturyConfig century = new CenturyConfig();
 
-    public static class Century {
+    public static class CenturyConfig {
 
         @ConfigOption(name = "Enable Active Player Timer", desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket.")
         @Expose
