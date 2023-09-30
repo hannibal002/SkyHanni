@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -20,7 +21,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay == 0) return
+        if (SkyHanniMod.feature.itemAbilities.fireVeilWand.display == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
         if (event.type == EnumParticleTypes.FLAME && event.count == 1 && event.speed == 0f && event.offset.isZero()) {
@@ -44,11 +45,17 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay != 1) return
+        if (SkyHanniMod.feature.itemAbilities.fireVeilWand.display != 1) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
-        val color = SkyHanniMod.feature.itemAbilities.fireVeilWandDisplayColor.toChromaColor()
+        val color = SkyHanniMod.feature.itemAbilities.fireVeilWand.displayColor.toChromaColor()
 
         RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWand.displayColor")
+        event.move(3,"itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWand.display")
     }
 }
