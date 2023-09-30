@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
