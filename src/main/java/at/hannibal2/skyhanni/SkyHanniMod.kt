@@ -168,6 +168,7 @@ import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.EnderNodeTracker
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
+import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.misc.HarpFeatures
 import at.hannibal2.skyhanni.features.misc.HideArmor
@@ -570,6 +571,7 @@ class SkyHanniMod {
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
+        loadModule(FixNEUHeavyPearls())
 
         init()
 
