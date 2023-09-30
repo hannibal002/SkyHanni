@@ -150,10 +150,12 @@ public class DungeonConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
+
+        @Expose
+        public Position pos = new Position(10, 10, false, true);
     }
 
-    @Expose
-    public Position copilotPos = new Position(10, 10, false, true);
+
 
     @Expose
     @ConfigOption(name = "Party Finder", desc = "")

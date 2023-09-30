@@ -19,7 +19,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FishingTimer {
-    private val config get() = SkyHanniMod.feature.fishing
+    private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private val barnLocation = LorenzVec(108, 89, -252)
 
     private var rightLocation = false
@@ -30,7 +30,7 @@ class FishingTimer {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.barnTimer.enabled) return
+        if (!config.enabled) return
 
         if (event.repeatSeconds(3)) {
             rightLocation = isRightLocation()
@@ -40,14 +40,14 @@ class FishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
-        if (OSUtils.isKeyHeld(config.barnTimer.manualResetTimer)) startTime = System.currentTimeMillis()
+        if (OSUtils.isKeyHeld(config.manualResetTimer)) startTime = System.currentTimeMillis()
     }
 
     private fun tryPlaySound() {
         if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime
-        val barnTimerAlertTime = config.barnTimer.alertTime * 1_000
+        val barnTimerAlertTime = config.alertTime * 1_000
         if (duration > barnTimerAlertTime && duration < barnTimerAlertTime + 3_000) {
             SoundUtils.playBeepSound()
         }
@@ -65,7 +65,7 @@ class FishingTimer {
             startTime = 0
         }
 
-        if (inHollows && newCount >= 60 && config.barnTimer.wormLimitAlert) {
+        if (inHollows && newCount >= 60 && config.wormLimitAlert) {
             SoundUtils.playBeepSound()
         }
     }
@@ -83,9 +83,9 @@ class FishingTimer {
     private fun isRightLocation(): Boolean {
         inHollows = false
 
-        if (config.barnTimer.forStranded && LorenzUtils.isStrandedProfile) return true
+        if (config.forStranded && LorenzUtils.isStrandedProfile) return true
 
-        if (config.barnTimer.crystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
+        if (config.crystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             inHollows = true
             return true
         }
@@ -100,18 +100,18 @@ class FishingTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.barnTimer.enabled) return
+        if (!config.enabled) return
         if (!rightLocation) return
         if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime
-        val barnTimerAlertTime = config.barnTimer.alertTime * 1_000
+        val barnTimerAlertTime = config.alertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
         val name = if (currentCount == 1) "sea creature" else "sea creatures"
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
-        config.barnTimerPos.renderString(text, posLabel = "BarnTimer")
+        config.pos.renderString(text, posLabel = "BarnTimer")
     }
 
     @SubscribeEvent
@@ -122,5 +122,6 @@ class FishingTimer {
         event.move(3, "fishing.barnTimerForStranded", "fishing.barnTimer.forStranded")
         event.move(3, "fishing.wormLimitAlert", "fishing.barnTimer.wormLimitAlert")
         event.move(3, "fishing.manualResetTimer", "fishing.barnTimer.manualResetTimer")
+        event.move(3, "fishing.barnTimerPos", "fishing.barnTimer.pos")
     }
 }
