@@ -133,12 +133,13 @@ class DungeonCopilot {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.copilotPos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        SkyHanniMod.feature.dungeon.dungeonCopilot.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
         event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
         event.move(3,"dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
+        event.move(3,"dungeon.copilotPos", "dungeon.dungeonCopilot.pos")
     }
 }
