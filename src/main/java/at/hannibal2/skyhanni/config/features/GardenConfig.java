@@ -219,7 +219,7 @@ public class GardenConfig {
                         "§9Replenish I",
                 }
         )
-        public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
 
 
     }
