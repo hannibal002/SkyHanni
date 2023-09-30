@@ -252,14 +252,30 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 val nameWithColor = item.name ?: return ""
                 val lore = item.getLore()
                 if (lore.any { it.contains(" the closing of") }) {
-                    val colorCode = nameWithColor.take(2)
-                    var numPerks = 0
-                    for (line in item.getLore()) {
-                        if (line.startsWith(colorCode) && !(line.startsWith(colorCode + "§"))) {
-                            numPerks++
+                    if (!(itemName.contains("Jerry"))) {
+                        val colorCode = nameWithColor.take(2)
+                        var numPerks = 0
+                        for (line in lore) {
+                            if (line.startsWith(colorCode) && !(line.startsWith(colorCode + "§"))) {
+                                numPerks++
+                            }
+                        }
+                        return "" + colorCode + numPerks
+                    } else {
+                        for (line in lore) {
+                            if (line.contains("Perkpocalypse")) {
+                                if (lore.any { it.contains("SLASHED Pricing") } || lore.any { it.contains("Slayer XP Buff") } || lore.any { it.contains("Pathfinder") }) return "§bAtx"
+                                if (lore.any { it.contains("Prospection") } || lore.any { it.contains("Mining XP Buff") } || lore.any { it.contains("Mining Fiesta") }) return "§bCle"
+                                if (lore.any { it.contains("Lucky!") } || lore.any { it.contains("Pet XP Buff") } || lore.any { it.contains("Mythological Ritual") }) return "§bDna"
+                                if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖"
+                                if (lore.any { it.contains("Farming Simulator") } || lore.any { it.contains("Pelt-pocalypse") } || lore.any { it.contains("GOATed") }) return "§bFnng"
+                                if (lore.any { it.contains("Sweet Tooth") } || lore.any { it.contains("Benevolence") } || lore.any { it.contains("Extra Event") }) return "§bFxy"
+                                if (lore.any { it.contains("Luck of the Sea 2.0") } || lore.any { it.contains("Fishing XP Buff") } || lore.any { it.contains("Fishing Festival") }) return "§bMrna"
+                                if (lore.any { it.contains("Marauder") } || lore.any { it.contains("EZPZ") } || lore.any { it.contains("Benediction") }) return "§bPaul"
+                                else return "§c?"
+                            }
                         }
                     }
-                    return "" + colorCode + numPerks
                 }
             }
         }

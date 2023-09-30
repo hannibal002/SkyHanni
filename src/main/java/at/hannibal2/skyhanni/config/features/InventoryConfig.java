@@ -428,7 +428,7 @@ public class InventoryConfig {
                     "§bAuction House + Bazaar (Various)",
                     "§bDojo Progress (Abbv)",
                     "§bBank Tier (Abbv)",
-                    "§bMayor Perk Count (#)",
+                    "§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)",
             }
     )
     public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
