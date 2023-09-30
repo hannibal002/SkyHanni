@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -52,6 +53,11 @@ class BlazeSlayerClearView {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazeClearView && nearBlaze
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blaze.clearView && nearBlaze
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "slayer.blazeClearView", "slayer.blaze.clearView")
     }
 }

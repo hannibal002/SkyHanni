@@ -162,10 +162,6 @@ public class FishingConfig {
         public Position pos = new Position(10, 10, false, true);
     }
 
-
-
-
-
     @Expose
     @ConfigOption(name = "Chum/Chumcap Bucket Hider", desc = "")
     @Accordion
