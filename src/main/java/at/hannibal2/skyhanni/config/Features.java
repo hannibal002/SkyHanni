@@ -1,7 +1,27 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.features.*;
+import at.hannibal2.skyhanni.config.features.About;
+import at.hannibal2.skyhanni.config.features.BazaarConfig;
+import at.hannibal2.skyhanni.config.features.ChatConfig;
+import at.hannibal2.skyhanni.config.features.CombatConfig;
+import at.hannibal2.skyhanni.config.features.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.CrimsonIsleConfig;
+import at.hannibal2.skyhanni.config.features.DevConfig;
+import at.hannibal2.skyhanni.config.features.DungeonConfig;
+import at.hannibal2.skyhanni.config.features.EventConfig;
+import at.hannibal2.skyhanni.config.features.FishingConfig;
+import at.hannibal2.skyhanni.config.features.GUIConfig;
+import at.hannibal2.skyhanni.config.features.GardenConfig;
+import at.hannibal2.skyhanni.config.features.InventoryConfig;
+import at.hannibal2.skyhanni.config.features.ItemAbilityConfig;
+import at.hannibal2.skyhanni.config.features.MarkedPlayerConfig;
+import at.hannibal2.skyhanni.config.features.MiningConfig;
+import at.hannibal2.skyhanni.config.features.MinionsConfig;
+import at.hannibal2.skyhanni.config.features.MiscConfig;
+import at.hannibal2.skyhanni.config.features.OldHidden;
+import at.hannibal2.skyhanni.config.features.RiftConfig;
+import at.hannibal2.skyhanni.config.features.SlayerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -24,7 +44,7 @@ public class Features extends Config {
     @Override
     public List<Social> getSocials() {
         return Arrays.asList(
-                Social.forLink("Join our Discord", DISCORD, "https://discord.gg/8DXVN4BJz3"),
+                Social.forLink("Join our Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
                 Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
         );
     }
@@ -44,7 +64,7 @@ public class Features extends Config {
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
     public GUIConfig gui = new GUIConfig();
 
     @Expose
@@ -52,11 +72,11 @@ public class Features extends Config {
     public ChatConfig chat = new ChatConfig();
 
     @Expose
-    @Category(name = "Dungeon", desc = "Features that change the dungeon experience in catacombs.")
+    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
 
     @Expose
-    @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
+    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
     public InventoryConfig inventory = new InventoryConfig();
 
     @Expose
@@ -64,15 +84,11 @@ public class Features extends Config {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @Category(name = "Summonings", desc = "Mobs you revive.")
-    public SummoningsConfig summonings = new SummoningsConfig();
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose
-    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
-    public AshfangConfig ashfang = new AshfangConfig();
-
-    @Expose
-    @Category(name = "Minion", desc = "The minions at your private island.")
+    @Category(name = "Minion", desc = "The minions on your private island.")
     public MinionsConfig minions = new MinionsConfig();
 
     @Expose
@@ -84,44 +100,36 @@ public class Features extends Config {
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
-    @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
+    @Category(name = "Combat", desc = "Everything combat and PvE related.")
+    public CombatConfig combat = new CombatConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Diana", desc = "Diana's mythological event.")
-    public DianaConfig diana = new DianaConfig();
+    @Category(name = "Mining", desc = "Features that help you break blocks.")
+    public MiningConfig mining = new MiningConfig();
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsConfig commands = new CommandsConfig();
 
     @Expose
-    @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer.")
+    @Category(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
-    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
-    public BingoConfig bingo = new BingoConfig();
+    @Category(name = "Events", desc = "Stuff that is not always available.")
+    public EventConfig event = new EventConfig();
 
     @Expose
-    @Category(name = "Mobs", desc = "Visual help for Mobs")
-    public MobsConfig mobs = new MobsConfig();
-
-    @Expose
-    @Category(name = "Garden", desc = "Features on the Garden island.")
+    @Category(name = "Garden", desc = "Features for the Garden island.")
     public GardenConfig garden = new GardenConfig();
 
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")
     public RiftConfig rift = new RiftConfig();
-
-    @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
@@ -136,4 +144,8 @@ public class Features extends Config {
 
     @Expose
     public Storage storage = new Storage();
+
+    @Expose
+    public int lastVersion = ConfigUpdaterMigrator.INSTANCE.getConfigVersion();
+
 }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -33,7 +34,13 @@ import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.*
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.CopyItemCommand
+import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
+import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
+import at.hannibal2.skyhanni.test.command.CopyTabListCommand
+import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -237,7 +244,7 @@ object Commands {
         registerCommand(
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
-        ) { CopyItemCommand.command(it) }
+        ) { CopyItemCommand.command() }
         registerCommand(
             "shcopyparticles",
             "Copied information about the particles that spawn in the next 50ms to the clipboard"
@@ -247,6 +254,14 @@ object Commands {
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
         ) { TestChatCommand.command(it) }
+        registerCommand(
+            "shcopyinternalname",
+            "Copies the internal name of the item in hand to the clipboard."
+        ) { SkyHanniDebugsAndTests.copyItemInternalName() }
+        registerCommand(
+            "shpartydebug",
+            "List persons into the chat SkyHanni thinks are in your party."
+        ) { PartyAPI.listMembers() }
     }
 
     private fun internalCommands() {
@@ -300,7 +315,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
+            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()

@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import com.google.gson.Gson
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream

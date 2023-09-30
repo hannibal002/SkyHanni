@@ -3,7 +3,15 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +50,13 @@ public class InventoryConfig {
     public int hideNotClickableOpacity = 180;
 
     @Expose
-    @ConfigOption(name = "Green line", desc = "Adds green line around items that are clickable.")
+    @ConfigOption(name = "Bypass With Control", desc = "Adds the ability to bypass not clickable items when holding the control key.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean notClickableItemsBypass = true;
+
+    @Expose
+    @ConfigOption(name = "Green Line", desc = "Adds green line around items that are clickable.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean hideNotClickableItemsGreenLine = true;
@@ -242,13 +256,13 @@ public class InventoryConfig {
         public int nameLength = 100;
 
         @Expose
-        @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
+        @ConfigOption(name = "Highlight Slot", desc = "Highlight slot where the item is when you hover over it in the display.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enableHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Highlight color", desc = "Choose the highlight color.")
+        @ConfigOption(name = "Highlight Color", desc = "Choose the highlight color.")
         @ConfigEditorColour
         public String highlightColor = "0:249:0:255:88";
 
@@ -288,8 +302,64 @@ public class InventoryConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Helper", desc = "")
+    @Accordion
+    public HelperConfig helper = new HelperConfig();
+
+    public static class HelperConfig {
+        @Expose
+        @ConfigOption(name = "Melody's Hair Harp", desc = "")
+        @Accordion
+        public HarpConfig harp = new HarpConfig();
+
+        public static class HarpConfig {
+            @Expose
+            @ConfigOption(name = "Use Keybinds", desc = "In the Harp, press buttons with your number row on the keyboard instead of clicking.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean keybinds = false;
+
+            @Expose
+            @ConfigOption(name = "Show Numbers", desc = "In the Harp, show buttons as stack size (intended to be used with the Keybinds).")
+            @ConfigEditorBoolean
+            public boolean showNumbers = false;
+        }
+
+        @Expose
+        @ConfigOption(name = "Tia Relay Abiphone Network Maintenance", desc = "")
+        @Accordion
+        public TiaRelayConfig tiaRelay = new TiaRelayConfig();
+
+        public static class TiaRelayConfig {
+
+            @Expose
+            @ConfigOption(name = "Sound Puzzle Helper", desc = "Helps with solving the sound puzzle for Tia (The 9 Operator Chips to do maintainance for the Abiphone Network).")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean soundHelper = true;
+
+            @Expose
+            @ConfigOption(name = "Next Waypoint", desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the Abiphone network needs to be done.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean nextWaypoint = true;
+
+            @Expose
+            @ConfigOption(name = "All Waypoints", desc = "Show all relay waypoints at once (intended for debugging).")
+            @ConfigEditorBoolean
+            public boolean allWaypoints = false;
+
+            @Expose
+            @ConfigOption(name = "Mute Sound", desc = "Mutes the sound when close to the relay.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean tiaRelayMute = true;
+        }
+    }
+
+    @Expose
     @ConfigOption(
-            name = "Item number",
+            name = "Item Number",
             desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
@@ -336,13 +406,6 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
-
-    @Expose
-    @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
-            desc = "Highlights used Bonzo's Masks with a background.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightDepletedBonzosMasks = false;
 
     @Expose
     @ConfigOption(name = "Missing Tasks",

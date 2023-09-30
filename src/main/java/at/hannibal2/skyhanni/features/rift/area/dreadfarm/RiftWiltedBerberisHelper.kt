@@ -61,16 +61,12 @@ class RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
-//        if (event.distanceToPlayer > 10) return
-
         val location = event.location
         val berberis = nearestBerberis(location)
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
-            if (config.hideparticles) {
-                if (berberis != null) {
-                    event.isCanceled = true
-                }
+            if (config.hideparticles && berberis != null) {
+                event.isCanceled = true
             }
             return
         }

@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 
@@ -44,7 +43,7 @@ class CaptureFarmingGear {
             val farmingItems = farmingItems ?: return
             val resultList = mutableListOf<String>()
 
-            val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
+            val itemStack = InventoryUtils.getItemInHand() ?: return
             val itemID = itemStack.getInternalName_old()
             resultList.add(itemStack.displayName.toString())
             resultList.add(itemID)
@@ -137,33 +136,25 @@ class CaptureFarmingGear {
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName_old().split(";")
-                if (split.first() == "ELEPHANT") {
-                    if (split.last().toInt() > highestElephantRarity) {
-                        farmingItems[FarmingItems.ELEPHANT] = item
-                        outdatedItems[FarmingItems.ELEPHANT] = false
-                        highestElephantRarity = split.last().toInt()
-                    }
+                if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
+                    farmingItems[FarmingItems.ELEPHANT] = item
+                    outdatedItems[FarmingItems.ELEPHANT] = false
+                    highestElephantRarity = split.last().toInt()
                 }
-                if (split.first() == "MOOSHROOM_COW") {
-                    if (split.last().toInt() > highestMooshroomRarity) {
-                        farmingItems[FarmingItems.MOOSHROOM_COW] = item
-                        outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                        highestMooshroomRarity = split.last().toInt()
-                    }
+                if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
+                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                    outdatedItems[FarmingItems.MOOSHROOM_COW] = false
+                    highestMooshroomRarity = split.last().toInt()
                 }
-                if (split.first() == "RABBIT") {
-                    if (split.last().toInt() > highestRabbitRarity) {
-                        farmingItems[FarmingItems.RABBIT] = item
-                        outdatedItems[FarmingItems.RABBIT] = false
-                        highestRabbitRarity = split.last().toInt()
-                    }
+                if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
+                    farmingItems[FarmingItems.RABBIT] = item
+                    outdatedItems[FarmingItems.RABBIT] = false
+                    highestRabbitRarity = split.last().toInt()
                 }
-                if (split.first() == "BEE") {
-                    if (split.last().toInt() > highestBeeRarity) {
+                if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
                         farmingItems[FarmingItems.BEE] = item
                         outdatedItems[FarmingItems.BEE] = false
                         highestBeeRarity = split.last().toInt()
-                    }
                 }
             }
         }

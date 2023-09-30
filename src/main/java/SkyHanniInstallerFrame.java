@@ -1,12 +1,39 @@
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -435,18 +462,18 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
             boolean deletingFailure = false;
             if (modsFolder.isDirectory()) { // Delete in this current folder.
-                boolean failed = findSkyblockAddonsAndDelete(modsFolder.listFiles());
+                boolean failed = findSkyHanniAndDelete(modsFolder.listFiles());
                 if (failed) deletingFailure = true;
             }
             if (inSubFolder) { // We are in the 1.8.9 folder, delete in the parent folder as well.
                 if (modsFolder.getParentFile().isDirectory()) {
-                    boolean failed = findSkyblockAddonsAndDelete(modsFolder.getParentFile().listFiles());
+                    boolean failed = findSkyHanniAndDelete(modsFolder.getParentFile().listFiles());
                     if (failed) deletingFailure = true;
                 }
             } else { // We are in the main mods folder, but the 1.8.9 subfolder exists... delete in there too.
                 File subFolder = new File(modsFolder, "1.8.9");
                 if (subFolder.exists() && subFolder.isDirectory()) {
-                    boolean failed = findSkyblockAddonsAndDelete(subFolder.listFiles());
+                    boolean failed = findSkyHanniAndDelete(subFolder.listFiles());
                     if (failed) deletingFailure = true;
                 }
             }
@@ -471,7 +498,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         }
     }
 
-    private boolean findSkyblockAddonsAndDelete(File[] files) {
+    private boolean findSkyHanniAndDelete(File[] files) {
         if (files == null) return false;
 
         for (File file : files) {

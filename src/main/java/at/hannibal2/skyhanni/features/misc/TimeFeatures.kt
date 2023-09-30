@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,9 +17,11 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class TimeFeatures {
-    private val config get() = SkyHanniMod.feature.misc.timeConfigs
+    private val config get() = SkyHanniMod.feature.gui
+    private val winterConfig get() = SkyHanniMod.feature.event.winter
 
-    private val format = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
 
     private val startOfNextYear = RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
@@ -29,10 +32,11 @@ class TimeFeatures {
         if (!LorenzUtils.inSkyBlock) return
 
         if (config.realTime) {
-            config.realTimePos.renderString(format.format(System.currentTimeMillis()), posLabel = "Real Time")
+            val currentTime = (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
+            config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
 
-        if (config.winterTime && IslandType.WINTER.isInIsland()) {
+        if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
             val timeTillNextYear = startOfNextYear.getValue().timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
             val text = if (alreadyInNextYear) {
@@ -40,7 +44,16 @@ class TimeFeatures {
             } else {
                 "§fJerry's Workshop §ecloses in §b${timeTillNextYear.format()}"
             }
-            config.winterTimePos.renderString(text, posLabel = "Winter Time")
+            winterConfig.islandCloseTimePosition.renderString(text, posLabel = "Winter Time")
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.timeConfigs.winterTime", "event.winter.islandCloseTime")
+        event.move(2, "misc.timeConfigs.winterTimePos", "event.winter.islandCloseTimePosition")
+
+        event.move(2, "misc.timeConfigs.realTime", "gui.realTime")
+        event.move(2, "misc.timeConfigs.realTimePos", "gui.realTimePosition")
     }
 }
