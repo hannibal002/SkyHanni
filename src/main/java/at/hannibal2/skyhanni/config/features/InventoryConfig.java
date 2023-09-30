@@ -256,13 +256,13 @@ public class InventoryConfig {
         public int nameLength = 100;
 
         @Expose
-        @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
+        @ConfigOption(name = "Highlight Slot", desc = "Highlight slot where the item is when you hover over it in the display.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enableHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Highlight color", desc = "Choose the highlight color.")
+        @ConfigOption(name = "Highlight Color", desc = "Choose the highlight color.")
         @ConfigEditorColour
         public String highlightColor = "0:249:0:255:88";
 
@@ -359,7 +359,7 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-            name = "Item number",
+            name = "Item Number",
             desc = "Showing the item number as a stack size for these items." // Some values may be truncated percentages or §a✔§r§7s.
     )
     @ConfigEditorDraggableList(
@@ -476,7 +476,7 @@ public class InventoryConfig {
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
-                exampleText = {          
+                exampleText = {
                         "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
                         "§bHOTM Tiers Progress (%)",
                         "§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)",
@@ -490,7 +490,7 @@ public class InventoryConfig {
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
         )
         @ConfigEditorDraggableList(
-                exampleText = {          
+                exampleText = {
                         "§bBestiary Level (#)",
                         "§bBestiary Progress (%, Overall + per Family)",
                         "§bCurrent Slayer Levels (#)",

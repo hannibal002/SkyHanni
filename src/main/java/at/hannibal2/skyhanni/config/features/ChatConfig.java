@@ -72,7 +72,7 @@ public class ChatConfig {
     public boolean winterGift = false;
 
     @Expose
-    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in Crystal Hollows. " +
+    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
             "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -94,7 +94,7 @@ public class ChatConfig {
     public boolean watchDog = true;
 
     @Expose
-    @ConfigOption(name = "Profile Join", desc = "Hide 'You are playing on profile' and 'Profile ID' chat messages")
+    @ConfigOption(name = "Profile Join", desc = "Hide 'You are playing on profile' and 'Profile ID' chat messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
@@ -121,7 +121,7 @@ public class ChatConfig {
     public boolean playerRankHider = false;
 
     @Expose
-    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and grey out the message if any are found.")
+    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     @FeatureToggle
@@ -134,7 +134,7 @@ public class ChatConfig {
     public boolean dungeonMessages = true;
 
     @Expose
-    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in the dungeon.")
+    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in the Dungeon.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dungeonBossMessages = false;
@@ -179,8 +179,8 @@ public class ChatConfig {
     @ConfigOption(
             name = "Translator",
             desc = "Click on a message to translate it into English. " +
-                    "Use /shcopytranslation to get the translation from English. " +
-                    "Translation is not guaranteed to be 100% accurate."
+                    "Use §e/shcopytranslation§7 to get the translation from English. " +
+                    "§cTranslation is not guaranteed to be 100% accurate."
     )
     @ConfigEditorBoolean
     @FeatureToggle

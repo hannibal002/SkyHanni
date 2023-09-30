@@ -55,7 +55,7 @@ public class MiscConfig {
         public boolean showAlways = false;
 
         @Expose
-        @ConfigOption(name = "Dragon Egg", desc = "For an Golden Dragon Egg, show progress to level 100 instead of 200.")
+        @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
         @ConfigEditorBoolean
         public boolean showGoldenDragonEgg = true;
 
@@ -98,7 +98,7 @@ public class MiscConfig {
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the Non God Pot Effects display.")
+    @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
@@ -180,7 +180,7 @@ public class MiscConfig {
     public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Show always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
@@ -310,7 +310,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Enable Data Tracker",
                 desc = "Tracks all of your data from doing Trevor Quests.\n" +
-                        "Shows based on the setting below"
+                        "Shows based on the setting below."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -320,7 +320,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Show Between Quests",
                 desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                        "Will show in the Trapper's Den regardless. Global toggle above"
+                        "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
         )
         @ConfigEditorBoolean
         public boolean displayType = true;
@@ -488,7 +488,7 @@ public class MiscConfig {
             public boolean enabled = false;
 
             @Expose
-            @ConfigOption(name = "Line color", desc = "Color of the line.")
+            @ConfigOption(name = "Line Color", desc = "Color of the line.")
             @ConfigEditorColour
             public String lineColor = "0:255:255:255:255";
 

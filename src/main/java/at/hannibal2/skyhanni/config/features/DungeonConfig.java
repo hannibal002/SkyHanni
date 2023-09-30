@@ -40,7 +40,7 @@ public class DungeonConfig {
     public boolean cleanEnd = false;
 
     @Expose
-    @ConfigOption(name = "Clean Ending", desc = "After the last dungeon boss has died, all entities and " +
+    @ConfigOption(name = "Clean Ending", desc = "After the last Dungeon boss has died, all entities and " +
             "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
@@ -48,7 +48,7 @@ public class DungeonConfig {
     public boolean cleanEndToggle = false;
 
     @Expose
-    @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 guardians from the clean end feature when " +
+    @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 Guardians from the clean end feature when " +
             "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
@@ -61,13 +61,13 @@ public class DungeonConfig {
     public boolean damageSplashBoss = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in Dungeon in red color.")
+    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight Deathmites in Dungeons in red color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightDeathmites = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Teammates", desc = "Highlight dungeon teammates with a glowing outline.")
+    @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightTeammates = true;
@@ -120,14 +120,14 @@ public class DungeonConfig {
     public boolean hideSkeletonSkull = true;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the healer kills mobs.")
+    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean hideHealerOrbs = false;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the golden fairy that follows the Healer in Dungeons.")
+    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the Golden Fairy that follows the Healer in Dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     @FeatureToggle
@@ -177,7 +177,7 @@ public class DungeonConfig {
     public static class TabListConfig {
 
         @Expose
-        @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in dungeon anyway?)")
+        @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in Dungeons anyway?)")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean coloredClassLevel = true;

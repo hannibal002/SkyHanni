@@ -114,7 +114,7 @@ public class CombatConfig {
         public static class EnderSlayerConfig {
 
             @Expose
-            @ConfigOption(name = "Laser phase timer", desc = "Show a timer when the laser phase will end.")
+            @ConfigOption(name = "Laser Phase Timer", desc = "Show a timer when the laser phase will end.")
             @ConfigEditorBoolean
             public boolean laserPhaseTimer = false;
 
@@ -131,7 +131,7 @@ public class CombatConfig {
 
         public static class VampireSlayerConfig {
             @Expose
-            @ConfigOption(name = "HP until Steak", desc = "Show the amount of HP missing until the steak can be used on the Vampire Slayer on top of the boss.")
+            @ConfigOption(name = "HP Until Steak", desc = "Show the amount of HP missing until the Steak can be used on the Vampire Slayer on top of the boss.")
             @ConfigEditorBoolean
             public boolean hpTillSteak = false;
 
@@ -201,7 +201,7 @@ public class CombatConfig {
             @ConfigOption(name = "§eText Formatting Info", desc = "§e%session% §ris §e§lalways §rreplaced with\n" +
                     "§7the count for your current session.\n" +
                     "§7Reset when restarting the game.\n" +
-                    "§7You can use §e&Z §7color code to use SBA chroma")
+                    "§7You can use §e&Z §7color code to use SBA chroma.")
             @ConfigEditorInfoText
             public boolean formatInfo = false;
 
@@ -493,7 +493,7 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
-                "§cNot working in dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
+                "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean summoningSoulDisplay = false;
@@ -608,7 +608,7 @@ public class CombatConfig {
         public boolean endermanTeleportationHider = true;
 
         @Expose
-        @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above arachne minis.")
+        @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above Arachne minis.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideNameTagArachneMinis = true;
@@ -646,7 +646,7 @@ public class CombatConfig {
         public int displayType = 0;
 
         @Expose
-        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs")
+        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs.")
         @ConfigEditorBoolean
         public boolean hideMaxed = false;
 
