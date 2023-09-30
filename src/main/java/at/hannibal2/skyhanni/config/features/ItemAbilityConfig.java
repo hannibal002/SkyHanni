@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -26,23 +24,22 @@ public class ItemAbilityConfig {
 
     @Expose
     @ConfigOption(name = "Fire Veil", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean fireVeilWand = false;
+    @Accordion
+    public FireVeilWandConfig fireVeilWand = new FireVeilWandConfig();
+    public static class FireVeilWandConfig{
+        @Expose
+        @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
+        @ConfigEditorDropdown(values = {"Particles", "Line", "Off"})
+        public int display = 0;
 
-    @Expose
-    @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
-    @ConfigEditorDropdown(values = {"Particles", "Line", "Off"})
-    @ConfigAccordionId(id = 1)
-    public int fireVeilWandDisplay = 0;
-
-    @Expose
-    @ConfigOption(
-            name = "Line Color",
-            desc = "Changes the color of the Fire Veil Wand line."
-    )
-    @ConfigEditorColour
-    @ConfigAccordionId(id = 1)
-    public String fireVeilWandDisplayColor = "0:245:255:85:85";
+        @Expose
+        @ConfigOption(
+                name = "Line Color",
+                desc = "Changes the color of the Fire Veil Wand line."
+        )
+        @ConfigEditorColour
+        public String displayColor = "0:245:255:85:85";
+    }
 
     @ConfigOption(name = "Chicken Head", desc = "")
     @Accordion
