@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -28,7 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class NonGodPotEffectDisplay {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.potionEffects
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
@@ -221,6 +222,13 @@ class NonGodPotEffectDisplay {
             extraSpace = 3,
             posLabel = "Non God Pot Effects"
         )
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffects.nonGodPotEffectDisplay")
+        event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffects.nonGodPotEffectShowMixins")
+        event.move(3, "misc.nonGodPotEffectDisplayPos", "misc.potionEffects.nonGodPotEffectPos")
     }
 
     private fun isEnabled() =

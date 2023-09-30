@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -17,18 +18,18 @@ class ParticleHider {
     @SubscribeEvent
     fun onHypExplosions(event: ReceiveParticleEvent) {
         val distanceToPlayer = event.distanceToPlayer
-        if (SkyHanniMod.feature.misc.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
+        if (SkyHanniMod.feature.misc.particleHider.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
             event.isCanceled = true
             return
         }
 
         val type = event.type
-        if (SkyHanniMod.feature.misc.hideCloseRedstoneparticles && type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2) {
+        if (SkyHanniMod.feature.misc.particleHider.hideCloseRedstoneParticles && type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2) {
             event.isCanceled = true
             return
         }
 
-        if (SkyHanniMod.feature.misc.hideFireballParticles && (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)) {
+        if (SkyHanniMod.feature.misc.particleHider.hideFireballParticles && (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)) {
             for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
                 val distance = entity.getLorenzVec().distance(event.location)
                 if (distance < 5) {
@@ -38,4 +39,17 @@ class ParticleHider {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"misc.hideBlazeParticles", "misc.particleHider.hideBlazeParticles")
+        event.move(3, "misc.hideEndermanParticles", "misc.particleHider.hideEndermanParticles")
+        event.move(3, "misc.hideFarParticles", "misc.particleHider.hideFarParticles")
+        event.move(3, "misc.hideFireballParticles", "misc.particleHider.hideFireballParticles")
+        event.move(3, "misc.hideCloseRedstoneparticles", "misc.particleHider.hideCloseRedstoneParticles")
+        event.move(3, "misc.hideFireBlockParticles", "misc.particleHider.hideFireBlockParticles")
+        event.move(3,"misc.hideSmokeParticles", "misc.particleHider.hideSmokeParticles")
+
+    }
+
 }
