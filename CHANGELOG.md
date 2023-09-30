@@ -182,7 +182,10 @@
 + Ignoring non-slayer drops in the slayer profit tracker. - hannibal2
 + Added support for slayer drops that go directly into the sack. - hannibal2
     + This still does not work for items that land directly in your inventory. (e.g., Netherrack-Looking Sunshade,
-    Summoning Eye, etc.)
+      Summoning Eye, etc.)
++ Added toggle for 12hr/24hr in real-time HUD. - Thunderblade73
++ Removed Flowering Bouquet from and added Cultivating to the default enabled Visitor Reward Warnings list. - hannibal2
++ Improved performance in the Garden Visitor inventory. - hannibal2
 
 ### Fixes
 
@@ -294,6 +297,16 @@
 + Hide item rarity error message in /ff. - hannibal2
 + Fixed an issue with the Wheat Profit Display not showing the correct value when combined with seeds. - Thunderblade73
 + Tab complte party members now also detects if the party leader leaves. - CalMWolfs
++ Fixed typos in many config settings. - Absterge
++ Fixed NEU Heavy Pearl detection. - hannibal2
++ Fixed showing Wrong Slayer Warning sometimes at the wrong time. - Cad
++ Fixed farming contest summary time being off sometimes. - hannibal2
++ Fixed wrong order at Visitor Drop Statistics. - hannibal2
++ Fixed bits and powder not saving in Visitor Drop Statistics. - hannibal2
++ Fixed not being able to disable show Dungeon Head Floor Number as stack size. - hannibal2
++ Fixed green bandana not getting detected for visitor reward warning. - hannibal2
++ Fixed zealots and zealot bruisers not getting detected when being runic. - hannibal2
++ Fixed mixins not getting detected correctly from effects inventory for Non God Pot Effect display. - hannibal2
 
 ### Removed Features
 
