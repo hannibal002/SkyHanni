@@ -267,7 +267,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                                 if (lore.any { it.contains("SLASHED Pricing") } || lore.any { it.contains("Slayer XP Buff") } || lore.any { it.contains("Pathfinder") }) return "§bAtx"
                                 if (lore.any { it.contains("Prospection") } || lore.any { it.contains("Mining XP Buff") } || lore.any { it.contains("Mining Fiesta") }) return "§bCle"
                                 if (lore.any { it.contains("Lucky!") } || lore.any { it.contains("Pet XP Buff") } || lore.any { it.contains("Mythological Ritual") }) return "§bDna"
-                                if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖"
+                                if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖" //fuck diaz
                                 if (lore.any { it.contains("Farming Simulator") } || lore.any { it.contains("Pelt-pocalypse") } || lore.any { it.contains("GOATed") }) return "§bFnng"
                                 if (lore.any { it.contains("Sweet Tooth") } || lore.any { it.contains("Benevolence") } || lore.any { it.contains("Extra Event") }) return "§bFxy"
                                 if (lore.any { it.contains("Luck of the Sea 2.0") } || lore.any { it.contains("Fishing XP Buff") } || lore.any { it.contains("Fishing Festival") }) return "§bMrna"
