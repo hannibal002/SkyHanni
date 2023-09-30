@@ -67,8 +67,10 @@ class MenuItemDisplayOverlayAbiphone {
 
         if ((stackSizeConfig.contains(2)) && ((chestName.contains("Abiphone"))) && (itemName.contains(" Operator Chip"))) {
             val maxRelays = "9" //edit this line whenever they add more relays
+            //§7Upgraded Relays: §e1§7/§59
+            //Upgraded Relays: 1/9
             for (line in item.getLore()) {
-                if (line.contains("Progress to Complete Category")) {
+                if (line.contains("Upgraded Relays: ")) {
                     if (line.contains("ALL!")) return maxRelays
                     else return xOutOfYNoColorRequiredPattern.matchMatcher(line) { group("useful") } ?: ""
                 }
