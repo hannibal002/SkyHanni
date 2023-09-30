@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
@@ -20,6 +21,8 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonHideItems {
+
+    private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
     private val hideParticles = mutableMapOf<EntityArmorStand, Long>()
     private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
@@ -61,18 +64,18 @@ class DungeonHideItems {
 
         if (entity is EntityItem) {
             val stack = entity.entityItem
-            if (SkyHanniMod.feature.dungeon.hideReviveStone && stack.cleanName() == "Revive Stone") {
+            if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
                 event.isCanceled = true
             }
 
-            if (SkyHanniMod.feature.dungeon.hideJournalEntry && stack.cleanName() == "Journal Entry") {
+            if (config.hideJournalEntry && stack.cleanName() == "Journal Entry") {
                 event.isCanceled = true
             }
         }
 
         if (entity !is EntityArmorStand) return
 
-        if (SkyHanniMod.feature.dungeon.hideSuperboomTNT) {
+        if (config.hideSuperboomTNT) {
             if (entity.name.startsWith("§9Superboom TNT")) {
                 event.isCanceled = true
             }
@@ -84,7 +87,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hideBlessing) {
+        if (config.hideBlessing) {
             if (entity.name.startsWith("§dBlessing of ")) {
                 event.isCanceled = true
             }
@@ -95,7 +98,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hideReviveStone) {
+        if (config.hideReviveStone) {
             if (entity.name == "§6Revive Stone") {
                 event.isCanceled = true
             }
@@ -107,7 +110,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hidePremiumFlesh) {
+        if (config.hidePremiumFlesh) {
             if (entity.name == "§9Premium Flesh") {
                 event.isCanceled = true
                 hideParticles[entity] = System.currentTimeMillis()
@@ -121,7 +124,7 @@ class DungeonHideItems {
 
         if (isSkeletonSkull(entity)) {
             EntityMovementData.addToTrack(entity)
-            if (SkyHanniMod.feature.dungeon.hideSkeletonSkull) {
+            if (config.hideSkeletonSkull) {
                 val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
                 if (lastMove + 100 > System.currentTimeMillis()) {
                     return
@@ -130,7 +133,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hideHealerOrbs) {
+        if (config.hideHealerOrbs) {
             when {
                 entity.name.startsWith("§c§lDAMAGE §e") -> event.isCanceled = true
                 entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.isCanceled = true
@@ -152,7 +155,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hideHealerFairy) {
+        if (config.hideHealerFairy) {
             val itemStack = entity.inventory[0]
             if (itemStack != null && itemStack.getSkullTexture() == healerFairyTexture) {
                 event.isCanceled = true
@@ -164,7 +167,7 @@ class DungeonHideItems {
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.hideSuperboomTNT && !SkyHanniMod.feature.dungeon.hideReviveStone) return
+        if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
         for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
@@ -222,5 +225,17 @@ class DungeonHideItems {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         hideParticles.clear()
         movingSkeletonSkulls.clear()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
+        event.move(3, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")
+        event.move(3, "dungeon.hideReviveStone", "dungeon.objectHider.hideReviveStone")
+        event.move(3, "dungeon.hidePremiumFlesh", "dungeon.objectHider.hidePremiumFlesh")
+        event.move(3, "dungeon.hideJournalEntry", "dungeon.objectHider.hideJournalEntry")
+        event.move(3, "dungeon.hideSkeletonSkull", "dungeon.objectHider.hideSkeletonSkull")
+        event.move(3, "dungeon.hideHealerOrbs", "dungeon.objectHider.hideHealerOrbs")
+        event.move(3, "dungeon.hideHealerFairy", "dungeon.objectHider.hideHealerFairy")
     }
 }

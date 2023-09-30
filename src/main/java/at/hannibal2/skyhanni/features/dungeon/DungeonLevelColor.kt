@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,7 +15,7 @@ class DungeonLevelColor {
     @SubscribeEvent
     fun onItemTooltip(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.dungeon.partyFinderColoredClassLevel) return
+        if (!SkyHanniMod.feature.dungeon.partyFinder.coloredClassLevel) return
 
         if (event.toolTip == null) return
         val chestName = InventoryUtils.openInventoryName()
@@ -33,6 +34,11 @@ class DungeonLevelColor {
                 event.toolTip[index] = " §b$playerName§f: §e$className $color$level"
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
 }
 
