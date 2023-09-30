@@ -61,8 +61,8 @@ object FarmingContestAPI {
             }
             inContest = currentContest
         } else {
-            if (currentCrop != contestCrop) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.CHANGE).postAndCatch()
+            if (currentCrop != contestCrop && currentCrop != null) {
+                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).postAndCatch()
                 startTime = SimpleTimeMark.now()
             }
         }
