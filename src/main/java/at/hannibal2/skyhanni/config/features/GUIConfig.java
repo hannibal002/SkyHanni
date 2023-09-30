@@ -83,7 +83,6 @@ public class GUIConfig {
             maxValue = 60,
             minStep = 1
     )
-    @ConfigAccordionId(id = 2)
     public int inGameDateDisplayRefreshSeconds = 10;
 
 
