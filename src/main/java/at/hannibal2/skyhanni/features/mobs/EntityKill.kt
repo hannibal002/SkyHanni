@@ -63,9 +63,9 @@ class EntityKill {
     fun onTick(event: LorenzTickEvent) {
         tickDelayer++
 
-        if(shouldTrackArrow){
-            val arrowCatch = EntityUtils.getEntitiesNearby<EntityArrow>(Minecraft.getMinecraft().thePlayer.getLorenzVec(),100.0)
-            if(arrowCatch.count()> 0) {
+        if (shouldTrackArrow) {
+            val arrowCatch = EntityUtils.getEntitiesNearby<EntityArrow>(Minecraft.getMinecraft().thePlayer.getLorenzVec(), 100.0)
+            if (arrowCatch.count() > 0) {
                 val arrow = arrowCatch.first()
                 LorenzDebug.log(arrow.toString())
             }
@@ -134,6 +134,7 @@ class EntityKill {
             }
         }
     }
+
     @SubscribeEvent
     fun onBlockClickSend(event: BlockClickEvent) {
         handleItemClick(event.itemInHand)
@@ -144,14 +145,15 @@ class EntityKill {
         handleItemClick(event.itemInHand)
     }
 
-    private fun handleItemClick(itemInHand: ItemStack?){
-        if(itemInHand == null) return
+    private fun handleItemClick(itemInHand: ItemStack?) {
+        if (itemInHand == null) return
 
         val lastLore = itemInHand.getLore().last().removeColor()
         LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
         //Bow
-        if(lastLore.endsWith("BOW")){
-            val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing") ?: 0) + if (itemInHand.displayName.contains("Juju")) 3 else 0
+        if (lastLore.endsWith("BOW")) {
+            val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
+                    ?: 0) + if (itemInHand.displayName.contains("Juju")) 3 else 0
 
             //Minecraft.getMinecraft().thePlayer.lookVec.normalize().toLorenzVec()
             val player = Minecraft.getMinecraft().thePlayer
@@ -177,7 +179,8 @@ class EntityKill {
         val index = mobHitList.binarySearch(mobId)
         if (index >= 0) return
         mobHitList.add(-(index + 1), mobId)
-        mobHitMap[mobId] = EntityUtils.getAllEntities().firstOrNull { it.entityId == mobId + 1 } ?: return //Fun Fact the corresponding ArmorStand for a mob has always the mobId + 1
+        mobHitMap[mobId] = EntityUtils.getAllEntities().firstOrNull { it.entityId == mobId + 1 }
+                ?: return //Fun Fact the corresponding ArmorStand for a mob has always the mobId + 1
     }
 
 }
