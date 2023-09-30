@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class StatsTuning {
+    private val config get() = SkyHanniMod.feature.inventory.statsTuning
     private val patternStatPoints = "§7Stat has: §e(?<amount>\\d+) points?".toPattern()
 
     @SubscribeEvent
@@ -22,7 +24,7 @@ class StatsTuning {
 
         val stack = event.stack
 
-        if (SkyHanniMod.feature.inventory.statsTuningTemplateStats && inventoryName == "Stats Tuning") {
+        if (config.templateStats && inventoryName == "Stats Tuning") {
             val name = stack.name ?: return
             if (name == "§aLoad") {
                 var grab = false
@@ -50,7 +52,7 @@ class StatsTuning {
                 }
             }
         }
-        if (SkyHanniMod.feature.inventory.statsTuningSelectedStats && inventoryName == "Accessory Bag Thaumaturgy") {
+        if (config.selectedStats && inventoryName == "Accessory Bag Thaumaturgy") {
             val name = stack.name ?: return
             if (name == "§aStats Tuning") {
                 var grab = false
@@ -78,7 +80,7 @@ class StatsTuning {
                 }
             }
         }
-        if (SkyHanniMod.feature.inventory.statsTuningPoints && inventoryName == "Stats Tuning") {
+        if (config.points && inventoryName == "Stats Tuning") {
             for (line in stack.getLore()) {
                 patternStatPoints.matchMatcher(line) {
                     val points = group("amount")
@@ -94,7 +96,7 @@ class StatsTuning {
         if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()
-        if (SkyHanniMod.feature.inventory.statsTuningSelectedTemplate && chestName == "Stats Tuning") {
+        if (config.selectedTemplate && chestName == "Stats Tuning") {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
                 val lore = stack.getLore()
@@ -104,5 +106,12 @@ class StatsTuning {
                 }
             }
         }
+    }
+    @SubscribeEvent
+    fun onConfigChange(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"inventory.statsTuningSelectedStats", "inventory.statsTuning.selectedStats")
+        event.move(3,"inventory.statsTuningSelectedTemplate", "inventory.statsTuning.selectedTemplate")
+        event.move(3,"inventory.statsTuningTemplateStats", "inventory.statsTuning.templateStats")
+        event.move(3,"inventory.statsTuningPoints", "inventory.statsTuning.points")
     }
 }
