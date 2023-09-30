@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PetExpTooltip {
-    private val config get() = SkyHanniMod.feature.misc.petExperienceToolTip
+    private val config get() = SkyHanniMod.feature.misc.pet.petExperienceToolTip
     private val level100Common = 5_624_785
     private val level100Legendary = 25_353_230
     private val level200 = 210_255_385
@@ -81,4 +82,10 @@ class PetExpTooltip {
         return Pair(maxLevel, maxXp)
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pet.petExperienceToolTip.petDisplay")
+        event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pet.petExperienceToolTip.showAlways")
+        event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pet.petExperienceToolTip.showGoldenDragonEgg")
+    }
 }
