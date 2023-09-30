@@ -303,10 +303,10 @@ public class GardenConfig {
                         "§b1 §9Dedication IV",
                         "§b6 §9Music Rune",
                         "§b1 §cSpace Helmet",
-                        " ", // If they want another empty row
-                        "§212,735 Garden EXP",
                         "§b1 §9Cultivating I",
                         "§b1 §9Replenish I",
+                        " ", // If they want another empty row
+                        "§212,735 Garden EXP",
                         "§b11,056 Bits",
                         "§250,556 Mithril Powder",
                         "§d50,556 Gemstone Powder",
