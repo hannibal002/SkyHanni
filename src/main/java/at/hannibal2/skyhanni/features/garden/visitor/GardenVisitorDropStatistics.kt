@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -52,6 +53,18 @@ object GardenVisitorDropStatistics {
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
         display = emptyList()
+    }
+
+    @SubscribeEvent
+    fun onVisitorAccept(event: VisitorAcceptEvent) {
+        if (!GardenAPI.onBarnPlot) return
+        if (!ProfileStorageData.loaded) return
+
+        for (internalName in event.visitor.allRewards) {
+            val reward = VisitorReward.getByInternalName(internalName) ?: continue
+            rewardsCount = rewardsCount.editCopy { addOrPut(reward, 1) }
+            saveAndUpdate()
+        }
     }
 
     @SubscribeEvent
@@ -97,14 +110,6 @@ object GardenVisitorDropStatistics {
                 setRarities(group("rarity"))
                 saveAndUpdate()
             }
-
-            for (reward in VisitorReward.entries) {
-                reward.pattern.matchMatcher(message) {
-                    val old = rewardsCount[reward] ?: 0
-                    rewardsCount = rewardsCount.editCopy { this[reward] = old + 1 }
-                    saveAndUpdate()
-                }
-            }
         }
     }
 
@@ -131,7 +136,10 @@ object GardenVisitorDropStatistics {
             )
         } else {
             addAsSingletonList("§c?")
-            CopyErrorCommand.logError(RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"), "Error rendering visitor drop statistics")
+            CopyErrorCommand.logError(
+                RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
+                "Error rendering visitor drop statistics"
+            )
         }
         //3
         addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
@@ -150,7 +158,7 @@ object GardenVisitorDropStatistics {
         for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
-                val stack = NEUItems.getItemStack(reward.internalName, true)
+                val stack = reward.itemStack
                 if (config.displayNumbersFirst)
                     add(listOf("§b${count.addSeparators()} ", stack))
                 else add(listOf(stack, " §b${count.addSeparators()}"))
