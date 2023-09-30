@@ -116,7 +116,7 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
-    private fun drawVisitorStatsDisplay(hidden: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
+    private fun drawDisplay(hidden: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
         //0
         addAsSingletonList("§e§lVisitor Statistics")
         //1
@@ -191,7 +191,7 @@ object GardenVisitorDropStatistics {
         hidden.visitorRarities = visitorRarities
         hidden.coinsSpent = coinsSpent
         hidden.rewardsCount = rewardsCount
-        display = formatDisplay(drawVisitorStatsDisplay(hidden))
+        display = formatDisplay(drawDisplay(hidden))
     }
 
     @SubscribeEvent
