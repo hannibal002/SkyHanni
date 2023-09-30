@@ -174,7 +174,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                             "Patron" -> "Ptn"
                             "Famous Player" -> "FP"
                             "Attaché" -> "Atc"
-                            "Ambassador" -> "Absd"
+                            "Ambassador" -> "Abd"
                             "Statesperson" -> "Stp"
                             "Senator" -> "Snt"
                             "Dignitary" -> "Dgn"

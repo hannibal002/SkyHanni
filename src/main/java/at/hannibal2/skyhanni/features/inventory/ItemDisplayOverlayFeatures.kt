@@ -349,7 +349,7 @@ class ItemDisplayOverlayFeatures {
                     }
                 }
                 val totalKillsNecessary = currentKillThresholdPerMobFamily * numberOfLines
-                val percent = (((killCount.toFloat()) / (totalKillsNecessary.toFloat())) * 100)
+                val percent = (((killCount.toFloat()) / (totalKillsNecessary.toFloat())) * 100) //keep this line here for easier debugging
                 return percent.toInt().toString()
             }
         }

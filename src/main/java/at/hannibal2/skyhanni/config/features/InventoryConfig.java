@@ -398,7 +398,7 @@ public class InventoryConfig {
     )
     @ConfigEditorDraggableList(
             exampleText = {
-                    "§bSkyblock Level (#)",
+                    "§bSkyblock Level (#, won't work in Rift)",
                     "§bSkill + Garden + Dungeoneering Levels (#)",
                     "§bSkill Average (#)",
                     "§bCollection Level + Progress (%)",
@@ -423,8 +423,8 @@ public class InventoryConfig {
                     "§bCollected Fairy/Enigma Souls + Completed Quests (#)",
                     "§bTrades Unlocked (%)",
                     "§bWardrobe Slot (#)",
-                    "§bShortened Skyblock Stats",
-                    "§bShortened Skyblock Profile Name (Fruits)",
+                    "§bSkyblock Stat Names (Abbvs)",
+                    "§bSkyblock Profile Fruits Name (Abbvs)",
                     "§bAuction House + Bazaar (Various)",
                     "§bDojo Progress (Abbv)",
                     "§bBank Tier (Abbv)",
@@ -443,12 +443,12 @@ public class InventoryConfig {
                         "§bMenu Pagination (#)",
                         "§bRNG Meter Drop Odds (Abbvs)",
                         "§bCommunity Shop + Essence Shop Upgrade Tiers (#)",
-                        "§bSelected Tab (§a⬇§bs or §a➡§bs)",
+                        "§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)",
                         "§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)",
                         "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",
                         "§bCurrently Active Potion Effects Count (#)",
                         "§bAccessory Bag Utilities (Various)",
-                        "§b\"Calendar and Events\" \"Start(ing) in\" Countdowns (Abbvs)",
+                        "§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]",
                         "§bSkyBlock Achievements Points (%)",
                 }
         )
@@ -499,7 +499,7 @@ public class InventoryConfig {
                         "§bUnlocked Slayer Recipes (#)",
                 }
         )
-        public List<Integer> menuItemNumberCombatAsStackSize = new ArrayList<>(Arrays.asList(0));
+        public List<Integer> menuItemNumberCombatAsStackSize = new ArrayList<>(Arrays.asList(0, 2));
 
 
         @Expose
