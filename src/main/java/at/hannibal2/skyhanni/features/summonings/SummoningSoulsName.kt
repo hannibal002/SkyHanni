@@ -39,7 +39,6 @@ class SummoningSoulsName {
     }
 
     private fun check() {
-        val minecraft = Minecraft.getMinecraft()
         for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (souls.contains(entity)) continue
 
@@ -61,11 +60,9 @@ class SummoningSoulsName {
 
         for (entity in EntityUtils.getEntities<EntityLiving>()) {
             val consumer = entity.getNameTagWith(2, "§c❤")
-            if (consumer != null) {
-                if (!consumer.name.contains("§e0")) {
-                    mobsLastLocation[entity] = entity.getLorenzVec()
-                    mobsName[entity] = consumer.name
-                }
+            if (consumer != null && !consumer.name.contains("§e0")) {
+                mobsLastLocation[entity] = entity.getLorenzVec()
+                mobsName[entity] = consumer.name
             }
         }
 

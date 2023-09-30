@@ -21,12 +21,10 @@ class RngMeterInventory {
         val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.stack
-        if (SkyHanniMod.feature.inventory.rngMeterFloorName) {
-            if (chestName == "Catacombs RNG Meter") {
-                val name = stack.name ?: return
-                if (name.removeColor() == "RNG Meter") {
-                    event.stackTip = stack.getLore()[0].between("(", ")")
-                }
+        if (SkyHanniMod.feature.inventory.rngMeterFloorName && chestName == "Catacombs RNG Meter") {
+            val name = stack.name ?: return
+            if (name.removeColor() == "RNG Meter") {
+                event.stackTip = stack.getLore()[0].between("(", ")")
             }
         }
     }
@@ -36,24 +34,20 @@ class RngMeterInventory {
         if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()
-        if (SkyHanniMod.feature.inventory.rngMeterNoDrop) {
-            if (chestName == "Catacombs RNG Meter") {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
-                        slot highlight LorenzColor.RED
-                    }
+        if (SkyHanniMod.feature.inventory.rngMeterNoDrop && chestName == "Catacombs RNG Meter") {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
+                    slot highlight LorenzColor.RED
                 }
             }
         }
 
-        if (SkyHanniMod.feature.inventory.rngMeterSelectedDrop) {
-            if (chestName.endsWith(" RNG Meter")) {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    if (stack.getLore().any { it.contains("§aSELECTED") }) {
-                        slot highlight LorenzColor.YELLOW
-                    }
+        if (SkyHanniMod.feature.inventory.rngMeterSelectedDrop && chestName.endsWith(" RNG Meter")) {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                if (stack.getLore().any { it.contains("§aSELECTED") }) {
+                    slot highlight LorenzColor.YELLOW
                 }
             }
         }

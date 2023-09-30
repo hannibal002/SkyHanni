@@ -55,19 +55,13 @@ class CosmeticFollowingLine {
 
         for ((a, b) in locations.keys.zipWithNext()) {
             val locationSpot = locations[b]!!
-            if (firstPerson) {
-                if (!locationSpot.onGround) {
-                    if (b in last7) {
-                        // Do not render the line in the face, keep more distance while the line is in the air
-                        continue
-                    }
-                }
+            if (firstPerson && !locationSpot.onGround && b in last7) {
+                // Do not render the line in the face, keep more distance while the line is in the air
+                continue
             }
-            if (b in last2) {
-                if (locationSpot.time.passedSince() < 400.milliseconds) {
-                    // Do not render the line directly next to the player, prevent laggy design
-                    continue
-                }
+            if (b in last2 && locationSpot.time.passedSince() < 400.milliseconds) {
+                // Do not render the line directly next to the player, prevent laggy design
+                continue
             }
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }

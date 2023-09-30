@@ -5,13 +5,19 @@ import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class GUIConfig {
 
-    @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays")
+    @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
     public Runnable positions = GuiEditManager::openGuiPositionEditor;
 
@@ -21,7 +27,7 @@ public class GUIConfig {
     public int keyBindOpen = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Global GUI scale", desc = "Globally scale all SkyHanni GUIs")
+    @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
     @ConfigEditorSlider(minValue = 0.1F, maxValue = 10, minStep = 0.05F)
     public float globalScale = 1F;
 
@@ -52,7 +58,7 @@ public class GUIConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Custom Text box", desc = "")
+    @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
 
@@ -81,10 +87,15 @@ public class GUIConfig {
     public boolean realTime = false;
 
     @Expose
+    @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
+    @ConfigEditorBoolean
+    public boolean realTimeFormatToggle = false;
+
+    @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Tps Display", desc = "Show the TPS of the current server, like in Soopy.")
+    @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tpsDisplay = false;

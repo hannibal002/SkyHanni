@@ -42,7 +42,7 @@ class DungeonHighlightClickedBlocks {
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
-        if (DungeonData.inBossRoom) return
+        if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val position = event.position
@@ -92,10 +92,4 @@ class DungeonHighlightClickedBlocks {
         CHEST("Chest"),
         WITHER_ESSENCE("Wither Essence"),
     }
-
-//    private fun nearWaterRoom(): Boolean {
-//        val playerLoc =
-//            LocationUtils.getPlayerLocation().add(LocationUtils.getPlayerLookingAtDirection().multiply(2)).add(0, 2, 0)
-//        return WaterBoardSolver.waterRoomDisplays.any { it.distance(playerLoc) < 3 }
-//    }
 }

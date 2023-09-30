@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -15,14 +17,14 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
-import java.util.*
+import java.util.LinkedList
+import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun isSack(name: String): Boolean =
-        name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
+    fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     fun ItemStack.getLore(): List<String> {
         val tagCompound = this.tagCompound ?: return emptyList()
@@ -70,12 +72,8 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem) {
-            if (player.inventory != null) {
-                if (player.inventory.itemStack != null) {
-                    list.add(player.inventory.itemStack)
-                }
-            }
+        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
+                list.add(player.inventory.itemStack)
         }
         return list
     }
@@ -93,14 +91,9 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem) {
-            if (player.inventory != null) {
-                if (player.inventory.itemStack != null) {
-                    map[player.inventory.itemStack] = -1
-                }
-            }
+        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
+            map[player.inventory.itemStack] = -1
         }
-
         return map
     }
 
@@ -199,38 +192,33 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
-    fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
+    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
+        val data = cachedData
+        if (data.itemRarityLastCheck.asTimeMark().passedSince() < 1.seconds) {
+            return data.itemRarity
+        }
+        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+
+        val internalName = getInternalName()
+        if (internalName == NEUInternalName.NONE) {
+            data.itemRarity = null
+            return null
+        }
+
+
         if (isPet(cleanName())) {
             return getPetRarity(this)
         }
 
-        val lore = getLore()
-        var lastLine = lore.lastOrNull() ?: return null
-        if (lastLine == "§eClick to inspect!") {
-            // Assuming inside ah browser
-            val index = lore.indexOfFirst { it.startsWith("§7Seller: ") } - 2
-            if (index > 0) {
-                lastLine = lore[index]
-            }
+        val rarity = LorenzRarity.readItemRarity(this)
+        data.itemRarity = rarity
+        if (rarity == null && logError) {
+            CopyErrorCommand.logErrorState(
+                "Could not read rarity for item $name",
+                "getItemRarityOrNull not found for: $internalName, name:'$name''"
+            )
         }
-        return when (lastLine.take(4)) {
-            "§f§l" -> LorenzRarity.COMMON
-            "§a§l" -> LorenzRarity.UNCOMMON
-            "§9§l" -> LorenzRarity.RARE
-            "§5§l" -> LorenzRarity.EPIC
-            "§6§l" -> LorenzRarity.LEGENDARY
-            "§d§l" -> LorenzRarity.MYTHIC
-            "§b§l" -> LorenzRarity.DIVINE
-            "§4§l" -> LorenzRarity.SUPREME
-            "§c§l" -> LorenzRarity.SPECIAL
-            else -> {
-                CopyErrorCommand.logErrorState(
-                    "Could not read rarity for item $name",
-                    "getItemRarityOrNull not found for: ${getInternalName()}, name:'$name', lastLine:'$lastLine'"
-                )
-                return null
-            }
-        }
+        return rarity
     }
 
     //extra method for shorter name and kotlin nullability logic

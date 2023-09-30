@@ -105,10 +105,8 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
-                    if (isDown > wasDown && isHovered(posX, posY)) {
-                        if (condition() && shouldAllowLink(true, bypassChecks)) {
-                            onClick()
-                        }
+                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                        onClick()
                     }
                     wasDown = isDown
                     render.render(posX, posY)

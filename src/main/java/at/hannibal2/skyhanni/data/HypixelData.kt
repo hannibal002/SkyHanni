@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -74,24 +78,22 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.isMod(2)) {
-            if (LorenzUtils.inSkyBlock) {
-                val originalLocation = ScoreboardData.sidebarLinesFormatted
-                    .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                    ?.substring(5)?.removeColor()
-                    ?: "?"
+        if (event.isMod(2) && LorenzUtils.inSkyBlock) {
+            val originalLocation = ScoreboardData.sidebarLinesFormatted
+                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
+                ?.substring(5)?.removeColor()
+                ?: "?"
 
-                skyBlockArea = when {
-                    skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
-                    skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
-                    skyBlockIsland == IslandType.THE_END && fakeZealotBruiserHideoutArea.isPlayerInside() -> "The End"
-                    skyBlockIsland == IslandType.THE_END && realZealotBruiserHideoutArea.isPlayerInside() -> "Zealot Bruiser Hideout"
+            skyBlockArea = when {
+                skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
+                skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
+                skyBlockIsland == IslandType.THE_END && fakeZealotBruiserHideoutArea.isPlayerInside() -> "The End"
+                skyBlockIsland == IslandType.THE_END && realZealotBruiserHideoutArea.isPlayerInside() -> "Zealot Bruiser Hideout"
 
-                    else -> originalLocation
-                }
-
-                checkProfileName()
+                else -> originalLocation
             }
+
+            checkProfileName()
         }
 
         if (!event.isMod(5)) return

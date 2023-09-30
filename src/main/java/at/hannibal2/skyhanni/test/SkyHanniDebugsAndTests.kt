@@ -6,16 +6,25 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
@@ -173,11 +182,9 @@ class SkyHanniDebugsAndTests {
             val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
             val y = LorenzUtils.formatDouble(location.y + 0.001).replace(",", ".")
             val z = LorenzUtils.formatDouble(location.z + 0.001).replace(",", ".")
-            if (args.size == 1) {
-                if (args[0].equals("json", false)) {
-                    OSUtils.copyToClipboard("\"$x:$y:$z\"")
-                    return
-                }
+            if (args.size == 1 && args[0].equals("json", false)) {
+                OSUtils.copyToClipboard("\"$x:$y:$z\"")
+                return
             }
 
             OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
@@ -188,12 +195,10 @@ class SkyHanniDebugsAndTests {
         }
 
         fun debugData(args: Array<String>) {
-            if (args.size == 2) {
-                if (args[0] == "profileName") {
-                    HypixelData.profileName = args[1].lowercase()
-                    LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
-                    return
-                }
+            if (args.size == 2 && args[0] == "profileName") {
+                HypixelData.profileName = args[1].lowercase()
+                LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
+                return
             }
             val builder = StringBuilder()
             builder.append("```\n")
@@ -223,9 +228,9 @@ class SkyHanniDebugsAndTests {
                 if (LorenzUtils.inDungeons) {
                     builder.append("\n")
                     builder.append("in dungeon!\n")
-                    builder.append(" dungeonFloor: ${DungeonData.dungeonFloor}\n")
-                    builder.append(" started: ${DungeonData.started}\n")
-                    builder.append(" inBossRoom: ${DungeonData.inBossRoom}\n")
+                    builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
+                    builder.append(" started: ${DungeonAPI.started}\n")
+                    builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
                 }
 
             }
@@ -272,6 +277,16 @@ class SkyHanniDebugsAndTests {
         val internalName = itemStack.getInternalName()
         if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
+
+    }
+
+    @SubscribeEvent
+    fun showItemRarity(event: ItemTooltipEvent) {
+        if (!config.showItemRarity) return
+        val itemStack = event.itemStack ?: return
+
+        val rarity = itemStack.getItemRarityOrNull(logError = false)
+        event.toolTip.add("Item rarity: $rarity")
     }
 
     @SubscribeEvent

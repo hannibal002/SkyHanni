@@ -37,11 +37,8 @@ class DungeonMilestonesDisplay {
     }
 
     private fun checkVisibility() {
-        if (currentMilestone >= 3) {
-            if (System.currentTimeMillis() > timeReached + 3_000)
-                if (display != "") {
-                    display = display.substring(1)
-                }
+        if (currentMilestone >= 3 && System.currentTimeMillis() > timeReached + 3_000 && display != "") {
+            display = display.substring(1)
         }
     }
 
