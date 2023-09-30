@@ -5,9 +5,13 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
@@ -17,6 +21,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AreaMiniBossFeatures {
+    private val config get() = SkyHanniMod.feature.combat.mobs
     private var lastTime = 0L
     private var miniBossType: AreaMiniBossType? = null
     private var respawnCooldown = 11_000L
@@ -39,11 +44,11 @@ class AreaMiniBossFeatures {
             }
             lastTime = time
 
-            if (SkyHanniMod.feature.mobs.areaBossHighlight) {
+            if (config.areaBossHighlight) {
                 val color = bossType.color.toColor().withAlpha(bossType.colorOpacity)
                 RenderLivingEntityHelper.setEntityColor(entity, color)
-                { SkyHanniMod.feature.mobs.areaBossHighlight }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.areaBossHighlight }
+                { config.areaBossHighlight }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { config.areaBossHighlight }
             }
 
             // TODO add sound
@@ -53,7 +58,7 @@ class AreaMiniBossFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.mobs.areaBossRespawnTimer) return
+        if (!config.areaBossRespawnTimer) return
 
         miniBossType?.apply {
             val time = getTime()

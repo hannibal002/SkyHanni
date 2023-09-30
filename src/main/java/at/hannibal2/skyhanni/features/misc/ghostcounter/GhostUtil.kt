@@ -95,7 +95,7 @@ object GhostUtil {
             lol
         } else {
             Utils.chromaStringByColourCode(this.replace("%value%", t)
-                .replace("%display%", "$level->${if (SkyHanniMod.feature.ghostCounter.showMax) "25" else nextLevel}"))
+                .replace("%display%", "$level->${if (SkyHanniMod.feature.combat.ghostCounter.showMax) "25" else nextLevel}"))
         }
     }
 
@@ -123,6 +123,6 @@ object GhostUtil {
     }
 
     private fun percent(number: Double): String {
-        return "${((number / 250_000) * 100).roundToPrecision(4)}"
+        return 100.0.coerceAtMost(((number / 250_000) * 100).roundToPrecision(4)).toString()
     }
 }

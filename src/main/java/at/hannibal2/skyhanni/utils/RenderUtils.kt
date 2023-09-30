@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -229,7 +230,6 @@ object RenderUtils {
         GlStateManager.translate(0f, -0.25f, 0f)
         GlStateManager.rotate(-renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-//    RenderUtil.drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
 
@@ -332,9 +332,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
-//        GlStateManager.scale(scale, scale, scale)
         GlStateManager.scale(finalScale, finalScale, finalScale)
-//        GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
@@ -354,6 +352,15 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
+
+    fun Position.transform(): Pair<Int, Int> {
+        GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
+        GlStateManager.scale(effectiveScale, effectiveScale, 1F)
+        val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()
+        val y = ((Utils.getMouseY() - getAbsY()) / effectiveScale).toInt()
+        return x to y
+    }
+
     fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string == null) return
         if (string == "") return
@@ -364,12 +371,12 @@ object RenderUtils {
     private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
-
+        transform()
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
 
-        val x = getAbsX() + offsetX
-        val y = getAbsY() + offsetY
+        val x = offsetX
+        val y = offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
@@ -443,15 +450,17 @@ object RenderUtils {
 
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(getAbsX().toFloat(), (getAbsY() + offsetY).toFloat(), 0F)
+        val (x, y) = transform()
+        GlStateManager.translate(0f, offsetY.toFloat(), 0F)
         var offsetX = 0
-        for (any in line) {
-            val renderable = Renderable.fromAny(any, itemScale = itemScale)
-                ?: throw RuntimeException("Unknown render object: $any")
-
-            renderable.render(getAbsX() + offsetX, getAbsY() + offsetY)
-            offsetX += renderable.width
-            GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
+        Renderable.withMousePosition(x, y) {
+            for (any in line) {
+                val renderable = Renderable.fromAny(any, itemScale = itemScale)
+                    ?: throw RuntimeException("Unknown render object: $any")
+                renderable.render(offsetX, offsetY)
+                offsetX += renderable.width
+                GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
+            }
         }
         GlStateManager.popMatrix()
         return offsetX
@@ -972,7 +981,12 @@ object RenderUtils {
         )
     }
 
-    fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float) {
+    fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float
+    ) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.disableLighting()

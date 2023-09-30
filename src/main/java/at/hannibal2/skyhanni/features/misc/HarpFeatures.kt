@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,7 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 class HarpFeatures {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
     private val keys = listOf(
@@ -34,7 +35,7 @@ class HarpFeatures {
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.harpKeybinds) return
+        if (!config.keybinds) return
         if (!openInventoryName().startsWith("Harp")) return
         val chest = event.gui as? GuiChest ?: return
 
@@ -58,7 +59,7 @@ class HarpFeatures {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.harpNumbers) return
+        if (!config.showNumbers) return
         if (!openInventoryName().startsWith("Harp")) return
         if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
 
@@ -67,5 +68,11 @@ class HarpFeatures {
         if (index == -1) return // this should never happen unless there's an update
 
         event.stackTip = (index + 1).toString()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
+        event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")
     }
 }

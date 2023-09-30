@@ -1,10 +1,15 @@
 package at.hannibal2.skyhanni.features.misc.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
@@ -21,7 +26,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class PowderTracker {
 
-    private val config get() = SkyHanniMod.feature.misc.powderTrackerConfig
+    private val config get() = SkyHanniMod.feature.mining.powderTracker
     private var display = emptyList<List<Any>>()
     private val picked = "§6You have successfully picked the lock on this chest!".toPattern()
     private val uncovered = "§aYou uncovered a treasure chest!".toPattern()
@@ -151,6 +156,11 @@ class PowderTracker {
         chestInfo.perMin.clear()
         doublePowder = false
         saveAndUpdate()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.powderTrackerConfig", "mining.powderTracker")
     }
 
     private fun saveAndUpdate() {

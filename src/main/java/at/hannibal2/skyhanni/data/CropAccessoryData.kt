@@ -16,7 +16,7 @@ import net.minecraft.nbt.CompressedStreamTools
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.ByteArrayInputStream
-import java.util.*
+import java.util.Base64
 
 class CropAccessoryData {
     private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toRegex()

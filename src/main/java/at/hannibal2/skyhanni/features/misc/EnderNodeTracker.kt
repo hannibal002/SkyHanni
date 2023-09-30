@@ -1,10 +1,16 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -20,7 +26,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EnderNodeTracker {
-    private val config get() = SkyHanniMod.feature.misc.enderNodeTracker
+    private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
     private val storage get() = ProfileStorageData.profileSpecific?.enderNodeTracker
 
     private var totalEnderArmor = 0
@@ -138,6 +144,11 @@ class EnderNodeTracker {
             .map { it.value }
             .sum()
         update()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
     }
 
     private fun calculateProfit(storage: Storage.ProfileSpecific.EnderNodeTracker): Map<EnderNode, Double> {

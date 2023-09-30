@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,11 +18,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 class HypixelData {
-    private val config get() = SkyHanniMod.feature.dev
     private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
     private val westVillageFarmArea = AxisAlignedBB(-54.0, 69.0, -115.0, -40.0, 75.0, -127.0)
     private val howlingCaveArea = AxisAlignedBB(-401.0, 50.0, -104.0, -337.0, 90.0, 36.0)
-    private val zealotBruiserHideoutArea = AxisAlignedBB(-520.0, 66.0, -332.0, -558.0, 85.0, -280.0)
+    private val fakeZealotBruiserHideoutArea = AxisAlignedBB(-520.0, 66.0, -332.0, -558.0, 85.0, -280.0)
+    private val realZealotBruiserHideoutArea = AxisAlignedBB(-552.0, 50.0, -245.0, -580.0, 72.0, -209.0)
 
     companion object {
         var hypixelLive = false
@@ -74,23 +78,22 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.isMod(2)) {
-            if (LorenzUtils.inSkyBlock) {
-                val originalLocation = ScoreboardData.sidebarLinesFormatted
-                    .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                    ?.substring(5)?.removeColor()
-                    ?: "?"
+        if (event.isMod(2) && LorenzUtils.inSkyBlock) {
+            val originalLocation = ScoreboardData.sidebarLinesFormatted
+                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
+                ?.substring(5)?.removeColor()
+                ?: "?"
 
-                skyBlockArea = when {
-                    skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
-                    skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
-                    skyBlockIsland == IslandType.THE_END && zealotBruiserHideoutArea.isPlayerInside() -> "The End"
+            skyBlockArea = when {
+                skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
+                skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
+                skyBlockIsland == IslandType.THE_END && fakeZealotBruiserHideoutArea.isPlayerInside() -> "The End"
+                skyBlockIsland == IslandType.THE_END && realZealotBruiserHideoutArea.isPlayerInside() -> "Zealot Bruiser Hideout"
 
-                    else -> originalLocation
-                }
-
-                checkProfileName()
+                else -> originalLocation
             }
+
+            checkProfileName()
         }
 
         if (!event.isMod(5)) return

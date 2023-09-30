@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackAPI {
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
+    private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
@@ -223,6 +224,9 @@ object SackAPI {
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
         SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved).postAndCatch()
+        if (chatConfig.hideSacksChange) {
+            event.blockedReason = "sacks_change"
+        }
     }
 
     @SubscribeEvent
@@ -270,20 +274,20 @@ object SackAPI {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, 0) }
     }
 
-    fun fetchSackItem(item: NEUInternalName): SackItem? {
+    fun fetchSackItem(item: NEUInternalName): SackItem {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, -1)
 
         if (sackData.containsKey(item)) {
-            return sackData[item]
+            return sackData[item] ?: return SackItem(0, 0, -1)
         }
 
         sackData = sackData.editCopy { this[item] = SackItem(0, 0, 2) }
-        return sackData[item]
+        return sackData[item] ?: return SackItem(0, 0, -1)
     }
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
-        SkyHanniMod.configManager.saveSackData("shutdown-hook")
+        SkyHanniMod.configManager.saveSackData("saving-data")
     }
 
     data class SackGemstone(

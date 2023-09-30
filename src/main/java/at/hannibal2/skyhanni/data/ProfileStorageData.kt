@@ -3,7 +3,14 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -149,13 +156,12 @@ object ProfileStorageData {
 
         profileSpecific?.crimsonIsle?.let {
             it.quests = oldHidden.crimsonIsleQuests
-            it.latestTrophyFishInInventory = oldHidden.crimsonIsleLatestTrophyFishInInventory
             it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
             it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
         }
 
         profileSpecific?.garden?.let {
-            it.experience = oldHidden.gardenExp
+            it.experience = oldHidden.gardenExp.toLong()
             it.cropCounter = oldHidden.gardenCropCounter
             it.cropUpgrades = oldHidden.gardenCropUpgrades
 

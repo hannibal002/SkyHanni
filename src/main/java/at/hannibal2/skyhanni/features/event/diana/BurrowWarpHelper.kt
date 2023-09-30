@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
 import org.lwjgl.input.Keyboard
 
 class BurrowWarpHelper {
-    private val config get() = SkyHanniMod.feature.diana
 
     private var lastWarpTime = 0L
     private var lastWarp: WarpPoint? = null
@@ -58,6 +57,7 @@ class BurrowWarpHelper {
     }
 
     companion object {
+        private val config get() = SkyHanniMod.feature.event.diana
         var currentWarp: WarpPoint? = null
 
         fun shouldUseWarps(target: LorenzVec) {
@@ -93,10 +93,10 @@ class BurrowWarpHelper {
     ) {
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { SkyHanniMod.feature.diana.ignoredWarps.crypt }),
+        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { SkyHanniMod.feature.diana.ignoredWarps.wizard }),
+        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
