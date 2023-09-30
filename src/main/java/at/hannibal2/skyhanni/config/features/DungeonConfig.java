@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
@@ -35,6 +33,7 @@ public class DungeonConfig {
     @Expose
     public Position deathCounterPos = new Position(10, 10, false, true);
 
+    @Expose
     @ConfigOption(name = "Clean End", desc = "")
     @Accordion
     public CleanEndConfig cleanEnd = new CleanEndConfig();
@@ -127,8 +126,7 @@ public class DungeonConfig {
         public boolean hideHealerFairy = false;
     }
 
-
-
+    @Expose
     @ConfigOption(name = "Message Filter", desc = "")
     @Accordion
     public MessageFilterConfig messageFilter = new MessageFilterConfig();
@@ -141,6 +139,7 @@ public class DungeonConfig {
         public boolean keysAndDoors = false;
     }
 
+    @Expose
     @ConfigOption(name = "Dungeon Copilot", desc = "")
     @Accordion
     public DungeonCopilotConfig dungeonCopilot = new DungeonCopilotConfig();
@@ -156,6 +155,7 @@ public class DungeonConfig {
     @Expose
     public Position copilotPos = new Position(10, 10, false, true);
 
+    @Expose
     @ConfigOption(name = "Party Finder", desc = "")
     @Accordion
     public PartyFinderConfig partyFinder = new PartyFinderConfig();
