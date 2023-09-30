@@ -87,8 +87,8 @@ class MenuItemDisplayOverlayAbiphone {
                         "Notkia" -> "Nka"
                         "Techy" -> "Tec"
                         "Scrapper" -> "Scr"
-                        "Für Elise" -> "WTF"
-                        "Jingle Bells" -> "Jbl"
+                        "Elise" -> "WTF"
+                        "Bells" -> "Jbl"
                         "Vibrate" -> "Vib"
                         else -> "?"
                     }

@@ -91,6 +91,7 @@ class MenuItemDisplayOverlayMining {
             for (line in lore) {
                 if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
                 else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
+                else if (line.contains("Your Other Crystals") || line.contains("Jasper") || line.contains("Ruby")) break
             }
             var crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
             return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
