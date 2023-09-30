@@ -58,7 +58,7 @@ class EntityKill {
 
     private var shouldTrackArrow = false
 
-    //This function was made with help from ChatGPT Link: https://chat.openai.com/share/1e5b11ed-b72e-4a69-bfe9-71a8d5fd2fa6
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         tickDelayer++
@@ -74,6 +74,8 @@ class EntityKill {
 
         if (tickDelayer < 21) return
         tickDelayer = 0
+
+        //This function was made with help from ChatGPT Link: https://chat.openai.com/share/1e5b11ed-b72e-4a69-bfe9-71a8d5fd2fa6
         val listA = EntityUtils.getAllEntities()
         val listB = mobHitList
         val listC = ArrayList<Int>(20)
