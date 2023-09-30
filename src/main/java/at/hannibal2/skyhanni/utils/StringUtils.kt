@@ -160,8 +160,6 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun trimWhiteSpaceAndResets(string: String): String = whiteSpaceResetPattern.matcher(string).replaceAll("")
-    fun removeResets(string: String): String = resetPattern.matcher(string).replaceAll("")
     fun String.capAtMinecraftLength(limit: Int) =
         capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
 

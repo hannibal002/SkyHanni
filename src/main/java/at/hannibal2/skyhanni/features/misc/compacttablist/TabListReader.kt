@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
 import com.google.common.collect.Ordering
 import net.minecraft.client.Minecraft
@@ -60,7 +61,7 @@ object TabListReader {
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList
 
         for (entry in fullTabList.indices step 20) {
-            val title = StringUtils.trimWhiteSpaceAndResets(tabList.getPlayerName(fullTabList[entry]))
+            val title = tabList.getPlayerName(fullTabList[entry]).trimWhiteSpaceAndResets()
             var column = getColumnFromName(columns, title)
 
             if (column == null) {
@@ -112,10 +113,10 @@ object TabListReader {
             if (line.contains(hypixelAdvertisingString)) continue
 
             var newLine = line
-            matcher = upgradesPattern.matcher(StringUtils.removeResets(newLine))
+            matcher = upgradesPattern.matcher(newLine.removeResets())
 
             if (matcher.matches()) {
-                var firstPart = StringUtils.trimWhiteSpaceAndResets(matcher.group("firstPart"))
+                var firstPart = matcher.group("firstPart").trimWhiteSpaceAndResets()
                 if (!firstPart.contains("§l")) {
                     firstPart = " $firstPart"
                 }
@@ -124,7 +125,7 @@ object TabListReader {
                 newLine = matcher.group("secondPart")
             }
 
-            newLine = StringUtils.trimWhiteSpaceAndResets(newLine)
+            newLine = newLine.trimWhiteSpaceAndResets()
             if (!newLine.contains("§l")) {
                 newLine = " $newLine"
             }
@@ -147,7 +148,7 @@ object TabListReader {
         for (column in columns) {
             var currentTabSection: TabSection? = null
             for (line in column.lines) {
-                if (StringUtils.trimWhiteSpaceAndResets(line).isEmpty()) {
+                if (line.trimWhiteSpaceAndResets().isEmpty()) {
                     currentTabSection = null
                     continue
                 }
