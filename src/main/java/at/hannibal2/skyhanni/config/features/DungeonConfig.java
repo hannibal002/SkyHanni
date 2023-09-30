@@ -124,7 +124,6 @@ public class DungeonConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideHealerFairy = false;
-    }
 
     @Expose
     @ConfigOption(name = "Message Filter", desc = "")
@@ -150,6 +149,7 @@ public class DungeonConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
+    }
 
         @Expose
         public Position pos = new Position(10, 10, false, true);
