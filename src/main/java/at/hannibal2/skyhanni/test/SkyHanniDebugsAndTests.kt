@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -38,6 +39,7 @@ class SkyHanniDebugsAndTests {
 
     companion object {
         private val config get() = SkyHanniMod.feature.dev
+        private val debugConfig get() = config.debug
         var displayLine = ""
         var displayList = emptyList<List<Any>>()
 
@@ -260,7 +262,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyInternalName)) return
+        if (!OSUtils.isKeyHeld(debugConfig.copyInternalName)) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
@@ -272,17 +274,17 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onShowInternalName(event: ItemTooltipEvent) {
-        if (!config.showInternalName) return
+        if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalName()
-        if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
+        if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
 
     }
 
     @SubscribeEvent
     fun showItemRarity(event: ItemTooltipEvent) {
-        if (!config.showItemRarity) return
+        if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack ?: return
 
         val rarity = itemStack.getItemRarityOrNull(logError = false)
@@ -291,7 +293,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onSHowNpcPrice(event: ItemTooltipEvent) {
-        if (!config.showNpcPrice) return
+        if (!debugConfig.showNpcPrice) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalNameOrNull() ?: return
 
@@ -317,7 +319,7 @@ class SkyHanniDebugsAndTests {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.debugEnabled) return
+        if (!debugConfig.enabled) return
 
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
@@ -530,5 +532,16 @@ class SkyHanniDebugsAndTests {
 //        println("particleCount: $particleCount")
 //        println("particleSpeed: $particleSpeed")
 //        println("offset: $offset")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.debugEnabled", "dev.debug.enabled")
+        event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
+        event.move(3, "dev.showEmptyNames", "dev.debug.showEmptyNames")
+        event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
+        event.move(3,"dev.copyInternalName", "dev.debug.copyInternalName")
+        event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+
     }
 }
