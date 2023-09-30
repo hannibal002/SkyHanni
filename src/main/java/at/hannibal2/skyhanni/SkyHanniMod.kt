@@ -572,6 +572,7 @@ class SkyHanniMod {
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
         loadModule(FixNEUHeavyPearls())
+        loadModule(EntityKill())
 
         init()
 
