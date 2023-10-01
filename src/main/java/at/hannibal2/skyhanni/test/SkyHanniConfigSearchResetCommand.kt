@@ -54,7 +54,6 @@ object SkyHanniConfigSearchResetCommand {
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
-            println("size: $affectedElements")
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {

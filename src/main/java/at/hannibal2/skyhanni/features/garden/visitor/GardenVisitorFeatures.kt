@@ -396,7 +396,6 @@ class GardenVisitorFeatures {
     }
 
     private fun readToolTip(visitor: Visitor, itemStack: ItemStack?) {
-        println("readToolTip")
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
         var totalPrice = 0.0
         var timeRequired = -1L
