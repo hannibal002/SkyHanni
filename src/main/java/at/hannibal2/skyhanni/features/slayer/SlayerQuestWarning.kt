@@ -23,6 +23,7 @@ class SlayerQuestWarning {
     private var lastWarning = 0L
     private var currentReason = ""
     private var dirtySidebar = false
+    private var hasAutoSlayer = false
     private var activeSlayer: SlayerType? = null
 
     //TODO add check if player has clicked on an item, before mobs around you gets damage
@@ -39,6 +40,8 @@ class SlayerQuestWarning {
         }
         if (message == "  §r§5§lSLAYER QUEST STARTED!") {
             needSlayerQuest = false
+            hasAutoSlayer = true
+            dirtySidebar = true
         }
 
         //no auto slayer
@@ -105,7 +108,10 @@ class SlayerQuestWarning {
             dirtySidebar = false
             if (slayerQuest && !needSlayerQuest) {
                 if (bossSlain) {
-                    needNewQuest("You have no Auto-Slayer active!")
+                    if (!hasAutoSlayer) {
+                        needNewQuest("You have no Auto-Slayer active!")
+                        hasAutoSlayer = false
+                    }
                 } else if (slayBoss) {
                     needNewQuest("You probably switched the server during an active boss and now hypixel doesn't know what to do.")
                 }

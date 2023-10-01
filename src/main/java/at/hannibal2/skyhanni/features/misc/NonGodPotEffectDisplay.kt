@@ -41,11 +41,11 @@ class NonGodPotEffectDisplay {
 
         INVISIBILITY("invisibility", "§8Invisibility I"), // when wearing sorrow armor
 
-        REV("ZOMBIE_BRAIN", "§9Zombie Brain Mixin", true),
-        TARA("SPIDER_EGG", "§9Spider Egg Mixin", true),
-        SVEN("WOLF_FUR", "§9Wolf Fur Mixin", true),
-        VOID("END_PORTAL_FUMES", "§9End Portal Fumes", true),
-        BLAZE("GABAGOEY", "§9Gabagoey", true),
+        REV("ZOMBIE_BRAIN", "§cZombie Brain Mixin", true),
+        TARA("SPIDER_EGG", "§6Spider Egg Mixin", true),
+        SVEN("WOLF_FUR", "§bWolf Fur Mixin", true),
+        VOID("END_PORTAL_FUMES", "§6Ender Portal Fumes", true),
+        BLAZE("GABAGOEY", "§fGabagoey", true),
 
         DEEP_TERROR("DEEPTERROR", "§4Deepterror", true),
         ;
@@ -155,7 +155,7 @@ class NonGodPotEffectDisplay {
         for (stack in event.inventoryItems.values) {
             val name = stack.name ?: continue
             for (effect in NonGodPotEffect.entries) {
-                if (name != effect.displayName) continue
+                if (!name.contains(effect.displayName)) continue
                 for (line in stack.getLore()) {
                     if (line.contains("Remaining") &&
                         line != "§7Time Remaining: §aCompleted!" &&

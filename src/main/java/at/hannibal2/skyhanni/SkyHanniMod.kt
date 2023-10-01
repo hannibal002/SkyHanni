@@ -52,7 +52,6 @@ import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
-import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
@@ -168,6 +167,7 @@ import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.EnderNodeTracker
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
+import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.misc.HarpFeatures
 import at.hannibal2.skyhanni.features.misc.HideArmor
@@ -298,7 +298,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.25.1",
+    version = "0.20",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -563,7 +563,7 @@ class SkyHanniMod {
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
-        loadModule(Translator())
+//        loadModule(Translator())
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
@@ -572,6 +572,7 @@ class SkyHanniMod {
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
         loadModule(PlayerChatSymbols())
+        loadModule(FixNEUHeavyPearls())
 
         init()
 

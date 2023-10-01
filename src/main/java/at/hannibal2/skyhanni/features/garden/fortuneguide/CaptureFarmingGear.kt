@@ -129,10 +129,10 @@ class CaptureFarmingGear {
             }
 
             // setting to current saved level -1 to stop later pages saving low rarity pets
-            var highestElephantRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT])
-            var highestMooshroomRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW])
-            var highestRabbitRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT])
-            var highestBeeRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE])
+            var highestElephantRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT]) - 1
+            var highestMooshroomRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW]) - 1
+            var highestRabbitRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT]) - 1
+            var highestBeeRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE]) - 1
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName_old().split(";")

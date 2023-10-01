@@ -696,9 +696,6 @@ class DamageIndicatorManager {
 
     private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
         val maxHealth: Int
-        println(" ")
-        println("realHealth: $realHealth")
-        println("realMaxHealth: $realMaxHealth")
         val health = if (DungeonAPI.isOneOf("F4")) {
             maxHealth = 4
 

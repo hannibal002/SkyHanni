@@ -299,6 +299,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
 + Added a countdown for Arachne spawn. - Cad
+    + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
 
 ## Garden Features
