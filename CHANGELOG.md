@@ -95,6 +95,7 @@
     + Pelts per hour
 + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
 + Added a countdown for Arachne spawn. - Cad
+    + Supports quick spawns.
 + Added **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
@@ -307,6 +308,10 @@
 + Fixed green bandana not getting detected for visitor reward warning. - hannibal2
 + Fixed zealots and zealot bruisers not getting detected when being runic. - hannibal2
 + Fixed mixins not getting detected correctly from effects inventory for Non God Pot Effect display. - hannibal2
++ Fixed an error when detecting Jacob Contest times. - hannibal2
++ Fixed Mushroom Goal breaking the Bingo Card detection. - hannibal2
++ Fixed Diana's Griffin Pet Warning not working during the Jerry Mayor. - hannibal2
++ Fixed /ff not detecting changes in the /pets inventory. - CalMWolfs
 
 ### Removed Features
 
