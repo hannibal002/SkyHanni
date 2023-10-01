@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.20 (Unreleased)
+## Version 0.20
 
 ### New Features
 
