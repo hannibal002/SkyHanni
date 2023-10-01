@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.disanceToIngoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.block.state.IBlockState
@@ -130,6 +131,9 @@ object EntityUtils {
 
     inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceTo(location) < radius }
+
+    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
+            getEntities<T>().filter { it.disanceToIngoreY(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 

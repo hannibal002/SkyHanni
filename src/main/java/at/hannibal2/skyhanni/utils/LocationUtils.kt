@@ -20,6 +20,8 @@ object LocationUtils {
 
     fun Entity.distanceTo(location: LorenzVec) = getLorenzVec().distance(location)
 
+    fun Entity.disanceToIngoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
+
     fun playerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val vec = player.getLorenzVec()

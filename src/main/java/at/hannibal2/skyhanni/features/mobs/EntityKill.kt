@@ -52,7 +52,7 @@ class EntityKill {
     private var mobHitMap = HashMap<Int, Entity>(200)
     private var mobHitList = mutableListOf<Int>()
 
-    private val mobNameFilter = "\\[.*\\] (.*) \\d+/\\d+❤".toRegex()
+    private val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
 
     private var tickDelayer = 0
 
@@ -76,7 +76,7 @@ class EntityKill {
         tickDelayer = 0
 
         //This function was made with help from ChatGPT Link: https://chat.openai.com/share/1e5b11ed-b72e-4a69-bfe9-71a8d5fd2fa6
-        val listA = EntityUtils.getAllEntities()
+        val listA = EntityUtils.getEntities<EntityLiving>()
         val listB = mobHitList
         val listC = ArrayList<Int>(20)
 
@@ -127,7 +127,7 @@ class EntityKill {
                     else -> 0.0
                 }
                 var i = 0
-                EntityUtils.getEntitiesNearby<EntityLiving>(event.clickedEntity.getLorenzVec(), range).forEach {
+                EntityUtils.getEntitiesNearbyIgnoreY<EntityLiving>(event.clickedEntity.getLorenzVec(), range).forEach {
                     addToMobHitList(it.entityId)
                     i++
                     LorenzDebug.log(it.name)
@@ -159,10 +159,10 @@ class EntityKill {
 
             //Minecraft.getMinecraft().thePlayer.lookVec.normalize().toLorenzVec()
             val player = Minecraft.getMinecraft().thePlayer
-            val raycastResult = EntityUtils.getAllEntities().filter {
+            val raycastResult = EntityUtils.getEntities<EntityLiving>().filter {
                 it.position.toLorenzVec().subtract(player.getLorenzVec()).dotPorduct(player.lookVec.normalize().toLorenzVec()).absoluteValue < 1.5
             }
-            val nearArrowHit = raycastResult.filter { it !is EntityPlayerSP && it !is EntityArmorStand && it !is EntityXPOrb && it !is EntityOtherPlayerMP }
+            val nearArrowHit = raycastResult //.filter { it !is EntityPlayerSP && it !is EntityArmorStand && it !is EntityXPOrb && it !is EntityOtherPlayerMP }
             nearArrowHit.forEach {
                 LorenzDebug.log(it.toString())
                 addToMobHitList(it.entityId)
@@ -181,7 +181,9 @@ class EntityKill {
         val index = mobHitList.binarySearch(mobId)
         if (index >= 0) return
         mobHitList.add(-(index + 1), mobId)
-        mobHitMap[mobId] = EntityUtils.getAllEntities().firstOrNull { it.entityId == mobId + 1 }
+
+        val theWorld = Minecraft.getMinecraft().theWorld ?: return
+        mobHitMap[mobId] = theWorld.getEntityByID(mobId + 1 )
                 ?: return //Fun Fact the corresponding ArmorStand for a mob has always the mobId + 1
     }
 
