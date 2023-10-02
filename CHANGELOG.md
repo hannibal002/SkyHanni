@@ -319,7 +319,6 @@
     - (Hypixel fixed their bug, finally)
 - Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
     - This should not affect much
-    -
 - Removed wishing compass in item number.
     - Every Wishing Compass now only has one use instead of three.
 
