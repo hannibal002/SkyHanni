@@ -37,7 +37,6 @@ public class DungeonConfig {
     @ConfigOption(name = "Clean End", desc = "")
     @Accordion
     public CleanEndConfig cleanEnd = new CleanEndConfig();
-
     public static class CleanEndConfig{
         @Expose
         @ConfigOption(name = "Clean Ending", desc = "After the last Dungeon boss has died, all entities and " +
@@ -74,7 +73,9 @@ public class DungeonConfig {
     public boolean highlightTeammates = true;
 
 
+    @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
+    @Accordion
     public ObjectHiderConfig objectHider = new ObjectHiderConfig();
     public static class ObjectHiderConfig {
         @Expose
