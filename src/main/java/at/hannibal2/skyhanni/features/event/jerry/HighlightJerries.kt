@@ -22,8 +22,7 @@ class HighlightJerries {
 
         if (entity is EntityVillager && maxHealth < 7 && maxHealth > 2) {
             RenderLivingEntityHelper.setEntityColor(entity, listOfLorenzColors[maxHealth].toColor().withAlpha(20))
-                { SkyHanniMod.feature.event.jerry.highlightJerries }
-            }
+            { SkyHanniMod.feature.event.jerry.highlightJerries }
         }
     }
 }
