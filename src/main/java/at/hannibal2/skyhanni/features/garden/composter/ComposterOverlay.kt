@@ -514,10 +514,10 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.composterOverlay", "garden.composter.overlay")
-        event.move(3, "garden.composterOverlayPriceType", "garden.composter.overlayPriceType")
-        event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composter.overlayOrganicMatterPos")
-        event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composter.overlayFuelExtrasPos")
-        event.move(3, "garden.composterRoundDown", "garden.composter.roundDown")
+        event.move(4, "garden.composterOverlay", "garden.composter.overlay")
+        event.move(4, "garden.composterOverlayPriceType", "garden.composter.overlayPriceType")
+        event.move(4, "garden.composterOverlayOrganicMatterPos", "garden.composter.overlayOrganicMatterPos")
+        event.move(4, "garden.composterOverlayFuelExtrasPos", "garden.composter.overlayFuelExtrasPos")
+        event.move(4, "garden.composterRoundDown", "garden.composter.roundDown")
     }
 }

@@ -114,7 +114,7 @@ class GardenLevelDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevel.display")
-        event.move(3, "garden.gardenLevelPos", "garden.gardenLevel.pos")
+        event.move(4, "garden.gardenLevelDisplay", "garden.gardenLevel.display")
+        event.move(4, "garden.gardenLevelPos", "garden.gardenLevel.pos")
     }
 }

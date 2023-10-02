@@ -84,8 +84,8 @@ class PetExpTooltip {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pet.petExperienceToolTip.petDisplay")
-        event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pet.petExperienceToolTip.showAlways")
-        event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pet.petExperienceToolTip.showGoldenDragonEgg")
+        event.move(4, "misc.petExperienceToolTip.petDisplay", "misc.pet.petExperienceToolTip.petDisplay")
+        event.move(4, "misc.petExperienceToolTip.showAlways", "misc.pet.petExperienceToolTip.showAlways")
+        event.move(4, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pet.petExperienceToolTip.showGoldenDragonEgg")
     }
 }

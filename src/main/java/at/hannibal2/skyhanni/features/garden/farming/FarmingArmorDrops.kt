@@ -146,8 +146,8 @@ class FarmingArmorDrops {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.farmingArmorDropsEnabled", "garden.farmingArmorDrops.enabled")
-        event.move(3,"garden.farmingArmorDropsHideChat", "garden.farmingArmorDrops.hideChat")
-        event.move(3,"garden.farmingArmorDropsPos", "garden.farmingArmorDrops.pos")
+        event.move(4,"garden.farmingArmorDropsEnabled", "garden.farmingArmorDrops.enabled")
+        event.move(4,"garden.farmingArmorDropsHideChat", "garden.farmingArmorDrops.hideChat")
+        event.move(4,"garden.farmingArmorDropsPos", "garden.farmingArmorDrops.pos")
     }
 }

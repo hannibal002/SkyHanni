@@ -179,9 +179,9 @@ class GardenVisitorTimer {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.visitorTimerEnabled", "garden.visitor.timer.enabled")
-        event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitor.timer.sixthVisitorEnabled")
-        event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitor.timer.sixthVisitorWarning")
-        event.move(3, "garden.visitorTimerPos", "garden.visitor.timer.pos")
+        event.move(4, "garden.visitorTimerEnabled", "garden.visitor.timer.enabled")
+        event.move(4, "garden.visitorTimerSixthVisitorEnabled", "garden.visitor.timer.sixthVisitorEnabled")
+        event.move(4, "garden.visitorTimerSixthVisitorWarning", "garden.visitor.timer.sixthVisitorWarning")
+        event.move(4, "garden.visitorTimerPos", "garden.visitor.timer.pos")
     }
 }

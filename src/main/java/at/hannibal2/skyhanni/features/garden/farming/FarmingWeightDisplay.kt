@@ -83,14 +83,14 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
-        event.move(3, "garden.eliteFarmingWeightDisplay","garden.eliteFarmingWeight.display")
-        event.move(3, "garden.eliteFarmingWeightPos","garden.eliteFarmingWeight.pos")
-        event.move(3, "garden.eliteFarmingWeightLeaderboard","garden.eliteFarmingWeight.leaderboard")
-        event.move(3, "garden.eliteFarmingWeightOvertakeETA","garden.eliteFarmingWeight.overtakeETA")
-        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage","garden.eliteFarmingWeight.offScreenDropMessage")
-        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways","garden.eliteFarmingWeight.overtakeETAAlways")
-        event.move(3, "garden.eliteFarmingWeightETAGoalRank","garden.eliteFarmingWeight.ETAGoalRank")
-        event.move(3, "garden.eliteFarmingWeightIgnoreLow","garden.eliteFarmingWeight.ignoreLow")
+        event.move(4, "garden.eliteFarmingWeightDisplay","garden.eliteFarmingWeight.display")
+        event.move(4, "garden.eliteFarmingWeightPos","garden.eliteFarmingWeight.pos")
+        event.move(4, "garden.eliteFarmingWeightLeaderboard","garden.eliteFarmingWeight.leaderboard")
+        event.move(4, "garden.eliteFarmingWeightOvertakeETA","garden.eliteFarmingWeight.overtakeETA")
+        event.move(4, "garden.eliteFarmingWeightOffScreenDropMessage","garden.eliteFarmingWeight.offScreenDropMessage")
+        event.move(4, "garden.eliteFarmingWeightOvertakeETAAlways","garden.eliteFarmingWeight.overtakeETAAlways")
+        event.move(4, "garden.eliteFarmingWeightETAGoalRank","garden.eliteFarmingWeight.ETAGoalRank")
+        event.move(4, "garden.eliteFarmingWeightIgnoreLow","garden.eliteFarmingWeight.ignoreLow")
     }
 
     companion object {

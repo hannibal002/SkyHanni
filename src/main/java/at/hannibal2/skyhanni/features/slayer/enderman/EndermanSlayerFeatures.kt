@@ -218,12 +218,12 @@ class EndermanSlayerFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.enderman.endermanBeaconConfig.highlightBeacon")
-        event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.enderman.endermanBeaconConfig.beaconColor")
-        event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.enderman.endermanBeaconConfig.showWarning")
-        event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.enderman.endermanBeaconConfig.showLine")
-        event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.enderman.endermanBeaconConfig.lineColor")
-        event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.enderman.endermanBeaconConfig.lineWidth")
-        event.move(3, "slayer.endermanHighlightNukekebi", "slayer.enderman.highlightNukekebi")
+        event.move(4, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.enderman.endermanBeaconConfig.highlightBeacon")
+        event.move(4, "slayer.endermanBeaconConfig.beaconColor", "slayer.enderman.endermanBeaconConfig.beaconColor")
+        event.move(4, "slayer.endermanBeaconConfig.showWarning", "slayer.enderman.endermanBeaconConfig.showWarning")
+        event.move(4, "slayer.endermanBeaconConfig.showLine", "slayer.enderman.endermanBeaconConfig.showLine")
+        event.move(4, "slayer.endermanBeaconConfig.lneColor", "slayer.enderman.endermanBeaconConfig.lineColor")
+        event.move(4, "slayer.endermanBeaconConfig.lineWidth", "slayer.enderman.endermanBeaconConfig.lineWidth")
+        event.move(4, "slayer.endermanHighlightNukekebi", "slayer.enderman.highlightNukekebi")
     }
 }

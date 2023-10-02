@@ -315,10 +315,10 @@ class BlazeSlayerDaggerHelper {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.blazeDaggers", "slayer.blaze.hellion.daggers")
-        event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blaze.hellion.markRightHellionShield")
-        event.move(3,"slayer.blazeFirstDagger", "slayer.blaze.hellion.firstDagger")
-        event.move(3,"slayer.blazeHideDaggerWarning", "slayer.blaze.hellion.hideDaggerWarning")
+        event.move(4, "slayer.blazeDaggers", "slayer.blaze.hellion.daggers")
+        event.move(4, "slayer.blazeMarkRightHellionShield", "slayer.blaze.hellion.markRightHellionShield")
+        event.move(4,"slayer.blazeFirstDagger", "slayer.blaze.hellion.firstDagger")
+        event.move(4,"slayer.blazeHideDaggerWarning", "slayer.blaze.hellion.hideDaggerWarning")
     }
 
 }

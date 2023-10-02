@@ -198,7 +198,7 @@ object GardenCropSpeed {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
+        event.move(4,"garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
 
     }
 }

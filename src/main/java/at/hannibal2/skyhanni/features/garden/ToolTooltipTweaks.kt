@@ -156,8 +156,8 @@ class ToolTooltipTweaks {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.compactToolTooltips", "garden.tooltipTweaks.compactToolTooltips")
-        event.move(3,"garden.fortuneTooltipKeybind", "garden.tooltipTweaks.fortuneTooltipKeybind")
-        event.move(3,"garden.cropTooltipFortune", "garden.tooltipTweaks.cropTooltipFortune")
+        event.move(4,"garden.compactToolTooltips", "garden.tooltipTweaks.compactToolTooltips")
+        event.move(4,"garden.fortuneTooltipKeybind", "garden.tooltipTweaks.fortuneTooltipKeybind")
+        event.move(4,"garden.cropTooltipFortune", "garden.tooltipTweaks.cropTooltipFortune")
     }
 }

@@ -143,8 +143,8 @@ class DicerRngDropCounter {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.dicerCounterDisplay", "garden.dicerCounter.display")
-        event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounter.hideChat")
-        event.move(3, "garden.dicerCounterPos", "garden.dicerCounter.pos")
+        event.move(4, "garden.dicerCounterDisplay", "garden.dicerCounter.display")
+        event.move(4, "garden.dicerCounterHideChat", "garden.dicerCounter.hideChat")
+        event.move(4, "garden.dicerCounterPos", "garden.dicerCounter.pos")
     }
 }

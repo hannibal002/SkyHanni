@@ -178,10 +178,10 @@ class JacobFarmingContestsInventory {
     }
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"inventory.jacobFarmingContestHighlightRewards","inventory.jacobFarmingContest.highlightRewards")
-        event.move(3,"inventory.jacobFarmingContestHideDuplicates","inventory.jacobFarmingContest.hideDuplicates")
-        event.move(3,"inventory.jacobFarmingContestRealTime","inventory.jacobFarmingContest.realTime")
-        event.move(3,"inventory.jacobFarmingContestFinneganIcon","inventory.jacobFarmingContest.finneganIcon")
-        event.move(3,"inventory.jacobFarmingContestMedalIcon","inventory.jacobFarmingContest.medalIcon")
+        event.move(4,"inventory.jacobFarmingContestHighlightRewards","inventory.jacobFarmingContest.highlightRewards")
+        event.move(4,"inventory.jacobFarmingContestHideDuplicates","inventory.jacobFarmingContest.hideDuplicates")
+        event.move(4,"inventory.jacobFarmingContestRealTime","inventory.jacobFarmingContest.realTime")
+        event.move(4,"inventory.jacobFarmingContestFinneganIcon","inventory.jacobFarmingContest.finneganIcon")
+        event.move(4,"inventory.jacobFarmingContestMedalIcon","inventory.jacobFarmingContest.medalIcon")
     }
 }

@@ -503,14 +503,14 @@ object GardenNextJacobContest {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContest.display")
-        event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContest.everywhere")
-        event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContest.otherGuis")
-        event.move(3, "garden.nextJacobContestsFetchAutomatically", "garden.nextJacobContest.fetchAutomatically")
-        event.move(3, "garden.nextJacobContestsShareAutomatically", "garden.nextJacobContest.shareAutomatically")
-        event.move(3, "garden.nextJacobContestWarn", "garden.nextJacobContest.warn")
-        event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContest.warnTime")
-        event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContest.warnPopup")
-        event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContest.pos")
+        event.move(4, "garden.nextJacobContestDisplay", "garden.nextJacobContest.display")
+        event.move(4, "garden.nextJacobContestEverywhere", "garden.nextJacobContest.everywhere")
+        event.move(4, "garden.nextJacobContestOtherGuis", "garden.nextJacobContest.otherGuis")
+        event.move(4, "garden.nextJacobContestsFetchAutomatically", "garden.nextJacobContest.fetchAutomatically")
+        event.move(4, "garden.nextJacobContestsShareAutomatically", "garden.nextJacobContest.shareAutomatically")
+        event.move(4, "garden.nextJacobContestWarn", "garden.nextJacobContest.warn")
+        event.move(4, "garden.nextJacobContestWarnTime", "garden.nextJacobContest.warnTime")
+        event.move(4, "garden.nextJacobContestWarnPopup", "garden.nextJacobContest.warnPopup")
+        event.move(4, "garden.nextJacobContestPos", "garden.nextJacobContest.pos")
     }
 }

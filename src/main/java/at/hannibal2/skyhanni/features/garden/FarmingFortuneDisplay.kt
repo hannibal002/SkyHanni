@@ -285,8 +285,8 @@ class FarmingFortuneDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortune.display")
-        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortune.dropMultiplier")
-        event.move(3,"garden.farmingFortunePos", "garden.farmingFortune.pos")
+        event.move(4,"garden.farmingFortuneDisplay", "garden.farmingFortune.display")
+        event.move(4,"garden.farmingFortuneDropMultiplier", "garden.farmingFortune.dropMultiplier")
+        event.move(4,"garden.farmingFortunePos", "garden.farmingFortune.pos")
     }
 }

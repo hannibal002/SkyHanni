@@ -43,6 +43,6 @@ fun EntityLiving.setHellionShield(shield: HellionShield?) {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.blazeColoredMobs", "slayer.blaze.hellion.coloredMobs")
+        event.move(4, "slayer.blazeColoredMobs", "slayer.blaze.hellion.coloredMobs")
     }
 }

@@ -55,7 +55,7 @@ class FireVeilWandParticles {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWand.displayColor")
-        event.move(3,"itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWand.display")
+        event.move(4,"itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWand.displayColor")
+        event.move(4,"itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWand.display")
     }
 }

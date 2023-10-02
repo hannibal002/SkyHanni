@@ -232,12 +232,12 @@ object GardenVisitorDropStatistics {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.visitorDropsStatistics.enabled", "garden.visitor.dropsStatistics.enabled")
-        event.move(3, "garden.visitorDropsStatistics.textFormat", "garden.visitor.dropsStatistics.textFormat")
-        event.move(3, "garden.visitorDropsStatistics.displayNumbersFirst", "garden.visitor.dropsStatistics.displayNumbersFirst")
-        event.move(3, "garden.visitorDropsStatistics.displayIcons", "garden.visitor.dropsStatistics.displayIcons")
-        event.move(3, "garden.visitorDropsStatistics.onlyOnBarn", "garden.visitor.dropsStatistics.onlyOnBarn")
-        event.move(3, "garden.visitorDropsStatistics.visitorDropPos", "garden.visitor.dropsStatistics.pos")
+        event.move(4, "garden.visitorDropsStatistics.enabled", "garden.visitor.dropsStatistics.enabled")
+        event.move(4, "garden.visitorDropsStatistics.textFormat", "garden.visitor.dropsStatistics.textFormat")
+        event.move(4, "garden.visitorDropsStatistics.displayNumbersFirst", "garden.visitor.dropsStatistics.displayNumbersFirst")
+        event.move(4, "garden.visitorDropsStatistics.displayIcons", "garden.visitor.dropsStatistics.displayIcons")
+        event.move(4, "garden.visitorDropsStatistics.onlyOnBarn", "garden.visitor.dropsStatistics.onlyOnBarn")
+        event.move(4, "garden.visitorDropsStatistics.visitorDropPos", "garden.visitor.dropsStatistics.pos")
     }
 }
 

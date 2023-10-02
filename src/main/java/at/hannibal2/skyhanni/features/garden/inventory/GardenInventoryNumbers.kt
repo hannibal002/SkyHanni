@@ -56,9 +56,9 @@ class GardenInventoryNumbers {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.numberCropMilestone", "garden.numbers.cropMilestone")
-        event.move(3,"garden.numberCropUpgrades", "garden.numbers.cropUpgrades")
-        event.move(3,"garden.numberComposterUpgrades", "garden.numbers.composterUpgrades")
+        event.move(4,"garden.numberCropMilestone", "garden.numbers.cropMilestone")
+        event.move(4,"garden.numberCropUpgrades", "garden.numbers.cropUpgrades")
+        event.move(4,"garden.numberComposterUpgrades", "garden.numbers.composterUpgrades")
     }
 
 }

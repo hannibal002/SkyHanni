@@ -50,6 +50,6 @@ class EndermanSlayerHideParticles {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"slayer.endermanHideParticles", "slayer.enderman.hideParticles")
+        event.move(4,"slayer.endermanHideParticles", "slayer.enderman.hideParticles")
     }
 }

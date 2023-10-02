@@ -854,8 +854,8 @@ class DamageIndicatorManager {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
-        event.move(3,"slayer.endermanPhaseDisplay", "slayer.enderman.phaseDisplay")
-        event.move(3, "slayer.blazePhaseDisplay", "slayer.blaze.phaseDisplay")
+        event.move(4,"slayer.endermanPhaseDisplay", "slayer.enderman.phaseDisplay")
+        event.move(4, "slayer.blazePhaseDisplay", "slayer.blaze.phaseDisplay")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

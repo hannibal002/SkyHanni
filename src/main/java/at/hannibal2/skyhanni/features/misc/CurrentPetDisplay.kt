@@ -74,6 +74,6 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"misc.petDisplay", "misc.pet.display")
+        event.move(4,"misc.petDisplay", "misc.pet.display")
     }
 }

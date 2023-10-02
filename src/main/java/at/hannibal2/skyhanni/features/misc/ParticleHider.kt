@@ -42,13 +42,13 @@ class ParticleHider {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"misc.hideBlazeParticles", "misc.particleHider.hideBlazeParticles")
-        event.move(3, "misc.hideEndermanParticles", "misc.particleHider.hideEndermanParticles")
-        event.move(3, "misc.hideFarParticles", "misc.particleHider.hideFarParticles")
-        event.move(3, "misc.hideFireballParticles", "misc.particleHider.hideFireballParticles")
-        event.move(3, "misc.hideCloseRedstoneparticles", "misc.particleHider.hideCloseRedstoneParticles")
-        event.move(3, "misc.hideFireBlockParticles", "misc.particleHider.hideFireBlockParticles")
-        event.move(3,"misc.hideSmokeParticles", "misc.particleHider.hideSmokeParticles")
+        event.move(4,"misc.hideBlazeParticles", "misc.particleHider.hideBlazeParticles")
+        event.move(4, "misc.hideEndermanParticles", "misc.particleHider.hideEndermanParticles")
+        event.move(4, "misc.hideFarParticles", "misc.particleHider.hideFarParticles")
+        event.move(4, "misc.hideFireballParticles", "misc.particleHider.hideFireballParticles")
+        event.move(4, "misc.hideCloseRedstoneparticles", "misc.particleHider.hideCloseRedstoneParticles")
+        event.move(4, "misc.hideFireBlockParticles", "misc.particleHider.hideFireBlockParticles")
+        event.move(4,"misc.hideSmokeParticles", "misc.particleHider.hideSmokeParticles")
 
     }
 

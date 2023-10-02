@@ -209,15 +209,15 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.composterDisplayEnabled", "garden.composter.displayEnabled")
-        event.move(3, "garden.composterDisplayOutsideGarden", "garden.composter.displayOutsideGarden")
-        event.move(3, "garden.composterWarnAlmostClose", "garden.composter.warnAlmostClose")
-        event.move(3, "garden.composterDisplayPos", "garden.composter.displayPos")
-        event.move(3, "garden.composterOutsideGardenPos", "garden.composter.outsideGardenPos")
-        event.move(3, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
-        event.move(3, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
-        event.move(3, "garden.composterNotifyLowTitle", "garden.composter.notifyLow.title")
-        event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composter.notifyLow.organicMatter")
-        event.move(3, "garden.composterNotifyLowFuel", "garden.composter.notifyLow.fuel")
+        event.move(4, "garden.composterDisplayEnabled", "garden.composter.displayEnabled")
+        event.move(4, "garden.composterDisplayOutsideGarden", "garden.composter.displayOutsideGarden")
+        event.move(4, "garden.composterWarnAlmostClose", "garden.composter.warnAlmostClose")
+        event.move(4, "garden.composterDisplayPos", "garden.composter.displayPos")
+        event.move(4, "garden.composterOutsideGardenPos", "garden.composter.outsideGardenPos")
+        event.move(4, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
+        event.move(4, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
+        event.move(4, "garden.composterNotifyLowTitle", "garden.composter.notifyLow.title")
+        event.move(4, "garden.composterNotifyLowOrganicMatter", "garden.composter.notifyLow.organicMatter")
+        event.move(4, "garden.composterNotifyLowFuel", "garden.composter.notifyLow.fuel")
     }
 }

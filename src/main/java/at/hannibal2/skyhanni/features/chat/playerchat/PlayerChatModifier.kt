@@ -89,8 +89,8 @@ class PlayerChatModifier {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "chat.playerRankHider", "chat.playerMessages.playerRankHider")
-        event.move(3, "chat.chatFilter", "chat.playerMessages.chatFilter")
+        event.move(4, "chat.playerRankHider", "chat.playerMessages.playerRankHider")
+        event.move(4, "chat.chatFilter", "chat.playerMessages.chatFilter")
     }
 
 

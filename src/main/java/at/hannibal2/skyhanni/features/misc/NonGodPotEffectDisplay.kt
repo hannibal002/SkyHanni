@@ -226,9 +226,9 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffects.nonGodPotEffectDisplay")
-        event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffects.nonGodPotEffectShowMixins")
-        event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffects.nonGodPotEffectPos")
+        event.move(4, "misc.nonGodPotEffectDisplay", "misc.potionEffects.nonGodPotEffectDisplay")
+        event.move(4, "misc.nonGodPotEffectShowMixins", "misc.potionEffects.nonGodPotEffectShowMixins")
+        event.move(4, "misc.nonGodPotEffectPos", "misc.potionEffects.nonGodPotEffectPos")
     }
 
     private fun isEnabled() =

@@ -78,7 +78,7 @@ class GardenCropMilestoneInventory {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.numberAverageCropMilestone", "garden.numbers.averageCropMilestone")
-        event.move(3, "garden.cropMilestoneTotalProgress", "garden.tooltipTweaks.cropMilestoneTotalProgress")
+        event.move(4,"garden.numberAverageCropMilestone", "garden.numbers.averageCropMilestone")
+        event.move(4, "garden.cropMilestoneTotalProgress", "garden.tooltipTweaks.cropMilestoneTotalProgress")
     }
 }

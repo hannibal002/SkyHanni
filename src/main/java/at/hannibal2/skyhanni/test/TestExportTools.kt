@@ -65,6 +65,6 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
+        event.move(4, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
     }
 }
