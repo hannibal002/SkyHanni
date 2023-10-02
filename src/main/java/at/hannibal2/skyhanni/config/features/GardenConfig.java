@@ -1216,9 +1216,9 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Yaw and Pitch", desc = "")
     @Accordion
-    public YawPitchDisplay yawPitchDisplay = new YawPitchDisplay();
+    public YawPitchDisplayConfig yawPitchDisplay = new YawPitchDisplayConfig();
 
-    public static class YawPitchDisplay {
+    public static class YawPitchDisplayConfig {
 
         @Expose
         @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
@@ -1277,9 +1277,9 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")
     @Accordion
-    public CropStartLocation cropStartLocation = new CropStartLocation();
+    public CropStartLocationConfig cropStartLocation = new CropStartLocationConfig();
 
-    public static class CropStartLocation {
+    public static class CropStartLocationConfig {
 
         @Expose
         @ConfigOption(name = "Enable", desc = "Show the start waypoint for your farm with the currently holding tool.")
