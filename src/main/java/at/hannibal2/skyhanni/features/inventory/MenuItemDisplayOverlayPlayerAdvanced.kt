@@ -224,10 +224,10 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
         
         if (stackSizeConfig.contains(8)) {
+            val lore = item.getLore()
             if ((chestName.contains("Election"))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
-                val lore = item.getLore()
                 if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (!(lore.isEmpty())) {
                     if (lore.any { it.contains("Candidate") }) {
@@ -247,32 +247,28 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            if (((chestName == "Calendar and Events") || (chestName.contains("Mayor "))) && (itemName.contains("Mayor "))) {
-                if (itemName.lowercase().contains("dante")) return "§c§l✖"
-                val nameWithColor = item.name ?: return ""
-                val lore = item.getLore()
-                if (lore.any { it.contains(" the closing of") }) {
-                    if (!(itemName.contains("Jerry"))) {
-                        val colorCode = nameWithColor.take(2)
-                        var numPerks = 0
-                        for (line in lore) {
-                            if (line.startsWith(colorCode) && !(line.startsWith(colorCode + "§"))) {
-                                numPerks++
+            if (((chestName == "Calendar and Events") || (chestName.contains("Mayor ")))) {
+                if (itemName.startsWith("JERRY IS MAYOR")) {
+                    return grabPerkpocalypseMayor(lore)
+                }
+                if (itemName.contains("Mayor ")) {
+                    if (itemName.lowercase().contains("dante")) return "§c§l✖"
+                    val nameWithColor = item.name ?: return ""
+                    if (lore.any { it.contains(" the closing of") }) {
+                        if (!(itemName.contains("Jerry")) || chestName.contains("Mayor")) {
+                            val colorCode = nameWithColor.take(2)
+                            var numPerks = 0
+                            for (line in lore) {
+                                if (line.startsWith(colorCode) && !(line.startsWith(colorCode + "§"))) {
+                                    numPerks++
+                                }
                             }
-                        }
-                        return "" + colorCode + numPerks
-                    } else {
-                        for (line in lore) {
-                            if (line.contains("Perkpocalypse")) {
-                                if (lore.any { it.contains("SLASHED Pricing") } || lore.any { it.contains("Slayer XP Buff") } || lore.any { it.contains("Pathfinder") }) return "§bAtx"
-                                if (lore.any { it.contains("Prospection") } || lore.any { it.contains("Mining XP Buff") } || lore.any { it.contains("Mining Fiesta") }) return "§bCle"
-                                if (lore.any { it.contains("Lucky!") } || lore.any { it.contains("Pet XP Buff") } || lore.any { it.contains("Mythological Ritual") }) return "§bDna"
-                                if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖" //fuck diaz
-                                if (lore.any { it.contains("Farming Simulator") } || lore.any { it.contains("Pelt-pocalypse") } || lore.any { it.contains("GOATed") }) return "§bFnng"
-                                if (lore.any { it.contains("Sweet Tooth") } || lore.any { it.contains("Benevolence") } || lore.any { it.contains("Extra Event") }) return "§bFxy"
-                                if (lore.any { it.contains("Luck of the Sea 2.0") } || lore.any { it.contains("Fishing XP Buff") } || lore.any { it.contains("Fishing Festival") }) return "§bMrna"
-                                if (lore.any { it.contains("Marauder") } || lore.any { it.contains("EZPZ") } || lore.any { it.contains("Benediction") }) return "§bPaul"
-                                else return "§c?"
+                            return "" + colorCode + numPerks
+                        } else {
+                            for (line in lore) {
+                                if (lore. any { it.contains("Perkpocalypse") }) {
+                                    return grabPerkpocalypseMayor(lore)
+                                }
                             }
                         }
                     }
@@ -346,5 +342,17 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
         
         return ""
+    }
+
+    private fun grabPerkpocalypseMayor(lore: List<String>): String {
+        if (lore.any { it.contains("SLASHED Pricing") } || lore.any { it.contains("Slayer XP Buff") } || lore.any { it.contains("Pathfinder") }) return "§bAtx"
+        if (lore.any { it.contains("Prospection") } || lore.any { it.contains("Mining XP Buff") } || lore.any { it.contains("Mining Fiesta") }) return "§bCle"
+        if (lore.any { it.contains("Lucky!") } || lore.any { it.contains("Pet XP Buff") } || lore.any { it.contains("Mythological Ritual") }) return "§bDna"
+        if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖" //fuck diaz
+        if (lore.any { it.contains("Farming Simulator") } || lore.any { it.contains("Pelt-pocalypse") } || lore.any { it.contains("GOATed") }) return "§bFng"
+        if (lore.any { it.contains("Sweet Tooth") } || lore.any { it.contains("Benevolence") } || lore.any { it.contains("Extra Event") }) return "§bFxy"
+        if (lore.any { it.contains("Luck of the Sea 2.0") } || lore.any { it.contains("Fishing XP Buff") } || lore.any { it.contains("Fishing Festival") }) return "§bMrn"
+        if (lore.any { it.contains("Marauder") } || lore.any { it.contains("EZPZ") } || lore.any { it.contains("Benediction") }) return "§bPul"
+        else return "§c?"
     }
 }
