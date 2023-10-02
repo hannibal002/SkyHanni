@@ -1144,35 +1144,34 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
-    @ConfigEditorAccordion(id = 22)
-    public boolean farmingFortune = false;
+    @Accordion
+    public FarmingFortuneConfig farmingFortune = new FarmingFortuneConfig();
+    public static class FarmingFortuneConfig{
+        @Expose
+        @ConfigOption(
+                name = "FF Display",
+                desc = "Displays the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean display = true;
 
-    @Expose
-    @ConfigOption(
-            name = "FF Display",
-            desc = "Displays the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 22)
-    @FeatureToggle
-    public boolean farmingFortuneDisplay = true;
+        @Expose
+        @ConfigOption(
+                name = "Show As Drop Multiplier",
+                desc = "Adds 100 to the displayed Farming Fortune so that it represents a drop multiplier rather than" +
+                        " the chance for bonus drops. "
+        )
+        @ConfigEditorBoolean
+        public boolean multiplier = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Show As Drop Multiplier",
-            desc = "Adds 100 to the displayed Farming Fortune so that it represents a drop multiplier rather than" +
-                    " the chance for bonus drops. "
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 22)
-    public boolean farmingFortuneDropMultiplier = true;
+        @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
+        @ConfigEditorButton(buttonText = "Open")
+        public Runnable positions = Commands::openFortuneGuide;
 
-    @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
-    @ConfigEditorButton(buttonText = "Open")
-    public Runnable positions = Commands::openFortuneGuide;
-
-    @Expose
-    public Position farmingFortunePos = new Position(5, -180, false, true);
+        @Expose
+        public Position pos = new Position(5, -180, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")
