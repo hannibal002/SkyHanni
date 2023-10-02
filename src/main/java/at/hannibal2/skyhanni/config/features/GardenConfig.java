@@ -125,34 +125,29 @@ public class GardenConfig {
             @Expose
             @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
             @ConfigEditorBoolean
-            @ConfigAccordionId(id = 4)
             @FeatureToggle
             public boolean showPrice = false;
 
             @Expose
             @ConfigOption(name = "Amount and Time", desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for Ironman.")
             @ConfigEditorBoolean
-            @ConfigAccordionId(id = 4)
             public boolean exactAmountAndTime = true;
 
             @Expose
             @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor GUI.")
             @ConfigEditorBoolean
-            @ConfigAccordionId(id = 4)
             @FeatureToggle
             public boolean copperPrice = true;
 
             @Expose
             @ConfigOption(name = "Copper Time", desc = "Show the time required per copper inside the visitor GUI.")
             @ConfigEditorBoolean
-            @ConfigAccordionId(id = 4)
             @FeatureToggle
             public boolean copperTime = false;
 
             @Expose
             @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor GUI.")
             @ConfigEditorBoolean
-            @ConfigAccordionId(id = 4)
             @FeatureToggle
             public boolean experiencePrice = false;
         }
@@ -219,34 +214,29 @@ public class GardenConfig {
         @Expose
         @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
         @FeatureToggle
         public boolean notificationTitle = true;
 
         @Expose
         @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
         @ConfigEditorDropdown(values = {"Color Only", "Name Only", "Both", "Disabled"})
-        @ConfigAccordionId(id = 1)
         public int highlightStatus = 2;
 
         @Expose
         @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
         @FeatureToggle
         public boolean coloredName = true;
 
         @Expose
         @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
         @FeatureToggle
         public boolean hypixelArrivedMessage = true;
 
         @Expose
         @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
         @FeatureToggle
         public boolean hideChat = true;
 
