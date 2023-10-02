@@ -25,321 +25,310 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "SkyMart", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean skyMart = false;
-
-    @Expose
-    @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean skyMartCopperPrice = true;
-
-    @Expose
-    @ConfigOption(name = "Advanced Stats", desc = "Show the BIN price and copper price for every item.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean skyMartCopperPriceAdvancedStats = false;
-
-    @Expose
-    public Position skyMartCopperPricePos = new Position(211, 132, false, true);
-
-    @Expose
-    @ConfigOption(name = "Visitor", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean visitor = false;
-
-    @Expose
-    @ConfigOption(name = "Visitor Timer", desc = "")
-    @ConfigAccordionId(id = 1)
-    @ConfigEditorAccordion(id = 2)
-    public boolean visitorTimer = false;
-
-    @Expose
-    @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
-            "and a number for how many visitors are already waiting.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean visitorTimerEnabled = true;
-
-    @Expose
-    @ConfigOption(name = "Sixth Visitor Estimate", desc = "Estimate when the sixth visitor in the queue will arrive. " +
-            "May be inaccurate with co-op members farming simultaneously.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    public boolean visitorTimerSixthVisitorEnabled = true;
-
-    @Expose
-    @ConfigOption(name = "Sixth Visitor Warning", desc = "Notifies when it is believed that the sixth visitor has arrived. " +
-            "May be inaccurate with co-op members farming simultaneously.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    public boolean visitorTimerSixthVisitorWarning = true;
-
-    @Expose
-    public Position visitorTimerPos = new Position(390, 65, false, true);
-
-    @Expose
-    @ConfigOption(name = "Visitor Items Needed", desc = "")
-    @ConfigAccordionId(id = 1)
-    @ConfigEditorAccordion(id = 3)
-    public boolean visitorNeeds = false;
-
-    @Expose
-    @ConfigOption(name = "Items Needed", desc = "Show all items needed for the visitors.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean visitorNeedsDisplay = true;
-
-    @Expose
-    public Position visitorNeedsPos = new Position(180, 170, false, true);
-
-    @Expose
-    @ConfigOption(name = "Only when Close", desc = "Only show the needed items when close to the visitors.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean visitorNeedsOnlyWhenClose = false;
-
-    @Expose
-    @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
-            "This helps buying the correct amount when not having a Booster Cookie Buff active.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean visitorNeedsInBazaarAlley = true;
-
-    @Expose
-    @ConfigOption(name = "Show Price", desc = "Show the coin price in the items needed list.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean visitorNeedsShowPrice = true;
-
-    @Expose
-    @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean visitorItemPreview = true;
-
-    @Expose
-    @ConfigOption(name = "Visitor Inventory", desc = "")
-    @ConfigAccordionId(id = 1)
-    @ConfigEditorAccordion(id = 4)
-    public boolean visitorInventory = false;
-
-    @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean visitorShowPrice = false;
-
-    @Expose
-    @ConfigOption(name = "Amount and Time", desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for Ironman.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    public boolean visitorExactAmountAndTime = true;
-
-    @Expose
-    @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor GUI.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean visitorCopperPrice = true;
-
-    @Expose
-    @ConfigOption(name = "Copper Time", desc = "Show the time required per copper inside the visitor GUI.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean visitorCopperTime = false;
-
-    @Expose
-    @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor GUI.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    @FeatureToggle
-    public boolean visitorExperiencePrice = false;
-
-    @Expose
-    @ConfigOption(name = "Visitor Reward Warning", desc = "")
-    @ConfigAccordionId(id = 1)
     @Accordion
-    public VisitorRewardWarning visitorRewardWarning = new VisitorRewardWarning();
-
-    public static class VisitorRewardWarning {
-
+    public SkyMartConfig skyMart = new SkyMartConfig();
+    public static class SkyMartConfig{
         @Expose
-        @ConfigOption(name = "Notify in Chat", desc = "Send a chat message once you talk to a visitor with reward.")
+        @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean notifyInChat = true;
+        public boolean copperPrice = true;
 
         @Expose
-        @ConfigOption(name = "Show over Name", desc = "Show the reward name above the visitor name.")
+        @ConfigOption(name = "Advanced Stats", desc = "Show the BIN price and copper price for every item.")
         @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean showOverName = true;
+        public boolean copperPriceAdvancedStats = false;
 
         @Expose
-        @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean preventRefusing = true;
-
-        @Expose
-        @ConfigOption(name = "Bypass Key", desc = "Hold that key to bypass the Prevent Refusing feature.")
-        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-        public int bypassKey = Keyboard.KEY_NONE;
-
-
-        /**
-         * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
-         */
-        @Expose
-        @ConfigOption(
-                name = "Items",
-                desc = "Warn for these reward items."
-        )
-        @ConfigEditorDraggableList(
-                exampleText = {
-                        "§9Flowering Bouquet",
-                        "§9Overgrown Grass",
-                        "§9Green Bandana",
-                        "§9Dedication IV",
-                        "§9Music Rune",
-                        "§cSpace Helmet",
-                        "§9Cultivating I",
-                        "§9Replenish I",
-                }
-        )
-        public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
-
-
+        public Position copperPricePos = new Position(211, 132, false, true);
     }
 
     @Expose
-    @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean visitorNotificationChat = true;
-
-    @Expose
-    @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean visitorNotificationTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
-    @ConfigEditorDropdown(values = {"Color Only", "Name Only", "Both", "Disabled"})
-    @ConfigAccordionId(id = 1)
-    public int visitorHighlightStatus = 2;
-
-    @Expose
-    @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean visitorColoredName = true;
-
-    @Expose
-    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean visitorHypixelArrivedMessage = true;
-
-    @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean visitorHideChat = true;
-
-    @Expose
-    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
+    @ConfigOption(name = "Visitor", desc = "")
     @Accordion
-    public VisitorDrops visitorDropsStatistics = new VisitorDrops();
+    public VisitorConfig visitor = new VisitorConfig();
+    public static class VisitorConfig{
+        @Expose
+        @ConfigOption(name = "Visitor Timer", desc = "")
+        @Accordion
+        public TimerConfig timer = new TimerConfig();
+        public static class TimerConfig{
+            @Expose
+            @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
+                    "and a number for how many visitors are already waiting.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = true;
 
-    public static class VisitorDrops {
+            @Expose
+            @ConfigOption(name = "Sixth Visitor Estimate", desc = "Estimate when the sixth visitor in the queue will arrive. " +
+                    "May be inaccurate with co-op members farming simultaneously.")
+            @ConfigEditorBoolean
+            public boolean sixthVisitorEnabled = true;
+
+            @Expose
+            @ConfigOption(name = "Sixth Visitor Warning", desc = "Notifies when it is believed that the sixth visitor has arrived. " +
+                    "May be inaccurate with co-op members farming simultaneously.")
+            @ConfigEditorBoolean
+            public boolean sixthVisitorWarning = true;
+
+            @Expose
+            public Position pos = new Position(390, 65, false, true);
+        }
 
         @Expose
-        @ConfigOption(
-                name = "Enabled",
-                desc = "Tallies up statistic about visitors and the rewards you have received from them."
-        )
+        @ConfigOption(name = "Visitor Items Needed", desc = "")
+        @Accordion
+        public NeedsConfig needs = new NeedsConfig();
+        public static class NeedsConfig{
+            @Expose
+            @ConfigOption(name = "Items Needed", desc = "Show all items needed for the visitors.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean display = true;
+
+            @Expose
+            public Position pos = new Position(180, 170, false, true);
+
+            @Expose
+            @ConfigOption(name = "Only when Close", desc = "Only show the needed items when close to the visitors.")
+            @ConfigEditorBoolean
+            public boolean onlyWhenClose = false;
+
+            @Expose
+            @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
+                    "This helps buying the correct amount when not having a Booster Cookie Buff active.")
+            @ConfigEditorBoolean
+            public boolean inBazaarAlley = true;
+
+            @Expose
+            @ConfigOption(name = "Show Price", desc = "Show the coin price in the items needed list.")
+            @ConfigEditorBoolean
+            public boolean showPrice = true;
+
+            @Expose
+            @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean itemPreview = true;
+        }
+
+        @Expose
+        @ConfigOption(name = "Visitor Inventory", desc = "")
+        @Accordion
+        public InventoryConfig inventory = new InventoryConfig();
+        public static class InventoryConfig{
+            @Expose
+            @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
+            @ConfigEditorBoolean
+            @ConfigAccordionId(id = 4)
+            @FeatureToggle
+            public boolean showPrice = false;
+
+            @Expose
+            @ConfigOption(name = "Amount and Time", desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for Ironman.")
+            @ConfigEditorBoolean
+            @ConfigAccordionId(id = 4)
+            public boolean exactAmountAndTime = true;
+
+            @Expose
+            @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor GUI.")
+            @ConfigEditorBoolean
+            @ConfigAccordionId(id = 4)
+            @FeatureToggle
+            public boolean copperPrice = true;
+
+            @Expose
+            @ConfigOption(name = "Copper Time", desc = "Show the time required per copper inside the visitor GUI.")
+            @ConfigEditorBoolean
+            @ConfigAccordionId(id = 4)
+            @FeatureToggle
+            public boolean copperTime = false;
+
+            @Expose
+            @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor GUI.")
+            @ConfigEditorBoolean
+            @ConfigAccordionId(id = 4)
+            @FeatureToggle
+            public boolean experiencePrice = false;
+        }
+
+        @Expose
+        @ConfigOption(name = "Visitor Reward Warning", desc = "")
+        @Accordion
+        public RewardWarningConfig rewardWarning = new RewardWarningConfig();
+        public static class RewardWarningConfig {
+
+            @Expose
+            @ConfigOption(name = "Notify in Chat", desc = "Send a chat message once you talk to a visitor with reward.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean notifyInChat = true;
+
+            @Expose
+            @ConfigOption(name = "Show over Name", desc = "Show the reward name above the visitor name.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean showOverName = true;
+
+            @Expose
+            @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean preventRefusing = true;
+
+            @Expose
+            @ConfigOption(name = "Bypass Key", desc = "Hold that key to bypass the Prevent Refusing feature.")
+            @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+            public int bypassKey = Keyboard.KEY_NONE;
+
+
+            /**
+             * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
+             */
+            @Expose
+            @ConfigOption(
+                    name = "Items",
+                    desc = "Warn for these reward items."
+            )
+            @ConfigEditorDraggableList(
+                    exampleText = {
+                            "§9Flowering Bouquet",
+                            "§9Overgrown Grass",
+                            "§9Green Bandana",
+                            "§9Dedication IV",
+                            "§9Music Rune",
+                            "§cSpace Helmet",
+                            "§9Cultivating I",
+                            "§9Replenish I",
+                    }
+            )
+            public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
+        }
+
+        @Expose
+        @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean enabled = true;
+        public boolean notificationChat = true;
 
         @Expose
-        @ConfigOption(
-                name = "Text Format",
-                desc = "Drag text to change the appearance of the overlay."
-        )
-        @ConfigEditorDraggableList(
-                exampleText = {
-                        "§e§lVisitor Statistics",
-                        "§e1,636 Total",
-                        "§a1,172§f-§9382§f-§681§f-§c1",
-                        "§21,382 Accepted",
-                        "§c254 Denied",
-                        " ",
-                        "§c62,072 Copper",
-                        "§33.2m Farming EXP",
-                        "§647.2m Coins Spent",
-                        "§b23 §9Flowering Bouquet",
-                        "§b4 §9Overgrown Grass",
-                        "§b2 §9Green Bandana",
-                        "§b1 §9Dedication IV",
-                        "§b6 §9Music Rune",
-                        "§b1 §cSpace Helmet",
-                        "§b1 §9Cultivating I",
-                        "§b1 §9Replenish I",
-                        " ", // If they want another empty row
-                        "§212,735 Garden EXP",
-                        "§b11,056 Bits",
-                        "§250,556 Mithril Powder",
-                        "§d50,556 Gemstone Powder",
-                }
-        )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
-
-
-        @Expose
-        @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
-                "§eNote: Will not update the preview above!")
+        @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
         @ConfigEditorBoolean
-        public boolean displayNumbersFirst = true;
+        @ConfigAccordionId(id = 1)
+        @FeatureToggle
+        public boolean notificationTitle = true;
 
         @Expose
-        @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
-                "§eNote: Will not update the preview above!")
+        @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
+        @ConfigEditorDropdown(values = {"Color Only", "Name Only", "Both", "Disabled"})
+        @ConfigAccordionId(id = 1)
+        public int highlightStatus = 2;
+
+        @Expose
+        @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
         @ConfigEditorBoolean
-        public boolean displayIcons = false;
+        @ConfigAccordionId(id = 1)
+        @FeatureToggle
+        public boolean coloredName = true;
 
         @Expose
-        @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+        @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
         @ConfigEditorBoolean
-        public boolean onlyOnBarn = true;
+        @ConfigAccordionId(id = 1)
+        @FeatureToggle
+        public boolean hypixelArrivedMessage = true;
 
         @Expose
-        public Position visitorDropPos = new Position(5, 20, false, true);
+        @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 1)
+        @FeatureToggle
+        public boolean hideChat = true;
+
+        @Expose
+        @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
+        @Accordion
+        public DropsStatisticsConfig dropsStatistics = new DropsStatisticsConfig();
+
+        public static class DropsStatisticsConfig {
+
+            @Expose
+            @ConfigOption(
+                    name = "Enabled",
+                    desc = "Tallies up statistic about visitors and the rewards you have received from them."
+            )
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(
+                    name = "Text Format",
+                    desc = "Drag text to change the appearance of the overlay."
+            )
+            @ConfigEditorDraggableList(
+                    exampleText = {
+                            "§e§lVisitor Statistics",
+                            "§e1,636 Total",
+                            "§a1,172§f-§9382§f-§681§f-§c1",
+                            "§21,382 Accepted",
+                            "§c254 Denied",
+                            " ",
+                            "§c62,072 Copper",
+                            "§33.2m Farming EXP",
+                            "§647.2m Coins Spent",
+                            "§b23 §9Flowering Bouquet",
+                            "§b4 §9Overgrown Grass",
+                            "§b2 §9Green Bandana",
+                            "§b1 §9Dedication IV",
+                            "§b6 §9Music Rune",
+                            "§b1 §cSpace Helmet",
+                            "§b1 §9Cultivating I",
+                            "§b1 §9Replenish I",
+                            " ", // If they want another empty row
+                            "§212,735 Garden EXP",
+                            "§b11,056 Bits",
+                            "§250,556 Mithril Powder",
+                            "§d50,556 Gemstone Powder",
+                    }
+            )
+            public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
+
+
+            @Expose
+            @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
+                    "§eNote: Will not update the preview above!")
+            @ConfigEditorBoolean
+            public boolean displayNumbersFirst = true;
+
+            @Expose
+            @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
+                    "§eNote: Will not update the preview above!")
+            @ConfigEditorBoolean
+            public boolean displayIcons = false;
+
+            @Expose
+            @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+            @ConfigEditorBoolean
+            public boolean onlyOnBarn = true;
+
+            @Expose
+            public Position pos = new Position(5, 20, false, true);
+        }
     }
 
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
-    @ConfigEditorAccordion(id = 5)
-    public boolean numbers = false;
+    @Accordion
+    public NumbersConfig numbers = new NumbersConfig();
+    public static class NumbersConfig{
+
+    }
 
     @Expose
     @ConfigOption(name = "Crop Milestone", desc = "Show the number of crop milestones in the inventory.")
