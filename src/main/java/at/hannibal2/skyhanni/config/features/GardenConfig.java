@@ -989,31 +989,30 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Anita Shop", desc = "")
-    @ConfigEditorAccordion(id = 16)
-    public boolean anitaMedalProfit = false;
+    @Accordion
+    public AnitaShopConfig anitaShop = new AnitaShopConfig();
+    public static class AnitaShopConfig {
+        @Expose
+        @ConfigOption(
+                name = "Medal Prices",
+                desc = "Helps to identify profitable items to buy at the Anita item shop " +
+                        "and potential profit from selling the item in the Auction House."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean medalProfitEnabled = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Medal Prices",
-            desc = "Helps to identify profitable items to buy at the Anita item shop " +
-                    "and potential profit from selling the item in the Auction House."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 16)
-    @FeatureToggle
-    public boolean anitaMedalProfitEnabled = true;
+        @Expose
+        @ConfigOption(
+                name = "Extra Farming Fortune",
+                desc = "Show current tier and cost to max out in the item tooltip.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean extraFarmingFortune = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Extra Farming Fortune",
-            desc = "Show current tier and cost to max out in the item tooltip.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 16)
-    @FeatureToggle
-    public boolean extraFarmingFortune = true;
-
-    @Expose
-    public Position anitaMedalProfitPos = new Position(206, 158, false, true);
+        @Expose
+        public Position medalProfitPos = new Position(206, 158, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Composter", desc = "")
