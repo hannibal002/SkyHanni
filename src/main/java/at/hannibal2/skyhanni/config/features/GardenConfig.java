@@ -344,193 +344,178 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Crop Milestones", desc = "")
-    @ConfigEditorAccordion(id = 6)
-    public boolean cropMilestones = false;
+    @Accordion
+    public CropMilestonesConfig cropMilestones = new CropMilestonesConfig();
+    public static class CropMilestonesConfig{
+        @Expose
+        @ConfigOption(
+                name = "Progress Display",
+                desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
+                        "§eRequires a tool with either a counter or Cultivating enchantment for full accuracy."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean progress = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Progress Display",
-            desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
-                    "§eRequires a tool with either a counter or Cultivating enchantment for full accuracy."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    @FeatureToggle
-    public boolean cropMilestoneProgress = true;
+        @Expose
+        @ConfigOption(
+                name = "Warn When Close",
+                desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
+                        "Useful for switching to a different pet for leveling.")
+        @ConfigEditorBoolean
+        public boolean warnClose = false;
 
-    @Expose
-    @ConfigOption(
-            name = "Warn When Close",
-            desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
-                    "Useful for switching to a different pet for leveling.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    public boolean cropMilestoneWarnClose = false;
+        @Expose
+        @ConfigOption(
+                name = "Time Format",
+                desc = "Change the highest time unit to show (1h30m vs 90min)")
+        @ConfigEditorDropdown(values = {"Year", "Day", "Hour", "Minute", "Second"})
+        public Property<Integer> highestTimeFormat = Property.of(0);
 
-    @Expose
-    @ConfigOption(
-            name = "Time Format",
-            desc = "Change the highest time unit to show (1h30m vs 90min)")
-    @ConfigEditorDropdown(values = {"Year", "Day", "Hour", "Minute", "Second"})
-    @ConfigAccordionId(id = 6)
-    public Property<Integer> cropMilestoneHighestTimeFormat = Property.of(0);
+        @Expose
+        @ConfigOption(
+                name = "Maxed Milestone",
+                desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.")
+        @ConfigEditorBoolean
+        public Property<Boolean> bestShowMaxedNeeded = Property.of(false);
 
-    @Expose
-    @ConfigOption(
-            name = "Maxed Milestone",
-            desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    public Property<Boolean> cropMilestoneBestShowMaxedNeeded = Property.of(false);
+        @Expose
+        @ConfigOption(
+                name = "Milestone Text",
+                desc = "Drag text to change the appearance of the overlay.\n" +
+                        "Hold a farming tool to show the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§6Crop Milestones",
+                        "§7Pumpkin Tier 22",
+                        "§e12,300§8/§e100,000",
+                        "§7In §b12m 34s",
+                        "§7Crops/Minute§8: §e12,345",
+                        "§7Blocks/Second§8: §e19.85",
+                        "§7Percentage: §e12.34%",
+                }
+        )
+        public List<Integer> text = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
 
-    @Expose
-    @ConfigOption(
-            name = "Milestone Text",
-            desc = "Drag text to change the appearance of the overlay.\n" +
-                    "Hold a farming tool to show the overlay."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
-                    "§6Crop Milestones",
-                    "§7Pumpkin Tier 22",
-                    "§e12,300§8/§e100,000",
-                    "§7In §b12m 34s",
-                    "§7Crops/Minute§8: §e12,345",
-                    "§7Blocks/Second§8: §e19.85",
-                    "§7Percentage: §e12.34%",
-            }
-    )
-    @ConfigAccordionId(id = 6)
-    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        @Expose
+        @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 6,
+                minStep = 1
+        )
+        public int blocksBrokenPrecision = 2;
 
-    @Expose
-    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")
-    @ConfigEditorSlider(
-            minValue = 0,
-            maxValue = 6,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 6)
-    public int blocksBrokenPrecision = 2;
+        @Expose
+        @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets.")
+        @ConfigEditorSlider(
+                minValue = 2,
+                maxValue = 60,
+                minStep = 1
+        )
+        public int blocksBrokenResetTime = 5;
 
-    @Expose
-    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets.")
-    @ConfigEditorSlider(
-            minValue = 2,
-            maxValue = 60,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 6)
-    public int blocksBrokenResetTime = 5;
+        @Expose
+        public Position progressDisplayPos = new Position(-400, -200, false, true);
 
-    @Expose
-    public Position cropMilestoneProgressDisplayPos = new Position(-400, -200, false, true);
+        @Expose
+        @ConfigOption(name = "Best Crop", desc = "")
+        @Accordion
+        public NextConfig next = new NextConfig();
+        // TODO moulconfig runnable support
+        public static class NextConfig{
+            @Expose
+            @ConfigOption(
+                    name = "Best Display",
+                    desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean bestDisplay = true;
 
-    @Expose
-    @ConfigOption(name = "Best Crop", desc = "")
-    @ConfigAccordionId(id = 6)
-    @ConfigEditorAccordion(id = 7)
-    public boolean cropMilestoneNext = false;
-    // TODO moulconfig runnable support
+            // TODO moulconfig runnable support
+            @Expose
+            @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
+            @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
+            public int bestType = 0;
 
-    @Expose
-    @ConfigOption(
-            name = "Best Display",
-            desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    @FeatureToggle
-    public boolean cropMilestoneBestDisplay = true;
+            // TODO moulconfig runnable support
+            @Expose
+            @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
+            @ConfigEditorSlider(
+                    minValue = 1,
+                    maxValue = 10,
+                    minStep = 1
+            )
+            public int showOnlyBest = 10;
 
-    // TODO moulconfig runnable support
-    @Expose
-    @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
-    @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
-    @ConfigAccordionId(id = 7)
-    public int cropMilestoneBestType = 0;
+            @Expose
+            @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+            @ConfigEditorBoolean
+            public boolean showCurrent = true;
 
-    // TODO moulconfig runnable support
-    @Expose
-    @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 10,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 7)
-    public int cropMilestoneShowOnlyBest = 10;
+            // TODO moulconfig runnable support
+            @Expose
+            @ConfigOption(
+                    name = "Always On",
+                    desc = "Show the Best Display always while on the garden.")
+            @ConfigEditorBoolean
+            public boolean bestAlwaysOn = false;
 
-    @Expose
-    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    public boolean cropMilestoneShowCurrent = true;
+            @Expose
+            @ConfigOption(
+                    name = "Compact Display",
+                    desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.")
+            @ConfigEditorBoolean
+            public boolean bestCompact = false;
 
-    // TODO moulconfig runnable support
-    @Expose
-    @ConfigOption(
-            name = "Always On",
-            desc = "Show the Best Display always while on the garden.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    public boolean cropMilestoneBestAlwaysOn = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Compact Display",
-            desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    public boolean cropMilestoneBestCompact = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Hide Title",
-            desc = "Hides the 'Best Crop Time' line entirely.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 7)
-    public boolean cropMilestoneBestHideTitle = false;
+            @Expose
+            @ConfigOption(
+                    name = "Hide Title",
+                    desc = "Hides the 'Best Crop Time' line entirely.")
+            @ConfigEditorBoolean
+            public boolean bestHideTitle = false;
 
 
-    @Expose
-    public Position cropMilestoneNextDisplayPos = new Position(-200, -200, false, true);
+            @Expose
+            public Position displayPos = new Position(-200, -200, false, true);
+        }
 
-    @Expose
-    @ConfigOption(name = "Mushroom Pet Perk", desc = "")
-    @ConfigAccordionId(id = 6)
-    @ConfigEditorAccordion(id = 15)
-    public boolean cropMilestoneMushroomPetPerk = false;
+        @Expose
+        @ConfigOption(name = "Mushroom Pet Perk", desc = "")
+        @Accordion
+        public MushroomPetPerkConfig mushroomPetPerk = new MushroomPetPerkConfig();
+        // TODO moulconfig runnable support
+        public static class MushroomPetPerkConfig{
+            @Expose
+            @ConfigOption(
+                    name = "Display Enabled",
+                    desc = "Show the progress and ETA for mushroom crops when farming other crops because of the Mooshroom Cow perk.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = true;
 
-    // TODO moulconfig runnable support
-    @Expose
-    @ConfigOption(
-            name = "Display Enabled",
-            desc = "Show the progress and ETA for mushroom crops when farming other crops because of the Mooshroom Cow perk.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 15)
-    @FeatureToggle
-    public boolean cropMilestoneMushroomPetPerkEnabled = true;
+            @Expose
+            @ConfigOption(
+                    name = "Mushroom Text",
+                    desc = "Drag text to change the appearance of the overlay.\n" +
+                            "Hold a farming tool to show the overlay."
+            )
+            @ConfigEditorDraggableList(
+                    exampleText = {
+                            "§6Mooshroom Cow Perk",
+                            "§7Mushroom Tier 8",
+                            "§e6,700§8/§e15,000",
+                            "§7In §b12m 34s",
+                            "§7Percentage: §e12.34%",
+                    }
+            )
+            public List<Integer> text = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
 
-    @Expose
-    @ConfigOption(
-            name = "Mushroom Text",
-            desc = "Drag text to change the appearance of the overlay.\n" +
-                    "Hold a farming tool to show the overlay."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
-                    "§6Mooshroom Cow Perk",
-                    "§7Mushroom Tier 8",
-                    "§e6,700§8/§e15,000",
-                    "§7In §b12m 34s",
-                    "§7Percentage: §e12.34%",
-            }
-    )
-    @ConfigAccordionId(id = 15)
-    public List<Integer> cropMilestoneMushroomPetPerkText = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
-
-    @Expose
-    public Position cropMilestoneMushroomPetPerkPos = new Position(-112, -143, false, true);
+            @Expose
+            public Position pos = new Position(-112, -143, false, true);
+        }
+    }
 
     // TODO moulconfig runnable support
     @Expose
