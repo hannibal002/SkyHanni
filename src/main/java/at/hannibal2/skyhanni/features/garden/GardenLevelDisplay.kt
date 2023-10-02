@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -17,7 +18,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.gardenLevel
     private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
@@ -106,8 +107,14 @@ class GardenLevelDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.gardenLevelPos.renderString(display, posLabel = "Garden Level")
+        config.pos.renderString(display, posLabel = "Garden Level")
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.gardenLevelDisplay
+    private fun isEnabled() = GardenAPI.inGarden() && config.display
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevel.display")
+        event.move(3, "garden.gardenLevelPos", "garden.gardenLevel.pos")
+    }
 }

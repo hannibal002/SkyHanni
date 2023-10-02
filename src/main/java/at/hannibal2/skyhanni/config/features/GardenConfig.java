@@ -711,18 +711,17 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
-    @ConfigEditorAccordion(id = 10)
-    public boolean gardenLevel = false;
+    public GardenLevelConfig gardenLevel = new GardenLevelConfig();
+    public static class GardenLevelConfig{
+        @Expose
+        @ConfigOption(name = "Display", desc = "Show the current Garden level and progress to the next level.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean display = true;
 
-    @Expose
-    @ConfigOption(name = "Display", desc = "Show the current Garden level and progress to the next level.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 10)
-    @FeatureToggle
-    public boolean gardenLevelDisplay = true;
-
-    @Expose
-    public Position gardenLevelPos = new Position(390, 40, false, true);
+        @Expose
+        public Position pos = new Position(390, 40, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Farming Weight", desc = "")
