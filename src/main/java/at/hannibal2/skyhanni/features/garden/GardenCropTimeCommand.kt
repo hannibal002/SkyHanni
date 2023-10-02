@@ -15,7 +15,7 @@ object GardenCropTimeCommand {
     private val config get() = SkyHanniMod.feature.garden
 
     fun onCommand(args: Array<String>) {
-        if (!config.moneyPerHourDisplay) {
+        if (!config.display) {
             LorenzUtils.chat("§c[SkyHanni] §cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
