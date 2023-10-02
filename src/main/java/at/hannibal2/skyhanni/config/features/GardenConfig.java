@@ -1176,47 +1176,44 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")
     @ConfigEditorAccordion(id = 20)
-    public boolean tooltipTweaks = false;
+    public TooltipTweaksConfig tooltipTweaks = new TooltipTweaksConfig();
+    public static class TooltipTweaksConfig{
+        @Expose
+        @ConfigOption(
+                name = "Compact Descriptions",
+                desc = "Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean compactToolTooltips = false;
 
-    @Expose
-    @ConfigOption(
-            name = "Compact Descriptions",
-            desc = "Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 20)
-    @FeatureToggle
-    public boolean compactToolTooltips = false;
+        @Expose
+        @ConfigOption(
+                name = "Breakdown Hotkey",
+                desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
+        )
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+        public int fortuneTooltipKeybind = Keyboard.KEY_LSHIFT;
 
-    @Expose
-    @ConfigOption(
-            name = "Breakdown Hotkey",
-            desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
-    )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    @ConfigAccordionId(id = 20)
-    public int fortuneTooltipKeybind = Keyboard.KEY_LSHIFT;
+        @Expose
+        @ConfigOption(
+                name = "Tooltip Format",
+                desc = "Show crop-specific Farming Fortune in tooltip.\n" +
+                        "§fShow: §7Crop-specific Fortune indicated as §6[+196]\n" +
+                        "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
+        )
+        @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
+        public int cropTooltipFortune = 1;
 
-    @Expose
-    @ConfigOption(
-            name = "Tooltip Format",
-            desc = "Show crop-specific Farming Fortune in tooltip.\n" +
-                    "§fShow: §7Crop-specific Fortune indicated as §6[+196]\n" +
-                    "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
-    )
-    @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
-    @ConfigAccordionId(id = 20)
-    public int cropTooltipFortune = 1;
-
-    @Expose
-    @ConfigOption(
-            name = "Total Crop Milestone",
-            desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 20)
-    @FeatureToggle
-    public boolean cropMilestoneTotalProgress = true;
+        @Expose
+        @ConfigOption(
+                name = "Total Crop Milestone",
+                desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean cropMilestoneTotalProgress = true;
+    }
 
     @Expose
     @ConfigOption(name = "Yaw and Pitch", desc = "")
