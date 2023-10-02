@@ -725,58 +725,55 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Farming Weight", desc = "")
-    @ConfigEditorAccordion(id = 11)
-    public boolean eliteFarmingWeight = false;
+    @Accordion
+    public EliteFarmingWeightConfig eliteFarmingWeight = new EliteFarmingWeightConfig();
 
-    @Expose
-    @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
-            "The calculation and API is provided by The Elite SkyBlock farmers. " +
-            "See §ehttps://elitebot.dev/info §7for more info.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    @FeatureToggle
-    public boolean eliteFarmingWeightDisplay = true;
+    public static class EliteFarmingWeightConfig{
+        @Expose
+        @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
+                "The calculation and API is provided by The Elite SkyBlock farmers. " +
+                "See §ehttps://elitebot.dev/info §7for more info.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean display = true;
 
-    @Expose
-    public Position eliteFarmingWeightPos = new Position(180, 10, false, true);
+        @Expose
+        public Position pos = new Position(180, 10, false, true);
 
-    @Expose
-    @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
-            "Only if your farming weight is high enough! Updates every 10 minutes.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean eliteFarmingWeightLeaderboard = true;
+        @Expose
+        @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
+                "Only if your farming weight is high enough! Updates every 10 minutes.")
+        @ConfigEditorBoolean
+        public boolean leaderboard = true;
 
-    @Expose
-    @ConfigOption(name = "Overtake ETA", desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Will show an ETA to rank #10,000 if you're not on the leaderboard yet.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean eliteFarmingWeightOvertakeETA = false;
+        @Expose
+        @ConfigOption(name = "Overtake ETA", desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
+                "Will show an ETA to rank #10,000 if you're not on the leaderboard yet.")
+        @ConfigEditorBoolean
+        public boolean overtakeETA = false;
 
-    @Expose
-    @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining Garden how many spots you have dropped since last Garden join.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean eliteFarmingWeightOffScreenDropMessage = true;
+        @Expose
+        @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining Garden how many spots you have dropped since last Garden join.")
+        @ConfigEditorBoolean
+        public boolean offScreenDropMessage = true;
 
-    @Expose
-    @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean eliteFarmingWeightOvertakeETAAlways = true;
+        @Expose
+        @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
+        @ConfigEditorBoolean
+        public boolean overtakeETAAlways = true;
 
-    @Expose
-    @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")")
-    @ConfigEditorText
-    @ConfigAccordionId(id = 11)
-    public String eliteFarmingWeightETAGoalRank = "10000";
+        @Expose
+        @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")")
+        @ConfigEditorText
+        public String ETAGoalRank = "10000";
 
-    @Expose
-    @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean eliteFarmingWeightIgnoreLow = false;
+        @Expose
+        @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
+        @ConfigEditorBoolean
+        public boolean ignoreLow = false;
+    }
+
+
 
     @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")

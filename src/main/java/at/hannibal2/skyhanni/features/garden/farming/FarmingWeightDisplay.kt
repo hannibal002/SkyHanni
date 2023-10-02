@@ -29,8 +29,8 @@ class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (isEnabled() && config.eliteFarmingWeightIgnoreLow || weight >= 200) {
-            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
+        if (isEnabled() && config.ignoreLow || weight >= 200) {
+            config.pos.renderStrings(display, posLabel = "Farming Weight Display")
         }
     }
 
@@ -83,10 +83,18 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightDisplay","garden.eliteFarmingWeight.display")
+        event.move(3, "garden.eliteFarmingWeightPos","garden.eliteFarmingWeight.pos")
+        event.move(3, "garden.eliteFarmingWeightLeaderboard","garden.eliteFarmingWeight.leaderboard")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETA","garden.eliteFarmingWeight.overtakeETA")
+        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage","garden.eliteFarmingWeight.offScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways","garden.eliteFarmingWeight.overtakeETAAlways")
+        event.move(3, "garden.eliteFarmingWeightETAGoalRank","garden.eliteFarmingWeight.ETAGoalRank")
+        event.move(3, "garden.eliteFarmingWeightIgnoreLow","garden.eliteFarmingWeight.ignoreLow")
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden
+        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeight
         private val localCounter = mutableMapOf<CropType, Long>()
 
         private var display = emptyList<String>()
@@ -148,14 +156,14 @@ class FarmingWeightDisplay {
             val list = mutableListOf<String>()
             list.add("§6Farming Weight§7: $weight$leaderboard")
 
-            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.eliteFarmingWeightOvertakeETAAlways)) {
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
                 list.add(getETA())
             }
             display = list
         }
 
         private fun getLeaderboard(): String {
-            if (!config.eliteFarmingWeightLeaderboard) return ""
+            if (!config.leaderboard) return ""
 
             // Fetching new leaderboard position every 10.5 minutes
             if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
@@ -184,7 +192,7 @@ class FarmingWeightDisplay {
         }
 
         private fun getRankGoal(): Int {
-            val value = config.eliteFarmingWeightETAGoalRank
+            val value = config.ETAGoalRank
             var goal = 10000
 
             // Check that the provided string is valid
@@ -192,7 +200,7 @@ class FarmingWeightDisplay {
             if (parsed < 1 || parsed > goal) {
                 LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
                 LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
-                config.eliteFarmingWeightETAGoalRank = goal.toString()
+                config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
             }
@@ -264,8 +272,8 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
-        private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
+        private fun isEnabled() = GardenAPI.inGarden() && config.display
+        private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
             val before = getExactWeight()
@@ -297,7 +305,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded && config.eliteFarmingWeightOffScreenDropMessage) {
+                if (wasNotLoaded && config.offScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
