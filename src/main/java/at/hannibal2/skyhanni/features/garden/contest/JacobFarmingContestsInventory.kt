@@ -178,7 +178,7 @@ class JacobFarmingContestsInventory {
     }
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"inventory.jacobFarmingContestHighlightedRewards","inventory.jacobFarmingContest.highlightRewards")
+        event.move(3,"inventory.jacobFarmingContestHighlightRewards","inventory.jacobFarmingContest.highlightRewards")
         event.move(3,"inventory.jacobFarmingContestHideDuplicates","inventory.jacobFarmingContest.hideDuplicates")
         event.move(3,"inventory.jacobFarmingContestRealTime","inventory.jacobFarmingContest.realTime")
         event.move(3,"inventory.jacobFarmingContestFinneganIcon","inventory.jacobFarmingContest.finneganIcon")

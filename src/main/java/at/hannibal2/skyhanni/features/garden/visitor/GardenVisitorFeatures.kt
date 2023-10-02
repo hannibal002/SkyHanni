@@ -848,7 +848,7 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorNotificationTitle", "garden.visitor.notificationTitle")
         event.move(3, "garden.visitorHighlightStatus", "garden.visitor.highlightStatus")
         event.move(3, "garden.visitorColoredName", "garden.visitor.coloredName")
-        event.move(3,"gardens.vistorHypiexlArrivedMessage","garden.visitor.hypixelArrivedMessage")
+        event.move(3,"garden.visitorHypixelArrivedMessage","garden.visitor.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitor.hideChat")
     }
 

@@ -149,7 +149,7 @@ class FarmingFortuneDisplay {
 
         private var tabFortune: Double = 0.0
         private var toolFortune: Double = 0.0
-        private val baseFortune: Double get() = if (config.multiplier) 100.0 else 0.0
+        private val baseFortune: Double get() = if (config.dropMultiplier) 100.0 else 0.0
         private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
         private val accessoryFortune: Double?
             get() = currentCrop?.let {
@@ -286,7 +286,7 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
         event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortune.display")
-        event.move(3,"garden.farmingFortuneMultiplier", "garden.farmingFortune.multiplier")
+        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortune.dropMultiplier")
         event.move(3,"garden.farmingFortunePos", "garden.farmingFortune.pos")
     }
 }

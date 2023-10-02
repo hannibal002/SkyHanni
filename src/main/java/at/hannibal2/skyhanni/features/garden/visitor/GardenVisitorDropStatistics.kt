@@ -237,7 +237,7 @@ object GardenVisitorDropStatistics {
         event.move(3, "garden.visitorDropsStatistics.displayNumbersFirst", "garden.visitor.dropsStatistics.displayNumbersFirst")
         event.move(3, "garden.visitorDropsStatistics.displayIcons", "garden.visitor.dropsStatistics.displayIcons")
         event.move(3, "garden.visitorDropsStatistics.onlyOnBarn", "garden.visitor.dropsStatistics.onlyOnBarn")
-        event.move(3, "garden.visitorDropsStatistics.visitorDropsPos", "garden.visitor.dropsStatistics.pos")
+        event.move(3, "garden.visitorDropsStatistics.visitorDropPos", "garden.visitor.dropsStatistics.pos")
     }
 }
 

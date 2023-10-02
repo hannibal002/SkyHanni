@@ -1161,7 +1161,7 @@ public class GardenConfig {
                         " the chance for bonus drops. "
         )
         @ConfigEditorBoolean
-        public boolean multiplier = true;
+        public boolean dropMultiplier = true;
 
         @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
         @ConfigEditorButton(buttonText = "Open")
