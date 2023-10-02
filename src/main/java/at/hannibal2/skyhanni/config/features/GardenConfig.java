@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
@@ -1175,7 +1173,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")
-    @ConfigEditorAccordion(id = 20)
+    @Accordion
     public TooltipTweaksConfig tooltipTweaks = new TooltipTweaksConfig();
     public static class TooltipTweaksConfig{
         @Expose
