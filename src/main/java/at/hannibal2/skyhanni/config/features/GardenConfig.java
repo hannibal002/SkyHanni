@@ -602,115 +602,112 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Optimal Speed", desc = "")
-    @ConfigEditorAccordion(id = 9)
-    public boolean optimalSpeed = false;
-
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n" +
-            "(Thanks MelonKingDE for the default values).")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean optimalSpeedEnabled = true;
-
-    @Expose
-    @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    public boolean optimalSpeedWarning = false;
-
-    @Expose
-    @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the Rancher Boots overlay by clicking on the presets.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean optimalSpeedSignEnabled = true;
-
-    @Expose
-    public Position optimalSpeedSignPosition = new Position(20, -195, false, true);
-
-    @Expose
-    @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
     @Accordion
-    @ConfigAccordionId(id = 9)
-    public CustomSpeed optimalSpeedCustom = new CustomSpeed();
-
-    public static class CustomSpeed {
+    public OptimalSpeedConfig optimalSpeed = new OptimalSpeedConfig();
+    public static class OptimalSpeedConfig{
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n" +
+                "(Thanks MelonKingDE for the default values).")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Wheat", desc = "Suggested farm speed:\n" +
-                "§e5 Blocks§7: §f✦ 93 speed\n" +
-                "§e4 Blocks§7: §f✦ 116 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int wheat = 93;
+        @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
+        @ConfigEditorBoolean
+        public boolean warning = false;
 
         @Expose
-        @ConfigOption(name = "Carrot", desc = "Suggested farm speed:\n" +
-                "§e5 Blocks§7: §f✦ 93 speed\n" +
-                "§e4 Blocks§7: §f✦ 116 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int carrot = 93;
+        @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the Rancher Boots overlay by clicking on the presets.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean signEnabled = true;
 
         @Expose
-        @ConfigOption(name = "Potato", desc = "Suggested farm speed:\n" +
-                "§e5 Blocks§7: §f✦ 93 speed\n" +
-                "§e4 Blocks§7: §f✦ 116 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int potato = 93;
+        public Position signPosition = new Position(20, -195, false, true);
 
         @Expose
-        @ConfigOption(name = "Nether Wart", desc = "Suggested farm speed:\n" +
-                "§e5 Blocks§7: §f✦ 93 speed\n" +
-                "§e4 Blocks§7: §f✦ 116 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int netherWart = 93;
+        @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
+        @Accordion
+        public CustomSpeedConfig customSpeed = new CustomSpeedConfig();
+
+        public static class CustomSpeedConfig {
+
+            @Expose
+            @ConfigOption(name = "Wheat", desc = "Suggested farm speed:\n" +
+                    "§e5 Blocks§7: §f✦ 93 speed\n" +
+                    "§e4 Blocks§7: §f✦ 116 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int wheat = 93;
+
+            @Expose
+            @ConfigOption(name = "Carrot", desc = "Suggested farm speed:\n" +
+                    "§e5 Blocks§7: §f✦ 93 speed\n" +
+                    "§e4 Blocks§7: §f✦ 116 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int carrot = 93;
+
+            @Expose
+            @ConfigOption(name = "Potato", desc = "Suggested farm speed:\n" +
+                    "§e5 Blocks§7: §f✦ 93 speed\n" +
+                    "§e4 Blocks§7: §f✦ 116 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int potato = 93;
+
+            @Expose
+            @ConfigOption(name = "Nether Wart", desc = "Suggested farm speed:\n" +
+                    "§e5 Blocks§7: §f✦ 93 speed\n" +
+                    "§e4 Blocks§7: §f✦ 116 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int netherWart = 93;
+
+            @Expose
+            @ConfigOption(name = "Pumpkin", desc = "Suggested farm speed:\n" +
+                    "§e3 Blocks§7: §f✦ 155 speed\n" +
+                    "§e2 Blocks§7: §f✦ 265 §7or §f400 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int pumpkin = 155;
+
+            @Expose
+            @ConfigOption(name = "Melon", desc = "Suggested farm speed:\n" +
+                    "§e3 Blocks§7: §f✦ 155 speed\n" +
+                    "§e2 Blocks§7: §f✦ 265 or 400 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int melon = 155;
+
+            @Expose
+            @ConfigOption(name = "Cocoa Beans", desc = "Suggested farm speed:\n" +
+                    "§e3 Blocks§7: §f✦ 155 speed\n" +
+                    "§e4 Blocks§7: §f✦ 116 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int cocoaBeans = 155;
+
+            // TODO does other speed settings exist?
+            @Expose
+            @ConfigOption(name = "Sugar Cane", desc = "Suggested farm speed:\n" +
+                    "§eYaw 45§7: §f✦ 328 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int sugarCane = 328;
+
+            @Expose
+            @ConfigOption(name = "Cactus", desc = "Suggested farm speed:\n" +
+                    "§eNormal§7: §f✦ 400 speed\n" +
+                    "§eRacing Helmet§7: §f✦ 464 speed\n" +
+                    "§eBlack Cat§7: §f✦ 464 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 500, minStep = 1)
+            public int cactus = 400;
+
+            // TODO does other speed settings exist?
+            @Expose
+            @ConfigOption(name = "Mushroom", desc = "Suggested farm speed:\n" +
+                    "§eYaw 60§7: §f✦ 233 speed")
+            @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
+            public int mushroom = 233;
+        }
 
         @Expose
-        @ConfigOption(name = "Pumpkin", desc = "Suggested farm speed:\n" +
-                "§e3 Blocks§7: §f✦ 155 speed\n" +
-                "§e2 Blocks§7: §f✦ 265 §7or §f400 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int pumpkin = 155;
-
-        @Expose
-        @ConfigOption(name = "Melon", desc = "Suggested farm speed:\n" +
-                "§e3 Blocks§7: §f✦ 155 speed\n" +
-                "§e2 Blocks§7: §f✦ 265 or 400 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int melon = 155;
-
-        @Expose
-        @ConfigOption(name = "Cocoa Beans", desc = "Suggested farm speed:\n" +
-                "§e3 Blocks§7: §f✦ 155 speed\n" +
-                "§e4 Blocks§7: §f✦ 116 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int cocoaBeans = 155;
-
-        // TODO does other speed settings exist?
-        @Expose
-        @ConfigOption(name = "Sugar Cane", desc = "Suggested farm speed:\n" +
-                "§eYaw 45§7: §f✦ 328 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int sugarCane = 328;
-
-        @Expose
-        @ConfigOption(name = "Cactus", desc = "Suggested farm speed:\n" +
-                "§eNormal§7: §f✦ 400 speed\n" +
-                "§eRacing Helmet§7: §f✦ 464 speed\n" +
-                "§eBlack Cat§7: §f✦ 464 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 500, minStep = 1)
-        public int cactus = 400;
-
-        // TODO does other speed settings exist?
-        @Expose
-        @ConfigOption(name = "Mushroom", desc = "Suggested farm speed:\n" +
-                "§eYaw 60§7: §f✦ 233 speed")
-        @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
-        public int mushroom = 233;
+        public Position pos = new Position(5, -200, false, true);
     }
-
-    @Expose
-    public Position optimalSpeedPos = new Position(5, -200, false, true);
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
