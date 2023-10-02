@@ -13,17 +13,28 @@ class HighlightJerries {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.event.jerry.highlightJerries) return
 
         val entity = event.entity
         val maxHealth = event.maxHealth
-        val listOfLorenzColors = listOf<LorenzColor>(LorenzColor.RED, LorenzColor.RED, LorenzColor.WHITE, LorenzColor.GREEN, LorenzColor.BLUE, LorenzColor.DARK_PURPLE, LorenzColor.GOLD, LorenzColor.LIGHT_PURPLE)
 
-        if (entity is EntityVillager && maxHealth < 7 && maxHealth > 2) {
-            RenderLivingEntityHelper.setEntityColor(entity, listOfLorenzColors[maxHealth].toColor().withAlpha(20))
-            { SkyHanniMod.feature.event.jerry.highlightJerries }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.event.jerry.highlightJerries }
+        if (entity is EntityVillager) {
+            if (maxHealth == 3) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.GREEN.toColor().withAlpha(20))
+                { SkyHanniMod.feature.event.jerry.highlightJerries }
+            }
+            if (maxHealth == 4) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.BLUE.toColor().withAlpha(20))
+                { SkyHanniMod.feature.event.jerry.highlightJerries }
+            }
+            if (maxHealth == 5) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(20))
+                { SkyHanniMod.feature.event.jerry.highlightJerries }
+            }
+            if (maxHealth == 6) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.GOLD.toColor().withAlpha(20))
+                { SkyHanniMod.feature.event.jerry.highlightJerries }
+            }
         }
     }
 }
