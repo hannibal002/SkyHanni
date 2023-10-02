@@ -773,29 +773,26 @@ public class GardenConfig {
         public boolean ignoreLow = false;
     }
 
-
-
     @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
-    @ConfigEditorAccordion(id = 12)
-    public boolean dicerCounter = false;
+    @Accordion
+    public DicerCounterConfig dicerCounter = new DicerCounterConfig();
+    public static class DicerCounterConfig{
+        @Expose
+        @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean display = true;
 
-    @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    @FeatureToggle
-    public boolean dicerCounterDisplay = true;
+        @Expose
+        @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideChat = false;
 
-    @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    @FeatureToggle
-    public boolean dicerCounterHideChat = false;
-
-    @Expose
-    public Position dicerCounterPos = new Position(16, -232, false, true);
+        @Expose
+        public Position pos = new Position(16, -232, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
