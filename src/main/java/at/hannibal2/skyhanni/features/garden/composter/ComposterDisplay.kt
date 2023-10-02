@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -19,7 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class ComposterDisplay {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.composter
     private val hidden get() = GardenAPI.config
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
@@ -45,7 +46,7 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!(config.composterDisplayEnabled && GardenAPI.inGarden())) return
+        if (!(config.displayEnabled && GardenAPI.inGarden())) return
 
         readData(event.tabList)
 
@@ -138,21 +139,21 @@ class ComposterDisplay {
     }
 
     private fun sendNotify() {
-        if (!config.composterNotifyLowEnabled) return
+        if (!config.notifyLow.enabled) return
         val hidden = hidden ?: return
 
-        if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter && System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
-            if (config.composterNotifyLowTitle) {
+        if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
+            if (config.notifyLow.title) {
                 TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
             hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
-        if (ComposterAPI.getFuel() <= config.composterNotifyLowFuel &&
+        if (ComposterAPI.getFuel() <= config.notifyLow.fuel &&
             System.currentTimeMillis() >= hidden.informedAboutLowFuel
         ) {
-            if (config.composterNotifyLowTitle) {
+            if (config.notifyLow.title) {
                 TitleUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
@@ -164,8 +165,8 @@ class ComposterDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (GardenAPI.inGarden() && config.composterDisplayEnabled) {
-            config.composterDisplayPos.renderStringsAndItems(display, posLabel = "Composter Display")
+        if (GardenAPI.inGarden() && config.displayEnabled) {
+            config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")
         }
 
         checkWarningsAndOutsideGarden()
@@ -187,14 +188,14 @@ class ComposterDisplay {
             }
         } else "?"
 
-        if (!GardenAPI.inGarden() && config.composterDisplayOutsideGarden) {
+        if (!GardenAPI.inGarden() && config.displayOutsideGarden) {
             val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET", true), "§b$format"))
-            config.composterOutsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
+            config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }
     }
 
     private fun warn(warningMessage: String) {
-        if (!config.composterWarnAlmostClose) return
+        if (!config.warnAlmostClose) return
         val storage = GardenAPI.config ?: return
 
         if (LorenzUtils.inDungeons) return
@@ -204,5 +205,19 @@ class ComposterDisplay {
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
         LorenzUtils.chat("§e[SkyHanni] $warningMessage")
         TitleUtils.sendTitle("§eComposter Warning!", 3.seconds)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "garden.composterDisplayEnabled", "garden.composter.displayEnabled")
+        event.move(3, "garden.composterDisplayOutsideGarden", "garden.composter.displayOutsideGarden")
+        event.move(3, "garden.composterWarnAlmostClose", "garden.composter.warnAlmostClose")
+        event.move(3, "garden.composterDisplayPos", "garden.composter.displayPos")
+        event.move(3, "garden.composterOutsideGardenPos", "garden.composter.outsideGardenPos")
+        event.move(3, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
+        event.move(3, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
+        event.move(3, "garden.composterNotifyLowTitle", "garden.composter.notifyLow.title")
+        event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composter.notifyLow.organicMatter")
+        event.move(3, "garden.composterNotifyLowFuel", "garden.composter.notifyLow.fuel")
     }
 }
