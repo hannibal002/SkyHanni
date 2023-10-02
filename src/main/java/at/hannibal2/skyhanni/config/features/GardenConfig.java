@@ -519,95 +519,86 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Custom Keybind", desc = "")
-    @ConfigEditorAccordion(id = 8)
-    public boolean keybind = false;
+    @ConfigOption(name = "Custom Keybinds", desc = "")
+    @Accordion
+    public KeyBindConfig keyBind = new KeyBindConfig();
 
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or Daedalus Axe in the hand.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 8)
-    @FeatureToggle
-    public boolean keyBindEnabled = false;
+    public static class KeyBindConfig{
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or Daedalus Axe in the hand.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
 
-    @ConfigOption(name = "Disable All", desc = "Disable all keys.")
-    @ConfigEditorButton(buttonText = "Disable")
-    @ConfigAccordionId(id = 8)
-    public Runnable keyBindPresetDisable = () -> {
-        keyBindAttack = Keyboard.KEY_NONE;
-        keyBindUseItem = Keyboard.KEY_NONE;
-        keyBindLeft = Keyboard.KEY_NONE;
-        keyBindRight = Keyboard.KEY_NONE;
-        keyBindForward = Keyboard.KEY_NONE;
-        keyBindBack = Keyboard.KEY_NONE;
-        keyBindJump = Keyboard.KEY_NONE;
-        keyBindSneak = Keyboard.KEY_NONE;
+        @ConfigOption(name = "Disable All", desc = "Disable all keys.")
+        @ConfigEditorButton(buttonText = "Disable")
+        public Runnable presetDisable = () -> {
+            attack = Keyboard.KEY_NONE;
+            useItem = Keyboard.KEY_NONE;
+            left = Keyboard.KEY_NONE;
+            right = Keyboard.KEY_NONE;
+            forward = Keyboard.KEY_NONE;
+            back = Keyboard.KEY_NONE;
+            jump = Keyboard.KEY_NONE;
+            sneak = Keyboard.KEY_NONE;
 
-        Minecraft.getMinecraft().thePlayer.closeScreen();
-    };
+            Minecraft.getMinecraft().thePlayer.closeScreen();
+        };
 
-    @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
-    @ConfigEditorButton(buttonText = "Default")
-    @ConfigAccordionId(id = 8)
-    public Runnable keyBindPresetDefault = () -> {
-        keyBindAttack = -100;
-        keyBindUseItem = -99;
-        keyBindLeft = Keyboard.KEY_A;
-        keyBindRight = Keyboard.KEY_D;
-        keyBindForward = Keyboard.KEY_W;
-        keyBindBack = Keyboard.KEY_S;
-        keyBindJump = Keyboard.KEY_SPACE;
-        keyBindSneak = Keyboard.KEY_LSHIFT;
-        Minecraft.getMinecraft().thePlayer.closeScreen();
-    };
+        @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
+        @ConfigEditorButton(buttonText = "Default")
+        public Runnable presetDefault = () -> {
+            attack = -100;
+            useItem = -99;
+            left = Keyboard.KEY_A;
+            right = Keyboard.KEY_D;
+            forward = Keyboard.KEY_W;
+            back = Keyboard.KEY_S;
+            jump = Keyboard.KEY_SPACE;
+            sneak = Keyboard.KEY_LSHIFT;
+            Minecraft.getMinecraft().thePlayer.closeScreen();
+        };
 
-    @Expose
-    @ConfigOption(name = "Attack", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = -100)
-    public int keyBindAttack = -100;
+        @Expose
+        @ConfigOption(name = "Attack", desc = "")
+        @ConfigEditorKeybind(defaultKey = -100)
+        public int attack = -100;
 
-    @Expose
-    @ConfigOption(name = "Use Item", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = -99)
-    public int keyBindUseItem = -99;
+        @Expose
+        @ConfigOption(name = "Use Item", desc = "")
+        @ConfigEditorKeybind(defaultKey = -99)
+        public int useItem = -99;
 
-    @Expose
-    @ConfigOption(name = "Move Left", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_A)
-    public int keyBindLeft = Keyboard.KEY_A;
+        @Expose
+        @ConfigOption(name = "Move Left", desc = "")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_A)
+        public int left = Keyboard.KEY_A;
 
-    @Expose
-    @ConfigOption(name = "Move Right", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_D)
-    public int keyBindRight = Keyboard.KEY_D;
+        @Expose
+        @ConfigOption(name = "Move Right", desc = "")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_D)
+        public int right = Keyboard.KEY_D;
 
-    @Expose
-    @ConfigOption(name = "Move Forward", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_W)
-    public int keyBindForward = Keyboard.KEY_W;
+        @Expose
+        @ConfigOption(name = "Move Forward", desc = "")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_W)
+        public int forward = Keyboard.KEY_W;
 
-    @Expose
-    @ConfigOption(name = "Move Back", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_S)
-    public int keyBindBack = Keyboard.KEY_S;
+        @Expose
+        @ConfigOption(name = "Move Back", desc = "")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_S)
+        public int back = Keyboard.KEY_S;
 
-    @Expose
-    @ConfigOption(name = "Jump", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_SPACE)
-    public int keyBindJump = Keyboard.KEY_SPACE;
+        @Expose
+        @ConfigOption(name = "Jump", desc = "")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_SPACE)
+        public int jump = Keyboard.KEY_SPACE;
 
-    @Expose
-    @ConfigOption(name = "Sneak", desc = "")
-    @ConfigAccordionId(id = 8)
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    public int keyBindSneak = Keyboard.KEY_LSHIFT;
+        @Expose
+        @ConfigOption(name = "Sneak", desc = "")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+        public int sneak = Keyboard.KEY_LSHIFT;
+    }
 
     @Expose
     @ConfigOption(name = "Optimal Speed", desc = "")
