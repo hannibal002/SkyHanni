@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -41,7 +42,7 @@ class ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
     private var fuelFactors: Map<String, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.composter
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 
@@ -110,7 +111,7 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.composterOverlay) return
+        if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
         inComposterUpgrades = event.inventoryName == "Composter Upgrades"
         if (!inComposter && !inComposterUpgrades) return
@@ -389,7 +390,7 @@ class ComposterOverlay {
             val item = NEUItems.getItemStack(internalName)
             val itemName = item.name!!
             val price = getPrice(internalName)
-            val itemsNeeded = if (config.composterRoundDown) {
+            val itemsNeeded = if (config.roundDown) {
                 val amount = missing / factor
                 if (amount > .75 && amount < 1.0) {
                     1.0
@@ -434,7 +435,7 @@ class ComposterOverlay {
     }
 
     private fun getPrice(internalName: String): Double {
-        val useSellPrice = config.composterOverlayPriceType == 1
+        val useSellPrice = config.overlayPriceType == 1
         val price = NEUItems.getPrice(internalName, useSellPrice)
         if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
 
@@ -494,11 +495,11 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
-            config.composterOverlayOrganicMatterPos.renderStringsAndItems(
+            config.overlayOrganicMatterPos.renderStringsAndItems(
                 organicMatterDisplay,
                 posLabel = "Composter Overlay Organic Matter"
             )
-            config.composterOverlayFuelExtrasPos.renderStringsAndItems(
+            config.overlayFuelExtrasPos.renderStringsAndItems(
                 fuelExtraDisplay,
                 posLabel = "Composter Overlay Fuel Extras"
             )
@@ -509,5 +510,14 @@ class ComposterOverlay {
         COMPOST("Compost", 1),
         HOUR("Hour", 60 * 60),
         DAY("Day", 60 * 60 * 24),
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "garden.composterOverlay", "garden.composter.overlay")
+        event.move(3, "garden.composterOverlayPriceType", "garden.composter.overlayPriceType")
+        event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composter.overlayOrganicMatterPos")
+        event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composter.overlayFuelExtrasPos")
+        event.move(3, "garden.composterRoundDown", "garden.composter.roundDown")
     }
 }

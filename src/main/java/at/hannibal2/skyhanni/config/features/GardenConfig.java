@@ -1016,143 +1016,131 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Composter", desc = "")
-    @ConfigEditorAccordion(id = 17)
-    public boolean composter = false;
+    @Accordion
+    public ComposterConfig composter = new ComposterConfig();
+    public static class ComposterConfig{
+        @Expose
+        @ConfigOption(
+                name = "Composter Overlay",
+                desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean overlay = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Composter Overlay",
-            desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    @FeatureToggle
-    public boolean composterOverlay = true;
+        @Expose
+        @ConfigOption(name = "Overlay Price", desc = "Toggle for Bazaar 'buy order' vs 'instant buy' price in composter overlay.")
+        @ConfigEditorDropdown(values = {"Instant Buy", "Buy Order"})
+        public int overlayPriceType = 0;
 
-    @Expose
-    @ConfigOption(name = "Overlay Price", desc = "Toggle for Bazaar 'buy order' vs 'instant buy' price in composter overlay.")
-    @ConfigEditorDropdown(values = {"Instant Buy", "Buy Order"})
-    @ConfigAccordionId(id = 17)
-    public int composterOverlayPriceType = 0;
+        @Expose
+        public Position overlayOrganicMatterPos = new Position(140, 152, false, true);
 
-    @Expose
-    public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
+        @Expose
+        public Position overlayFuelExtrasPos = new Position(-320, 152, false, true);
 
-    @Expose
-    public Position composterOverlayFuelExtrasPos = new Position(-320, 152, false, true);
+        @Expose
+        @ConfigOption(
+                name = "Display Element",
+                desc = "Displays the Compost data from the tab list as GUI element."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean displayEnabled = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Display Element",
-            desc = "Displays the Compost data from the tab list as GUI element."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    @FeatureToggle
-    public boolean composterDisplayEnabled = true;
+        @Expose
+        @ConfigOption(
+                name = "Outside Garden",
+                desc = "Show Time till Composter is empty outside Garden"
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean displayOutsideGarden = false;
 
-    @Expose
-    @ConfigOption(
-            name = "Outside Garden",
-            desc = "Show Time till Composter is empty outside Garden"
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    @FeatureToggle
-    public boolean composterDisplayOutsideGarden = false;
+        @Expose
+        @ConfigOption(
+                name = "Composter Warning",
+                desc = "Warn when the Composter gets close to empty, even outside Garden."
+        )
+        @ConfigEditorBoolean
+        public boolean warnAlmostClose = false;
 
-    @Expose
-    @ConfigOption(
-            name = "Composter Warning",
-            desc = "Warn when the Composter gets close to empty, even outside Garden."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    public boolean composterWarnAlmostClose = false;
+        @Expose
+        @ConfigOption(
+                name = "Upgrade Price",
+                desc = "Show the price for the Composter Upgrade in the lore."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean upgradePrice = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Upgrade Price",
-            desc = "Show the price for the Composter Upgrade in the lore."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    @FeatureToggle
-    public boolean composterUpgradePrice = true;
+        @Expose
+        @ConfigOption(
+                name = "Round Amount Needed",
+                desc = "Rounds the amount needed to fill your Composter down so that you don't overspend."
+        )
+        @ConfigEditorBoolean
+        public boolean roundDown = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Round Amount Needed",
-            desc = "Rounds the amount needed to fill your Composter down so that you don't overspend."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    public boolean composterRoundDown = true;
+        @Expose
+        @ConfigOption(
+                name = "Highlight Upgrade",
+                desc = "Highlight Upgrades that can be bought right now."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightUpgrade = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Highlight Upgrade",
-            desc = "Highlight Upgrades that can be bought right now."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    @FeatureToggle
-    public boolean composterHighLightUpgrade = true;
+        @Expose
+        @ConfigOption(
+                name = "Inventory Numbers",
+                desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the Composter Inventory."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean inventoryNumbers = true;
 
-    @Expose
-    @ConfigOption(
-            name = "Inventory Numbers",
-            desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the Composter Inventory."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 17)
-    @FeatureToggle
-    public boolean composterInventoryNumbers = true;
+        @Expose
+        @ConfigOption(name = "Notification When Low Composter", desc = "")
+        @Accordion
+        public NotifyLowConfig notifyLow = new NotifyLowConfig();
+        public static class NotifyLowConfig {
+            @Expose
+            @ConfigOption(name = "Enable", desc = "Show a notification when Organic Matter or Fuel runs low in your Composter.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = false;
 
-    @Expose
-    @ConfigOption(name = "Notification When Low Composter", desc = "")
-    @ConfigAccordionId(id = 17)
-    @ConfigEditorAccordion(id = 21)
-    public boolean composterNotifyLow = false;
+            @Expose
+            @ConfigOption(name = "Show Title", desc = "Send a title to notify.")
+            @ConfigEditorBoolean
+            public boolean title = false;
 
-    @Expose
-    @ConfigOption(name = "Enable", desc = "Show a notification when Organic Matter or Fuel runs low in your Composter.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 21)
-    @FeatureToggle
-    public boolean composterNotifyLowEnabled = false;
+            @Expose
+            @ConfigOption(name = "Min Organic Matter", desc = "Warn when Organic Matter is below this value.")
+            @ConfigEditorSlider(
+                    minValue = 1_000,
+                    maxValue = 80_000,
+                    minStep = 1
+            )
+            public int organicMatter = 20_000;
 
-    @Expose
-    @ConfigOption(name = "Show Title", desc = "Send a title to notify.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 21)
-    public boolean composterNotifyLowTitle = false;
+            @Expose
+            @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
+            @ConfigEditorSlider(
+                    minValue = 500,
+                    maxValue = 40_000,
+                    minStep = 1
+            )
+            public int fuel = 10_000;
+        }
 
-    @Expose
-    @ConfigOption(name = "Min Organic Matter", desc = "Warn when Organic Matter is below this value.")
-    @ConfigEditorSlider(
-            minValue = 1_000,
-            maxValue = 80_000,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 21)
-    public int composterNotifyLowOrganicMatter = 20_000;
+        @Expose
+        public Position displayPos = new Position(-390, 10, false, true);
 
-    @Expose
-    @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
-    @ConfigEditorSlider(
-            minValue = 500,
-            maxValue = 40_000,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 21)
-    public int composterNotifyLowFuel = 10_000;
-
-    @Expose
-    public Position composterDisplayPos = new Position(-390, 10, false, true);
-
-    @Expose
-    public Position composterOutsideGardenPos = new Position(-363, 13, false, true);
+        @Expose
+        public Position outsideGardenPos = new Position(-363, 13, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
