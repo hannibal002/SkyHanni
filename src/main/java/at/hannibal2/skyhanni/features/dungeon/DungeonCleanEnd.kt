@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonCleanEnd {
 
-    private val config = SkyHanniMod.feature.dungeon.cleanEnd
+    private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
 
     private var bossDone = false
     private var chestsSpawned = false
