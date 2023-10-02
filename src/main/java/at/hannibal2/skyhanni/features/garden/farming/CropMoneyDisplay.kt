@@ -109,7 +109,7 @@ object CropMoneyDisplay {
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
-        if (!config.cropMilestoneProgress) {
+        if (!config.cropMilestones.progress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newDisplay
         }
