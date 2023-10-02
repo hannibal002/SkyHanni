@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropTimeCommand {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.moneyPerHour
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
