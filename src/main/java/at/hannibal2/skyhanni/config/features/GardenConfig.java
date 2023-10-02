@@ -913,64 +913,57 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Next Jacob's Contest", desc = "")
-    @ConfigEditorAccordion(id = 14)
-    public boolean nextJacobContest = false;
+    @Accordion
+    public NextJacobContestConfig nextJacobContest = new NextJacobContestConfig();
+    public static class NextJacobContestConfig{
+        @Expose
+        @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean display = true;
 
-    @Expose
-    @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 14)
-    @FeatureToggle
-    public boolean nextJacobContestDisplay = true;
+        @Expose
+        @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in Garden but everywhere in SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean everywhere = false;
 
-    @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in Garden but everywhere in SkyBlock.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 14)
-    public boolean nextJacobContestEverywhere = false;
+        @Expose
+        @ConfigOption(name = "In Other Guis", desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.")
+        @ConfigEditorBoolean
+        public boolean otherGuis = false;
 
-    @Expose
-    @ConfigOption(name = "In Other Guis", desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 14)
-    public boolean nextJacobContestOtherGuis = false;
+        @Expose
+        @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.")
+        @ConfigEditorBoolean
+        public boolean fetchAutomatically = true;
 
-    @Expose
-    @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 14)
-    public boolean nextJacobContestsFetchAutomatically = true;
+        @Expose
+        @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
+        @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
+        public int shareAutomatically = 0;
 
-    @Expose
-    @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
-    @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
-    @ConfigAccordionId(id = 14)
-    public int nextJacobContestsShareAutomatically = 0;
+        @Expose
+        @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's Contest starts.")
+        @ConfigEditorBoolean
+        public boolean warn = false;
 
-    @Expose
-    @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's Contest starts.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 14)
-    public boolean nextJacobContestWarn = false;
+        @Expose
+        @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before a Jacob's Contest begins.")
+        @ConfigEditorSlider(
+                minValue = 10,
+                maxValue = 60 * 5,
+                minStep = 1
+        )
+        public int warnTime = 60 * 2;
 
-    @Expose
-    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before a Jacob's Contest begins.")
-    @ConfigEditorSlider(
-            minValue = 10,
-            maxValue = 60 * 5,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 14)
-    public int nextJacobContestWarnTime = 60 * 2;
+        @Expose
+        @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
+        @ConfigEditorBoolean
+        public boolean warnPopup = false;
 
-    @Expose
-    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 14)
-    public boolean nextJacobContestWarnPopup = false;
-
-    @Expose
-    public Position nextJacobContestPos = new Position(-200, 10, false, true);
+        @Expose
+        public Position pos = new Position(-200, 10, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Farming Armor Drops", desc = "")
