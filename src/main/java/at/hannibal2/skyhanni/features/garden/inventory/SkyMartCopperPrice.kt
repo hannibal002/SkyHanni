@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class SkyMartCopperPrice {
     private val pattern = "§c(?<amount>.*) Copper".toPattern()
     private var display = emptyList<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.skyMart
 
     companion object {
         var inInventory = false
@@ -46,7 +47,7 @@ class SkyMartCopperPrice {
                     val amountFormat = NumberUtil.format(amount)
 
                     val name = stack.nameWithEnchantment!!
-                    val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
+                    val advancedStats = if (config.copperPriceAdvancedStats) {
                         " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
                     } else ""
                     val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
@@ -69,7 +70,7 @@ class SkyMartCopperPrice {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
-            config.skyMartCopperPricePos.renderStringsAndItems(
+            config.copperPricePos.renderStringsAndItems(
                 display,
                 extraSpace = 5,
                 itemScale = 1.7,
@@ -78,5 +79,12 @@ class SkyMartCopperPrice {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.skyMartCopperPrice
+    private fun isEnabled() = GardenAPI.inGarden() && config.copperPrice
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
+        event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
+        event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
+    }
 }
