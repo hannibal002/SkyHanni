@@ -20,7 +20,7 @@ class HighlightJerries {
         val maxHealth = event.maxHealth
         val listOfLorenzColors = [LorenzColor.RED, LorenzColor.RED, LorenzColor.WHITE, LorenzColor.GREEN, LorenzColor.BLUE, LorenzColor.DARK_PURPLE, LorenzColor.GOLD, LorenzColor.LIGHT_PURPLE]
 
-        if (entity is EntityVillager && maxHealth < 7) {
+        if (entity is EntityVillager && maxHealth < 7 && maxHealth > 2) {
             RenderLivingEntityHelper.setEntityColor(entity, listOfLorenzColors[maxHealth].toColor().withAlpha(20))
             { SkyHanniMod.feature.event.jerry.highlightJerries }
             RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.event.jerry.highlightJerries }
