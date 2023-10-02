@@ -18,7 +18,7 @@ class HighlightJerries {
 
         val entity = event.entity
         val maxHealth = event.maxHealth
-        val listOfLorenzColors = mapOf(2 to LorenzColor.WHITE, 3 to LorenzColor.GREEN, 4 to LorenzColor.BLUE, 5 to LorenzColor.DARK_PURPLE, 6 to LorenzColor.GOLD, 7 to LorenzColor.LIGHT_PURPLE) //2 and 7 are in case admins do a little trolling
+        val listOfLorenzColors = listOf<LorenzColor>(LorenzColor.RED, LorenzColor.RED, LorenzColor.WHITE, LorenzColor.GREEN, LorenzColor.BLUE, LorenzColor.DARK_PURPLE, LorenzColor.GOLD, LorenzColor.LIGHT_PURPLE)
 
         if (entity is EntityVillager && maxHealth < 7 && maxHealth > 2) {
             RenderLivingEntityHelper.setEntityColor(entity, listOfLorenzColors[maxHealth].toColor().withAlpha(20))
