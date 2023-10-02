@@ -126,7 +126,7 @@ public class CombatConfig {
         @Expose
         @ConfigOption(name = "Vampire Slayer", desc = "")
         @Accordion
-        public DamageIndicatorConfig.VampireSlayerConfig vampireSlayer = new DamageIndicatorConfig.VampireSlayerConfig();
+        public VampireSlayerConfig vampireSlayer = new VampireSlayerConfig();
 
         public static class VampireSlayerConfig {
             @Expose
