@@ -311,6 +311,21 @@ public class EventConfig {
         public Position pos = new Position(150, 150, false, true);
     }
 
+    @ConfigOption(name = "Mayor Jerry's Jerrypocalypse", desc = "")
+    @Accordion
+    @Expose
+    public MayorJerryConfig jerry = new MayorJerryConfig();
+
+    public static class MayorJerryConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight Jerries", desc = "")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightJerries = true;
+
+    }
+
     // comment in if the event is needed again
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion
