@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.event.jerry
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
