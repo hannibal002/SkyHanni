@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,7 +22,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.anitaShop
     private var display = emptyList<List<Any>>()
 
     companion object {
@@ -44,7 +45,7 @@ class AnitaMedalProfit {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.anitaMedalProfitEnabled) return
+        if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
         if (GardenVisitorFeatures.inVisitorInventory) return
 
@@ -138,12 +139,18 @@ class AnitaMedalProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
-            config.anitaMedalProfitPos.renderStringsAndItems(
+            config.medalProfitPos.renderStringsAndItems(
                 display,
                 extraSpace = 5,
                 itemScale = 1.7,
                 posLabel = "Anita Medal Profit"
             )
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
+        event.move(3,"garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")
     }
 }
