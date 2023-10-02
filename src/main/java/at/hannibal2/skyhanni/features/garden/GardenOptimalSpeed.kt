@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,8 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
-    private val config get() = SkyHanniMod.feature.garden
-    private val configCustomSpeed get() = config.optimalSpeedCustom
+    private val config get() = SkyHanniMod.feature.garden.optimalSpeed
+    private val configCustomSpeed get() = config.customSpeed
     private var currentSpeed = 100
     private var optimalSpeed = -1
     private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
@@ -52,7 +53,7 @@ class GardenOptimalSpeed {
         val gui = event.gui
         if (gui !is GuiEditSign) return
         if (!gui.isRancherSign()) return
-        config.optimalSpeedSignPosition.renderStringsAndItems(
+        config.signPosition.renderStringsAndItems(
             rancherOverlayList,
             posLabel = "Optimal Speed Rancher Overlay"
         )
@@ -87,15 +88,15 @@ class GardenOptimalSpeed {
 
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
-            config.optimalSpeedPos.renderString("§c$text", posLabel = "Garden Optimal Speed")
+            config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
              warn()
         } else {
-            config.optimalSpeedPos.renderString("§a$text", posLabel = "Garden Optimal Speed")
+            config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
     }
 
     private fun warn() {
-        if (!config.optimalSpeedWarning) return
+        if (!config.warning) return
         if (!Minecraft.getMinecraft().thePlayer.onGround) return
         if (GardenAPI.onBarnPlot) return
         if (System.currentTimeMillis() < lastWarnTime + 20_000) return
@@ -107,6 +108,25 @@ class GardenOptimalSpeed {
         }
     }
 
-    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.optimalSpeedSignEnabled
-    private fun isEnabled() = GardenAPI.inGarden() && config.optimalSpeedEnabled
+    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"garden.optimalSpeedEnabled", "garden.optimalSpeed.enabled")
+        event.move(3,"garden.optimalSpeedWarning", "garden.optimalSpeed.warning")
+        event.move(3,"garden.optimalSpeedSignEnabled", "garden.optimalSpeed.signEnabled")
+        event.move(3,"garden.optimalSpeedSignPosition", "garden.optimalSpeed.signPosition")
+        event.move(3,"garden.optimalSpeedPos", "garden.optimalSpeed.pos")
+        event.move(3,"garden.optimalSpeedCustom.wheat", "garden.optimalSpeed.customSpeed.wheat")
+        event.move(3,"garden.optimalSpeedCustom.carrot", "garden.optimalSpeed.customSpeed.carrot")
+        event.move(3,"garden.optimalSpeedCustom.potato", "garden.optimalSpeed.customSpeed.potato")
+        event.move(3,"garden.optimalSpeedCustom.netherWart", "garden.optimalSpeed.customSpeed.netherWart")
+        event.move(3,"garden.optimalSpeedCustom.pumpkin", "garden.optimalSpeed.customSpeed.pumpkin")
+        event.move(3,"garden.optimalSpeedCustom.melon", "garden.optimalSpeed.customSpeed.melon")
+        event.move(3,"garden.optimalSpeedCustom.cocoaBeans", "garden.optimalSpeed.customSpeed.cocoaBeans")
+        event.move(3,"garden.optimalSpeedCustom.sugarCane", "garden.optimalSpeed.customSpeed.sugarCane")
+        event.move(3,"garden.optimalSpeedCustom.cactus", "garden.optimalSpeed.customSpeed.cactus")
+        event.move(3,"garden.optimalSpeedCustom.mushroom", "garden.optimalSpeed.customSpeed.mushroom")
+    }
 }
