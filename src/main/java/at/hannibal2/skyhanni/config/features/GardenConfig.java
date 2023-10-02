@@ -968,25 +968,24 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Farming Armor Drops", desc = "")
 
-    @ConfigEditorAccordion(id = 18)
-    public boolean farmingArmorDrops = false;
+    @Accordion
+    public FarmingArmorDropsConfig farmingArmorDrops = new FarmingArmorDropsConfig();
+    public static class FarmingArmorDropsConfig{
+        @Expose
+        @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
 
-    @Expose
-    @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 18)
-    @FeatureToggle
-    public boolean farmingArmorDropsEnabled = true;
+        @Expose
+        @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideChat = false;
 
-    @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 18)
-    @FeatureToggle
-    public boolean farmingArmorDropsHideChat = false;
-
-    @Expose
-    public Position farmingArmorDropsPos = new Position(16, -232, false, true);
+        @Expose
+        public Position pos = new Position(16, -232, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Anita Shop", desc = "")

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -26,7 +27,7 @@ class FarmingArmorDrops {
 
     private var hasArmor = false
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.farmingArmorDrops
 
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
@@ -45,7 +46,7 @@ class FarmingArmorDrops {
         for (dropType in ArmorDropType.entries) {
             if (dropType.chatMessage == event.message) {
                 addDrop(dropType)
-                if (config.farmingArmorDropsHideChat) {
+                if (config.hideChat) {
                     event.blockedReason = "farming_armor_drops"
                 }
             }
@@ -81,16 +82,16 @@ class FarmingArmorDrops {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.farmingArmorDropsEnabled) return
+        if (!config.enabled) return
         if (!hasArmor) return
 
-        config.farmingArmorDropsPos.renderStrings(display, posLabel = "Farming Armor Drops")
+        config.pos.renderStrings(display, posLabel = "Farming Armor Drops")
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.farmingArmorDropsEnabled) return
+        if (!config.enabled) return
 
         if (event.isMod(30)) {
             checkArmor()
@@ -141,5 +142,12 @@ class FarmingArmorDrops {
             }
             return currentArmorDropChance
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"garden.farmingArmorDropsEnabled", "garden.farmingArmorDrops.enabled")
+        event.move(3,"garden.farmingArmorDropsHideChat", "garden.farmingArmorDrops.hideChat")
+        event.move(3,"garden.farmingArmorDropsPos", "garden.farmingArmorDrops.pos")
     }
 }
