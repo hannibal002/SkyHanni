@@ -317,36 +317,30 @@ public class GardenConfig {
     @Accordion
     public NumbersConfig numbers = new NumbersConfig();
     public static class NumbersConfig{
+        @Expose
+        @ConfigOption(name = "Crop Milestone", desc = "Show the number of crop milestones in the inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean cropMilestone = true;
 
+        @Expose
+        @ConfigOption(name = "Average Milestone", desc = "Show the average crop milestone in the crop milestone inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean averageCropMilestone = true;
+
+        @Expose
+        @ConfigOption(name = "Crop Upgrades", desc = "Show the number of upgrades in the crop upgrades inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean cropUpgrades = true;
+
+        @Expose
+        @ConfigOption(name = "Composter Upgrades", desc = "Show the number of upgrades in the Composter upgrades inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean composterUpgrades = true;
     }
-
-    @Expose
-    @ConfigOption(name = "Crop Milestone", desc = "Show the number of crop milestones in the inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 5)
-    @FeatureToggle
-    public boolean numberCropMilestone = true;
-
-    @Expose
-    @ConfigOption(name = "Average Milestone", desc = "Show the average crop milestone in the crop milestone inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 5)
-    @FeatureToggle
-    public boolean numberAverageCropMilestone = true;
-
-    @Expose
-    @ConfigOption(name = "Crop Upgrades", desc = "Show the number of upgrades in the crop upgrades inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 5)
-    @FeatureToggle
-    public boolean numberCropUpgrades = true;
-
-    @Expose
-    @ConfigOption(name = "Composter Upgrades", desc = "Show the number of upgrades in the Composter upgrades inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 5)
-    @FeatureToggle
-    public boolean numberComposterUpgrades = true;
 
     @Expose
     @ConfigOption(name = "Crop Milestones", desc = "")
