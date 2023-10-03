@@ -10,19 +10,31 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightJerries {
+    private val config get() = SkyHanniMod.feature.event.jerry
+
+    //RED RED WHITE LIGHT_PURPLE are fallbacks in case Hypixel admins do a little trolling
+    private val listOfLorenzColors = listOf(
+        LorenzColor.RED,
+        LorenzColor.RED,
+        LorenzColor.WHITE,
+        LorenzColor.GREEN,
+        LorenzColor.BLUE,
+        LorenzColor.DARK_PURPLE,
+        LorenzColor.GOLD,
+        LorenzColor.LIGHT_PURPLE
+    )
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (!SkyHanniMod.feature.event.jerry.highlightJerries) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.highlightJerries) return
 
         val entity = event.entity
         val maxHealth = event.maxHealth
-        val listOfLorenzColors = listOf<LorenzColor>(LorenzColor.RED, LorenzColor.RED, LorenzColor.WHITE, LorenzColor.GREEN, LorenzColor.BLUE, LorenzColor.DARK_PURPLE, LorenzColor.GOLD, LorenzColor.LIGHT_PURPLE)
-        //RED RED WHITE LIGHT_PURPLE ARE FALLBACKS IN CASE HYPIXEL ADMINS DO A LITTLE TROLLING
 
-        if (entity is EntityVillager && maxHealth < 7 && maxHealth > 2) {
-            RenderLivingEntityHelper.setEntityColor(entity, listOfLorenzColors[maxHealth].toColor().withAlpha(20))
-            { SkyHanniMod.feature.event.jerry.highlightJerries }
+        if (entity is EntityVillager && maxHealth in 3..6) {
+            val color = listOfLorenzColors[maxHealth].toColor().withAlpha(20)
+            RenderLivingEntityHelper.setEntityColor(entity, color) { config.highlightJerries }
         }
     }
 }
