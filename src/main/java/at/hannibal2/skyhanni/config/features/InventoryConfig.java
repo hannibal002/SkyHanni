@@ -387,7 +387,7 @@ public class InventoryConfig {
                 "§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)",
                 "§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)",
                 "§bMinion Storage Tier",
-                "§bCompactor/Deletor Enabled Status (§a✔§r§c§l✖§b)"
+                "§bCompactor/Deletor Enabled Status (§a✔§r§c§l✖§b)",
                 "§bItem Edition/Auction Number (if less than 1000)",
         }
     )
