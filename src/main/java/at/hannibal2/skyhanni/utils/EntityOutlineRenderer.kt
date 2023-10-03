@@ -274,7 +274,7 @@ object EntityOutlineRenderer {
         if (SkyHanniMod.feature.fishing.rareSeaCreatureHighlight) return true
         if (SkyHanniMod.feature.misc.glowingDroppedItems.enabled) return true
         if (SkyHanniMod.feature.dungeon.highlightTeammates) return true
-        if (SkyHanniMod.feature.misc.highlightPartyMembers) return true
+        if (SkyHanniMod.feature.misc.highlightPartyMembers.enabled) return true
 
         return false
     }

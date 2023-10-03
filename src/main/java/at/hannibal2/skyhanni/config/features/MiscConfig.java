@@ -535,11 +535,30 @@ public class MiscConfig {
 
     }
 
+
     @Expose
-    @ConfigOption(name = "Highlight Party Members", desc = "Draws a glowing outline around your party members")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightPartyMembers = false;
+    @ConfigOption(name = "Highlight Party Members", desc = "")
+    @Accordion
+    public HighlightPartyMembers highlightPartyMembers = new HighlightPartyMembers();
+
+    public static class HighlightPartyMembers {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around your party members")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Outline Color",
+                desc = "The color to outline party members in."
+        )
+        @ConfigEditorColour
+        public String outlineColor = "0:245:85:255:85";
+
+    }
+
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
