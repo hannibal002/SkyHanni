@@ -19,7 +19,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     VERY_SPECIAL(LorenzColor.RED, 9),
     ;
 
-    private val chatColorCode by lazy { color.getChatColor() }
+    val chatColorCode by lazy { color.getChatColor() }
     private val rawName by lazy { name.replace("_", " ") }
     private val normalName by lazy { "$chatColorCode§l$rawName" }
     private val recombName by lazy { "$chatColorCode§l§ka§r $chatColorCode§l$chatColorCode§l$rawName" }
@@ -50,6 +50,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
     companion object {
         fun getById(id: Int) = entries.firstOrNull { it.ordinal == id }
+        fun getByName(name: String) = entries.firstOrNull { it.name == name }
 
         fun readItemRarity(itemStack: ItemStack): LorenzRarity? {
             for (line in itemStack.getLore()) {

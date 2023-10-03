@@ -73,7 +73,7 @@ class FishingTimer {
         .map { entity ->
             val name = entity.name
             val isSummonedSoul = name.contains("'")
-            val hasFishingMobName = SeaCreatureManager.allFishingMobNames.any { name.contains(it) }
+            val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
             if (hasFishingMobName && !isSummonedSoul) {
                 if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
             } else 0

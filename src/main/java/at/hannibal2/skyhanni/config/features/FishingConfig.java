@@ -235,10 +235,33 @@ public class FishingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Rare", desc = "Highlight Rare Sea Creatures in blue color.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean rareSeaCreatureHighlight = false;
+    @ConfigOption(name = "Rare Sea Creatures", desc = "")
+    @Accordion
+    public RareCatches rareCatches = new RareCatches();
+
+    public static class RareCatches {
+
+        @Expose
+        @ConfigOption(name = "Alert (Own Sea Creatures)", desc = "Show an alert on screen when you catch a rare sea creature.")
+        @ConfigEditorBoolean
+        public boolean alertOwnCatches = true;
+
+        @Expose
+        @ConfigOption(name = "Alert (Other Sea Creatures)", desc = "Show an alert on screen when other players nearby catch a rare sea creature.")
+        @ConfigEditorBoolean
+        public boolean alertNearbyCatches = false;
+
+        @Expose
+        @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare sea creature alerts are displayed.")
+        @ConfigEditorBoolean
+        public boolean playSound = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight", desc = "Highlight nearby rare sea creatures.")
+        @ConfigEditorBoolean
+        public boolean highlight = false;
+
+    }
 
     @Expose
     @ConfigOption(

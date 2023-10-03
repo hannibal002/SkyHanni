@@ -11,6 +11,7 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
+import java.lang.reflect.Type
 
 object RepoUtils {
 
@@ -83,7 +84,7 @@ object RepoUtils {
         return false
     }
 
-    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
+    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T? {
         if (!repo.exists()) return null
 
         val jsonFile = File(repo, "constants/$constant.json")
@@ -100,7 +101,11 @@ object RepoUtils {
                 StandardCharsets.UTF_8
             )
         ).use { reader ->
-            return gson.fromJson(reader, clazz)
+            if (type == null) {
+                return gson.fromJson(reader, clazz)
+            } else {
+                return gson.fromJson(reader, type)
+            }
         }
     }
 }

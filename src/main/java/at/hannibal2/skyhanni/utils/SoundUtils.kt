@@ -34,10 +34,10 @@ object SoundUtils {
         }
     }
 
-    fun createSound(name: String, pitch: Float): ISound {
+    fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
             init {
-                volume = 50f
+                this.volume = volume
                 repeat = false
                 repeatDelay = 0
                 attenuationType = ISound.AttenuationType.NONE
@@ -53,5 +53,18 @@ object SoundUtils {
 
     fun playClickSound() {
         clickSound.playSound()
+    }
+
+    fun command(args: Array<String>) {
+         if (args.isEmpty()) {
+            LorenzUtils.chat("§c[SkyHanni] Specify a sound effect to test")
+            return
+        }
+
+        val soundName = args[0]
+        val pitch = args.getOrNull(1)?.toFloat() ?: 1.0f
+        val volume = args.getOrNull(2)?.toFloat() ?: 50.0f
+
+        createSound(soundName, pitch, volume).playSound()
     }
 }
