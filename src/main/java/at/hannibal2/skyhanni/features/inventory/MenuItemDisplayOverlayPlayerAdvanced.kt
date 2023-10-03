@@ -334,8 +334,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         val betterLine = line.removeColor().replace("▶ ", "")
                         if (itemName == "Sort") {
                             return when (betterLine.replace(" Price", "").replace(" Bid", "")) {
-                                "Highest " -> "§c⬆"
-                                "Lowest " -> "§a⬇"
+                                "Highest" -> "§c⬆"
+                                "Lowest" -> "§a⬇"
                                 "Ending soon" -> "§e☉"
                                 "Random" -> "R"
                                 else -> ""
