@@ -337,8 +337,8 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(24) && getInternalName_old().startsWith("ABIPHONE_")) {
-            return when (getInternalName_old()) {
+        if (stackSizeConfig.contains(24) && item.getInternalName_old().startsWith("ABIPHONE_")) {
+            return when (item.getInternalName_old()) {
                 "ABIPHONE_X_PLUS" -> "X"
                 "ABIPHONE_X_PLUS_SPECIAL_EDITION" -> "X§b§zSE"
                 "ABIPHONE_XI_ULTRA" -> "11"
