@@ -321,20 +321,43 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(23)) {
-            if (chestName.contains("Personal Compactor ")) {
+            if (chestName.contains("Personal Compactor ") || chestName.contains("Personal Deletor ")) {
                 //§aCompactor Currently OFF!
                 //§aCompactor Currently ON!
-                if (itemName.startsWith("Compactor Currently ")) {
-                    return when (itemName) {
-                        "Compactor Currently OFF!" -> "§c§l✖"
-                        "Compactor Currently ON!" -> "§a✔"
+                if (itemName.contains(" Currently ")) {
+                    return when (itemName.replace("Compactor ", "").replace("Deletor ", "")) {
+                        "Currently OFF!" -> "§c§l✖"
+                        "Currently ON!" -> "§a✔"
                         else -> ""
                     }
                 }
             }
+            if (itemName.startsWith("Personal ")) {
+                return itemName.replace("Personal ", "").replace("Compactor ", "").replace("Deletor ", "").dropLast(3) + "K"
+            }
+        }
+
+        if (stackSizeConfig.contains(24) && getInternalName_old().startsWith("ABIPHONE_")) {
+            return when (getInternalName_old()) {
+                "ABIPHONE_X_PLUS" -> "X"
+                "ABIPHONE_X_PLUS_SPECIAL_EDITION" -> "X§b§zSE"
+                "ABIPHONE_XI_ULTRA" -> "11"
+                "ABIPHONE_XI_ULTRA_STYLE" -> "11§b§zS"
+                "ABIPHONE_XII_MEGA" -> "12"
+                "ABIPHONE_XII_MEGA_COLOR" -> "12§b§zC"
+                "ABIPHONE_XIII_PRO" -> "13"
+                "ABIPHONE_XIII_PRO_GIGA" -> "13§b§zG"
+                "ABIPHONE_XIV_ENORMOUS" -> "14"
+                "ABIPHONE_XIV_ENORMOUS_BLACK" -> "§714"
+                "ABIPHONE_XIV_ENORMOUS_PURPLE" -> "§714"
+                "ABIPHONE_FLIP_DRAGON" -> "F§b§zD"
+                "ABIPHONE_FLIP_NUCLEUS" -> "F§b§zN"
+                "ABIPHONE_FLIP_VOLCANO" -> "F§b§zV"
+                else -> ""
+            }
         }
 		
-		if (stackSizeConfig.contains(24)) {
+		if (stackSizeConfig.contains(25)) {
             var thatNumber = ""
             if (item.getLore().any { it.contains("Auction ") }) {
                 thatNumber = item.getAuctionNumber().toString()
