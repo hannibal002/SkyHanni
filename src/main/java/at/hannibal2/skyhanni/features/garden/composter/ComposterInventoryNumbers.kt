@@ -18,7 +18,7 @@ class ComposterInventoryNumbers {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.composter.inventoryNumbers) return
+        if (!SkyHanniMod.feature.garden.composters.inventoryNumbers) return
 
         if (event.inventoryName != "Composter") return
 
@@ -70,6 +70,6 @@ class ComposterInventoryNumbers {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.composterInventoryNumbers", "garden.composter.inventoryNumbers")
+        event.move(3, "garden.composterInventoryNumbers", "garden.composters.inventoryNumbers")
     }
 }

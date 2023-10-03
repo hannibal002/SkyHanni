@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class NonGodPotEffectDisplay {
-    private val config get() = SkyHanniMod.feature.misc.potionEffects
+    private val config get() = SkyHanniMod.feature.misc.potionEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
@@ -226,9 +226,9 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffects.nonGodPotEffectDisplay")
-        event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffects.nonGodPotEffectShowMixins")
-        event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffects.nonGodPotEffectPos")
+        event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
+        event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
+        event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
     private fun isEnabled() =

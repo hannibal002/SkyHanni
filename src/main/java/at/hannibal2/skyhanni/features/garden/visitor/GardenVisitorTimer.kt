@@ -21,7 +21,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
-    private val config get() = SkyHanniMod.feature.garden.visitor.timer
+    private val config get() = SkyHanniMod.feature.garden.visitors.timer
     private val patternNextVisitor = " Next Visitor: §r§b(?<time>.*)".toPattern()
     private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
     private var render = ""
@@ -179,9 +179,9 @@ class GardenVisitorTimer {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.visitorTimerEnabled", "garden.visitor.timer.enabled")
-        event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitor.timer.sixthVisitorEnabled")
-        event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitor.timer.sixthVisitorWarning")
-        event.move(3, "garden.visitorTimerPos", "garden.visitor.timer.pos")
+        event.move(3, "garden.visitorTimerEnabled", "garden.visitors.timer.enabled")
+        event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
+        event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitors.timer.sixthVisitorWarning")
+        event.move(3, "garden.visitorTimerPos", "garden.visitors.timer.pos")
     }
 }

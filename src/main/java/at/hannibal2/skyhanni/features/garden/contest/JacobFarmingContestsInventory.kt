@@ -26,7 +26,7 @@ class JacobFarmingContestsInventory {
 
     private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)
     private val formatTime = SimpleDateFormat("HH:mm", Locale.US)
-    private val config get() = SkyHanniMod.feature.inventory.jacobFarmingContest
+    private val config get() = SkyHanniMod.feature.inventory.jacobFarmingContests
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
@@ -178,10 +178,10 @@ class JacobFarmingContestsInventory {
     }
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"inventory.jacobFarmingContestHighlightRewards","inventory.jacobFarmingContest.highlightRewards")
-        event.move(3,"inventory.jacobFarmingContestHideDuplicates","inventory.jacobFarmingContest.hideDuplicates")
-        event.move(3,"inventory.jacobFarmingContestRealTime","inventory.jacobFarmingContest.realTime")
-        event.move(3,"inventory.jacobFarmingContestFinneganIcon","inventory.jacobFarmingContest.finneganIcon")
-        event.move(3,"inventory.jacobFarmingContestMedalIcon","inventory.jacobFarmingContest.medalIcon")
+        event.move(3,"inventory.jacobFarmingContestHighlightRewards","inventory.jacobFarmingContests.highlightRewards")
+        event.move(3,"inventory.jacobFarmingContestHideDuplicates","inventory.jacobFarmingContests.hideDuplicates")
+        event.move(3,"inventory.jacobFarmingContestRealTime","inventory.jacobFarmingContests.realTime")
+        event.move(3,"inventory.jacobFarmingContestFinneganIcon","inventory.jacobFarmingContests.finneganIcon")
+        event.move(3,"inventory.jacobFarmingContestMedalIcon","inventory.jacobFarmingContests.medalIcon")
     }
 }

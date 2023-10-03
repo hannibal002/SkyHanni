@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChatFilter {
-    private val config get() = SkyHanniMod.feature.chat.filterTypes
+    private val config get() = SkyHanniMod.feature.chat.filterType
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

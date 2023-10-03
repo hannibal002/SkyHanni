@@ -53,11 +53,11 @@ class BlazeSlayerClearView {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blaze.clearView && nearBlaze
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.blazeClearView", "slayer.blaze.clearView")
+        event.move(3, "slayer.blazeClearView", "slayer.blazes.clearView")
     }
 }

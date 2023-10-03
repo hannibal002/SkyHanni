@@ -19,7 +19,7 @@ class DicerRngDropCounter {
     private var display = emptyList<String>()
     private val drops = mutableMapOf<CropType, MutableMap<DropRarity, Int>>()
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = SkyHanniMod.feature.garden.dicerCounter
+    private val config get() = SkyHanniMod.feature.garden.dicerCounters
 
     init {
         initDrops()
@@ -143,8 +143,8 @@ class DicerRngDropCounter {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.dicerCounterDisplay", "garden.dicerCounter.display")
-        event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounter.hideChat")
-        event.move(3, "garden.dicerCounterPos", "garden.dicerCounter.pos")
+        event.move(3, "garden.dicerCounterDisplay", "garden.dicerCounters.display")
+        event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounters.hideChat")
+        event.move(3, "garden.dicerCounterPos", "garden.dicerCounters.pos")
     }
 }

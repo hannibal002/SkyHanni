@@ -35,7 +35,7 @@ class GardenVisitorColorNames {
         var visitorItems = mapOf<String, List<String>>()
 
         fun getColoredName(name: String): String {
-            if (!SkyHanniMod.feature.garden.visitor.coloredName) return name
+            if (!SkyHanniMod.feature.garden.visitors.coloredName) return name
 
             val cleanName = name.removeColor()
             val color = visitorColor[cleanName] ?: return name

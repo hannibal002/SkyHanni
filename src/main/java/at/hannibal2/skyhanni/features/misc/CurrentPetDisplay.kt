@@ -38,7 +38,7 @@ class CurrentPetDisplay {
             blocked = true
         }
 
-        if (blocked && SkyHanniMod.feature.misc.pet.display) {
+        if (blocked && SkyHanniMod.feature.misc.pets.display) {
             event.blockedReason = "pets"
         }
     }
@@ -66,7 +66,7 @@ class CurrentPetDisplay {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
 
-        if (!SkyHanniMod.feature.misc.pet.display) return
+        if (!SkyHanniMod.feature.misc.pets.display) return
         val config = ProfileStorageData.profileSpecific ?: return
 
         SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
@@ -74,6 +74,6 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"misc.petDisplay", "misc.pet.display")
+        event.move(3,"misc.petDisplay", "misc.pets.display")
     }
 }

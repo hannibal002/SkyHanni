@@ -129,7 +129,7 @@ public class DevConfig {
     @Expose
     @ConfigOption(name = "Minecraft Console", desc = "")
     @Accordion
-    public MinecraftConsoleConfig minecraftConsole = new MinecraftConsoleConfig();
+    public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
     public static class MinecraftConsoleConfig{
         @Expose
@@ -161,7 +161,7 @@ public class DevConfig {
         @Expose
         @ConfigOption(name = "Console Filters", desc = "")
         @Accordion
-        public ConsoleFiltersConfig consoleFilters = new ConsoleFiltersConfig();
+        public ConsoleFiltersConfig consoleFilter = new ConsoleFiltersConfig();
 
         public static class ConsoleFiltersConfig{
             @Expose

@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValue
+    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 
     @SubscribeEvent
@@ -66,6 +66,6 @@ class EstimatedWardrobePrice {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"misc.estimatedIemValueArmor", "misc.estimatedItemValue.armor")
+        event.move(3,"misc.estimatedIemValueArmor", "misc.estimatedItemValues.armor")
     }
 }

@@ -42,7 +42,7 @@ class ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
     private var fuelFactors: Map<String, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden.composter
+    private val config get() = SkyHanniMod.feature.garden.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 
@@ -514,10 +514,10 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.composterOverlay", "garden.composter.overlay")
-        event.move(3, "garden.composterOverlayPriceType", "garden.composter.overlayPriceType")
-        event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composter.overlayOrganicMatterPos")
-        event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composter.overlayFuelExtrasPos")
-        event.move(3, "garden.composterRoundDown", "garden.composter.roundDown")
+        event.move(3, "garden.composterOverlay", "garden.composters.overlay")
+        event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
+        event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
+        event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
+        event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
     }
 }

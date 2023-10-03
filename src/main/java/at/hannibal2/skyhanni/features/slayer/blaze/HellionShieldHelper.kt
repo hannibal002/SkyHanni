@@ -18,7 +18,7 @@ class HellionShieldHelper {
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blaze.hellion.coloredMobs) return
+        if (!SkyHanniMod.feature.slayer.blazes.hellion.coloredMobs) return
 
         val shield = hellionShieldMobs.getOrDefault(event.entity, null) ?: return
         event.color = shield.color.toColor().withAlpha(80)
@@ -27,7 +27,7 @@ class HellionShieldHelper {
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blaze.hellion.coloredMobs) return
+        if (!SkyHanniMod.feature.slayer.blazes.hellion.coloredMobs) return
 
         hellionShieldMobs.getOrDefault(event.entity, null) ?: return
         event.shouldReset = true
@@ -43,6 +43,6 @@ fun EntityLiving.setHellionShield(shield: HellionShield?) {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.blazeColoredMobs", "slayer.blaze.hellion.coloredMobs")
+        event.move(3, "slayer.blazeColoredMobs", "slayer.blazes.hellion.coloredMobs")
     }
 }

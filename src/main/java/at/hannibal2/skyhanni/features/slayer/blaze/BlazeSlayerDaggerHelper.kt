@@ -37,7 +37,7 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blaze.hellion.hideDaggerWarning) return
+        if (!SkyHanniMod.feature.slayer.blazes.hellion.hideDaggerWarning) return
 
         val message = event.message
         if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
@@ -68,7 +68,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[SkyHanniMod.feature.slayer.blaze.hellion.firstDagger]
+        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazes.hellion.firstDagger]
         val second = first.other()
 
         textTopLeft = format(holding, true, first)
@@ -78,7 +78,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun findNearest(): HellionShield? {
-        if (!SkyHanniMod.feature.slayer.blaze.hellion.markRightHellionShield) return null
+        if (!SkyHanniMod.feature.slayer.blazes.hellion.markRightHellionShield) return null
 
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()
@@ -194,7 +194,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blaze.hellion.daggers
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.daggers
     }
 
     @SubscribeEvent
@@ -315,10 +315,10 @@ class BlazeSlayerDaggerHelper {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.blazeDaggers", "slayer.blaze.hellion.daggers")
-        event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blaze.hellion.markRightHellionShield")
-        event.move(3,"slayer.blazeFirstDagger", "slayer.blaze.hellion.firstDagger")
-        event.move(3,"slayer.blazeHideDaggerWarning", "slayer.blaze.hellion.hideDaggerWarning")
+        event.move(3, "slayer.blazeDaggers", "slayer.blazes.hellion.daggers")
+        event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
+        event.move(3,"slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
+        event.move(3,"slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
     }
 
 }

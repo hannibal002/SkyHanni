@@ -106,7 +106,7 @@ class JacobContestFFNeededDisplay {
 
     private fun formatFarmingFortune(farmingFortune: Double): String {
         var ff = farmingFortune
-        if (!config.farmingFortune.dropMultiplier) {
+        if (!config.farmingFortunes.dropMultiplier) {
             ff -= 100
             if (ff < 100) {
                 ff = 0.0

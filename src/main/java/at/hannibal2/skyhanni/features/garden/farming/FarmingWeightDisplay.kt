@@ -83,18 +83,18 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
-        event.move(3, "garden.eliteFarmingWeightDisplay","garden.eliteFarmingWeight.display")
-        event.move(3, "garden.eliteFarmingWeightPos","garden.eliteFarmingWeight.pos")
-        event.move(3, "garden.eliteFarmingWeightLeaderboard","garden.eliteFarmingWeight.leaderboard")
-        event.move(3, "garden.eliteFarmingWeightOvertakeETA","garden.eliteFarmingWeight.overtakeETA")
-        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage","garden.eliteFarmingWeight.offScreenDropMessage")
-        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways","garden.eliteFarmingWeight.overtakeETAAlways")
-        event.move(3, "garden.eliteFarmingWeightETAGoalRank","garden.eliteFarmingWeight.ETAGoalRank")
-        event.move(3, "garden.eliteFarmingWeightIgnoreLow","garden.eliteFarmingWeight.ignoreLow")
+        event.move(3, "garden.eliteFarmingWeightDisplay","garden.eliteFarmingWeights.display")
+        event.move(3, "garden.eliteFarmingWeightPos","garden.eliteFarmingWeights.pos")
+        event.move(3, "garden.eliteFarmingWeightLeaderboard","garden.eliteFarmingWeights.leaderboard")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETA","garden.eliteFarmingWeights.overtakeETA")
+        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage","garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways","garden.eliteFarmingWeights.overtakeETAAlways")
+        event.move(3, "garden.eliteFarmingWeightETAGoalRank","garden.eliteFarmingWeights.ETAGoalRank")
+        event.move(3, "garden.eliteFarmingWeightIgnoreLow","garden.eliteFarmingWeights.ignoreLow")
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeight
+        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
 
         private var display = emptyList<String>()

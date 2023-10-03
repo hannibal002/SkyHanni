@@ -48,7 +48,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Visitor", desc = "")
     @Accordion
-    public VisitorConfig visitor = new VisitorConfig();
+    public VisitorConfig visitors = new VisitorConfig();
     public static class VisitorConfig{
         @Expose
         @ConfigOption(name = "Visitor Timer", desc = "")
@@ -313,7 +313,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
     @Accordion
-    public NumbersConfig numbers = new NumbersConfig();
+    public NumbersConfig number = new NumbersConfig();
     public static class NumbersConfig{
         @Expose
         @ConfigOption(name = "Crop Milestone", desc = "Show the number of crop milestones in the inventory.")
@@ -601,7 +601,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Optimal Speed", desc = "")
     @Accordion
-    public OptimalSpeedConfig optimalSpeed = new OptimalSpeedConfig();
+    public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
     public static class OptimalSpeedConfig{
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n" +
@@ -709,7 +709,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
-    public GardenLevelConfig gardenLevel = new GardenLevelConfig();
+    public GardenLevelConfig gardenLevels = new GardenLevelConfig();
     public static class GardenLevelConfig{
         @Expose
         @ConfigOption(name = "Display", desc = "Show the current Garden level and progress to the next level.")
@@ -724,7 +724,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Farming Weight", desc = "")
     @Accordion
-    public EliteFarmingWeightConfig eliteFarmingWeight = new EliteFarmingWeightConfig();
+    public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
 
     public static class EliteFarmingWeightConfig{
         @Expose
@@ -774,7 +774,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @Accordion
-    public DicerCounterConfig dicerCounter = new DicerCounterConfig();
+    public DicerCounterConfig dicerCounters = new DicerCounterConfig();
     public static class DicerCounterConfig{
         @Expose
         @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
@@ -795,7 +795,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
     @Accordion
-    public MoneyPerHourConfig moneyPerHour = new MoneyPerHourConfig();
+    public MoneyPerHourConfig moneyPerHours = new MoneyPerHourConfig();
     public static class MoneyPerHourConfig{
         @Expose
         @ConfigOption(name = "Show Money per Hour",
@@ -912,7 +912,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Next Jacob's Contest", desc = "")
     @Accordion
-    public NextJacobContestConfig nextJacobContest = new NextJacobContestConfig();
+    public NextJacobContestConfig nextJacobContests = new NextJacobContestConfig();
     public static class NextJacobContestConfig{
         @Expose
         @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
@@ -967,7 +967,7 @@ public class GardenConfig {
     @ConfigOption(name = "Farming Armor Drops", desc = "")
 
     @Accordion
-    public FarmingArmorDropsConfig farmingArmorDrops = new FarmingArmorDropsConfig();
+    public FarmingArmorDropsConfig farmingArmorDrop = new FarmingArmorDropsConfig();
     public static class FarmingArmorDropsConfig{
         @Expose
         @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
@@ -1015,7 +1015,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Composter", desc = "")
     @Accordion
-    public ComposterConfig composter = new ComposterConfig();
+    public ComposterConfig composters = new ComposterConfig();
     public static class ComposterConfig{
         @Expose
         @ConfigOption(
@@ -1143,7 +1143,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
     @Accordion
-    public FarmingFortuneConfig farmingFortune = new FarmingFortuneConfig();
+    public FarmingFortuneConfig farmingFortunes = new FarmingFortuneConfig();
     public static class FarmingFortuneConfig{
         @Expose
         @ConfigOption(
@@ -1174,7 +1174,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")
     @Accordion
-    public TooltipTweaksConfig tooltipTweaks = new TooltipTweaksConfig();
+    public TooltipTweaksConfig tooltipTweak = new TooltipTweaksConfig();
     public static class TooltipTweaksConfig{
         @Expose
         @ConfigOption(

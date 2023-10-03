@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatModifier {
 
-    private val config get() = SkyHanniMod.feature.chat.playerMessages
+    private val config get() = SkyHanniMod.feature.chat.playerMessage
     private val patterns = mutableListOf<Regex>()
 
     init {
@@ -89,8 +89,8 @@ class PlayerChatModifier {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "chat.playerRankHider", "chat.playerMessages.playerRankHider")
-        event.move(3, "chat.chatFilter", "chat.playerMessages.chatFilter")
+        event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
+        event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")
     }
 
 

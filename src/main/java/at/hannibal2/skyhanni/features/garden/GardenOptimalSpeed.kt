@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
-    private val config get() = SkyHanniMod.feature.garden.optimalSpeed
+    private val config get() = SkyHanniMod.feature.garden.optimalSpeeds
     private val configCustomSpeed get() = config.customSpeed
     private var currentSpeed = 100
     private var optimalSpeed = -1
@@ -113,20 +113,20 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.optimalSpeedEnabled", "garden.optimalSpeed.enabled")
-        event.move(3,"garden.optimalSpeedWarning", "garden.optimalSpeed.warning")
-        event.move(3,"garden.optimalSpeedSignEnabled", "garden.optimalSpeed.signEnabled")
-        event.move(3,"garden.optimalSpeedSignPosition", "garden.optimalSpeed.signPosition")
-        event.move(3,"garden.optimalSpeedPos", "garden.optimalSpeed.pos")
-        event.move(3,"garden.optimalSpeedCustom.wheat", "garden.optimalSpeed.customSpeed.wheat")
-        event.move(3,"garden.optimalSpeedCustom.carrot", "garden.optimalSpeed.customSpeed.carrot")
-        event.move(3,"garden.optimalSpeedCustom.potato", "garden.optimalSpeed.customSpeed.potato")
-        event.move(3,"garden.optimalSpeedCustom.netherWart", "garden.optimalSpeed.customSpeed.netherWart")
-        event.move(3,"garden.optimalSpeedCustom.pumpkin", "garden.optimalSpeed.customSpeed.pumpkin")
-        event.move(3,"garden.optimalSpeedCustom.melon", "garden.optimalSpeed.customSpeed.melon")
-        event.move(3,"garden.optimalSpeedCustom.cocoaBeans", "garden.optimalSpeed.customSpeed.cocoaBeans")
-        event.move(3,"garden.optimalSpeedCustom.sugarCane", "garden.optimalSpeed.customSpeed.sugarCane")
-        event.move(3,"garden.optimalSpeedCustom.cactus", "garden.optimalSpeed.customSpeed.cactus")
-        event.move(3,"garden.optimalSpeedCustom.mushroom", "garden.optimalSpeed.customSpeed.mushroom")
+        event.move(3,"garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
+        event.move(3,"garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")
+        event.move(3,"garden.optimalSpeedSignEnabled", "garden.optimalSpeeds.signEnabled")
+        event.move(3,"garden.optimalSpeedSignPosition", "garden.optimalSpeeds.signPosition")
+        event.move(3,"garden.optimalSpeedPos", "garden.optimalSpeeds.pos")
+        event.move(3,"garden.optimalSpeedCustom.wheat", "garden.optimalSpeeds.customSpeed.wheat")
+        event.move(3,"garden.optimalSpeedCustom.carrot", "garden.optimalSpeeds.customSpeed.carrot")
+        event.move(3,"garden.optimalSpeedCustom.potato", "garden.optimalSpeeds.customSpeed.potato")
+        event.move(3,"garden.optimalSpeedCustom.netherWart", "garden.optimalSpeeds.customSpeed.netherWart")
+        event.move(3,"garden.optimalSpeedCustom.pumpkin", "garden.optimalSpeeds.customSpeed.pumpkin")
+        event.move(3,"garden.optimalSpeedCustom.melon", "garden.optimalSpeeds.customSpeed.melon")
+        event.move(3,"garden.optimalSpeedCustom.cocoaBeans", "garden.optimalSpeeds.customSpeed.cocoaBeans")
+        event.move(3,"garden.optimalSpeedCustom.sugarCane", "garden.optimalSpeeds.customSpeed.sugarCane")
+        event.move(3,"garden.optimalSpeedCustom.cactus", "garden.optimalSpeeds.customSpeed.cactus")
+        event.move(3,"garden.optimalSpeedCustom.mushroom", "garden.optimalSpeeds.customSpeed.mushroom")
     }
 }

@@ -15,7 +15,7 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
-    public FilterTypesConfig filterTypes = new FilterTypesConfig();
+    public FilterTypesConfig filterType = new FilterTypesConfig();
 
     public static class FilterTypesConfig{
         @Expose
@@ -96,7 +96,7 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
     @Accordion
-    public PlayerMessagesConfig playerMessages = new PlayerMessagesConfig();
+    public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
     public static class PlayerMessagesConfig{
         @Expose

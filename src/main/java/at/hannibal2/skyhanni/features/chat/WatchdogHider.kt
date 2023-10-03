@@ -16,7 +16,7 @@ class WatchdogHider {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterTypes.watchDog) return
+        if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
         when (event.message) {
             watchdogStartLine -> {

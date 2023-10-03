@@ -50,7 +50,7 @@ object CropMoneyDisplay {
     }
 
     private var display = emptyList<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden.moneyPerHour
+    private val config get() = SkyHanniMod.feature.garden.moneyPerHours
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
@@ -421,20 +421,20 @@ object CropMoneyDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.moneyPerHourDisplay", "garden.moneyPerHour.display")
-        event.move(3, "garden.moneyPerHourShowOnlyBest", "garden.moneyPerHour.showOnlyBest")
-        event.move(3, "garden.moneyPerHourShowCurrent", "garden.moneyPerHour.showCurrent")
-        event.move(3, "garden.moneyPerHourAlwaysOn", "garden.moneyPerHour.alwaysOn")
-        event.move(3, "garden.moneyPerHourCompact", "garden.moneyPerHour.compact")
-        event.move(3, "garden.moneyPerHourCompactPrice", "garden.moneyPerHour.compactPrice")
-        event.move(3, "garden.moneyPerHourUseCustomFormat", "garden.moneyPerHour.useCustomFormat")
-        event.move(3, "garden.moneyPerHourCustomFormat", "garden.moneyPerHour.customFormat")
-        event.move(3, "garden.moneyPerHourMergeSeeds", "garden.moneyPerHour.mergeSeeds")
-        event.move(3, "garden.moneyPerHourBountiful", "garden.moneyPerHour.bountiful")
-        event.move(3, "garden.moneyPerHourMooshroom", "garden.moneyPerHour.mooshroom")
-        event.move(3, "garden.moneyPerHourArmor", "garden.moneyPerHour.armor")
-        event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHour.dicer")
-        event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHour.hideTitle")
-        event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHour.pos")
+        event.move(3, "garden.moneyPerHourDisplay", "garden.moneyPerHours.display")
+        event.move(3, "garden.moneyPerHourShowOnlyBest", "garden.moneyPerHours.showOnlyBest")
+        event.move(3, "garden.moneyPerHourShowCurrent", "garden.moneyPerHours.showCurrent")
+        event.move(3, "garden.moneyPerHourAlwaysOn", "garden.moneyPerHours.alwaysOn")
+        event.move(3, "garden.moneyPerHourCompact", "garden.moneyPerHours.compact")
+        event.move(3, "garden.moneyPerHourCompactPrice", "garden.moneyPerHours.compactPrice")
+        event.move(3, "garden.moneyPerHourUseCustomFormat", "garden.moneyPerHours.useCustomFormat")
+        event.move(3, "garden.moneyPerHourCustomFormat", "garden.moneyPerHours.customFormat")
+        event.move(3, "garden.moneyPerHourMergeSeeds", "garden.moneyPerHours.mergeSeeds")
+        event.move(3, "garden.moneyPerHourBountiful", "garden.moneyPerHours.bountiful")
+        event.move(3, "garden.moneyPerHourMooshroom", "garden.moneyPerHours.mooshroom")
+        event.move(3, "garden.moneyPerHourArmor", "garden.moneyPerHours.armor")
+        event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
+        event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
+        event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
     }
 }

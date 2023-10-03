@@ -18,7 +18,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
-    private val config get() = SkyHanniMod.feature.garden.gardenLevel
+    private val config get() = SkyHanniMod.feature.garden.gardenLevels
     private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
@@ -114,7 +114,7 @@ class GardenLevelDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevel.display")
-        event.move(3, "garden.gardenLevelPos", "garden.gardenLevel.pos")
+        event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevels.display")
+        event.move(3, "garden.gardenLevelPos", "garden.gardenLevels.pos")
     }
 }

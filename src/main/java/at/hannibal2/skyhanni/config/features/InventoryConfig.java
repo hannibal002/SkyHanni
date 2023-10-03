@@ -115,7 +115,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Jacob Farming Contest", desc = "")
     @Accordion
-    public JacobFarmingContestConfig jacobFarmingContest = new JacobFarmingContestConfig();
+    public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
     public static class JacobFarmingContestConfig{
         @Expose
         @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the Jacob inventory.")

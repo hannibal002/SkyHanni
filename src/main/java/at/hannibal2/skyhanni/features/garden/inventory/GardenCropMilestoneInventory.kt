@@ -23,7 +23,7 @@ class GardenCropMilestoneInventory {
 
     @SubscribeEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
-        if (!config.numbers.averageCropMilestone) return
+        if (!config.number.averageCropMilestone) return
 
         val tiers = mutableListOf<Double>()
         for (cropType in CropType.entries) {
@@ -54,7 +54,7 @@ class GardenCropMilestoneInventory {
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.tooltipTweaks.cropMilestoneTotalProgress) return
+        if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 
         val itemStack = event.itemStack ?: return
         val crop = GardenCropMilestones.getCropTypeByLore(itemStack) ?: return
@@ -78,7 +78,7 @@ class GardenCropMilestoneInventory {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.numberAverageCropMilestone", "garden.numbers.averageCropMilestone")
-        event.move(3, "garden.cropMilestoneTotalProgress", "garden.tooltipTweaks.cropMilestoneTotalProgress")
+        event.move(3,"garden.numberAverageCropMilestone", "garden.number.averageCropMilestone")
+        event.move(3, "garden.cropMilestoneTotalProgress", "garden.tooltipTweak.cropMilestoneTotalProgress")
     }
 }

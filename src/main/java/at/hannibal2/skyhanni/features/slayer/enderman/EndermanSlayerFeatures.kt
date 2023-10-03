@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class EndermanSlayerFeatures {
-    private val config get() = SkyHanniMod.feature.slayer.enderman
+    private val config get() = SkyHanniMod.feature.slayer.endermen
     private val beaconConfig get() = config.endermanBeaconConfig
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private var flyingBeacons = listOf<EntityArmorStand>()
@@ -218,12 +218,12 @@ class EndermanSlayerFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.enderman.endermanBeaconConfig.highlightBeacon")
-        event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.enderman.endermanBeaconConfig.beaconColor")
-        event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.enderman.endermanBeaconConfig.showWarning")
-        event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.enderman.endermanBeaconConfig.showLine")
-        event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.enderman.endermanBeaconConfig.lineColor")
-        event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.enderman.endermanBeaconConfig.lineWidth")
-        event.move(3, "slayer.endermanHighlightNukekebi", "slayer.enderman.highlightNukekebi")
+        event.move(3, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.endermen.endermanBeaconConfig.highlightBeacon")
+        event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.endermen.endermanBeaconConfig.beaconColor")
+        event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.endermen.endermanBeaconConfig.showWarning")
+        event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.endermen.endermanBeaconConfig.showLine")
+        event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
+        event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
+        event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
     }
 }

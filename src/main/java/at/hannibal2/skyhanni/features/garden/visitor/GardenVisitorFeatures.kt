@@ -73,7 +73,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-private val config get() = SkyHanniMod.feature.garden.visitor
+private val config get() = SkyHanniMod.feature.garden.visitors
 
 class GardenVisitorFeatures {
     private var visitors = mapOf<String, Visitor>()
@@ -828,28 +828,28 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.visitorNeedsDisplay", "garden.visitor.needs.display")
-        event.move(3, "garden.visitorNeedsPos", "garden.visitor.needs.pos")
-        event.move(3, "garden.visitorNeedsOnlyWhenClose", "garden.visitor.needs.onlyWhenClose")
-        event.move(3, "garden.visitorNeedsInBazaarAlley", "garden.visitor.needs.inBazaarAlley")
-        event.move(3,"garden.visitorNeedsShowPrice", "garden.visitor.needs.showPrice")
-        event.move(3,"garden.visitorItemPreview", "garden.visitor.needs.itemPreview")
-        event.move(3, "garden.visitorShowPrice", "garden.visitor.inventory.showPrice")
-        event.move(3, "garden.visitorExactAmountAndTime", "garden.visitor.inventory.exactAmountAndTime")
-        event.move(3, "garden.visitorCopperPrice", "garden.visitor.inventory.copperPrice")
-        event.move(3, "garden.visitorCopperTime", "garden.visitor.inventory.copperTime")
-        event.move(3, "garden.visitorExperiencePrice", "garden.visitor.inventory.experiencePrice")
-        event.move(3,"garden.visitorRewardWarning.notifyInChat","garden.visitor.rewardWarning.notifyInChat")
-        event.move(3,"garden.visitorRewardWarning.showOverName","garden.visitor.rewardWarning.showOverName")
-        event.move(3,"garden.visitorRewardWarning.preventRefusing","garden.visitor.rewardWarning.preventRefusing")
-        event.move(3,"garden.visitorRewardWarning.bypassKey","garden.visitor.rewardWarning.bypassKey")
-        event.move(3,"garden.visitorRewardWarning.drops","garden.visitor.rewardWarning.drops")
-        event.move(3, "garden.visitorNotificationChat", "garden.visitor.notificationChat")
-        event.move(3, "garden.visitorNotificationTitle", "garden.visitor.notificationTitle")
-        event.move(3, "garden.visitorHighlightStatus", "garden.visitor.highlightStatus")
-        event.move(3, "garden.visitorColoredName", "garden.visitor.coloredName")
-        event.move(3,"garden.visitorHypixelArrivedMessage","garden.visitor.hypixelArrivedMessage")
-        event.move(3, "garden.visitorHideChat", "garden.visitor.hideChat")
+        event.move(3, "garden.visitorNeedsDisplay", "garden.visitors.needs.display")
+        event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")
+        event.move(3, "garden.visitorNeedsOnlyWhenClose", "garden.visitors.needs.onlyWhenClose")
+        event.move(3, "garden.visitorNeedsInBazaarAlley", "garden.visitors.needs.inBazaarAlley")
+        event.move(3,"garden.visitorNeedsShowPrice", "garden.visitors.needs.showPrice")
+        event.move(3,"garden.visitorItemPreview", "garden.visitors.needs.itemPreview")
+        event.move(3, "garden.visitorShowPrice", "garden.visitors.inventory.showPrice")
+        event.move(3, "garden.visitorExactAmountAndTime", "garden.visitors.inventory.exactAmountAndTime")
+        event.move(3, "garden.visitorCopperPrice", "garden.visitors.inventory.copperPrice")
+        event.move(3, "garden.visitorCopperTime", "garden.visitors.inventory.copperTime")
+        event.move(3, "garden.visitorExperiencePrice", "garden.visitors.inventory.experiencePrice")
+        event.move(3,"garden.visitorRewardWarning.notifyInChat","garden.visitors.rewardWarning.notifyInChat")
+        event.move(3,"garden.visitorRewardWarning.showOverName","garden.visitors.rewardWarning.showOverName")
+        event.move(3,"garden.visitorRewardWarning.preventRefusing","garden.visitors.rewardWarning.preventRefusing")
+        event.move(3,"garden.visitorRewardWarning.bypassKey","garden.visitors.rewardWarning.bypassKey")
+        event.move(3,"garden.visitorRewardWarning.drops","garden.visitors.rewardWarning.drops")
+        event.move(3, "garden.visitorNotificationChat", "garden.visitors.notificationChat")
+        event.move(3, "garden.visitorNotificationTitle", "garden.visitors.notificationTitle")
+        event.move(3, "garden.visitorHighlightStatus", "garden.visitors.highlightStatus")
+        event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
+        event.move(3,"garden.visitorHypixelArrivedMessage","garden.visitors.hypixelArrivedMessage")
+        event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
     }
 
 }

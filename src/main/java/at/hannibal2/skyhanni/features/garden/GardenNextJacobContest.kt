@@ -496,21 +496,21 @@ object GardenNextJacobContest {
         null
     }
 
-    private val config get() = SkyHanniMod.feature.garden.nextJacobContest
+    private val config get() = SkyHanniMod.feature.garden.nextJacobContests
     private val nextContestCrops = mutableListOf<CropType>()
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContest.display")
-        event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContest.everywhere")
-        event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContest.otherGuis")
-        event.move(3, "garden.nextJacobContestsFetchAutomatically", "garden.nextJacobContest.fetchAutomatically")
-        event.move(3, "garden.nextJacobContestsShareAutomatically", "garden.nextJacobContest.shareAutomatically")
-        event.move(3, "garden.nextJacobContestWarn", "garden.nextJacobContest.warn")
-        event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContest.warnTime")
-        event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContest.warnPopup")
-        event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContest.pos")
+        event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
+        event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")
+        event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContests.otherGuis")
+        event.move(3, "garden.nextJacobContestsFetchAutomatically", "garden.nextJacobContests.fetchAutomatically")
+        event.move(3, "garden.nextJacobContestsShareAutomatically", "garden.nextJacobContests.shareAutomatically")
+        event.move(3, "garden.nextJacobContestWarn", "garden.nextJacobContests.warn")
+        event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContests.warnTime")
+        event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
+        event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
     }
 }

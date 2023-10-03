@@ -46,10 +46,10 @@ class EndermanSlayerHideParticles {
 
     private fun LorenzVec.distanceToNearestEnderman() = endermanLocations.minOfOrNull { it.distanceSq(this) }
 
-    fun isEnabled() = IslandType.THE_END.isInIsland() && SkyHanniMod.feature.slayer.enderman.hideParticles
+    fun isEnabled() = IslandType.THE_END.isInIsland() && SkyHanniMod.feature.slayer.endermen.hideParticles
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"slayer.endermanHideParticles", "slayer.enderman.hideParticles")
+        event.move(3,"slayer.endermanHideParticles", "slayer.endermen.hideParticles")
     }
 }

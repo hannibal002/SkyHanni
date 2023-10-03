@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class ComposterDisplay {
-    private val config get() = SkyHanniMod.feature.garden.composter
+    private val config get() = SkyHanniMod.feature.garden.composters
     private val hidden get() = GardenAPI.config
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
@@ -209,15 +209,15 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.composterDisplayEnabled", "garden.composter.displayEnabled")
-        event.move(3, "garden.composterDisplayOutsideGarden", "garden.composter.displayOutsideGarden")
-        event.move(3, "garden.composterWarnAlmostClose", "garden.composter.warnAlmostClose")
-        event.move(3, "garden.composterDisplayPos", "garden.composter.displayPos")
-        event.move(3, "garden.composterOutsideGardenPos", "garden.composter.outsideGardenPos")
-        event.move(3, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
-        event.move(3, "garden.composterNotifyLowEnabled", "garden.composter.notifyLow.enabled")
-        event.move(3, "garden.composterNotifyLowTitle", "garden.composter.notifyLow.title")
-        event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composter.notifyLow.organicMatter")
-        event.move(3, "garden.composterNotifyLowFuel", "garden.composter.notifyLow.fuel")
+        event.move(3, "garden.composterDisplayEnabled", "garden.composters.displayEnabled")
+        event.move(3, "garden.composterDisplayOutsideGarden", "garden.composters.displayOutsideGarden")
+        event.move(3, "garden.composterWarnAlmostClose", "garden.composters.warnAlmostClose")
+        event.move(3, "garden.composterDisplayPos", "garden.composters.displayPos")
+        event.move(3, "garden.composterOutsideGardenPos", "garden.composters.outsideGardenPos")
+        event.move(3, "garden.composterNotifyLowEnabled", "garden.composters.notifyLow.enabled")
+        event.move(3, "garden.composterNotifyLowEnabled", "garden.composters.notifyLow.enabled")
+        event.move(3, "garden.composterNotifyLowTitle", "garden.composters.notifyLow.title")
+        event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composters.notifyLow.organicMatter")
+        event.move(3, "garden.composterNotifyLowFuel", "garden.composters.notifyLow.fuel")
     }
 }

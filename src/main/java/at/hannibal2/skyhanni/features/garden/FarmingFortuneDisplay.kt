@@ -142,7 +142,7 @@ class FarmingFortuneDisplay {
 
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.farmingFortune
+        private val config get() = SkyHanniMod.feature.garden.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestTrueFarmingFortune
 
         private val currentCrop get() = GardenAPI.getCurrentlyFarmedCrop()
@@ -285,8 +285,8 @@ class FarmingFortuneDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortune.display")
-        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortune.dropMultiplier")
-        event.move(3,"garden.farmingFortunePos", "garden.farmingFortune.pos")
+        event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
+        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
+        event.move(3,"garden.farmingFortunePos", "garden.farmingFortunes.pos")
     }
 }

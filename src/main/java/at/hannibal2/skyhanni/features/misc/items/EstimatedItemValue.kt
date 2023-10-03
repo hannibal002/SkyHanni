@@ -73,7 +73,7 @@ import java.util.Locale
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValue
+    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -790,11 +790,11 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValue.enabled")
-        event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValue.hotkey")
-        event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValue.alwaysEnabled")
-        event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValue.enchantmentsCap")
-        event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValue.exactPrice")
-        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValue.itemPriceDataPos")
+        event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
+        event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")
+        event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")
+        event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
+        event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
+        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
     }
 }

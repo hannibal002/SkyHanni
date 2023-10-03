@@ -16,7 +16,7 @@ public class SlayerConfig {
     @Expose
     @ConfigOption(name = "Enderman Slayer Features", desc = "")
     @Accordion
-    public EndermanConfig enderman =  new EndermanConfig();
+    public EndermanConfig endermen =  new EndermanConfig();
     public static class EndermanConfig{
         @Expose
         @ConfigOption(name = "Yang Glyph (beacon)", desc = "")
@@ -83,7 +83,7 @@ public class SlayerConfig {
     @Expose
     @ConfigOption(name = "Blaze", desc = "")
     @Accordion
-    public BlazeConfig blaze = new BlazeConfig();
+    public BlazeConfig blazes = new BlazeConfig();
     public static class BlazeConfig{
         @Expose
         @ConfigOption(name = "Hellion Shields", desc = "")

@@ -15,8 +15,8 @@ import org.apache.logging.log4j.message.Message
 
 class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
-    private val config get() = SkyHanniMod.feature.dev.minecraftConsole
-    private val filterConfig get() = config.consoleFilters
+    private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
+    private val filterConfig get() = config.consoleFilter
 
     private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
     private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
@@ -238,18 +238,18 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     }
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3,"dev.printUnfilteredDebugs", "dev.minecraftConsole.printUnfilteredDebugs")
-        event.move(3,"dev.logUnfilteredFile", "dev.minecraftConsole.logUnfilteredFile")
-        event.move(3,"dev.printUnfilteredDebugsOutsideSkyBlock", "dev.minecraftConsole.printUnfilteredDebugsOutsideSkyBlock")
-        event.move(3,"dev.printFilteredReason", "dev.minecraftConsole.printFilteredReason")
-        event.move(3,"dev.filterChat", "dev.minecraftConsole.consoleFilters.filterChat")
-        event.move(3,"dev.filterGrowBuffer", "dev.minecraftConsole.consoleFilters.filterGrowBuffer")
-        event.move(3,"dev.filterUnknownSound", "dev.minecraftConsole.consoleFilters.filterUnknownSound")
-        event.move(3,"dev.filterParticleVillagerHappy", "dev.minecraftConsole.consoleFilters.filterParticleVillagerHappy")
-        event.move(3,"dev.filterAmsHelperTransformer", "dev.minecraftConsole.consoleFilters.filterAmsHelperTransformer")
-        event.move(3,"dev.filterAsmHelperApplying", "dev.minecraftConsole.consoleFilters.filterAsmHelperApplying")
-        event.move(3,"dev.filterBiomeIdBounds", "dev.minecraftConsole.consoleFilters.filterBiomeIdBounds")
-        event.move(3,"dev.filterScoreboardErrors", "dev.minecraftConsole.consoleFilters.filterScoreboardErrors")
-        event.move(3,"dev.filterOptiFine", "dev.minecraftConsole.consoleFilters.filterOptiFine")
+        event.move(3,"dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
+        event.move(3,"dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")
+        event.move(3,"dev.printUnfilteredDebugsOutsideSkyBlock", "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock")
+        event.move(3,"dev.printFilteredReason", "dev.minecraftConsoles.printFilteredReason")
+        event.move(3,"dev.filterChat", "dev.minecraftConsoles.consoleFilter.filterChat")
+        event.move(3,"dev.filterGrowBuffer", "dev.minecraftConsoles.consoleFilter.filterGrowBuffer")
+        event.move(3,"dev.filterUnknownSound", "dev.minecraftConsoles.consoleFilter.filterUnknownSound")
+        event.move(3,"dev.filterParticleVillagerHappy", "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy")
+        event.move(3,"dev.filterAmsHelperTransformer", "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer")
+        event.move(3,"dev.filterAsmHelperApplying", "dev.minecraftConsoles.consoleFilter.filterAsmHelperApplying")
+        event.move(3,"dev.filterBiomeIdBounds", "dev.minecraftConsoles.consoleFilter.filterBiomeIdBounds")
+        event.move(3,"dev.filterScoreboardErrors", "dev.minecraftConsoles.consoleFilter.filterScoreboardErrors")
+        event.move(3,"dev.filterOptiFine", "dev.minecraftConsoles.consoleFilter.filterOptiFine")
     }
 }

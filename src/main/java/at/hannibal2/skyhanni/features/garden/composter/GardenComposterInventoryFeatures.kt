@@ -19,7 +19,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenComposterInventoryFeatures {
-    private val config get() = SkyHanniMod.feature.garden.composter
+    private val config get() = SkyHanniMod.feature.garden.composters
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
@@ -99,7 +99,7 @@ class GardenComposterInventoryFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "garden.composterUpgradePrice", "garden.composter.upgradePrice")
-        event.move(3, "garden.composterHighLightUpgrade", "garden.composter.highlightUpgrade")
+        event.move(3, "garden.composterUpgradePrice", "garden.composters.upgradePrice")
+        event.move(3, "garden.composterHighLightUpgrade", "garden.composters.highlightUpgrade")
     }
 }

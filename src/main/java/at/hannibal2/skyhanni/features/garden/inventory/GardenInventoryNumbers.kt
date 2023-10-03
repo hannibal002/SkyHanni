@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenInventoryNumbers {
-    private val config get() = SkyHanniMod.feature.garden.numbers
+    private val config get() = SkyHanniMod.feature.garden.number
 
     private var patternTierProgress = "§7Progress to Tier (?<tier>.*): §e(?:.*)".toPattern()
     private var patternUpgradeTier = "§7Current Tier: §[ea](?<tier>.*)§7/§a.*".toPattern()
@@ -56,9 +56,9 @@ class GardenInventoryNumbers {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.numberCropMilestone", "garden.numbers.cropMilestone")
-        event.move(3,"garden.numberCropUpgrades", "garden.numbers.cropUpgrades")
-        event.move(3,"garden.numberComposterUpgrades", "garden.numbers.composterUpgrades")
+        event.move(3,"garden.numberCropMilestone", "garden.number.cropMilestone")
+        event.move(3,"garden.numberCropUpgrades", "garden.number.cropUpgrades")
+        event.move(3,"garden.numberComposterUpgrades", "garden.number.composterUpgrades")
     }
 
 }
