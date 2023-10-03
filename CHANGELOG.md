@@ -1,5 +1,21 @@
 # SkyHanni - Change Log
 
+## Version 0.21 (unreleased)
+
+### New Features
+
+### Events
+
++ Highlight Jerries during the Jerrypoclaypse. - Erymanthus
+
+### Changes
+
+### Bug Fixes
+
+#### Config
+
++ Fixed two typos in the config description. - Absterge
+
 ## Version 0.20
 
 ### New Features
