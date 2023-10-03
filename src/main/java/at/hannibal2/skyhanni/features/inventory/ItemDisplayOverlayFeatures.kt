@@ -326,8 +326,8 @@ class ItemDisplayOverlayFeatures {
                 //§aCompactor Currently ON!
                 if (itemName.startsWith("Compactor Currently ")) {
                     return when (itemName) {
-                        itemName.endsWith("OFF!") -> "§c§l✖"
-                        itemName.endsWith("ON!") -> "§a✔"
+                        "Compactor Currently OFF!" -> "§c§l✖"
+                        "Compactor Currently ON!" -> "§a✔"
                         else -> ""
                     }
                 }
