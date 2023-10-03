@@ -305,8 +305,22 @@ class ItemDisplayOverlayFeatures {
                 return percent.toInt().toString()
             }
         }
+
+        if (stackSizeConfig.contains(22) && item.getInternalName_old().endsWith("_ENCHANTED_CHEST") && itemName.endsWith(" Storage")) {
+            var colorCode = item.name ?: return ""
+            colorCode = colorCode.take(2)
+            val numSlots = when (itemName) {
+                ("Small Storage") -> "3"
+                ("Medium Storage") -> "9"
+                ("Large Storage") -> "15"
+                ("X-Large Storage") -> "21"
+                ("XX-Large Storage") -> "27"
+                else -> ""
+            }
+            return "" + colorCode + numSlots
+        }
 		
-		if (stackSizeConfig.contains(22)) {
+		if (stackSizeConfig.contains(23)) {
             var thatNumber = ""
             if (item.getLore().any { it.contains("Auction ") }) {
                 thatNumber = item.getAuctionNumber().toString()
