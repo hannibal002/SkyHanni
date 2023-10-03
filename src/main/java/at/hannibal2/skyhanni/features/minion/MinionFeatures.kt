@@ -342,10 +342,10 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "minions.lastClickedMinionDisplay", "minions.lastClickedMinion.display")
-        event.move(3, "minions.lastOpenedMinionColor", "minions.lastClickedMinion.color")
-        event.move(3, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
-        event.move(3, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
-        event.move(3, "minions.distance", "minions.emptiedTime.distance")
+        event.move(4, "minions.lastClickedMinionDisplay", "minions.lastClickedMinion.display")
+        event.move(4, "minions.lastOpenedMinionColor", "minions.lastClickedMinion.color")
+        event.move(4, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
+        event.move(4, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
+        event.move(4, "minions.distance", "minions.emptiedTime.distance")
     }
 }

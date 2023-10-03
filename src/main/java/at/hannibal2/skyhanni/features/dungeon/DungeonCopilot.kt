@@ -138,8 +138,8 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
-        event.move(3,"dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
-        event.move(3,"dungeon.copilotPos", "dungeon.dungeonCopilot.pos")
+        event.move(4, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
+        event.move(4,"dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
+        event.move(4,"dungeon.copilotPos", "dungeon.dungeonCopilot.pos")
     }
 }

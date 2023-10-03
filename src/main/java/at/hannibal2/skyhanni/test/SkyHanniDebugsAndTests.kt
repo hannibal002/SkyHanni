@@ -536,12 +536,12 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dev.debugEnabled", "dev.debug.enabled")
-        event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
-        event.move(3, "dev.showEmptyNames", "dev.debug.showEmptyNames")
-        event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
-        event.move(3,"dev.copyInternalName", "dev.debug.copyInternalName")
-        event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+        event.move(4, "dev.debugEnabled", "dev.debug.enabled")
+        event.move(4, "dev.showInternalName", "dev.debug.showInternalName")
+        event.move(4, "dev.showEmptyNames", "dev.debug.showEmptyNames")
+        event.move(4, "dev.showItemRarity", "dev.debug.showItemRarity")
+        event.move(4,"dev.copyInternalName", "dev.debug.copyInternalName")
+        event.move(4, "dev.showNpcPrice", "dev.debug.showNpcPrice")
 
     }
 }

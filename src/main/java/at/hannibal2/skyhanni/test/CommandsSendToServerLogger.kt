@@ -15,6 +15,6 @@ class CommandsSendToServerLogger {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dev.commandLogs", "dev.debug.commandLogs")
+        event.move(4, "dev.commandLogs", "dev.debug.commandLogs")
     }
 }
