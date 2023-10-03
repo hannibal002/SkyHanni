@@ -83,8 +83,8 @@ class SkyMartCopperPrice {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(4, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
-        event.move(4, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
-        event.move(4, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
+        event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
+        event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
+        event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
     }
 }

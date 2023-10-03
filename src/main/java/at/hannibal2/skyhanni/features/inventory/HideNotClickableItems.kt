@@ -507,11 +507,11 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(4, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
-        event.move(4, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")
-        event.move(4, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
-        event.move(4, "inventory.notClickableItemsBypass", "inventory.hideNotClickable.itemsBypass")
-        event.move(4, "inventory.hideNotClickableItemsGreenLine", "inventory.hideNotClickable.itemsGreenLine")
+        event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
+        event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")
+        event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
+        event.move(3, "inventory.notClickableItemsBypass", "inventory.hideNotClickable.itemsBypass")
+        event.move(3, "inventory.hideNotClickableItemsGreenLine", "inventory.hideNotClickable.itemsGreenLine")
 
     }
 }

@@ -38,7 +38,7 @@ class DungeonLevelColor {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(4, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
+        event.move(3, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
 }
 

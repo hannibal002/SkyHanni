@@ -116,12 +116,12 @@ class FishingTimer {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(4, "fishing.barnTimer", "fishing.barnTimer.enabled")
-        event.move(4, "fishing.barnTimerAlertTime", "fishing.barnTimer.alertTime")
-        event.move(4, "fishing.barnTimerCrystalHollows", "fishing.barnTimer.crystalHollows")
-        event.move(4, "fishing.barnTimerForStranded", "fishing.barnTimer.forStranded")
-        event.move(4, "fishing.wormLimitAlert", "fishing.barnTimer.wormLimitAlert")
-        event.move(4, "fishing.manualResetTimer", "fishing.barnTimer.manualResetTimer")
-        event.move(4, "fishing.barnTimerPos", "fishing.barnTimer.pos")
+        event.move(3, "fishing.barnTimer", "fishing.barnTimer.enabled")
+        event.move(3, "fishing.barnTimerAlertTime", "fishing.barnTimer.alertTime")
+        event.move(3, "fishing.barnTimerCrystalHollows", "fishing.barnTimer.crystalHollows")
+        event.move(3, "fishing.barnTimerForStranded", "fishing.barnTimer.forStranded")
+        event.move(3, "fishing.wormLimitAlert", "fishing.barnTimer.wormLimitAlert")
+        event.move(3, "fishing.manualResetTimer", "fishing.barnTimer.manualResetTimer")
+        event.move(3, "fishing.barnTimerPos", "fishing.barnTimer.pos")
     }
 }

@@ -117,8 +117,8 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dungeon.cleanEndToggle", "dungeon.cleanEnd.toggle")
-        event.move(4, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
+        event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.toggle")
+        event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
     }
 
 }

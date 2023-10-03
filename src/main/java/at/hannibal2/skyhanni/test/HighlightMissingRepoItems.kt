@@ -60,6 +60,6 @@ class HighlightMissingRepoItems {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dev.highlightMissingRepo", "dev.debug.highlightMissingRepo")
+        event.move(3, "dev.highlightMissingRepo", "dev.debug.highlightMissingRepo")
     }
 }

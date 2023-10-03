@@ -40,6 +40,6 @@ object TestCopyRngMeterValues {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dev.copyRngMeter", "dev.debug.copyRngMeter")
+        event.move(3, "dev.copyRngMeter", "dev.debug.copyRngMeter")
     }
 }

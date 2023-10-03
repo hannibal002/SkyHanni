@@ -370,15 +370,15 @@ class ChatFilter {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "chat.hypixelHub", "chat.filterType.hypixelHub")
-        event.move(4, "chat.empty", "chat.filterType.empty")
-        event.move(4, "chat.warping", "chat.filterType.warping")
-        event.move(4, "chat.guildExp", "chat.filterType.guildExp")
-        event.move(4, "chat.friendJoinLeft", "chat.filterType.friendJoinLeft")
-        event.move(4, "chat.winterGift", "chat.filterType.winterGift")
-        event.move(4, "chat.powderMining", "chat.filterType.powderMining")
-        event.move(4, "chat.killCombo", "chat.filterType.killCombo")
-        event.move(4, "chat.profileJoin", "chat.filterType.profileJoin")
-        event.move(4, "chat.others", "chat.filterType.others")
+        event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
+        event.move(3, "chat.empty", "chat.filterType.empty")
+        event.move(3, "chat.warping", "chat.filterType.warping")
+        event.move(3, "chat.guildExp", "chat.filterType.guildExp")
+        event.move(3, "chat.friendJoinLeft", "chat.filterType.friendJoinLeft")
+        event.move(3, "chat.winterGift", "chat.filterType.winterGift")
+        event.move(3, "chat.powderMining", "chat.filterType.powderMining")
+        event.move(3, "chat.killCombo", "chat.filterType.killCombo")
+        event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
+        event.move(3, "chat.others", "chat.filterType.others")
     }
 }

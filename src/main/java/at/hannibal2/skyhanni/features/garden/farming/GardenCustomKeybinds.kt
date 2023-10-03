@@ -70,14 +70,14 @@ object GardenCustomKeybinds {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(4, "garden.keyBindEnabled", "garden.keyBind.enabled")
-        event.move(4, "garden.keyBindAttack", "garden.keyBind.attack")
-        event.move(4, "garden.keyBindUseItem", "garden.keyBind.useItem")
-        event.move(4, "garden.keyBindLeft", "garden.keyBind.left")
-        event.move(4, "garden.keyBindRight", "garden.keyBind.right")
-        event.move(4, "garden.keyBindForward", "garden.keyBind.forward")
-        event.move(4, "garden.keyBindBack", "garden.keyBind.back")
-        event.move(4, "garden.keyBindJump", "garden.keyBind.jump")
-        event.move(4, "garden.keyBindSneak", "garden.keyBind.sneak")
+        event.move(3, "garden.keyBindEnabled", "garden.keyBind.enabled")
+        event.move(3, "garden.keyBindAttack", "garden.keyBind.attack")
+        event.move(3, "garden.keyBindUseItem", "garden.keyBind.useItem")
+        event.move(3, "garden.keyBindLeft", "garden.keyBind.left")
+        event.move(3, "garden.keyBindRight", "garden.keyBind.right")
+        event.move(3, "garden.keyBindForward", "garden.keyBind.forward")
+        event.move(3, "garden.keyBindBack", "garden.keyBind.back")
+        event.move(3, "garden.keyBindJump", "garden.keyBind.jump")
+        event.move(3, "garden.keyBindSneak", "garden.keyBind.sneak")
     }
 }

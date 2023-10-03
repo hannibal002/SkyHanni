@@ -229,13 +229,13 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
-        event.move(4, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")
-        event.move(4, "dungeon.hideReviveStone", "dungeon.objectHider.hideReviveStone")
-        event.move(4, "dungeon.hidePremiumFlesh", "dungeon.objectHider.hidePremiumFlesh")
-        event.move(4, "dungeon.hideJournalEntry", "dungeon.objectHider.hideJournalEntry")
-        event.move(4, "dungeon.hideSkeletonSkull", "dungeon.objectHider.hideSkeletonSkull")
-        event.move(4, "dungeon.hideHealerOrbs", "dungeon.objectHider.hideHealerOrbs")
-        event.move(4, "dungeon.hideHealerFairy", "dungeon.objectHider.hideHealerFairy")
+        event.move(3, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
+        event.move(3, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")
+        event.move(3, "dungeon.hideReviveStone", "dungeon.objectHider.hideReviveStone")
+        event.move(3, "dungeon.hidePremiumFlesh", "dungeon.objectHider.hidePremiumFlesh")
+        event.move(3, "dungeon.hideJournalEntry", "dungeon.objectHider.hideJournalEntry")
+        event.move(3, "dungeon.hideSkeletonSkull", "dungeon.objectHider.hideSkeletonSkull")
+        event.move(3, "dungeon.hideHealerOrbs", "dungeon.objectHider.hideHealerOrbs")
+        event.move(3, "dungeon.hideHealerFairy", "dungeon.objectHider.hideHealerFairy")
     }
 }

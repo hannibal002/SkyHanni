@@ -114,6 +114,6 @@ object TestCopyBestiaryValues {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dev.copyBestiaryData", "dev.debug.copyBestiaryData")
+        event.move(3, "dev.copyBestiaryData", "dev.debug.copyBestiaryData")
     }
 }

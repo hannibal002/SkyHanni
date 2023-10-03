@@ -21,6 +21,6 @@ class ShowItemUuid {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dev.showItemUuid", "dev.debug.showItemUuid")
+        event.move(3, "dev.showItemUuid", "dev.debug.showItemUuid")
     }
 }

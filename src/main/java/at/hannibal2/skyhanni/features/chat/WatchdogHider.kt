@@ -52,7 +52,7 @@ class WatchdogHider {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "chat.watchDog", "chat.filterType.watchDog")
+        event.move(3, "chat.watchDog", "chat.filterType.watchDog")
     }
 }
 

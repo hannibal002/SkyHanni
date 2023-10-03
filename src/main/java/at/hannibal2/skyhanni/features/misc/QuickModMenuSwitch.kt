@@ -194,6 +194,6 @@ object QuickModMenuSwitch {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(4, "dev.modMenuLog", "dev.debug.modMenuLog")
+        event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
     }
 }

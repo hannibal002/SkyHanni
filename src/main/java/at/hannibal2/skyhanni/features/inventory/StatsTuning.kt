@@ -109,9 +109,9 @@ class StatsTuning {
     }
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(4,"inventory.statsTuningSelectedStats", "inventory.statsTuning.selectedStats")
-        event.move(4,"inventory.statsTuningSelectedTemplate", "inventory.statsTuning.selectedTemplate")
-        event.move(4,"inventory.statsTuningTemplateStats", "inventory.statsTuning.templateStats")
-        event.move(4,"inventory.statsTuningPoints", "inventory.statsTuning.points")
+        event.move(3,"inventory.statsTuningSelectedStats", "inventory.statsTuning.selectedStats")
+        event.move(3,"inventory.statsTuningSelectedTemplate", "inventory.statsTuning.selectedTemplate")
+        event.move(3,"inventory.statsTuningTemplateStats", "inventory.statsTuning.templateStats")
+        event.move(3,"inventory.statsTuningPoints", "inventory.statsTuning.points")
     }
 }
