@@ -387,6 +387,7 @@ public class InventoryConfig {
                 "§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)",
                 "§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)",
                 "§bMinion Storage Tier",
+                "§bCompactor/Deletor Enabled Status (§a✔§r§c§l✖§b)"
                 "§bItem Edition/Auction Number (if less than 1000)",
         }
     )
@@ -408,7 +409,7 @@ public class InventoryConfig {
                     "§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)",
                     "§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)",
                     "§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)",
-                    "§bQuick Upgrade Missing Count",
+                    "§bQuick Upgrade Missing Count (#)",
             }
     )
     public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.init.Blocks
@@ -124,7 +125,6 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(3) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
             return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
         }
-
         
         if (stackSizeConfig.contains(4) && chestName.startsWith("Your Stats Breakdown")) {
             val statName = item.name ?: return ""
@@ -280,7 +280,6 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (itemName.isEmpty()) return ""
             val lore = item.getLore()
             if (chestName.contains("Bazaar")) {
-                if (!(itemName == "Manage Orders")) return ""
                 if (itemName == "Manage Orders") {
                     var result = ""
                     for (line in lore) {
@@ -290,6 +289,25 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         }
                     }
                     return result
+                }
+                if (itemName == "Instasell Ignore List" && lore.any { it.contains("Ignored: ") }) {
+                    for (line in lore) {
+                        if (line.contains("Ignored: ")) { //§7Ignored: §c47 Products --> Ignored: 47 Products --> Ignored: 47 Product --> 47
+                            return line.removeColor().replace("Products", "Product").between("Ignored: ", " Product")
+                        }
+                    }
+                }
+                if (itemName.endsWith(" Mode")) {
+                    return itemName.take(3)
+                }
+            }
+            if (chestName.contains(" ➜ ") && itemName.contains("Instasell Ignore") && lore.any { it.contains("Bulk Instasell: ") }) {
+                for (line in lore) {
+                    if (line.contains("Bulk Instasell: ")) {
+                        //§cIgnored!
+                        //§aAllowed!
+                        return line.replace("Bulk Instasell: ", "").take(5)
+                    }
                 }
             }
             if ((chestName == "Auction View")) {
@@ -316,10 +334,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         val betterLine = line.removeColor().replace("▶ ", "")
                         if (itemName == "Sort") {
                             return when (betterLine) {
-                                "Highest Price" -> "§c⬆"
-                                "Lowest Price" -> "§a⬇"
-                                "Highest Bid" -> "§c⬆"
-                                "Lowest Bid" -> "§a⬇"
+                                betterLine.contains("Highest ") -> "§c⬆"
+                                betterLine.contains("Lowest") -> "§a⬇"
                                 "Ending soon" -> "§e☉"
                                 "Random" -> "R"
                                 else -> ""
@@ -348,7 +364,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (lore.any { it.contains("SLASHED Pricing") } || lore.any { it.contains("Slayer XP Buff") } || lore.any { it.contains("Pathfinder") }) return "§bAtx"
         if (lore.any { it.contains("Prospection") } || lore.any { it.contains("Mining XP Buff") } || lore.any { it.contains("Mining Fiesta") }) return "§bCle"
         if (lore.any { it.contains("Lucky!") } || lore.any { it.contains("Pet XP Buff") } || lore.any { it.contains("Mythological Ritual") }) return "§bDna"
-        if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖" //fuck diaz
+        if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖" //fuck diaz, all of my homies hate diaz. diaz is a rather common hypixel admin L and she must be removed from the game like candidate barry was.
         if (lore.any { it.contains("Farming Simulator") } || lore.any { it.contains("Pelt-pocalypse") } || lore.any { it.contains("GOATed") }) return "§bFng"
         if (lore.any { it.contains("Sweet Tooth") } || lore.any { it.contains("Benevolence") } || lore.any { it.contains("Extra Event") }) return "§bFxy"
         if (lore.any { it.contains("Luck of the Sea 2.0") } || lore.any { it.contains("Fishing XP Buff") } || lore.any { it.contains("Fishing Festival") }) return "§bMrn"

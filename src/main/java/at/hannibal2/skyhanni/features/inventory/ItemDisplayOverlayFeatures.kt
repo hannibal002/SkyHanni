@@ -319,8 +319,22 @@ class ItemDisplayOverlayFeatures {
             }
             return "" + colorCode + numSlots
         }
+
+        if (stackSizeConfig.contains(23)) {
+            if (chestName.contains("Personal Compactor ")) {
+                //§aCompactor Currently OFF!
+                //§aCompactor Currently ON!
+                if (itemName.startsWith("Compactor Currently ")) {
+                    return when (itemName) {
+                        itemName.endsWith("OFF!") -> "§c§l✖"
+                        itemName.endsWith("ON!") -> "§a✔"
+                        else -> ""
+                    }
+                }
+            }
+        }
 		
-		if (stackSizeConfig.contains(23)) {
+		if (stackSizeConfig.contains(24)) {
             var thatNumber = ""
             if (item.getLore().any { it.contains("Auction ") }) {
                 thatNumber = item.getAuctionNumber().toString()
