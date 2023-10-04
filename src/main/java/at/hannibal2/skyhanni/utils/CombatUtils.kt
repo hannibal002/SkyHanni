@@ -57,7 +57,7 @@ object CombatUtils {
         lastTotalXp = totalXp
     }
 
-    fun calculateXPHour(){
+    private fun calculateXPHour(){
         while (xpGainQueue.size > 30) {
             xpGainQueue.removeLast()
         }
