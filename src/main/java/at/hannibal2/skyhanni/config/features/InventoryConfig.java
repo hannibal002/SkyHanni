@@ -386,8 +386,8 @@ public class InventoryConfig {
                 "§bBottle of Jyrre Intelligence Bonus",
                 "§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)",
                 "§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)",
-                "§bMinion Storage Tier",
-                "§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b)\n§b+ Tier",
+                "§bMinion Storage Tier (#)",
+                "§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)",
                 "§bAbiphone Tier",
                 "§bItem Edition/Auction Number (if less than 1000)",
         }
