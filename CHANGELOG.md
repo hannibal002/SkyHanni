@@ -10,11 +10,24 @@
 
 ### Changes
 
++ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the leaderboard, or manual reloading the farming weight. - hannibal2
++ Added "Burning Desert" as a tarantula slayer area. - hannibal2
++ Slayer features now work only when the slayer type matches the current SkyBlock area. - hannibal2
+
 ### Bug Fixes
+
++ The yaw/pitch display does no longer show scientific notations at small values. - hannibal2
++ Fixed slayer RNG Meter problem to detect the selected item. - hannibal2
 
 #### Config
 
 + Fixed two typos in the config description. - Absterge
++ Fixed small typos in config. - Absterge
+
+#### Removed Features
+
++ Removed **Duplicate Hider**.
+    + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
 
 ## Version 0.20
 
