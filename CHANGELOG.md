@@ -512,7 +512,7 @@
     + Added a workaround for a crash when refusing a visitor - hannibal2
 + Added support for new counter drops to dicer rng counter - ReyMaratov
 + Fixed composter inventory numbers after Hypixel changes - hannibal2
-+ Rng dicer chat hider now works without enabling drop counter
++ RNG dicer chat hider now works without enabling drop counter
 + Server restart timer no longer shows all the time if over 2 minutes
 + Fixed crazy rare drops not counting properly - ReyMaratov
 + Fixed individual attribute prices in estimated item value - nea
