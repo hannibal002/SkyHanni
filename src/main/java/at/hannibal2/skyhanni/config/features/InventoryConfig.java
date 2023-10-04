@@ -443,7 +443,7 @@ public class InventoryConfig {
     )
     @ConfigEditorDraggableList(
             exampleText = {
-                    "§bMenu Pagination (#)",
+                    "§bMenu Pagination (#) + Sorting/Filtering Abbreviations",
                     "§bRNG Meter Drop Odds (Abbvs)",
                     "§bCommunity Shop + Essence Shop Upgrade Tiers (#)",
                     "§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)",
