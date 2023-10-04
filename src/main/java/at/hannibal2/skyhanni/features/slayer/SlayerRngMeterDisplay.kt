@@ -53,7 +53,7 @@ class SlayerRngMeterDisplay {
 
         if (!isEnabled()) return
 
-        if (config.hideChat && SlayerAPI.isInSlayerArea) {
+        if (config.hideChat && SlayerAPI.isInCorrectArea) {
             changedItemPattern.matchMatcher(event.message) {
                 event.blockedReason = "slayer_rng_meter"
             }
@@ -167,7 +167,7 @@ class SlayerRngMeterDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         config.pos.renderString(display, posLabel = "Rng Meter Display")
