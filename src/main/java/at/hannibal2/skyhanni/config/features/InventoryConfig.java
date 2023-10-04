@@ -131,13 +131,6 @@ public class InventoryConfig {
     public boolean jacobFarmingContestHighlightRewards = true;
 
     @Expose
-    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the Jacob inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestHideDuplicates = true;
-
-    @Expose
     @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
