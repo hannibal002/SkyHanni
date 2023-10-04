@@ -285,80 +285,90 @@ open class FFGuideGUI : GuiScreen() {
 
         if (selectedPage != FortuneGuidePage.UPGRADES) {
             if (currentCrop == null) {
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 130, 16, 16) &&
-                    currentPet != FarmingItems.ELEPHANT
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.ELEPHANT
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 130, 16, 16) &&
-                    currentPet != FarmingItems.MOOSHROOM_COW
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.MOOSHROOM_COW
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 130, 16, 16) &&
-                    currentPet != FarmingItems.RABBIT
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.RABBIT
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 130, 16, 16) &&
-                    currentPet != FarmingItems.BEE
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.BEE
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentArmor = if (currentArmor == 1) 0 else 1
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentArmor = if (currentArmor == 2) 0 else 2
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentArmor = if (currentArmor == 3) 0 else 3
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentArmor = if (currentArmor == 4) 0 else 4
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentEquipment = if (currentEquipment == 1) 0 else 1
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 282, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentEquipment = if (currentEquipment == 2) 0 else 2
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 302, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentEquipment = if (currentEquipment == 3) 0 else 3
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 322, guiTop + 5, 16, 16)) {
-                    SoundUtils.playClickSound()
-                    currentEquipment = if (currentEquipment == 4) 0 else 4
+                when {
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 130, 16, 16) &&
+                            currentPet != FarmingItems.ELEPHANT -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.ELEPHANT
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 130, 16, 16) &&
+                            currentPet != FarmingItems.MOOSHROOM_COW -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.MOOSHROOM_COW
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 130, 16, 16) &&
+                            currentPet != FarmingItems.RABBIT -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.RABBIT
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 130, 16, 16) &&
+                            currentPet != FarmingItems.BEE -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.BEE
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentArmor = if (currentArmor == 1) 0 else 1
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentArmor = if (currentArmor == 2) 0 else 2
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentArmor = if (currentArmor == 3) 0 else 3
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentArmor = if (currentArmor == 4) 0 else 4
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentEquipment = if (currentEquipment == 1) 0 else 1
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 282, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentEquipment = if (currentEquipment == 2) 0 else 2
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 302, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentEquipment = if (currentEquipment == 3) 0 else 3
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 322, guiTop + 5, 16, 16) -> {
+                        SoundUtils.playClickSound()
+                        currentEquipment = if (currentEquipment == 4) 0 else 4
+                    }
                 }
             } else {
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 160, 16, 16) &&
-                    currentPet != FarmingItems.ELEPHANT
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.ELEPHANT
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 160, 16, 16) &&
-                    currentPet != FarmingItems.MOOSHROOM_COW
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.MOOSHROOM_COW
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 160, 16, 16) &&
-                    currentPet != FarmingItems.RABBIT
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.RABBIT
-                    FFStats.getTotalFF()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 160, 16, 16) &&
-                    currentPet != FarmingItems.BEE
-                ) {
-                    SoundUtils.playClickSound()
-                    currentPet = FarmingItems.BEE
-                    FFStats.getTotalFF()
+                when {
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 160, 16, 16) &&
+                            currentPet != FarmingItems.ELEPHANT -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.ELEPHANT
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 160, 16, 16) &&
+                            currentPet != FarmingItems.MOOSHROOM_COW -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.MOOSHROOM_COW
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 160, 16, 16) &&
+                            currentPet != FarmingItems.RABBIT -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.RABBIT
+                        FFStats.getTotalFF()
+                    }
+                    GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 160, 16, 16) &&
+                            currentPet != FarmingItems.BEE -> {
+                        SoundUtils.playClickSound()
+                        currentPet = FarmingItems.BEE
+                        FFStats.getTotalFF()
+                    }
                 }
             }
         } else {
