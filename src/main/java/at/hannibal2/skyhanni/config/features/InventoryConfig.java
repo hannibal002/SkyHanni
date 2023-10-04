@@ -443,7 +443,7 @@ public class InventoryConfig {
     )
     @ConfigEditorDraggableList(
             exampleText = {
-                    "§bMenu Pagination (#) + Sorting/Filtering Abbreviations",
+                    "§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)",
                     "§bRNG Meter Drop Odds (Abbvs)",
                     "§bCommunity Shop + Essence Shop Upgrade Tiers (#)",
                     "§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)",
@@ -533,6 +533,7 @@ public class InventoryConfig {
                     "§bSelected Ringtone (Abbv)",
                     "§bTic Tac Toe Stats (§aW§eT§cL§b)",
                     "§bSnake Highest Score (#)",
+                    "§bSorting/Filtering Abbreviations",
             }
     )
     public List<Integer> menuItemNumberAbiphoneAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2));

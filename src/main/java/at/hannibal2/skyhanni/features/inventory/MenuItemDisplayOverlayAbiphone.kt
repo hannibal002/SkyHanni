@@ -114,6 +114,23 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
+        if ((stackSizeConfig.contains(6)) && ((chestName.contains("Abiphone")) || chestName.contains("Contacts Directory")) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
+            for (line in item.getLore()) {
+                if (line.contains("▶ ")) {
+                    val placeholder = line.removeColor().replace("▶ ","").replace(" ","")
+                    return when (placeholder) {
+                        "Alphabetical" -> "ABC"
+                        "DoNotDisturbFirst" -> "§cDND"
+                        "Difficulty" -> "§aE§eM§cH"
+                        "UsualLocation" -> "Loc"
+                        "NotAdded" -> "§cQA"
+                        "CompletedQuestButNotAdded" -> "§aQ§cA"
+                        else -> placeholder.take(3)
+                    }
+                }
+            }
+        }
+
         return ""
     }
 }

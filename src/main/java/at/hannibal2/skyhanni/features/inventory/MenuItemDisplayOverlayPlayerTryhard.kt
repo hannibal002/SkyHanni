@@ -87,7 +87,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
-            if (!(chestName.contains("Auction"))) {
+            if (!(chestName.contains("Auction")) && !(chestName.contains("Abiphone")) && !(chestName.contains("Contacts Directory"))) {
                 if (((itemName.contains("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)) && (lore.any { it.contains("▶ ") }))) || ((itemName.contains("Filter") && (item.getItem() is ItemEnderEye)) && (lore.any { it.contains("▶ ") }))) {
                     for (line in lore) {
                         if (line.contains("▶ ")) {
