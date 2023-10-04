@@ -115,7 +115,7 @@ class ItemDisplayOverlayFeatures {
             return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
         }
 
-        if (stackSizeConfig.contains(8) && itemName.contains("Kuudra Key")) {
+        if (stackSizeConfig.contains(7) && itemName.contains("Kuudra Key")) {
             return when (itemName) {
                 "Kuudra Key" -> "§a1"
                 "Hot Kuudra Key" -> "§22"
@@ -126,28 +126,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(9) && (chestName == "Your Skills") && (item.getLore().any { it.contains("Click to view!") })) {
-            if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
-            val split = itemName.split(" ")
-            if (split.size < 2) return "0" // prevent accidentally converting skill names to roman numerals
-            if (!itemName.contains("Dungeon")) {
-                val text = split.last()
-                return "" + text.romanToDecimalIfNeeded()
-            }
-        }
-
-        if (stackSizeConfig.contains(10) && chestName.endsWith(" Collections") && (item.getLore().any { it.contains("Click to view!") })) {
-            val lore = item.getLore()
-            if (CollectionAPI.isCollectionTier0(lore)) return "0"
-            item.name?.let {
-                if (it.startsWith("§e")) {
-                    val text = it.split(" ").last()
-                    return "" + text.romanToDecimalIfNeeded()
-                }
-            }
-        }
-
-        if (stackSizeConfig.contains(11) && itemName.contains("Rancher's Boots")) {
+        if (stackSizeConfig.contains(8) && itemName.contains("Rancher's Boots")) {
             for (line in item.getLore()) {
                 rancherBootsSpeedCapPattern.matchMatcher(line) {
                     return group("cap")
@@ -155,7 +134,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(12) && itemName.contains("Larva Hook")) {
+        if (stackSizeConfig.contains(9) && itemName.contains("Larva Hook")) {
             for (line in item.getLore()) {
                 "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
                     val amount = group("amount").toInt()
@@ -168,7 +147,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(13) && (itemName.startsWith("Dungeon ") && itemName.contains(" Potion"))) {
+        if (stackSizeConfig.contains(10) && (itemName.startsWith("Dungeon ") && itemName.contains(" Potion"))) {
             item.name?.let {
                 "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {

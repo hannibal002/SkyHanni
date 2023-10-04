@@ -367,7 +367,7 @@ public class InventoryConfig {
                 "§bMaster Star Tier",
                 "§bMaster Skull Tier",
                 "§bGolden/Diamond Dungeon Head Floor Number",
-                "§bNew Year Cake",
+                "§bNew Year Cake/Spooky Pie SB Year",
                 "§bPet Level",
                 "§bMinion Tier",
                 "§bCrimson Armor",
