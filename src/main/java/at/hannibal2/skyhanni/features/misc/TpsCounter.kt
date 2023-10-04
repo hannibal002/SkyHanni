@@ -98,16 +98,12 @@ class TpsCounter {
     }
 
     private fun getColor(tps: Double): String {
-        return if (tps > 19.8) {
-            "§2"
-        } else if (tps > 19) {
-            "§a"
-        } else if (tps > 17.5) {
-            "§6"
-        } else if (tps > 12) {
-            "§c"
-        } else {
-            "§4"
+        return when {
+            tps > 19.8 -> "§2"
+            tps > 19 -> "§a"
+            tps > 17.5 -> "§6"
+            tps > 12 -> "§c"
+            else -> "§4"
         }
     }
 }
