@@ -95,8 +95,7 @@ class ItemDisplayOverlayFeatures {
             if (itemName.startsWith("New Year Cake (")) return "§b" + itemName.between("(Year ", ")")
             if (itemName.startsWith("Spooky Pie")) {
                 for (line in item.getLore()) {
-                    if (line.lowercase().contains("skyblock year "))
-                    return line.lowercase().removeColor().between("skyblock year ", ".")
+                    if (line.lowercase().contains("skyblock year ")) return "§b" + line.lowercase().removeColor().between("skyblock year ", ".")
                 }
             }
         }
