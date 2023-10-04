@@ -170,7 +170,7 @@ class SlayerRngMeterDisplay {
         if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        config.pos.renderString(display, posLabel = "Rng Meter Display")
+        config.pos.renderString(display, posLabel = "RNG Meter Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
