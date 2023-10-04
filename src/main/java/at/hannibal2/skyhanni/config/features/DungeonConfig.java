@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DungeonConfig {
@@ -174,6 +175,31 @@ public class DungeonConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean coloredClassLevel = true;
+
+        @Expose
+        @ConfigOption(name = "Floor Stack Size", desc = "Display the party finder floor as the item stack size.")
+        @ConfigEditorBoolean
+        public boolean floorAsStackSize = true;
+
+        @Expose
+        @ConfigOption(name = "Mark Paid Carries", desc = "Highlight paid carries with a red background to make them easier to find/skip.")
+        @ConfigEditorBoolean
+        public boolean markPaidCarries = true;
+
+        @Expose
+        @ConfigOption(name = "Mark Low Levels", desc = "Highlight groups with players at or below the specified level to make them easier to find/skip.")
+        @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
+        public int markGroupsBelowLevel = 0;
+
+        @Expose
+        @ConfigOption(name = "Mark Ineligible Groups", desc = "Highlight groups with requirements that you do not meet.")
+        @ConfigEditorBoolean
+        public boolean markIneligibleGroups = true;
+
+        @Expose
+        @ConfigOption(name = "Mark Missing Class", desc = "Highlight groups that don't currently have any members of your selected dungeon class.")
+        @ConfigEditorBoolean
+        public boolean markMissingClass = true;
     }
 
     @Expose

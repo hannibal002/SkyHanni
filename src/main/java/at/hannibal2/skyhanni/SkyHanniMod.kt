@@ -71,9 +71,9 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter
 import at.hannibal2.skyhanni.features.dungeon.DungeonCleanEnd
 import at.hannibal2.skyhanni.features.dungeon.DungeonCopilot
 import at.hannibal2.skyhanni.features.dungeon.DungeonDeathCounter
+import at.hannibal2.skyhanni.features.dungeon.DungeonFinderFeatures
 import at.hannibal2.skyhanni.features.dungeon.DungeonHideItems
 import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
-import at.hannibal2.skyhanni.features.dungeon.DungeonLevelColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
@@ -454,7 +454,6 @@ class SkyHanniMod {
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
-        loadModule(DungeonLevelColor())
         loadModule(BazaarCancelledBuyOrderClipboard())
         loadModule(CompactSplashPotionMessage())
         loadModule(CroesusUnopenedChestTracker())
@@ -608,6 +607,7 @@ class SkyHanniMod {
         loadModule(PartyMemberOutlines())
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
+        loadModule(DungeonFinderFeatures())
 
         init()
 
