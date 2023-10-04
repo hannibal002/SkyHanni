@@ -91,8 +91,14 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(3) && (itemName.startsWith("New Year Cake ("))) {
-            return "§b" + itemName.between("(Year ", ")")
+        if (stackSizeConfig.contains(3)) {
+            if (itemName.startsWith("New Year Cake (")) return "§b" + itemName.between("(Year ", ")")
+            if (itemName.startsWith("Spooky Pie")) {
+                for (line in item.getLore()) {
+                    if (line.lowercase().contains("skyblock year "))
+                    return line.lowercase().removeColor().between("skyblock year ", ".")
+                }
+            }
         }
 
         if (stackSizeConfig.contains(4) && (!chestName.endsWith("Sea Creature Guide")) && (ItemUtils.isPet(itemName))) {
