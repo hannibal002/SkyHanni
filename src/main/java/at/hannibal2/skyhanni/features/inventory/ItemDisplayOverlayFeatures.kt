@@ -332,7 +332,7 @@ class ItemDisplayOverlayFeatures {
                     }
                 }
             }
-            if (itemName.startsWith("Personal ")) {
+            if (itemName.startsWith("Personal ") && item.getInternalName_old().contains("PERSONAL_")) {
                 return itemName.replace("Personal ", "").replace("Compactor ", "").replace("Deletor ", "").dropLast(3) + "K"
             }
         }
