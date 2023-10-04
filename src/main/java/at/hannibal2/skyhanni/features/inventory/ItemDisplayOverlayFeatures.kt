@@ -334,9 +334,9 @@ class ItemDisplayOverlayFeatures {
                 "ABIPHONE_XIV_ENORMOUS" -> "14"
                 "ABIPHONE_XIV_ENORMOUS_BLACK" -> "§714"
                 "ABIPHONE_XIV_ENORMOUS_PURPLE" -> "§714"
-                "ABIPHONE_FLIP_DRAGON" -> "F§b§zD"
-                "ABIPHONE_FLIP_NUCLEUS" -> "F§b§zN"
-                "ABIPHONE_FLIP_VOLCANO" -> "F§b§zV"
+                "ABIPHONE_FLIP_DRAGON" -> "Fl§b§zD"
+                "ABIPHONE_FLIP_NUCLEUS" -> "Fl§b§zN"
+                "ABIPHONE_FLIP_VOLCANO" -> "Fl§b§zV"
                 else -> ""
             }
         }
