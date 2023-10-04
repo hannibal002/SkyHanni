@@ -66,21 +66,23 @@ class MenuItemDisplayOverlayPlayerTryhard {
 
         //NOTE: IT'S String.length, NOT String.length()!
         
-        if (stackSizeConfig.contains(0) && (itemName == "Previous Page" || itemName == "Next Page")) {
-            val line = item.getLore().first().replace(",", "")
-            if (chestName.contains("Auction")) {
-                auctionHousePagePattern.matchMatcher(line) {
-                    var pageNum = group("pagenumber").toInt()
-                    if (itemName == "Previous Page") {
-                        pageNum--
-                    } else if (itemName == "Next Page") {
-                        pageNum++
+        if (stackSizeConfig.contains(0)) {
+            if ((itemName == "Previous Page" || itemName == "Next Page")) {
+                val line = item.getLore().first().replace(",", "")
+                if (chestName.contains("Auction")) {
+                    auctionHousePagePattern.matchMatcher(line) {
+                        var pageNum = group("pagenumber").toInt()
+                        if (itemName == "Previous Page") {
+                            pageNum--
+                        } else if (itemName == "Next Page") {
+                            pageNum++
+                        }
+                        if (pageNum > 999) return "1k+"
+                        else return "${pageNum}"
                     }
-                    if (pageNum > 999) return "1k+"
-                    else return "${pageNum}"
                 }
+                return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
-            return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
         }
 
         if (stackSizeConfig.contains(1) && (chestName.contains(" RNG Meter"))) {
