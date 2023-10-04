@@ -109,7 +109,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(5) && (itemName.contains(" Minion ")) && (item.getLore().any { it.contains("Place this minion") })) {
+        if (stackSizeConfig.contains(5) && (itemName.contains(" Minion ")) && !(itemName.endsWith(" Recipes")) && (item.getLore().any { it.contains("Place this minion") })) {
             val array = itemName.split(" ")
             val last = array[array.size - 1]
             return last.romanToDecimal().toString()
