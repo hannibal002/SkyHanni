@@ -12,6 +12,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.init.Blocks
+import net.minecraft.item.Item
+import net.minecraft.item.ItemEnderEye
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -67,8 +70,9 @@ class MenuItemDisplayOverlayPlayerTryhard {
         //NOTE: IT'S String.length, NOT String.length()!
         
         if (stackSizeConfig.contains(0)) {
+            val lore = item.getLore()
             if ((itemName == "Previous Page" || itemName == "Next Page")) {
-                val line = item.getLore().first().replace(",", "")
+                val line = lore.first().replace(",", "")
                 if (chestName.contains("Auction")) {
                     auctionHousePagePattern.matchMatcher(line) {
                         var pageNum = group("pagenumber").toInt()
@@ -82,6 +86,15 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     }
                 }
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
+            }
+            if (!(chestName.contains("Auction"))) {
+                if (((itemName.contains("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)) && (lore.any { it.contains("▶ ") }))) && ((itemName.contains("Filter") && (item.getItem() is ItemEnderEye)) && (lore.any { it.contains("▶ ") }))) {
+                    for (line in lore) {
+                        if (line.contains("▶ ")) {
+                            return line.removeColor().replace("▶ ","").replace(" ","").take(3)
+                        }
+                    }
+                }
             }
         }
 
