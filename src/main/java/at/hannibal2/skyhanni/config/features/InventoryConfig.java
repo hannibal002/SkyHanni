@@ -370,7 +370,7 @@ public class InventoryConfig {
                 "§bNew Year Cake/Spooky Pie SB Year",
                 "§bPet Level",
                 "§bMinion Tier",
-                "§bCrimson Armor",
+                "§bCrimson Armor Crimson Stars",
                 "§bKuudra Key",
                 "§bRancher's Boots Speed",
                 "§bLarva Hook",
