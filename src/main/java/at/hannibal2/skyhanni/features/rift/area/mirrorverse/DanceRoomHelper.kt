@@ -50,17 +50,22 @@ object DanceRoomHelper {
         val size = instructions.size
         val format = line.format()
 
-        if (index < size && index == lineIndex) {
-            val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
-            "${now.formatColor()} $format $countdown"
+        when {
+            index < size && index == lineIndex -> {
+                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+                "${now.formatColor()} $format $countdown"
 
-        } else if (index + 1 < size && index + 1 == lineIndex) {
-            "${next.formatColor()} $format"
+            }
+            index + 1 < size && index + 1 == lineIndex -> {
+                "${next.formatColor()} $format"
 
-        } else if (index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex)) {
-            "${later.formatColor()} $format"
+            }
+            index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex) -> {
+                "${later.formatColor()} $format"
 
-        } else null
+            }
+            else -> null
+        }
     }
 
     private fun String.formatColor() = replace("&", "§")
