@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -24,8 +24,13 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     private val amtToWithdrawPattern = "(§.)?Amount to withdraw: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
 
     @SubscribeEvent
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         event.stackTip = getStackTip(event.stack)
+        if (event.stackTip.contains("Balance: ")) {
+            event.offsetY = -23
+            event.offsetX = 0
+            event.alignLeft = false
+        }
     }
 
     private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
@@ -246,7 +251,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            if (chestName.endsWith("Bank Account") && itemName.endsWith(" Coins")) {
+            if (chestName.endsWith("Bank Account") && itemName.contains("Deposit Coins")) {
                 bankBalancePattern.matchMatcher(lore.first()) {
                     val totalAsString = group("total").replace(",", "")
                     val usefulPartAsString = group("useful")
@@ -258,8 +263,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         in 13..15 -> "T"
                         else -> "§b§z:)"
                     }
-                    if (suffix == "§b§z:)") return suffix
-                    else return "§6" + usefulPartAsString + suffix
+                    if (suffix == "§b§z:)") return "§6Balance: " + suffix
+                    else return "§6Balance: " + usefulPartAsString + suffix
                 }
             }
         }
