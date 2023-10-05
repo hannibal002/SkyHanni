@@ -76,7 +76,7 @@ object SlayerItemProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInSlayerArea) {
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
             logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
             addMobKillCoins(coins.toInt())
         }
@@ -141,7 +141,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (sackChange in event.sackChanges) {
@@ -156,7 +156,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         val packet = event.packet
@@ -357,7 +357,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {

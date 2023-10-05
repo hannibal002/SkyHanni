@@ -24,7 +24,6 @@ class SlayerQuestWarning {
     private var currentReason = ""
     private var dirtySidebar = false
     private var hasAutoSlayer = false
-    private var activeSlayer: SlayerType? = null
 
     //TODO add check if player has clicked on an item, before mobs around you gets damage
 
@@ -53,7 +52,6 @@ class SlayerQuestWarning {
         }
 
         if (message == "§aYour Slayer Quest has been cancelled!") {
-            activeSlayer = null
             needSlayerQuest = false
         }
 
@@ -101,8 +99,6 @@ class SlayerQuestWarning {
                 loaded = true
             }
         }
-
-        activeSlayer = SlayerType.getByDisplayName(slayerTypeName)
 
         if (loaded) {
             dirtySidebar = false
@@ -154,18 +150,18 @@ class SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val area = LorenzUtils.skyBlockArea
-        val slayerType = SlayerType.getByArea(area) ?: return false
+        val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
+
+        val activeSlayer = SlayerAPI.getActiveSlayer()
 
         if (activeSlayer != null) {
-            val activeSlayer = activeSlayer!!
             if (slayerType != activeSlayer) {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
                 SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and are in the $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
                 )
             }
         }
