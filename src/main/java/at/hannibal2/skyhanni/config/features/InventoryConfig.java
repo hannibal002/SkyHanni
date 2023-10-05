@@ -430,7 +430,7 @@ public class InventoryConfig {
                     "§bSkyblock Profile Fruits Name (Abbvs)",
                     "§bAuction House + Bazaar (Various)",
                     "§bDojo Progress (Abbv)",
-                    "§bBank Tier (Abbv)",
+                    "§bBank Utilities (Abbvs)",
                     "§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)",
             }
     )

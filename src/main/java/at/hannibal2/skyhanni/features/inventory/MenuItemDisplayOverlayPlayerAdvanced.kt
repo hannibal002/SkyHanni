@@ -20,6 +20,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
     private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
     private val enigmaSoulsPattern = "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?\/(§.)?.*".toPattern()
+    private val bankBalancePattern = "(§.)?Current balance: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
+    private val amtToWithdrawPattern = "(§.)?Amount to withdraw: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -58,7 +60,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         */
 
         //NOTE: IT'S String.length, NOT String.length()!
-        
+
         if (stackSizeConfig.contains(0)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
@@ -215,10 +217,49 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(7) && (chestName == "Bank") && (itemName == "Bank Upgrades")) {
-            for (line in item.getLore()) {
-                if (line.startsWith("§7Current account: ")) {
-                    return line.removeColor().replace("Current account: ", "").substring(0,1)
+        if (stackSizeConfig.contains(7) && chestName.contains("Bank")) {
+            val lore = item.getLore()
+            if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%") && lore.any { it.contains("Amount to withdraw: ") }) {
+                for (line in lore) {
+                    if (line.contains("Amount to withdraw: ")) {
+                        amtToWithdrawPattern.matchMatcher(line) {
+                            val totalAsString = group("total").replace(",", "")
+                            val usefulPartAsString = group("useful")
+                            var suffix = when (totalAsString.length) {
+                                in 1..3 -> ""
+                                in 4..6 -> "k"
+                                in 7..9 -> "M"
+                                in 10..12 -> "B"
+                                in 13..15 -> "T"
+                                else -> "§b§z:)"
+                            }
+                            if (suffix == "§b§z:)") return suffix
+                            else return "§6" + usefulPartAsString + suffix
+                        }
+                    }
+                }
+            }
+            if ((itemName == "Bank Upgrades")) {
+                for (line in lore) {
+                    if (line.startsWith("§7Current account: ")) {
+                        return line.removeColor().replace("Current account: ", "").substring(0,1)
+                    }
+                }
+            }
+            if (chestName.endsWith("Bank Account") && itemName.endsWith(" Coins")) {
+                bankBalancePattern.matchMatcher(lore.first()) {
+                    val totalAsString = group("total").replace(",", "")
+                    val usefulPartAsString = group("useful")
+                    var suffix = when (totalAsString.length) {
+                        in 1..3 -> ""
+                        in 4..6 -> "k"
+                        in 7..9 -> "M"
+                        in 10..12 -> "B"
+                        in 13..15 -> "T"
+                        else -> "§b§z:)"
+                    }
+                    if (suffix == "§b§z:)") return suffix
+                    else return "§6" + usefulPartAsString + suffix
                 }
             }
         }
