@@ -125,7 +125,7 @@ class MenuItemDisplayOverlayAbiphone {
                         "usuallocation" -> "Loc"
                         "notadded" -> "§cQA"
                         "completedquestbutnotadded" -> "§aQ§cA"
-                        else -> placeholder.take(3)
+                        else -> placeholder.take(3).capitalize()
                     }
                 }
             }
