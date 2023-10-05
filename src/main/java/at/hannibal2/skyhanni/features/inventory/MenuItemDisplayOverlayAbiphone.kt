@@ -117,7 +117,7 @@ class MenuItemDisplayOverlayAbiphone {
         if ((stackSizeConfig.contains(6)) && ((chestName.contains("Abiphone")) || chestName.contains("Contacts Directory")) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
             for (line in item.getLore()) {
                 if (line.contains("▶ ")) {
-                    val placeholder = line.removeColor().replace("▶ ","").replace(" ","").lowercase()
+                    val placeholder = line.removeColor().replace("▶ ","").replace(" ","").lowercase() //lowercase() because i dont trust hypixel admins
                     return when (placeholder) {
                         "alphabetical" -> "ABC"
                         "donotdisturbfirst" -> "§cDND"
