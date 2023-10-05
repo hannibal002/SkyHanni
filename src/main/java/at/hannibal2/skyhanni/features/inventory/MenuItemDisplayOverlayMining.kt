@@ -66,6 +66,7 @@ class MenuItemDisplayOverlayMining {
 
         //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
         //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
+        //ping @erymanthus on the skyhanni discord if you find any bugs with this
         if (stackSizeConfig.contains(1) && chestName == ("Heart of the Mountain") && item.cleanName().contains("Tier ")) {
             val nameWithColor = item.name ?: return ""
             if (nameWithColor.contains("§a")) return ""
