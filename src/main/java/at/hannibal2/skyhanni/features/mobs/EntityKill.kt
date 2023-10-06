@@ -7,13 +7,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.item.EntityXPOrb
-import net.minecraft.entity.projectile.EntityArrow
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
@@ -26,7 +21,7 @@ class EntityKill {
     // TODO(Wither Implosion)
     // TODO(Wither Impact)
     // TODO(Frozen Scythe)
-    // TODO(Bow) Priority
+    // TODO(Bow) Priority, separate System
     // TODO(Terminater Beam)
     // TODO(Thornes)
     // TODO(Celeste Wand)
@@ -47,70 +42,82 @@ class EntityKill {
     // TODO(Berserk Swing Range) Even more Pain
     // TODO(Exlosion Bow)
     // TODO(Multi Arrow)
+    // TODO(Fishing Rod)
+    // TODO(Special Fishing Rods)
 
-
-    private var mobHitMap = HashMap<Int, Entity>(200)
-    private var mobHitList = mutableListOf<Int>()
-
-    private val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
-
-    private var tickDelayer = 0
+    private var mobHitList = mutableSetOf<SkyblockMobUtils.SkyblockMob>()
 
     private var shouldTrackArrow = false
 
 
+    private val currentEntityLiving = mutableSetOf<EntityLiving>()
+    private val previousEntityLiving = mutableSetOf<EntityLiving>()
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        tickDelayer++
+        previousEntityLiving.clear()
+        previousEntityLiving.addAll(currentEntityLiving)
+        currentEntityLiving.clear()
+        currentEntityLiving.addAll(EntityUtils.getEntities())
 
-        if (shouldTrackArrow) {
-            val arrowCatch = EntityUtils.getEntitiesNearby<EntityArrow>(Minecraft.getMinecraft().thePlayer.getLorenzVec(), 100.0)
-            if (arrowCatch.count() > 0) {
-                val arrow = arrowCatch.first()
-                LorenzDebug.log(arrow.toString())
-            }
-            shouldTrackArrow = false
-        }
-
-        if (tickDelayer < 21) return
-        tickDelayer = 0
-
-        //This function was made with help from ChatGPT Link: https://chat.openai.com/share/1e5b11ed-b72e-4a69-bfe9-71a8d5fd2fa6
-        val listA = EntityUtils.getEntities<EntityLiving>()
-        val listB = mobHitList
-        val listC = ArrayList<Int>(20)
-
-        val setA = listA.map { it.entityId }.toSet()
-
-        //LorenzDebug.log("$setA")
-        LorenzDebug.log("$listB")
-
-        for (i: Int in listB.indices) {
-            val elementB = listB[i]
-            if (elementB !in setA) {
-                // Element in List B not found in List A
-                killEvent(elementB)
-                listC.add(i)
-            }
-        }
-        listC.reversed().forEach { listB.removeAt(it) }
+        //Spawned EntityLiving
+        (currentEntityLiving - previousEntityLiving).forEach { EntityLivingSpawnEvent(it).postAndCatch() }
+        //Despawned EntityLiving
+        (previousEntityLiving - currentEntityLiving).forEach { EntityLivingDeathEvent(it).postAndCatch() }
     }
 
-    fun killEvent(id: Int) {
-        val itemStand = mobHitMap[id] ?: return
-        val mobName = mobNameFilter.find(itemStand.name.removeColor())?.groupValues?.get(1)
-        LorenzDebug.chatAndLog("Mob Name: $mobName")
+    @SubscribeEvent
+    fun onEntityLivingDeath(event: EntityLivingDeathEvent) {
+        //LorenzDebug.log("Hit List: $mobHitList")
+        mobHitList.firstOrNull { it.baseEntity == event.entity }
+            ?.let { SkyblockMobKillEvent(it, false).postAndCatch() }
+    }
 
+    @SubscribeEvent
+    fun onSkyblockMobKill(event: SkyblockMobKillEvent) {
+        LorenzDebug.chatAndLog("Mob Name: ${event.mob.name}")
+        mobHitList.remove(event.mob)
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        //Backup to avoid Memory Leak (if any exists)
+        mobHitList.clear()
+    }
+
+    private fun addToMobHitList(mobId: Int) {
+        EntityUtils.getEntityById(mobId)?.let {
+            addToMobHitList(it)
+        }
+    }
+
+    private fun addToMobHitList(entity: Entity) {
+            mobHitList.add(SkyblockMobUtils.SkyblockMob(entity))
+    }
+
+    private fun checkAndAddToMobHitList(mobId: Int) {
+        EntityUtils.getEntityById(mobId)?.let {
+            checkAndAddToMobHitList(it)
+        }
+    }
+
+    private fun checkAndAddToMobHitList(entity: Entity) {
+        if (!isInMobHitList(entity)) {
+            addToMobHitList(entity)
+        }
+    }
+
+    private fun isInMobHitList(entity: Entity): Boolean {
+        return mobHitList.any { it.baseEntity == entity }
     }
 
     @SubscribeEvent
     fun onEntityHit(event: EntityClickEvent) {
         val entity = event.clickedEntity ?: return
-        if (entity.entityId in mobHitMap) return
 
         //Base Melee Hit
         if (event.clickType == ClickType.LEFT_CLICK) {
-            addToMobHitList(entity.entityId)
+            checkAndAddToMobHitList(entity)
 
             val itemInHand = InventoryUtils.getItemInHand() ?: return
             val enchantmentsOfItemInHand = itemInHand.getEnchantments()
@@ -128,7 +135,7 @@ class EntityKill {
                 }
                 var i = 0
                 EntityUtils.getEntitiesNearbyIgnoreY<EntityLiving>(event.clickedEntity.getLorenzVec(), range).forEach {
-                    addToMobHitList(it.entityId)
+                    checkAndAddToMobHitList(it)
                     i++
                     LorenzDebug.log(it.name)
                 }
@@ -155,36 +162,21 @@ class EntityKill {
         //Bow
         if (lastLore.endsWith("BOW")) {
             val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
-                    ?: 0) + if (itemInHand.displayName.contains("Juju")) 3 else 0
+                ?: 0) + if (itemInHand.displayName.contains("Juju")) 3 else 0
 
             //Minecraft.getMinecraft().thePlayer.lookVec.normalize().toLorenzVec()
             val player = Minecraft.getMinecraft().thePlayer
             val raycastResult = EntityUtils.getEntities<EntityLiving>().filter {
-                it.position.toLorenzVec().subtract(player.getLorenzVec()).dotPorduct(player.lookVec.normalize().toLorenzVec()).absoluteValue < 1.5
+                it.position.toLorenzVec().subtract(player.getLorenzVec())
+                    .dotPorduct(player.lookVec.normalize().toLorenzVec()).absoluteValue < 1.5
             }
-            val nearArrowHit = raycastResult //.filter { it !is EntityPlayerSP && it !is EntityArmorStand && it !is EntityXPOrb && it !is EntityOtherPlayerMP }
+            val nearArrowHit =
+                raycastResult //.filter { it !is EntityPlayerSP && it !is EntityArmorStand && it !is EntityXPOrb && it !is EntityOtherPlayerMP }
             nearArrowHit.forEach {
                 LorenzDebug.log(it.toString())
-                addToMobHitList(it.entityId)
+                checkAndAddToMobHitList(it)
             }
             shouldTrackArrow = true
         }
     }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        mobHitMap.clear()
-        mobHitList.clear()
-    }
-
-    private fun addToMobHitList(mobId: Int) {
-        val index = mobHitList.binarySearch(mobId)
-        if (index >= 0) return
-        mobHitList.add(-(index + 1), mobId)
-
-        val theWorld = Minecraft.getMinecraft().theWorld ?: return
-        mobHitMap[mobId] = theWorld.getEntityByID(mobId + 1 )
-                ?: return //Fun Fact the corresponding ArmorStand for a mob has always the mobId + 1
-    }
-
 }

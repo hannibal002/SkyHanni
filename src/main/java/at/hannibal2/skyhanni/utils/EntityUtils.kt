@@ -156,4 +156,6 @@ object EntityUtils {
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence() ?: emptySequence()
+
+    fun getEntityById(id : Int) : Entity? = Minecraft.getMinecraft()?.theWorld?.getEntityByID(id)
 }
