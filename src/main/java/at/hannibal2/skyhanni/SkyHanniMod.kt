@@ -145,6 +145,7 @@ import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.ItemStars
+import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
@@ -573,6 +574,7 @@ class SkyHanniMod {
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
         loadModule(FixNEUHeavyPearls())
+        loadModule(QuickCraftFeatures())
 
         init()
 
