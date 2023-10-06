@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -227,10 +228,16 @@ class SkyHanniDebugsAndTests {
 
                 if (LorenzUtils.inDungeons) {
                     builder.append("\n")
-                    builder.append("in dungeon!\n")
+                    builder.append("In dungeon!\n")
                     builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
                     builder.append(" started: ${DungeonAPI.started}\n")
                     builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
+                }
+                if (SlayerAPI.hasActiveSlayerQuest()) {
+                    builder.append("\n")
+                    builder.append("Doing slayer!\n")
+                    builder.append(" activeSlayer: ${SlayerAPI.getActiveSlayer()}\n")
+                    builder.append(" isInCorrectArea: ${SlayerAPI.isInCorrectArea}\n")
                 }
 
             }

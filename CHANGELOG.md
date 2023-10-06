@@ -10,11 +10,24 @@
 
 ### Changes
 
++ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the leaderboard, or manual reloading the farming weight. - hannibal2
++ Added "Burning Desert" as a tarantula slayer area. - hannibal2
++ Slayer features now work only when the slayer type matches the current SkyBlock area. - hannibal2
+
 ### Bug Fixes
+
++ The yaw/pitch display does no longer show scientific notations at small values. - hannibal2
++ Fixed slayer RNG Meter problem to detect the selected item. - hannibal2
 
 #### Config
 
 + Fixed two typos in the config description. - Absterge
++ Fixed small typos in config. - Absterge
+
+#### Removed Features
+
++ Removed **Duplicate Hider**.
+    + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
 
 ## Version 0.20
 
@@ -512,7 +525,7 @@
     + Added a workaround for a crash when refusing a visitor - hannibal2
 + Added support for new counter drops to dicer rng counter - ReyMaratov
 + Fixed composter inventory numbers after Hypixel changes - hannibal2
-+ Rng dicer chat hider now works without enabling drop counter
++ RNG dicer chat hider now works without enabling drop counter
 + Server restart timer no longer shows all the time if over 2 minutes
 + Fixed crazy rare drops not counting properly - ReyMaratov
 + Fixed individual attribute prices in estimated item value - nea

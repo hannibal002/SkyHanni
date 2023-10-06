@@ -92,7 +92,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight stuff that is missing in the SkyBlock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
-+ **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + **Contest Time** - Show the real time format to the farming contest description.
 + **Pet Candies Used number**
     + Works even after Hypixel removed the `10 pet candies applied` line
