@@ -274,6 +274,7 @@ object Commands {
 //            "shsendtranslation",
 //            "Respond with a translation of the message that the user clicks"
 //        ) { Translator.toEnglish(it) }
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun commandHelp(args: Array<String>) {
