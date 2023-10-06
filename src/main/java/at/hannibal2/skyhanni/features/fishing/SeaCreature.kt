@@ -17,6 +17,5 @@ data class SeaCreature(
     private fun rare(): String {
         return if (rare) "§l" else ""
     }
-
 }
 
