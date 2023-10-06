@@ -108,8 +108,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 }
             }
         }
-
-        println("Unknown quest: '$name'")
+        LorenzUtils.chat("§c[SkyHanni] Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 

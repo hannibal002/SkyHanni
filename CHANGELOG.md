@@ -1,6 +1,35 @@
 # SkyHanni - Change Log
 
-## Version 0.20 (Unreleased)
+## Version 0.21 (unreleased)
+
+### New Features
+
+### Events
+
++ Highlight Jerries during the Jerrypoclaypse. - Erymanthus
+
+### Changes
+
++ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the leaderboard, or manual reloading the farming weight. - hannibal2
++ Added "Burning Desert" as a tarantula slayer area. - hannibal2
++ Slayer features now work only when the slayer type matches the current SkyBlock area. - hannibal2
+
+### Bug Fixes
+
++ The yaw/pitch display does no longer show scientific notations at small values. - hannibal2
++ Fixed slayer RNG Meter problem to detect the selected item. - hannibal2
+
+#### Config
+
++ Fixed two typos in the config description. - Absterge
++ Fixed small typos in config. - Absterge
+
+#### Removed Features
+
++ Removed **Duplicate Hider**.
+    + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
+
+## Version 0.20
 
 ### New Features
 
@@ -95,6 +124,7 @@
     + Pelts per hour
 + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
 + Added a countdown for Arachne spawn. - Cad
+    + Supports quick spawns.
 + Added **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
@@ -182,7 +212,10 @@
 + Ignoring non-slayer drops in the slayer profit tracker. - hannibal2
 + Added support for slayer drops that go directly into the sack. - hannibal2
     + This still does not work for items that land directly in your inventory. (e.g., Netherrack-Looking Sunshade,
-    Summoning Eye, etc.)
+      Summoning Eye, etc.)
++ Added toggle for 12hr/24hr in real-time HUD. - Thunderblade73
++ Removed Flowering Bouquet from and added Cultivating to the default enabled Visitor Reward Warnings list. - hannibal2
++ Improved performance in the Garden Visitor inventory. - hannibal2
 
 ### Fixes
 
@@ -294,6 +327,20 @@
 + Hide item rarity error message in /ff. - hannibal2
 + Fixed an issue with the Wheat Profit Display not showing the correct value when combined with seeds. - Thunderblade73
 + Tab complte party members now also detects if the party leader leaves. - CalMWolfs
++ Fixed typos in many config settings. - Absterge
++ Fixed NEU Heavy Pearl detection. - hannibal2
++ Fixed showing Wrong Slayer Warning sometimes at the wrong time. - Cad
++ Fixed farming contest summary time being off sometimes. - hannibal2
++ Fixed wrong order at Visitor Drop Statistics. - hannibal2
++ Fixed bits and powder not saving in Visitor Drop Statistics. - hannibal2
++ Fixed not being able to disable show Dungeon Head Floor Number as stack size. - hannibal2
++ Fixed green bandana not getting detected for visitor reward warning. - hannibal2
++ Fixed zealots and zealot bruisers not getting detected when being runic. - hannibal2
++ Fixed mixins not getting detected correctly from effects inventory for Non God Pot Effect display. - hannibal2
++ Fixed an error when detecting Jacob Contest times. - hannibal2
++ Fixed Mushroom Goal breaking the Bingo Card detection. - hannibal2
++ Fixed Diana's Griffin Pet Warning not working during the Jerry Mayor. - hannibal2
++ Fixed /ff not detecting changes in the /pets inventory. - CalMWolfs
 
 ### Removed Features
 
@@ -301,7 +348,6 @@
     - (Hypixel fixed their bug, finally)
 - Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
     - This should not affect much
-    -
 - Removed wishing compass in item number.
     - Every Wishing Compass now only has one use instead of three.
 
@@ -479,7 +525,7 @@
     + Added a workaround for a crash when refusing a visitor - hannibal2
 + Added support for new counter drops to dicer rng counter - ReyMaratov
 + Fixed composter inventory numbers after Hypixel changes - hannibal2
-+ Rng dicer chat hider now works without enabling drop counter
++ RNG dicer chat hider now works without enabling drop counter
 + Server restart timer no longer shows all the time if over 2 minutes
 + Fixed crazy rare drops not counting properly - ReyMaratov
 + Fixed individual attribute prices in estimated item value - nea

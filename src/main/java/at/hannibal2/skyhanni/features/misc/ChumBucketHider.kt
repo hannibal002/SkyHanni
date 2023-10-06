@@ -51,7 +51,6 @@ class ChumBucketHider {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
-                    println("found lower chum entity")
                     hiddenEntities.add(entity)
                     event.isCanceled = true
                     return
