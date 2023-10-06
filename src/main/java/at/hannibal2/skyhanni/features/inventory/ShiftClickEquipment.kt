@@ -21,8 +21,6 @@ class ShiftClickEquipment {
 
         if (slot.stack == null) return
 
-        val stack = slot.stack
-
         if (SkyHanniMod.feature.inventory.shiftClickForEquipment && chestName.startsWith("Your Equipment")) {
             Minecraft.getMinecraft().playerController.windowClick(
                 event.container.windowId,
