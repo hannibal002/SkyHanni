@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -400,6 +401,20 @@ object RenderUtils {
             offsetY += 10 + extraSpace
         }
         GuiEditManager.add(this, posLabel, longestX, offsetY)
+    }
+
+    fun Position.renderRenderables(
+        renderables: List<Renderable>,
+        extraSpace: Int = 0,
+        itemScale: Double = 1.0,
+        posLabel: String,
+    ) {
+        if (renderables.isEmpty()) return
+        val list = mutableListOf<List<Any>>()
+        for (line in renderables) {
+            list.addAsSingletonList(line)
+        }
+        renderStringsAndItems(list, extraSpace, itemScale, posLabel)
     }
 
     /**

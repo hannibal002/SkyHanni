@@ -166,7 +166,7 @@ object Commands {
     }
 
     private fun usersBugFix() {
-        registerCommand("shupdaterepo", "Download the Skyhanni repo again") { SkyHanniMod.repo.updateRepo() }
+        registerCommand("shupdaterepo", "Download the SkyHanni repo again") { SkyHanniMod.repo.updateRepo() }
         registerCommand(
             "shresetburrowwarps",
             "Manually resetting disabled diana burrow warp points"
