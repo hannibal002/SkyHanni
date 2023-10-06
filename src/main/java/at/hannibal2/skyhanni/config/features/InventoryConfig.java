@@ -413,7 +413,7 @@ public class InventoryConfig {
                     "§bQuick Upgrade Missing Count (#)",
             }
     )
-    public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
+    public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9));
 
     @Expose
     @ConfigOption(
@@ -434,7 +434,7 @@ public class InventoryConfig {
                     "§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)",
             }
     )
-    public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6));
+    public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 9));
 
     @Expose
     @ConfigOption(
@@ -455,7 +455,7 @@ public class InventoryConfig {
                     "§bSkyBlock Achievements Points (%)",
             }
     )
-    public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(0));
+    public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(2, 4, 5, 8));
 
     @Expose
     @ConfigOption(
