@@ -51,6 +51,7 @@ class MenuItemDisplayOverlayMining {
         if (stackSizeConfig.contains(0) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
             if (lore.last().contains("Right-click to ") && lore.last().contains("disable") && lore.any { it.contains("Your Current Effect") }) {
+                // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
                 /*
                 "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
                 "§8 ■ §7Gain §a+50 §6☘ Mining Fortune§7." --> " ■ Gain +50 ☘ Mining Fortune."
@@ -66,13 +67,13 @@ class MenuItemDisplayOverlayMining {
                         currentEffectLineLocated = true
                     }
                     if (currentEffectLineLocated && line.contains(" ■ ")) {
-                        return when (line.removeColor()) {
-                            " ■ Gain +100 ⸕ Mining Speed" -> return "§6⸕§a⬆"
-                            " ■ Gain +50 ☘ Mining Fortune." -> return "§6☘§a⬆"
-                            " ■ Gain +15% more Powder while" -> return "§a%⬆✳"
-                            " ■ Reduce Pickaxe Ability cooldown" -> return "§a⸕☉⬇"
-                            " ■ 10x chance to find Goblins" -> return "§a*⬆§6☃"
-                            " ■ Gain 5x Titanium drops." -> return "§a*⬆§9T"
+                        return when (line.removeColor().replace(" ■ ", "").replace(".", "")) {
+                            "Gain +100 ⸕ Mining Speed" -> return "§a+§6⸕"
+                            "Gain +50 ☘ Mining Fortune" -> return "§a+§6☘"
+                            "Gain +15% more Powder while" -> return "§a15%"
+                            "Reduce Pickaxe Ability cooldown" -> return "§a20%"
+                            "10x chance to find Goblins" -> return "§a10x"
+                            "Gain 5x Titanium drops" -> return "§a5x§9T"
                             else -> "§c!?"
                         }
                     }
