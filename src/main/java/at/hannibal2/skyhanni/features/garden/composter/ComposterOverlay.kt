@@ -448,7 +448,7 @@ class ComposterOverlay {
 
     private fun retrieveMaterials(internalName: String, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0 || internalName == "BIOFUEL") return
-        if (config.composterOverlayGetType == 0 && !LorenzUtils.noTradeMode) {
+        if (config.composterOverlayRetrieveFrom == 0 && !LorenzUtils.noTradeMode) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
