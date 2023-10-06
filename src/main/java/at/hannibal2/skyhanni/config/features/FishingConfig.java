@@ -244,12 +244,13 @@ public class FishingConfig {
         @Expose
         @ConfigOption(name = "Alert (Own Sea Creatures)", desc = "Show an alert on screen when you catch a rare sea creature.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean alertOwnCatches = true;
 
         @Expose
         @ConfigOption(name = "Alert (Other Sea Creatures)", desc = "Show an alert on screen when other players nearby catch a rare sea creature.")
         @ConfigEditorBoolean
-        public boolean alertNearbyCatches = false;
+        public boolean alertOtherCatches = false;
 
         @Expose
         @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare sea creature alerts are displayed.")
@@ -259,6 +260,7 @@ public class FishingConfig {
         @Expose
         @ConfigOption(name = "Highlight", desc = "Highlight nearby rare sea creatures.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean highlight = false;
 
     }

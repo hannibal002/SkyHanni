@@ -49,7 +49,7 @@ class SeaCreatureFeatures {
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
             { config.highlight }
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlight }
-            if (config.alertNearbyCatches && lastRareCatch.passedSince() > 1.seconds) {
+            if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
                 TitleUtils.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6)
                 if (config.playSound) SoundUtils.playBeepSound()
