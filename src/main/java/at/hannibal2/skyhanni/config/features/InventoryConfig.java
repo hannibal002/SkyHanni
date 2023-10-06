@@ -480,12 +480,13 @@ public class InventoryConfig {
     )
     @ConfigEditorDraggableList(
             exampleText = {
+                    "§bCurrent Sky Mall Perk (Abbv)", //do not move this PLEASE otherwise one of the other stack size features will break
                     "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
                     "§bHOTM Tiers Progress (%)",
                     "§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)",
             }
     )
-    public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(0, 1));
+    public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(1, 2));
 
     @Expose
     @ConfigOption(
