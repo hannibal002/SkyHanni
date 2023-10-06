@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,6 +35,25 @@ class QuickCraftFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!isEnabled()) return
+        if (LorenzUtils.isControlKeyDown()) return
+        if (event.gui !is GuiChest) return
+        val chest = event.gui.inventorySlots as ContainerChest
+
+        for (slot in chest.inventorySlots) {
+            if (slot == null) continue
+            if (slot.slotNumber !in quickCraftSlots) continue
+            val stack = slot.stack
+            if (stack.name == "§cQuick Crafting Slot") continue
+            if (needsQuickCraftConfirmation(stack)) {
+                val color = LorenzColor.DARK_GRAY.addOpacity(180)
+                stack.background = color.rgb
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !quickCraftSlots.contains(event.slot?.slotNumber)) return
@@ -45,6 +69,7 @@ class QuickCraftFeatures {
         return !quickCraftableItems.contains(item.displayName.removeColor())
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableQuickCraftingConfirmation && InventoryUtils.openInventoryName() == "Craft Item"
+    fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.quickCraftingConfirmation && InventoryUtils.openInventoryName() == "Craft Item"
 
 }
