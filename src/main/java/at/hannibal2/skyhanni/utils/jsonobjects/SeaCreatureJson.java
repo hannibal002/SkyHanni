@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.jsonobjects;
 
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent;
+import at.hannibal2.skyhanni.utils.LorenzRarity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
 
@@ -26,7 +26,7 @@ public class SeaCreatureJson {
         @Expose
         public Boolean rare;
         @Expose
-        public String rarity;
+        public LorenzRarity rarity;
     }
 
 }

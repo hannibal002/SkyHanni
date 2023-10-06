@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.jsonobjects.SeaCreatureJson
 import com.google.gson.reflect.TypeToken
@@ -45,7 +44,7 @@ class SeaCreatureManager {
                 for ((displayName, seaCreature) in variant.sea_creatures) {
                     val chatMessage = seaCreature.chat_message
                     val fishingExperience = seaCreature.fishing_experience
-                    val rarity = LorenzRarity.getByName(seaCreature.rarity) ?: LorenzRarity.COMMON
+                    val rarity = seaCreature.rarity
                     val rare = seaCreature.rare ?: false
 
                     val creature = SeaCreature(displayName, fishingExperience, chatColor, rare, rarity)
