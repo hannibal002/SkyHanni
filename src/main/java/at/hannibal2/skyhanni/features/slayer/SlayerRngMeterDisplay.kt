@@ -53,7 +53,7 @@ class SlayerRngMeterDisplay {
 
         if (!isEnabled()) return
 
-        if (config.hideChat && SlayerAPI.isInSlayerArea) {
+        if (config.hideChat && SlayerAPI.isInCorrectArea) {
             changedItemPattern.matchMatcher(event.message) {
                 event.blockedReason = "slayer_rng_meter"
             }
@@ -117,7 +117,7 @@ class SlayerRngMeterDisplay {
 
         val storage = getStorage() ?: return
 
-        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§aSELECTED") } }
+        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         if (selectedItem == null) {
             storage.itemGoal = ""
             storage.goalNeeded = -1
@@ -167,10 +167,10 @@ class SlayerRngMeterDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        config.pos.renderString(display, posLabel = "Rng Meter Display")
+        config.pos.renderString(display, posLabel = "RNG Meter Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

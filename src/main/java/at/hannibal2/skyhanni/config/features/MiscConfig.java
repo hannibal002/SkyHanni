@@ -44,7 +44,7 @@ public class MiscConfig {
     public static class PetExperienceToolTipConfig {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.")
+        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean petDisplay = true;
@@ -650,6 +650,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean superpairsClicksAlert = false;
+
+    @Expose
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixNeuHeavyPearls = true;
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
