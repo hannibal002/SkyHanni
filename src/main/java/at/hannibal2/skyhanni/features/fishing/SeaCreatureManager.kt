@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.jsonobjects.SeaCreatureJson
-import com.google.gson.reflect.TypeToken
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SeaCreatureManager {
