@@ -145,7 +145,6 @@ class HideNotClickableItems {
         if (isDisabled()) return
         if (!config.hideNotClickableItemsBlockClicks) return
         if (bypasssActive()) return
-
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 
