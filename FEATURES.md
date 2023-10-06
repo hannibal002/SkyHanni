@@ -92,7 +92,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight stuff that is missing in the SkyBlock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
-+ **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + **Contest Time** - Show the real time format to the farming contest description.
 + **Pet Candies Used number**
     + Works even after Hypixel removed the `10 pet candies applied` line
@@ -508,6 +507,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
 
+## Events
+
++ Highlight Jerries during the Jerrypoclaypse. - Erymanthus
+
 ## Commands
 
 + **/shcommands**
@@ -616,7 +619,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Only on Private island.
 + Account upgrade complete reminder. - appable0
 + Pet Experience Tooltip
-    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
       shift key.
     + Highlight the level 100 text in gold for pets below legendary. - hannibal2
       (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)

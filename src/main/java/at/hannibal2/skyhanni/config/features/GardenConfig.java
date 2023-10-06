@@ -839,7 +839,7 @@ public class GardenConfig {
     public boolean dicerCounter = false;
 
     @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigOption(name = "RNG Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     @FeatureToggle
