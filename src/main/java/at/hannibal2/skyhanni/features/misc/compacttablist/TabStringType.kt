@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
-enum class TabStringType() {
+enum class TabStringType {
     TITLE,
     SUB_TITLE,
     TEXT,

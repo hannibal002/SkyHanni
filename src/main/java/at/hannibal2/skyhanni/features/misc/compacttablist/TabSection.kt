@@ -1,16 +1,11 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
-class TabSection(column: TabColumn) {
-
-    var columnValue = column
-
+class TabSection(val columnValue: TabColumn) {
     val lines = mutableListOf<String>()
 
     fun addLine(line: String) {
         lines.add(line)
     }
 
-    fun size(): Int {
-        return lines.size
-    }
+    fun size() = lines.size
 }

@@ -76,7 +76,6 @@ object TabListRenderer {
             -0x80000000
         )
 
-
         var headerY = y
         if (header.isNotEmpty()) {
             for (line in header) {

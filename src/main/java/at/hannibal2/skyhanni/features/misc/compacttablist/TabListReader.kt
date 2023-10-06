@@ -1,20 +1,16 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import at.hannibal2.skyhanni.utils.TabListData
-import com.google.common.collect.Ordering
 import net.minecraft.client.Minecraft
-import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// heavily inspired by SBA code
 object TabListReader {
-    private val playerOrdering = Ordering.from(TabListData.PlayerComparator())
-
     var hypixelAdvertisingString = "HYPIXEL.NET"
     private val godPotPattern = "You have a God Potion active! (?<timer>[\\w ]+)".toPattern()
     private val activeEffectPattern = "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*".toPattern()
@@ -25,17 +21,13 @@ object TabListReader {
     private val tabListSPattern = "(?i)§S".toPattern()
 
     val renderColumns = mutableListOf<RenderColumn>()
-    // heavily inspired by SBA code
+
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(5)) return
+    fun onTick(event: TabListUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.compactTabList.enabled) return
-        val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return
 
-        if (thePlayer.sendQueue == null) return
-
-        var tabLines = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        var tabLines = event.tabList
 
         if (tabLines.size < 80) return
 
@@ -56,12 +48,11 @@ object TabListReader {
         combineColumnsToRender(columns, renderColumn)
     }
 
-    private fun parseColumns(fullTabList: List<NetworkPlayerInfo>): MutableList<TabColumn> {
+    private fun parseColumns(fullTabList: List<String>): MutableList<TabColumn> {
         val columns = mutableListOf<TabColumn>()
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList
 
         for (entry in fullTabList.indices step 20) {
-            val title = tabList.getPlayerName(fullTabList[entry]).trimWhiteSpaceAndResets()
+            val title = fullTabList[entry].trimWhiteSpaceAndResets()
             var column = getColumnFromName(columns, title)
 
             if (column == null) {
@@ -70,7 +61,7 @@ object TabListReader {
             }
 
             for (columnEntry in (entry + 1) until fullTabList.size.coerceAtMost(entry + 20)) {
-                column.addLine(tabList.getPlayerName(fullTabList[columnEntry]))
+                column.addLine(fullTabList[columnEntry])
             }
         }
         return columns
