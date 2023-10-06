@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -23,14 +24,39 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     private val bankBalancePattern = "(§.)?Current balance: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
     private val amtToWithdrawPattern = "(§.)?Amount to withdraw: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
 
+    /*
+    see the next comment block for context of
+    this oddball RenderInventoryItemTipEvent function
+
+    - ery
+    */
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+        if (!(event.inventoryName.contains("Bank Account"))) return
         event.stackTip = getStackTip(event.stack)
         if (event.stackTip.contains("Balance: ")) {
             event.offsetY = -23
             event.offsetX = 0
             event.alignLeft = false
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderItemTip(event: RenderItemTipEvent) {
+        if (event.stack.cleanName().contains("Deposit Coins")) return
+        /*
+        so apparently i have to make a whole separate event for the bank balance display.
+        also having everything in this class rely on RenderInventoryItemTipEvent would
+        cause weird results in auction house sorting item (and probably other places too,
+        but i noticed it first in auction house and immediately sought to fix the issue
+        here.
+
+        the above line was the quickest fix without having to write a whole separate function
+        specifically for grabbing the bank balance.
+
+        - ery
+        */
+        event.stackTip = getStackTip(event.stack)
     }
 
     private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
