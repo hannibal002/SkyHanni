@@ -142,28 +142,19 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (event.gui !is GuiChest) return
+        if (isDisabled()) return
+        if (!config.hideNotClickableItemsBlockClicks) return
+        if (bypasssActive()) return
 
+        if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 
         val slot = event.slot ?: return
 
         if (slot.slotNumber == slot.slotIndex) return
-
         if (slot.stack == null) return
 
         val stack = slot.stack
-
-        if (config.shiftClickForEquipment && chestName.startsWith("Your Equipment")) {
-            Minecraft.getMinecraft().playerController.windowClick(event.container.windowId, event.slot.slotNumber, event.clickedButton, 1, Minecraft.getMinecraft().thePlayer)
-            event.isCanceled = true
-        }
-
-        if (isDisabled()) return
-
-        if (!config.hideNotClickableItemsBlockClicks) return
-
-        if (bypasssActive()) return
 
         if (hide(chestName, stack)) {
             event.isCanceled = true

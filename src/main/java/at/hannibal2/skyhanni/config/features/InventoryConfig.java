@@ -416,9 +416,9 @@ public class InventoryConfig {
     public boolean highlightAuctions = true;
 
     @Expose
-    @ConfigOption(name = "Shift Click For Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
+    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean shiftClickForEquipment = true;
+    public boolean shiftClickForEquipment = false;
 
 }

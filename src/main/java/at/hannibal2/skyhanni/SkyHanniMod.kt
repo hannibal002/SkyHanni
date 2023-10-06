@@ -140,15 +140,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
-import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
-import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
-import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
-import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
-import at.hannibal2.skyhanni.features.inventory.ItemStars
-import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
-import at.hannibal2.skyhanni.features.inventory.SackDisplay
-import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
-import at.hannibal2.skyhanni.features.inventory.StatsTuning
+import at.hannibal2.skyhanni.features.inventory.*
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
@@ -570,6 +562,7 @@ class SkyHanniMod {
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
+        loadModule(ShiftClickEquipment())
 
         init()
 
