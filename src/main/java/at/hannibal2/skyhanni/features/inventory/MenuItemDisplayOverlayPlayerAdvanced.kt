@@ -27,7 +27,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     /*
     see the next comment block for context of
     this oddball RenderInventoryItemTipEvent function
-
+    DO NOT CHANGE THE BELOW RenderInventoryItemTipEvent FUNCTION
+    UNLESS IF YOU KNOW WHAT YOU'RE DOING!!
     - ery
     */
     @SubscribeEvent
@@ -53,6 +54,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
         the above line was the quickest fix without having to write a whole separate function
         specifically for grabbing the bank balance.
+
+        therefore:
+
+        DO NOT CHANGE ANYTHING INSIDE THIS RenderItemTipEvent FUNCTION
+        UNLESS IF YOU KNOW WHAT YOU'RE DOING!!
 
         - ery
         */
