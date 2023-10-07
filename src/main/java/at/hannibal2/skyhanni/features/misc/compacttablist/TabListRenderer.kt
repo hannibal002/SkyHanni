@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -20,9 +21,9 @@ object TabListRenderer {
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
+        if (!LorenzUtils.inSkyBlock) return
         if (event.type != RenderGameOverlayEvent.ElementType.PLAYER_LIST) return
         if (!config.enabled) return
-        if (TabListReader.renderColumns.isEmpty()) return
         event.isCanceled = true
 
         val columns = TabListReader.renderColumns

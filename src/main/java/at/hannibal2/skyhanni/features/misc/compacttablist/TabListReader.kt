@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -23,11 +26,12 @@ object TabListReader {
     val renderColumns = mutableListOf<RenderColumn>()
 
     @SubscribeEvent
-    fun onTick(event: TabListUpdateEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!event.isMod(5)) return
         if (!SkyHanniMod.feature.misc.compactTabList.enabled) return
 
-        var tabLines = event.tabList
+        var tabLines = TabListData.getTabList()
 
         if (tabLines.size < 80) return
 
