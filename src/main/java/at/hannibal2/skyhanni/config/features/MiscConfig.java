@@ -573,7 +573,7 @@ public class MiscConfig {
             public boolean reverseSort = false;
 
             @Expose
-            @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons of player in the tab list.")
+            @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons/skins of player in the tab list.")
             @ConfigEditorBoolean
             public boolean hidePlayerIcons = false;
 
