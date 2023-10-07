@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.FriendAPI
+import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -155,18 +156,17 @@ object AdvancedPlayerList {
         MarkedPlayerManager.isMarkedPlayer(name) -> 8
         PartyAPI.partyMembers.contains(name) -> 5
         FriendAPI.getAllFriends().any { it.name.contains(name) } -> 4
-        // TODO add guild
+        GuildAPI.isInGuild(name) -> 3
 
         else -> 1
     }
 
     private fun getSocialScoreIcon(score: Int) = when (score) {
-        10 -> "§cTHIS IS ME"
-        8 -> "§eMARKED"
+        10 -> "§c§lME"
+        8 -> "§e§lMARKED"
         5 -> "§7§lP"
-        4 -> "§9§lF"
-        3 -> "§aG"
-        // TODO add guild
+        4 -> "§6§lF"
+        3 -> "§2§lG"
 
         else -> ""
     }

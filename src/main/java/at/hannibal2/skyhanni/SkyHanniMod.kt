@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
@@ -355,6 +356,7 @@ class SkyHanniMod {
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI())
         loadModule(PartyAPI())
+        loadModule(GuildAPI)
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
