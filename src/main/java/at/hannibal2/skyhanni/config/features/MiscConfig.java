@@ -563,6 +563,32 @@ public class MiscConfig {
         @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
         @ConfigEditorBoolean
         public boolean reverseSort = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
+        @ConfigEditorBoolean
+        public boolean hideRankColor = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Emblems", desc = "Hide the emblems behind the player name.")
+        @ConfigEditorBoolean
+        public boolean hideEmblem = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Level", desc = "Hide the SkyBlock level numbers.")
+        @ConfigEditorBoolean
+        public boolean hideLevel = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Level Brackets", desc = "Hide the emblems behind the player name.")
+        @ConfigEditorBoolean
+        public boolean hideLevelBrackets = false;
+
+        @Expose
+        @ConfigOption(name = "Level Color As Name", desc = "Use the color of the skyblock level as the player color.")
+        @ConfigEditorBoolean
+        public boolean useLevelColorForName = false;
+
     }
 
     @Expose

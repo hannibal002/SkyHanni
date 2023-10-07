@@ -80,11 +80,10 @@ object TabListReader {
     }
 
     private fun newSorting(original: List<String>): List<String> {
-
         if (LorenzUtils.inKuudraFight) return original
         if (LorenzUtils.inDungeons) return original
 
-        val pattern = ".*\\[(?<rank>.*)] (?<name>.*)".toPattern()
+        val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
         val playerDatas = mutableMapOf<String, PlayerData>()
         newList.add(original.first())
@@ -101,21 +100,28 @@ object TabListReader {
                 continue
             }
             pattern.matchMatcher(line) {
-                val removeColor = group("rank").removeColor()
+                val levelText = group("level")
+                val removeColor = levelText.removeColor()
                 try {
                     val playerData = PlayerData(removeColor.toInt())
                     playerDatas[line] = playerData
 
                     val fullName = group("name")
                     val name = fullName.split(" ")
-                    playerData.name = name[0].removeColor()
+                    val coloredName = name[0]
+                    playerData.coloredName = coloredName
+                    playerData.name = coloredName.removeColor()
+                    playerData.levelText = levelText
                     if (name.size > 1) {
-                        val rest = name.drop(1).joinToString(" ")
-                        if (rest.contains("♲")) {
+                        val nameSuffix = name.drop(1).joinToString(" ")
+                        playerData.nameSuffix = nameSuffix
+                        if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
                         } else {
                             playerData.bingoLevel = getBingoRank(line)
                         }
+                    } else {
+                        playerData.nameSuffix = ""
                     }
 
                 } catch (e: NumberFormatException) {
@@ -147,7 +153,7 @@ object TabListReader {
             else -> prepare
         }
 
-        var newPlayerList = sorted.map { it.key }.toMutableList()
+        var newPlayerList = sorted.map { buildName(it.value) }.toMutableList()
         if (config.reverseSort) {
             newPlayerList = newPlayerList.reversed().toMutableList()
         }
@@ -159,6 +165,29 @@ object TabListReader {
         val rest = original.drop(playerDatas.size + extraTitles + 1)
         newList.addAll(rest)
         return newList
+    }
+
+    private fun buildName(data: PlayerData): String {
+        val playerName = if (config.useLevelColorForName) {
+            val c = data.levelText[3]
+            "§$c" + data.name
+        } else if (config.hideRankColor) "§b" + data.name else data.coloredName
+
+        val level = if (!config.hideLevel) {
+            if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
+        } else ""
+
+        val suffix = if (config.hideEmblem) {
+            if (data.ironman) {
+                "§8[§7Iron Man§8]"
+            } else {
+                if (data.bingoLevel > -1) {
+                    "§rBingo ${data.bingoLevel}"
+                } else ""
+            }
+        } else data.nameSuffix
+
+        return "$level $playerName $suffix"
     }
 
     private var randomOrderCache =
@@ -194,12 +223,14 @@ object TabListReader {
         else -> -1
     }
 
-    class PlayerData(
-        val sbLevel: Int,
-        var name: String = "",
-        var ironman: Boolean = false,
+    class PlayerData(val sbLevel: Int) {
+        var name: String = "?"
+        var coloredName: String = "?"
+        var nameSuffix: String = "?"
+        var levelText: String = "?"
+        var ironman: Boolean = false
         var bingoLevel: Int = -1
-    )
+    }
 
     private fun parseFooterAsColumn(): TabColumn? {
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
