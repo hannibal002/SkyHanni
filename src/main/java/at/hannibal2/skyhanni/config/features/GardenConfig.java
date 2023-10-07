@@ -6,17 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -1111,7 +1101,7 @@ public class GardenConfig {
     public int composterOverlayPriceType = 0;
 
     @Expose
-    @ConfigOption(name = "Retrieve From", desc = "Where should the items be tried to get retrieved from?: From the Bazaar or from the Sacks.")
+    @ConfigOption(name = "Retrieve From", desc = "Toggle to retrieve the materials from the Bazaar or Sacks in the composter overlay.")
     @ConfigEditorDropdown(values = {"Bazaar", "Sacks"})
     @ConfigAccordionId(id = 17)
     public int composterOverlayRetrieveFrom = 0;

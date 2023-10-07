@@ -479,17 +479,15 @@ class ComposterOverlay {
             return
         }
 
-        if (having < itemsNeeded) {
-            LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
-            if (amountInSacks <= itemsNeeded - having) {
-                if (LorenzUtils.noTradeMode) {
-                    LorenzUtils.chat("§e[SkyHanni] You're out of $itemName §ein your sacks!")
-                } else {
-                    LorenzUtils.clickableChat(
-                        "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
-                        "bz ${itemName.removeColor()}"
-                    )
-                }
+        LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
+        if (amountInSacks <= itemsNeeded - having) {
+            if (LorenzUtils.noTradeMode) {
+                LorenzUtils.chat("§e[SkyHanni] You're out of $itemName §ein your sacks!")
+            } else {
+                LorenzUtils.clickableChat(
+                    "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    "bz ${itemName.removeColor()}"
+                )
             }
         }
     }
