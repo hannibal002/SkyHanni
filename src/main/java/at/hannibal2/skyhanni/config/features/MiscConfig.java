@@ -602,6 +602,10 @@ public class MiscConfig {
             @ConfigEditorBoolean
             public boolean useLevelColorForName = false;
 
+            @Expose
+            @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familar with bingo.")
+            @ConfigEditorBoolean
+            public boolean showBingoRankNumber = false;
         }
     }
 

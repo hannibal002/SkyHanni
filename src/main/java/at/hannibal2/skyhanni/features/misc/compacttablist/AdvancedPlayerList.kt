@@ -165,15 +165,22 @@ object AdvancedPlayerList {
         else -> -1
     }
 
-    private fun getBingoIcon(rank: Int) = when (rank) {
-        -1 -> "" // Not in Bingo
+    private fun getBingoIcon(rank: Int): String {
+        val rankIcon = when (rank) {
+            -1 -> "" // Not in Bingo
 
-        0 -> "§7Ⓑ" //No Rank
-        1 -> "§aⒷ" //Rank 1
-        2 -> "§9Ⓑ" //Rank 2
-        3 -> "§5Ⓑ" //Rank 3
-        4 -> "§6Ⓑ" //Rank 4
-        else -> "Bingo?"
+            0 -> "§7Ⓑ" //No Rank
+            1 -> "§aⒷ" //Rank 1
+            2 -> "§9Ⓑ" //Rank 2
+            3 -> "§5Ⓑ" //Rank 3
+            4 -> "§6Ⓑ" //Rank 4
+            else -> "Bingo?"
+        }
+        return if (config.showBingoRankNumber && rank != -1) {
+            "$rankIcon $rank"
+        } else {
+            rankIcon
+        }
     }
 
     class PlayerData(val sbLevel: Int) {
