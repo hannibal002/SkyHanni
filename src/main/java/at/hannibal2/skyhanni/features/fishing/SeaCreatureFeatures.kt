@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -77,6 +78,7 @@ class SeaCreatureFeatures {
         YETI(EntityPlayer::class.java, "Yeti", 2_000_000),
         NUTCRACKER(EntityZombie::class.java, "Nutcracker", 4_000_000),
         GREAT_WHITE_SHARK(EntityPlayer::class.java, "Great White Shark", 1_500_000),
+        LORD_JAWBUS(EntityIronGolem::class.java, "Lord Jawbus", 100_000_000),
         ;
     }
 }
