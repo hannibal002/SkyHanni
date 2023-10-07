@@ -549,9 +549,20 @@ public class MiscConfig {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist")
+        @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist.")
         @ConfigEditorBoolean
         public boolean hideAdverts = false;
+
+        @Expose
+        @ConfigOption(name = "Player Sort", desc = "Change what the player list is sorted by.")
+        @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild"})
+        @ConfigAccordionId(id = 1)
+        public int playerSort = 0;
+
+        @Expose
+        @ConfigOption(name = "Invert Sort", desc = "Flip the player list on its head (also works with default rank).")
+        @ConfigEditorBoolean
+        public boolean reverseSort = false;
     }
 
     @Expose

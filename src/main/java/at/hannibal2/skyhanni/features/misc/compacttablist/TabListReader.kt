@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.FriendAPI
+import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -14,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
 object TabListReader {
+    private val config get() = SkyHanniMod.feature.misc.compactTabList
     var hypixelAdvertisingString = "HYPIXEL.NET"
     private val godPotPattern = "You have a God Potion active! (?<timer>[\\w ]+)".toPattern()
     private val activeEffectPattern = "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*".toPattern()
@@ -29,7 +33,7 @@ object TabListReader {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.isMod(5)) return
-        if (!SkyHanniMod.feature.misc.compactTabList.enabled) return
+        if (!config.enabled) return
 
         var tabLines = TabListData.getTabList()
 
@@ -52,8 +56,9 @@ object TabListReader {
         combineColumnsToRender(columns, renderColumn)
     }
 
-    private fun parseColumns(fullTabList: List<String>): MutableList<TabColumn> {
+    private fun parseColumns(original: List<String>): MutableList<TabColumn> {
         val columns = mutableListOf<TabColumn>()
+        val fullTabList = newSorting(original)
 
         for (entry in fullTabList.indices step 20) {
             val title = fullTabList[entry].trimWhiteSpaceAndResets()
@@ -71,6 +76,112 @@ object TabListReader {
         return columns
     }
 
+    private fun newSorting(original: List<String>): List<String> {
+
+        if (LorenzUtils.inKuudraFight) return original
+        if (LorenzUtils.inDungeons) return original
+
+        val pattern = ".*\\[(?<rank>.*)] (?<name>.*)".toPattern()
+        val newList = mutableListOf<String>()
+        val playerDatas = mutableMapOf<String, PlayerData>()
+        newList.add(original.first())
+
+        var extraTitles = 0
+        var i = 0
+
+        for (line in original) {
+            i++
+            if (i == 1) continue
+            if (line.isEmpty() || line.contains("Server Info")) break
+            if (line.contains("§r§a§lPlayers")) {
+                extraTitles++
+                continue
+            }
+            pattern.matchMatcher(line) {
+                val removeColor = group("rank").removeColor()
+                try {
+                    val playerData = PlayerData(removeColor.toInt())
+                    playerDatas[line] = playerData
+
+                    val fullName = group("name")
+                    val name = fullName.split(" ")
+                    playerData.name = name[0].removeColor()
+                    if (name.size > 1) {
+                        val rest = name.drop(1).joinToString(" ")
+                        if (rest.contains("♲")) {
+                            playerData.ironman = true
+                        } else {
+                            playerData.bingoLevel = getBingoRank(line)
+                        }
+                    }
+
+                } catch (e: NumberFormatException) {
+                    val message = "Special user (youtube or admin?): '$line'"
+                    LorenzUtils.debug(message)
+                    println(message)
+                }
+            }
+        }
+        val prepare = playerDatas.entries
+
+        val sorted = when (config.playerSort) {
+
+            // Rank (Default)
+            1 -> prepare.sortedBy { -(it.value.sbLevel) }
+
+            // Name (Abc)
+            2 -> prepare.sortedBy { it.value.name.lowercase().replace("_", "") }
+
+            // Ironman/Bingo
+            3 -> prepare.sortedBy { -if (it.value.ironman) 10 else it.value.bingoLevel }
+
+            // Party/Friends/Guild First
+            4 -> prepare.sortedBy { -socialScore(it.value.name) }
+
+            else -> prepare
+        }
+
+        var newPlayerList = sorted.map { it.key }.toMutableList()
+        if (config.reverseSort) {
+            newPlayerList = newPlayerList.reversed().toMutableList()
+        }
+        if (extraTitles > 0) {
+            newPlayerList.add(19, original.first())
+        }
+        newList.addAll(newPlayerList)
+
+        val rest = original.drop(playerDatas.size + extraTitles + 1)
+        newList.addAll(rest)
+        return newList
+    }
+
+    private fun socialScore(name: String) = when {
+        LorenzUtils.getPlayerName() == name -> 5
+        MarkedPlayerManager.isMarkedPlayer(name) -> 4
+        PartyAPI.partyMembers.contains(name) -> 3
+        FriendAPI.getAllFriends().any { it.name == name } -> 2
+        // TODO add guild
+
+        else -> 1
+    }
+
+    private fun getBingoRank(text: String) = when {
+        text.contains("§7Ⓑ") -> 0 //No Rank
+        text.contains("§aⒷ") -> 1 //Rank 1
+        text.contains("§9Ⓑ") -> 2 //Rank 2
+        text.contains("§5Ⓑ") -> 3 //Rank 3
+        text.contains("§6Ⓑ") -> 4 //Rank 4
+
+        else -> -1
+    }
+
+    class PlayerData(
+        val sbLevel: Int,
+        var name: String = "",
+        var ironman: Boolean = false,
+        var bingoLevel: Int = -1
+    )
+
     private fun parseFooterAsColumn(): TabColumn? {
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
 
@@ -84,7 +195,8 @@ object TabListReader {
 
         var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
         if (matcher.find()) {
-            footer = activeEffectPattern.matcher(footer).replaceAll("Active Effects:\n§cGod Potion§r: ${matcher.group("timer")}")
+            footer = activeEffectPattern.matcher(footer)
+                .replaceAll("Active Effects:\n§cGod Potion§r: ${matcher.group("timer")}")
         } else {
             matcher = effectCountPattern.matcher(tabList.footer_skyhanni.unformattedText)
             footer = if (matcher.find()) {
