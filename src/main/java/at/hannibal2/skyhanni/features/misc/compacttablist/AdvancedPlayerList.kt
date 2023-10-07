@@ -131,9 +131,6 @@ object AdvancedPlayerList {
 
         if (config.markSpecialPersons) {
             val score = socialScore(data.name)
-            if (score != 1) {
-                LorenzUtils.debug(data.name + " score = $score")
-            }
             suffix += " " + getSocialScoreIcon(score)
         }
 
