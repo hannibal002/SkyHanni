@@ -142,16 +142,10 @@ class HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
+            if (BingoAPI.getRank(line) != null) {
+                bingo = true
+            }
             when (line) {
-                " §7Ⓑ §7Bingo", // No Rank
-                " §aⒷ §aBingo", // Rank 1
-                " §9Ⓑ §9Bingo", // Rank 2
-                " §5Ⓑ §5Bingo", // Rank 3
-                " §6Ⓑ §6Bingo", // Rank 4
-                -> {
-                    bingo = true
-                }
-
                 " §7♲ §7Ironman" -> {
                     ironman = true
                 }

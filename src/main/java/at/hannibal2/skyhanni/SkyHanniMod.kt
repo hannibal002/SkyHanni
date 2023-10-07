@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
@@ -361,6 +362,7 @@ class SkyHanniMod {
         loadModule(PurseAPI())
         loadModule(RiftAPI)
         loadModule(SackAPI)
+        loadModule(BingoAPI)
 
         // features
         loadModule(BazaarOrderHelper())
