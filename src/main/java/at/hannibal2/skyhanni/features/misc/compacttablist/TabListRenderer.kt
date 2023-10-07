@@ -106,13 +106,13 @@ object TabListRenderer {
                 val savedX = middleX
 
                 if (tabLine.type == TabStringType.PLAYER) {
-                    val pLayerInfo = minecraft.netHandler.getPlayerInfo(TabStringType.usernameFromLine(tabLine.text))
-                    if (pLayerInfo != null) {
-                        val player = minecraft.theWorld.getPlayerEntityByUUID(pLayerInfo.gameProfile.id)
-
-                        minecraft.textureManager.bindTexture(pLayerInfo.locationSkin)
+                    val playerInfo = tabLine.getInfo()
+                    if (playerInfo != null) {
+                        minecraft.textureManager.bindTexture(playerInfo.locationSkin)
                         GlStateManager.color(1f, 1f, 1f, 1f)
                         Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+
+                        val player = tabLine.getEntity(playerInfo)
                         if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
                             Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40.0f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
                         }
@@ -122,14 +122,14 @@ object TabListRenderer {
 
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
-                        tabLine.text,
+                        tabLine.customName,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
                         0xFFFFFF
                     )
                 } else {
                     minecraft.fontRendererObj.drawStringWithShadow(
-                        tabLine.text,
+                        tabLine.customName,
                         middleX.toFloat(),
                         middleY.toFloat(),
                         0xFFFFFF

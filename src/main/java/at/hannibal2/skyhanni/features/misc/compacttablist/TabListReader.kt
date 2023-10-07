@@ -29,6 +29,7 @@ object TabListReader {
     private val dungeonBuffPattern = "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
     private val upgradesPattern = "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)".toPattern()
     private val tabListSPattern = "(?i)§S".toPattern()
+    private var playerDatas = mutableMapOf<String, PlayerData>()
 
     val renderColumns = mutableListOf<RenderColumn>()
 
@@ -83,9 +84,11 @@ object TabListReader {
         if (LorenzUtils.inKuudraFight) return original
         if (LorenzUtils.inDungeons) return original
 
+        if (LorenzUtils.isControlKeyDown()) return original
+
         val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
-        val playerDatas = mutableMapOf<String, PlayerData>()
+        val currentData = mutableMapOf<String, PlayerData>()
         newList.add(original.first())
 
         var extraTitles = 0
@@ -104,7 +107,7 @@ object TabListReader {
                 val removeColor = levelText.removeColor()
                 try {
                     val playerData = PlayerData(removeColor.toInt())
-                    playerDatas[line] = playerData
+                    currentData[line] = playerData
 
                     val fullName = group("name")
                     val name = fullName.split(" ")
@@ -131,7 +134,8 @@ object TabListReader {
                 }
             }
         }
-        val prepare = playerDatas.entries
+        playerDatas = currentData
+        val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
 
@@ -153,7 +157,7 @@ object TabListReader {
             else -> prepare
         }
 
-        var newPlayerList = sorted.map { buildName(it.value) }.toMutableList()
+        var newPlayerList = sorted.map { it.key }.toMutableList()
         if (config.reverseSort) {
             newPlayerList = newPlayerList.reversed().toMutableList()
         }
@@ -167,7 +171,7 @@ object TabListReader {
         return newList
     }
 
-    private fun buildName(data: PlayerData): String {
+    private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
             "§$c" + data.name
@@ -341,13 +345,13 @@ object TabListReader {
                         currentCount = 1
                     } else {
                         if (firstColumnCopy.size() > 0) {
-                            firstColumnCopy.addLine(TabLine("", TabStringType.TEXT))
+                            firstColumnCopy.addLine(createTabLine("", TabStringType.TEXT))
                         }
                     }
 
                     if (needsTitle) {
                         lastTitle = section.columnValue.columnTitle
-                        firstColumnCopy.addLine(TabLine(lastTitle, TabStringType.TITLE))
+                        firstColumnCopy.addLine(createTabLine(lastTitle, TabStringType.TITLE))
                         currentCount++
                     }
 
@@ -357,7 +361,7 @@ object TabListReader {
                             currentCount = 1
                         }
 
-                        firstColumnCopy.addLine(TabLine(line, TabStringType.fromLine(line)))
+                        firstColumnCopy.addLine(createTabLine(line, TabStringType.fromLine(line)))
                         currentCount++
                     }
                 } else {
@@ -365,20 +369,24 @@ object TabListReader {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                     } else {
                         if (firstColumnCopy.size() > 0) {
-                            firstColumnCopy.addLine(TabLine("", TabStringType.TEXT))
+                            firstColumnCopy.addLine(createTabLine("", TabStringType.TEXT))
                         }
                     }
 
                     if (needsTitle) {
                         lastTitle = section.columnValue.columnTitle
-                        firstColumnCopy.addLine(TabLine(lastTitle, TabStringType.TITLE))
+                        firstColumnCopy.addLine(createTabLine(lastTitle, TabStringType.TITLE))
                     }
 
                     for (line in section.lines) {
-                        firstColumnCopy.addLine(TabLine(line, TabStringType.fromLine(line)))
+                        firstColumnCopy.addLine(createTabLine(line, TabStringType.fromLine(line)))
                     }
                 }
             }
         }
     }
+
+    private fun createTabLine(text: String, type: TabStringType) = playerDatas[text]?.let {
+        TabLine(text, type, createCustomName(it))
+    } ?: TabLine(text, type)
 }
