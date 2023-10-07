@@ -538,12 +538,13 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Compact Tab List", desc = "")
     @Accordion
-    public CompactTabList compactTabList = new CompactTabList();
+    public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
-    public static class CompactTabList {
+    public static class CompactTabListConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
-                "doesn't break god-pot detection and shortens some other lines.") //made tablist one word here so both searches will pick it up
+                "doesn't break god-pot detection and shortens some other lines.")
+        //made tablist one word here so both searches will pick it up
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
@@ -554,46 +555,54 @@ public class MiscConfig {
         public boolean hideAdverts = false;
 
         @Expose
-        @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
-        @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
-        @ConfigAccordionId(id = 1)
-        public int playerSortOrder = 0;
+        @ConfigOption(name = "Advanced Player List", desc = "")
+        @Accordion
+        public AdvancedPlayerList advancedPlayerList = new AdvancedPlayerList();
 
-        @Expose
-        @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
-        @ConfigEditorBoolean
-        public boolean reverseSort = false;
+        public static class AdvancedPlayerList {
 
-        @Expose
-        @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons of player in the tab list.")
-        @ConfigEditorBoolean
-        public boolean hidePlayerIcons = false;
+            @Expose
+            @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
+            @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
+            @ConfigAccordionId(id = 1)
+            public int playerSortOrder = 0;
 
-        @Expose
-        @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
-        @ConfigEditorBoolean
-        public boolean hideRankColor = false;
+            @Expose
+            @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
+            @ConfigEditorBoolean
+            public boolean reverseSort = false;
 
-        @Expose
-        @ConfigOption(name = "Hide Emblems", desc = "Hide the emblems behind the player name.")
-        @ConfigEditorBoolean
-        public boolean hideEmblem = false;
+            @Expose
+            @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons of player in the tab list.")
+            @ConfigEditorBoolean
+            public boolean hidePlayerIcons = false;
 
-        @Expose
-        @ConfigOption(name = "Hide Level", desc = "Hide the SkyBlock level numbers.")
-        @ConfigEditorBoolean
-        public boolean hideLevel = false;
+            @Expose
+            @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
+            @ConfigEditorBoolean
+            public boolean hideRankColor = false;
 
-        @Expose
-        @ConfigOption(name = "Hide Level Brackets", desc = "Hide the emblems behind the player name.")
-        @ConfigEditorBoolean
-        public boolean hideLevelBrackets = false;
+            @Expose
+            @ConfigOption(name = "Hide Emblems", desc = "Hide the emblems behind the player name.")
+            @ConfigEditorBoolean
+            public boolean hideEmblem = false;
 
-        @Expose
-        @ConfigOption(name = "Level Color As Name", desc = "Use the color of the skyblock level as the player color.")
-        @ConfigEditorBoolean
-        public boolean useLevelColorForName = false;
+            @Expose
+            @ConfigOption(name = "Hide Level", desc = "Hide the SkyBlock level numbers.")
+            @ConfigEditorBoolean
+            public boolean hideLevel = false;
 
+            @Expose
+            @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
+            @ConfigEditorBoolean
+            public boolean hideLevelBrackets = false;
+
+            @Expose
+            @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
+            @ConfigEditorBoolean
+            public boolean useLevelColorForName = false;
+
+        }
     }
 
     @Expose

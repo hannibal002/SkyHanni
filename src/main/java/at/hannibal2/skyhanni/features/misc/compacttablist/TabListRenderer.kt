@@ -105,7 +105,7 @@ object TabListRenderer {
             for (tabLine in column.lines) {
                 val savedX = middleX
 
-                if (tabLine.type == TabStringType.PLAYER && !config.hidePlayerIcons) {
+                if (tabLine.type == TabStringType.PLAYER && !config.advancedPlayerList.hidePlayerIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         minecraft.textureManager.bindTexture(playerInfo.locationSkin)
@@ -120,7 +120,7 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                val text = if (TabListReader.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                val text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
