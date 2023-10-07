@@ -112,9 +112,7 @@ object AdvancedPlayerList {
         return newList
     }
 
-    fun ignoreCustomTabList(): Boolean {
-        return LorenzUtils.isControlKeyDown()
-    }
+    fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && LorenzUtils.isControlKeyDown()
 
     private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
