@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -62,7 +63,7 @@ object AdvancedPlayerList {
                         if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
                         } else {
-                            playerData.bingoLevel = getBingoRank(line)
+                            playerData.bingoLevel = BingoAPI.getRank(line)
                         }
                     } else {
                         playerData.nameSuffix = ""
@@ -87,7 +88,7 @@ object AdvancedPlayerList {
             2 -> prepare.sortedBy { it.value.name.lowercase().replace("_", "") }
 
             // Ironman/Bingo
-            3 -> prepare.sortedBy { -if (it.value.ironman) 10 else it.value.bingoLevel }
+            3 -> prepare.sortedBy { -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1 }
 
             // Party/Friends/Guild First
             4 -> prepare.sortedBy { -socialScore(it.value.name) }
@@ -125,7 +126,7 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else getBingoIcon(data.bingoLevel)
+            if (data.ironman) "§7♲" else data.bingoLevel?.let { getBingoIcon(it) } ?: ""
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
@@ -160,7 +161,8 @@ object AdvancedPlayerList {
     }
 
     private fun getSocialScoreIcon(score: Int) = when (score) {
-        10 -> "§c§lME"
+//        10 -> "§c§lME"
+        10 -> ""
         8 -> "§e§lMARKED"
         5 -> "§7§lP"
         4 -> "§6§lF"
@@ -169,27 +171,8 @@ object AdvancedPlayerList {
         else -> ""
     }
 
-    private fun getBingoRank(text: String) = when {
-        text.contains("§7Ⓑ") -> 0 //No Rank
-        text.contains("§aⒷ") -> 1 //Rank 1
-        text.contains("§9Ⓑ") -> 2 //Rank 2
-        text.contains("§5Ⓑ") -> 3 //Rank 3
-        text.contains("§6Ⓑ") -> 4 //Rank 4
-
-        else -> -1
-    }
-
     private fun getBingoIcon(rank: Int): String {
-        val rankIcon = when (rank) {
-            -1 -> "" // Not in Bingo
-
-            0 -> "§7Ⓑ" //No Rank
-            1 -> "§aⒷ" //Rank 1
-            2 -> "§9Ⓑ" //Rank 2
-            3 -> "§5Ⓑ" //Rank 3
-            4 -> "§6Ⓑ" //Rank 4
-            else -> "Bingo?"
-        }
+        val rankIcon = BingoAPI.getIcon(rank) ?: ""
         return if (config.showBingoRankNumber && rank != -1) {
             "$rankIcon $rank"
         } else {
@@ -203,6 +186,6 @@ object AdvancedPlayerList {
         var nameSuffix: String = "?"
         var levelText: String = "?"
         var ironman: Boolean = false
-        var bingoLevel: Int = -1
+        var bingoLevel: Int? = null
     }
 }
