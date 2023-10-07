@@ -125,11 +125,19 @@ object AdvancedPlayerList {
             if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
         } else ""
 
-        val suffix = if (config.hideEmblem) {
+        var suffix = if (config.hideEmblem) {
             if (data.ironman) "§7♲" else getBingoIcon(data.bingoLevel)
         } else data.nameSuffix
 
-        return "$level $playerName $suffix"
+        if (config.markSpecialPersons) {
+            val score = socialScore(data.name)
+            if (score != 1) {
+                LorenzUtils.debug(data.name + " score = $score")
+            }
+            suffix += " " + getSocialScoreIcon(score)
+        }
+
+        return "$level $playerName ${suffix.trim()}"
     }
 
     private var randomOrderCache =
@@ -146,13 +154,24 @@ object AdvancedPlayerList {
     }
 
     private fun socialScore(name: String) = when {
-        LorenzUtils.getPlayerName() == name -> 5
-        MarkedPlayerManager.isMarkedPlayer(name) -> 4
-        PartyAPI.partyMembers.contains(name) -> 3
-        FriendAPI.getAllFriends().any { it.name == name } -> 2
+        LorenzUtils.getPlayerName() == name -> 10
+        MarkedPlayerManager.isMarkedPlayer(name) -> 8
+        PartyAPI.partyMembers.contains(name) -> 5
+        FriendAPI.getAllFriends().any { it.name.contains(name) } -> 4
         // TODO add guild
 
         else -> 1
+    }
+
+    private fun getSocialScoreIcon(score: Int) = when (score) {
+        10 -> "§cTHIS IS ME"
+        8 -> "§eMARKED"
+        5 -> "§7§lP"
+        4 -> "§9§lF"
+        3 -> "§aG"
+        // TODO add guild
+
+        else -> ""
     }
 
     private fun getBingoRank(text: String) = when {
