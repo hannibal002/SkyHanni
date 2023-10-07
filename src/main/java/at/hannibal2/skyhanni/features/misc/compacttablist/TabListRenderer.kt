@@ -120,16 +120,17 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
+                val text = if (TabListReader.ignoreCustomTabList()) tabLine.text else tabLine.customName
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
-                        tabLine.customName,
+                        text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
                         0xFFFFFF
                     )
                 } else {
                     minecraft.fontRendererObj.drawStringWithShadow(
-                        tabLine.customName,
+                        text,
                         middleX.toFloat(),
                         middleY.toFloat(),
                         0xFFFFFF

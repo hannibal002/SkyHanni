@@ -84,7 +84,7 @@ object TabListReader {
         if (LorenzUtils.inKuudraFight) return original
         if (LorenzUtils.inDungeons) return original
 
-        if (LorenzUtils.isControlKeyDown()) return original
+        if (ignoreCustomTabList()) return original
 
         val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
@@ -171,6 +171,10 @@ object TabListReader {
         return newList
     }
 
+    fun ignoreCustomTabList(): Boolean {
+        return LorenzUtils.isControlKeyDown()
+    }
+
     private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
@@ -182,13 +186,7 @@ object TabListReader {
         } else ""
 
         val suffix = if (config.hideEmblem) {
-            if (data.ironman) {
-                "§8[§7Iron Man§8]"
-            } else {
-                if (data.bingoLevel > -1) {
-                    "§rBingo ${data.bingoLevel}"
-                } else ""
-            }
+            if (data.ironman) "§7♲" else getBingoIcon(data.bingoLevel)
         } else data.nameSuffix
 
         return "$level $playerName $suffix"
@@ -225,6 +223,17 @@ object TabListReader {
         text.contains("§6Ⓑ") -> 4 //Rank 4
 
         else -> -1
+    }
+
+    private fun getBingoIcon(rank: Int) = when (rank) {
+        -1 -> "" // Not in Bingo
+
+        0 -> "§7Ⓑ" //No Rank
+        1 -> "§aⒷ" //Rank 1
+        2 -> "§9Ⓑ" //Rank 2
+        3 -> "§5Ⓑ" //Rank 3
+        4 -> "§6Ⓑ" //Rank 4
+        else -> "Bingo?"
     }
 
     class PlayerData(val sbLevel: Int) {
