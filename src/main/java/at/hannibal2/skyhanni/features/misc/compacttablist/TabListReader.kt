@@ -12,8 +12,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
+import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 // heavily inspired by SBA code
 object TabListReader {
@@ -124,7 +127,7 @@ object TabListReader {
         }
         val prepare = playerDatas.entries
 
-        val sorted = when (config.playerSort) {
+        val sorted = when (config.playerSortOrder) {
 
             // Rank (Default)
             1 -> prepare.sortedBy { -(it.value.sbLevel) }
@@ -137,6 +140,9 @@ object TabListReader {
 
             // Party/Friends/Guild First
             4 -> prepare.sortedBy { -socialScore(it.value.name) }
+
+            // Random
+            5 -> prepare.sortedBy { getRandomOrder(it.value.name) }
 
             else -> prepare
         }
@@ -153,6 +159,19 @@ object TabListReader {
         val rest = original.drop(playerDatas.size + extraTitles + 1)
         newList.addAll(rest)
         return newList
+    }
+
+    private var randomOrderCache =
+        CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build<String, Int>()
+
+    private fun getRandomOrder(name: String): Int {
+        val saved = randomOrderCache.getIfPresent(name)
+        if (saved != null) {
+            return saved
+        }
+        val r = (Random.nextDouble() * 500).toInt()
+        randomOrderCache.put(name, r)
+        return r
     }
 
     private fun socialScore(name: String) = when {

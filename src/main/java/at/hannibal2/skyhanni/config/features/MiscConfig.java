@@ -554,13 +554,13 @@ public class MiscConfig {
         public boolean hideAdverts = false;
 
         @Expose
-        @ConfigOption(name = "Player Sort", desc = "Change what the player list is sorted by.")
-        @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild"})
+        @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
+        @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
         @ConfigAccordionId(id = 1)
-        public int playerSort = 0;
+        public int playerSortOrder = 0;
 
         @Expose
-        @ConfigOption(name = "Invert Sort", desc = "Flip the player list on its head (also works with default rank).")
+        @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
         @ConfigEditorBoolean
         public boolean reverseSort = false;
     }
