@@ -22,7 +22,7 @@ object SackDisplay {
 
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (SackAPI.inSackInventory) {
             if (!isEnabled()) return
             config.position.renderStringsAndItems(

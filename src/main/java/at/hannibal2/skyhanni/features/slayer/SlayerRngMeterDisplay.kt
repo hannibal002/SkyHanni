@@ -165,7 +165,7 @@ class SlayerRngMeterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return

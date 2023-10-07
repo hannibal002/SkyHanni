@@ -62,6 +62,9 @@ public class Storage {
 
         @Expose
         public long nextAccountUpgradeCompletionTime = -1L;
+
+        @Expose
+        public List<String> guildMembers = new ArrayList<>();
     }
 
     public static class ProfileSpecific {

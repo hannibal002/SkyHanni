@@ -19,7 +19,7 @@ class LivingMetalSuitProgress {
     private var progressMap = mapOf<ItemStack, Double?>()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderStringsAndItems(
             display,

@@ -139,7 +139,7 @@ class KingTalismanHelper {
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.kingTalismanHelper) return
 
         config.kingTalismanHelperPos.renderStrings(display, posLabel = "King Talisman Helper")
