@@ -19,7 +19,7 @@ class GardenYawAndPitch {
     private var lastPitch = 0f
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return

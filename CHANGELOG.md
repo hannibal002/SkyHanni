@@ -4,20 +4,37 @@
 
 ### New Features
 
++ Added Quick Craft Confirmation. - Cad
+    + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
+    + Sack items can be crafted normally.
++ Added **Compact Tab List**.
+    + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
+    + Option to hide Hypixel advertisment banners. - CalMWolfs
+    + Added **Advanced Player List**. - hannibal2
+        + Customize the player list (inside the tab list) in various ways.
+        + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
+          party/friends/guild
+        + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
+          level
+
 ### Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
 
 ### Changes
 
-+ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the leaderboard, or manual reloading the farming weight. - hannibal2
++ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the
+  leaderboard, or manual reloading the farming weight. - hannibal2
 + Added "Burning Desert" as a tarantula slayer area. - hannibal2
 + Slayer features now work only when the slayer type matches the current SkyBlock area. - hannibal2
++ Made Fatal Tempo same as Chimera in Estimated Item Value. - jani
 
 ### Bug Fixes
 
 + The yaw/pitch display does no longer show scientific notations at small values. - hannibal2
 + Fixed slayer RNG Meter problem to detect the selected item. - hannibal2
++ Fixed capitalization errors. - J10a1n15
++ Fixed a bug that hides the contest inventory menu. - CalMWolfs
 
 #### Config
 
