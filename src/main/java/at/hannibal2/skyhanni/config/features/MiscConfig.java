@@ -565,6 +565,11 @@ public class MiscConfig {
         public boolean reverseSort = false;
 
         @Expose
+        @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons of player in the tab list.")
+        @ConfigEditorBoolean
+        public boolean hidePlayerIcons = false;
+
+        @Expose
         @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
         @ConfigEditorBoolean
         public boolean hideRankColor = false;

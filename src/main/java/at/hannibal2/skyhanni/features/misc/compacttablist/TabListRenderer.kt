@@ -105,7 +105,7 @@ object TabListRenderer {
             for (tabLine in column.lines) {
                 val savedX = middleX
 
-                if (tabLine.type == TabStringType.PLAYER) {
+                if (tabLine.type == TabStringType.PLAYER && !config.hidePlayerIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         minecraft.textureManager.bindTexture(playerInfo.locationSkin)
