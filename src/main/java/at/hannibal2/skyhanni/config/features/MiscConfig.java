@@ -536,6 +536,25 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Compact Tab List", desc = "")
+    @Accordion
+    public CompactTabList compactTabList = new CompactTabList();
+
+    public static class CompactTabList {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
+                "doesn't break god-pot detection and shortens some other lines.") //made tablist one word here so both searches will pick it up
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist")
+        @ConfigEditorBoolean
+        public boolean hideAdverts = false;
+    }
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle

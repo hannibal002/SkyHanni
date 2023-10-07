@@ -78,13 +78,13 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.farmingFortunePos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!CropAccessoryData.isLoadingAccessories) return
         SkyHanniMod.feature.misc.inventoryLoadPos.renderString(

@@ -192,6 +192,8 @@ import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
+import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
+import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -570,6 +572,8 @@ class SkyHanniMod {
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
+        loadModule(TabListReader)
+        loadModule(TabListRenderer)
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
