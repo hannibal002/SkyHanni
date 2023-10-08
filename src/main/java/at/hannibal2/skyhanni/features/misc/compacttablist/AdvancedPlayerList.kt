@@ -118,7 +118,7 @@ object AdvancedPlayerList {
     private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
         "hannibal2",
         "CalMWolfs",
-        "HiZe",
+        "HiZe_",
         "lrg89",
         "Eisengolem",
     )
