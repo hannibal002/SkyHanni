@@ -611,6 +611,11 @@ public class MiscConfig {
             @ConfigOption(name = "Mark Special Persons", desc = "Show speical icons behind the name of guild members, party members, friends, and marked players.")
             @ConfigEditorBoolean
             public boolean markSpecialPersons = false;
+
+            @Expose
+            @ConfigOption(name = "Mark SkyHanni Devs", desc = "Adds a §c:O §7behind the tablist name of SkyHanni's creators.")
+            @ConfigEditorBoolean
+            public boolean markSkyHanniDevs = false;
         }
     }
 

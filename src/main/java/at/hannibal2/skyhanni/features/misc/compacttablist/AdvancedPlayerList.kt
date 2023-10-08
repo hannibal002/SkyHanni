@@ -115,6 +115,14 @@ object AdvancedPlayerList {
 
     fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && LorenzUtils.isControlKeyDown()
 
+    private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
+        "hannibal2",
+        "CalMWolfs",
+        "HiZe",
+        "lrg89",
+        "Eisengolem",
+    )
+
     private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
@@ -132,6 +140,9 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
+        }
+        if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding) {
+            suffix += " §c:O"
         }
 
         return "$level $playerName ${suffix.trim()}"
