@@ -164,8 +164,8 @@ object AdvancedPlayerList {
 //        10 -> "§c§lME"
         10 -> ""
         8 -> "§e§lMARKED"
-        5 -> "§7§lP"
-        4 -> "§6§lF"
+        5 -> "§9§lP"
+        4 -> "§d§lF"
         3 -> "§2§lG"
 
         else -> ""
