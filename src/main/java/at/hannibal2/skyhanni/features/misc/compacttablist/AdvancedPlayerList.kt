@@ -103,7 +103,7 @@ object AdvancedPlayerList {
         if (config.reverseSort) {
             newPlayerList = newPlayerList.reversed().toMutableList()
         }
-        if (extraTitles > 0) {
+        if (extraTitles > 0 && newPlayerList.size >= 19) {
             newPlayerList.add(19, original.first())
         }
         newList.addAll(newPlayerList)
