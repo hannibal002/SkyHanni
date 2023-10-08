@@ -664,9 +664,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Kick Duration. - hannibal2
     + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
     + Useful if you get blocked because of 'You were kicked while joining that server!'.
-    + Send warning and sound this seconds after a SkyBlock kick.
+    + Send a warning and sound after a custom amount of seconds.
 + Added Time In Limbo. - hannibal2
-    + Show the time since you entered the limbo.
+    + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
 
 ## Cosmetics

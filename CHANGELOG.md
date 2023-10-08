@@ -19,9 +19,9 @@
 + Added Kick Duration. - hannibal2
     + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
     + Useful if you get blocked because of 'You were kicked while joining that server!'.
-    + Send warning and sound this seconds after a SkyBlock kick.
+    + Send a warning and sound after a custom amount of seconds.
 + Added Time In Limbo. - hannibal2
-    + Show the time since you entered the limbo.
+    + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
 
 ### Events
@@ -36,9 +36,9 @@
 + Slayer features now work only when the slayer type matches the current SkyBlock area. - hannibal2
 + Made Fatal Tempo same as Chimera in Estimated Item Value. - jani
 + Added debug options for fishing hook display. - hannibal2
-    + This should help to find values the fishing hook display works 100% with.
-+ Changed the color for tab list special persons mark.
-+ Mark SkyHanni Devs in tab list special.
+    + This should help find values that the fishing hook display works 100% with.
++ Changed the color for the tab list Special Persons Mark.
++ Mark SkyHanni Devs in the tab list special.
 
 ### Bug Fixes
 
@@ -46,8 +46,8 @@
 + Fixed slayer RNG Meter problem to detect the selected item. - hannibal2
 + Fixed capitalization errors. - J10a1n15
 + Fixed a bug that hides the contest inventory menu. - CalMWolfs
-+ Fixed error in tab list. - hannibal2
-+ Fixed fishing hook display data not properly resetting on world change. - hannibal2
++ Fixed an error with the tab list. - hannibal2
++ Fixed fishing hook display data not properly resetting on a world change. - hannibal2
 + Fixed an error in Quick Craft Confirmation. - hannibal2
 + Fixed a crash with future NEU versions because of renamed code. - hannibal2
 + Fixed double rendering of item tooltips with chat triggers. - nea
