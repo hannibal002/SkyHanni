@@ -33,7 +33,7 @@ class FishingHookDisplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
+        if (!event.isMod(config.debugUpdateInterval)) return
 
         val entities = EntityUtils.getEntities<EntityFishHook>()
         bobberLocation = entities.firstOrNull { it.angler is EntityPlayerSP }?.getLorenzVec()
@@ -47,7 +47,7 @@ class FishingHookDisplay {
         val bobberLocation = bobberLocation ?: return
 
         val distance = entity.getLorenzVec().distance(bobberLocation)
-        if (distance > 0.1) return
+        if (distance > config.debugMaxDistance) return
         if (entity is EntityArmorStand) {
             armorStand = entity
         }
