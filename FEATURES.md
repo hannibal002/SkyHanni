@@ -661,6 +661,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
           party/friends/guild
         + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
           level
++ Added Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send warning and sound this seconds after a SkyBlock kick.
++ Added Time In Limbo. - hannibal2
+    + Show the time since you entered the limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
 
 ## Cosmetics
 
