@@ -615,6 +615,37 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Kick Duration", desc = "")
+    @Accordion
+    public KickDurationConfig kickDuration = new KickDurationConfig();
+
+    public static class KickDurationConfig {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
+                        "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
+        @ConfigEditorSlider(
+                minValue = 5,
+                maxValue = 300,
+                minStep = 1
+        )
+        @ConfigAccordionId(id = 11)
+        public Property<Integer> warnTime = Property.of(60);
+
+        @Expose
+        public Position position = new Position(400, 200, 1.3f);
+    }
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -716,6 +747,17 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixNeuHeavyPearls = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Time In Limbo",
+            desc = "Show the time since you entered the limbo.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showTimeInLimbo = true;
+
+    @Expose
+    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
