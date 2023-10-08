@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -21,6 +22,13 @@ class FishingHookDisplay {
     private var bobberLocation: LorenzVec? = null
     private var armorStand: EntityArmorStand? = null
     private var display = ""
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = ""
+        bobberLocation = null
+        armorStand = null
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
