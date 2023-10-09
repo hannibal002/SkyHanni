@@ -240,7 +240,6 @@ public class FishingConfig {
                 maxValue = 80,
                 minStep = 1
         )
-        @ConfigAccordionId(id = 2)
         public int debugUpdateInterval = 20;
 
         @Expose
@@ -254,7 +253,6 @@ public class FishingConfig {
                 maxValue = 5f,
                 minStep = 0.01f
         )
-        @ConfigAccordionId(id = 2)
         public double debugMaxDistance = 0.1;
     }
 
