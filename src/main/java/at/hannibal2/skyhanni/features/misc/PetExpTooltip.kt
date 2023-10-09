@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -58,11 +59,23 @@ class PetExpTooltip {
 
         index = toolTip.indexOfFirst { it.contains("Progress to Level") }
         if (index != -1) {
-            val offset = if (NotEnoughUpdates.INSTANCE.config.tooltipTweaks.petExtendExp) 4 else 3
+
+            val offset = if (isNeuExtendedExpEnabled) 4 else 3
             return index + offset
         }
 
         return null
+    }
+
+    private val isNeuExtendedExpEnabled get() = fieldPetExtendExp.get(objectNeuTooltipTweaks) as Boolean
+
+    private val objectNeuTooltipTweaks by lazy {
+        val field = NotEnoughUpdates.INSTANCE.config.javaClass.getDeclaredField("tooltipTweaks")
+        field.makeAccessible().get(NotEnoughUpdates.INSTANCE.config)
+    }
+
+    private val fieldPetExtendExp by lazy {
+        objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
     }
 
     private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {

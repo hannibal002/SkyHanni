@@ -185,6 +185,7 @@ import at.hannibal2.skyhanni.features.misc.HarpFeatures
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.HideDamageSplash
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
+import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
@@ -198,6 +199,7 @@ import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
+import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
@@ -311,7 +313,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.3",
+    version = "0.21.Beta.4",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -599,6 +601,8 @@ class SkyHanniMod {
         loadModule(DungeonRankTabListColor())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
+        loadModule(SkyBlockKickDuration())
+        loadModule(LimboTimeTracker())
 
         init()
 
