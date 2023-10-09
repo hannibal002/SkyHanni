@@ -64,26 +64,25 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Inventory
 
-- Not Clickable Items
-    - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
++ Not Clickable Items
+    + Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
       around items that meet that requirement.
-    - Works in:
-        - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
-        - bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
-        - chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
-    - Option to allow/block clicks
-- Option to change the gray-out opacity for 'Not Clickable Items'.
-- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and
+    + Works in:
+        + In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
+        + bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
+        + chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
+    + Option to allow/block clicks
++ Option to change the gray-out opacity for 'Not Clickable Items'.
++ Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and
   diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and
   collection level)
-- Sack name (show short name of sacks)
-- Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same
++ Sack name (show short name of sacks)
++ Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same
   enchantment are highlighted in the inventory)
-- compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors,
++ compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors,
   cloaks and fishing rods)
-- RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a
++ RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a
   drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
-
 + Show the tuning stats in the Thaumaturgy inventory.
 + Show the amount of selected tuning points in the stats tuning inventory.
 + Highlight the selected template in the stats tuning inventory.
@@ -92,7 +91,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight stuff that is missing in the SkyBlock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
-+ **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + **Contest Time** - Show the real time format to the farming contest description.
 + **Pet Candies Used number**
     + Works even after Hypixel removed the `10 pet candies applied` line
@@ -106,6 +104,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ **Quick Craft Confirmation**. - Cad
+    + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
+    + Sack items can be crafted normally.
 
 ## Item Abilities
 
@@ -651,6 +652,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
     + Change the scale with plus and minus keys. - CalMWolfs
++ Added **Compact Tab List**.
+    + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
+    + Option to hide Hypixel advertisment banners. - CalMWolfs
+    + Added **Advanced Player List**. - hannibal2
+        + Customize the player list (inside the tab list) in various ways.
+        + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
+          party/friends/guild
+        + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
+          level
++ Added Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send a warning and sound after a custom amount of seconds.
++ Added Time In Limbo. - hannibal2
+    + Show the time since you entered limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
 
 ## Cosmetics
 

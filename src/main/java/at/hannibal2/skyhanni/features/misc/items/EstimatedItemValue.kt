@@ -94,7 +94,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
         if (!OSUtils.isKeyHeld(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
@@ -648,7 +648,7 @@ object EstimatedItemValue {
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName == "ultimate_chimera") {
+            if (rawName == "ultimate_chimera" || rawName == "ultimate_fatal_tempo") {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
