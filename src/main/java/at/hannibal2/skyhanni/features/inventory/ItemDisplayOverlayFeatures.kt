@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -209,23 +209,23 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(15) && item.getInternalName_old().contains("CAMPFIRE_TALISMAN_")) {
-            return ((item.getInternalName_old().replace("CAMPFIRE_TALISMAN_", "").toInt()) + 1).toString()
+        if (stackSizeConfig.contains(15) && item.getInternalName().asString().contains("CAMPFIRE_TALISMAN_")) {
+            return ((item.getInternalName().asString().replace("CAMPFIRE_TALISMAN_", "").toInt()) + 1).toString()
 
         }
 
-        if (stackSizeConfig.contains(16) && item.getInternalName_old() == ("BLOOD_GOD_CREST")) {
+        if (stackSizeConfig.contains(16) && item.getInternalName().asString() == ("BLOOD_GOD_CREST")) {
             return (item.getBloodGodKills().toString().length.toString())
         }
 
-        if (stackSizeConfig.contains(17) && item.getInternalName_old() == ("YETI_ROD")) {
+        if (stackSizeConfig.contains(17) && item.getInternalName().asString() == ("YETI_ROD")) {
             val kills = item.getYetiRodFishesCaught().toString()
             if (kills == "null") { return "" }
             if (kills.length >= 4){ return "100" }
             else { return (kills.dropLast(1)) }
         }
 
-        if (stackSizeConfig.contains(18) && item.getInternalName_old() == ("THE_SHREDDER")) {
+        if (stackSizeConfig.contains(18) && item.getInternalName().asString() == ("THE_SHREDDER")) {
             val lore = item.getLore()
                 if ((lore.any { it.contains("cap): ") }) && (lore.any { it.contains("Bonus Damage ") })) {
                     for (line in lore) {
@@ -236,7 +236,7 @@ class ItemDisplayOverlayFeatures {
                 }
         }
 
-        if (stackSizeConfig.contains(19) && item.getInternalName_old() == ("BOTTLE_OF_JYRRE")) {
+        if (stackSizeConfig.contains(19) && item.getInternalName().asString() == ("BOTTLE_OF_JYRRE")) {
             val lore = item.getLore()
             if (lore.any { it.contains("Intelligence Bonus: ")}) {
                 for (line in lore) {
@@ -247,7 +247,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(20) && item.getInternalName_old().startsWith("SOULFLOW_") && !(chestName.contains("Auction"))) {
+        if (stackSizeConfig.contains(20) && item.getInternalName().asString().startsWith("SOULFLOW_") && !(chestName.contains("Auction"))) {
             //§7Internalized: §316,493⸎ Soulflow
             //Internalized: 16,493⸎ Soulflow
             val line = item.getLore().first()
@@ -269,7 +269,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(21) && item.getInternalName_old().startsWith("CRUX_")) {
+        if (stackSizeConfig.contains(21) && item.getInternalName().asString().startsWith("CRUX_")) {
             val lore = item.getLore()
             var numberOfLines = 0 //"zoMG ERY WHY NOT JUST REPLACE "CRUX_TALISMAN"?!?!?" yeah i considered that too but then realized hypixel might change that one day
             var killCount = 0
@@ -290,7 +290,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(22) && item.getInternalName_old().endsWith("_ENCHANTED_CHEST") && itemName.endsWith(" Storage")) {
+        if (stackSizeConfig.contains(22) && item.getInternalName().asString().endsWith("_ENCHANTED_CHEST") && itemName.endsWith(" Storage")) {
             var colorCode = item.name ?: return ""
             colorCode = colorCode.take(2)
             val numSlots = when (itemName) {
@@ -316,13 +316,13 @@ class ItemDisplayOverlayFeatures {
                     }
                 }
             }
-            if (itemName.startsWith("Personal ") && item.getInternalName_old().contains("PERSONAL_")) {
+            if (itemName.startsWith("Personal ") && item.getInternalName().asString().contains("PERSONAL_")) {
                 return itemName.replace("Personal ", "").replace("Compactor ", "").replace("Deletor ", "").dropLast(3) + "K"
             }
         }
 
-        if (stackSizeConfig.contains(24) && item.getInternalName_old().startsWith("ABIPHONE_")) {
-            return when (item.getInternalName_old()) {
+        if (stackSizeConfig.contains(24) && item.getInternalName().asString().startsWith("ABIPHONE_")) {
+            return when (item.getInternalName().asString()) {
                 "ABIPHONE_X_PLUS" -> "X"
                 "ABIPHONE_X_PLUS_SPECIAL_EDITION" -> "X§b§zSE"
                 "ABIPHONE_XI_ULTRA" -> "11"
