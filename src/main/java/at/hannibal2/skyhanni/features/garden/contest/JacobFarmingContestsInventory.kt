@@ -94,24 +94,6 @@ class JacobFarmingContestsInventory {
     }
 
     @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
-
-        if (hideEverything) {
-            val slot = event.slot
-            val number = slot.slotNumber
-            if (number in 10..43) {
-                event.isCanceled = true
-                return
-            }
-
-        }
-
-        event.isCanceled = true
-    }
-
-    @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return

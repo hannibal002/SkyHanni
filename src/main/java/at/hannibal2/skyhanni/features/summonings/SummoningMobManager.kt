@@ -137,7 +137,7 @@ class SummoningMobManager {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.summoningMobDisplay) return
         if (summoningMobs.isEmpty()) return

@@ -220,12 +220,42 @@ public class FishingConfig {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Hide Armor Stand", desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled.")
+        @ConfigOption(
+                name = "Hide Armor Stand",
+                desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
+        )
         @ConfigEditorBoolean
         public boolean hideArmorStand = true;
 
         @Expose
         public Position position = new Position(460, -240, 3.4f);
+
+        @Expose
+        @ConfigOption(
+                name = "Debug: Update Interval",
+                desc = "Changes the time in ticks between updates (should be as high as possible). Default is 20"
+        )
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 80,
+                minStep = 1
+        )
+        @ConfigAccordionId(id = 2)
+        public int debugUpdateInterval = 20;
+
+        @Expose
+        @ConfigOption(
+                name = "Debug: Distance",
+                desc = "Changes the maximal detection distance between the fishing rod bobber and " +
+                        "the armor stand that shows the hypixel timer (should be as low as possible). Default is 0.1"
+        )
+        @ConfigEditorSlider(
+                minValue = 0.01f,
+                maxValue = 5f,
+                minStep = 0.01f
+        )
+        @ConfigAccordionId(id = 2)
+        public double debugMaxDistance = 0.1;
     }
 
     @Expose

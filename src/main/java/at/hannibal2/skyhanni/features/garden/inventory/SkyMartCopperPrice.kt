@@ -68,7 +68,7 @@ class SkyMartCopperPrice {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
             config.copperPricePos.renderStringsAndItems(
                 display,
