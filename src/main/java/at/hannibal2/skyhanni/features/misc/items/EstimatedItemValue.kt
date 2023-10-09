@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -228,7 +227,7 @@ object EstimatedItemValue {
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        var internalName = stack.getInternalName_old().removePrefix("VANQUISHED_")
+        var internalName = stack.getInternalName().asString().removePrefix("VANQUISHED_")
         val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
         var genericName = internalName
         if (kuudraSets.any { internalName.contains(it) }
@@ -637,7 +636,7 @@ object EstimatedItemValue {
             "ZOMBIE_COMMANDER_WHIP",
         )
 
-        val internalName = stack.getInternalName_old()
+        val internalName = stack.getInternalName().asString()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
