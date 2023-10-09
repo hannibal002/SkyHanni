@@ -14,10 +14,12 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object SlayerAPI {
 
@@ -26,7 +28,7 @@ object SlayerAPI {
             .build<Pair<NEUInternalName, Int>, Pair<String, Double>>()
 
     var questStartTime = 0L
-    var isInSlayerArea = false
+    var isInCorrectArea = false
     var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
     var latestWrongAreaWarning = 0L
@@ -96,6 +98,24 @@ object SlayerAPI {
         }
     }
 
+    fun getActiveSlayer() = activeSlayer.getValue()
+
+    private val activeSlayer = RecalculatingValue(1.seconds) {
+        grabActiveSlayer()
+    }
+
+    private fun grabActiveSlayer(): SlayerType? {
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            for (type in SlayerType.entries) {
+                if (line.contains(type.displayName)) {
+                    return type
+                }
+            }
+        }
+
+        return null
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -118,11 +138,43 @@ object SlayerAPI {
         }
 
         if (event.isMod(5)) {
-            isInSlayerArea = if (LorenzUtils.isStrandedProfile) {
+            isInCorrectArea = if (LorenzUtils.isStrandedProfile) {
                 true
             } else {
-                SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+                getSlayerTypeForCurrentArea() == getActiveSlayer()
             }
         }
+    }
+
+    fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
+        "Graveyard",
+        "Coal Mine",
+        -> SlayerType.REVENANT
+
+        "Spider Mound",
+        "Arachne's Burrow",
+        "Arachne's Sanctuary",
+        "Burning Desert",
+        -> SlayerType.TARANTULA
+
+        "Ruins",
+        "Howling Cave",
+        -> SlayerType.SVEN
+
+        "The End",
+        "Void Sepulture",
+        "Zealot Bruiser Hideout",
+        -> SlayerType.VOID
+
+        "Stronghold",
+        "The Wasteland",
+        "Smoldering Tomb",
+        -> SlayerType.INFERNO
+
+        "Stillgore Château",
+        "Oubliette",
+        -> SlayerType.VAMPIRE
+
+        else -> null
     }
 }

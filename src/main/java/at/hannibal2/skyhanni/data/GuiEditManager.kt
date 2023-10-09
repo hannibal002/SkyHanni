@@ -44,7 +44,7 @@ class GuiEditManager {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         latestPositions = currentPositions.toMap()
         currentPositions.clear()
     }
@@ -78,11 +78,11 @@ class GuiEditManager {
 
             GlStateManager.translate(0f, 0f, 200f)
 
-            GuiRenderEvent.GameOverlayRenderEvent().postAndCatch()
+            GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
 
             GlStateManager.pushMatrix()
             GlStateManager.enableDepth()
-            GuiRenderEvent.ChestBackgroundRenderEvent().postAndCatch()
+            GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
             GlStateManager.popMatrix()
 
             GlStateManager.translate(0f, 0f, -200f)

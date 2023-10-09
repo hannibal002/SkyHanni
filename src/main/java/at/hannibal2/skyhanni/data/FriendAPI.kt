@@ -67,23 +67,19 @@ class FriendAPI {
 
         removedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("removed friend: '$name'")
             removedFriend(name)
         }
         addedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("added friend: '$name'")
             addFriend(name)
         }
 
         noBestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("no best friend: '$name'")
             setBestFriend(name, false)
         }
         bestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("best friend: '$name'")
             setBestFriend(name, true)
         }
     }

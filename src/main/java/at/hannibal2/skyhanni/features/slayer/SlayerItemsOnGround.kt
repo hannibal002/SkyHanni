@@ -29,7 +29,7 @@ class SlayerItemsOnGround {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (entityItem in EntityUtils.getEntities<EntityItem>()) {

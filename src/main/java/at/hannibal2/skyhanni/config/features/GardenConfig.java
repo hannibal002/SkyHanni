@@ -219,7 +219,7 @@ public class GardenConfig {
                         "§9Replenish I",
                 }
         )
-        public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
 
 
     }
@@ -303,10 +303,10 @@ public class GardenConfig {
                         "§b1 §9Dedication IV",
                         "§b6 §9Music Rune",
                         "§b1 §cSpace Helmet",
-                        " ", // If they want another empty row
-                        "§212,735 Garden EXP",
                         "§b1 §9Cultivating I",
                         "§b1 §9Replenish I",
+                        " ", // If they want another empty row
+                        "§212,735 Garden EXP",
                         "§b11,056 Bits",
                         "§250,556 Mithril Powder",
                         "§d50,556 Gemstone Powder",
@@ -839,7 +839,7 @@ public class GardenConfig {
     public boolean dicerCounter = false;
 
     @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigOption(name = "RNG Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     @FeatureToggle
