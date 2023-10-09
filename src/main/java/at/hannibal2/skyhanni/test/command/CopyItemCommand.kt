@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -16,7 +16,7 @@ object CopyItemCommand {
             val itemStack = InventoryUtils.getItemInHand() ?: return
             resultList.add("ITEM LORE")
             resultList.add("display name: '" + itemStack.displayName.toString() + "'")
-            val itemID = itemStack.getInternalName_old()
+            val itemID = itemStack.getInternalName().asString()
             resultList.add("internalName: '$itemID'")
             resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
             resultList.add("lore:")
