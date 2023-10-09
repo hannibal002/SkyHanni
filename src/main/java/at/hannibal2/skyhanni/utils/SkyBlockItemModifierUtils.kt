@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -31,7 +31,7 @@ object SkyBlockItemModifierUtils {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
-    private fun ItemStack.getBaseSilexCount() = when (getInternalName_old()) {
+    private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
         "PROMISING_SPADE" -> 5
 
