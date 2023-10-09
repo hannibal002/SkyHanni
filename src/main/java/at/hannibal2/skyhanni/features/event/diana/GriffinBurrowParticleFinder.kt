@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -134,7 +135,7 @@ class GriffinBurrowParticleFinder {
     }
 
     private val ItemStack.isSpade
-        get() = getInternalName_old() == "ANCESTRAL_SPADE"
+        get() = getInternalName().equals("ANCESTRAL_SPADE")
 
     class Burrow(
         var location: LorenzVec,
