@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
