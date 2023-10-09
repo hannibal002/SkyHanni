@@ -15,12 +15,19 @@ class BasketWaypoints {
     private val config get() = SkyHanniMod.feature.misc.halloweenBasket
     private var waypoint: LorenzVec? = null
     private var waypointName: String? = null
+    private var isHalloween: Boolean = chechScoreboardHalloweenSpecific()
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!event.repeatSeconds(1)) return
+        isHalloween = chechScoreboardHalloweenSpecific()
+    }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (LorenzUtils.inSkyBlock || !LorenzUtils.onHypixel) return
-
-        if (!chechScoreboardHalloweenSpecific()) return
+        if (!LorenzUtils.onHypixel) return
+        if (LorenzUtils.inSkyBlock) return
+        if (!isHalloween) return
 
         if (config.allWaypoints) {
             for (basket in Basket.entries) {
@@ -48,14 +55,11 @@ class BasketWaypoints {
     private fun chechScoreboardHalloweenSpecific(): Boolean {
         return (
             ( ScoreboardData.sidebarLinesFormatted.any {
-                it.contains("Hypixel Level")
-            } ) && 
-            ( ScoreboardData.sidebarLinesFormatted.any {
-                it.contains("Halloween ")
-            } ) && 
-            ( ScoreboardData.sidebarLinesFormatted.any {
-                it.contains("Baskets ")
-            } )
+                    it.contains("Hypixel Level")
+                    && it.contains("Halloween ")
+                    && it.contains("Baskets ")
+                }
+            )
         )
     }
 }
