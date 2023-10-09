@@ -5,11 +5,14 @@ import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.jsonobjects.DevListJson
 import com.google.common.cache.CacheBuilder
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
@@ -115,13 +118,20 @@ object AdvancedPlayerList {
 
     fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && LorenzUtils.isControlKeyDown()
 
-    private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
+    private val listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCodingOLD = listOf(
         "hannibal2",
         "CalMWolfs",
         "HiZe_",
         "lrg89",
         "Eisengolem",
     )
+    private var listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding: List<String> = emptyList()
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        event.getConstant<DevListJson>("DevList")?.usernames?.let {
+            listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding = it
+        }
+    }
 
     private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
@@ -141,7 +151,7 @@ object AdvancedPlayerList {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
-        if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding) {
+        if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding) {
             suffix += " §c:O"
         }
 
