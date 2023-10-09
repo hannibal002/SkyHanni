@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
@@ -235,11 +235,11 @@ class HideNotClickableItems {
 
         reverseColor = true
 
-        val internalName = stack.getInternalName_old()
-        if (internalName == ComposterOverlay.currentOrganicMatterItem) {
+        val internalName = stack.getInternalName()
+        if (internalName.equals(ComposterOverlay.currentOrganicMatterItem)) {
             return false
         }
-        if (internalName == ComposterOverlay.currentFuelItem) {
+        if (internalName.equals(ComposterOverlay.currentFuelItem)) {
             return false
         }
 
