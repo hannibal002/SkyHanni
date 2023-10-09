@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -108,12 +109,13 @@ class ShowMotesNpcSellPrice {
         itemMap.clear()
         for ((index, stack) in stacks) {
             val itemValue = stack.motesNpcPrice() ?: continue
-            if (itemMap.contains(stack.getInternalName_old())) {
-                val (oldIndex, oldValue) = itemMap[stack.getInternalName_old()] ?: return
+            val internalName = stack.getInternalName().asString()
+            if (itemMap.contains(internalName)) {
+                val (oldIndex, oldValue) = itemMap[internalName] ?: return
                 oldIndex.add(index)
-                itemMap[stack.getInternalName_old()] = Pair(oldIndex, oldValue + itemValue)
+                itemMap[internalName] = Pair(oldIndex, oldValue + itemValue)
             } else {
-                itemMap[stack.getInternalName_old()] = Pair(mutableListOf(index), itemValue)
+                itemMap[internalName] = Pair(mutableListOf(index), itemValue)
             }
         }
         inInventory = true
