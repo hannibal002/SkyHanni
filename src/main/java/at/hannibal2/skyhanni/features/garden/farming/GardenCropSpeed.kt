@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import com.google.gson.JsonObject
@@ -104,7 +104,7 @@ object GardenCropSpeed {
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 val heldTool = InventoryUtils.getItemInHand()
-                val toolName = heldTool?.getInternalName_old()
+                val toolName = heldTool?.getInternalName()?.asString()
                 if (toolName?.contains("DICER") == true) {
                     val lastCrop = lastBrokenCrop?.cropName?.lowercase() ?: "NONE"
                     if (toolName.lowercase().contains(lastCrop)) {
