@@ -113,7 +113,7 @@ object AdvancedPlayerList {
         return newList
     }
 
-    fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && LorenzUtils.isControlKeyDown()
+    fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debug.enabled && LorenzUtils.isControlKeyDown()
 
     private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
         "hannibal2",
