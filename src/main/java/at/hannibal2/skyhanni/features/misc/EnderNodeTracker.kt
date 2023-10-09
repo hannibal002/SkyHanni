@@ -127,7 +127,7 @@ class EnderNodeTracker {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (!isInTheEnd()) return
         config.position.renderStringsAndItems(display, posLabel = "Ender Node Tracker")

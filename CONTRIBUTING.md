@@ -71,6 +71,9 @@ You can write in the description of the pr the wording for the changelog as well
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
+- Do not use wildcards in imports (see the imgae below for setting this up in IntelliJ)
+- ![image](https://github.com/hannibal002/SkyHanni/assets/24389977/84c3a640-b39a-407e-a73c-12e548f33e88)
+
 
 ## Software Used in SkyHanni
 

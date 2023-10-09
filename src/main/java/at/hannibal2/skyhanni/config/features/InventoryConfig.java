@@ -131,13 +131,6 @@ public class InventoryConfig {
     public boolean jacobFarmingContestHighlightRewards = true;
 
     @Expose
-    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the Jacob inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestHideDuplicates = true;
-
-    @Expose
     @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
@@ -381,6 +374,16 @@ public class InventoryConfig {
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+
+    @Expose
+    @ConfigOption(
+            name = "Quick Craft Confirmation",
+            desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+                    "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quickCraftingConfirmation = false;
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
