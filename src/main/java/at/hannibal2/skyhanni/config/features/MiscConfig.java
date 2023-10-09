@@ -546,7 +546,6 @@ public class MiscConfig {
             @Expose
             @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
             @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
-            @ConfigAccordionId(id = 1)
             public int playerSortOrder = 0;
 
             @Expose
@@ -625,7 +624,6 @@ public class MiscConfig {
                 maxValue = 300,
                 minStep = 1
         )
-        @ConfigAccordionId(id = 11)
         public Property<Integer> warnTime = Property.of(60);
 
         @Expose
