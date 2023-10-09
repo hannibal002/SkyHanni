@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.halloweenlobbywaypoints
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,18 +17,19 @@ class BasketWaypoints {
     private val config get() = SkyHanniMod.feature.misc.halloweenBasket
     private var waypoint: LorenzVec? = null
     private var waypointName: String? = null
-    private var isHalloween: Boolean = chechScoreboardHalloweenSpecific()
+    private var isHalloween: Boolean = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!config.allWaypoints && !config.allEntranceWaypoints) return
+        if (!HypixelData.hypixelLive) return //dont show outside of live hypixel network
+        if (LorenzUtils.inSkyBlock) return 
         if (!event.repeatSeconds(1)) return
         isHalloween = chechScoreboardHalloweenSpecific()
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.onHypixel) return
-        if (LorenzUtils.inSkyBlock) return
         if (!isHalloween) return
 
         if (config.allWaypoints) {
@@ -53,13 +56,15 @@ class BasketWaypoints {
     }
 
     private fun chechScoreboardHalloweenSpecific(): Boolean {
-        return (
-            ( ScoreboardData.sidebarLinesFormatted.any {
-                    it.contains("Hypixel Level")
-                    && it.contains("Halloween ")
-                    && it.contains("Baskets ")
-                }
-            )
+        //am checking separate lines of scoreboard, cannot do `it.contains("xyz") && it.contains("ABC")`
+        val theScoreboardList = ScoreboardData.sidebarLinesFormatted
+        return ( theScoreboardList.any {
+                it.contains("Hypixel Level")
+            } && theScoreboardList.any {
+                it.contains("Halloween")
+            } && theScoreboardList.any {
+                it.contains("Baskets")
+            }
         )
     }
 }
