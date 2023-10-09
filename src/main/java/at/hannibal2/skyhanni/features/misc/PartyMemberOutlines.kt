@@ -2,12 +2,9 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,7 +14,7 @@ class PartyMemberOutlines {
 
     @SubscribeEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.XRAY) {
+        if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
             event.queueEntitiesToOutline { entity -> getEntityOutlineColor(entity) }
         }
     }
