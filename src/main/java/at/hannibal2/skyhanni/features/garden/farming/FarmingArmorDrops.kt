@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -99,7 +99,7 @@ class FarmingArmorDrops {
 
     private fun checkArmor() {
         val armorPieces = InventoryUtils.getArmor()
-            .mapNotNull { it?.getInternalName_old() }
+            .mapNotNull { it?.getInternalName()?.asString() }
             .count { armorPattern.matcher(it).matches() }
         hasArmor = armorPieces > 1
     }
@@ -129,7 +129,7 @@ class FarmingArmorDrops {
                 val armorDropName = crop.specialDropType
                 val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
                 val pieceCount = InventoryUtils.getArmor()
-                    .mapNotNull { it?.getInternalName_old() }
+                    .mapNotNull { it?.getInternalName()?.asString() }
                     .count { it.contains(armorName) || it.contains("FERMENTO") }
 
                 val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
