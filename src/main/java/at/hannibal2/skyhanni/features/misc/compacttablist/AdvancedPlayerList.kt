@@ -118,13 +118,6 @@ object AdvancedPlayerList {
 
     fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && LorenzUtils.isControlKeyDown()
 
-    private val listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCodingOLD = listOf(
-        "hannibal2",
-        "CalMWolfs",
-        "HiZe_",
-        "lrg89",
-        "Eisengolem",
-    )
     private var listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding: List<String> = emptyList()
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
