@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -95,7 +95,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName_old()
+            val rawId = item.getInternalName().asString()
             if (isMinionName(name)) {
                 minions[name] = rawId
             }
@@ -106,7 +106,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName_old()
+            val rawId = item.getInternalName().asString()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
