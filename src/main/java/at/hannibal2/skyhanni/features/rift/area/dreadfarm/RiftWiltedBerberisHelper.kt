@@ -80,6 +80,12 @@ class RiftWiltedBerberisHelper {
             return
         }
 
+        val x = location.x
+        val y = location.y
+        val z = location.z
+        val string = "x = $x, y = $y, z = $z"
+        LorenzUtils.chat(x, y, z)
+
         with(berberis) {
             val isMoving = currentParticles != location
             if (isMoving) {
