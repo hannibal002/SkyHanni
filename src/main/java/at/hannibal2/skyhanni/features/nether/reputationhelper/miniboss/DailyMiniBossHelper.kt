@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState

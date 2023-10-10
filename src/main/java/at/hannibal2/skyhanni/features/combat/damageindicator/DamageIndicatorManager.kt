@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.damageindicator
+package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.damageindicator
+package at.hannibal2.skyhanni.features.combat.damageindicator
 
 enum class BossType(
     val fullName: String,

@@ -62,7 +62,7 @@ import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash

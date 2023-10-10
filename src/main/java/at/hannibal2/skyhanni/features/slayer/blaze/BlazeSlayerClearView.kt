@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.damageindicator.BossType
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.projectile.EntityFireball
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
