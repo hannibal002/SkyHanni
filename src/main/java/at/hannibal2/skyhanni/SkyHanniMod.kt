@@ -210,8 +210,8 @@ import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
-import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
-import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
+import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
+import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker

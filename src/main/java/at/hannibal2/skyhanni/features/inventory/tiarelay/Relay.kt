@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.tiarelay
+package at.hannibal2.skyhanni.features.inventory.tiarelay
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzVec
