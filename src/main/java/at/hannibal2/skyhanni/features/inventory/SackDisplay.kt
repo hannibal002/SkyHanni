@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -98,9 +99,15 @@ object SackDisplay {
                     config.sortingType = it.ordinal
                     update(false)
                 })
-
+            newDisplay.addButton(
+                prefix = "§7Number format: ",
+                getName = NumberFormat.entries[config.numberFormat].DisplayName,
+                onChange = {
+                    config.numberFormat = (config.numberFormat + 1) % 3
+                    update(false)
+                }
+            )
             if (config.showPrice) {
-                newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
                 newDisplay.addSelector<PriceFrom>(" ",
                     getName = { type -> type.displayName },
                     isCurrent = { it.ordinal == config.priceFrom },
@@ -108,6 +115,15 @@ object SackDisplay {
                         config.priceFrom = it.ordinal
                         update(false)
                     })
+                newDisplay.addButton(
+                    prefix = "§7Price Format: ",
+                    getName = PriceFormat.entries[config.priceFormat].displayName,
+                    onChange = {
+                        config.priceFormat = (config.priceFormat + 1) % 2
+                        update(false)
+                    }
+                )
+                newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
             }
         }
 
@@ -161,5 +177,17 @@ object SackDisplay {
         BAZAAR("Bazaar Price"),
         NPC("Npc Price"),
         ;
+    }
+
+    enum class PriceFormat(val displayName: String) {
+        FORMATED("Formatted"),
+        UNFORMATED("Unformatted")
+        ;
+    }
+
+    enum class NumberFormat(val DisplayName: String) {
+        DEFAULT("Default"),
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted")
     }
 }
