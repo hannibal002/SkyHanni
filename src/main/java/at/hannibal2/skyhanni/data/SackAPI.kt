@@ -85,16 +85,16 @@ object SackAPI {
     }
 
     private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        0 -> (getPrice(true) * stored.formatNumber()).toInt().let { if (it < 0) 0 else it }
+        0 -> (getPrice(true) * stored.formatNumber()).toInt().let { if (it < 0) 0L else it.toLong() }
 
         1 -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
-            (npcPrice * stored.formatNumber()).toInt()
+            (npcPrice * stored.formatNumber()).toLong()
         } catch (e: Exception) {
-            0
+            0L
         }
 
-        else -> 0
+        else -> 0L
     }
 
     fun getSacksData(savingSacks: Boolean) {
@@ -296,10 +296,10 @@ object SackAPI {
         var flawed: String = "0",
         var fine: String = "0",
         var flawless: String = "0",
-        var roughPrice: Int = 0,
-        var flawedPrice: Int = 0,
-        var finePrice: Int = 0,
-        var flawlessPrice: Int = 0,
+        var roughPrice: Long = 0,
+        var flawedPrice: Long = 0,
+        var finePrice: Long = 0,
+        var flawlessPrice: Long = 0,
     )
 
     data class SackRune(
@@ -314,7 +314,7 @@ object SackAPI {
         var colorCode: String = "",
         var stored: String = "0",
         var total: String = "0",
-        var price: Int = 0,
+        var price: Long = 0,
     )
 }
 
