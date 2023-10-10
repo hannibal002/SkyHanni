@@ -19,7 +19,7 @@ class LimboTimeTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§cYou are AFK. Move around to return from AFK.") {
+        if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
         }
