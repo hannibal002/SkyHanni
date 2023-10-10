@@ -270,9 +270,11 @@ object EstimatedItemValue {
             if (price != null) {
                 subTotal += price
             }
+            var displayName = attr.first
+            if (displayName == ("MENDING")) displayName = "VITALITY"
             list.add(
                 "  §9${
-                    attr.first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                    displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
                 } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
             )
         }
