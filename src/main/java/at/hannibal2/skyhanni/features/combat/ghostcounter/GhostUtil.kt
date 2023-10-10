@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.ghostcounter
+package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager

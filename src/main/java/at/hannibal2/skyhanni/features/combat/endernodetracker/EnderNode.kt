@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.combat.endernodetracker
 
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName

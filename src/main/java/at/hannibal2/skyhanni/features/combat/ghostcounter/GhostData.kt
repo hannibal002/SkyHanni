@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.ghostcounter
+package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import java.util.regex.Pattern
 import kotlin.math.roundToInt

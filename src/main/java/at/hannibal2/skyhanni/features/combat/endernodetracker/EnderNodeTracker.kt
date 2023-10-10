@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.combat.endernodetracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator

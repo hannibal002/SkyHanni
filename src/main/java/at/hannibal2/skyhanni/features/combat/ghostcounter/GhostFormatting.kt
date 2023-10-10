@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.ghostcounter
+package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser

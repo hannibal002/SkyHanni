@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.ghostcounter
+package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -15,14 +15,14 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option.KILLS
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.bestiaryData
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatBestiary
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatText
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.isUsingCTGhostCounter
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.preFormat
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.prettyTime
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option.KILLS
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.bestiaryData
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatBestiary
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateXP
