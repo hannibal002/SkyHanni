@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 enum class FrozenTreasure(
     val internalName: String,

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
-import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
