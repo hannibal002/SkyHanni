@@ -643,7 +643,6 @@ public class MiscConfig {
                 maxValue = 300,
                 minStep = 1
         )
-        @ConfigAccordionId(id = 11)
         public Property<Integer> warnTime = Property.of(60);
 
         @Expose
