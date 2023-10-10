@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.powdertracker
+package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import java.util.regex.Pattern
 

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.powdertracker
+package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator

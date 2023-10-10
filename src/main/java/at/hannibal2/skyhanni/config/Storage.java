@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
-import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
