@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mobs
+package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils

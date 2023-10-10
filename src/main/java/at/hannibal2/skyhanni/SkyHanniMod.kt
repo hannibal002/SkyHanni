@@ -159,7 +159,7 @@ import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.BestiaryData
+import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.inventory.ChestValue
@@ -216,10 +216,10 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
-import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
-import at.hannibal2.skyhanni.features.mobs.MobHighlight
-import at.hannibal2.skyhanni.features.mobs.SpawnTimers
+import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
+import at.hannibal2.skyhanni.features.combat.mobs.AshfangMinisNametagHider
+import at.hannibal2.skyhanni.features.combat.mobs.MobHighlight
+import at.hannibal2.skyhanni.features.combat.mobs.SpawnTimers
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazes
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazingSouls
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
