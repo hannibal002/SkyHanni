@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -28,7 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BestiaryData {
 
-    private val config get() = SkyHanniMod.feature.misc.bestiaryData
+    private val config get() = SkyHanniMod.feature.combat.bestiary
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
@@ -45,7 +46,7 @@ object BestiaryData {
     )
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(
@@ -93,6 +94,11 @@ object BestiaryData {
         mobList.clear()
         stackList.clear()
         inInventory = false
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.bestiaryData", "combat.bestiary")
     }
 
     private fun update() {

@@ -48,21 +48,17 @@ object TestCopyBestiaryValues {
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3]
         if (backItem == null) {
-//            println("first is null!")
             return
         }
         if (backItem.getLore().none { it.contains("Bestiary Milestone") }) {
-//            println("wrong first: ${backItem.getLore()}")
             return
         }
 
         val rankingItem = event.inventoryItems[3 + 9 * 5 + 2]
         if (rankingItem == null) {
-//            println("second is null!")
             return
         }
         if (rankingItem.getLore().none { it.contains("Ranking") }) {
-//            println("wrong second: ${rankingItem.getLore()}")
             return
         }
 

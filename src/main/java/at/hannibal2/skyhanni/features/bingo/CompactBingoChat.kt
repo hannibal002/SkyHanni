@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBingoChat {
-    private val config get() = SkyHanniMod.feature.bingo.compactChat
+    private val config get() = SkyHanniMod.feature.event.bingo.compactChat
 
     private var inSkillLevelUp = false
-    private var inSkyblockLevelUp = false
+    private var inSkyBlockLevelUp = false
     private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
@@ -28,7 +28,7 @@ class CompactBingoChat {
             message == "§e§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
         ) {
             inSkillLevelUp = false
-            inSkyblockLevelUp = false
+            inSkyBlockLevelUp = false
             inCollectionLevelUp = false
             if (config.hideBorder) {
                 event.blockedReason = "compact_bingo_border"
@@ -48,10 +48,8 @@ class CompactBingoChat {
             return false
         }
 
-        if (inSkillLevelUp) {
-            if (!message.contains("Access to") && !message.endsWith(" Enchantment")) {
-                return true
-            }
+        if (inSkillLevelUp && !message.contains("Access to") && !message.endsWith(" Enchantment")) {
+            return true
         }
 
         return false
@@ -59,11 +57,11 @@ class CompactBingoChat {
 
     private fun onSkyBlockLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§3§lSKYBLOCK LEVEL UP §bLevel ")) {
-            inSkyblockLevelUp = true
+            inSkyBlockLevelUp = true
             return false
         }
 
-        if (inSkyblockLevelUp) {
+        if (inSkyBlockLevelUp) {
             if (message == "  §r§a§lREWARDS") return true
             // We don't care about extra health & strength
             healthPattern.matchMatcher(message) {

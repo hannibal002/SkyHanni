@@ -66,10 +66,8 @@ class GardenCropMilestoneFix {
         val tabListValue = baseCrops + progress - smallestPercentage
 
         val newValue = tabListValue.toLong()
-        if (tabListCropProgress[crop] != newValue) {
-            if (tabListCropProgress.containsKey(crop)) {
-                changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
-            }
+        if (tabListCropProgress[crop] != newValue && tabListCropProgress.containsKey(crop)) {
+            changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
         }
         tabListCropProgress[crop] = newValue
     }

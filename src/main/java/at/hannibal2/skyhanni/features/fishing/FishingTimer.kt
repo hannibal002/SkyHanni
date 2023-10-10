@@ -4,9 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -65,7 +72,9 @@ class FishingTimer {
     private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
         .map { entity ->
             val name = entity.name
-            if (SeaCreatureManager.allFishingMobNames.any { name.contains(it) }) {
+            val isSummonedSoul = name.contains("'")
+            val hasFishingMobName = SeaCreatureManager.allFishingMobNames.any { name.contains(it) }
+            if (hasFishingMobName && !isSummonedSoul) {
                 if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
             } else 0
         }.sum()
@@ -88,7 +97,7 @@ class FishingTimer {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.barnTimer) return
         if (!rightLocation) return

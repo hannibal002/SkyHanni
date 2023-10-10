@@ -26,7 +26,6 @@ object FFStats {
 
     var cakeExpireTime = 0L
 
-    // todo maybe these could be maps
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
     val beltFF = mutableMapOf<FFTypes, Double>()
@@ -183,7 +182,7 @@ object FFStats {
     }
 
     private fun getPetFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
-        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
+        val gardenLvl = GardenAPI.getGardenLevel()
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = getPetFF(item)
         out[FFTypes.PET_ITEM] = when (item.getPetItem()) {

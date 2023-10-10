@@ -14,7 +14,7 @@ class DungeonBossHideDamageSplash {
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.damageSplashBoss) return
-        if (!DungeonData.inBossRoom) return
+        if (!DungeonAPI.inBossRoom) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.isCanceled = true

@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.*
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
@@ -13,7 +15,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
 import java.io.IOException
-import java.util.*
 
 open class FFGuideGUI : GuiScreen() {
     companion object {
@@ -206,11 +207,9 @@ open class FFGuideGUI : GuiScreen() {
         if (Mouse.getEventButtonState()) {
             mouseClickEvent()
         }
-        if (!Mouse.getEventButtonState()) {
-            if (Mouse.getEventDWheel() != 0) {
-                lastMouseScroll = Mouse.getEventDWheel()
-                noMouseScrollFrames = 0
-            }
+        if (!Mouse.getEventButtonState() && Mouse.getEventDWheel() != 0) {
+            lastMouseScroll = Mouse.getEventDWheel()
+            noMouseScrollFrames = 0
         }
     }
 
@@ -270,22 +269,18 @@ open class FFGuideGUI : GuiScreen() {
 
         x = guiLeft - 28
         y = guiTop + 15
-        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25)) {
-            if (selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW) {
+        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25) && selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW) {
                 SoundUtils.playClickSound()
                 selectedPage = if (currentCrop == null) {
                     FortuneGuidePage.OVERVIEW
                 } else {
                     FortuneGuidePage.CROP
                 }
-            }
         }
         y += 30
-        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25)) {
-            if (selectedPage != FortuneGuidePage.UPGRADES) {
+        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25) && selectedPage != FortuneGuidePage.UPGRADES) {
                 selectedPage = FortuneGuidePage.UPGRADES
                 SoundUtils.playClickSound()
-            }
         }
 
         if (selectedPage != FortuneGuidePage.UPGRADES) {

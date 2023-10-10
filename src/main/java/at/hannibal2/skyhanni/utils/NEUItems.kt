@@ -246,36 +246,24 @@ object NEUItems {
                 val count = ingredient.count.toInt()
                 var internalItemId = ingredient.internalItemId
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN") {
-                    if (internalItemId == "INK_SACK-2") {
-                        internalItemId = "CACTUS"
-                    }
+                if (internalName == "ENCHANTED_CACTUS_GREEN" && internalItemId == "INK_SACK-2") {
+                    internalItemId = "CACTUS"
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE") {
-                    if (internalItemId == "WHEAT") {
+                if (internalName == "ENCHANTED_COOKIE" && internalItemId == "WHEAT") {
                         continue
-                    }
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT") {
-                    if (internalItemId == "GOLDEN_CARROT") {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT" && internalItemId == "GOLDEN_CARROT") {
                         continue
-                    }
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER") {
-                    if (internalItemId == "RABBIT_HIDE") {
+                if (internalName == "LEATHER" && internalItemId == "RABBIT_HIDE") {
                         continue
-                    }
                 }
-
-//                println("")
-//                println("rawId: $rawId")
-//                println("internalItemId: $internalItemId")
 
                 val old = map.getOrDefault(internalItemId, 0)
                 map[internalItemId] = old + count
@@ -332,9 +320,7 @@ object NEUItems {
         if (!jsonObject.has("internalname")) {
             jsonObject.add("internalname", JsonPrimitive("_"))
         }
-        if (removeLore) {
-            if (jsonObject.has("lore")) jsonObject.remove("lore")
-        }
+        if (removeLore && jsonObject.has("lore")) jsonObject.remove("lore")
         val jsonString = jsonObject.toString()
         return StringUtils.encodeBase64(jsonString)
     }

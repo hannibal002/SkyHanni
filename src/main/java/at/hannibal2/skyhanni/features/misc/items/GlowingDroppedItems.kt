@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,7 +18,7 @@ class GlowingDroppedItems {
     private val config get() = SkyHanniMod.feature.misc.glowingDroppedItems
 
     /**
-     * List of skyblock locations where we might see items in showcases
+     * List of SkyBlock locations where we might see items in showcases
      */
     private val showcaseItemLocations = setOf(
         "The End",
@@ -27,20 +28,24 @@ class GlowingDroppedItems {
     @SubscribeEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.XRAY) {
-            event.queueEntitiesToOutline(getEntityOutlineColor)
+            event.queueEntitiesToOutline { getEntityOutlineColor(it) }
         }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
-        if (entity is EntityItem && !shouldHideShowcaseItem(entity)) {
-            val rarity = entity.entityItem.getItemRarityOrNull()
+    private fun getEntityOutlineColor(entity: Entity): Int? {
+        val item = entity as? EntityItem ?: return null
+        if (shouldHideShowcaseItem(entity)) return null
 
-            if (config.highlightFishingBait || entity.entityItem.name?.endsWith(" Bait") != true) {
-                rarity?.color?.toColor()?.rgb
-            } else null
-        } else null
+        val entityItem = item.entityItem
+        if (!config.highlightFishingBait && entityItem.name?.endsWith(" Bait") == true) {
+            return null
+        }
+
+        entityItem.getInternalNameOrNull() ?: return null
+        val rarity = entityItem.getItemRarityOrNull()
+        return rarity?.color?.toColor()?.rgb
     }
 
     private fun isShowcaseArea() =

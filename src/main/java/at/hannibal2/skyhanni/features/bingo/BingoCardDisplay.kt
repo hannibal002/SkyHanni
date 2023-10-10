@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -33,7 +34,7 @@ class BingoCardDisplay {
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
 
-        private val config get() = SkyHanniMod.feature.bingo.bingoCard
+        private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
         private var displayMode = 0
         val personalGoals = mutableListOf<PersonalGoal>()
         private val communityGoals = mutableListOf<CommunityGoal>()
@@ -138,7 +139,7 @@ class BingoCardDisplay {
     private var lastSneak = false
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
@@ -181,5 +182,10 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideCommunityGoals.onToggle { update() }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "bingo", "event.bingo")
     }
 }
