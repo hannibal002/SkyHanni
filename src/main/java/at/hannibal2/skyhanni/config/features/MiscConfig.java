@@ -44,7 +44,7 @@ public class MiscConfig {
     public static class PetExperienceToolTipConfig {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.")
+        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean petDisplay = true;
@@ -55,7 +55,7 @@ public class MiscConfig {
         public boolean showAlways = false;
 
         @Expose
-        @ConfigOption(name = "Dragon Egg", desc = "For an Golden Dragon Egg, show progress to level 100 instead of 200.")
+        @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
         @ConfigEditorBoolean
         public boolean showGoldenDragonEgg = true;
 
@@ -98,7 +98,7 @@ public class MiscConfig {
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the Non God Pot Effects display.")
+    @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
@@ -180,7 +180,7 @@ public class MiscConfig {
     public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Show always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
@@ -310,7 +310,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Enable Data Tracker",
                 desc = "Tracks all of your data from doing Trevor Quests.\n" +
-                        "Shows based on the setting below"
+                        "Shows based on the setting below."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -320,7 +320,7 @@ public class MiscConfig {
         @ConfigOption(
                 name = "Show Between Quests",
                 desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                        "Will show in the Trapper's Den regardless. Global toggle above"
+                        "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
         )
         @ConfigEditorBoolean
         public boolean displayType = true;
@@ -488,7 +488,7 @@ public class MiscConfig {
             public boolean enabled = false;
 
             @Expose
-            @ConfigOption(name = "Line color", desc = "Color of the line.")
+            @ConfigOption(name = "Line Color", desc = "Color of the line.")
             @ConfigEditorColour
             public String lineColor = "0:255:255:255:255";
 
@@ -533,6 +533,145 @@ public class MiscConfig {
         @ConfigEditorBoolean
         public boolean highlightFishingBait = false;
 
+    }
+
+
+    @Expose
+    @ConfigOption(name = "Highlight Party Members", desc = "")
+    @Accordion
+    public HighlightPartyMembers highlightPartyMembers = new HighlightPartyMembers();
+
+    public static class HighlightPartyMembers {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around your party members")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Outline Color",
+                desc = "The color to outline party members in."
+        )
+        @ConfigEditorColour
+        public String outlineColor = "0:245:85:255:85";
+
+    }
+
+
+    @Expose
+    @ConfigOption(name = "Compact Tab List", desc = "")
+    @Accordion
+    public CompactTabListConfig compactTabList = new CompactTabListConfig();
+
+    public static class CompactTabListConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
+                "doesn't break god-pot detection and shortens some other lines.")
+        //made tablist one word here so both searches will pick it up
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist.")
+        @ConfigEditorBoolean
+        public boolean hideAdverts = false;
+
+        @Expose
+        @ConfigOption(name = "Advanced Player List", desc = "")
+        @Accordion
+        public AdvancedPlayerList advancedPlayerList = new AdvancedPlayerList();
+
+        public static class AdvancedPlayerList {
+
+            @Expose
+            @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
+            @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
+            @ConfigAccordionId(id = 1)
+            public int playerSortOrder = 0;
+
+            @Expose
+            @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
+            @ConfigEditorBoolean
+            public boolean reverseSort = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons/skins of player in the tab list.")
+            @ConfigEditorBoolean
+            public boolean hidePlayerIcons = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
+            @ConfigEditorBoolean
+            public boolean hideRankColor = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Emblems", desc = "Hide the emblems behind the player name.")
+            @ConfigEditorBoolean
+            public boolean hideEmblem = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Level", desc = "Hide the SkyBlock level numbers.")
+            @ConfigEditorBoolean
+            public boolean hideLevel = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
+            @ConfigEditorBoolean
+            public boolean hideLevelBrackets = false;
+
+            @Expose
+            @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
+            @ConfigEditorBoolean
+            public boolean useLevelColorForName = false;
+
+            @Expose
+            @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familar with bingo.")
+            @ConfigEditorBoolean
+            public boolean showBingoRankNumber = false;
+
+            @Expose
+            @ConfigOption(name = "Mark Special Persons", desc = "Show speical icons behind the name of guild members, party members, friends, and marked players.")
+            @ConfigEditorBoolean
+            public boolean markSpecialPersons = false;
+
+            @Expose
+            @ConfigOption(name = "Mark SkyHanni Devs", desc = "Adds a §c:O §7behind the tablist name of SkyHanni's creators.")
+            @ConfigEditorBoolean
+            public boolean markSkyHanniDevs = false;
+        }
+    }
+
+    @Expose
+    @ConfigOption(name = "Kick Duration", desc = "")
+    @Accordion
+    public KickDurationConfig kickDuration = new KickDurationConfig();
+
+    public static class KickDurationConfig {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
+                        "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
+        @ConfigEditorSlider(
+                minValue = 5,
+                maxValue = 300,
+                minStep = 1
+        )
+        public Property<Integer> warnTime = Property.of(60);
+
+        @Expose
+        public Position position = new Position(400, 200, 1.3f);
     }
 
     @Expose
@@ -631,6 +770,23 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean superpairsClicksAlert = false;
+
+    @Expose
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixNeuHeavyPearls = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Time In Limbo",
+            desc = "Show the time since you entered the limbo.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showTimeInLimbo = true;
+
+    @Expose
+    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);

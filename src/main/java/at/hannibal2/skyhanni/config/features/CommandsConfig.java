@@ -50,7 +50,7 @@ public class CommandsConfig {
         public boolean vipVisits = true;
 
         @Expose
-        @ConfigOption(name = "/gfs Sack", desc = "Tab complete /gfs sack items.")
+        @ConfigOption(name = "/gfs Sack", desc = "Tab complete §e/gfs §7sack items.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean gfsSack = true;

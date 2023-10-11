@@ -26,7 +26,6 @@ object FFStats {
 
     var cakeExpireTime = 0L
 
-    // todo maybe these could be maps
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
     val beltFF = mutableMapOf<FFTypes, Double>()

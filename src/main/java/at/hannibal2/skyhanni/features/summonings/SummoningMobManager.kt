@@ -77,10 +77,8 @@ class SummoningMobManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (config.summoningMobDisplay) {
-            if (event.repeatSeconds(1)) {
-                updateData()
-            }
+        if (config.summoningMobDisplay && event.repeatSeconds(1)) {
+            updateData()
         }
 
         if (searchArmorStands) {
@@ -139,7 +137,7 @@ class SummoningMobManager {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.summoningMobDisplay) return
         if (summoningMobs.isEmpty()) return

@@ -78,7 +78,7 @@ object DanceRoomHelper {
     } + this
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRoom) return
         config.position.renderStrings(
@@ -151,10 +151,8 @@ object DanceRoomHelper {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
-            if (entity is EntityOtherPlayerMP) {
-                if (inRoom) {
-                    event.isCanceled = true
-                }
+            if (entity is EntityOtherPlayerMP && inRoom) {
+                event.isCanceled = true
             }
         }
     }

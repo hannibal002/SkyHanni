@@ -78,24 +78,22 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.isMod(2)) {
-            if (LorenzUtils.inSkyBlock) {
-                val originalLocation = ScoreboardData.sidebarLinesFormatted
-                    .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                    ?.substring(5)?.removeColor()
-                    ?: "?"
+        if (event.isMod(2) && LorenzUtils.inSkyBlock) {
+            val originalLocation = ScoreboardData.sidebarLinesFormatted
+                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
+                ?.substring(5)?.removeColor()
+                ?: "?"
 
-                skyBlockArea = when {
-                    skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
-                    skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
-                    skyBlockIsland == IslandType.THE_END && fakeZealotBruiserHideoutArea.isPlayerInside() -> "The End"
-                    skyBlockIsland == IslandType.THE_END && realZealotBruiserHideoutArea.isPlayerInside() -> "Zealot Bruiser Hideout"
+            skyBlockArea = when {
+                skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
+                skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
+                skyBlockIsland == IslandType.THE_END && fakeZealotBruiserHideoutArea.isPlayerInside() -> "The End"
+                skyBlockIsland == IslandType.THE_END && realZealotBruiserHideoutArea.isPlayerInside() -> "Zealot Bruiser Hideout"
 
-                    else -> originalLocation
-                }
-
-                checkProfileName()
+                else -> originalLocation
             }
+
+            checkProfileName()
         }
 
         if (!event.isMod(5)) return
@@ -144,16 +142,10 @@ class HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
+            if (BingoAPI.getRank(line) != null) {
+                bingo = true
+            }
             when (line) {
-                " §7Ⓑ §7Bingo", // No Rank
-                " §aⒷ §aBingo", // Rank 1
-                " §9Ⓑ §9Bingo", // Rank 2
-                " §5Ⓑ §5Bingo", // Rank 3
-                " §6Ⓑ §6Bingo", // Rank 4
-                -> {
-                    bingo = true
-                }
-
                 " §7♲ §7Ironman" -> {
                     ironman = true
                 }

@@ -293,10 +293,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
-        if (miniBossQuest.miniBoss == miniBoss) {
-            if (miniBossQuest.state == QuestState.ACCEPTED) {
-                updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
-            }
+        if (miniBossQuest.miniBoss == miniBoss && miniBossQuest.state == QuestState.ACCEPTED) {
+            updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
         }
     }
 

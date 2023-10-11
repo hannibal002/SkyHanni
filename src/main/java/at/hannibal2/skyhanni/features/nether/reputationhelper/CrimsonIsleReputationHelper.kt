@@ -106,16 +106,14 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun renderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
 
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        if (config.useHotkey) {
-            if (!OSUtils.isKeyHeld(config.hotkey)) {
-                return
-            }
+        if (config.useHotkey && !OSUtils.isKeyHeld(config.hotkey)) {
+            return
         }
 
         config.position.renderStringsAndItems(

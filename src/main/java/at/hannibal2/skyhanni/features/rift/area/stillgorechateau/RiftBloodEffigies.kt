@@ -127,13 +127,11 @@ class RiftBloodEffigies {
                     continue
                 }
 
-                if (config.respawningSoon) {
-                    if (diff < 60_000 * config.respwningSoonTime) {
-                        val time = TimeUtils.formatDuration(diff - 999)
-                        event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
-                        event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
-                        continue
-                    }
+                if (config.respawningSoon && diff < 60_000 * config.respwningSoonTime) {
+                    val time = TimeUtils.formatDuration(diff - 999)
+                    event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
+                    event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
+                    continue
                 }
             }
 

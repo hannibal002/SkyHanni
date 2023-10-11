@@ -55,38 +55,29 @@ object PlayerTabComplete {
 
         return buildList {
 
-            if (config.friends) {
-                if (PlayerCategory.FRIENDS !in ignored) {
-                    FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
-                        .forEach { add(it.name) }
-                }
+            if (config.friends && PlayerCategory.FRIENDS !in ignored) {
+                FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
+                    .forEach { add(it.name) }
             }
 
-            if (config.islandPlayers) {
-                if (PlayerCategory.ISLAND_PLAYERS !in ignored) {
-                    for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
-                        if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
-                            add(entity.name)
-                        }
+            if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in ignored) {
+                for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
+                    if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
+                        add(entity.name)
                     }
                 }
             }
 
-            if (config.party) {
-                if (PlayerCategory.PARTY !in ignored) {
-                    for (member in PartyAPI.partyMembers) {
-                        add(member)
-                    }
+            if (config.party && PlayerCategory.PARTY !in ignored) {
+                for (member in PartyAPI.partyMembers) {
+                    add(member)
                 }
-
             }
 
-            if (config.vipVisits) {
-                if (command == "visit") {
-                    vipVisitsJson?.let {
-                        for (visit in it.vipVisits) {
-                            add(visit)
-                        }
+            if (config.vipVisits && command == "visit") {
+                vipVisitsJson?.let {
+                    for (visit in it.vipVisits) {
+                        add(visit)
                     }
                 }
             }

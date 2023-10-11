@@ -219,7 +219,7 @@ public class GardenConfig {
                         "§9Replenish I",
                 }
         )
-        public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+        public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
 
 
     }
@@ -303,10 +303,10 @@ public class GardenConfig {
                         "§b1 §9Dedication IV",
                         "§b6 §9Music Rune",
                         "§b1 §cSpace Helmet",
-                        " ", // If they want another empty row
-                        "§212,735 Garden EXP",
                         "§b1 §9Cultivating I",
                         "§b1 §9Replenish I",
+                        " ", // If they want another empty row
+                        "§212,735 Garden EXP",
                         "§b11,056 Bits",
                         "§250,556 Mithril Powder",
                         "§d50,556 Gemstone Powder",
@@ -328,7 +328,7 @@ public class GardenConfig {
         public boolean displayIcons = false;
 
         @Expose
-        @ConfigOption(name = "Only On Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+        @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
         @ConfigEditorBoolean
         public boolean onlyOnBarn = true;
 
@@ -478,7 +478,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only show top", desc = "Only show the top # crops.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
     @ConfigEditorSlider(
             minValue = 1,
             maxValue = 10,
@@ -488,7 +488,7 @@ public class GardenConfig {
     public int cropMilestoneShowOnlyBest = 10;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneShowCurrent = true;
@@ -839,7 +839,7 @@ public class GardenConfig {
     public boolean dicerCounter = false;
 
     @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigOption(name = "RNG Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     @FeatureToggle
@@ -861,7 +861,7 @@ public class GardenConfig {
     public boolean moneyPerHour = false;
 
     @Expose
-    @ConfigOption(name = "Show money per Hour",
+    @ConfigOption(name = "Show Money per Hour",
             desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
                     "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
@@ -871,7 +871,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only show top", desc = "Only show the best # items.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the best # items.")
     @ConfigEditorSlider(
             minValue = 1,
             maxValue = 25,
@@ -881,7 +881,7 @@ public class GardenConfig {
     public int moneyPerHourShowOnlyBest = 5;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigOption(name = "Extend Top List", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourShowCurrent = true;
@@ -1119,6 +1119,12 @@ public class GardenConfig {
     public int composterOverlayPriceType = 0;
 
     @Expose
+    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
+    @ConfigEditorDropdown(values = {"Bazaar", "Sacks"})
+    @ConfigAccordionId(id = 17)
+    public int composterOverlayRetrieveFrom = 0;
+
+    @Expose
     public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
 
     @Expose
@@ -1146,7 +1152,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(
-            name = "Composter warning",
+            name = "Composter Warning",
             desc = "Warn when the Composter gets close to empty, even outside Garden."
     )
     @ConfigEditorBoolean

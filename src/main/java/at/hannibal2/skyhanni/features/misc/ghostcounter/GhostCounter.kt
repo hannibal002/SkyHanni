@@ -97,7 +97,7 @@ object GhostCounter {
     private val VOLTA = "VOLTA".asInternalName()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (config.onlyOnMist && !inMist) return
         config.position.renderStringsAndItems(
@@ -276,18 +276,14 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0..450.0) {
-                        if (lastXp != "0") {
-                            if (num >= 0) {
-                                KILLS.add(num)
-                                KILLS.add(num, true)
-                                Option.GHOSTSINCESORROW.add(num)
-                                Option.KILLCOMBO.add(num)
-                                Option.SKILLXPGAINED.add(gained * num.roundToLong())
-                                Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
-                            }
-                        }
+                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
+                        KILLS.add(num)
+                        KILLS.add(num, true)
+                        Option.GHOSTSINCESORROW.add(num)
+                        Option.KILLCOMBO.add(num)
+                        Option.SKILLXPGAINED.add(gained * num.roundToLong())
+                        Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                        hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
                     }
                     lastXp = res
                 }

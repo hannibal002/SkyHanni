@@ -44,17 +44,14 @@ class BlazeSlayerFirePitsWarning {
         val lastHealth = event.lastHealth
 
         val percentHealth = maxHealth * 0.33
-        if (health < percentHealth) {
-            if (lastHealth > percentHealth) {
-                when (entityData.bossType) {
-                    BossType.SLAYER_BLAZE_3,
-                    BossType.SLAYER_BLAZE_4,
-                    -> {
-                        fireFirePits()
-                    }
-
-                    else -> {}
+        if (health < percentHealth && lastHealth > percentHealth) {
+            when (entityData.bossType) {
+                BossType.SLAYER_BLAZE_3,
+                BossType.SLAYER_BLAZE_4,
+                -> {
+                    fireFirePits()
                 }
+                else -> {}
             }
         }
     }

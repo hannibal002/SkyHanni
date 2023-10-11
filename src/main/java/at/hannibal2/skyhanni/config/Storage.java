@@ -58,6 +58,9 @@ public class Storage {
 
         @Expose
         public long nextAccountUpgradeCompletionTime = -1L;
+
+        @Expose
+        public List<String> guildMembers = new ArrayList<>();
     }
 
     public static class ProfileSpecific {
@@ -186,6 +189,15 @@ public class Storage {
 
                 @Expose
                 public long coinsSpent = 0;
+
+                @Expose
+                public long bits = 0;
+
+                @Expose
+                public long mithrilPowder = 0;
+
+                @Expose
+                public long gemstonePowder = 0;
 
                 @Expose
                 public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();

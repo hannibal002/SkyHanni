@@ -131,13 +131,6 @@ public class InventoryConfig {
     public boolean jacobFarmingContestHighlightRewards = true;
 
     @Expose
-    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the Jacob inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestHideDuplicates = true;
-
-    @Expose
     @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
@@ -256,13 +249,13 @@ public class InventoryConfig {
         public int nameLength = 100;
 
         @Expose
-        @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
+        @ConfigOption(name = "Highlight Slot", desc = "Highlight slot where the item is when you hover over it in the display.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enableHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Highlight color", desc = "Choose the highlight color.")
+        @ConfigOption(name = "Highlight Color", desc = "Choose the highlight color.")
         @ConfigEditorColour
         public String highlightColor = "0:249:0:255:88";
 
@@ -359,7 +352,7 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-            name = "Item number",
+            name = "Item Number",
             desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
@@ -381,6 +374,16 @@ public class InventoryConfig {
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+
+    @Expose
+    @ConfigOption(
+            name = "Quick Craft Confirmation",
+            desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+                    "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quickCraftingConfirmation = false;
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")

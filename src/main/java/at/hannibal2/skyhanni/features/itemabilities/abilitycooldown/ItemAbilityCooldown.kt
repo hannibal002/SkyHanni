@@ -41,23 +41,18 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
-        if (event.soundName == "mob.zombie.remedy") {
-            if (event.pitch == 0.6984127f && event.volume == 1f) {
-                val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-                if (abilityScrolls.size != 3) return
+        //TODO: add comment labels for these
+        if (event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f) {
+            val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
+            if (abilityScrolls.size != 3) return
 
-                ItemAbility.HYPERION.sound()
-            }
+            ItemAbility.HYPERION.sound()
         }
-        if (event.soundName == "liquid.lavapop") {
-            if (event.pitch == 1.0f && event.volume == 1f) {
-                ItemAbility.FIRE_FURY_STAFF.sound()
-            }
+        if (event.soundName == "liquid.lavapop" && event.pitch == 1.0f && event.volume == 1f) {
+            ItemAbility.FIRE_FURY_STAFF.sound()
         }
-        if (event.soundName == "mob.enderdragon.growl") {
-            if (event.pitch == 1f && event.volume == 1f) {
-                ItemAbility.ICE_SPRAY_WAND.sound()
-            }
+        if (event.soundName == "mob.enderdragon.growl" && event.pitch == 1f && event.volume == 1f) {
+            ItemAbility.ICE_SPRAY_WAND.sound()
         }
         if (event.soundName == "mob.endermen.portal") {
             if (event.pitch == 0.61904764f && event.volume == 1f) {
@@ -74,104 +69,65 @@ class ItemAbilityCooldown {
                 ItemAbility.SHADOW_FURY.sound()
             }
         }
-        if (event.soundName == "random.anvil_land") {
-            if (event.pitch == 0.4920635f && event.volume == 1f) {
-                ItemAbility.GIANTS_SWORD.sound()
-            }
+        if (event.soundName == "random.anvil_land" && event.pitch == 0.4920635f && event.volume == 1f) {
+            ItemAbility.GIANTS_SWORD.sound()
         }
-        if (event.soundName == "mob.ghast.affectionate_scream") {
-            if (event.pitch == 0.4920635f && event.volume == 0.15f) {
-                ItemAbility.ATOMSPLIT_KATANA.sound()
-            }
+        if (event.soundName == "mob.ghast.affectionate_scream" && event.pitch == 0.4920635f && event.volume == 0.15f) {
+            ItemAbility.ATOMSPLIT_KATANA.sound()
         }
-//        if (event.soundName == "random.click") {
-//            if (event.pitch == 2.0f && event.volume == 0.55f) {
-//                ItemAbility.RAGNAROCK_AXE.sound()
-//            }
-//        }
-        if (event.soundName == "liquid.lavapop") {
-            if (event.pitch == 0.7619048f && event.volume == 0.15f) {
-                ItemAbility.WAND_OF_ATONEMENT.sound()
-            }
+        if (event.soundName == "liquid.lavapop" && event.pitch == 0.7619048f && event.volume == 0.15f) {
+            ItemAbility.WAND_OF_ATONEMENT.sound()
         }
-        if (event.soundName == "mob.bat.hurt") {
-            if (event.volume == 0.1f) {
-                ItemAbility.STARLIGHT_WAND.sound()
-            }
+        if (event.soundName == "mob.bat.hurt" && event.volume == 0.1f) {
+            ItemAbility.STARLIGHT_WAND.sound()
         }
-        if (event.soundName == "mob.guardian.curse") {
-            if (event.volume == 0.2f) {
-                ItemAbility.VOODOO_DOLL.sound()
-            }
+        if (event.soundName == "mob.guardian.curse" && event.volume == 0.2f) {
+            ItemAbility.VOODOO_DOLL.sound()
         }
-        if (event.soundName == "random.successful_hit") { // Jinxed Voodoo Doll Hit
-            if (event.volume == 1.0f && event.pitch == 0.7936508f) {
+        if (event.soundName == "random.successful_hit" && event.volume == 1.0f && event.pitch == 0.7936508f) { // Jinxed Voodoo Doll Hit
+            ItemAbility.VOODOO_DOLL_WILTED.sound()
+        }
+        if (event.soundName == "mob.ghast.scream" && event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7) { // Jinxed Voodoo Doll Miss
+            val recentItems = InventoryUtils.recentItemsInHand.values
+            if (VOODOO_DOLL_WILTED in recentItems) {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
             }
         }
-        if (event.soundName == "mob.ghast.scream") { // Jinxed Voodoo Doll Miss
-            if (event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7) {
-                val recentItems = InventoryUtils.recentItemsInHand.values
-                if (VOODOO_DOLL_WILTED in recentItems) {
-                    ItemAbility.VOODOO_DOLL_WILTED.sound()
-                }
+        if (event.soundName == "random.explode" && event.pitch == 4.047619f && event.volume == 0.2f) {
+            ItemAbility.GOLEM_SWORD.sound()
+        }
+        if (event.soundName == "mob.wolf.howl" && event.volume == 0.5f) {
+            val recentItems = InventoryUtils.recentItemsInHand.values
+            if (WEIRD_TUBA in recentItems) {
+                ItemAbility.WEIRD_TUBA.sound()
+            }
+            if (WEIRDER_TUBA in recentItems) {
+                ItemAbility.WEIRDER_TUBA.sound()
             }
         }
-        if (event.soundName == "random.explode") {
-            if (event.pitch == 4.047619f && event.volume == 0.2f) {
-                ItemAbility.GOLEM_SWORD.sound()
-            }
+        if (event.soundName == "mob.zombie.unfect" && event.pitch == 2.0f && event.volume == 0.3f) {
+            ItemAbility.END_STONE_SWORD.sound()
         }
-        if (event.soundName == "mob.wolf.howl") {
-            if (event.volume == 0.5f) {
-                val recentItems = InventoryUtils.recentItemsInHand.values
-                if (WEIRD_TUBA in recentItems) {
-                    ItemAbility.WEIRD_TUBA.sound()
-                }
-                if (WEIRDER_TUBA in recentItems) {
-                    ItemAbility.WEIRDER_TUBA.sound()
-                }
-            }
+        if (event.soundName == "mob.wolf.panting" && event.pitch == 1.3968254f && event.volume == 0.4f) {
+            ItemAbility.SOUL_ESOWARD.sound()
         }
-        if (event.soundName == "mob.zombie.unfect") {
-            if (event.pitch == 2.0f && event.volume == 0.3f) {
-                ItemAbility.END_STONE_SWORD.sound()
-            }
+        if (event.soundName == "mob.zombiepig.zpigangry" && event.pitch == 2.0f && event.volume == 0.3f) {
+            ItemAbility.PIGMAN_SWORD.sound()
         }
-        if (event.soundName == "mob.wolf.panting") {
-            if (event.pitch == 1.3968254f && event.volume == 0.4f) {
-                ItemAbility.SOUL_ESOWARD.sound()
-            }
+        if (event.soundName == "mob.ghast.fireball" && event.pitch == 1.0f && event.volume == 0.3f) {
+            ItemAbility.EMBER_ROD.sound()
         }
-        if (event.soundName == "mob.zombiepig.zpigangry") {
-            if (event.pitch == 2.0f && event.volume == 0.3f) {
-                ItemAbility.PIGMAN_SWORD.sound()
-            }
+        if (event.soundName == "mob.guardian.elder.idle" && event.pitch == 2.0f && event.volume == 0.2f) {
+            ItemAbility.FIRE_FREEZE_STAFF.sound()
         }
-        if (event.soundName == "mob.ghast.fireball") {
-            if (event.pitch == 1.0f && event.volume == 0.3f) {
-                ItemAbility.EMBER_ROD.sound()
-            }
+        if (event.soundName == "random.explode" && event.pitch == 0.4920635f && event.volume == 0.5f) {
+            ItemAbility.STAFF_OF_THE_VOLCANO.sound()
         }
-        if (event.soundName == "mob.guardian.elder.idle") {
-            if (event.pitch == 2.0f && event.volume == 0.2f) {
-                ItemAbility.FIRE_FREEZE_STAFF.sound()
-            }
+        if (event.soundName == "random.eat" && event.pitch == 1.0f && event.volume == 1.0f) {
+            ItemAbility.STAFF_OF_THE_VOLCANO.sound()
         }
-        if (event.soundName == "random.explode") {
-            if (event.pitch == 0.4920635f && event.volume == 0.5f) {
-                ItemAbility.STAFF_OF_THE_VOLCANO.sound()
-            }
-        }
-        if (event.soundName == "random.eat") {
-            if (event.pitch == 1.0f && event.volume == 1.0f) {
-                ItemAbility.STAFF_OF_THE_VOLCANO.sound()
-            }
-        }
-        if (event.soundName == "random.drink") {
-            if (event.pitch.round(1) == 1.8f && event.volume == 1.0f) {
-                ItemAbility.HOLY_ICE.sound()
-            }
+        if (event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f) {
+            ItemAbility.HOLY_ICE.sound()
         }
     }
 

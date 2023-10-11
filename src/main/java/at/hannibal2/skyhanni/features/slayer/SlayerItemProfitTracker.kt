@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.get
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
@@ -49,6 +48,7 @@ object SlayerItemProfitTracker {
     private var collectedCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.SECONDS).build<Int, Unit>()
 
     private var itemLogCategory = ""
+    private var baseSlayerType = ""
     private var display = emptyList<List<Any>>()
     private val logger = LorenzLogger("slayer/item_profit_tracker")
     private var inventoryOpen = false
@@ -76,11 +76,9 @@ object SlayerItemProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL) {
-            if (SlayerAPI.isInSlayerArea) {
-                logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
-                addMobKillCoins(coins.toInt())
-            }
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
+            logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
+            addMobKillCoins(coins.toInt())
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
             logger.log("Coins paid for starting slayer quest: ${coins.addSeparators()}")
@@ -92,6 +90,7 @@ object SlayerItemProfitTracker {
     fun onSlayerChange(event: SlayerChangeEvent) {
         val newSlayer = event.newSlayer
         itemLogCategory = newSlayer.removeColor()
+        baseSlayerType = itemLogCategory.substringBeforeLast(" ")
         update()
     }
 
@@ -142,7 +141,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (sackChange in event.sackChanges) {
@@ -157,7 +156,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         val packet = event.packet
@@ -186,20 +185,16 @@ object SlayerItemProfitTracker {
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
         addItemPickup(internalName, amount)
         logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
-        if (config.priceInChat) {
-            if (price > config.minimumPrice) {
-                LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
-            }
+        if (config.priceInChat && price > config.minimumPrice) {
+            LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
         }
-        if (config.titleWarning) {
-            if (price > config.minimumPriceWarning) {
-                TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
-            }
+        if (config.titleWarning && price > config.minimumPriceWarning) {
+            TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean {
-        val allowedList = allowedItems.get { itemLogCategory.startsWith(it) } ?: return false
+        val allowedList = allowedItems[baseSlayerType] ?: return false
         return internalName in allowedList
     }
 
@@ -362,7 +357,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
@@ -407,13 +402,11 @@ object SlayerItemProfitTracker {
             return
         }
 
-        if (args.size == 1) {
-            if (args[0].lowercase() == "confirm") {
-                resetData(DisplayMode.TOTAL)
-                update()
-                LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
-                return
-            }
+        if (args.size == 1 && args[0].lowercase() == "confirm") {
+            resetData(DisplayMode.TOTAL)
+            update()
+            LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
+            return
         }
 
         LorenzUtils.clickableChat(

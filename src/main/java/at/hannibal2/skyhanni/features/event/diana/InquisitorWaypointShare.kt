@@ -97,11 +97,9 @@ object InquisitorWaypointShare {
         }
 
         // TODO: Change the check to only one line once we have a confirmed inquis message line
-        if (message.contains("§r§eYou dug out ")) {
-            if (message.contains("Inquis")) {
-                time = System.currentTimeMillis()
-                logger.log("found Inquisitor")
-            }
+        if (message.contains("§r§eYou dug out ") && message.contains("Inquis")) {
+            time = System.currentTimeMillis()
+            logger.log("found Inquisitor")
         }
     }
 

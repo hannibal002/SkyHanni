@@ -139,8 +139,6 @@ object QuickModMenuSwitch {
         try {
             when (mod.command) {
                 "patcher" -> {
-                    println("try opening patcher")
-                    // GuiUtil.open(Objects.requireNonNull(Patcher.instance.getPatcherConfig().gui()))
                     val patcher = Class.forName("club.sk1er.patcher.Patcher")
                     val instance = patcher.getDeclaredField("instance").get(null)
                     val config = instance.javaClass.getDeclaredMethod("getPatcherConfig").invoke(instance)
@@ -149,7 +147,6 @@ object QuickModMenuSwitch {
                     for (method in guiUtils.declaredMethods) {
                         try {
                             method.invoke(null, gui)
-                            println("opened patcher")
                             return
                         } catch (_: Exception) {
                         }
@@ -158,8 +155,6 @@ object QuickModMenuSwitch {
                 }
 
                 "hytil" -> {
-                    println("try opening hytil")
-                    // HytilsReborn.INSTANCE.getConfig().openGui()
                     val hytilsReborn = Class.forName("cc.woverflow.hytils.HytilsReborn")
                     val instance = hytilsReborn.getDeclaredField("INSTANCE").get(null)
                     val config = instance.javaClass.getDeclaredMethod("getConfig").invoke(instance)
@@ -168,7 +163,6 @@ object QuickModMenuSwitch {
                     for (method in guiUtils.declaredMethods) {
                         try {
                             method.invoke(null, gui)
-                            println("opened hytil")
                             return
                         } catch (_: Exception) {
                         }

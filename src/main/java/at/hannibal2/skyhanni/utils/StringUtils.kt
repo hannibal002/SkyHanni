@@ -78,7 +78,7 @@ object StringUtils {
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     fun String.cleanPlayerName(): String {
-        val split = split(" ")
+        val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {
@@ -137,7 +137,7 @@ object StringUtils {
     fun optionalPlural(number: Int, singular: String, plural: String) =
         "$number " + if (number == 1) singular else plural
 
-    fun progressBar(percentage: Double, steps: Int = 25): Any {
+    fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
         val prefix = "§5§o§2"
         val step = "§l§m "
@@ -150,11 +150,9 @@ object StringUtils {
         for (i in 0..steps) {
             val toDouble = i.toDouble()
             val stepPercentage = toDouble / steps
-            if (stepPercentage >= percentage) {
-                if (!inMissingArea) {
-                    builder.append(missing)
-                    inMissingArea = true
-                }
+            if (stepPercentage >= percentage && !inMissingArea) {
+                builder.append(missing)
+                inMissingArea = true
             }
             builder.append(step)
         }

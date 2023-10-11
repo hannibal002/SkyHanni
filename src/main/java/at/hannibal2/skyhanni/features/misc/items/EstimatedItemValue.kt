@@ -94,7 +94,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
         if (!OSUtils.isKeyHeld(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
@@ -270,9 +270,11 @@ object EstimatedItemValue {
             if (price != null) {
                 subTotal += price
             }
+            var displayName = attr.first
+            if (displayName == ("MENDING")) displayName = "VITALITY"
             list.add(
                 "  §9${
-                    attr.first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                    displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
                 } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
             )
         }
@@ -642,13 +644,13 @@ object EstimatedItemValue {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5) {
-                if (internalName in hasAlwaysScavenger) continue
+            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
             }
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName == "ultimate_chimera") {
+            if (rawName == "ultimate_chimera" || rawName == "ultimate_fatal_tempo" || rawName == "smoldering") {
 
                 when (rawLevel) {
                     2 -> multiplier = 2

@@ -46,13 +46,13 @@ public class DevConfig {
     public boolean modMenuLog = false;
 
     @Expose
-    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lore.")
+    @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showInternalName = false;
 
     @Expose
-    @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even for items with none.")
+    @ConfigOption(name = "Show Empty Internal Names", desc = "Shows internal name even for items with none.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showEmptyNames = false;
@@ -76,25 +76,25 @@ public class DevConfig {
     public boolean showNpcPrice = false;
 
     @Expose
-    @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items in the lore.")
+    @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showItemUuid = false;
 
     @Expose
-    @ConfigOption(name = "Copy NBT data", desc = "Copies compressed NBT data on key press in a GUI")
+    @ConfigOption(name = "Copy NBT Data", desc = "Copies compressed NBT data on key press in a GUI")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     @ConfigAccordionId(id = 0)
     public int copyNBTDataCompressed = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed XP needed from rng meter inventories as json to clipboard.")
+    @ConfigOption(name = "Copy RNG Meter", desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyRngMeter = false;
 
     @Expose
-    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the besiary data from the inventory as json to clipboard.")
+    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the bestiary data from the inventory as json to clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyBestiaryData = false;

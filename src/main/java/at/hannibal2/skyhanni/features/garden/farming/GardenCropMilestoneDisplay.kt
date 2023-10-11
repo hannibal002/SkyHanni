@@ -51,7 +51,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
 
@@ -122,10 +122,8 @@ object GardenCropMilestoneDisplay {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.cropMilestoneBestDisplay) {
-            if (config.cropMilestoneBestAlwaysOn || currentCrop != null) {
-                bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
-            }
+        if (config.cropMilestoneBestDisplay && config.cropMilestoneBestAlwaysOn || currentCrop != null) {
+            bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
         }
     }
 
