@@ -4,20 +4,53 @@
 
 ### New Features
 
++ Added Quick Craft Confirmation. - Cad
+    + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
+    + Sack items can be crafted normally.
++ Added **Compact Tab List**.
+    + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
+    + Option to hide Hypixel advertisment banners. - CalMWolfs
+    + Added **Advanced Player List**. - hannibal2
+        + Customize the player list (inside the tab list) in various ways.
+        + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
+          party/friends/guild
+        + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
+          level
++ Added Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send a warning and sound after a custom amount of seconds.
++ Added Time In Limbo. - hannibal2
+    + Show the time since you entered limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
+
 ### Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
 
 ### Changes
 
-+ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the leaderboard, or manual reloading the farming weight. - hannibal2
++ Allowing clicks on the farming weight overlay to open the Farming Profile of you or the next person in the
+  leaderboard, or manual reloading the farming weight. - hannibal2
 + Added "Burning Desert" as a tarantula slayer area. - hannibal2
 + Slayer features now work only when the slayer type matches the current SkyBlock area. - hannibal2
++ Made Fatal Tempo same as Chimera in Estimated Item Value. - jani
++ Added debug options for fishing hook display. - hannibal2
+    + This should help find values that the fishing hook display works 100% with.
++ Changed the color for the tab list Special Persons Mark.
++ Mark SkyHanni Devs in the tab list special.
 
 ### Bug Fixes
 
 + The yaw/pitch display does no longer show scientific notations at small values. - hannibal2
 + Fixed slayer RNG Meter problem to detect the selected item. - hannibal2
++ Fixed capitalization errors. - J10a1n15
++ Fixed a bug that hides the contest inventory menu. - CalMWolfs
++ Fixed an error with the tab list. - hannibal2
++ Fixed fishing hook display data not properly resetting on a world change. - hannibal2
++ Fixed an error in Quick Craft Confirmation. - hannibal2
++ Fixed a crash with future NEU versions because of renamed code. - hannibal2
++ Fixed double rendering of item tooltips with chat triggers. - nea
 
 #### Config
 

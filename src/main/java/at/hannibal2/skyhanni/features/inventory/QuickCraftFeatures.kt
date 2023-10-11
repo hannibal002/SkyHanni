@@ -45,8 +45,9 @@ class QuickCraftFeatures {
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
             if (slot.slotNumber !in quickCraftSlots) continue
-            val stack = slot.stack
-            if (stack.name == "§cQuick Crafting Slot") continue
+            val stack = slot.stack ?: continue
+            val name = stack.name ?: continue
+            if (name == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 val color = LorenzColor.DARK_GRAY.addOpacity(180)
                 stack.background = color.rgb

@@ -78,7 +78,7 @@ object StringUtils {
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     fun String.cleanPlayerName(): String {
-        val split = split(" ")
+        val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {

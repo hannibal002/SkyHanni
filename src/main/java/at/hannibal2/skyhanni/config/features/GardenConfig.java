@@ -1119,6 +1119,12 @@ public class GardenConfig {
     public int composterOverlayPriceType = 0;
 
     @Expose
+    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
+    @ConfigEditorDropdown(values = {"Bazaar", "Sacks"})
+    @ConfigAccordionId(id = 17)
+    public int composterOverlayRetrieveFrom = 0;
+
+    @Expose
     public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
 
     @Expose
