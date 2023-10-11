@@ -23,8 +23,11 @@
 + Added Time In Limbo. - hannibal2
     + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
++ Added Highlight Party Members. - Cad
++ Added Shift Click Equipment. - Thunderblade73
+    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 
-### Events
+#### Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
 
@@ -39,6 +42,9 @@
     + This should help find values that the fishing hook display works 100% with.
 + Changed the color for the tab list Special Persons Mark.
 + Mark SkyHanni Devs in the tab list special.
++ Added buttons to change the format of the price and the number in the sack display. - HiZe
++ Made Smoldering same as Fatal Tempo and Chimera in Estimated Item Value. - jani
++ Added an option to change where to get the items from in the composter overlay: from the bazaar or from sacks. - HiZe
 
 ### Bug Fixes
 
@@ -51,6 +57,8 @@
 + Fixed an error in Quick Craft Confirmation. - hannibal2
 + Fixed a crash with future NEU versions because of renamed code. - hannibal2
 + Fixed double rendering of item tooltips with chat triggers. - nea
++ Fixed Sacks Display integer limit error. - HiZe & hannibal2
++ Fixed the vitality attribute is wrongly labeled as "mending" in Estimated Item Value. - walker
 
 #### Config
 
