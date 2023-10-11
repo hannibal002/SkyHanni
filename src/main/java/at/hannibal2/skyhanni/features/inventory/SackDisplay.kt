@@ -37,7 +37,7 @@ object SackDisplay {
 
     private fun drawDisplay(savingSacks: Boolean): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-        var totalPrice = 0
+        var totalPrice = 0L
         var rendered = 0
         SackAPI.getSacksData(savingSacks)
 
@@ -83,7 +83,7 @@ object SackDisplay {
                     )
 
                     if (colorCode == "§a") add(" §c§l(Full!)")
-                    if (config.showPrice && price != 0) add(" §7(§6${format(price)}§7)")
+                    if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
                 rendered++
             }
@@ -137,7 +137,7 @@ object SackDisplay {
                     add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
                     val price = (roughprice + flawedprice + fineprice + flawlessprice)
                     totalPrice += price
-                    if (config.showPrice && price != 0) add(" §7(§6${format(price)}§7)")
+                    if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
             }
             if (config.showPrice) newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
@@ -145,7 +145,7 @@ object SackDisplay {
         return newDisplay
     }
 
-    private fun format(price: Int) = if (config.priceFormat == 0) NumberUtil.format(price) else price.addSeparators()
+    private fun format(price: Long) = if (config.priceFormat == 0) NumberUtil.format(price) else price.addSeparators()
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
