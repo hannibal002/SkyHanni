@@ -151,7 +151,7 @@ object SackDisplay {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
                     add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
-                    val price = (roughprice + flawedprice + fineprice + flawlessprice).toLong()
+                    val price = roughprice + flawedprice + fineprice + flawlessprice
                     totalPrice += price
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })

@@ -84,8 +84,8 @@ object SackAPI {
             else null
     }
 
-    private fun NEUInternalName.sackPrice(stored: String): Long = when (sackDisplayConfig.priceFrom) {
-        0 -> (getPrice(true) * stored.formatNumber()).toLong().let { if (it < 0) 0L else it.toLong() }
+    private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
+        0 -> (getPrice(true) * stored.formatNumber()).toLong().let { if (it < 0) 0L else it }
 
         1 -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
