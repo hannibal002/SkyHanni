@@ -159,7 +159,7 @@ object StringUtils {
         builder.append(end)
         return builder.toString()
     }
-    
+
     fun String.capAtMinecraftLength(limit: Int) =
         capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
 

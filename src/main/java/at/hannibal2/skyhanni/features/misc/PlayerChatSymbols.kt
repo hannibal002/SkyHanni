@@ -2,22 +2,22 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// code inspired by SBA but heavily modified to be more functional and actually work
 class PlayerChatSymbols {
     private val config get() = SkyHanniMod.feature.misc.chatSymbols
-    private val tabUsernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
     private val nameSymbols = mutableMapOf<String, String>()
 
-    // code inspired by SBA but heavily modified to be more functional and actually work
     @SubscribeEvent
     fun onChatReceived(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -33,15 +33,11 @@ class PlayerChatSymbols {
         if (talkingPlayer != null) {
             nameSymbols[username] = talkingPlayer.displayName.siblings[0].unformattedText
         } else {
-            val playerNames = Minecraft.getMinecraft().thePlayer.sendQueue.playerInfoMap
+            val result = TabListData.getTabList()
+                .find { playerName -> TabStringType.usernameFromLine(playerName) == username }
 
-            val result = playerNames.stream()
-                .filter { playerName -> playerName.displayName != null }
-                .filter { playerName -> usernameFromLine(playerName.displayName.formattedText) == username }
-                .findAny()
-
-            if (result.isPresent) {
-                nameSymbols[username] = result.get().displayName.formattedText
+            if (result != null) {
+                nameSymbols[username] = result
             }
         }
 
@@ -74,7 +70,6 @@ class PlayerChatSymbols {
                                 }
                                 else -> oldText
                             }
-
                             component.setText_skyhanni(component.text_skyhanni().replace(oldText, newText))
                             return@modifyFirstChatComponent true
                         }
@@ -84,10 +79,5 @@ class PlayerChatSymbols {
                 }
             }
         }
-    }
-
-    private fun usernameFromLine(input: String): String {
-        val usernameMatcher = tabUsernamePattern.matcher(input.removeColor())
-        return if (usernameMatcher.find()) usernameMatcher.group("username") else input
     }
 }
