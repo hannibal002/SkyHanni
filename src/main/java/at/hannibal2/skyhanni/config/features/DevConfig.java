@@ -82,7 +82,13 @@ public class DevConfig {
     public boolean showItemUuid = false;
 
     @Expose
-    @ConfigOption(name = "Copy NBT Data", desc = "Copies compressed NBT data on key press in a GUI")
+    @ConfigOption(name = "Copy NBT Data", desc = "Copies NBT data on key press in a GUI")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 0)
+    public int copyNBTData = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Copy Compressed NBT Data", desc = "Copies compressed NBT data on key press in a GUI")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     @ConfigAccordionId(id = 0)
     public int copyNBTDataCompressed = Keyboard.KEY_NONE;

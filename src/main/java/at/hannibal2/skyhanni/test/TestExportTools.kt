@@ -47,13 +47,18 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed) || !OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTData) ) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
-        val json = toJson(Item, stack)
-        OSUtils.copyToClipboard(json)
-        LorenzUtils.chat("Copied test importable to clipbooard")
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)){
+            val json = toJson(Item, stack)
+            OSUtils.copyToClipboard(json)
+            LorenzUtils.chat("Copied test importable to clipboard")
+            return
+        }
+        OSUtils.copyToClipboard(stack.tagCompound.toString())
+        LorenzUtils.chat("Copied NBTData to clipboard")
     }
 
 
