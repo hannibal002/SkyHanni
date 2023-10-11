@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
 import at.hannibal2.skyhanni.config.features.BazaarConfig;
 import at.hannibal2.skyhanni.config.features.ChatConfig;
+import at.hannibal2.skyhanni.config.features.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.CombatConfig;
 import at.hannibal2.skyhanni.config.features.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.CrimsonIsleConfig;
