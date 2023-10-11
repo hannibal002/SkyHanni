@@ -245,21 +245,14 @@ object FFStats {
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return when {
-                rawInternalName.contains("ELEPHANT;4") -> {
-                    1.5 * petLevel
-                }
+                rawInternalName.contains("ELEPHANT;4") -> 1.5 * petLevel
                 rawInternalName.contains("MOOSHROOM_COW;4") -> {
                     (10 + petLevel).toDouble() + floor(floor(strength / (40 - petLevel * .2)) * .7)
                 }
-                rawInternalName.contains("MOOSHROOM") -> {
-                    (10 + petLevel).toDouble()
-                }
-                rawInternalName.contains("BEE;2") -> {
-                    0.2 * petLevel
-                }
-                rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> {
-                    0.3 * petLevel
-                }
+
+                rawInternalName.contains("MOOSHROOM") -> (10 + petLevel).toDouble()
+                rawInternalName.contains("BEE;2") -> 0.2 * petLevel
+                rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 else -> 0.0
             }
         }

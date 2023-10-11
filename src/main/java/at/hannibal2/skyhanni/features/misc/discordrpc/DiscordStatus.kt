@@ -103,6 +103,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         when {
             island == IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
                 "${getVisitingName()}'s Island"
+
             island == IslandType.GARDEN -> {
                 if (location.startsWith("Plot: ")) {
                     lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
@@ -110,12 +111,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                     lastKnownDisplayStrings[LOCATION] = "Personal Garden"
                 }
             }
+
             island == IslandType.GARDEN_GUEST -> {
                 lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
                 if (location.startsWith("Plot: ")) {
                     lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
                 } // "MelonKingDe's Garden (Plot: 8)"
             }
+
             location != "None" && location != "invalid" -> {
                 lastKnownDisplayStrings[LOCATION] = location
             }
@@ -132,19 +135,13 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
             motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
-        when {
-            coins == "1" -> {
-                lastKnownDisplayStrings[PURSE] = "1 Coin"
-            }
-            coins != "" && coins != null -> {
-                lastKnownDisplayStrings[PURSE] = "$coins Coins"
-            }
-            motes == "1" -> {
-                lastKnownDisplayStrings[PURSE] = "1 Mote"
-            }
-            motes != "" && motes != null -> {
-                lastKnownDisplayStrings[PURSE] = "$motes Motes"
-            }
+        lastKnownDisplayStrings[PURSE] = when {
+            coins == "1" -> "1 Coin"
+            coins != "" && coins != null -> "$coins Coins"
+            motes == "1" -> "1 Mote"
+            motes != "" && motes != null -> "$motes Motes"
+
+            else -> lastKnownDisplayStrings[PURSE] ?: ""
         }
         lastKnownDisplayStrings[PURSE] ?: ""
     }),
@@ -218,14 +215,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
         var profile = "SkyBlock Level: [$sbLevel] on "
 
-        profile += (
-                when {
-                    HypixelData.ironman -> "♲"
-                    HypixelData.bingo -> "Ⓑ"
-                    HypixelData.stranded -> "☀"
-                    else -> ""
-                }
-                )
+        profile += when {
+            HypixelData.ironman -> "♲"
+            HypixelData.bingo -> "Ⓑ"
+            HypixelData.stranded -> "☀"
+            else -> ""
+        }
 
         val fruit = HypixelData.profileName.firstLetterUppercase()
         if (fruit == "") profile =
@@ -251,6 +246,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                     slayerName = match.group("name")
                     slayerLevel = match.group("level")
                 }
+
                 noColorLine == "Slay the boss!" -> bossAlive = "slaying"
                 noColorLine == "Boss slain!" -> bossAlive = "slain"
             }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -54,16 +53,16 @@ object DanceRoomHelper {
             index < size && index == lineIndex -> {
                 val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
                 "${now.formatColor()} $format $countdown"
-
             }
+
             index + 1 < size && index + 1 == lineIndex -> {
                 "${next.formatColor()} $format"
-
             }
+
             index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex) -> {
                 "${later.formatColor()} $format"
-
             }
+
             else -> null
         }
     }
@@ -73,14 +72,16 @@ object DanceRoomHelper {
     private fun String.format() =
         split(" ").joinToString(" ") { it.firstLetterUppercase().addColor().replace("&", "§") }
 
-    private fun String.addColor() = when (this) {
-        "Move" -> config.danceRoomFormatting.color.move
-        "Stand" -> config.danceRoomFormatting.color.stand
-        "Sneak" -> config.danceRoomFormatting.color.sneak
-        "Jump" -> config.danceRoomFormatting.color.jump
-        "Punch" -> config.danceRoomFormatting.color.punch
-        else -> config.danceRoomFormatting.color.fallback
-    } + this
+    private fun String.addColor() = with(config.danceRoomFormatting.color) {
+        when (this@addColor) {
+            "Move" -> move
+            "Stand" -> stand
+            "Sneak" -> sneak
+            "Jump" -> jump
+            "Punch" -> punch
+            else -> fallback
+        } + this
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

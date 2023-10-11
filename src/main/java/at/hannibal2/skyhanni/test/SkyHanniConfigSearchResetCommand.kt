@@ -83,15 +83,16 @@ object SkyHanniConfigSearchResetCommand {
         }
 
         val root: Any = when {
-            term.startsWith("config") -> {
-                SkyHanniMod.feature
-            }
+            term.startsWith("config") -> SkyHanniMod.feature
+
             term.startsWith("playerSpecific") -> {
                 ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
             }
+
             term.startsWith("profileSpecific") -> {
                 ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
             }
+
             else -> return "§cUnknown config location!"
         }
 

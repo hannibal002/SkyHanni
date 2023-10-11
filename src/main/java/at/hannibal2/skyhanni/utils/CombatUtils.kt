@@ -25,7 +25,6 @@ object CombatUtils {
     private var gainTimer = 0
     var _isKilling = false
 
-
     /**
      * Taken from NotEnoughUpdates
      */
@@ -44,11 +43,13 @@ object CombatUtils {
                     xpGainQueue.add(0, delta)
                     calculateXPHour()
                 }
+
                 xpGainTimer > 0 -> {
                     xpGainTimer--
                     xpGainQueue.add(0, 0f)
                     calculateXPHour()
                 }
+
                 delta <= 0 -> {
                     isKilling = false
                 }
@@ -57,7 +58,7 @@ object CombatUtils {
         lastTotalXp = totalXp
     }
 
-    private fun calculateXPHour(){
+    private fun calculateXPHour() {
         while (xpGainQueue.size > 30) {
             xpGainQueue.removeLast()
         }

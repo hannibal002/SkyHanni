@@ -184,14 +184,14 @@ object VampireSlayerFeatures {
             val coopBoss = configCoopBoss.highlight && containCoop && isNPC()
             val shouldRender = if (ownBoss) true else if (otherBoss) true else coopBoss
 
-            val color =
-                when {
-                    canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.color()
-                    ownBoss -> configOwnBoss.highlightColor.color()
-                    otherBoss -> configOtherBoss.highlightColor.color()
-                    coopBoss -> configCoopBoss.highlightColor.color()
-                    else -> 0
-                }
+            val color = when {
+                canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.color()
+                ownBoss -> configOwnBoss.highlightColor.color()
+                otherBoss -> configOtherBoss.highlightColor.color()
+                coopBoss -> configCoopBoss.highlightColor.color()
+
+                else -> 0
+            }
 
             val shouldSendSteakTitle =
                 if (canUseSteak && configOwnBoss.steakAlert && containUser) true
