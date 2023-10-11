@@ -671,6 +671,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
 + Highlight Party Members. - Cad
+    + Marking partly members with a bright outline to better find them in the world.
 
 ## Cosmetics
 
