@@ -463,7 +463,7 @@ class ComposterOverlay {
                 "sax"
             )
             return
-        } else if (amountInSacks == 0) {
+        } else if (amountInSacks == 0L) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
                 LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks.")
