@@ -183,6 +183,7 @@ import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.features.misc.ParticleHider
+import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
 import at.hannibal2.skyhanni.features.misc.PasteIntoSigns
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
@@ -587,6 +588,7 @@ class SkyHanniMod {
         loadModule(QuickCraftFeatures())
         loadModule(SkyBlockKickDuration())
         loadModule(LimboTimeTracker())
+        loadModule(PartyMemberOutlines())
 
         init()
 
