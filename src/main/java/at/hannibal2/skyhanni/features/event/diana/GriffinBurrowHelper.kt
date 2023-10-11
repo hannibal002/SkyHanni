@@ -3,15 +3,24 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.EntityMoveEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -87,10 +96,8 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (event.distance > 10) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                teleportedLocation = event.newLocation
-            }
+        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+            teleportedLocation = event.newLocation
         }
     }
 
@@ -163,10 +170,8 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
-            if (config.inquisitorSharing.focusInquisitor) {
-                return
-            }
+        if (InquisitorWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+            return
         }
 
         if (config.burrowsNearbyDetection) {

@@ -3,15 +3,22 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.*
+import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
@@ -235,7 +242,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             else if (noColorLine == "Boss slain!") bossAlive = "slain"
         }
 
-        if (slayerLevel == "") "Planning to do a slayer quest"// selected slayer in rpc but hasn't started a quest
+        if (slayerLevel == "") AutoStatus.SLAYER.placeholderText // selected slayer in rpc but hasn't started a quest
         else if (bossAlive == "spawning") "Spawning a $slayerName $slayerLevel boss."
         else if (bossAlive == "slaying") "Slaying a $slayerName $slayerLevel boss."
         else if (bossAlive == "slain") "Finished slaying a $slayerName $slayerLevel boss."
@@ -247,17 +254,22 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     AUTO({
-        val slayerResult = SLAYER.displayMessageSupplier!!.get()
-        val stackingResult = STACKING.displayMessageSupplier!!.get()
-        val milestoneResult = CROP_MILESTONES.displayMessageSupplier!!.get()
-        if (slayerResult != "Planning to do a slayer quest") slayerResult
-        else if (milestoneResult != "Not farming!") milestoneResult
-        else if (stackingResult != "") stackingResult
-        else {
-            val statusNoAuto = entries.toMutableList()
-            statusNoAuto.remove(AUTO)
-            statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+        var autoReturn = ""
+        for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
+            val autoStatus = AutoStatus.entries[statusID]
+            val result =
+                autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
+            if (result != autoStatus.placeholderText) { // if that value is useful, display it
+                autoReturn = result
+                break
+            }
         }
+        if (autoReturn == "") { // if we didn't find any useful information, display the fallback
+            val statusNoAuto = DiscordStatus.entries.toMutableList()
+            statusNoAuto.remove(AUTO)
+            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+        }
+        autoReturn
     }),
 
     CROP_MILESTONES({
@@ -270,10 +282,8 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         } ?: 100 // percentage to next milestone
 
         if (tier != null) {
-            "${crop.cropName}: Milestone $tier ($progress)"
-        } else {
-            "Not farming!"
-        }
+            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected"})"
+        } else AutoStatus.CROP_MILESTONES.placeholderText
     }),
 
     PETS({
@@ -319,7 +329,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             return percent
         }
 
-        var stackingReturn = ""
+        var stackingReturn = AutoStatus.STACKING.placeholderText
         if (extraAttributes != null) {
             val enchantments = extraAttributes.getCompoundTag("enchantments")
             var stackingEnchant = ""
@@ -335,11 +345,27 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             val stackingPercent = getProgressPercent(amount, levels)
 
             stackingReturn =
-                if (stackingPercent == "" || amount == 0) "" // outdated info is useless for AUTO; empty strings are manually ignored
+                if (stackingPercent == "" || amount == 0) AutoStatus.STACKING.placeholderText // outdated info is useless for AUTO
                 else "$itemName: ${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
         }
         stackingReturn
 
+    }),
+
+    DUNGEONS({
+        if (!DungeonAPI.inDungeon()) {
+            AutoStatus.DUNGEONS.placeholderText
+        } else {
+            val boss = DungeonAPI.getCurrentBoss()
+            if (boss == null) {
+                "Unknown dungeon boss"
+            } else {
+                val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
+                val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+                val time = DungeonAPI.getTime()
+                "$floor Kills: $amountKills ($time)"
+            }
+        }
     })
     ;
 
@@ -349,4 +375,11 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         return ""
     }
+}
+
+enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
+    CROP_MILESTONES("Not farming!", DiscordStatus.CROP_MILESTONES),
+    SLAYER("Planning to do a slayer quest", DiscordStatus.SLAYER),
+    STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
+    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS);
 }

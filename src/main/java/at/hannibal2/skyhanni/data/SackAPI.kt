@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackAPI {
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
+    private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
@@ -84,16 +85,16 @@ object SackAPI {
     }
 
     private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        0 -> (getPrice(true) * stored.formatNumber()).toInt().let { if (it < 0) 0 else it }
+        0 -> (getPrice(true) * stored.formatNumber()).toLong().let { if (it < 0) 0L else it }
 
         1 -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
-            (npcPrice * stored.formatNumber()).toInt()
+            (npcPrice * stored.formatNumber()).toLong()
         } catch (e: Exception) {
-            0
+            0L
         }
 
-        else -> 0
+        else -> 0L
     }
 
     fun getSacksData(savingSacks: Boolean) {
@@ -119,25 +120,25 @@ object SackAPI {
                                 "Rough" -> {
                                     gem.rough = stored
                                     gem.roughPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
                                 }
 
                                 "Flawed" -> {
                                     gem.flawed = stored
                                     gem.flawedPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
                                 }
 
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
                                 }
 
                                 "Flawless" -> {
                                     gem.flawless = stored
                                     gem.flawlessPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
                                 }
                             }
                             gemstoneItem[name] = gem
@@ -151,13 +152,13 @@ object SackAPI {
                         item.colorCode = group("color")
                         item.stored = stored
                         item.total = group("total")
-                        if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber().toInt())
+                        if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
                         item.price = if (isTrophySack) {
                             val trophyName =
                                 internalName.asString().lowercase().substringBeforeLast("_").replace("_", "")
                             val filletValue =
                                 TrophyFishManager.getInfoByName(trophyName)?.getFilletValue(sackRarity!!) ?: 0
-                            val storedNumber = stored.formatNumber().toInt()
+                            val storedNumber = stored.formatNumber()
                             "MAGMA_FISH".asInternalName().sackPrice((filletValue * storedNumber).toString())
                         } else internalName.sackPrice(stored).coerceAtLeast(0)
 
@@ -223,6 +224,9 @@ object SackAPI {
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
         SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved).postAndCatch()
+        if (chatConfig.hideSacksChange) {
+            event.blockedReason = "sacks_change"
+        }
     }
 
     @SubscribeEvent
@@ -244,7 +248,7 @@ object SackAPI {
             if (sackData.containsKey(item.key)) {
                 val oldData = sackData[item.key]
                 var newAmount = oldData!!.amount + item.value
-                var changed = newAmount - oldData.amount
+                var changed = (newAmount - oldData.amount).toInt()
                 if (newAmount < 0) {
                     newAmount = 0
                     changed = 0
@@ -252,7 +256,7 @@ object SackAPI {
                 sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.outdatedStatus) }
             } else {
                 val newAmount = if (item.value > 0) item.value else 0
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, newAmount, 2) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount.toLong(), newAmount, 2) }
             }
         }
 
@@ -266,7 +270,7 @@ object SackAPI {
         saveSackData()
     }
 
-    private fun setSackItem(item: NEUInternalName, amount: Int) {
+    private fun setSackItem(item: NEUInternalName, amount: Long) {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, 0) }
     }
 
@@ -292,10 +296,10 @@ object SackAPI {
         var flawed: String = "0",
         var fine: String = "0",
         var flawless: String = "0",
-        var roughPrice: Int = 0,
-        var flawedPrice: Int = 0,
-        var finePrice: Int = 0,
-        var flawlessPrice: Int = 0,
+        var roughPrice: Long = 0,
+        var flawedPrice: Long = 0,
+        var finePrice: Long = 0,
+        var flawlessPrice: Long = 0,
     )
 
     data class SackRune(
@@ -310,7 +314,7 @@ object SackAPI {
         var colorCode: String = "",
         var stored: String = "0",
         var total: String = "0",
-        var price: Int = 0,
+        var price: Long = 0,
     )
 }
 
@@ -318,7 +322,7 @@ object SackAPI {
 // lastChange is set to 0 when value is refreshed in the sacks gui and when being set initially
 // if it didn't change in an update the lastChange value will stay the same and not be set to 0
 data class SackItem(
-    @Expose val amount: Int,
+    @Expose val amount: Long,
     @Expose val lastChange: Int,
     @Expose val outdatedStatus: Int
 )

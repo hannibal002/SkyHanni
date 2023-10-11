@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.EntityUtils

@@ -43,15 +43,13 @@ class GardenLevelDisplay {
         val oldLevel = GardenAPI.getGardenLevel()
         GardenAPI.gardenExp = gardenExp + moreExp
         val newLevel = GardenAPI.getGardenLevel()
-        if (newLevel == oldLevel + 1) {
-            if (newLevel > 15) {
-                LorenzUtils.runDelayed(50.milliseconds) {
-                    LorenzUtils.clickableChat(
-                        " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                                " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                        "/gardenlevels"
-                    )
-                }
+        if (newLevel == oldLevel + 1 && newLevel > 15) {
+            LorenzUtils.runDelayed(50.milliseconds) {
+                LorenzUtils.clickableChat(
+                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
+                            " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
+                    "/gardenlevels"
+                )
             }
         }
         update()
@@ -105,7 +103,7 @@ class GardenLevelDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.gardenLevelPos.renderString(display, posLabel = "Garden Level")

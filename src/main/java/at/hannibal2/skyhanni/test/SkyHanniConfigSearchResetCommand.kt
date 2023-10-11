@@ -54,7 +54,6 @@ object SkyHanniConfigSearchResetCommand {
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
-            println("size: $affectedElements")
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
@@ -220,12 +219,8 @@ object SkyHanniConfigSearchResetCommand {
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
-            if (newObj != null) {
-                if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double) {
-                    if (newObj !is Position && !newObj.javaClass.isEnum) {
-                        map.putAll(loadAllFields(fieldName, newObj, depth + 1))
-                    }
-                }
+            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum) {
+                map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }
 

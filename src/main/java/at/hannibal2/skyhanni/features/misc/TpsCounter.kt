@@ -36,7 +36,7 @@ class TpsCounter {
             if (ignoreFirstTicks > 0) {
                 ignoreFirstTicks--
                 val current = ignoreFirstTicks + minDataAmount
-                display = "§eTps: §f(${current}s)"
+                display = "§eTPS: §f(${current}s)"
                 packetsFromLastSecond = 0
                 return@fixedRateTimer
             }
@@ -49,13 +49,13 @@ class TpsCounter {
 
             display = if (tpsList.size < minDataAmount) {
                 val current = minDataAmount - tpsList.size
-                "§eTps: §f(${current}s)"
+                "§eTPS: §f(${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
                 var tps = (sum / tpsList.size).round(1)
                 if (tps > 20) tps = 20.0
                 val color = getColor(tps)
-                "§eTps: $color$tps"
+                "§eTPS: $color$tps"
             }
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
@@ -84,7 +84,7 @@ class TpsCounter {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.tpsDisplay) return
 

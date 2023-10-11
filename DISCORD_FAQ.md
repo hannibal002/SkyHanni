@@ -21,5 +21,8 @@ _Frequently Asked Questions_
 > Thus, we'll wait for other mods in the community to update for Minecraft versions 1.19 or 1.20.
 > Switching from 1.8.9 to 1.19 should only take a couple of days, and we plan to discontinue support for 1.8.9 afterward since we won't support multiple versions at once.
 
-*This FAQ was last updated on September 15th, 2023.
+> **7: Does the barn fishing timer work on the Crimson Isle?**
+> No, the barn fishing timer is not supported in the Crimson Isle in Hypixel Skyblock because it would disrupt other fishers due to competition for the maximum sea creature cap, potentially leading to conflicts and stealing of sea creatures.
+
+*This FAQ was last updated on September 23rd, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

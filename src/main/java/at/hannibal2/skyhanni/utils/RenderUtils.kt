@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -230,7 +231,6 @@ object RenderUtils {
         GlStateManager.translate(0f, -0.25f, 0f)
         GlStateManager.rotate(-renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-//    RenderUtil.drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
 
@@ -333,9 +333,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
-//        GlStateManager.scale(scale, scale, scale)
         GlStateManager.scale(finalScale, finalScale, finalScale)
-//        GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
@@ -403,6 +401,20 @@ object RenderUtils {
             offsetY += 10 + extraSpace
         }
         GuiEditManager.add(this, posLabel, longestX, offsetY)
+    }
+
+    fun Position.renderRenderables(
+        renderables: List<Renderable>,
+        extraSpace: Int = 0,
+        itemScale: Double = 1.0,
+        posLabel: String,
+    ) {
+        if (renderables.isEmpty()) return
+        val list = mutableListOf<List<Any>>()
+        for (line in renderables) {
+            list.addAsSingletonList(line)
+        }
+        renderStringsAndItems(list, extraSpace, itemScale, posLabel)
     }
 
     /**

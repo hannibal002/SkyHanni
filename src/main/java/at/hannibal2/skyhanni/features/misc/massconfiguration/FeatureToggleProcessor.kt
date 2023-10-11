@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.observer.Property
 import io.github.moulberry.moulconfig.processor.ConfigStructureReader
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
-import java.util.*
+import java.util.Stack
 
 class FeatureToggleProcessor : ConfigStructureReader {
 

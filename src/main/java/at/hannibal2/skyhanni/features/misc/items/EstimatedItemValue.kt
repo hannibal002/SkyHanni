@@ -7,23 +7,29 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.manager
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.GemstoneSlotType
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -62,7 +68,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
-import java.util.*
+import java.util.Locale
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -88,7 +94,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
         if (!OSUtils.isKeyHeld(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
@@ -264,9 +270,11 @@ object EstimatedItemValue {
             if (price != null) {
                 subTotal += price
             }
+            var displayName = attr.first
+            if (displayName == ("MENDING")) displayName = "VITALITY"
             list.add(
                 "  §9${
-                    attr.first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                    displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
                 } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
             )
         }
@@ -281,7 +289,7 @@ object EstimatedItemValue {
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        var rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
             val stoneJson = values.asJsonObject
@@ -317,7 +325,7 @@ object EstimatedItemValue {
             itemRarity = LorenzRarity.LEGENDARY
         } else {
             if (stack.isRecombobulated()) {
-                val oneBelow = itemRarity.oneBelow(logError = false)
+                val oneBelow = itemRarity.oneBelow()
                 if (oneBelow == null) {
                     CopyErrorCommand.logErrorState(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
@@ -537,8 +545,12 @@ object EstimatedItemValue {
         val internalName = stack.getHelmetSkin() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Skin: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -546,8 +558,12 @@ object EstimatedItemValue {
         val internalName = stack.getArmorDye() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getNameOrRepoError()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Dye: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
     }
 
@@ -555,9 +571,18 @@ object EstimatedItemValue {
         val internalName = stack.getRune() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
-        list.add("§7Rune: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        val name = internalName.getItemNameOrNull()
+        val displayname = name ?: "§c${internalName.asString()}"
+        list.add("§7Rune: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
         return price
+    }
+
+    private fun NEUInternalName.getNameOrRepoError(): String? {
+        val stack = getItemStackOrNull() ?: return null
+        return stack.nameWithEnchantment ?: "§cItem Name Error"
     }
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
@@ -619,13 +644,13 @@ object EstimatedItemValue {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5) {
-                if (internalName in hasAlwaysScavenger) continue
+            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
             }
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName == "ultimate_chimera") {
+            if (rawName == "ultimate_chimera" || rawName == "ultimate_fatal_tempo" || rawName == "smoldering") {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
