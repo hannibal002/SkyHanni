@@ -2,7 +2,16 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -49,12 +58,10 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     private fun checkQuest(name: String, green: Boolean, needAmount: Int) {
         val oldQuest = getQuestByName(name)
         if (oldQuest != null) {
-            if (green) {
-                if (oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
-                    oldQuest.state = QuestState.READY_TO_COLLECT
-                    dailyQuestHelper.update()
-                    LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
-                }
+            if (green && oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
+                oldQuest.state = QuestState.READY_TO_COLLECT
+                dailyQuestHelper.update()
+                LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
             }
             return
         }
@@ -101,8 +108,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 }
             }
         }
-
-        println("Unknown quest: '$name'")
+        LorenzUtils.chat("§c[SkyHanni] Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 
@@ -122,19 +128,15 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             val stack = event.inventoryItems[22] ?: continue
 
             val completed = stack.getLore().any { it.contains("Completed!") }
-            if (completed) {
-                if (quest.state != QuestState.COLLECTED) {
-                    quest.state = QuestState.COLLECTED
-                    dailyQuestHelper.update()
-                }
+            if (completed && quest.state != QuestState.COLLECTED) {
+                quest.state = QuestState.COLLECTED
+                dailyQuestHelper.update()
             }
 
             val accepted = !stack.getLore().any { it.contains("Click to start!") }
-            if (accepted) {
-                if (quest.state == QuestState.NOT_ACCEPTED) {
-                    quest.state = QuestState.ACCEPTED
-                    dailyQuestHelper.update()
-                }
+            if (accepted && quest.state == QuestState.NOT_ACCEPTED) {
+                quest.state = QuestState.ACCEPTED
+                dailyQuestHelper.update()
             }
         }
     }
@@ -146,15 +148,13 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             val state = QuestState.valueOf(split[1])
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
-            if (quest is ProgressQuest) {
-                if (split.size == 4) {
-                    try {
-                        val haveAmount = split[3].toInt()
-                        quest.haveAmount = haveAmount
-                    } catch (e: IndexOutOfBoundsException) {
-                        println("text: '$text'")
-                        e.printStackTrace()
-                    }
+            if (quest is ProgressQuest && split.size == 4) {
+                try {
+                    val haveAmount = split[3].toInt()
+                    quest.haveAmount = haveAmount
+                } catch (e: IndexOutOfBoundsException) {
+                    println("text: '$text'")
+                    e.printStackTrace()
                 }
             }
             addQuest(quest)

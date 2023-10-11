@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -12,7 +13,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.FileReader
-import java.util.*
+import java.util.UUID
 
 class FriendAPI {
     private val file = File("config/skyhanni/friends.json")
@@ -66,23 +67,19 @@ class FriendAPI {
 
         removedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("removed friend: '$name'")
             removedFriend(name)
         }
         addedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("added friend: '$name'")
             addFriend(name)
         }
 
         noBestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("no best friend: '$name'")
             setBestFriend(name, false)
         }
         bestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("best friend: '$name'")
             setBestFriend(name, true)
         }
     }
@@ -114,7 +111,12 @@ class FriendAPI {
 
             val uuid = "/viewprofile (?<uuid>.*)".toPattern().matchMatcher(value) {
                 group("uuid")?.let {
-                    UUID.fromString(it)
+                    try {
+                        UUID.fromString(it)
+                    } catch (e: IllegalArgumentException) {
+                        CopyErrorCommand.logError(e, "Error reading friend list.")
+                        return
+                    }
                 }
             }
             val bestFriend = sibling.unformattedText.contains("§l")

@@ -6,6 +6,7 @@
     "maxShiftBy": 2
   },
   "mixins": [
+    "AccessorChatComponentText",
     "AccessorGuiPlayerTabOverlay",
     "MixinBlockFire",
     "MixinEntityBlaze",

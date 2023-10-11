@@ -3,7 +3,15 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +50,13 @@ public class InventoryConfig {
     public int hideNotClickableOpacity = 180;
 
     @Expose
-    @ConfigOption(name = "Green line", desc = "Adds green line around items that are clickable.")
+    @ConfigOption(name = "Bypass With Control", desc = "Adds the ability to bypass not clickable items when holding the control key.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean notClickableItemsBypass = true;
+
+    @Expose
+    @ConfigOption(name = "Green Line", desc = "Adds green line around items that are clickable.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean hideNotClickableItemsGreenLine = true;
@@ -115,13 +129,6 @@ public class InventoryConfig {
     @ConfigAccordionId(id = 3)
     @FeatureToggle
     public boolean jacobFarmingContestHighlightRewards = true;
-
-    @Expose
-    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the Jacob inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestHideDuplicates = true;
 
     @Expose
     @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
@@ -242,13 +249,13 @@ public class InventoryConfig {
         public int nameLength = 100;
 
         @Expose
-        @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
+        @ConfigOption(name = "Highlight Slot", desc = "Highlight slot where the item is when you hover over it in the display.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enableHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Highlight color", desc = "Choose the highlight color.")
+        @ConfigOption(name = "Highlight Color", desc = "Choose the highlight color.")
         @ConfigEditorColour
         public String highlightColor = "0:249:0:255:88";
 
@@ -345,7 +352,7 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-            name = "Item number",
+            name = "Item Number",
             desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
@@ -367,6 +374,16 @@ public class InventoryConfig {
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+
+    @Expose
+    @ConfigOption(
+            name = "Quick Craft Confirmation",
+            desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+                    "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quickCraftingConfirmation = false;
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
@@ -401,5 +418,10 @@ public class InventoryConfig {
     @FeatureToggle
     public boolean highlightAuctions = true;
 
+    @Expose
+    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickForEquipment = false;
 
 }

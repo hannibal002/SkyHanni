@@ -129,40 +129,32 @@ class CaptureFarmingGear {
             }
 
             // setting to current saved level -1 to stop later pages saving low rarity pets
-            var highestElephantRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT])
-            var highestMooshroomRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW])
-            var highestRabbitRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT])
-            var highestBeeRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE])
+            var highestElephantRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT]) - 1
+            var highestMooshroomRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW]) - 1
+            var highestRabbitRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT]) - 1
+            var highestBeeRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE]) - 1
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName_old().split(";")
-                if (split.first() == "ELEPHANT") {
-                    if (split.last().toInt() > highestElephantRarity) {
-                        farmingItems[FarmingItems.ELEPHANT] = item
-                        outdatedItems[FarmingItems.ELEPHANT] = false
-                        highestElephantRarity = split.last().toInt()
-                    }
+                if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
+                    farmingItems[FarmingItems.ELEPHANT] = item
+                    outdatedItems[FarmingItems.ELEPHANT] = false
+                    highestElephantRarity = split.last().toInt()
                 }
-                if (split.first() == "MOOSHROOM_COW") {
-                    if (split.last().toInt() > highestMooshroomRarity) {
-                        farmingItems[FarmingItems.MOOSHROOM_COW] = item
-                        outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                        highestMooshroomRarity = split.last().toInt()
-                    }
+                if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
+                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                    outdatedItems[FarmingItems.MOOSHROOM_COW] = false
+                    highestMooshroomRarity = split.last().toInt()
                 }
-                if (split.first() == "RABBIT") {
-                    if (split.last().toInt() > highestRabbitRarity) {
-                        farmingItems[FarmingItems.RABBIT] = item
-                        outdatedItems[FarmingItems.RABBIT] = false
-                        highestRabbitRarity = split.last().toInt()
-                    }
+                if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
+                    farmingItems[FarmingItems.RABBIT] = item
+                    outdatedItems[FarmingItems.RABBIT] = false
+                    highestRabbitRarity = split.last().toInt()
                 }
-                if (split.first() == "BEE") {
-                    if (split.last().toInt() > highestBeeRarity) {
+                if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
                         farmingItems[FarmingItems.BEE] = item
                         outdatedItems[FarmingItems.BEE] = false
                         highestBeeRarity = split.last().toInt()
-                    }
                 }
             }
         }

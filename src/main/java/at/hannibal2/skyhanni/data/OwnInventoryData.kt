@@ -77,6 +77,12 @@ class OwnInventoryData {
 
         val internalName = item.getInternalNameOrNull()
 
+        item.name?.let {
+            if (it == "§8Quiver Arrow") {
+                return
+            }
+        }
+
         if (internalName == null) {
             LorenzUtils.debug("OwnInventoryData add is empty for: '${item.name}'")
             return

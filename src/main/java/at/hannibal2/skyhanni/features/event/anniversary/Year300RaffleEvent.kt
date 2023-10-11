@@ -42,7 +42,7 @@ object Year300RaffleEvent {
 
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         config.activeTimerPosition.renderSingleLineWithItems(
             overlay ?: return,
             posLabel = "300þ Anniversary Active Timer"
@@ -70,6 +70,4 @@ object Year300RaffleEvent {
             Renderable.string("§eTime Left: ${timeLeft.format()}")
         )
     }
-
-
 }

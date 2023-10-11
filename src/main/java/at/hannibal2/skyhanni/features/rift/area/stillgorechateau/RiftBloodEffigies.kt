@@ -6,11 +6,17 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.jsonobjects.RiftEffigiesJson
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -121,13 +127,11 @@ class RiftBloodEffigies {
                     continue
                 }
 
-                if (config.respawningSoon) {
-                    if (diff < 60_000 * config.respwningSoonTime) {
-                        val time = TimeUtils.formatDuration(diff - 999)
-                        event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
-                        event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
-                        continue
-                    }
+                if (config.respawningSoon && diff < 60_000 * config.respwningSoonTime) {
+                    val time = TimeUtils.formatDuration(diff - 999)
+                    event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
+                    event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
+                    continue
                 }
             }
 

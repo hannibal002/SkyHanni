@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -55,7 +59,6 @@ class MinionCraftHelper {
         }
 
         if (!event.isMod(3)) return
-//        if (!event.isMod(60)) return
 
         val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
 
@@ -146,6 +149,8 @@ class MinionCraftHelper {
                 if (internalId == "REVENANT_GENERATOR_1") continue
                 if (internalId == "TARANTULA_GENERATOR_1") continue
                 if (internalId == "VOIDLING_GENERATOR_1") continue
+                if (internalId == "INFERNO_GENERATOR_1") continue
+                if (internalId == "VAMPIRE_GENERATOR_1") continue
                 tierOneMinions.add(internalId)
             }
 
@@ -155,10 +160,8 @@ class MinionCraftHelper {
 
                     for (ingredient in recipe.ingredients) {
                         val id = ingredient.internalItemId
-                        if (!id.contains("_GENERATOR_")) {
-                            if (!allIngredients.contains(id)) {
-                                allIngredients.add(id)
-                            }
+                        if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
+                            allIngredients.add(id)
                         }
                     }
                 }
@@ -240,7 +243,7 @@ class MinionCraftHelper {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 

@@ -2,19 +2,37 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestCategory
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -30,7 +48,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
-    private var latestTrophyFishInInventory = 0
 
 
     @SubscribeEvent
@@ -51,26 +68,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            checkInventoryForTrophyFish()
-        }
-
         if (event.repeatSeconds(3)) {
             checkInventoryForFetchItem()
         }
-    }
-
-    // TODO use OwnInventoryItemUpdateEvent
-    private fun checkInventoryForTrophyFish() {
-        val fishQuest = getQuest<TrophyFishQuest>() ?: return
-        if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
-
-        val fishName = fishQuest.fishName
-        val currentlyInInventory = InventoryUtils.countItemsInLowerInventory { it.name?.contains(fishName) ?: false }
-        val diff = currentlyInInventory - latestTrophyFishInInventory
-        if (diff < 1) return
-        latestTrophyFishInInventory = currentlyInInventory
-        updateProcessQuest(fishQuest, fishQuest.haveAmount + diff)
     }
 
     fun update() {
@@ -110,6 +110,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 if (slot == null) continue
                 if (slot.slotNumber != slot.slotIndex) continue
                 val stack = slot.stack ?: continue
+                if (stack.name!!.contains("Enchanted")) continue
+
                 if (stack.getLore().any { it.contains(fetchItem) }) {
                     slot highlight LorenzColor.AQUA
                 }
@@ -147,6 +149,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             val rescueMissionQuest = getQuest<RescueMissionQuest>() ?: return
             rescueMissionQuest.state = QuestState.READY_TO_COLLECT
             update()
+        }
+
+        if (message.contains("§6§lTROPHY FISH! §r§bYou caught a")) {
+            val fishQuest = getQuest<TrophyFishQuest>() ?: return
+            if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
+            val fishName = fishQuest.fishName
+
+            if (message.contains(fishName)) {
+                updateProcessQuest(fishQuest, fishQuest.haveAmount + 1)
+            }
         }
     }
 
@@ -281,33 +293,27 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
-        if (miniBossQuest.miniBoss == miniBoss) {
-            if (miniBossQuest.state == QuestState.ACCEPTED) {
-                updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
-            }
+        if (miniBossQuest.miniBoss == miniBoss && miniBossQuest.state == QuestState.ACCEPTED) {
+            updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
         }
     }
 
     fun finishKuudra(kuudraTier: KuudraTier) {
         val kuudraQuest = getQuest<KuudraQuest>() ?: return
-        if (kuudraQuest.kuudraTier == kuudraTier) {
-            //TODO make inline method for this two lines
-            if (kuudraQuest.state == QuestState.ACCEPTED) {
-                kuudraQuest.state = QuestState.READY_TO_COLLECT
-            }
+        //TODO make inline method for this two lines
+        if (kuudraQuest.kuudraTier == kuudraTier && kuudraQuest.state == QuestState.ACCEPTED) {
+            kuudraQuest.state = QuestState.READY_TO_COLLECT
         }
     }
 
     fun reset() {
         quests.clear()
-        latestTrophyFishInInventory = 0
     }
 
     fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         reset()
 
         questLoader.loadConfig(storage)
-        latestTrophyFishInInventory = storage.latestTrophyFishInInventory
 
     }
 
@@ -334,8 +340,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             }
             storage.quests.add(builder.toString())
         }
-
-        storage.latestTrophyFishInInventory = latestTrophyFishInInventory
     }
 
     private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
