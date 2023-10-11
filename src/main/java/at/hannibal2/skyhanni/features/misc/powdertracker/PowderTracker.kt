@@ -179,7 +179,7 @@ class PowderTracker {
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§b§lPowder Tracker")
-        if (inventoryOpen){
+        if (inventoryOpen) {
             addSelector<DisplayMode>(
                 "§7Display Mode: ",
                 getName = { type -> type.displayName },
@@ -189,7 +189,7 @@ class PowderTracker {
                     saveAndUpdate()
                 }
             )
-        }else{
+        } else {
             addAsSingletonList("")
         }
 

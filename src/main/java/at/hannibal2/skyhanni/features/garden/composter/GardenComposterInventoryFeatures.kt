@@ -55,7 +55,7 @@ class GardenComposterInventoryFeatures {
                 if (internalName == null) {
                     LorenzUtils.chat(
                         "§c[SkyHanni] Error reading internal name for item '$itemName§c' " +
-                                "(in GardenComposterInventoryFeatures)"
+                            "(in GardenComposterInventoryFeatures)"
                     )
                     continue
                 }

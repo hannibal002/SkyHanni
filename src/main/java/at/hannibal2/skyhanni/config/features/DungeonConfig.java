@@ -41,7 +41,7 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Clean Ending", desc = "After the last Dungeon boss has died, all entities and " +
-            "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
+        "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     @FeatureToggle
@@ -49,7 +49,7 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 Guardians from the clean end feature when " +
-            "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
+        "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean cleanEndF3IgnoreGuardians = false;
@@ -185,14 +185,14 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
-            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
+        "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightSkeletonSkull = true;
 
     @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
-            "shows unopened chests.")
+        "shows unopened chests.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;

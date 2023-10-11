@@ -243,7 +243,7 @@ class ChestValue {
         }
 
         val inMinion = contains("Minion") && !contains("Recipe") &&
-                LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+            LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
         return this == "Chest" || this == "Large Chest" || inMinion || this == "Personal Vault"
     }
 

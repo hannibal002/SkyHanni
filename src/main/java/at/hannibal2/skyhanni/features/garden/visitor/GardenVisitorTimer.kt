@@ -29,7 +29,7 @@ class GardenVisitorTimer {
     private var visitorJustArrived = false
     private var sixthVisitorReady = false
 
-    //TODO nea?
+    // TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Long?
         get() = GardenAPI.config?.visitorInterval

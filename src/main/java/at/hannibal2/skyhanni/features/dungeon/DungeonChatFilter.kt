@@ -159,7 +159,7 @@ class DungeonChatFilter {
         else -> false
     }
 
-    //TODO sort out and filter separately
+    // TODO sort out and filter separately
     private fun isUnsortedBlockedMessage(message: String): Boolean = when {
         message.matchRegex("(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!") -> true
         message == "§5A shiver runs down your spine..." -> true

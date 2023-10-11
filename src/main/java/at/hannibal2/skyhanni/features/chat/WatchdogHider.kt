@@ -22,11 +22,13 @@ class WatchdogHider {
                 startLineComponent = event.chatComponent
                 blockedLines = 0
             }
+
             watchdogAnnouncementLine -> {
                 ChatManager.retractMessage(startLineComponent, "watchdog")
                 startLineComponent = null
                 inWatchdog = true
             }
+
             watchdogEndLine -> {
                 event.blockedReason = "watchdog"
                 inWatchdog = false

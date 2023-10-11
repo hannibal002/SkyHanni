@@ -87,7 +87,8 @@ class DungeonCleanEnd {
             && DungeonAPI.isOneOf("F3", "M3")
             && entity is EntityGuardian
             && entity.entityId != lastBossId
-            && Minecraft.getMinecraft().thePlayer.isSneaking) {
+            && Minecraft.getMinecraft().thePlayer.isSneaking
+        ) {
             return
         }
 

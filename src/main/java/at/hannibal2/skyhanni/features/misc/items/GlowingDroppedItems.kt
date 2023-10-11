@@ -50,11 +50,11 @@ class GlowingDroppedItems {
 
     private fun isShowcaseArea() =
         showcaseItemLocations.contains(LorenzUtils.skyBlockArea) ||
-                LorenzUtils.skyBlockIsland.equalsOneOf(
-                    IslandType.HUB,
-                    IslandType.PRIVATE_ISLAND,
-                    IslandType.PRIVATE_ISLAND_GUEST
-                )
+            LorenzUtils.skyBlockIsland.equalsOneOf(
+                IslandType.HUB,
+                IslandType.PRIVATE_ISLAND,
+                IslandType.PRIVATE_ISLAND_GUEST
+            )
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {
         if (!isShowcaseArea() || config.highlightShowcase) return false

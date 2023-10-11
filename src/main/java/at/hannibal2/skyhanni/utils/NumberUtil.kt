@@ -45,15 +45,15 @@ object NumberUtil {
     fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
-        if (value < 1000) return value.toString() //deal with small numbers
+        if (value < 1000) return value.toString() // deal with small numbers
 
         val (divideBy, suffix) = suffixes.floorEntry(value)
 
-        val truncated = value / (divideBy / 10) //the number part of the output times 10
+        val truncated = value / (divideBy / 10) // the number part of the output times 10
 
         val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
 

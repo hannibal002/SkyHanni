@@ -41,7 +41,7 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
-        //TODO: add comment labels for these
+        // TODO: add comment labels for these
         if (event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f) {
             val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
             if (abilityScrolls.size != 3) return
@@ -251,7 +251,7 @@ class ItemAbilityCooldown {
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
         val uuid = stack.getIdentifier() ?: return
         val list = items.filter { (it.key.getIdentifier()) == uuid }
-             .firstNotNullOfOrNull { it.value } ?: return
+            .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
             if (guiOpen && !itemText.onCooldown) continue

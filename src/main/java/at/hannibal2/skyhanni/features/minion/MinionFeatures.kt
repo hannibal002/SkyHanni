@@ -231,7 +231,7 @@ class MinionFeatures {
 
         val message = event.message
         if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-                minions?.get(lastMinion)?.let {
+            minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
 
@@ -243,14 +243,14 @@ class MinionFeatures {
             lastMinionOpened = 0L
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
-                minions = minions?.editCopy {
-                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
-                        displayName = newMinionName
-                        lastClicked = 0
-                    }
+            minions = minions?.editCopy {
+                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = newMinionName
+                    lastClicked = 0
                 }
-                newMinion = null
-                newMinionName = null
+            }
+            newMinion = null
+            newMinionName = null
         }
 
         minionUpgradePattern.matchMatcher(message) {

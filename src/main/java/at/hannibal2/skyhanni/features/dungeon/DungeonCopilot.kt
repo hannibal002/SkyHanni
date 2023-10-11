@@ -37,7 +37,7 @@ class DungeonCopilot {
 
         var foundKeyOrDoor = false
 
-        //key pickup
+        // key pickup
         if (message.matchRegex("(.*) §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!") ||
             message == "§eA §r§a§r§6§r§8Wither Key§r§e was picked up!"
         ) {

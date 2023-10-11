@@ -304,7 +304,7 @@ object RenderUtils {
             pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
 
 
-        //7 – 25
+        // 7 – 25
 
         val translate = LorenzVec(x, y, z)
         val length = translate.length().toFloat()
@@ -631,7 +631,7 @@ object RenderUtils {
         val distToPlayerSq =
             (x - renderOffsetX) * (x - renderOffsetX) + (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight)) + (z - renderOffsetZ) * (z - renderOffsetZ)
         var distToPlayer = sqrt(distToPlayerSq)
-        //TODO this is optional maybe?
+        // TODO this is optional maybe?
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
@@ -766,7 +766,7 @@ object RenderUtils {
         val worldRenderer = tessellator.worldRenderer
         GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
 
-        //vertical
+        // vertical
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
         worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
@@ -786,7 +786,7 @@ object RenderUtils {
             c.alpha / 255f * alphaMultiplier
         )
 
-        //x
+        // x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
@@ -805,7 +805,7 @@ object RenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier
         )
-        //z
+        // z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
         worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
@@ -867,7 +867,7 @@ object RenderUtils {
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
 
-        //vertical
+        // vertical
         if (drawVerticalBarriers) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
@@ -890,7 +890,7 @@ object RenderUtils {
             c.alpha / 255f * alphaMultiplier
         )
 
-        //x
+        // x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
         worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
@@ -909,7 +909,7 @@ object RenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier
         )
-        //z
+        // z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
         worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()

@@ -70,7 +70,7 @@ object ItemUtils {
         }
 
         if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-                list.add(player.inventory.itemStack)
+            list.add(player.inventory.itemStack)
         }
         return list
     }
@@ -177,7 +177,7 @@ object ItemUtils {
         return rarity
     }
 
-    //extra method for shorter name and kotlin nullability logic
+    // extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?
         get() = this.displayName
         set(value) {

@@ -30,7 +30,7 @@ open class FFGuideGUI : GuiScreen() {
         var selectedPage = FortuneGuidePage.OVERVIEW
         var currentCrop: CropType? = null
 
-        //todo set this to what they have equip
+        // todo set this to what they have equip
         var currentPet = FarmingItems.ELEPHANT
         var currentArmor = 0
         var currentEquipment = 0
@@ -270,7 +270,8 @@ open class FFGuideGUI : GuiScreen() {
         x = guiLeft - 28
         y = guiTop + 15
         if (isMouseIn(x, y, 28, 25) &&
-            selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW) {
+            selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW
+        ) {
             SoundUtils.playClickSound()
             selectedPage = if (currentCrop == null) {
                 FortuneGuidePage.OVERVIEW

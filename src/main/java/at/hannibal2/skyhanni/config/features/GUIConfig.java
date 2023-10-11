@@ -44,8 +44,8 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
-                "§eUse '&' as the colour code character.\n" +
-                "§eUse '\\n' as the line break character.")
+            "§eUse '&' as the colour code character.\n" +
+            "§eUse '\\n' as the line break character.")
         @ConfigEditorText
         public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 

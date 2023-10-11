@@ -43,46 +43,46 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(
-                name = "Boss Name",
-                desc = "Change how the boss name should be displayed.")
+            name = "Boss Name",
+            desc = "Change how the boss name should be displayed.")
         @ConfigEditorDropdown(values = {"Hidden", "Full Name", "Short Name"})
         public int bossName = 1;
 
         @Expose
         @ConfigOption(
-                name = "Select Boss",
-                desc = "Change what type of boss you want the damage indicator be enabled for."
+            name = "Select Boss",
+            desc = "Change what type of boss you want the damage indicator be enabled for."
         )
         @ConfigEditorDraggableList(
-                exampleText = {
-                        "§bDungeon All",
-                        "§bNether Mini Bosses",
-                        "§bVanquisher",
-                        "§bEndstone Protector (not tested)",
-                        "§bEnder Dragon (not finished)",
-                        "§bRevenant Horror",
-                        "§bTarantula Broodfather",
-                        "§bSven Packmaster",
-                        "§bVoidgloom Seraph",
-                        "§bInferno Demonlord (only tier 1 yet)",
-                        "§bHeadless Horseman (bugged)",
-                        "§bDungeon Floor 1",
-                        "§bDungeon Floor 2",
-                        "§bDungeon Floor 3",
-                        "§bDungeon Floor 4",
-                        "§bDungeon Floor 5",
-                        "§bDungeon Floor 6",
-                        "§bDungeon Floor 7",
-                        "§bDiana Mobs",
-                        "§bSea Creatures",
-                        "Dummy",
-                        "§bArachne",
-                        "§bThe Rift Bosses",
-                        "§bRiftstalker Bloodfiend",
-                        "§6Reindrake"
-                }
+            exampleText = {
+                "§bDungeon All",
+                "§bNether Mini Bosses",
+                "§bVanquisher",
+                "§bEndstone Protector (not tested)",
+                "§bEnder Dragon (not finished)",
+                "§bRevenant Horror",
+                "§bTarantula Broodfather",
+                "§bSven Packmaster",
+                "§bVoidgloom Seraph",
+                "§bInferno Demonlord (only tier 1 yet)",
+                "§bHeadless Horseman (bugged)",
+                "§bDungeon Floor 1",
+                "§bDungeon Floor 2",
+                "§bDungeon Floor 3",
+                "§bDungeon Floor 4",
+                "§bDungeon Floor 5",
+                "§bDungeon Floor 6",
+                "§bDungeon Floor 7",
+                "§bDiana Mobs",
+                "§bSea Creatures",
+                "Dummy",
+                "§bArachne",
+                "§bThe Rift Bosses",
+                "§bRiftstalker Bloodfiend",
+                "§6Reindrake"
+            }
         )
-        //TODO only show currently working and tested features
+        // TODO only show currently working and tested features
         public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22, 23, 24));
 
         @Expose
@@ -162,32 +162,32 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(
-                name = "Display Text",
-                desc = "Drag text to change the appearance of the overlay."
+            name = "Display Text",
+            desc = "Drag text to change the appearance of the overlay."
         )
         @ConfigEditorDraggableList(
-                exampleText = {
-                        "§6Ghosts Counter",
-                        "  §bGhost Killed: 42",
-                        "  §bSorrow: 6",
-                        "  §bGhost since Sorrow: 1",
-                        "  §bGhosts/Sorrow: 5",
-                        "  §bVolta: 6",
-                        "  §bPlasma: 8",
-                        "  §bGhostly Boots: 1",
-                        "  §bBag Of Cash: 4",
-                        "  §bAvg Magic Find: 271",
-                        "  §bScavenger Coins: 15,000",
-                        "  §bKill Combo: 14",
-                        "  §bHighest Kill Combo: 96",
-                        "  §bSkill XP Gained: 145,648",
-                        "  §bBestiary 1: 0/10",
-                        "  §bXP/h: 810,410",
-                        "  §bKills/h: 420",
-                        "  §bETA: 14d",
-                        "  §bMoney/h: 13,420,069",
-                        "  §bMoney made: 14B"
-                }
+            exampleText = {
+                "§6Ghosts Counter",
+                "  §bGhost Killed: 42",
+                "  §bSorrow: 6",
+                "  §bGhost since Sorrow: 1",
+                "  §bGhosts/Sorrow: 5",
+                "  §bVolta: 6",
+                "  §bPlasma: 8",
+                "  §bGhostly Boots: 1",
+                "  §bBag Of Cash: 4",
+                "  §bAvg Magic Find: 271",
+                "  §bScavenger Coins: 15,000",
+                "  §bKill Combo: 14",
+                "  §bHighest Kill Combo: 96",
+                "  §bSkill XP Gained: 145,648",
+                "  §bBestiary 1: 0/10",
+                "  §bXP/h: 810,410",
+                "  §bKills/h: 420",
+                "  §bETA: 14d",
+                "  §bMoney/h: 13,420,069",
+                "  §bMoney made: 14B"
+            }
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
 
@@ -199,9 +199,9 @@ public class CombatConfig {
         public static class TextFormatting {
 
             @ConfigOption(name = "§eText Formatting Info", desc = "§e%session% §ris §e§lalways §rreplaced with\n" +
-                    "§7the count for your current session.\n" +
-                    "§7Reset when restarting the game.\n" +
-                    "§7You can use §e&Z §7color code to use SBA chroma.")
+                "§7the count for your current session.\n" +
+                "§7Reset when restarting the game.\n" +
+                "§7You can use §e&Z §7color code to use SBA chroma.")
             @ConfigEditorInfoText
             public boolean formatInfo = false;
 
@@ -224,80 +224,80 @@ public class CombatConfig {
 
             @Expose
             @ConfigOption(name = "Ghost Killed", desc = "Ghost Killed line.\n§e%value% §ris replaced with\n" +
-                    "Ghost Killed.\n" +
-                    "§e%session% §7is replaced with Ghost killed")
+                "Ghost Killed.\n" +
+                "§e%session% §7is replaced with Ghost killed")
             @ConfigEditorText
             public String ghostKilledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n" +
-                    "§e%value% §7is replaced with\nsorrows dropped.")
+                "§e%value% §7is replaced with\nsorrows dropped.")
             @ConfigEditorText
             public String sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Ghost Since Sorrow", desc = "Ghost Since Sorrow line.\n" +
-                    "§e%value% §7is replaced with\nGhost since last sorrow drop.")
+                "§e%value% §7is replaced with\nGhost since last sorrow drop.")
             @ConfigEditorText
             public String ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%";
 
             @Expose
             @ConfigOption(name = "Ghost Kill Per Sorrow", desc = "Ghost Kill Per Sorrow line.\n" +
-                    "§e%value% §7is replaced with\naverage ghost kill per sorrow drop.")
+                "§e%value% §7is replaced with\naverage ghost kill per sorrow drop.")
             @ConfigEditorText
             public String ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%";
 
             @Expose
             @ConfigOption(name = "Voltas", desc = "Voltas drop line.\n" +
-                    "§e%value% §7is replaced with\nvoltas dropped.")
+                "§e%value% §7is replaced with\nvoltas dropped.")
             @ConfigEditorText
             public String voltasFormat = "  &6Voltas: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Plasmas", desc = "Plasmas drop line.\n" +
-                    "§e%value% §7is replaced with\nplasmas dropped.")
+                "§e%value% §7is replaced with\nplasmas dropped.")
             @ConfigEditorText
             public String plasmasFormat = "  &6Plasmas: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Ghostly Boots", desc = "Ghostly Boots drop line.\n" +
-                    "§e%value% §7is replaced with\nGhostly Boots dropped.")
+                "§e%value% §7is replaced with\nGhostly Boots dropped.")
             @ConfigEditorText
             public String ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Bag Of Cash", desc = "Bag Of Cash drop line.\n" +
-                    "§e%value% §7is replaced with\nBag Of Cash dropped.")
+                "§e%value% §7is replaced with\nBag Of Cash dropped.")
             @ConfigEditorText
             public String bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Average Magic Find", desc = "Average Magic Find line.\n" +
-                    "§e%value% §7is replaced with\nAverage Magic Find.")
+                "§e%value% §7is replaced with\nAverage Magic Find.")
             @ConfigEditorText
             public String avgMagicFindFormat = "  &6Avg Magic Find: &b%value%";
 
             @Expose
             @ConfigOption(name = "Scavenger Coins", desc = "Scavenger Coins line.\n" +
-                    "§e%value% §7is replaced with\nCoins earned from kill ghosts.\nInclude: Scavenger Enchant, Scavenger Talismans, Kill Combo.")
+                "§e%value% §7is replaced with\nCoins earned from kill ghosts.\nInclude: Scavenger Enchant, Scavenger Talismans, Kill Combo.")
             @ConfigEditorText
             public String scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Kill Combo", desc = "Kill Combo line.\n" +
-                    "§e%value% §7is replaced with\nYour current kill combo.")
+                "§e%value% §7is replaced with\nYour current kill combo.")
             @ConfigEditorText
             public String killComboFormat = "  &6Kill Combo: &b%value%";
 
             @Expose
             @ConfigOption(name = "Highest Kill Combo", desc = "Highest Kill Combo line.\n" +
-                    "§e%value% §7is replaced with\nYour current highest kill combo.")
+                "§e%value% §7is replaced with\nYour current highest kill combo.")
             @ConfigEditorText
             public String highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Skill XP Gained", desc = "Skill XP Gained line.\n" +
-                    "§e%value% §7is replaced with\nSkill XP Gained from killing Ghosts.")
+                "§e%value% §7is replaced with\nSkill XP Gained from killing Ghosts.")
             @ConfigEditorText
             public String skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7(%session%)";
 
@@ -310,10 +310,10 @@ public class CombatConfig {
 
                 @Expose
                 @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §7is replaced with\n" +
-                        "Your current progress to next level.\n" +
-                        "§e%currentLevel% &7is replaced with your current bestiary level\n" +
-                        "§e%nextLevel% §7is replaced with your current bestiary level +1.\n" +
-                        "§e%value% §7is replaced with one of the text below.")
+                    "Your current progress to next level.\n" +
+                    "§e%currentLevel% &7is replaced with your current bestiary level\n" +
+                    "§e%nextLevel% §7is replaced with your current bestiary level +1.\n" +
+                    "§e%value% §7is replaced with one of the text below.")
                 @ConfigEditorText
                 public String base = "  &6Bestiary %display%: &b%value%";
 
@@ -324,20 +324,20 @@ public class CombatConfig {
 
                 @Expose
                 @ConfigOption(name = "Maxed", desc = "Text to show when your bestiary for ghost is at max level.\n" +
-                        "§e%currentKill% §7is replaced with your current total kill.")
+                    "§e%currentKill% §7is replaced with your current total kill.")
                 @ConfigEditorText
                 public String maxed = "%currentKill% (&c&lMaxed!)";
 
                 @Expose
                 @ConfigOption(name = "Progress to Max", desc = "Text to show progress when the §eMaxed Bestiary §7option is §aON\n" +
-                        "§e%currentKill% §7is replaced with your current total kill.")
+                    "§e%currentKill% §7is replaced with your current total kill.")
                 @ConfigEditorText
                 public String showMax_progress = "%currentKill%/250k (%percentNumber%%)";
 
                 @Expose
                 @ConfigOption(name = "Progress", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §cOFF\n" +
-                        "§e%currentKill% §7is replaced with how many kill you have to the next level.\n" +
-                        "§e%killNeeded% §7is replaced with how many kill you need to reach the next level.")
+                    "§e%currentKill% §7is replaced with how many kill you have to the next level.\n" +
+                    "§e%killNeeded% §7is replaced with how many kill you need to reach the next level.")
                 @ConfigEditorText
                 public String progress = "%currentKill%/%killNeeded%";
             }
@@ -352,7 +352,7 @@ public class CombatConfig {
 
                 @Expose
                 @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n" +
-                        "§e%value% §7is replaced with one of the text below.")
+                    "§e%value% §7is replaced with one of the text below.")
                 @ConfigEditorText
                 public String base = "  &6XP/h: &b%value%";
 
@@ -363,7 +363,7 @@ public class CombatConfig {
 
                 @Expose
                 @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-                        "when you are doing nothing for a given amount of seconds")
+                    "when you are doing nothing for a given amount of seconds")
                 @ConfigEditorText
                 public String paused = "&c(PAUSED)";
             }
@@ -377,7 +377,7 @@ public class CombatConfig {
             public static class ETAFormatting {
                 @Expose
                 @ConfigOption(name = "ETA to next level", desc = "ETA To Next Level Line.\n" +
-                        "§e%value% §7is replaced with one of the text below.")
+                    "§e%value% §7is replaced with one of the text below.")
                 @ConfigEditorText
                 public String base = "  &6ETA: &b%value%";
 
@@ -398,15 +398,15 @@ public class CombatConfig {
 
                 @Expose
                 @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-                        "when you are doing nothing for a given amount of seconds")
+                    "when you are doing nothing for a given amount of seconds")
                 @ConfigEditorText
                 public String paused = "&c(PAUSED)";
 
                 @Expose
                 @ConfigOption(name = "Time", desc = "§e%days% §7is replaced with days remaining.\n" +
-                        "§e%hours% §7is replaced with hours remaining.\n" +
-                        "§e%minutes% §7is replaced with minutes remaining.\n" +
-                        "§e%seconds% §7is replaced with seconds remaining.")
+                    "§e%hours% §7is replaced with hours remaining.\n" +
+                    "§e%minutes% §7is replaced with minutes remaining.\n" +
+                    "§e%seconds% §7is replaced with seconds remaining.")
                 @ConfigEditorText
                 public String time = "&6%days%%hours%%minutes%%seconds%";
             }
@@ -429,7 +429,7 @@ public class CombatConfig {
 
                 @Expose
                 @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-                        "when you are doing nothing for a given amount of seconds")
+                    "when you are doing nothing for a given amount of seconds")
                 @ConfigEditorText
                 public String paused = "&c(PAUSED)";
             }
@@ -437,14 +437,14 @@ public class CombatConfig {
 
             @Expose
             @ConfigOption(name = "Money Per Hour", desc = "Money Per Hour.\n§e%value% §7is replaced with\nEstimated money you get per hour\n" +
-                    "Calculated with your kill per hour and your average magic find.")
+                "Calculated with your kill per hour and your average magic find.")
             @ConfigEditorText
             public String moneyHourFormat = "  &6$/h: &b%value%";
 
             @Expose
             @ConfigOption(name = "Money made", desc = "Calculate the money you made.\nInclude §eSorrow§7, §ePlasma§7, §eVolta§7, §e1M coins drop\n" +
-                    "§eGhostly Boots§7, §eScavenger coins.\n" +
-                    "§cUsing current Sell Offer value.")
+                "§eGhostly Boots§7, §eScavenger coins.\n" +
+                "§cUsing current Sell Offer value.")
             @ConfigEditorText
             public String moneyMadeFormat = "  &6Money made: &b%value%";
         }
@@ -452,17 +452,17 @@ public class CombatConfig {
         @Expose
         @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
         @ConfigEditorSlider(
-                minValue = -5,
-                maxValue = 10,
-                minStep = 1)
+            minValue = -5,
+            maxValue = 10,
+            minStep = 1)
         public int extraSpace = 1;
 
         @Expose
         @ConfigOption(name = "Pause Timer", desc = "How many seconds does it wait before pausing.")
         @ConfigEditorSlider(
-                minValue = 1,
-                maxValue = 20,
-                minStep = 1
+            minValue = 1,
+            maxValue = 20,
+            minStep = 1
         )
         public int pauseTimer = 3;
 
@@ -493,7 +493,7 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
-                "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
+            "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean summoningSoulDisplay = false;
@@ -558,8 +558,8 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(
-                name = "Special Zealots",
-                desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
+            name = "Special Zealots",
+            desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -583,9 +583,9 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(
-                name = "Area Boss",
-                desc = "Show a timer when Golden Ghoul, Old Wolf, Voidling Extremist or Millenia-Aged Blaze respawns. " +
-                        "§cSometimes it takes 20-30 seconds to calibrate correctly."
+            name = "Area Boss",
+            desc = "Show a timer when Golden Ghoul, Old Wolf, Voidling Extremist or Millenia-Aged Blaze respawns. " +
+                "§cSometimes it takes 20-30 seconds to calibrate correctly."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -593,9 +593,9 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(
-                name = "Arachne Spawn Timer",
-                desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long " +
-                        "until the boss will spawn. §cTimer may be 1-2 seconds off."
+            name = "Arachne Spawn Timer",
+            desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long " +
+                "until the boss will spawn. §cTimer may be 1-2 seconds off."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -634,14 +634,14 @@ public class CombatConfig {
         @Expose
         @ConfigOption(name = "Display type", desc = "Choose what the display should show")
         @ConfigEditorDropdown(values = {
-                "Global to max",
-                "Global to next tier",
-                "Lowest total kills",
-                "Highest total kills",
-                "Lowest kills needed to max",
-                "Highest kills needed to max",
-                "Lowest kills needed to next tier",
-                "Highest kills needed to next tier"
+            "Global to max",
+            "Global to next tier",
+            "Lowest total kills",
+            "Highest total kills",
+            "Lowest kills needed to max",
+            "Highest kills needed to max",
+            "Lowest kills needed to next tier",
+            "Highest kills needed to next tier"
         })
         public int displayType = 0;
 
@@ -667,9 +667,9 @@ public class CombatConfig {
     public static class EnderNodeConfig {
         @Expose
         @ConfigOption(
-                name = "Enabled",
-                desc = "Tracks all of your drops from mining Ender Nodes in the End.\n" +
-                        "Also tracks drops from Endermen."
+            name = "Enabled",
+            desc = "Tracks all of your drops from mining Ender Nodes in the End.\n" +
+                "Also tracks drops from Endermen."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -677,37 +677,37 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(
-                name = "Text Format",
-                desc = "Drag text to change the appearance of the overlay."
+            name = "Text Format",
+            desc = "Drag text to change the appearance of the overlay."
         )
         @ConfigEditorDraggableList(
-                exampleText = {
-                        "§5§lEnder Node Tracker",
-                        "§d1,303 Ender Nodes Mined",
-                        "§615.3M Coins Made",
-                        " ",
-                        "§b123 §cEndermite Nest",
-                        "§b832 §aEnchanted End Stone",
-                        "§b230 §aEnchanted Obsidian",
-                        "§b1630 §aEnchanted Ender Pearl",
-                        "§b85 §aGrand Experience Bottle",
-                        "§b4 §9Titanic Experience Bottle",
-                        "§b15 §9End Stone Shulker",
-                        "§b53 §9End Stone Geode",
-                        "§b10 §d◆ Magical Rune I",
-                        "§b24 §5Ender Gauntlet",
-                        "§b357 §5Mite Gel",
-                        "§b2 §cShrimp The Fish",
-                        " ",
-                        "§b200 §5Ender Armor",
-                        "§b24 §5Ender Helmet",
-                        "§b24 §5Ender Chestplate",
-                        "§b24 §5Ender Leggings",
-                        "§b24 §5Ender Boots",
-                        "§b24 §5Ender Necklace",
-                        "§f10§7-§a8§7-§93§7-§52§7-§61 §fEnderman Pet",
-                        " "
-                }
+            exampleText = {
+                "§5§lEnder Node Tracker",
+                "§d1,303 Ender Nodes Mined",
+                "§615.3M Coins Made",
+                " ",
+                "§b123 §cEndermite Nest",
+                "§b832 §aEnchanted End Stone",
+                "§b230 §aEnchanted Obsidian",
+                "§b1630 §aEnchanted Ender Pearl",
+                "§b85 §aGrand Experience Bottle",
+                "§b4 §9Titanic Experience Bottle",
+                "§b15 §9End Stone Shulker",
+                "§b53 §9End Stone Geode",
+                "§b10 §d◆ Magical Rune I",
+                "§b24 §5Ender Gauntlet",
+                "§b357 §5Mite Gel",
+                "§b2 §cShrimp The Fish",
+                " ",
+                "§b200 §5Ender Armor",
+                "§b24 §5Ender Helmet",
+                "§b24 §5Ender Chestplate",
+                "§b24 §5Ender Leggings",
+                "§b24 §5Ender Boots",
+                "§b24 §5Ender Necklace",
+                "§f10§7-§a8§7-§93§7-§52§7-§61 §fEnderman Pet",
+                " "
+            }
         )
         public Property<List<Integer>> textFormat = Property.of(new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 23)));
 

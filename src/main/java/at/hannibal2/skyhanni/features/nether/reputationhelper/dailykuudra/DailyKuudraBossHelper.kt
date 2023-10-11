@@ -45,8 +45,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
 
         for (line in ScoreboardData.sidebarLines) {
-            if(line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")){
-                val tier = line.substringAfter("(T").substring(0,1).toInt()
+            if (line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")) {
+                val tier = line.substringAfter("(T").substring(0, 1).toInt()
                 val kuudraTier = getByTier(tier)!!
                 finished(kuudraTier)
                 return
@@ -101,7 +101,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         kuudraTiers.clear()
 
-        //Repo
+        // Repo
         val repoData = reputationHelper.repoData ?: return
         val jsonElement = repoData["KUUDRA"]
         var tier = 1
@@ -117,7 +117,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
             tier++
         }
 
-        //Config
+        // Config
         for (name in storage.kuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true
         }

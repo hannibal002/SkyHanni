@@ -25,7 +25,7 @@ class SlayerQuestWarning {
     private var dirtySidebar = false
     private var hasAutoSlayer = false
 
-    //TODO add check if player has clicked on an item, before mobs around you gets damage
+    // TODO add check if player has clicked on an item, before mobs around you gets damage
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -33,7 +33,7 @@ class SlayerQuestWarning {
 
         val message = event.message
 
-        //died
+        // died
         if (message == "  §r§c§lSLAYER QUEST FAILED!") {
             needNewQuest("The old slayer quest has failed!")
         }
@@ -43,7 +43,7 @@ class SlayerQuestWarning {
             dirtySidebar = true
         }
 
-        //no auto slayer
+        // no auto slayer
         if (message.matchRegex("   §r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!")) {
             needNewQuest("You have no Auto-Slayer active!")
         }
@@ -55,7 +55,7 @@ class SlayerQuestWarning {
             needSlayerQuest = false
         }
 
-        //TODO auto slayer disabled bc of no more money in bank or purse
+        // TODO auto slayer disabled bc of no more money in bank or purse
     }
 
     private fun needNewQuest(reason: String) {

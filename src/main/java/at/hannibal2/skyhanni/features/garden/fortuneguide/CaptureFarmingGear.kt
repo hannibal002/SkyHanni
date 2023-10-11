@@ -35,8 +35,10 @@ class CaptureFarmingGear {
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
-        private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
-            "RANCHERS", "FARMER", "RABBIT")
+        private val farmingSets = arrayListOf(
+            "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
+            "RANCHERS", "FARMER", "RABBIT"
+        )
         private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
         fun captureFarmingGear() {
@@ -51,8 +53,8 @@ class CaptureFarmingGear {
             val currentCrop = itemStack.getCropType()
 
             if (currentCrop == null) {
-                //todo better fall back items
-                //todo Daedalus axe
+                // todo better fall back items
+                // todo Daedalus axe
             } else {
                 for (item in FarmingItems.entries) {
                     if (item.name == currentCrop.name) {
@@ -109,7 +111,8 @@ class CaptureFarmingGear {
                     FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
                     val enchantments = slot.getEnchantments() ?: emptyMap()
                     val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
-                    GardenAPI.config?.uniqueVisitors = round(FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
+                    GardenAPI.config?.uniqueVisitors =
+                        round(FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
                 }
             }
         }
@@ -152,9 +155,9 @@ class CaptureFarmingGear {
                     highestRabbitRarity = split.last().toInt()
                 }
                 if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
-                        farmingItems[FarmingItems.BEE] = item
-                        outdatedItems[FarmingItems.BEE] = false
-                        highestBeeRarity = split.last().toInt()
+                    farmingItems[FarmingItems.BEE] = item
+                    outdatedItems[FarmingItems.BEE] = false
+                    highestBeeRarity = split.last().toInt()
                 }
             }
         }

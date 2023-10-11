@@ -114,7 +114,7 @@ class JacobContestTimeNeeded {
             var bracketText = "${bracket.displayName} $color$formatDuration"
             var blocksPerSecond = crop.getLatestBlocksPerSecond()
             if (blocksPerSecond == null) {
-                marking += "§0§l !" //hoping this never shows
+                marking += "§0§l !" // hoping this never shows
                 blocksPerSecond = 19.9
                 lowBPSWarning = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
             } else {

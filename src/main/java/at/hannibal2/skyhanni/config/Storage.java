@@ -82,9 +82,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -367,22 +367,22 @@ public class Storage {
                 @Override
                 public String toString() {
                     return "SlayerItemProfit{" +
-                            "internalName='" + internalName + '\'' +
-                            ", timesDropped=" + timesDropped +
-                            ", totalAmount=" + totalAmount +
-                            ", hidden=" + hidden +
-                            '}';
+                        "internalName='" + internalName + '\'' +
+                        ", timesDropped=" + timesDropped +
+                        ", totalAmount=" + totalAmount +
+                        ", hidden=" + hidden +
+                        '}';
                 }
             }
 
             @Override
             public String toString() {
                 return "SlayerProfitList{" +
-                        "items=" + items +
-                        ", mobKillCoins=" + mobKillCoins +
-                        ", slayerSpawnCost=" + slayerSpawnCost +
-                        ", slayerCompletedCount=" + slayerCompletedCount +
-                        '}';
+                    "items=" + items +
+                    ", mobKillCoins=" + mobKillCoins +
+                    ", slayerSpawnCost=" + slayerSpawnCost +
+                    ", slayerCompletedCount=" + slayerCompletedCount +
+                    '}';
             }
         }
 
@@ -406,11 +406,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
@@ -441,7 +441,7 @@ public class Storage {
             public int selfKillingAnimals;
 
             @Expose
-            public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities= new HashMap<>();
+            public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities = new HashMap<>();
         }
 
         @Expose

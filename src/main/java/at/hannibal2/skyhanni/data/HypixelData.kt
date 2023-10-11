@@ -30,7 +30,7 @@ class HypixelData {
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
 
-        //Ironman, Stranded and Bingo
+        // Ironman, Stranded and Bingo
         var noTrade = false
 
         var ironman = false
@@ -201,6 +201,6 @@ class HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
-                scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
     }
 }

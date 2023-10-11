@@ -256,7 +256,8 @@ class FarmingFortuneDisplay {
                     reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
 
                     itemBaseFortune = if (tool.getInternalName_old().contains("LOTUS")) 5.0
-                    else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount() ?: 0 ) * 1.0
+                    else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount()
+                        ?: 0) * 1.0
                     greenThumbFortune = if (tool.getInternalName_old().contains("LOTUS")) {
                         displayedFortune - reforgeFortune - itemBaseFortune
                     } else 0.0

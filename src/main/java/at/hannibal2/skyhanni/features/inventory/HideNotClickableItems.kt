@@ -263,7 +263,7 @@ class HideNotClickableItems {
             "BRACELET"
         )
         for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {//todo use item api
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
                 reverseColor = true
                 return false
             }
@@ -292,7 +292,7 @@ class HideNotClickableItems {
     private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Chest" && chestName != "Large Chest") return false
 
-        //TODO make check if player is on private island
+        // TODO make check if player is on private island
 
         if (!ItemUtils.isSoulBound(stack)) return false
 

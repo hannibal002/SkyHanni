@@ -92,7 +92,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     private fun updateRender() {
         val newList = mutableListOf<List<Any>>()
 
-        //TODO test
+        // TODO test
         if (factionType == FactionType.NONE) return
 
         newList.addAsSingletonList("Reputation Helper:")

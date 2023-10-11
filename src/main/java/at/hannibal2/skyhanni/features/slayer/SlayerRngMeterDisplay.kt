@@ -117,7 +117,8 @@ class SlayerRngMeterDisplay {
 
         val storage = getStorage() ?: return
 
-        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
+        val selectedItem =
+            event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         if (selectedItem == null) {
             storage.itemGoal = ""
             storage.goalNeeded = -1

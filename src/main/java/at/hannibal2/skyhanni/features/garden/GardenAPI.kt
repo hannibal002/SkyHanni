@@ -158,7 +158,7 @@ object GardenAPI {
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
+        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
 
     fun clearCropSpeed() {
         config?.cropsPerSecond?.clear()

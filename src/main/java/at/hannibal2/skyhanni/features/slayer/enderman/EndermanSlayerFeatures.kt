@@ -53,7 +53,11 @@ class EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && canSee(
+                LocationUtils.playerEyeLocation(),
+                entity.getLorenzVec()
+            )
+        ) {
             endermenWithBeacons.add(entity)
             logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }

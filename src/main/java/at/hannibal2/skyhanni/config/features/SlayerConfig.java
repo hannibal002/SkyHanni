@@ -30,8 +30,8 @@ public class SlayerConfig {
 
         @Expose
         @ConfigOption(name = "Highlight Beacon",
-                desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
-                        "Supports beacon in hand and beacon flying.")
+            desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
+                "Supports beacon in hand and beacon flying.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean highlightBeacon = true;
@@ -389,7 +389,7 @@ public class SlayerConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Count all items you pick up while doing slayer, " +
-                "keep track of how much you pay for starting slayers and calculating the overall profit.")
+            "keep track of how much you pay for starting slayers and calculating the overall profit.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
@@ -399,7 +399,7 @@ public class SlayerConfig {
 
         @Expose
         @ConfigOption(name = "Price in Chat", desc = "Show an extra chat message when you pick up an item. " +
-                "(This contains name, amount and price)")
+            "(This contains name, amount and price)")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean priceInChat = false;

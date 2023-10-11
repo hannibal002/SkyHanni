@@ -46,7 +46,7 @@ class BurrowWarpHelper {
                     it.unlocked = false
                     LorenzUtils.chat(
                         "§e[SkyHanni] Detected not having access to warp point §b${it.displayName}§e!\n" +
-                                "§e[SkyHanni] Use §c/shresetburrowwarps §eonce you have activated this travel scroll."
+                            "§e[SkyHanni] Use §c/shresetburrowwarps §eonce you have activated this travel scroll."
                     )
                     lastWarp = null
                     currentWarp = null

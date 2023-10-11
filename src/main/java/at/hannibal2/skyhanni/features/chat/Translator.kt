@@ -1,26 +1,26 @@
-//package at.hannibal2.skyhanni.features.chat
+// package at.hannibal2.skyhanni.features.chat
 //
-//import at.hannibal2.skyhanni.SkyHanniMod
-//import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
-//import at.hannibal2.skyhanni.events.LorenzChatEvent
-//import at.hannibal2.skyhanni.utils.APIUtil
-//import at.hannibal2.skyhanni.utils.LorenzUtils
-//import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
-//import at.hannibal2.skyhanni.utils.OSUtils
-//import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
-//import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-//import com.google.gson.JsonArray
-//import kotlinx.coroutines.launch
-//import net.minecraft.event.ClickEvent
-//import net.minecraft.event.HoverEvent
-//import net.minecraft.util.ChatComponentText
-//import net.minecraft.util.ChatStyle
-//import net.minecraftforge.fml.common.eventhandler.EventPriority
-//import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-//import java.net.URLDecoder
-//import java.net.URLEncoder
+// import at.hannibal2.skyhanni.SkyHanniMod
+// import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+// import at.hannibal2.skyhanni.events.LorenzChatEvent
+// import at.hannibal2.skyhanni.utils.APIUtil
+// import at.hannibal2.skyhanni.utils.LorenzUtils
+// import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
+// import at.hannibal2.skyhanni.utils.OSUtils
+// import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
+// import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+// import com.google.gson.JsonArray
+// import kotlinx.coroutines.launch
+// import net.minecraft.event.ClickEvent
+// import net.minecraft.event.HoverEvent
+// import net.minecraft.util.ChatComponentText
+// import net.minecraft.util.ChatStyle
+// import net.minecraftforge.fml.common.eventhandler.EventPriority
+// import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+// import java.net.URLDecoder
+// import java.net.URLEncoder
 //
-//class Translator {
+// class Translator {
 //    private val messageContentRegex = Regex(".*: (.*)")
 //
 //    // Logic for listening for a user click on a chat message is from NotEnoughUpdates

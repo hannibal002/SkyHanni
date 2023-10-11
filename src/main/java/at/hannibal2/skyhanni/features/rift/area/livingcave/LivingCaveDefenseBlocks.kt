@@ -76,9 +76,9 @@ class LivingCaveDefenseBlocks {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
                 entity = EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(compareLocation, 2.0)
-                        .filter { isCorrectMob(it.name) }
-                        .filter { !it.isAtFullHealth() }
-                        .minByOrNull { it.distanceTo(compareLocation) }
+                    .filter { isCorrectMob(it.name) }
+                    .filter { !it.isAtFullHealth() }
+                    .minByOrNull { it.distanceTo(compareLocation) }
             }
 
             val defenseBlock = entity?.let { DefenseBlock(it, location) } ?: return

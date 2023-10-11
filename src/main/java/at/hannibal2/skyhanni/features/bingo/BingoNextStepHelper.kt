@@ -85,7 +85,7 @@ class BingoNextStepHelper {
             }
 
             if (!step.done && !parentDone && requirementsToDo == 0 && !currentSteps.contains(step)) {
-                    currentSteps = currentSteps.editCopy { add(step) }
+                currentSteps = currentSteps.editCopy { add(step) }
             }
         }
 
@@ -150,7 +150,7 @@ class BingoNextStepHelper {
                 currentStep.amountHavingHidden -= 10
             }
         }
-        //TODO add thys message
+        // TODO add thys message
 //        if (event.message == "thys message") {
 //            thys.done()
 //        }
@@ -248,22 +248,22 @@ class BingoNextStepHelper {
 
         if (description == "Craft an Emerald Ring.") {
             return CraftStep("Emerald Ring") requires (
-                    ItemsStep(
-                        "32x Enchanted Emerald",
-                        "Emerald",
-                        160 * 32,
-                        mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
-                    ) requires IslandType.DWARVEN_MINES.getStep())
+                ItemsStep(
+                    "32x Enchanted Emerald",
+                    "Emerald",
+                    160 * 32,
+                    mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
+                ) requires IslandType.DWARVEN_MINES.getStep())
         }
 
         if (description == "Obtain a Mathematical Hoe Blueprint.") {
             return CraftStep("Mathematical Hoe Blueprint") requires (
-                    ItemsStep(
-                        "32x Jacob's Ticket",
-                        "Jacob's Ticket",
-                        32,
-                        mapOf("Jacob's Ticket" to 1)
-                    ).addItemRequirements() requires IslandType.GARDEN.getStep())
+                ItemsStep(
+                    "32x Jacob's Ticket",
+                    "Jacob's Ticket",
+                    32,
+                    mapOf("Jacob's Ticket" to 1)
+                ).addItemRequirements() requires IslandType.GARDEN.getStep())
         }
 
         crystalPattern.matchMatcher(description) {

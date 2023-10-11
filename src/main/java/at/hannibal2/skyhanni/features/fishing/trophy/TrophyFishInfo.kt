@@ -41,7 +41,10 @@ data class TrophyFishInfo(
 
     fun getFilletValue(rarity: TrophyRarity): Int {
         if (fillet == null) {
-            CopyErrorCommand.logError(Error("fillet is null for '$displayName'"), "Error trying to read trophy fish info")
+            CopyErrorCommand.logError(
+                Error("fillet is null for '$displayName'"),
+                "Error trying to read trophy fish info"
+            )
             return -1
         }
         return fillet.getOrDefault(rarity, -1)

@@ -17,7 +17,8 @@ object TrevorTracker {
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
     private var display = emptyList<List<Any>>()
 
-    private val selfKillMobPattern = "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
+    private val selfKillMobPattern =
+        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
     private val killMobPattern = "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.".toPattern()
 
     private val peltsPerSecond = mutableListOf<Int>()
@@ -76,7 +77,7 @@ object TrevorTracker {
         if (matcher.matches()) {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
-            storage.selfKillingAnimals +=  1
+            storage.selfKillingAnimals += 1
             saveAndUpdate()
         }
         matcher = killMobPattern.matcher(event.message)

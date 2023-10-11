@@ -67,7 +67,11 @@ class LivingCaveLivingMetalHelper {
             val percentage = diff.toDouble() / maxTime
             a.slope(b, 1 - percentage)
         } else b
-        event.drawWaypointFilled(location, LorenzColor.AQUA.toColor(), seeThroughBlocks = location.distanceToPlayer() < 10)
+        event.drawWaypointFilled(
+            location,
+            LorenzColor.AQUA.toColor(),
+            seeThroughBlocks = location.distanceToPlayer() < 10
+        )
     }
 
     @SubscribeEvent

@@ -139,7 +139,9 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.moneyPerHourDicer) {
+            if (InventoryUtils.getItemInHand()?.getInternalName()
+                    ?.contains("DICER") == true && config.moneyPerHourDicer
+            ) {
                 val (dicerDrops, internalName) = when (it) {
                     CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
                     CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
@@ -275,8 +277,8 @@ object CropMoneyDisplay {
 
         val onlyNpcPrice =
             (!config.moneyPerHourUseCustomFormat && LorenzUtils.noTradeMode) ||
-                    (config.moneyPerHourUseCustomFormat && config.moneyPerHourCustomFormat.size == 1 &&
-                            config.moneyPerHourCustomFormat[0] == 2)
+                (config.moneyPerHourUseCustomFormat && config.moneyPerHourCustomFormat.size == 1 &&
+                    config.moneyPerHourCustomFormat[0] == 2)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!

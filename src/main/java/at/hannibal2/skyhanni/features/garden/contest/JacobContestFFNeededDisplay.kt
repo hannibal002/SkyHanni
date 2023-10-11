@@ -96,12 +96,12 @@ class JacobContestFFNeededDisplay {
             add(listOf("§6Your ", crop.icon, "§6FF: $farmingFortune"))
         }
         addAsSingletonList("")
-       if (blocksPerSecond == null || trueFF == null) {
-           add(listOf("§cMissing data from above!"))
-       } else {
-           val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-           add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
-       }
+        if (blocksPerSecond == null || trueFF == null) {
+            add(listOf("§cMissing data from above!"))
+        } else {
+            val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
+        }
     }
 
     private fun formatFarmingFortune(farmingFortune: Double): String {

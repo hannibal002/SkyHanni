@@ -95,7 +95,7 @@ class NonGodPotEffectDisplay {
     private fun update() {
         val now = System.currentTimeMillis()
         if (effectDuration.values.removeIf { it.ended }) {
-            //to fetch the real amount of active pots
+            // to fetch the real amount of active pots
             totalEffectsCount = 0
             checkFooter = true
         }

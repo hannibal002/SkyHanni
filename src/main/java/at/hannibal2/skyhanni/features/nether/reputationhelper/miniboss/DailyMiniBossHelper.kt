@@ -107,7 +107,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         miniBosses.clear()
 
-        //Repo
+        // Repo
         val repoData = reputationHelper.repoData ?: return
         val jsonElement = repoData["MINIBOSS"]
         for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
@@ -118,7 +118,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
             miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, patterns))
         }
 
-        //Config
+        // Config
         for (name in storage.miniBossesDoneToday) {
             getByDisplayName(name)!!.doneToday = true
         }

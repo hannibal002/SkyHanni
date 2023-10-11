@@ -110,7 +110,7 @@ class DamageIndicatorManager {
 
         val player = Minecraft.getMinecraft().thePlayer
 
-        //TODO config to define between 100ms and 5 sec
+        // TODO config to define between 100ms and 5 sec
         val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
             (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
@@ -150,7 +150,7 @@ class DamageIndicatorManager {
 
         for (data in data.values) {
 
-            //TODO test end stone protector in hole? - maybe change eye pos
+            // TODO test end stone protector in hole? - maybe change eye pos
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
@@ -162,8 +162,8 @@ class DamageIndicatorManager {
             var healthText = data.healthText
             val delayedStart = data.delayedStart
             if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
-                    val delay = delayedStart - System.currentTimeMillis()
-                    healthText = formatDelay(delay)
+                val delay = delayedStart - System.currentTimeMillis()
+                healthText = formatDelay(delay)
             }
 
             val location = if (data.dead && data.deathLocation != null) {
@@ -262,7 +262,7 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
 
-                //TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+                // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
             -> true
 
             else -> false
@@ -411,7 +411,7 @@ class DamageIndicatorManager {
 
             BossType.SLAYER_ZOMBIE_5 -> {
                 if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
-                    //TODO fix
+                    // TODO fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
 //                    val format = formatDelay(remainingTicks * 50)
@@ -519,9 +519,9 @@ class DamageIndicatorManager {
             }
         } + " §f"
 
-        //hide while in the middle
+        // hide while in the middle
 //        val position = entity.getLorenzVec()
-        //TODO other logic or something
+        // TODO other logic or something
 //        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
         var calcHealth = -1
@@ -616,7 +616,7 @@ class DamageIndicatorManager {
         }
 
 
-        //Hit phase
+        // Hit phase
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
             val maxHits = when (entityData.bossType) {
@@ -639,11 +639,11 @@ class DamageIndicatorManager {
             return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
-        //Laser phase
+        // Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
             val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            //val remainingTicks = 8 * 20 - ticksAlive
+            // TODO more tests, more exact values, better logic? idk make this working perfectly pls
+            // val remainingTicks = 8 * 20 - ticksAlive
             val remainingTicks = (7.4 * 20).toLong() - ticksAlive
 
             if (config.enderSlayer.showHealthDuringLaser) {
@@ -768,7 +768,7 @@ class DamageIndicatorManager {
             damageCounter.currentDamage += damage
         }
         if (healing > 0) {
-            //Hide auto heal every 10 ticks (with rounding errors)
+            // Hide auto heal every 10 ticks (with rounding errors)
             if ((healing == 15_000L || healing == 15_001L) && entityData.bossType == BossType.SLAYER_ZOMBIE_5) return
 
             val damageCounter = entityData.damageCounter

@@ -228,7 +228,7 @@ class SoopyGuessBurrow {
                         i++
                     }
 
-                    //Why does this happen?
+                    // Why does this happen?
                     if (pr1.isEmpty()) return
 
                     val p1 = pr1.last()

@@ -122,17 +122,17 @@ object GardenVisitorDropStatistics {
     }
 
     private fun drawDisplay(hidden: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
-        //0
+        // 0
         addAsSingletonList("§e§lVisitor Statistics")
-        //1
+        // 1
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
-        //2
+        // 2
         if (visitorRarities.isNotEmpty()) {
             addAsSingletonList(
                 "§a${visitorRarities[0].addSeparators()}§f-" +
-                        "§9${visitorRarities[1].addSeparators()}§f-" +
-                        "§6${visitorRarities[2].addSeparators()}§f-" +
-                        "§c${visitorRarities[3].addSeparators()}"
+                    "§9${visitorRarities[1].addSeparators()}§f-" +
+                    "§6${visitorRarities[2].addSeparators()}§f-" +
+                    "§c${visitorRarities[3].addSeparators()}"
             )
         } else {
             addAsSingletonList("§c?")
@@ -141,20 +141,20 @@ object GardenVisitorDropStatistics {
                 "Error rendering visitor drop statistics"
             )
         }
-        //3
+        // 3
         addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
-        //4
+        // 4
         addAsSingletonList(format(deniedVisitors, "Denied", "§c", ""))
-        //5
+        // 5
         addAsSingletonList("")
-        //6
+        // 6
         addAsSingletonList(format(hidden.copper, "Copper", "§c", ""))
-        //7
+        // 7
         addAsSingletonList(format(hidden.farmingExp, "Farming EXP", "§3", "§7"))
-        //8
+        // 8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
-        //9 – 16
+        // 9 – 16
         for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
@@ -166,15 +166,15 @@ object GardenVisitorDropStatistics {
                 addAsSingletonList(format(count, reward.displayName, "§b"))
             }
         }
-        //17
+        // 17
         addAsSingletonList("")
-        //18
+        // 18
         addAsSingletonList(format(hidden.gardenExp, "Garden EXP", "§2", "§7"))
-        //19
+        // 19
         addAsSingletonList(format(hidden.bits, "Bits", "§b", "§b"))
-        //20
+        // 20
         addAsSingletonList(format(hidden.mithrilPowder, "Mithril Powder", "§2", "§2"))
-        //21
+        // 21
         addAsSingletonList(format(hidden.gemstonePowder, "Gemstone Powder", "§d", "§d"))
     }
 

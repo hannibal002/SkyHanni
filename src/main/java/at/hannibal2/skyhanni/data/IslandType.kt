@@ -15,11 +15,11 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     CRYSTAL_HOLLOWS("Crystal Hollows"),
     THE_PARK("The Park", "floating_islands_1"),
     DEEP_CAVERNS("Deep Caverns", "deep_caverns"),
-    GOLD_MINES("Gold Mine", "gold_mine"),//TODO confirm
+    GOLD_MINES("Gold Mine", "gold_mine"),// TODO confirm
     GARDEN("Garden"),
     GARDEN_GUEST("Garden Guest"),
     SPIDER_DEN("Spider's Den"),
-    WINTER("Jerry's Workshop"), //todo confirm
+    WINTER("Jerry's Workshop"), // todo confirm
     THE_RIFT("The Rift"),
 
     NONE(""),

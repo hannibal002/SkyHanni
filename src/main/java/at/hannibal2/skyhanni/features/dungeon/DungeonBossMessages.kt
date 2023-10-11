@@ -45,7 +45,7 @@ class DungeonBossMessages {
                 }
             }
 
-            //M7 – Dragons
+            // M7 – Dragons
             message == "§cThe Crystal withers your soul as you hold it in your hands!" -> return true
             message == "§cIt doesn't seem like that is supposed to go there." -> return true
         }

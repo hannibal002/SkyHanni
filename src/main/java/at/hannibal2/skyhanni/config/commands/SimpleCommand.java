@@ -34,7 +34,7 @@ public class SimpleCommand extends CommandBase {
 
     public interface TabCompleteRunnable {
 
-         List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos);
+        List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos);
     }
 
     public boolean canCommandSenderUseCommand(ICommandSender sender) {

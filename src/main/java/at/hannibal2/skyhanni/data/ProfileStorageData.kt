@@ -105,12 +105,17 @@ object ProfileStorageData {
             noTabListTime = System.currentTimeMillis()
             LorenzUtils.chat(
                 "§c[SkyHanni] Extra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+                    "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
             )
         }
     }
 
-    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, sackProfile: SackData.PlayerSpecific, profileName: String, reason: String) {
+    private fun loadProfileSpecific(
+        playerSpecific: Storage.PlayerSpecific,
+        sackProfile: SackData.PlayerSpecific,
+        profileName: String,
+        reason: String
+    ) {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }

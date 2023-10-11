@@ -67,7 +67,7 @@ class PlayerChatModifier {
 
             // TODO remove workaround
             if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
-                //all players same color in chat
+                // all players same color in chat
                 string = string.replace("§r§7: ", "§r§f: ")
             }
         }

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -21,10 +20,10 @@ class SummoningSoulsName {
 
     private val texture =
         "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU" +
-                "4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdH" +
-                "VyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgI" +
-                "nVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMx" +
-                "NjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ"
+            "4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdH" +
+            "VyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgI" +
+            "nVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMx" +
+            "NjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ"
 
     private val souls = mutableMapOf<EntityArmorStand, String>()
     private val mobsLastLocation = mutableMapOf<EntityLiving, LorenzVec>()
@@ -34,7 +33,7 @@ class SummoningSoulsName {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        //TODO use packets instead of this
+        // TODO use packets instead of this
         check()
     }
 
@@ -68,7 +67,7 @@ class SummoningSoulsName {
 
         val entityList = EntityUtils.getEntities<EntityArmorStand>()
         souls.keys.removeIf { it !in entityList }
-        //TODO fix overhead!
+        // TODO fix overhead!
 //        mobs.keys.removeIf { it !in world.loadedEntityList }
     }
 

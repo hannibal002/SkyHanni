@@ -37,8 +37,8 @@ object Year300RaffleEvent {
     }
 
     fun isEnabled() = config.enableActiveTimer &&
-            Instant.now().isBefore(SkyBlockTime(301).toInstant()) &&
-            LorenzUtils.inSkyBlock
+        Instant.now().isBefore(SkyBlockTime(301).toInstant()) &&
+        LorenzUtils.inSkyBlock
 
 
     @SubscribeEvent

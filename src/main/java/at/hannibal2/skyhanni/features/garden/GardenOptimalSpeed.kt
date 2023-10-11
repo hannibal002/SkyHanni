@@ -71,8 +71,8 @@ class GardenOptimalSpeed {
         CropType.CARROT -> configCustomSpeed.carrot
         CropType.POTATO -> configCustomSpeed.potato
         CropType.NETHER_WART -> configCustomSpeed.netherWart
-        CropType.PUMPKIN ->  configCustomSpeed.pumpkin
-        CropType.MELON ->  configCustomSpeed.melon
+        CropType.PUMPKIN -> configCustomSpeed.pumpkin
+        CropType.MELON -> configCustomSpeed.melon
         CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
         CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
         CropType.CACTUS -> configCustomSpeed.cactus
@@ -88,7 +88,7 @@ class GardenOptimalSpeed {
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
             config.optimalSpeedPos.renderString("§c$text", posLabel = "Garden Optimal Speed")
-             warn()
+            warn()
         } else {
             config.optimalSpeedPos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }

@@ -16,7 +16,8 @@ import java.util.regex.Pattern
 
 object StringUtils {
     private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    private val chatUsernamePattern =
+        "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
 

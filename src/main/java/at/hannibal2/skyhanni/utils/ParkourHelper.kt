@@ -53,7 +53,9 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        if (location.offsetCenter().distanceToPlayer() < detectionRange && Minecraft.getMinecraft().thePlayer.onGround) {
+                        if (location.offsetCenter()
+                                .distanceToPlayer() < detectionRange && Minecraft.getMinecraft().thePlayer.onGround
+                        ) {
                             current = index
                         }
                     }

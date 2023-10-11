@@ -534,7 +534,7 @@ class GardenVisitorFeatures {
                     continue
                 }
 
-                //hide own player name
+                // hide own player name
                 if (name.contains(LorenzUtils.getPlayerName())) {
                     logger.log("Ignore wrong own name: '$name'")
                     continue

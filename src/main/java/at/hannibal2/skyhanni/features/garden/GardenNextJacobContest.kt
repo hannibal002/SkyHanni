@@ -327,7 +327,7 @@ object GardenNextJacobContest {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
                     "Farming Contest soon!\n" +
-                            "Crops: ${cropText.removeColor()}"
+                        "Crops: ${cropText.removeColor()}"
                 )
             }
         }
@@ -396,7 +396,7 @@ object GardenNextJacobContest {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay
-            && (GardenAPI.inGarden() || config.nextJacobContestEverywhere)
+        && (GardenAPI.inGarden() || config.nextJacobContestEverywhere)
 
     private fun isFetchEnabled() = isEnabled() && config.nextJacobContestsFetchAutomatically
     private fun isSendEnabled() = isFetchEnabled() && config.nextJacobContestsShareAutomatically != 2 // 2 = Disabled

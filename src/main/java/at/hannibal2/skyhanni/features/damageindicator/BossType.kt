@@ -6,9 +6,9 @@ enum class BossType(
     val shortName: String = fullName,
     val showDeathTime: Boolean = false
 ) {
-    GENERIC_DUNGEON_BOSS("Generic Dungeon boss", 0),//TODO split into different bosses
+    GENERIC_DUNGEON_BOSS("Generic Dungeon boss", 0),// TODO split into different bosses
 
-    //Nether Mini Bosses
+    // Nether Mini Bosses
     NETHER_BLADESOUL("§8Bladesoul", 1),
     NETHER_MAGMA_BOSS("§4Magma Boss", 1),
     NETHER_ASHFANG("§cAshfang", 1),
@@ -18,7 +18,7 @@ enum class BossType(
     NETHER_VANQUISHER("§5Vanquisher", 2),
 
     END_ENDSTONE_PROTECTOR("§cEndstone Protector", 3),
-    END_ENDER_DRAGON("Ender Dragon", 4),//TODO fix totally
+    END_ENDER_DRAGON("Ender Dragon", 4),// TODO fix totally
 
     SLAYER_ZOMBIE_1("§aRevenant Horror 1", 5, "§aRev 1", showDeathTime = true),
     SLAYER_ZOMBIE_2("§eRevenant Horror 2", 5, "§eRev 2", showDeathTime = true),
@@ -88,12 +88,12 @@ enum class BossType(
     LEECH_SUPREME("§cLeech Supreme", 22),
     BACTE("§aBacte", 22),
 
-    WINTER_REINDRAKE("Reindrake", 24),//TODO fix totally
+    WINTER_REINDRAKE("Reindrake", 24),// TODO fix totally
 
-    //TODO arachne
+    // TODO arachne
 
-    //TODO corelone
-    //TODO bal
+    // TODO corelone
+    // TODO bal
 
 
     /**
@@ -107,5 +107,5 @@ enum class BossType(
      *
      */
 
-    //TODO diana mythological creatures
+    // TODO diana mythological creatures
 }

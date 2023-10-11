@@ -127,7 +127,11 @@ object GhostCounter {
         }
         val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> "${
+                ((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(
+                    2
+                )
+            }"
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting
@@ -419,7 +423,7 @@ object GhostCounter {
             Option.KILLCOMBO.set(0.0)
             update()
         }
-        //replace with BestiaryLevelUpEvent ?
+        // replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message) {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {

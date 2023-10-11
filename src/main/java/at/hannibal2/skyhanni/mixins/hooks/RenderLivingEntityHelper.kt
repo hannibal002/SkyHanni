@@ -47,7 +47,7 @@ class RenderLivingEntityHelper {
                 }
             }
 
-            //TODO remove event
+            // TODO remove event
             val event = RenderMobColoredEvent(entity, 0)
             event.postAndCatch()
             return event.color
@@ -61,7 +61,7 @@ class RenderLivingEntityHelper {
                 }
             }
 
-            //TODO remove event
+            // TODO remove event
             val event = ResetEntityHurtEvent(entity, false)
             event.postAndCatch()
             return if (event.shouldReset) 0 else entity.hurtTime

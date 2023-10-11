@@ -18,7 +18,7 @@ enum class ItemAbility(
     val actionBarDetection: Boolean = true,
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
-    //TODO add into repo
+    // TODO add into repo
 
     HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),

@@ -73,7 +73,7 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
-            "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
+        "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     @FeatureToggle
@@ -100,7 +100,7 @@ public class ChatConfig {
     @FeatureToggle
     public boolean profileJoin = true;
 
-    //TODO remove
+    // TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
     @ConfigEditorBoolean
@@ -141,11 +141,11 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Hide Far Deaths", desc = "Hide other players' death messages, " +
-            "except for players who are nearby or during Dungeons/a Kuudra fight.")
+        "except for players who are nearby or during Dungeons/a Kuudra fight.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideFarDeathMessages = false;
-    //TODO jawbus + thunder
+    // TODO jawbus + thunder
 
     @Expose
     @ConfigOption(name = "Compact Potion Message", desc = "Shorten chat messages about player potion effects.")
@@ -167,9 +167,9 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(
-            name = "Sacks Hider",
-            desc = "Hide the chat's sack change message with this, " +
-                    "not in Hypixel settings, for mods to access sack data in new features."
+        name = "Sacks Hider",
+        desc = "Hide the chat's sack change message with this, " +
+            "not in Hypixel settings, for mods to access sack data in new features."
     )
     @ConfigEditorBoolean
     @FeatureToggle
