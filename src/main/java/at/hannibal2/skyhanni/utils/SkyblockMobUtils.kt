@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.features.mobs.EntityKill
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
 
 object SkyblockMobUtils {
     val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
@@ -13,6 +16,22 @@ object SkyblockMobUtils {
             ?: "Skyblock Name of Mob ${baseEntity.name} found"
 
         override fun toString() : String = name
+    }
+
+    fun isSkillBlockMob(entity: Entity): Boolean {
+        if(entity !is EntityLivingBase) return false
+        if (entity is EntityArmorStand) return false
+        //Protection that no real Player gets added. Only difference to a custom mob is that every Skyblockitem has a nbtTag
+        if (entity.inventory != null) {
+            if (entity.inventory.isNotEmpty() && entity.inventory.any { it != null && it.tagCompound == null })
+            {
+                if(EntityKill.config.mobKilldetetctionLogPlayerCantBeAdded) {
+                    LorenzDebug.log("Entity ${entity.name} is not allowed in HitList")
+                }
+                return false
+            }
+        }
+        return true
     }
 
 }

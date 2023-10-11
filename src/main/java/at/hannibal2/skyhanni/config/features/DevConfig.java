@@ -235,4 +235,35 @@ public class DevConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean filterBiomeIdBounds = true;
+
+    //Mob Kill Detection (Only temporarily)
+
+    @Expose
+    @ConfigOption(name = "Mob Kill Detection", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean mobKilldetetction = false;
+
+    @Expose
+    @ConfigOption(name = "mobKilldetetctionLogMobHitList", desc = "")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean mobKilldetetctionLogMobHitList = false;
+
+    @Expose
+    @ConfigOption(name = "mobKilldetetctionLogMobHitListId", desc = "")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean mobKilldetetctionLogMobHitListId = false;
+
+    @Expose
+    @ConfigOption(name = "mobKilldetetctionLogPlayerCantBeAdded", desc = "")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean mobKilldetetctionLogPlayerCantBeAdded = false;
+
+    @Expose
+    @ConfigOption(name = "arrowDebug", desc = "")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean arrowDebug = false;
 }

@@ -274,6 +274,7 @@ import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.utils.ArrowUtils
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
@@ -345,6 +346,8 @@ class SkyHanniMod {
         loadModule(BlockData())
         loadModule(DefaultConfigFeatures)
         loadModule(EntityOutlineRenderer)
+        loadModule(EntityKill)
+        loadModule(ArrowUtils)
 
         // APIs
         loadModule(BazaarApi())
@@ -573,7 +576,6 @@ class SkyHanniMod {
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
         loadModule(FixNEUHeavyPearls())
-        loadModule(EntityKill())
 
         init()
 
