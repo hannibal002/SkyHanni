@@ -100,17 +100,16 @@ object EntityUtils {
 
     //TODO remove baseMaxHealth
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        if (maxHealth == health) return true
+        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        if (maxHealth == health * derpyMultiplier) return true
 
-        //Derpy
-        if (maxHealth == health * 2) return true
-
-        if (!boss) {
+        if (!boss && !LorenzUtils.inDungeons) {
             //Corrupted
-            if (maxHealth == health * 3) return true
-
-            //Derpy + Corrupted
-            if (maxHealth == health * 2 * 3) return true
+            if (maxHealth == health * 3 * derpyMultiplier) return true
+            // Runic
+            if (maxHealth == health * 4 * derpyMultiplier) return true
+            // Corrupted+Runic
+            if (maxHealth == health * 12 * derpyMultiplier) return true
         }
 
         return false
@@ -134,14 +133,6 @@ object EntityUtils {
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
-//    fun WorldClient.getEntitiesNearby(
-//        clazz: Class<EntityBlaze>,
-//        location: LorenzVec,
-//        radius: Double
-//    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
-//        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
-//    }
-
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
         if (inventory == null) return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
@@ -160,5 +151,5 @@ object EntityUtils {
 
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence() ?: emptySequence<Entity>()
+    }?.asSequence() ?: emptySequence()
 }

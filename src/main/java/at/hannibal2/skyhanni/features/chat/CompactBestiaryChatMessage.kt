@@ -20,6 +20,8 @@ class CompactBestiaryChatMessage {
 
     var milestoneMessage: String? = null
 
+    val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -56,7 +58,7 @@ class CompactBestiaryChatMessage {
         } else if (inBestiary) {
             event.blockedReason = "bestiary"
             blockedLines++
-            if (blockedLines > 10) {
+            if (blockedLines > 15) {
                 blockedLines = 0
                 inBestiary = false
             }
@@ -73,9 +75,9 @@ class CompactBestiaryChatMessage {
                     LorenzUtils.chat("§6§lBESTIARY MILESTONE $it")
                     milestoneMessage = null
                 }
-                if (message.endsWith("§6§lBESTIARY MILESTONE")) {
+                milestonePattern.matchEntire(message)?.let {
                     acceptMoreDescription = false
-                    milestoneMessage = message
+                    milestoneMessage = it.groups[1]!!.value
                 }
                 if (acceptMoreDescription) {
                     bestiaryDescription.add(message.trim())

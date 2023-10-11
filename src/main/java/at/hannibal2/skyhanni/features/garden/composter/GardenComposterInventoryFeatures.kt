@@ -3,8 +3,14 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -39,18 +45,21 @@ class GardenComposterInventoryFeatures {
             if (next) {
                 if (line.endsWith(" Copper")) continue
                 if (line == "") break
-                val (itemName, amount) = ItemUtils.readItemAmount(line)
-                if (itemName == null) {
+                val pair = ItemUtils.readItemAmount(line)
+                if (pair == null) {
                     LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                     continue
                 }
+                val (itemName, amount) = pair
                 val internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName == null) {
-                    LorenzUtils.chat("§c[SkyHanni] Error reading internal name for item '$itemName§c' " +
-                            "(in GardenComposterInventoryFeatures)")
+                    LorenzUtils.chat(
+                        "§c[SkyHanni] Error reading internal name for item '$itemName§c' " +
+                                "(in GardenComposterInventoryFeatures)"
+                    )
                     continue
                 }
-                val lowestBin = NEUItems.getPrice(internalName)
+                val lowestBin = internalName.getPrice()
                 val price = lowestBin * amount
                 fullPrice += price
                 val format = NumberUtil.format(price)

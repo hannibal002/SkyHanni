@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -22,9 +23,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardDisplay {
 
-    private val MAX_PERSONAL_GOALS = 20
-    private val MAX_COMMUNITY_GOALS = 5
-
     private var display = emptyList<String>()
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
@@ -33,7 +31,10 @@ class BingoCardDisplay {
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.bingo.bingoCard
+        private const val MAX_PERSONAL_GOALS = 20
+        private const val MAX_COMMUNITY_GOALS = 5
+
+        private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
         private var displayMode = 0
         val personalGoals = mutableListOf<PersonalGoal>()
         private val communityGoals = mutableListOf<CommunityGoal>()
@@ -138,18 +139,16 @@ class BingoCardDisplay {
     private var lastSneak = false
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        if (config.quickToggle) {
-            if (ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
-                val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-                if (lastSneak != sneaking) {
-                    lastSneak = sneaking
-                    if (sneaking) {
-                        toggleMode()
-                    }
+        if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
+            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+            if (lastSneak != sneaking) {
+                lastSneak = sneaking
+                if (sneaking) {
+                    toggleMode()
                 }
             }
         }
@@ -183,5 +182,10 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideCommunityGoals.onToggle { update() }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "bingo", "event.bingo")
     }
 }

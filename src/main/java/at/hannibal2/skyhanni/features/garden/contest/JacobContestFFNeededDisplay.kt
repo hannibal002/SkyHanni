@@ -59,14 +59,14 @@ class JacobContestFFNeededDisplay {
 
         val crop = contest.crop
         add(listOf("§7For this ", crop.icon, "§7${crop.cropName} contest:"))
-        for (bracket in ContestBracket.values()) {
+        for (bracket in ContestBracket.entries) {
             addAsSingletonList(getLine(bracket, contest.brackets, crop))
         }
         addAsSingletonList("")
 
         val (size, averages) = FarmingContestAPI.calculateAverages(crop)
         add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
-        for (bracket in ContestBracket.values()) {
+        for (bracket in ContestBracket.entries) {
             addAsSingletonList(getLine(bracket, averages, crop))
         }
         addAsSingletonList("")
@@ -124,7 +124,7 @@ class JacobContestFFNeededDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return

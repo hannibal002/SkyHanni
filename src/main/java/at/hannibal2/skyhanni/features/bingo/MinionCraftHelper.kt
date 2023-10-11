@@ -2,8 +2,12 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -16,8 +20,10 @@ import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
+    private val config get() = SkyHanniMod.feature.event.bingo
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
@@ -35,7 +41,7 @@ class MinionCraftHelper {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
+        if (!config.minionCraftHelperEnabled) return
 
         if (event.isMod(10)) {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
@@ -53,7 +59,6 @@ class MinionCraftHelper {
         }
 
         if (!event.isMod(3)) return
-//        if (!event.isMod(60)) return
 
         val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
 
@@ -90,7 +95,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName()
+            val rawId = item.getInternalName_old()
             if (isMinionName(name)) {
                 minions[name] = rawId
             }
@@ -101,7 +106,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName()
+            val rawId = item.getInternalName_old()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
@@ -144,6 +149,8 @@ class MinionCraftHelper {
                 if (internalId == "REVENANT_GENERATOR_1") continue
                 if (internalId == "TARANTULA_GENERATOR_1") continue
                 if (internalId == "VOIDLING_GENERATOR_1") continue
+                if (internalId == "INFERNO_GENERATOR_1") continue
+                if (internalId == "VAMPIRE_GENERATOR_1") continue
                 tierOneMinions.add(internalId)
             }
 
@@ -153,10 +160,8 @@ class MinionCraftHelper {
 
                     for (ingredient in recipe.ingredients) {
                         val id = ingredient.internalItemId
-                        if (!id.contains("_GENERATOR_")) {
-                            if (!allIngredients.contains(id)) {
-                                allIngredients.add(id)
-                            }
+                        if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
+                            allIngredients.add(id)
                         }
                     }
                 }
@@ -238,17 +243,17 @@ class MinionCraftHelper {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
+        if (!config.minionCraftHelperEnabled) return
 
-        SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
+        config.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
     }
 
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        TitleUtils.sendTitle("Can craft $minionName", 3_000)
+        TitleUtils.sendTitle("Can craft $minionName", 3.seconds)
         alreadyNotified.add(minionName)
     }
 
@@ -269,7 +274,7 @@ class MinionCraftHelper {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
-            val internalName = NEUItems.getInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
+            val internalName = NEUItems.getRawInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }

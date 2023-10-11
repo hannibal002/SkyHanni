@@ -39,7 +39,7 @@ class LorenzLogger(filePath: String) {
         try {
             createParent(File(fileName))
             val handler = FileHandler(fileName)
-            handler.encoding ="utf-8"
+            handler.encoding = "utf-8"
             logger.addHandler(handler)
             logger.useParentHandlers = false
             handler.formatter = object : Formatter() {
@@ -58,10 +58,8 @@ class LorenzLogger(filePath: String) {
 
     private fun createParent(file: File) {
         val parent = file.parentFile
-        if (parent != null) {
-            if (!parent.isDirectory) {
-                parent.mkdirs()
-            }
+        if (parent != null && !parent.isDirectory) {
+            parent.mkdirs()
         }
     }
 

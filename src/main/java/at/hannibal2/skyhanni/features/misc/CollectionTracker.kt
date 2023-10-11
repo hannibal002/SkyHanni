@@ -5,16 +5,19 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
 
 class CollectionTracker {
 
@@ -47,22 +50,19 @@ class CollectionTracker {
             val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
                 LorenzUtils.chat("§c[SkyHanni] Gemstone collection is not supported!")
-//                setNewCollection("GEMSTONE_COLLECTION", "Gemstone")
                 return
             } else if (rawName == "mushroom") {
                 LorenzUtils.chat("§c[SkyHanni] Mushroom collection is not supported!")
-//                setNewCollection("MUSHROOM_COLLECTION", "Mushroom")
                 return
             }
 
-//            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName) ?: rawName.replace(" ", "_")
             val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
             if (foundInternalName == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
                 return
             }
 
-            val stack = NEUItems.getItemStackOrNull(foundInternalName)
+            val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
                 return
@@ -97,7 +97,7 @@ class CollectionTracker {
         private fun setNewCollection(internalName: NEUInternalName, name: String) {
             val foundAmount = CollectionAPI.getCollectionCounter(internalName)
             if (foundAmount == null) {
-                LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (Maybe the API is disabled or try to open the collection inventory)")
+                LorenzUtils.chat("§c[SkyHanni] $name collection not found. Try to open the collection inventory!")
                 return
             }
             this.internalName = internalName
@@ -129,19 +129,27 @@ class CollectionTracker {
 
             display = Collections.singletonList(buildList {
                 internalName?.let {
-                    add(NEUItems.getItemStack(it))
+                    add(it.getItemStack())
                 }
                 add("$itemName collection: §e$format $gainText")
             })
         }
 
-        private fun countCurrentlyInInventory() =
-            InventoryUtils.countItemsInLowerInventory { it.getInternalName_new() == internalName }
+        private fun countCurrentlyInInventory(): Int {
+            val cactus = "CACTUS".asInternalName()
+            val cactusGreen = "INK_SACK-2".asInternalName()
+            return InventoryUtils.countItemsInLowerInventory {
+                if (internalName == cactus && it.getInternalName() == cactusGreen) {
+                    return@countItemsInLowerInventory true
+                }
+                it.getInternalName() == internalName
+            }
+        }
 
         fun handleTabComplete(command: String): List<String>? {
             if (command != "shtrackcollection") return null
 
-            return CollectionAPI.collectionValue.keys.mapNotNull { NEUItems.getItemStackOrNull(it) }
+            return CollectionAPI.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
                 .map { it.displayName.removeColor().replace(" ", "_") }
         }
     }
@@ -161,21 +169,17 @@ class CollectionTracker {
 
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
-        if (diff != 0) {
-            if (diff > 0) {
+        if (diff != 0 && diff > 0) {
                 gainItems(diff)
-            }
         }
 
         lastAmountInInventory = currentlyInInventory
     }
 
     private fun updateGain() {
-        if (recentGain != 0) {
-            if (System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
-                recentGain = 0
-                updateDisplay()
-            }
+        if (recentGain != 0 && System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
+            recentGain = 0
+            updateDisplay()
         }
     }
 
@@ -192,7 +196,7 @@ class CollectionTracker {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")

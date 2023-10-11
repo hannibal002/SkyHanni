@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -28,7 +29,7 @@ class SlayerItemsOnGround {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (entityItem in EntityUtils.getEntities<EntityItem>()) {
@@ -40,9 +41,9 @@ class SlayerItemsOnGround {
             if (SlayerAPI.ignoreSlayerDrop(name)) continue
             // happens in spiders den sometimes
             if (itemStack.item == Items.spawn_egg) continue
-            if (itemStack.getInternalName() == "") continue
+            if (itemStack.getInternalName_old() == "") continue
 
-            val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
+            val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack.getInternalName(), itemStack.stackSize)
             if (config.minimumPrice > price) continue
 
             itemsOnGround.put(entityItem, location to itemName)

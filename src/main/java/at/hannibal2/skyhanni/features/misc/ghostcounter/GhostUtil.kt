@@ -31,22 +31,32 @@ object GhostUtil {
         val hours = millis / 1000 / 60 / 60 % 24
         val days = millis / 1000 / 60 / 60 / 24
         return buildMap {
-            if (millis < 0) {
-                clear()
-            } else if (minutes == 0L && hours == 0L && days == 0L) {
-                put("seconds", seconds.toString())
-            } else if (hours == 0L && days == 0L) {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-            } else if (days == 0L) {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-                put("hours", hours.toString())
-            } else {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-                put("hours", hours.toString())
-                put("days", days.toString())
+            when {
+                millis < 0 -> {
+                    clear()
+                }
+
+                minutes == 0L && hours == 0L && days == 0L -> {
+                    put("seconds", seconds.toString())
+                }
+
+                hours == 0L && days == 0L -> {
+                    put("seconds", seconds.toString())
+                    put("minutes", minutes.toString())
+                }
+
+                days == 0L -> {
+                    put("seconds", seconds.toString())
+                    put("minutes", minutes.toString())
+                    put("hours", hours.toString())
+                }
+
+                else -> {
+                    put("seconds", seconds.toString())
+                    put("minutes", minutes.toString())
+                    put("hours", hours.toString())
+                    put("days", days.toString())
+                }
             }
         }
     }
@@ -58,7 +68,10 @@ object GhostUtil {
                 LorenzUtils.chat("§e[SkyHanni] §cYou already imported GhostCounterV3 data!")
                 return
             }
-            val json = ConfigManager.gson.fromJson(FileReader(GhostCounter.ghostCounterV3File), com.google.gson.JsonObject::class.java)
+            val json = ConfigManager.gson.fromJson(
+                FileReader(GhostCounter.ghostCounterV3File),
+                com.google.gson.JsonObject::class.java
+            )
             GhostData.Option.GHOSTSINCESORROW.add(json["ghostsSinceSorrow"].asDouble)
             GhostData.Option.SORROWCOUNT.add(json["sorrowCount"].asDouble)
             GhostData.Option.BAGOFCASH.add(json["BagOfCashCount"].asDouble)
@@ -75,33 +88,36 @@ object GhostUtil {
             LorenzUtils.chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
     }
 
-    fun String.formatText(value: Int, session: Int = -1): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
+    fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
+
+    fun String.formatText(value: Int, session: Int = -1) = Utils.chromaStringByColourCode(
+        this.replace("%value%", value.addSeparators())
             .replace("%session%", session.addSeparators())
-            .replace("&", "§"))
+            .replace("&", "§")
+    )
+
+    fun String.formatText(t: String) = Utils.chromaStringByColourCode(this.replace("%value%", t).replace("&", "§"))
+
+    fun String.preFormat(t: String, level: Int, nextLevel: Int) = if (nextLevel == 26) {
+        Utils.chromaStringByColourCode(
+            replace("%value%", t)
+                .replace("%display%", "25")
+        )
+    } else {
+        Utils.chromaStringByColourCode(
+            this.replace("%value%", t)
+                .replace(
+                    "%display%",
+                    "$level->${if (SkyHanniMod.feature.combat.ghostCounter.showMax) "25" else nextLevel}"
+                )
+        )
     }
 
-    fun String.formatText(t: String): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", t)
-            .replace("&", "§"))
-    }
-
-    fun String.preFormat(t: String, level: Int, nextLevel: Int): String {
-        return if (nextLevel == 26) {
-            val lol = Utils.chromaStringByColourCode(this.replace("%value%", t)
-                .replace("%display%", "25"))
-            lol
-        } else {
-            Utils.chromaStringByColourCode(this.replace("%value%", t)
-                .replace("%display%", "$level->${if (SkyHanniMod.feature.ghostCounter.showMax) "25" else nextLevel}"))
-        }
-    }
-
-    fun String.formatText(value: Double, session: Double): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", value.roundToPrecision(2).addSeparators())
+    fun String.formatText(value: Double, session: Double) = Utils.chromaStringByColourCode(
+        this.replace("%value%", value.roundToPrecision(2).addSeparators())
             .replace("%session%", session.roundToPrecision(2).addSeparators())
-            .replace("&", "§"))
-    }
+            .replace("&", "§")
+    )
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
         val bestiaryNextLevel = GhostCounter.hidden?.bestiaryNextLevel
@@ -111,7 +127,10 @@ object GhostUtil {
             ?: "§cNo Bestiary Level data!"
 
         return Utils.chromaStringByColourCode(
-            this.replace("%currentKill%", if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
+            this.replace(
+                "%currentKill%",
+                if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators()
+            )
                 .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
                 .replace("%killNeeded%", NumberUtil.format(killNeeded))
                 .replace("%currentLevel%", currentLevel)
@@ -120,7 +139,6 @@ object GhostUtil {
         )
     }
 
-    private fun percent(number: Double): String {
-        return "${((number / 250_000) * 100).roundToPrecision(4)}"
-    }
+    private fun percent(number: Double) =
+        100.0.coerceAtMost(((number / 250_000) * 100).roundToPrecision(4)).toString()
 }

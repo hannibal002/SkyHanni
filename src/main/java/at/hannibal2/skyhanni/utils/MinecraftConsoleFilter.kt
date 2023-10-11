@@ -39,30 +39,22 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         val formattedMessage = message.formattedMessage
         val thrown = event.thrown
 
-        if (SkyHanniMod.feature.dev.filterChat) {
-            if (formattedMessage.startsWith("[CHAT] ")) {
-                filterConsole("chat")
-                return Filter.Result.DENY
-            }
+        if (SkyHanniMod.feature.dev.filterChat && formattedMessage.startsWith("[CHAT] ")) {
+            filterConsole("chat")
+            return Filter.Result.DENY
         }
-        if (SkyHanniMod.feature.dev.filterGrowBuffer) {
-            if (formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
-                filterConsole("Grow BufferBuilder buffer")
-                return Filter.Result.DENY
-            }
+        if (SkyHanniMod.feature.dev.filterGrowBuffer && formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
+            filterConsole("Grow BufferBuilder buffer")
+            return Filter.Result.DENY
         }
-        if (SkyHanniMod.feature.dev.filterUnknownSound) {
-            if (formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
-                filterConsole("Unknown soundEvent (minecraft:)")
-                return Filter.Result.DENY
-            }
+        if (SkyHanniMod.feature.dev.filterUnknownSound && formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
+            filterConsole("Unknown soundEvent (minecraft:)")
+            return Filter.Result.DENY
         }
         //TODO testing
-        if (SkyHanniMod.feature.dev.filterParticleVillagerHappy) {
-            if (formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
-                filterConsole("particle VILLAGER_HAPPY")
-                return Filter.Result.DENY
-            }
+        if (SkyHanniMod.feature.dev.filterParticleVillagerHappy && formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
+            filterConsole("particle VILLAGER_HAPPY")
+            return Filter.Result.DENY
         }
 
         if (SkyHanniMod.feature.dev.filterOptiFine) {
@@ -75,18 +67,14 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 return Filter.Result.DENY
             }
         }
-        if (loggerName == "AsmHelper") {
-            if (SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
+        if (loggerName == "AsmHelper" && SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
                 if (formattedMessage.startsWith("Transforming class ")) {
                     filterConsole("AsmHelper Transforming")
                     return Filter.Result.DENY
-                }
             }
-            if (SkyHanniMod.feature.dev.filterAsmHelperApplying) {
-                if (formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
-                    filterConsole("AsmHelper Applying AsmWriter")
-                    return Filter.Result.DENY
-                }
+            if (SkyHanniMod.feature.dev.filterAsmHelperApplying && formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
+                filterConsole("AsmHelper Applying AsmWriter")
+                return Filter.Result.DENY
             }
         }
 
@@ -125,36 +113,31 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
 
-        if (thrown != null) {
+        if (thrown != null  && SkyHanniMod.feature.dev.filterScoreboardErrors) {
             val cause = thrown.cause
-            if (cause != null) {
-                if (cause.stackTrace.isNotEmpty()) {
-                    val first = cause.stackTrace[0]
-                    if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
-                        val firstName = first.toString()
-                        if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
-                            firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
-                        ) {
-                            filterConsole("NullPointerException at Scoreboard.removeTeam")
-                            return Filter.Result.DENY
-                        }
-                        if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
-                            filterConsole("IllegalArgumentException at Scoreboard.createTeam")
-                            return Filter.Result.DENY
-                        }
-                        if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
-                            firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)") {
-                            filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
-                            return Filter.Result.DENY
-                        }
-                    }
-                }
-            }
-            if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
-                if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
-                    filterConsole("IllegalArgumentException because scoreboard team already exists")
+            if (cause != null && cause.stackTrace.isNotEmpty()) {
+                val first = cause.stackTrace[0]
+                val firstName = first.toString()
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
+                ) {
+                    filterConsole("NullPointerException at Scoreboard.removeTeam")
                     return Filter.Result.DENY
                 }
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
+                    filterConsole("IllegalArgumentException at Scoreboard.createTeam")
+                    return Filter.Result.DENY
+                }
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
+                ) {
+                    filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
+                    return Filter.Result.DENY
+                }
+            }
+            if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
+                filterConsole("IllegalArgumentException because scoreboard team already exists")
+                return Filter.Result.DENY
             }
         }
 
@@ -177,19 +160,17 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             debug("marker is null")
         }
         debug("thrown: '$thrown'")
-        if (thrown != null) {
-            if (thrown.stackTrace.isNotEmpty()) {
-                var element = thrown.stackTrace[0]
-                debug("thrown first element: '$element'")
-                val cause = thrown.cause
-                if (cause != null) {
-                    debug("throw cause: '$cause'")
-                    if (cause.stackTrace.isNotEmpty()) {
-                        element = cause.stackTrace[0]
-                        debug("thrown cause first element: '$element'")
-                    } else {
-                        debug("thrown cause has no elements")
-                    }
+        if (thrown != null && thrown.stackTrace.isNotEmpty()) {
+            var element = thrown.stackTrace[0]
+            debug("thrown first element: '$element'")
+            val cause = thrown.cause
+            if (cause != null) {
+                debug("throw cause: '$cause'")
+                if (cause.stackTrace.isNotEmpty()) {
+                    element = cause.stackTrace[0]
+                    debug("thrown cause first element: '$element'")
+                } else {
+                    debug("thrown cause has no elements")
                 }
             }
         }

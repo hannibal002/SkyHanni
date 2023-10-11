@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -11,12 +12,17 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PlayerTabComplete {
-    private val config get() = SkyHanniMod.feature.misc.tabCompleteCommands
+    private val config get() = SkyHanniMod.feature.commands.tabComplete
     private var vipVisitsJson: VipVisitsJson? = null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         vipVisitsJson = event.getConstant<VipVisitsJson>("VipVisits")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.tabCompleteCommands", "commands.tabComplete")
     }
 
     enum class PlayerCategory {
@@ -49,38 +55,29 @@ object PlayerTabComplete {
 
         return buildList {
 
-            if (config.friends) {
-                if (PlayerCategory.FRIENDS !in ignored) {
-                    FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
-                        .forEach { add(it.name) }
-                }
+            if (config.friends && PlayerCategory.FRIENDS !in ignored) {
+                FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
+                    .forEach { add(it.name) }
             }
 
-            if (config.islandPlayers) {
-                if (PlayerCategory.ISLAND_PLAYERS !in ignored) {
-                    for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
-                        if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
-                            add(entity.name)
-                        }
+            if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in ignored) {
+                for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
+                    if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
+                        add(entity.name)
                     }
                 }
             }
 
-            if (config.party) {
-                if (PlayerCategory.PARTY !in ignored) {
-                    for (member in PartyAPI.partyMembers) {
-                        add(member)
-                    }
+            if (config.party && PlayerCategory.PARTY !in ignored) {
+                for (member in PartyAPI.partyMembers) {
+                    add(member)
                 }
-
             }
 
-            if (config.vipVisits) {
-                if (command == "visit") {
-                    vipVisitsJson?.let {
-                        for (visit in it.vipVisits) {
-                            add(visit)
-                        }
+            if (config.vipVisits && command == "visit") {
+                vipVisitsJson?.let {
+                    for (visit in it.vipVisits) {
+                        add(visit)
                     }
                 }
             }

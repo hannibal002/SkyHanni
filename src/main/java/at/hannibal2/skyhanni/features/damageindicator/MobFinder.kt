@@ -1,28 +1,42 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.monster.*
+import net.minecraft.entity.monster.EntityBlaze
+import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.monster.EntityGhast
+import net.minecraft.entity.monster.EntityGiantZombie
+import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntityIronGolem
+import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.monster.EntityPigZombie
+import net.minecraft.entity.monster.EntitySkeleton
+import net.minecraft.entity.monster.EntitySlime
+import net.minecraft.entity.monster.EntitySpider
+import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
-import java.util.*
+import java.util.UUID
 
 class MobFinder {
 
@@ -63,135 +77,99 @@ class MobFinder {
 
     internal fun tryAdd(entity: EntityLivingBase): EntityResult? {
         if (LorenzUtils.inDungeons) {
-            if (DungeonData.isOneOf("F1", "M1")) {
-                if (floor1bonzo1) {
-                    if (entity is EntityOtherPlayerMP) {
-                        if (entity.name == "Bonzo ") {
-                            return EntityResult(floor1bonzo1SpawnTime)
-                        }
-                    }
+            if (DungeonAPI.isOneOf("F1", "M1")) {
+                if (floor1bonzo1 && entity is EntityOtherPlayerMP && entity.name == "Bonzo ") {
+                    return EntityResult(floor1bonzo1SpawnTime)
                 }
-                if (floor1bonzo2) {
-                    if (entity is EntityOtherPlayerMP) {
-                        if (entity.name == "Bonzo ") {
-                            return EntityResult(floor1bonzo2SpawnTime, finalDungeonBoss = true)
-                        }
-                    }
+                if (floor1bonzo2 && entity is EntityOtherPlayerMP && entity.name == "Bonzo ") {
+                    return EntityResult(floor1bonzo2SpawnTime, finalDungeonBoss = true)
                 }
             }
 
-            if (DungeonData.isOneOf("F2", "M2")) {
-                if (entity.name == "Summon ") {
-                    if (entity is EntityOtherPlayerMP) {
-                        if (floor2summons1) {
-                            if (!floor2summonsDiedOnce.contains(entity)) {
-                                if (entity.health.toInt() != 0) {
-                                    return EntityResult(floor2summons1SpawnTime)
-                                } else {
-                                    floor2summonsDiedOnce.add(entity)
-                                }
-                            }
-                        }
-                        if (floor2secondPhase) {
-                            return EntityResult(floor2secondPhaseSpawnTime)
-                        }
-                    }
-                }
-
-                if (floor2secondPhase) {
-                    if (entity is EntityOtherPlayerMP) {
-                        //TODO only show scarf after (all/at least x) summons are dead?
-                        val result = entity.name == "Scarf "
-                        if (result) {
-                            return EntityResult(floor2secondPhaseSpawnTime, finalDungeonBoss = true)
-                        }
-                    }
-                }
-            }
-
-            if (DungeonData.isOneOf("F3", "M3")) {
-                if (entity is EntityGuardian) {
-                    if (floor3GuardianShield) {
-                        if (guardians.size == 4) {
-                            var totalHealth = 0
-                            for (guardian in guardians) {
-                                totalHealth += guardian.health.toInt()
-                            }
-                            if (totalHealth == 0) {
-                                floor3GuardianShield = false
-                                guardians.clear()
-                            }
+            if (DungeonAPI.isOneOf("F2", "M2")) {
+                if (entity.name == "Summon " && entity is EntityOtherPlayerMP) {
+                    if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
+                        if (entity.health.toInt() != 0) {
+                            return EntityResult(floor2summons1SpawnTime)
                         } else {
-                            findGuardians()
+                            floor2summonsDiedOnce.add(entity)
                         }
-                        if (guardians.contains(entity)) {
-                            return EntityResult(floor3GuardianShieldSpawnTime, true)
-                        }
+                    }
+                    if (floor2secondPhase) {
+                        return EntityResult(floor2secondPhaseSpawnTime)
                     }
                 }
 
-                if (floor3Professor) {
-                    if (entity is EntityOtherPlayerMP) {
-                        if (entity.name == "The Professor") {
-                            return EntityResult(
-                                floor3ProfessorSpawnTime,
-                                floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis()
-                            )
-                        }
-                    }
-                }
-                if (floor3ProfessorGuardianPrepare) {
-                    if (entity is EntityOtherPlayerMP) {
-                        if (entity.name == "The Professor") {
-                            return EntityResult(floor3ProfessorGuardianPrepareSpawnTime, true)
-                        }
-                    }
-                }
-
-                if (entity is EntityGuardian) {
-                    if (floor3ProfessorGuardian) {
-                        if (entity == floor3ProfessorGuardianEntity) {
-                            return EntityResult(finalDungeonBoss = true)
-                        }
+                if (floor2secondPhase && entity is EntityOtherPlayerMP) {
+                    //TODO only show scarf after (all/at least x) summons are dead?
+                    val result = entity.name == "Scarf "
+                    if (result) {
+                        return EntityResult(floor2secondPhaseSpawnTime, finalDungeonBoss = true)
                     }
                 }
             }
 
-            if (DungeonData.isOneOf("F4", "M4")) {
-                if (entity is EntityGhast) {
+            if (DungeonAPI.isOneOf("F3", "M3")) {
+                if (entity is EntityGuardian && floor3GuardianShield) {
+                    if (guardians.size == 4) {
+                        var totalHealth = 0
+                        for (guardian in guardians) {
+                            totalHealth += guardian.health.toInt()
+                        }
+                        if (totalHealth == 0) {
+                            floor3GuardianShield = false
+                            guardians.clear()
+                        }
+                    } else {
+                        findGuardians()
+                    }
+                    if (guardians.contains(entity)) {
+                        return EntityResult(floor3GuardianShieldSpawnTime, true)
+                    }
+                }
+
+                if (floor3Professor && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
                     return EntityResult(
-                        bossType = BossType.DUNGEON_F4_THORN,
-                        ignoreBlocks = true,
-                        finalDungeonBoss = true
+                        floor3ProfessorSpawnTime,
+                        floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis()
                     )
                 }
-            }
+                if (floor3ProfessorGuardianPrepare && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
+                    return EntityResult(floor3ProfessorGuardianPrepareSpawnTime, true)
+                }
 
-            if (DungeonData.isOneOf("F5", "M5")) {
-                if (entity is EntityOtherPlayerMP) {
-                    if (entity == DungeonLividFinder.livid) {
-                        return EntityResult(
-                            bossType = BossType.DUNGEON_F5,
-                            ignoreBlocks = true,
-                            finalDungeonBoss = true
-                        )
-                    }
+                if (entity is EntityGuardian && floor3ProfessorGuardian && entity == floor3ProfessorGuardianEntity) {
+                    return EntityResult(finalDungeonBoss = true)
                 }
             }
 
-            if (DungeonData.isOneOf("F6", "M6")) {
-                if (entity is EntityGiantZombie && !entity.isInvisible) {
-                    if (floor6Giants && entity.posY > 68) {
-                        val extraDelay = checkExtraF6GiantsDelay(entity)
-                        return EntityResult(
-                            floor6GiantsSpawnTime + extraDelay,
-                            floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis()
-                        )
-                    }
+            if (DungeonAPI.isOneOf("F4", "M4") && entity is EntityGhast) {
+                return EntityResult(
+                    bossType = BossType.DUNGEON_F4_THORN,
+                    ignoreBlocks = true,
+                    finalDungeonBoss = true
+                )
+            }
 
-                    if (floor6Sadan) {
-                        return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true)
-                    }
+            if (DungeonAPI.isOneOf("F5", "M5") && entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid) {
+                return EntityResult(
+                    bossType = BossType.DUNGEON_F5,
+                    ignoreBlocks = true,
+                    finalDungeonBoss = true
+                )
+            }
+
+            if (DungeonAPI.isOneOf("F6", "M6") && entity is EntityGiantZombie && !entity.isInvisible) {
+                if (floor6Giants && entity.posY > 68) {
+                    val extraDelay = checkExtraF6GiantsDelay(entity)
+                    return EntityResult(
+                        floor6GiantsSpawnTime + extraDelay,
+                        floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis()
+                    )
+                }
+
+                if (floor6Sadan) {
+                    return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true)
                 }
             }
         } else if (RiftAPI.inRift()) {
@@ -202,101 +180,87 @@ class MobFinder {
 
                 if (entity.name == "Bloodfiend ") {
                     when {
-                        entity.hasMaxHealth(625) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
-                        entity.hasMaxHealth(1_100) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
-                        entity.hasMaxHealth(1_800) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
-                        entity.hasMaxHealth(2_400) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
-                        entity.hasMaxHealth(3_000) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                        entity.hasMaxHealth(625, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                        entity.hasMaxHealth(1_100, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                        entity.hasMaxHealth(1_800, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                        entity.hasMaxHealth(2_400, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                        entity.hasMaxHealth(3_000, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
                     }
                 }
             }
-            if (entity is EntitySlime) {
-                if (entity.baseMaxHealth == 1_000) {
-                    return EntityResult(bossType = BossType.BACTE)
-                }
+            if (entity is EntitySlime && entity.baseMaxHealth == 1_000) {
+                return EntityResult(bossType = BossType.BACTE)
             }
         } else {
-            if (entity is EntityBlaze) {
-                if (entity.name != "Dinnerbone") {
-                    if (entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ")) {
-                        if (entity.hasMaxHealth(50_000_000)) {
-                            return EntityResult(bossType = BossType.NETHER_ASHFANG)
-                        }
-                    }
-                }
+            if (entity is EntityBlaze && entity.name != "Dinnerbone" && entity.hasNameTagWith(
+                    2,
+                    "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r "
+                ) && entity.hasMaxHealth(50_000_000, true)
+            ) {
+                return EntityResult(bossType = BossType.NETHER_ASHFANG)
             }
-            if (entity is EntitySkeleton) {
-                if (entity.hasNameTagWith(5, "§e﴾ §8[§7Lv200§8] §l§8§lBladesoul§r ")) {
-                    return EntityResult(bossType = BossType.NETHER_BLADESOUL)
-                }
+            if (entity is EntitySkeleton && entity.hasNameTagWith(5, "§e﴾ §8[§7Lv200§8] §l§8§lBladesoul§r ")) {
+                return EntityResult(bossType = BossType.NETHER_BLADESOUL)
             }
             if (entity is EntityOtherPlayerMP) {
                 if (entity.name == "Mage Outlaw") {
                     return EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
                 }
-                if (entity.name == "DukeBarb ") {
-                    if (entity.getLorenzVec().distanceToPlayer() < 30) {
-                        return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
-                    }
+                if (entity.name == "DukeBarb " && entity.getLorenzVec().distanceToPlayer() < 30) {
+                    return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
                 }
             }
-            if (entity is EntityWither) {
-                if (entity.hasNameTagWith(4, "§8[§7Lv100§8] §c§5Vanquisher§r ")) {
-                    return EntityResult(bossType = BossType.NETHER_VANQUISHER)
-                }
+            if (entity is EntityWither && entity.hasNameTagWith(4, "§8[§7Lv100§8] §c§5Vanquisher§r ")) {
+                return EntityResult(bossType = BossType.NETHER_VANQUISHER)
             }
-            if (entity is EntityEnderman) {
-                if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
-                    when {
-                        entity.hasMaxHealth(300_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
-                        entity.hasMaxHealth(12_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
-                        entity.hasMaxHealth(50_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
-                        entity.hasMaxHealth(210_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
-                    }
+            if (entity is EntityEnderman && entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
+                when {
+                    entity.hasMaxHealth(300_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
+                    entity.hasMaxHealth(12_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+                    entity.hasMaxHealth(50_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
+                    entity.hasMaxHealth(210_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
                 }
             }
             if (entity is EntityDragon) {
                 //TODO testing and use sidebar data
-                return EntityResult(bossType = BossType.END_ENDER_DRAGON)
-            }
-            if (entity is EntityIronGolem) {
-                if (entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
-                    return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
+                if (IslandType.THE_END.isInIsland()) {
+                    return EntityResult(bossType = BossType.END_ENDER_DRAGON)
+                } else if (IslandType.WINTER.isInIsland()) {
+                    return EntityResult(bossType = BossType.WINTER_REINDRAKE)
                 }
+            }
+            if (entity is EntityIronGolem && entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
+                return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
             }
             if (entity is EntityZombie) {
                 if (entity.hasNameTagWith(2, "§c☠ §bRevenant Horror")) {
                     when {
-                        entity.hasMaxHealth(500) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
-                        entity.hasMaxHealth(20_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
-                        entity.hasMaxHealth(400_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
-                        entity.hasMaxHealth(1_500_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
+                        entity.hasMaxHealth(500, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
+                        entity.hasMaxHealth(20_000, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
+                        entity.hasMaxHealth(400_000, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
+                        entity.hasMaxHealth(1_500_000, true) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
                     }
                 }
-                if (entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ")) {
-                    if (entity.hasMaxHealth(10_000_000)) {
-                        return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
-                    }
+                if (entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ") && entity.hasMaxHealth(10_000_000, true)) {
+                    return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
                 }
             }
-            if (entity is EntityLiving) {
-                if (entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
-                    return EntityResult(bossType = BossType.DUMMY)
-                }
+            if (entity is EntityLiving && entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
+                return EntityResult(bossType = BossType.DUMMY)
             }
-            if (entity is EntityMagmaCube) {
-                if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
-                    if (entity.hasMaxHealth(200_000_000)) {
-                        return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
-                    }
-                }
+            if (entity is EntityMagmaCube && entity.hasNameTagWith(
+                    15,
+                    "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r "
+                ) && entity.hasMaxHealth(200_000_000, true)
+            ) {
+                return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
             }
-            if (entity is EntityHorse) {
-                if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
-                    if (entity.hasMaxHealth(3_000_000)) {
-                        return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
-                    }
-                }
+            if (entity is EntityHorse && entity.hasNameTagWith(
+                    15,
+                    "§8[§7Lv100§8] §c§6Headless Horseman§r "
+                ) && entity.hasMaxHealth(3_000_000, true)
+            ) {
+                return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
             }
             if (entity is EntityBlaze && entity.hasNameTagWith(2, "§c☠ §bInferno Demonlord ")) {
                 when {
@@ -326,22 +290,20 @@ class MobFinder {
             if (entity is EntitySpider) {
                 if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
                     when {
-                        entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-                        entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-                        entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-                        entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+                        entity.hasMaxHealth(740, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                        entity.hasMaxHealth(30_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                        entity.hasMaxHealth(900_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                        entity.hasMaxHealth(2_400_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
                     }
                 }
                 checkArachne(entity)?.let { return it }
             }
-            if (entity is EntityWolf) {
-                if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
-                    when {
-                        entity.hasMaxHealth(2_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
-                        entity.hasMaxHealth(40_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
-                        entity.hasMaxHealth(750_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
-                        entity.hasMaxHealth(2_000_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
-                    }
+            if (entity is EntityWolf && entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
+                when {
+                    entity.hasMaxHealth(2_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
+                    entity.hasMaxHealth(40_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
+                    entity.hasMaxHealth(750_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
+                    entity.hasMaxHealth(2_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
                 }
             }
             if (entity is EntityOtherPlayerMP) {
@@ -349,21 +311,15 @@ class MobFinder {
                 if (entity.name == "Minos Champion") return EntityResult(bossType = BossType.MINOS_CHAMPION)
                 if (entity.name == "Minotaur ") return EntityResult(bossType = BossType.MINOTAUR)
             }
-            if (entity is EntityIronGolem) {
-                if (entity.hasMaxHealth(1_500_000)) {
-                    return EntityResult(bossType = BossType.GAIA_CONSTURUCT)
-                }
+            if (entity is EntityIronGolem && entity.hasMaxHealth(1_500_000)) {
+                return EntityResult(bossType = BossType.GAIA_CONSTURUCT)
             }
-            if (entity is EntityGuardian) {
-                if (entity.hasMaxHealth(35_000_000)) {
-                    return EntityResult(bossType = BossType.THUNDER)
-                }
+            if (entity is EntityGuardian && entity.hasMaxHealth(35_000_000)) {
+                return EntityResult(bossType = BossType.THUNDER)
             }
 
-            if (entity is EntityIronGolem) {
-                if (entity.hasMaxHealth(100_000_000)) {
-                    return EntityResult(bossType = BossType.LORD_JAWBUS)
-                }
+            if (entity is EntityIronGolem && entity.hasMaxHealth(100_000_000)) {
+                return EntityResult(bossType = BossType.LORD_JAWBUS)
             }
         }
 
@@ -375,52 +331,19 @@ class MobFinder {
             entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne")
         ) {
             val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12) {
-                markArachneMinis(entity)
-                return null
-            }
-            if (maxHealth == 4000) {
-                markArachneMinis(entity)
-                return null
-            }
-            markArachne(entity)
+            // Ignore the minis
+            if (maxHealth == 12 || maxHealth.derpy() == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_SMALL)
         }
         if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) {
             val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12) {
-                markArachneMinis(entity)
-                return null
-            }
-            if (maxHealth == 20000) {
-                markArachneMinis(entity)
-                return null
-            }
-            markArachne(entity)
+            if (maxHealth == 12 || maxHealth.derpy() == 20_000) return null
             return EntityResult(bossType = BossType.ARACHNE_BIG)
         }
 
         return null
-    }
-
-    private val arachneBossHighlighter get() = SkyHanniMod.feature.mobs.arachneBossHighlighter
-
-    private fun markArachneMinis(entity: EntityLivingBase) {
-        if (arachneBossHighlighter) {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.GOLD.toColor().withAlpha(50))
-            { arachneBossHighlighter }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { arachneBossHighlighter }
-        }
-    }
-
-    private fun markArachne(entity: EntityLivingBase) {
-        if (arachneBossHighlighter) {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
-            { arachneBossHighlighter }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { arachneBossHighlighter }
-        }
     }
 
     private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Long {
@@ -564,15 +487,11 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (LorenzUtils.inDungeons) {
-            if (floor3ProfessorGuardian) {
-                if (entity is EntityGuardian) {
-                    if (floor3ProfessorGuardianEntity == null) {
-                        floor3ProfessorGuardianEntity = entity
-                        floor3ProfessorGuardianPrepare = false
-                    }
-                }
-            }
+        if (LorenzUtils.inDungeons && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
+
+            floor3ProfessorGuardianEntity = entity
+            floor3ProfessorGuardianPrepare = false
+
         }
     }
 
@@ -581,12 +500,12 @@ class MobFinder {
 
         for (entity in EntityUtils.getEntities<EntityGuardian>()) {
             //F3
-            if (entity.hasMaxHealth(1_000_000) || entity.hasMaxHealth(1_200_000)) {
+            if (entity.hasMaxHealth(1_000_000, true) || entity.hasMaxHealth(1_200_000, true)) {
                 guardians.add(entity)
             }
 
             //M3
-            if (entity.hasMaxHealth(120_000_000) || entity.hasMaxHealth(240_000_000)) {
+            if (entity.hasMaxHealth(120_000_000, true) || entity.hasMaxHealth(240_000_000, true)) {
                 guardians.add(entity)
             }
         }

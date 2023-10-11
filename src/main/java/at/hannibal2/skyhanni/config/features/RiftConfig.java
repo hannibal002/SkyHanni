@@ -1,8 +1,15 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftConfig {
@@ -17,10 +24,11 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the remaining rift time, max time, percentage, and extra time changes.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Max time", desc = "Show max time.")
+        @ConfigOption(name = "Max Time", desc = "Show max time.")
         @ConfigEditorBoolean
         public boolean maxTime = true;
 
@@ -37,12 +45,13 @@ public class RiftConfig {
     @ConfigOption(name = "Crux Talisman Progress", desc = "")
     @Accordion
     @Expose
-    public CruxTalisman cruxTalisman = new CruxTalisman();
+    public CruxTalismanDisplay cruxTalisman = new CruxTalismanDisplay();
 
-    public static class CruxTalisman {
+    public static class CruxTalismanDisplay {
         @Expose
         @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = false;
 
         @Expose
@@ -53,6 +62,7 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Show Bonuses", desc = "Show bonuses you get from the talisman.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public Property<Boolean> showBonuses = Property.of(true);
 
         @Expose
@@ -69,6 +79,7 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Click on Enigma Souls in Rift Guides to highlight their location.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
@@ -96,6 +107,7 @@ public class RiftConfig {
             @ConfigOption(name = "Shy Crux Warning", desc = "Shows a warning when a Shy Crux is going to steal your time. " +
                     "Useful if you play without volume.")
             @ConfigEditorBoolean
+            @FeatureToggle
             public boolean shyWarning = true;
 
             @ConfigOption(name = "Larvas", desc = "")
@@ -108,6 +120,7 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Highlight", desc = "Highlight §cLarvas on trees §7while holding a §eLarva Hook §7in the hand.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean highlight = true;
 
                 @Expose
@@ -128,6 +141,7 @@ public class RiftConfig {
                 @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding a " +
                         "§eEmpty Odonata Bottle §7in the hand.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean highlight = true;
 
                 @Expose
@@ -155,16 +169,19 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Hacking Solver", desc = "Highlights the correct button to click in the hacking inventory.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean solver = true;
 
                 @Expose
-                @ConfigOption(name = "Color Guide", desc = "Tells you which colour to pick.")
+                @ConfigOption(name = "Color Guide", desc = "Tells you which color to pick.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean colour = true;
 
                 @Expose
                 @ConfigOption(name = "Terminal Waypoints", desc = "While wearing the helmet, waypoints will appear at each terminal location.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean waypoints = true;
             }
         }
@@ -179,6 +196,7 @@ public class RiftConfig {
             @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) " +
                     "§7changes color from brown to red and is breakable.")
             @ConfigEditorBoolean
+            @FeatureToggle
             public boolean agaricusCap = true;
 
             @ConfigOption(name = "Volt Crux", desc = "")
@@ -189,23 +207,26 @@ public class RiftConfig {
             public static class VoltCruxConfig {
 
                 @Expose
-                @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a volt is discharging lightning.")
+                @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a Volt is discharging lightning.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean voltWarning = true;
 
                 @Expose
                 @ConfigOption(name = "Volt Range Highlighter", desc = "Shows the area in which a Volt might strike lightning.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean voltRange = true;
 
                 @Expose
-                @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the volt range be highlighted?")
+                @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the Volt range be highlighted?")
                 @ConfigEditorColour
                 public String voltColour = "0:60:0:0:255";
 
                 @Expose
-                @ConfigOption(name = "Volt mood color", desc = "Change the color of the volt enemy depending on their mood.")
+                @ConfigOption(name = "Volt Mood Color", desc = "Change the color of the Volt enemy depending on their mood.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean voltMoodMeter = false;
             }
 
@@ -219,6 +240,7 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Show Wilted Berberis helper.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = true;
 
                 @Expose
@@ -227,14 +249,14 @@ public class RiftConfig {
                 public boolean onlyOnFarmland = false;
 
                 @Expose
-                @ConfigOption(name = "Hide Particles", desc = "Hide the wilted berberis particles.")
+                @ConfigOption(name = "Hide Particles", desc = "Hide the Wilted Berberis particles.")
                 @ConfigEditorBoolean
                 public boolean hideparticles = false;
 
             }
         }
 
-        @ConfigOption(name = "Mirror Verse", desc = "")
+        @ConfigOption(name = "Mirrorverse", desc = "")
         @Accordion
         @Expose
         public MirrorVerse mirrorVerseConfig = new MirrorVerse();
@@ -249,8 +271,9 @@ public class RiftConfig {
             public static class LavaMazeConfig {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the mirror verse by showing the correct way.")
+                @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the Mirrorverse by showing the correct way.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = true;
 
                 @Expose
@@ -269,8 +292,9 @@ public class RiftConfig {
                 public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+                @ConfigOption(name = "Hide Others Players", desc = "Hide other players while doing the lava maze.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean hidePlayers = false;
             }
 
@@ -283,8 +307,9 @@ public class RiftConfig {
             public static class UpsideDownParkour {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the mirror verse by showing the correct way.")
+                @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the Mirrorverse by showing the correct way.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = true;
 
                 @Expose
@@ -308,8 +333,9 @@ public class RiftConfig {
                 public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the upside down parkour.")
+                @ConfigOption(name = "Hide Others Players", desc = "Hide other players while doing the upside down parkour.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean hidePlayers = false;
             }
 
@@ -322,12 +348,13 @@ public class RiftConfig {
             public static class DanceRoomHelper {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
+                @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = false;
 
                 @Expose
-                @ConfigOption(name = "Lines to show", desc = "How many tasks you should see.")
+                @ConfigOption(name = "Lines to Show", desc = "How many tasks you should see.")
                 @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
                 public int lineToShow = 3;
 
@@ -337,13 +364,14 @@ public class RiftConfig {
                 public int extraSpace = 0;
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players inside the dance room.")
+                @ConfigOption(name = "Hide Other Players", desc = "Hide other players inside the dance room.")
                 @ConfigEditorBoolean
                 public boolean hidePlayers = false;
 
                 @Expose
                 @ConfigOption(name = "Hide Title", desc = "Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean hideOriginalTitle = false;
 
                 @Expose
@@ -426,6 +454,7 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Highlights the location of the invisible Tubulator blocks (Laser Parkour).")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = true;
 
                 @Expose
@@ -449,8 +478,9 @@ public class RiftConfig {
                 public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+                @ConfigOption(name = "Hide Other Players", desc = "Hide other players while doing the lava maze.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean hidePlayers = false;
             }
         }
@@ -479,8 +509,9 @@ public class RiftConfig {
             public static class LivingMetalSuitProgress {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Display progress Living Metal Suit")
+                @ConfigOption(name = "Enabled", desc = "Display Living Metal Suit progress.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = false;
 
                 @Expose
@@ -502,11 +533,13 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Show a line between Defense blocks and the mob and highlight the blocks.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = true;
 
                 @Expose
-                @ConfigOption(name = "Hide Particles", desc = "Hide particles around Defense Blocks")
+                @ConfigOption(name = "Hide Particles", desc = "Hide particles around Defense Blocks.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean hideParticles = false;
 
                 @Expose
@@ -526,11 +559,13 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Living Metal", desc = "Show a moving animation between Living Metal and the next block.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = true;
 
                 @Expose
                 @ConfigOption(name = "Hide Particles", desc = "Hide Living Metal particles.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean hideParticles = false;
 
             }
@@ -546,6 +581,7 @@ public class RiftConfig {
             @Expose
             @ConfigOption(name = "Highlight Blobbercysts", desc = "Highlight Blobbercysts in Bacte fight.")
             @ConfigEditorBoolean
+            @FeatureToggle
             public boolean highlightBlobbercysts = true;
         }
 
@@ -564,13 +600,15 @@ public class RiftConfig {
             public static class EffigiesConfig {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Show locations of inactive Blood Effigy.")
+                @ConfigOption(name = "Enabled", desc = "Show locations of inactive Blood Effigies.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean enabled = false;
 
                 @Expose
                 @ConfigOption(name = "Respawning Soon", desc = "Show effigies that are about to respawn.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean respawningSoon = false;
 
                 @Expose
@@ -585,6 +623,7 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Unknown Times", desc = "Show effigies without known time.")
                 @ConfigEditorBoolean
+                @FeatureToggle
                 public boolean unknownTime = false;
             }
         }
@@ -610,26 +649,28 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean showPrice = true;
 
         @Expose
         @ConfigOption(name = "Burger Stacks", desc = "Set your McGrubber's burger stacks.")
-        @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
+        @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 5)
         public int burgerStacks = 0;
 
         @Expose
-        @ConfigOption(name = "Inventory value", desc = "")
+        @ConfigOption(name = "Inventory Value", desc = "")
         @Accordion
         public InventoryValue inventoryValue = new InventoryValue();
 
         public static class InventoryValue {
             @Expose
-            @ConfigOption(name = "Inventory value", desc = "Show total Motes NPC price for the current opened inventory.")
+            @ConfigOption(name = "Inventory Value", desc = "Show total Motes NPC price for the current opened inventory.")
             @ConfigEditorBoolean
+            @FeatureToggle
             public boolean enabled = true;
 
             @Expose
-            @ConfigOption(name = "Number format type", desc = "Short: 1.2M\n" +
+            @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
                     "Long: 1,200,000")
             @ConfigEditorDropdown(values = {"Short", "Long"})
             public int formatType = 0;
@@ -649,11 +690,13 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Highlight Motes Orbs", desc = "Highlight flying Motes Orbs.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Hide Particles", desc = "Hide normal motes orbs particles.")
+        @ConfigOption(name = "Hide Particles", desc = "Hide normal Motes Orbs particles.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean hideParticles = false;
 
     }
@@ -661,10 +704,12 @@ public class RiftConfig {
     @Expose
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightGuide = true;
 
     @Expose
     @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka in the hand.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean horsezookaHider = false;
 }

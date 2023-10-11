@@ -9,11 +9,12 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangMinisNametagHider {
+    private val config get() = SkyHanniMod.feature.combat.mobs
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.mobs.hideNameTagArachneMinis) return
+        if (!config.hideNameTagArachneMinis) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return

@@ -1,13 +1,26 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import java.util.regex.Pattern
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 
-enum class VisitorReward(val displayName: String, val internalName: String, val pattern: Pattern) {
-    FLOWERING_BOUQUET("§9Flowering Bouquet", "FLOWERING_BOUQUET", "Flowering Bouquet".toPattern()),
-    OVERGROWN_GRASS("§9Overgrown Grass", "OVERGROWN_GRASS", "Overgrown Grass".toPattern()),
-    GREEN_BANDANA("§9Green Bandana", "GREEN_BANDANA", "Green Bandana".toPattern()),
-    DEDICATION("§9Dedication IV", "DEDICATION;4", "Dedication (IV|4) Book".toPattern()),
-    MUSIC_RUNE("§9Music Rune", "MUSIC_RUNE;1", "◆ Music Rune [1I]".toPattern()),
-    SPACE_HELMET("§cSpace Helmet", "DCTR_SPACE_HELM", "Space Helmet".toPattern()),
-    // Pretty sure that the symbol is ◆ but not 100%
+enum class VisitorReward(private val rawInternalName: String) {
+    FLOWERING_BOUQUET("FLOWERING_BOUQUET"),
+    OVERGROWN_GRASS("OVERGROWN_GRASS"),
+    GREEN_BANDANA("GREEN_BANDANA"),
+    DEDICATION("DEDICATION;4"),
+    MUSIC_RUNE("MUSIC_RUNE;1"),
+    SPACE_HELMET("DCTR_SPACE_HELM"),
+    CULTIVATING("CULTIVATING;1"),
+    REPLENISH("REPLENISH;1"),
+    ;
+
+    private val internalName by lazy { rawInternalName.asInternalName() }
+    val itemStack by lazy { internalName.getItemStack() }
+    val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.toString() }
+
+    companion object {
+        fun getByInternalName(internalName: NEUInternalName) = entries.firstOrNull { it.internalName == internalName }
+    }
 }

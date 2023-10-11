@@ -21,12 +21,9 @@ class MayorElection {
         var candidates = mapOf<Int, MayorJson.Candidate>()
         var currentCandidate: MayorJson.Candidate? = null
 
-        fun isPerkActive(mayor: String, perk: String): Boolean {
-            return currentCandidate?.let { currentCandidate ->
-                currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
-            } ?: false
-        }
-
+        fun isPerkActive(mayor: String, perk: String) = currentCandidate?.let { currentCandidate ->
+            currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
+        } ?: false
     }
 
     @SubscribeEvent
@@ -61,7 +58,7 @@ class MayorElection {
     private fun checkCurrentMayor() {
         var currentYear = SkyBlockTime.now().year
 
-        // The time in the current skyblock year when the election circle will restart
+        // The time in the current SkyBlock year when the election circle will restart
         val month = 3 // Late Spring
         val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
 

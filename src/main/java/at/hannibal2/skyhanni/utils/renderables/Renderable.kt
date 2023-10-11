@@ -2,35 +2,50 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
+import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
     val width: Int
     val height: Int
-    fun isHovered(posX: Int, posY: Int) =
-        Utils.getMouseX() in (posX..posX + width)
-                && Utils.getMouseY() in (posY..posY + height) // TODO: adjust for variable height?
+    fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (posX..posX + width)
+                && y in (posY..posY + height) // TODO: adjust for variable height?
+    } ?: false
 
     /**
-     * N.B.: the offset is absolute, not relative to the position and shouldn't be used for rendering
+     * Pos x and pos y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
      */
     fun render(posX: Int, posY: Int)
 
     companion object {
         val logger = LorenzLogger("debug/renderable")
+        val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
+
+        var currentRenderPassMousePosition: Pair<Int, Int>? = null
+            private set
+
+        fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
+            val last = currentRenderPassMousePosition
+            try {
+                currentRenderPassMousePosition = Pair(posX, posY)
+                return block()
+            } finally {
+                currentRenderPassMousePosition = last
+            }
+        }
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -40,19 +55,48 @@ interface Renderable {
             else -> null
         }
 
-        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable = link(string(text), onClick, bypassChecks = bypassChecks) { true }
-        fun optionalLink(text: String, onClick: () -> Unit, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable =
+        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
+            link(string(text), onClick, bypassChecks = bypassChecks) { true }
+
+        fun optionalLink(
+            text: String,
+            onClick: () -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable =
             link(string(text), onClick, bypassChecks, condition)
 
-        fun link(renderable: Renderable, onClick: () -> Unit, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
-            return clickable(hoverable(underlined(renderable), renderable, bypassChecks, condition = condition), onClick, 0, bypassChecks, condition)
+        fun link(
+            renderable: Renderable,
+            onClick: () -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable {
+            return clickable(
+                hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
+                onClick,
+                0,
+                bypassChecks,
+                condition
+            )
         }
 
-        fun clickAndHover(text: String, tips: List<String>, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable {
+        fun clickAndHover(
+            text: String,
+            tips: List<String>,
+            bypassChecks: Boolean = false,
+            onClick: () -> Unit
+        ): Renderable {
             return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
         }
 
-        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, bypassChecks: Boolean = false, condition: () -> Boolean = { true }) =
+        fun clickable(
+            render: Renderable,
+            onClick: () -> Unit,
+            button: Int = 0,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ) =
             object : Renderable {
                 override val width: Int
                     get() = render.width
@@ -62,17 +106,27 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
-                    if (isDown > wasDown && isHovered(posX, posY)) {
-                        if (condition() && shouldAllowLink(true, bypassChecks)) {
-                            onClick()
-                        }
+                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
+                            true,
+                            bypassChecks
+                        )
+                    ) {
+                        onClick()
                     }
                     wasDown = isDown
                     render.render(posX, posY)
                 }
             }
 
-        fun hoverTips(text: String, tips: List<String>, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+        fun hoverTips(
+            text: String,
+            tips: List<String>,
+            indexes: List<Int> = listOf(),
+            stack: ItemStack? = null,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable {
+
             val render = string(text)
             return object : Renderable {
                 override val width: Int
@@ -83,51 +137,25 @@ interface Renderable {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
-                            renderToolTips(posX, posY, tips)
+                            list[Pair(posX, posY)] = indexes
+                            GlStateManager.pushMatrix()
+                            GlStateManager.translate(0F, 0F, 400F)
+
+                            RenderLineTooltips.drawHoveringText(
+                                posX, posY, tips,
+                                stack,
+                                currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
+                                currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                            )
+                            GlStateManager.popMatrix()
+                        }
+                    } else {
+                        if (list.contains(Pair(posX, posY))) {
+                            list.remove(Pair(posX, posY))
                         }
                     }
                 }
             }
-        }
-
-        private fun renderToolTips(posX: Int, posY: Int, tips: List<String>, border: Int = 1) {
-            GlStateManager.pushMatrix()
-//            GlStateManager.translate(0f, 0f, 2f)
-//            GuiRenderUtils.drawTooltip(tips, posX, posY, 0)
-//            GlStateManager.translate(0f, 0f, -2f)
-
-            val x = Utils.getMouseX() - posX + 10
-            val startY = Utils.getMouseY() - posY - 10
-            var maxX = 0
-            var y = startY
-            val renderer = Minecraft.getMinecraft().fontRendererObj
-
-            GlStateManager.translate(0f, 0f, 2f)
-            for (line in tips) {
-                renderer.drawStringWithShadow(
-                    "§f$line",
-                    1f + x,
-                    1f + y,
-                    0
-                )
-                val currentX = renderer.getStringWidth(line)
-                if (currentX > maxX) {
-                    maxX = currentX
-                }
-                y += 10
-            }
-            GlStateManager.translate(0f, 0f, -1f)
-
-            GuiScreen.drawRect(
-                x - border,
-                startY - border,
-                x + maxX + 10 + border,
-                y + border,
-                LorenzColor.DARK_GRAY.toColor().rgb
-            )
-            GlStateManager.translate(0f, 0f, -1f)
-
-            GlStateManager.popMatrix()
         }
 
         private fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
@@ -171,7 +199,12 @@ interface Renderable {
             }
         }
 
-        fun hoverable(hovered: Renderable, unhovered: Renderable, bypassChecks: Boolean = false, condition: () -> Boolean = { true }) =
+        fun hoverable(
+            hovered: Renderable,
+            unhovered: Renderable,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ) =
             object : Renderable {
                 override val width: Int
                     get() = max(hovered.width, unhovered.width)
@@ -191,8 +224,16 @@ interface Renderable {
             override val height = 10
 
             override fun render(posX: Int, posY: Int) {
+                GlStateManager.pushMatrix()
+                if (Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen is GuiChat)
+                    GlStateManager.translate(0F, 0F, -145F)
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
+                GlStateManager.popMatrix()
             }
+        }
+
+        fun singeltonString(string: String): List<Renderable> {
+            return Collections.singletonList(string(string))
         }
 
         fun string(string: String) = object : Renderable {

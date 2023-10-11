@@ -24,7 +24,7 @@ class SharkFishCounter {
 
         val displayName = event.seaCreature.displayName
         if (displayName.contains("Shark")) {
-            counter++
+            counter += if (event.doubleHook) 2 else 1
             display = "§7Sharks caught: §e${counter.addSeparators()}"
         }
     }
@@ -69,7 +69,7 @@ class SharkFishCounter {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return

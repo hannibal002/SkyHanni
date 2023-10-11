@@ -16,6 +16,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
     private val config get() = SkyHanniMod.feature.garden
@@ -38,7 +39,7 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
-        rancherOverlayList = CropType.values().map { crop ->
+        rancherOverlayList = CropType.entries.map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
                 LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
             })
@@ -79,7 +80,7 @@ class GardenOptimalSpeed {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         if (optimalSpeed == -1) return
@@ -100,7 +101,7 @@ class GardenOptimalSpeed {
         if (System.currentTimeMillis() < lastWarnTime + 20_000) return
 
         lastWarnTime = System.currentTimeMillis()
-        TitleUtils.sendTitle("§cWrong speed!", 3_000)
+        TitleUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
             LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
         }

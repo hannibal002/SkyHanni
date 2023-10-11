@@ -8,7 +8,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import org.apache.commons.io.FileUtils
-import java.io.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.CompletableFuture
@@ -22,7 +29,7 @@ class RepoManager(private val configLocation: File) {
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
         if (SkyHanniMod.feature.dev.repoAutoUpdate) {
-            fetchRepository().thenRun(this::reloadRepository)
+            fetchRepository(false).thenRun(this::reloadRepository)
         } else {
             reloadRepository()
         }
@@ -40,7 +47,7 @@ class RepoManager(private val configLocation: File) {
         reloadRepository("Repo loaded from local files successful :)")
     }
 
-    private fun fetchRepository(command: Boolean = false): CompletableFuture<Boolean> {
+    private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync {
             try {
                 val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
@@ -55,14 +62,12 @@ class RepoManager(private val configLocation: File) {
                     e.printStackTrace()
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
-                if (File(configLocation, "repo").exists()) {
-                    if (currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
-                        if (command) {
-                            LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
-                            atomicShouldManuallyReload.set(false)
-                        }
-                        return@supplyAsync false
+                if (File(configLocation, "repo").exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
+                    if (command) {
+                        LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
+                        atomicShouldManuallyReload.set(false)
                     }
+                    return@supplyAsync false
                 }
                 RepoUtils.recursiveDelete(repoLocation)
                 repoLocation.mkdirs()

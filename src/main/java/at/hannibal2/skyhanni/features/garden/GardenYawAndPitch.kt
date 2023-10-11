@@ -6,17 +6,19 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class GardenYawAndPitch {
     private val config get() = SkyHanniMod.feature.garden.yawPitchDisplay
-    private var lastChange = 0L
+    private var lastChange = SimpleTimeMark.farPast()
     private var lastYaw = 0f
     private var lastPitch = 0f
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return
@@ -30,16 +32,18 @@ class GardenYawAndPitch {
         val pitch = player.rotationPitch
 
         if (yaw != lastYaw || pitch != lastPitch) {
-            lastChange = System.currentTimeMillis()
+            lastChange = SimpleTimeMark.now()
         }
         lastYaw = yaw
         lastPitch = pitch
 
-        if (!config.showAlways && System.currentTimeMillis() > lastChange + (config.timeout * 1000)) return
+        if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 
+        val yawText = yaw.round(config.yawPrecision)
+        val pitchText = pitch.round(config.pitchPrecision)
         val displayList = listOf(
-            "§aYaw: §f${yaw.toDouble().round(config.yawPrecision)}",
-            "§aPitch: §f${pitch.toDouble().round(config.pitchPrecision)}",
+            "§aYaw: §f$yawText",
+            "§aPitch: §f$pitchText",
         )
         if (GardenAPI.inGarden()) {
             config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
@@ -50,6 +54,6 @@ class GardenYawAndPitch {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastChange = System.currentTimeMillis()
+        lastChange = SimpleTimeMark.farPast()
     }
 }

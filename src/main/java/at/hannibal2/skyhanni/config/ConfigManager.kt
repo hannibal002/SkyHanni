@@ -6,8 +6,11 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -16,9 +19,18 @@ import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.item.ItemStack
-import java.io.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.UUID
 import kotlin.concurrent.fixedRateTimer
 
 class ConfigManager {
@@ -65,16 +77,27 @@ class ConfigManager {
                     return NEUItems.loadNBTData(reader.nextString())
                 }
             }.nullSafe())
+            .registerTypeAdapter(NEUInternalName::class.java, object : TypeAdapter<NEUInternalName>() {
+                override fun write(out: JsonWriter, value: NEUInternalName) {
+                    out.value(value.asString())
+                }
+
+                override fun read(reader: JsonReader): NEUInternalName {
+                    return reader.nextString().asInternalName()
+                }
+            }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
     }
 
     lateinit var features: Features
+    lateinit var sackData: SackData
         private set
     private val logger = LorenzLogger("config_manager")
 
     var configDirectory = File("config/skyhanni")
     private var configFile: File? = null
+    private var sackFile: File? = null
     lateinit var processor: MoulConfigProcessor<Features>
 
     fun firstLoad() {
@@ -84,10 +107,7 @@ class ConfigManager {
         configDirectory.mkdir()
 
         configFile = File(configDirectory, "config.json")
-
-        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
-            saveConfig("auto-save-60s")
-        }
+        sackFile = File(configDirectory, "sacks.json")
 
         logger.log("Trying to load config from $configFile")
 
@@ -104,8 +124,10 @@ class ConfigManager {
 
 
                 logger.log("load-config-now")
+                val jsonObject = gson.fromJson(builder.toString(), JsonObject::class.java)
+                val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                 features = gson.fromJson(
-                    builder.toString(),
+                    newJsonObject,
                     Features::class.java
                 )
                 logger.log("Loaded config from file")
@@ -123,10 +145,42 @@ class ConfigManager {
             }
         }
 
+        if (sackFile!!.exists()) {
+            try {
+                val inputStreamReader = InputStreamReader(FileInputStream(sackFile!!), StandardCharsets.UTF_8)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val builder = StringBuilder()
+                for (line in bufferedReader.lines()) {
+                    builder.append(line)
+                    builder.append("\n")
+                }
+
+
+                logger.log("load-sacks-now")
+                sackData = gson.fromJson(
+                    builder.toString(),
+                    SackData::class.java
+                )
+                logger.log("Loaded sacks from file")
+            } catch (error: Exception) {
+                error.printStackTrace()
+            }
+        }
+
         if (!::features.isInitialized) {
             logger.log("Creating blank config and saving to file")
             features = Features()
             saveConfig("blank config")
+        }
+
+        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+            saveConfig("auto-save-60s")
+        }
+
+        if (!::sackData.isInitialized) {
+            logger.log("Creating blank sack data and saving")
+            sackData = SackData()
+            saveSackData("blank config")
         }
 
         val features = SkyHanniMod.feature
@@ -142,7 +196,7 @@ class ConfigManager {
 
     private fun fixConfig(line: String): String {
         var result = line
-        for (type in CropType.values()) {
+        for (type in CropType.entries) {
             val normal = "\"${type.cropName}\""
             val enumName = "\"${type.name}\""
             while (result.contains(normal)) {
@@ -158,13 +212,37 @@ class ConfigManager {
         try {
             logger.log("Saving config file")
             file.parentFile.mkdirs()
-            file.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
+            val unit = file.parentFile.resolve("config.json.write")
+            unit.createNewFile()
+            BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
                 // TODO remove old "hidden" area
                 writer.write(gson.toJson(SkyHanniMod.feature))
             }
+            // Perform move — which is atomic, unlike writing — after writing is done.
+            Files.move(
+                unit.toPath(),
+                file.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.ATOMIC_MOVE
+            )
         } catch (e: IOException) {
             logger.log("Could not save config file to $file")
+            e.printStackTrace()
+        }
+    }
+
+    fun saveSackData(reason: String) {
+        logger.log("saveSackData: $reason")
+        val file = sackFile ?: throw Error("Can not save sacks, sackFile is null!")
+        try {
+            logger.log("Saving sack file")
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
+                writer.write(gson.toJson(SkyHanniMod.sackData))
+            }
+        } catch (e: IOException) {
+            logger.log("Could not save sacks file to $file")
             e.printStackTrace()
         }
     }

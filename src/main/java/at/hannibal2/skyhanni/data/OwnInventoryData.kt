@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.OwnInventorItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -28,7 +29,7 @@ class OwnInventoryData {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
                 val item = packet.func_149174_e() ?: return
-                OwnInventorItemUpdateEvent(item).postAndCatch()
+                OwnInventoryItemUpdateEvent(item).postAndCatch()
             }
         }
         if (packet is S2FPacketSetSlot) {
@@ -74,21 +75,27 @@ class OwnInventoryData {
         val diffWorld = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
         if (diffWorld < 3_000) return
 
-        val internalName = item.getInternalName()
+        val internalName = item.getInternalNameOrNull()
+
+        item.name?.let {
+            if (it == "§8Quiver Arrow") {
+                return
+            }
+        }
+
+        if (internalName == null) {
+            LorenzUtils.debug("OwnInventoryData add is empty for: '${item.name}'")
+            return
+        }
         if (internalName.startsWith("MAP-")) return
 
         val (_, amount) = NEUItems.getMultiplier(internalName)
         if (amount > 1) return
 
-        if (internalName == "") {
-            LorenzUtils.debug("OwnInventoryData add is empty for: '$internalName'")
-            return
-        }
-
         addMultiplier(internalName, add)
     }
 
-    private fun addMultiplier(internalName: String, amount: Int) {
+    private fun addMultiplier(internalName: NEUInternalName, amount: Int) {
         CollectionAPI.addFromInventory(internalName, amount)
     }
 }

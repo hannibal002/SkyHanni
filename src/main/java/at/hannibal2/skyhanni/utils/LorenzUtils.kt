@@ -3,14 +3,18 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -19,6 +23,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
@@ -26,11 +31,15 @@ import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Collections
+import java.util.Timer
+import java.util.TimerTask
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
@@ -40,7 +49,7 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
-    val inDungeons get() = inSkyBlock && DungeonData.inDungeon()
+    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
@@ -50,18 +59,19 @@ object LorenzUtils {
 
     val noTradeMode get() = HypixelData.noTrade
 
+    val isStrandedProfile get() = HypixelData.stranded
+
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
+    var lastButtonClicked = 0L
 
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled) {
-            if (internalChat(DEBUG_PREFIX + message)) {
-                consoleLog("[Debug] $message")
-            }
+        if (SkyHanniMod.feature.dev.debugEnabled && internalChat(DEBUG_PREFIX + message)) {
+            consoleLog("[Debug] $message")
         }
     }
 
@@ -114,26 +124,31 @@ object LorenzUtils {
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result
     }
 
-    fun Float.round(decimals: Int): Double {
+    fun Float.round(decimals: Int): Float {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result.toFloat()
     }
 
     // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    //TODO change to Int
+    // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
-//        NumberFormat.getPercentInstance().format(percentage)
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
     fun formatInteger(i: Int): String = formatInteger(i.toLong())
@@ -196,7 +211,7 @@ object LorenzUtils {
     }
 
     // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, String>>) {
+    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
         val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
@@ -208,7 +223,7 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            NEUItems.getItemStackOrNull(data[pair]!!.second)?.let {
+            data[pair]!!.second.getItemStackOrNull()?.let {
                 list.add(listOf(it, "$displayName   $second"))
             }
         }
@@ -216,16 +231,25 @@ object LorenzUtils {
 
     fun setTextIntoSign(text: String) {
         val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
+        if (gui !is AccessorGuiEditSign) return
         gui.tileSign.signText[0] = ChatComponentText(text)
+    }
+
+    fun addTextIntoSign(addedText: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is AccessorGuiEditSign) return
+        val lines = gui.tileSign.signText
+        val index = gui.editLine
+        val text = lines[index].unformattedText + addedText
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
     fun clickableChat(message: String, command: String) {
         val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        val fullCommand = "/" + command.removePrefix("/")
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /${command.removePrefix("/")}"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
@@ -265,9 +289,12 @@ object LorenzUtils {
         }
     }
 
-    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+    fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
 
-    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
+    fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
+
+    // A mac-only key, represents Windows key on windows (but different key code)
+    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_RMETA)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -308,16 +335,15 @@ object LorenzUtils {
         }
     }
 
-    fun <T> MutableList<List<Any>>.addSelector(
+    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
-        values: Array<T>,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        onChange: (T) -> Unit,
+        crossinline onChange: (T) -> Unit,
     ) {
         add(buildList {
             add(prefix)
-            for (entry in values) {
+            for (entry in enumValues<T>()) {
                 val display = getName(entry)
                 if (isCurrent(entry)) {
                     add("§a[$display]")
@@ -330,6 +356,31 @@ object LorenzUtils {
                 }
                 add(" ")
             }
+        })
+    }
+
+    inline fun MutableList<List<Any>>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            add("§a]")
         })
     }
 
@@ -391,24 +442,30 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inIsland(this)
 
-    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N): N {
-        val old = this[item] ?: 0
-        val new = when (old) {
-            is Double -> old + amount.toDouble()
-            is Float -> old + amount.toFloat()
-            is Long -> old + amount.toLong()
-            else -> old.toInt() + amount.toInt()
-        }
-        @Suppress("UNCHECKED_CAST")
-        this[item] = new as N
-        return new
+    fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
+        val currentValue = this[key] ?: 0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
     }
 
-    @Suppress("UNCHECKED_CAST")
+    fun <K> MutableMap<K, Long>.addOrPut(key: K, number: Long): Long {
+        val currentValue = this[key] ?: 0L
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double {
+        val currentValue = this[key] ?: 0.0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
     fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
-        if (values.isEmpty()) {
-            return 0.0
-        }
+        if (values.isEmpty()) return 0.0
+
         return when (values.first()) {
             is Double -> values.sumOf { it.toDouble() }
             is Float -> values.sumOf { it.toDouble() }
@@ -435,7 +492,7 @@ object LorenzUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun Any.equalsOneOf(vararg other: Any): Boolean {
+    fun <T> T.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }
@@ -450,4 +507,34 @@ object LorenzUtils {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
     }
+
+    fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
+
+    private val recalculateDerpy =
+        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+
+    val isDerpy get() = recalculateDerpy.getValue()
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun runDelayed(duration: Duration, runnable: () -> Unit) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runnable()
+            }
+        }, duration.inWholeMilliseconds)
+    }
+
+    fun isPastingKeysDown(): Boolean {
+        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+        return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
+    }
+
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
+
+    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
+        if (condition()) transofmration(this) else this
+
+    fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
+        if (condition) ifTrue(this) else ifFalse(this)
 }

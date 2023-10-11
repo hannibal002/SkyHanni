@@ -6,14 +6,24 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SeaCreatureMessageShortener {
+    private val config get() = SkyHanniMod.feature.fishing
 
     @SubscribeEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!SkyHanniMod.feature.fishing.shortenFishingMessage) return
-
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.shortenFishingMessage && !config.compactDoubleHook) return
         val seaCreature = event.seaCreature
         event.chatEvent.blockedReason = "sea_creature_caught"
-        LorenzUtils.chat("§9You caught a $seaCreature§9!")
+
+        var message = if (config.shortenFishingMessage) {
+            "§9You caught a $seaCreature§9!"
+        } else event.chatEvent.message
+
+        if (config.compactDoubleHook && event.doubleHook) {
+            message = "§e§lDOUBLE HOOK! $message"
+        }
+        LorenzUtils.chat(message)
+
         if (seaCreature.fishingExperience == 0) {
             LorenzUtils.debug("no fishing exp set for " + seaCreature.displayName)
         }

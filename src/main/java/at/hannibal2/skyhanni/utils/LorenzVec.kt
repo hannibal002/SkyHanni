@@ -7,7 +7,11 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.round
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class LorenzVec(
     val x: Double,
@@ -23,7 +27,7 @@ data class LorenzVec(
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 
-    fun distanceIgnoreY(other: LorenzVec): Double = distanceIgnoreYSq(other).pow(0.5)
+    fun distanceIgnoreY(other: LorenzVec): Double = distanceSqIgnoreY(other).pow(0.5)
 
     fun distance(other: LorenzVec): Double = distanceSq(other).pow(0.5)
 
@@ -38,7 +42,7 @@ data class LorenzVec(
         return (dx * dx + dy * dy + dz * dz)
     }
 
-    fun distanceIgnoreYSq(other: LorenzVec): Double {
+    fun distanceSqIgnoreY(other: LorenzVec): Double {
         val dx = (other.x - x)
         val dz = (other.z - z)
         return (dx * dx + dz * dz)
@@ -92,7 +96,20 @@ data class LorenzVec(
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
 
-    fun equals(other: LorenzVec) = x == other.x && y == other.y && z == other.z
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+
+        return (other as? LorenzVec)?.let {
+            x == it.x && y == it.y && z == it.z
+        } ?: super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        result = 31 * result + z.hashCode()
+        return result
+    }
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
 
@@ -112,7 +129,8 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
-    fun boundingToOffset(offX: Double, offY: Double, offZ: Double) = AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
+    fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
+        AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
 
     fun scale(scalar: Double): LorenzVec {
         return LorenzVec(scalar * x, scalar * y, scalar * z)

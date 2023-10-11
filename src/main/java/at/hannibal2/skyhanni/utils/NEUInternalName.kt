@@ -5,10 +5,15 @@ class NEUInternalName private constructor(private val internalName: String) {
     companion object {
         private val map = mutableMapOf<String, NEUInternalName>()
 
-        fun from(name: String): NEUInternalName {
-            val internalName = name.uppercase()
+        val NONE = "NONE".asInternalName()
+        val MISSING_ITEM = "MISSING_ITEM".asInternalName()
+
+        fun String.asInternalName(): NEUInternalName {
+            val internalName = uppercase()
             return map.getOrPut(internalName) { NEUInternalName(internalName) }
         }
+
+        fun fromItemName(itemName: String) = NEUItems.getInternalNameFromItemName(itemName)
     }
 
     fun asString() = internalName
@@ -20,9 +25,18 @@ class NEUInternalName private constructor(private val internalName: String) {
         return super.equals(other)
     }
 
-    override fun toString(): String {
-        return "internalName:$internalName"
-    }
+    override fun toString(): String = "internalName:$internalName"
 
-//    fun equals(other: String) = internalName == other
+    override fun hashCode(): Int = internalName.hashCode()
+
+    fun equals(other: String) = internalName == other
+
+    fun contains(other: String) = internalName.contains(other)
+
+    fun startsWith(other: String) = internalName.startsWith(other)
+
+    fun endsWith(other: String) = internalName.endsWith(other)
+
+    fun replace(oldValue: String, newValue: String) =
+        internalName.replace(oldValue.uppercase(), newValue.uppercase()).asInternalName()
 }

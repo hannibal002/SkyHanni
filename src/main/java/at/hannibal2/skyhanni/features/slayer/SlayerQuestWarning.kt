@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class SlayerQuestWarning {
     private val config get() = SkyHanniMod.feature.slayer
@@ -22,7 +23,7 @@ class SlayerQuestWarning {
     private var lastWarning = 0L
     private var currentReason = ""
     private var dirtySidebar = false
-    private var activeSlayer: SlayerType? = null
+    private var hasAutoSlayer = false
 
     //TODO add check if player has clicked on an item, before mobs around you gets damage
 
@@ -36,8 +37,10 @@ class SlayerQuestWarning {
         if (message == "  §r§c§lSLAYER QUEST FAILED!") {
             needNewQuest("The old slayer quest has failed!")
         }
-        if (message == "§eYour unsuccessful quest has been cleared out!") {
+        if (message == "  §r§5§lSLAYER QUEST STARTED!") {
             needSlayerQuest = false
+            hasAutoSlayer = true
+            dirtySidebar = true
         }
 
         //no auto slayer
@@ -49,7 +52,6 @@ class SlayerQuestWarning {
         }
 
         if (message == "§aYour Slayer Quest has been cancelled!") {
-            activeSlayer = null
             needSlayerQuest = false
         }
 
@@ -65,10 +67,8 @@ class SlayerQuestWarning {
     fun onTick(event: LorenzTickEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
 
-        if (dirtySidebar) {
-            if (event.repeatSeconds(3)) {
-                checkSidebar()
-            }
+        if (dirtySidebar && event.repeatSeconds(3)) {
+            checkSidebar()
         }
     }
 
@@ -100,13 +100,14 @@ class SlayerQuestWarning {
             }
         }
 
-        activeSlayer = SlayerType.getByDisplayName(slayerTypeName)
-
         if (loaded) {
             dirtySidebar = false
             if (slayerQuest && !needSlayerQuest) {
                 if (bossSlain) {
-                    needNewQuest("You have no Auto-Slayer active!")
+                    if (!hasAutoSlayer) {
+                        needNewQuest("You have no Auto-Slayer active!")
+                        hasAutoSlayer = false
+                    }
                 } else if (slayBoss) {
                     needNewQuest("You probably switched the server during an active boss and now hypixel doesn't know what to do.")
                 }
@@ -134,7 +135,7 @@ class SlayerQuestWarning {
         LorenzUtils.chat("§e[SkyHanni] $chatMessage")
 
         if (config.questWarningTitle) {
-            TitleUtils.sendTitle("§e$titleMessage", 2_000)
+            TitleUtils.sendTitle("§e$titleMessage", 2.seconds)
         }
     }
 
@@ -143,26 +144,24 @@ class SlayerQuestWarning {
         if (!(LorenzUtils.inSkyBlock)) return
 
         val entity = event.entity
-        if (entity.getLorenzVec().distanceToPlayer() < 6) {
-            if (isSlayerMob(entity)) {
-                tryWarn()
-            }
+        if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
+            tryWarn()
         }
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val area = LorenzUtils.skyBlockArea
-        val slayerType = SlayerType.getByArea(area) ?: return false
+        val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
+
+        val activeSlayer = SlayerAPI.getActiveSlayer()
 
         if (activeSlayer != null) {
-            val activeSlayer = activeSlayer!!
             if (slayerType != activeSlayer) {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
                 SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and are in the $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
                 )
             }
         }

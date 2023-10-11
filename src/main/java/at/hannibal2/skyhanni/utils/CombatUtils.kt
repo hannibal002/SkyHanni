@@ -13,7 +13,7 @@ object CombatUtils {
     var lastUpdate: Long = -1
     private var skillInfo: XPInformation.SkillInfo? = null
     private var skillInfoLast: XPInformation.SkillInfo? = null
-    private const val skillType = "Combat"
+    private const val SKILL_TYPE = "Combat"
     var xpGainHourLast = -1f
     var xpGainHour = -1f
     var isKilling = false
@@ -25,7 +25,6 @@ object CombatUtils {
     private var gainTimer = 0
     var _isKilling = false
 
-
     /**
      * Taken from NotEnoughUpdates
      */
@@ -33,36 +32,40 @@ object CombatUtils {
         lastUpdate = System.currentTimeMillis()
         xpGainHourLast = xpGainHour
         skillInfoLast = skillInfo
-        skillInfo = XPInformation.getInstance().getSkillInfo(skillType) ?: return
+        skillInfo = XPInformation.getInstance().getSkillInfo(SKILL_TYPE) ?: return
         val totalXp: Float = skillInfo!!.totalXp
         if (lastTotalXp > 0) {
             val delta: Float = totalXp - lastTotalXp
 
-            if (delta > 0 && delta < 1000) {
-                xpGainTimer = GhostCounter.config.pauseTimer
-                xpGainQueue.add(0, delta)
-                while (xpGainQueue.size > 30) {
-                    xpGainQueue.removeLast()
+            when {
+                delta > 0 && delta < 1000 -> {
+                    xpGainTimer = GhostCounter.config.pauseTimer
+                    xpGainQueue.add(0, delta)
+                    calculateXPHour()
                 }
-                var totalGain = 0f
-                for (f in xpGainQueue) totalGain += f
-                xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
-                isKilling = true
-            } else if (xpGainTimer > 0) {
-                xpGainTimer--
-                xpGainQueue.add(0, 0f)
-                while (xpGainQueue.size > 30) {
-                    xpGainQueue.removeLast()
+
+                xpGainTimer > 0 -> {
+                    xpGainTimer--
+                    xpGainQueue.add(0, 0f)
+                    calculateXPHour()
                 }
-                var totalGain = 0f
-                for (f in xpGainQueue) totalGain += f
-                xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
-                isKilling = true
-            } else if (delta <= 0) {
-                isKilling = false
+
+                delta <= 0 -> {
+                    isKilling = false
+                }
             }
         }
         lastTotalXp = totalXp
+    }
+
+    private fun calculateXPHour() {
+        while (xpGainQueue.size > 30) {
+            xpGainQueue.removeLast()
+        }
+        var totalGain = 0f
+        for (f in xpGainQueue) totalGain += f
+        xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
+        isKilling = true
     }
 
     fun calculateETA() {

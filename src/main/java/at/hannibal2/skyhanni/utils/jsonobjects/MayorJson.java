@@ -35,13 +35,6 @@ public class MayorJson {
         }
     }
 
-//    public class Current {
-//        @Expose
-//        public int year;
-//        @Expose
-//        public ArrayList<Candidate> candidates;
-//    }
-
     public class Election {
         @Expose
         public int year;

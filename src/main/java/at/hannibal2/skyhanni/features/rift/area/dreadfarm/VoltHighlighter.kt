@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -76,7 +76,7 @@ class VoltHighlighter {
                 if (dischargeTimeLeft > Duration.ZERO) {
                     event.drawDynamicText(
                         event.exactLocation(entity).add(0.0, 2.5, 0.0),
-                        "§eLightning: ${TimeUtils.formatDuration(dischargeTimeLeft, showMilliSeconds = true)}",
+                        "§eLightning: ${dischargeTimeLeft.format(showMilliSeconds = true)}",
                         2.5
                     )
                 }

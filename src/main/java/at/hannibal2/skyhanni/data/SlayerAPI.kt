@@ -1,27 +1,34 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object SlayerAPI {
 
     private var nameCache =
-        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build<Pair<String, Int>, Pair<String, Double>>()
+        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+            .build<Pair<NEUInternalName, Int>, Pair<String, Double>>()
 
     var questStartTime = 0L
-    var isInSlayerArea = false
+    var isInCorrectArea = false
     var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
     var latestWrongAreaWarning = 0L
@@ -42,9 +49,6 @@ object SlayerAPI {
 
         // Spider
         "Cobweb" -> true
-        "String" -> true
-        "Spider Eye" -> true
-        "Bone" -> true
 
         // Blaze
         "Water Bottle" -> true
@@ -52,9 +56,7 @@ object SlayerAPI {
         else -> false
     }
 
-    fun getItemNameAndPrice(stack: ItemStack): Pair<String, Double> {
-        val internalName = stack.getInternalName()
-        val amount = stack.stackSize
+    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
         val key = internalName to amount
         nameCache.getIfPresent(key)?.let {
             return it
@@ -63,8 +65,8 @@ object SlayerAPI {
         val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
         val displayName = getNameWithEnchantmentFor(internalName)
 
-        val price = NEUItems.getPrice(internalName)
-        val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
+        val price = internalName.getPrice()
+        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         val maxPrice = npcPrice.coerceAtLeast(price)
         val totalPrice = maxPrice * amount
 
@@ -76,11 +78,11 @@ object SlayerAPI {
         return result
     }
 
-    fun getNameWithEnchantmentFor(internalName: String): String? {
-        if (internalName == "WISP_POTION") {
+    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
+        if (internalName.asString() == "WISP_POTION") {
             return "§fWisp's Ice-Flavored Water"
         }
-        return NEUItems.getItemStack(internalName).nameWithEnchantment
+        return internalName.getItemStack().nameWithEnchantment ?: error("Could not find name for $internalName")
     }
 
     @SubscribeEvent
@@ -94,6 +96,24 @@ object SlayerAPI {
         if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
             SlayerQuestCompleteEvent().postAndCatch()
         }
+    }
+
+    fun getActiveSlayer() = activeSlayer.getValue()
+
+    private val activeSlayer = RecalculatingValue(1.seconds) {
+        grabActiveSlayer()
+    }
+
+    private fun grabActiveSlayer(): SlayerType? {
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            for (type in SlayerType.entries) {
+                if (line.contains(type.displayName)) {
+                    return type
+                }
+            }
+        }
+
+        return null
     }
 
     @SubscribeEvent
@@ -118,7 +138,43 @@ object SlayerAPI {
         }
 
         if (event.isMod(5)) {
-            isInSlayerArea = SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
+            isInCorrectArea = if (LorenzUtils.isStrandedProfile) {
+                true
+            } else {
+                getSlayerTypeForCurrentArea() == getActiveSlayer()
+            }
         }
+    }
+
+    fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
+        "Graveyard",
+        "Coal Mine",
+        -> SlayerType.REVENANT
+
+        "Spider Mound",
+        "Arachne's Burrow",
+        "Arachne's Sanctuary",
+        "Burning Desert",
+        -> SlayerType.TARANTULA
+
+        "Ruins",
+        "Howling Cave",
+        -> SlayerType.SVEN
+
+        "The End",
+        "Void Sepulture",
+        "Zealot Bruiser Hideout",
+        -> SlayerType.VOID
+
+        "Stronghold",
+        "The Wasteland",
+        "Smoldering Tomb",
+        -> SlayerType.INFERNO
+
+        "Stillgore Château",
+        "Oubliette",
+        -> SlayerType.VAMPIRE
+
+        else -> null
     }
 }

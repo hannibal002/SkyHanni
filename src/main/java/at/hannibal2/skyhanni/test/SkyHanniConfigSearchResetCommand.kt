@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.JsonElement
 import io.github.moulberry.notenoughupdates.util.Shimmy
+import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -20,11 +21,13 @@ object SkyHanniConfigSearchResetCommand {
     private var lastCommand = emptyArray<String>()
 
     fun command(args: Array<String>) {
-        LorenzUtils.chat(runCommand(args))
+        SkyHanniMod.coroutineScope.launch {
+            LorenzUtils.chat(runCommand(args))
+        }
         lastCommand = args
     }
 
-    private fun runCommand(args: Array<String>): String {
+    private suspend fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
             return "§c[SkyHanni] This is a powerful config-edit command, only use it if you know what you are doing!"
         }
@@ -51,7 +54,6 @@ object SkyHanniConfigSearchResetCommand {
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
-            println("size: $affectedElements")
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
@@ -71,7 +73,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private fun setCommand(args: Array<String>): String {
+    private suspend fun setCommand(args: Array<String>): String {
         if (args.size < 3) return "§c/shconfig set <config name> <json element>"
         val term = args[1]
         var rawJson = args.drop(2).joinToString(" ")
@@ -80,13 +82,19 @@ object SkyHanniConfigSearchResetCommand {
             rawJson = readFromClipboard
         }
 
-        val root: Any = if (term.startsWith("config")) {
-            SkyHanniMod.feature
-        } else if (term.startsWith("playerSpecific")) {
-            ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
-        } else if (term.startsWith("profileSpecific")) {
-            ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
-        } else return "§cUnknown config location!"
+        val root: Any = when {
+            term.startsWith("config") -> SkyHanniMod.feature
+
+            term.startsWith("playerSpecific") -> {
+                ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
+            }
+
+            term.startsWith("profileSpecific") -> {
+                ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
+            }
+
+            else -> return "§cUnknown config location!"
+        }
 
         val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
         if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
@@ -217,12 +225,8 @@ object SkyHanniConfigSearchResetCommand {
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
-            if (newObj != null) {
-                if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double) {
-                    if (newObj !is Position && !newObj.javaClass.isEnum) {
-                        map.putAll(loadAllFields(fieldName, newObj, depth + 1))
-                    }
-                }
+            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum) {
+                map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }
 
@@ -260,7 +264,8 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Position) {
             val x = javaClass.getDeclaredField("x").makeAccessible().get(this)
             val y = javaClass.getDeclaredField("y").makeAccessible().get(this)
-            return "($x, $y)"
+            val scale = javaClass.getDeclaredField("scale").makeAccessible().get(this)
+            return "($x, $y, $scale)"
         }
 
         if (this is String) {

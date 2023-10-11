@@ -11,8 +11,8 @@ class BlockData {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet == null) return
+        @Suppress("USELESS_ELVIS")
+        val packet = event.packet ?: return
 
         if (packet is S23PacketBlockChange) {
             val blockPos = packet.blockPosition ?: return

@@ -1,23 +1,36 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -33,14 +46,14 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.UUID
 import kotlin.math.max
 
 class DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val config get() = SkyHanniMod.feature.damageIndicator
+    private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     companion object {
         private var data = mapOf<UUID, EntityData>()
@@ -141,32 +154,22 @@ class DamageIndicatorManager {
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
-            if (!data.ignoreBlocks) {
-                if (!player.canEntityBeSeen(data.entity)) continue
-            }
+            if (!data.ignoreBlocks && !player.canEntityBeSeen(data.entity)) continue
             if (data.bossType.bossTypeToggle !in config.bossesToShow) continue
 
             val entity = data.entity
 
             var healthText = data.healthText
             val delayedStart = data.delayedStart
-            if (delayedStart != -1L) {
-                if (delayedStart > System.currentTimeMillis()) {
+            if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
                     val delay = delayedStart - System.currentTimeMillis()
                     healthText = formatDelay(delay)
-                }
             }
 
-//            val partialTicks = event.partialTicks
             val location = if (data.dead && data.deathLocation != null) {
                 data.deathLocation!!
             } else {
                 val loc = entity.getLorenzVec()
-//                val loc = LorenzVec(
-//                    RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
-//                    RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
-//                    RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
-//                )
                 if (data.dead) data.deathLocation = loc
                 loc
             }.add(-0.5, 0.0, -0.5)
@@ -369,7 +372,7 @@ class DamageIndicatorManager {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
-                    val floor = DungeonData.dungeonFloor
+                    val floor = DungeonAPI.dungeonFloor
                     LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
                 }
                 return thorn
@@ -437,9 +440,8 @@ class DamageIndicatorManager {
     }
 
     private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
-        val shields = HellionShield.values()
         var found = false
-        for (shield in shields) {
+        for (shield in HellionShield.entries) {
             val armorStand = entity.getNameTagWith(3, shield.name)
             if (armorStand != null) {
                 val number = armorStand.name.split(" ♨")[1].substring(0, 1)
@@ -638,13 +640,13 @@ class DamageIndicatorManager {
         }
 
         //Laser phase
-        if (entity.ridingEntity != null) {
+        if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
             val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
             //TODO more tests, more exact values, better logic? idk make this working perfectly pls
             //val remainingTicks = 8 * 20 - ticksAlive
-            val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+            val remainingTicks = (7.4 * 20).toLong() - ticksAlive
 
-            if (config.showHealthDuringLaser) {
+            if (config.enderSlayer.showHealthDuringLaser) {
                 entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
             } else {
                 return formatDelay(remainingTicks * 50)
@@ -659,8 +661,8 @@ class DamageIndicatorManager {
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
-    ): String? {
-        val config = SkyHanniMod.feature.damageIndicator.vampireSlayer
+    ): String {
+        val config = config.vampireSlayer
 
         if (config.percentage) {
             val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
@@ -694,10 +696,7 @@ class DamageIndicatorManager {
 
     private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
         val maxHealth: Int
-        println(" ")
-        println("realHealth: $realHealth")
-        println("realMaxHealth: $realMaxHealth")
-        val health = if (DungeonData.isOneOf("F4")) {
+        val health = if (DungeonAPI.isOneOf("F4")) {
             maxHealth = 4
 
             if (realMaxHealth == 300_000L) {
@@ -723,7 +722,7 @@ class DamageIndicatorManager {
                     else -> return null
                 }
             }
-        } else if (DungeonData.isOneOf("M4")) {
+        } else if (DungeonAPI.isOneOf("M4")) {
             maxHealth = 6
 
             if (realMaxHealth == 900_000L) {
@@ -764,11 +763,9 @@ class DamageIndicatorManager {
     private fun checkDamage(entityData: EntityData, health: Long, lastHealth: Long) {
         val damage = lastHealth - health
         val healing = health - lastHealth
-        if (damage > 0) {
-            if (entityData.bossType != BossType.DUMMY) {
-                val damageCounter = entityData.damageCounter
-                damageCounter.currentDamage += damage
-            }
+        if (damage > 0 && entityData.bossType != BossType.DUMMY) {
+            val damageCounter = entityData.damageCounter
+            damageCounter.currentDamage += damage
         }
         if (healing > 0) {
             //Hide auto heal every 10 ticks (with rounding errors)
@@ -843,19 +840,20 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            if (entityData != null) {
-                if (isEnabled()) {
-                    if (config.hideVanillaNametag) {
-                        val name = entity.name
-                        if (name.contains("Plaesmaflux")) return
-                        if (name.contains("Overflux")) return
-                        if (name.contains("Mana Flux")) return
-                        if (name.contains("Radiant")) return
-                        event.isCanceled = true
-                    }
-                }
+            if (entityData != null && isEnabled() && config.hideVanillaNametag) {
+                val name = entity.name
+                if (name.contains("Plaesmaflux")) return
+                if (name.contains("Overflux")) return
+                if (name.contains("Mana Flux")) return
+                if (name.contains("Radiant")) return
+                event.isCanceled = true
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "damageIndicator", "combat.damageIndicator")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

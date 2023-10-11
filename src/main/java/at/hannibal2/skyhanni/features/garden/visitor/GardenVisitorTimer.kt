@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.CropClickEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -13,6 +17,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
+import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
     private val config get() = SkyHanniMod.feature.garden
@@ -111,7 +116,7 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis < 0) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    TitleUtils.sendTitle("§a6th Visitor Ready", 5_000)
+                    TitleUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
                 }
@@ -139,7 +144,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")

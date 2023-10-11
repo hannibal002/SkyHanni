@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -38,7 +36,7 @@ object ChatManager {
             }
         }
 
-    fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
+    private fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
 
     enum class ActionKind(format: Any) {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
@@ -97,7 +95,7 @@ object ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
-            messageHistory.put(key, MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null))
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null)
             return
         }
 
@@ -109,9 +107,9 @@ object ChatManager {
             loggerModified.log(" ")
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
-            messageHistory.put(key, MessageFilteringResult(original, ActionKind.MODIFIED, null, modified))
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified)
         } else {
-            messageHistory.put(key, MessageFilteringResult(original, ActionKind.ALLOWED, null, null))
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null)
         }
     }
 
@@ -142,19 +140,11 @@ object ChatManager {
         return false
     }
 
-    @SubscribeEvent
-    fun onChatMessage(chatEvent: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
-        val seaCreature = SeaCreatureManager.getSeaCreature(chatEvent.message) ?: return
-        SeaCreatureFishEvent(seaCreature, chatEvent).postAndCatch()
-    }
-
     fun openChatFilterGUI() {
         SkyHanniMod.screenToOpen = ChatFilterGui(getRecentMessageHistory())
     }
 
-    val chatLinesField by lazy {
+    private val chatLinesField by lazy {
         MethodHandles.publicLookup().unreflectGetter(
             ReflectionHelper.findField(GuiNewChat::class.java, "chatLines", "field_146252_h", "h")
                 .makeAccessible()
@@ -164,9 +154,10 @@ object ChatManager {
     fun retractMessage(message: IChatComponent?, reason: String) {
         if (message == null) return
         val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
+
         @Suppress("UNCHECKED_CAST")
-        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
-        if (!chatLines.removeIf { it.chatComponent === message }) return
+        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
+        if (!chatLines.removeIf { it?.chatComponent === message }) return
         chatGUI.refreshChat()
 
         val history = messageHistory[IdentityCharacteristics(message)] ?: return

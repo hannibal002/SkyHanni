@@ -8,15 +8,21 @@ object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
-
     fun formatDuration(
         duration: Duration,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
         maxUnits: Int = -1
+    ): String = duration.format(biggestUnit, showMilliSeconds, longName, maxUnits)
+
+    fun Duration.format(
+        biggestUnit: TimeUnit = TimeUnit.YEAR,
+        showMilliSeconds: Boolean = false,
+        longName: Boolean = false,
+        maxUnits: Int = -1
     ): String = formatDuration(
-        duration.inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
+        inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
 
     fun formatDuration(
@@ -29,7 +35,7 @@ object TimeUtils {
         // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
-        for (unit in TimeUnit.values()) {
+        for (unit in TimeUnit.entries) {
             if (unit.ordinal >= biggestUnit.ordinal) {
                 val factor = unit.factor
                 map[unit] = (milliseconds / factor).toInt()
@@ -60,9 +66,7 @@ object TimeUtils {
                 }
 
                 count++
-                if (maxUnits != -1) {
-                    if (count == maxUnits) break
-                }
+                if (maxUnits != -1 && count == maxUnits) break
             }
         }
         return builder.toString().trim()

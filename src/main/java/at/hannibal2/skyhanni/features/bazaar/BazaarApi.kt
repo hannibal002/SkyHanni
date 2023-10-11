@@ -1,11 +1,20 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
@@ -21,25 +30,17 @@ class BazaarApi {
         var inBazaarInventory = false
         private var currentSearchedItem = ""
 
-        fun getBazaarDataByName(name: String): BazaarData? =
-            NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
+        var currentlyOpenedProduct: NEUInternalName? = null
 
-        fun getBazaarDataByInternalName(internalName: String) =
-            getBazaarDataByInternalName_new(NEUInternalName.from(internalName))
+        fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
 
-        fun getBazaarDataByInternalName_new(internalName: NEUInternalName) = if (isBazaarItem(internalName)) {
-                holder.getData(internalName)
-            } else null
+        fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
+            holder.getData(this)
+        } else null
 
-        fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
+        fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
 
-        fun isBazaarItem(internalName: NEUInternalName): Boolean {
-            return NEUItems.manager.auctionManager.getBazaarInfo(internalName.asString()) != null
-        }
-
-        fun isBazaarItem(internalName: String): Boolean {
-            return NEUItems.manager.auctionManager.getBazaarInfo(internalName) != null
-        }
+        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
         fun searchForBazaarItem(displayName: String, amount: Int = -1) {
             if (!LorenzUtils.inSkyBlock) return
@@ -55,6 +56,21 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
+        if (inBazaarInventory) {
+            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+            currentlyOpenedProduct = openedProduct
+            BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
+        }
+    }
+
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+        val buyInstantly = inventoryItems[10] ?: return null
+
+        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        val bazaarItem = inventoryItems[13] ?: return null
+
+        val itemName = bazaarItem.displayName
+        return NEUItems.getInternalNameOrNull(itemName)
     }
 
     @SubscribeEvent
@@ -103,12 +119,10 @@ class BazaarApi {
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val returnItem = event.inventorySize - 5
         for ((slot, item) in event.inventoryItems) {
-            if (slot == returnItem) {
-                if (item.name?.removeColor().let { it == "Go Back" }) {
-                    val lore = item.getLore()
-                    if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
-                        return true
-                    }
+            if (slot == returnItem && item.name?.removeColor().let { it == "Go Back" }) {
+                val lore = item.getLore()
+                if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
+                    return true
                 }
             }
         }
@@ -130,5 +144,6 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
+        currentlyOpenedProduct = null
     }
 }

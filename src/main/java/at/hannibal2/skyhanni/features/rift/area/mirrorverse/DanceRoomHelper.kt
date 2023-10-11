@@ -1,13 +1,23 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,17 +49,22 @@ object DanceRoomHelper {
         val size = instructions.size
         val format = line.format()
 
-        if (index < size && index == lineIndex) {
-            val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
-            "${now.formatColor()} $format $countdown"
+        when {
+            index < size && index == lineIndex -> {
+                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+                "${now.formatColor()} $format $countdown"
+            }
 
-        } else if (index + 1 < size && index + 1 == lineIndex) {
-            "${next.formatColor()} $format"
+            index + 1 < size && index + 1 == lineIndex -> {
+                "${next.formatColor()} $format"
+            }
 
-        } else if (index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex)) {
-            "${later.formatColor()} $format"
+            index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex) -> {
+                "${later.formatColor()} $format"
+            }
 
-        } else null
+            else -> null
+        }
     }
 
     private fun String.formatColor() = replace("&", "§")
@@ -57,17 +72,19 @@ object DanceRoomHelper {
     private fun String.format() =
         split(" ").joinToString(" ") { it.firstLetterUppercase().addColor().replace("&", "§") }
 
-    private fun String.addColor() = when (this) {
-        "Move" -> config.danceRoomFormatting.color.move
-        "Stand" -> config.danceRoomFormatting.color.stand
-        "Sneak" -> config.danceRoomFormatting.color.sneak
-        "Jump" -> config.danceRoomFormatting.color.jump
-        "Punch" -> config.danceRoomFormatting.color.punch
-        else -> config.danceRoomFormatting.color.fallback
-    } + this
+    private fun String.addColor() = with(config.danceRoomFormatting.color) {
+        when (this@addColor) {
+            "Move" -> move
+            "Stand" -> stand
+            "Sneak" -> sneak
+            "Jump" -> jump
+            "Punch" -> punch
+            else -> fallback
+        } + this
+    }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRoom) return
         config.position.renderStrings(
@@ -140,10 +157,8 @@ object DanceRoomHelper {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
-            if (entity is EntityOtherPlayerMP) {
-                if (inRoom) {
-                    event.isCanceled = true
-                }
+            if (entity is EntityOtherPlayerMP && inRoom) {
+                event.isCanceled = true
             }
         }
     }

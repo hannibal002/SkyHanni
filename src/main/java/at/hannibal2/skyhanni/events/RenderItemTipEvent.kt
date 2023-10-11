@@ -12,4 +12,4 @@ class RenderItemTipEvent(
         }
 }
 
-class RenderObject(val text: String, var offsetX: Int = 0, var offsetY: Int = 0,)
+class RenderObject(val text: String, var offsetX: Int = 0, var offsetY: Int = 0)

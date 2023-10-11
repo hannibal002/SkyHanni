@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import com.google.gson.annotations.Expose;
 
@@ -12,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 public class OldHidden {
-
-    @Expose
-    public String apiKey = "";
 
     @Expose
     public String currentPet = "";
@@ -27,9 +25,6 @@ public class OldHidden {
 
     @Expose
     public List<String> crimsonIsleQuests = new ArrayList<>();
-
-    @Expose
-    public int crimsonIsleLatestTrophyFishInInventory = 0;
 
     @Expose
     public List<String> crimsonIsleMiniBossesDoneToday = new ArrayList<>();
@@ -77,7 +72,7 @@ public class OldHidden {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
-    public Map<String, Integer> gardenFarmingArmorDrops = new HashMap<>();
+    public Map<FarmingArmorDrops.ArmorDropType, Integer> gardenFarmingArmorDrops = new HashMap<>();
 
     @Expose
     public Map<ComposterUpgrade, Integer> gardenComposterUpgrades = new HashMap<>();

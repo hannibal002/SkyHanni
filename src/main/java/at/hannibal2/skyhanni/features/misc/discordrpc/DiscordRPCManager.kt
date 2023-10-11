@@ -17,7 +17,8 @@ import com.jagrosh.discordipc.entities.RichPresence
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -146,13 +147,13 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    private fun getStatusByConfigId(id: Int) = DiscordStatus.values().getOrElse(id) { DiscordStatus.NONE }
+    private fun getStatusByConfigId(id: Int) = DiscordStatus.entries.getOrElse(id) { DiscordStatus.NONE }
 
     private fun isEnabled() = config.enabled.get()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins skyblock but only running it again once they join and leave.
+        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins SkyBlock but only running it again once they join and leave.
         if (LorenzUtils.inSkyBlock) {
             start()
             startOnce = true

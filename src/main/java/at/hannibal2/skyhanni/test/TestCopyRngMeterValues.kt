@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -17,7 +18,7 @@ object TestCopyRngMeterValues {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!SkyHanniMod.feature.dev.copyRngMeter) return
 
-        val map = mutableMapOf<String, Long>()
+        val map = mutableMapOf<NEUInternalName, Long>()
         val slayerPattern = "§7Slayer XP: §d.*§5/§d(?<xp>.*)".toPattern()
         val dungeonPattern = "§7Dungeon Score: §d.*§5/§d(?<xp>.*)".toPattern()
         for (item in event.inventoryItems.values) {

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -40,7 +40,7 @@ class RiftWiltedBerberisHelper {
 
         list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
 
-        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName()?.let {
+        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName_old()?.let {
             it == "FARMING_WAND"
         } ?: false
 
@@ -61,16 +61,12 @@ class RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
-//        if (event.distanceToPlayer > 10) return
-
         val location = event.location
         val berberis = nearestBerberis(location)
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
-            if (config.hideparticles) {
-                if (berberis != null) {
-                    event.isCanceled = true
-                }
+            if (config.hideparticles && berberis != null) {
+                event.isCanceled = true
             }
             return
         }

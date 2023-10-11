@@ -53,10 +53,8 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        if (location.offsetCenter().distanceToPlayer() < detectionRange) {
-                            if (Minecraft.getMinecraft().thePlayer.onGround) {
-                                current = index
-                            }
+                        if (location.offsetCenter().distanceToPlayer() < detectionRange && Minecraft.getMinecraft().thePlayer.onGround) {
+                            current = index
                         }
                     }
                 }
@@ -64,10 +62,8 @@ class ParkourHelper(
                 val distanceToPlayer = locations.first().offsetCenter().distanceToPlayer()
                 if (distanceToPlayer < detectionRange) {
                     visible = true
-                } else if (distanceToPlayer > 15) {
-                    if (current < 1) {
-                        visible = false
-                    }
+                } else if (distanceToPlayer > 15 && current < 1) {
+                    visible = false
                 }
 
                 if (!visible) return
@@ -86,8 +82,7 @@ class ParkourHelper(
                     next.value.offsetCenter(),
                     colorForIndex(prev.index),
                     5,
-                    false,
-                    colorForIndex(next.index)
+                    false
                 )
             }
             val nextShortcuts = current until current + lookAhead
@@ -114,14 +109,12 @@ class ParkourHelper(
                     val aabb = axisAlignedBB(location).expandBlock()
                     event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), .6f)
                 } else {
-                  val aabb = axisAlignedBB(location)
+                    val aabb = axisAlignedBB(location)
                     event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), 1f)
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }
-                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber) {
-                    if (!isMovingPlatform) {
-                        event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
-                    }
+                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
+                    event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
                 }
             }
         } catch (e: Throwable) {

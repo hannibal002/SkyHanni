@@ -29,11 +29,6 @@ public class MixinGuiChat {
     @Shadow
     private List<String> foundPlayerNames = Lists.newArrayList();
 
-    @Shadow
-    public void autocompletePlayerNames() {
-
-    }
-
     @Inject(method = "onAutocompleteResponse", at = @At(value = "HEAD"), cancellable = true)
     private void renderItemOverlayPost(String[] originalArray, CallbackInfo ci) {
 
@@ -45,7 +40,7 @@ public class MixinGuiChat {
             this.playerNamesFound = false;
             this.foundPlayerNames.clear();
             for (String s : result) {
-                if (s.length() > 0) {
+                if (!s.isEmpty()) {
                     this.foundPlayerNames.add(s);
                 }
             }
@@ -53,12 +48,11 @@ public class MixinGuiChat {
             String s1 = this.inputField.getText().substring(this.inputField.func_146197_a(-1, this.inputField.getCursorPosition(), false));
             String s2 = StringUtils.getCommonPrefix(result);
             s2 = EnumChatFormatting.getTextWithoutFormattingCodes(s2);
-            if (s2.length() > 0 && !s1.equalsIgnoreCase(s2)) {
+            if (!s2.isEmpty() && !s1.equalsIgnoreCase(s2)) {
                 this.inputField.deleteFromCursor(this.inputField.func_146197_a(-1, this.inputField.getCursorPosition(), false) - this.inputField.getCursorPosition());
                 this.inputField.writeText(s2);
-            } else if (this.foundPlayerNames.size() > 0) {
+            } else if (!this.foundPlayerNames.isEmpty()) {
                 this.playerNamesFound = true;
-                this.autocompletePlayerNames();
             }
         }
     }

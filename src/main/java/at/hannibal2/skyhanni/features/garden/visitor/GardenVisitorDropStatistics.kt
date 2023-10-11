@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -27,9 +29,6 @@ object GardenVisitorDropStatistics {
     var deniedVisitors = 0
     private var totalVisitors = 0
     private var visitorRarities = mutableListOf<Long>()
-    private var copper = 0
-    private var gardenExp = 0
-    private var farmingExp = 0L
     var coinsSpent = 0L
 
     var lastAccept = 0L
@@ -38,6 +37,9 @@ object GardenVisitorDropStatistics {
     private val copperPattern = "[+](?<amount>.*) Copper".toPattern()
     private val gardenExpPattern = "[+](?<amount>.*) Garden Experience".toPattern()
     private val farmingExpPattern = "[+](?<amount>.*) Farming XP".toPattern()
+    private val bitsPattern = "[+](?<amount>.*) Bits".toPattern()
+    private val mithrilPowderPattern = "[+](?<amount>.*) Mithril Powder".toPattern()
+    private val gemstonePowderPattern = "[+](?<amount>.*) Gemstone Powder".toPattern()
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -54,39 +56,59 @@ object GardenVisitorDropStatistics {
     }
 
     @SubscribeEvent
+    fun onVisitorAccept(event: VisitorAcceptEvent) {
+        if (!GardenAPI.onBarnPlot) return
+        if (!ProfileStorageData.loaded) return
+
+        for (internalName in event.visitor.allRewards) {
+            val reward = VisitorReward.getByInternalName(internalName) ?: continue
+            rewardsCount = rewardsCount.editCopy { addOrPut(reward, 1) }
+            saveAndUpdate()
+        }
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
         if (lastAccept - System.currentTimeMillis() <= 0 && lastAccept - System.currentTimeMillis() > -1000) {
             val message = event.message.removeColor().trim()
+            val hidden = GardenAPI.config?.visitorDrops ?: return
 
             copperPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
-                copper += amount
+                hidden.copper += amount
                 saveAndUpdate()
             }
             farmingExpPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber()
-                farmingExp += amount
+                hidden.farmingExp += amount
                 saveAndUpdate()
             }
             gardenExpPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
                 if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
-                gardenExp += amount
+                hidden.gardenExp += amount
+                saveAndUpdate()
+            }
+            bitsPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                hidden.bits += amount
+                saveAndUpdate()
+            }
+            mithrilPowderPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                hidden.mithrilPowder += amount
+                saveAndUpdate()
+            }
+            gemstonePowderPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                hidden.gemstonePowder += amount
                 saveAndUpdate()
             }
             acceptPattern.matchMatcher(message) {
                 setRarities(group("rarity"))
                 saveAndUpdate()
-            }
-
-            for (reward in VisitorReward.values()) {
-                reward.pattern.matchMatcher(message) {
-                    val old = rewardsCount[reward] ?: 0
-                    rewardsCount = rewardsCount.editCopy { this[reward] = old + 1 }
-                    saveAndUpdate()
-                }
             }
         }
     }
@@ -99,7 +121,7 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
-    private fun drawVisitorStatsDisplay() = buildList<List<Any>> {
+    private fun drawDisplay(hidden: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
         //0
         addAsSingletonList("§e§lVisitor Statistics")
         //1
@@ -114,7 +136,10 @@ object GardenVisitorDropStatistics {
             )
         } else {
             addAsSingletonList("§c?")
-            CopyErrorCommand.logError(RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"), "Error rendering visitor drop statistics")
+            CopyErrorCommand.logError(
+                RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
+                "Error rendering visitor drop statistics"
+            )
         }
         //3
         addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
@@ -123,17 +148,17 @@ object GardenVisitorDropStatistics {
         //5
         addAsSingletonList("")
         //6
-        addAsSingletonList(format(copper, "Copper", "§c", ""))
+        addAsSingletonList(format(hidden.copper, "Copper", "§c", ""))
         //7
-        addAsSingletonList(format(farmingExp, "Farming EXP", "§3", "§7"))
+        addAsSingletonList(format(hidden.farmingExp, "Farming EXP", "§3", "§7"))
         //8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
-        //9 – 14
-        for (reward in VisitorReward.values()) {
+        //9 – 16
+        for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
-                val stack = NEUItems.getItemStack(reward.internalName, true)
+                val stack = reward.itemStack
                 if (config.displayNumbersFirst)
                     add(listOf("§b${count.addSeparators()} ", stack))
                 else add(listOf(stack, " §b${count.addSeparators()}"))
@@ -141,10 +166,16 @@ object GardenVisitorDropStatistics {
                 addAsSingletonList(format(count, reward.displayName, "§b"))
             }
         }
-        //15
+        //17
         addAsSingletonList("")
-        //16
-        addAsSingletonList(format(gardenExp, "Garden EXP", "§2", "§7"))
+        //18
+        addAsSingletonList(format(hidden.gardenExp, "Garden EXP", "§2", "§7"))
+        //19
+        addAsSingletonList(format(hidden.bits, "Bits", "§b", "§b"))
+        //20
+        addAsSingletonList(format(hidden.mithrilPowder, "Mithril Powder", "§2", "§2"))
+        //21
+        addAsSingletonList(format(hidden.gemstonePowder, "Gemstone Powder", "§d", "§d"))
     }
 
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =
@@ -166,12 +197,9 @@ object GardenVisitorDropStatistics {
         hidden.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
         hidden.visitorRarities = visitorRarities
-        hidden.copper = copper
-        hidden.farmingExp = farmingExp
-        hidden.gardenExp = gardenExp
         hidden.coinsSpent = coinsSpent
         hidden.rewardsCount = rewardsCount
-        display = formatDisplay(drawVisitorStatsDisplay())
+        display = formatDisplay(drawDisplay(hidden))
     }
 
     @SubscribeEvent
@@ -187,16 +215,13 @@ object GardenVisitorDropStatistics {
         deniedVisitors = hidden.deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
         visitorRarities = hidden.visitorRarities
-        copper = hidden.copper
-        farmingExp = hidden.farmingExp
-        gardenExp = hidden.gardenExp
         coinsSpent = hidden.coinsSpent
         rewardsCount = hidden.rewardsCount
         saveAndUpdate()
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (!GardenAPI.inGarden()) return
         if (GardenAPI.hideExtraGuis()) return

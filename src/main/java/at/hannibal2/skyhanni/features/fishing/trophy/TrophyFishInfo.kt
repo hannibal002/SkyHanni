@@ -22,8 +22,9 @@ data class TrophyFishInfo(
     // Credit to NotEnoughUpdates (Trophy Fish profile viewer page) for the format.
     fun getTooltip(counts: Map<TrophyRarity, Int>): ChatStyle {
         val bestFishObtained = counts.keys.maxOrNull() ?: TrophyRarity.BRONZE
+        val rateString = if (rate != null) "§8[§7$rate%§8]" else ""
         val display = """
-            |$displayName §8[§7$rate%§8]
+            |$displayName $rateString
             |${description.splitLines(150)}
             |
             |${TrophyRarity.DIAMOND.formattedString}: ${formatCount(counts, TrophyRarity.DIAMOND)}

@@ -8,6 +8,7 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     CRIMSON_ISLE("Crimson Isle"),
     DWARVEN_MINES("Dwarven Mines"),
     DUNGEON_HUB("Dungeon Hub", "dungeon_hub"),
+    CATACOMBS("Catacombs", "dungeon"),
 
     HUB("Hub", "village"),
     THE_FARMING_ISLANDS("The Farming Islands"),
@@ -27,7 +28,7 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
 
     companion object {
         fun getBySidebarName(name: String): IslandType {
-            return values().firstOrNull { it.displayName == name } ?: UNKNOWN
+            return entries.firstOrNull { it.displayName == name } ?: UNKNOWN
         }
     }
 }

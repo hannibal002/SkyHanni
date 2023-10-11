@@ -6,8 +6,16 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
-import at.hannibal2.skyhanni.features.bingo.nextstep.*
+import at.hannibal2.skyhanni.features.bingo.nextstep.ChatMessageStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.CollectionStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.CraftStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.IslandVisitStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.ItemsStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.NextStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.ObtainCrystalStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.PartialProgressItemsStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.ProgressionStep
+import at.hannibal2.skyhanni.features.bingo.nextstep.SkillLevelStep
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,7 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoNextStepHelper {
-    private val config get() = SkyHanniMod.feature.bingo.bingoCard
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
 
     private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
@@ -76,12 +84,8 @@ class BingoNextStepHelper {
                 }
             }
 
-            if (!step.done && !parentDone) {
-                if (requirementsToDo == 0) {
-                    if (!currentSteps.contains(step)) {
-                        currentSteps = currentSteps.editCopy { add(step) }
-                    }
-                }
+            if (!step.done && !parentDone && requirementsToDo == 0 && !currentSteps.contains(step)) {
+                    currentSteps = currentSteps.editCopy { add(step) }
             }
         }
 
@@ -121,7 +125,7 @@ class BingoNextStepHelper {
         }
     }
 
-    var nextMessageIsCrystal = false
+    private var nextMessageIsCrystal = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -179,7 +183,7 @@ class BingoNextStepHelper {
                 }
             }
             if (step is CollectionStep) {
-                val counter = CollectionAPI.getCollectionCounter(step.collectionName) ?: 0
+                val counter = CollectionAPI.getCollectionCounter(step.internalName) ?: 0
                 if (step.amountHaving != counter) {
                     step.amountHaving = counter
                     if (counter >= step.amountNeeded) {
@@ -195,10 +199,8 @@ class BingoNextStepHelper {
         if (done) return
         done = true
         updateResult()
-        if (!silent) {
-            if (config.stepHelper) {
-                LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
-            }
+        if (!silent && config.stepHelper) {
+            LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
         }
     }
 
@@ -278,33 +280,17 @@ class BingoNextStepHelper {
         return null
     }
 
-    fun <T : NextStep> T.makeFinalStep(): T {
+    private fun <T : NextStep> T.makeFinalStep(): T {
         finalSteps.add(this)
         return this
     }
 
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-
-        val visitedZones = profileData["visited_zones"]?.asJsonArray ?: return
-        for (element in visitedZones) {
-            val zoneName = element.asString
-            for (step in islands.values) {
-                val island = step.island
-                if (island.apiName == zoneName) {
-                    step.done(true)
-                }
-            }
-        }
-    }
-
-    infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
+    private infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
         itemIslandRequired[itemName]?.let { this requires it }
         return this
     }
 
-    infix fun <T : NextStep> T.requires(other: NextStep): T {
+    private infix fun <T : NextStep> T.requires(other: NextStep): T {
         requirements.add(other)
         return this
     }
@@ -343,7 +329,7 @@ class BingoNextStepHelper {
 
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
-        // TODO add skyblock level requirement
+        // TODO add SkyBlock level requirement
 //        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
         IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
 
@@ -357,7 +343,6 @@ class BingoNextStepHelper {
             "Combat",
             12
         ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
-
 //        enchantedCharcoal(7)
 //        compactor(7)
     }
