@@ -31,22 +31,28 @@ object GhostUtil {
         val hours = millis / 1000 / 60 / 60 % 24
         val days = millis / 1000 / 60 / 60 / 24
         return buildMap {
-            if (millis < 0) {
-                clear()
-            } else if (minutes == 0L && hours == 0L && days == 0L) {
-                put("seconds", seconds.toString())
-            } else if (hours == 0L && days == 0L) {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-            } else if (days == 0L) {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-                put("hours", hours.toString())
-            } else {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-                put("hours", hours.toString())
-                put("days", days.toString())
+            when {
+                millis < 0 -> {
+                    clear()
+                }
+                minutes == 0L && hours == 0L && days == 0L -> {
+                    put("seconds", seconds.toString())
+                }
+                hours == 0L && days == 0L -> {
+                    put("seconds", seconds.toString())
+                    put("minutes", minutes.toString())
+                }
+                days == 0L -> {
+                    put("seconds", seconds.toString())
+                    put("minutes", minutes.toString())
+                    put("hours", hours.toString())
+                }
+                else -> {
+                    put("seconds", seconds.toString())
+                    put("minutes", minutes.toString())
+                    put("hours", hours.toString())
+                    put("days", days.toString())
+                }
             }
         }
     }

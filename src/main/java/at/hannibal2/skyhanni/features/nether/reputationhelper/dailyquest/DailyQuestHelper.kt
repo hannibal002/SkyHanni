@@ -300,11 +300,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishKuudra(kuudraTier: KuudraTier) {
         val kuudraQuest = getQuest<KuudraQuest>() ?: return
-        if (kuudraQuest.kuudraTier == kuudraTier) {
-            //TODO make inline method for this two lines
-            if (kuudraQuest.state == QuestState.ACCEPTED) {
-                kuudraQuest.state = QuestState.READY_TO_COLLECT
-            }
+        //TODO make inline method for this two lines
+        if (kuudraQuest.kuudraTier == kuudraTier && kuudraQuest.state == QuestState.ACCEPTED) {
+            kuudraQuest.state = QuestState.READY_TO_COLLECT
         }
     }
 

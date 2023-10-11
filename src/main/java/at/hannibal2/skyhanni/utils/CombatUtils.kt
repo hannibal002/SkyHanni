@@ -38,31 +38,33 @@ object CombatUtils {
         if (lastTotalXp > 0) {
             val delta: Float = totalXp - lastTotalXp
 
-            if (delta > 0 && delta < 1000) {
-                xpGainTimer = GhostCounter.config.pauseTimer
-                xpGainQueue.add(0, delta)
-                while (xpGainQueue.size > 30) {
-                    xpGainQueue.removeLast()
+            when {
+                delta > 0 && delta < 1000 -> {
+                    xpGainTimer = GhostCounter.config.pauseTimer
+                    xpGainQueue.add(0, delta)
+                    calculateXPHour()
                 }
-                var totalGain = 0f
-                for (f in xpGainQueue) totalGain += f
-                xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
-                isKilling = true
-            } else if (xpGainTimer > 0) {
-                xpGainTimer--
-                xpGainQueue.add(0, 0f)
-                while (xpGainQueue.size > 30) {
-                    xpGainQueue.removeLast()
+                xpGainTimer > 0 -> {
+                    xpGainTimer--
+                    xpGainQueue.add(0, 0f)
+                    calculateXPHour()
                 }
-                var totalGain = 0f
-                for (f in xpGainQueue) totalGain += f
-                xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
-                isKilling = true
-            } else if (delta <= 0) {
-                isKilling = false
+                delta <= 0 -> {
+                    isKilling = false
+                }
             }
         }
         lastTotalXp = totalXp
+    }
+
+    private fun calculateXPHour(){
+        while (xpGainQueue.size > 30) {
+            xpGainQueue.removeLast()
+        }
+        var totalGain = 0f
+        for (f in xpGainQueue) totalGain += f
+        xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
+        isKilling = true
     }
 
     fun calculateETA() {
