@@ -5,18 +5,25 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 object DungeonRoomDetection {
     var canLoadRooms = false
@@ -26,6 +33,7 @@ object DungeonRoomDetection {
     var testEntrance: DoorEntrance? = null
     var renderTestLocations = mutableMapOf<LorenzVec, String>()
 //    var testClickedBlocks = mutableListOf(LorenzVec)
+    var lastDetectionTime = SimpleTimeMark.farPast()
 
     var renderDebug = mutableMapOf<LorenzVec, String>()
 
@@ -44,6 +52,10 @@ object DungeonRoomDetection {
             val clickedLocation = event.position
             val location = it.getOffset(clickedLocation) ?: return
 //            println("")
+            if (it.location.distance(clickedLocation) < 3) return
+            if (lastDetectionTime.passedSince() < 350.milliseconds) return
+            lastDetectionTime = SimpleTimeMark.now()
+
             val registryName = clickedLocation.getBlockAt().registryName
             val blockName = registryName.split(":")[1]
 //            println("clicked at $location = $registryName")
