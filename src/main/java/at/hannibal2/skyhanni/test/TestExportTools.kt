@@ -51,11 +51,11 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(config.copyNBTDataCompressed) && !OSUtils.isKeyHeld(config.copyNBTData)) return
+        if (config.copyNBTDataCompressed.isKeyHeld() && config.copyNBTData.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
-        if (OSUtils.isKeyHeld(config.copyNBTData)) {
+        if (config.copyNBTData.isKeyHeld()) {
             copyItemToClipboard(stack)
             return
         }
