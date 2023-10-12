@@ -43,6 +43,8 @@ class SkyHanniDebugsAndTests {
         var displayLine = ""
         var displayList = emptyList<List<Any>>()
 
+        var globalRenderToggle = true
+
         var a = 1.0
         var b = 60.0
         var c = 0.0
@@ -211,6 +213,7 @@ class SkyHanniDebugsAndTests {
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
             builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
+            builder.append("globalRenderToggle: ${globalRenderToggle}\n")
             builder.append("\n")
 
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
@@ -263,6 +266,15 @@ class SkyHanniDebugsAndTests {
             val rawInternalName = internalName.asString()
             OSUtils.copyToClipboard(rawInternalName)
             LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+        }
+
+        fun toggleRender() {
+            globalRenderToggle = !globalRenderToggle
+            if (globalRenderToggle) {
+                LorenzUtils.chat("§e[SkyHanni] §cEnabled global render toggle! Run this command again to show SkyHanni elements again.")
+            } else {
+                LorenzUtils.chat("§e[SkyHanni] §aDisabled global render toggle!")
+            }
         }
     }
 

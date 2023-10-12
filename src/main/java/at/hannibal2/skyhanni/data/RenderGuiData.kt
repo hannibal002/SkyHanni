@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -15,6 +16,7 @@ class RenderGuiData {
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        if (!SkyHanniDebugsAndTests.globalRenderToggle) return
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui()) return
 
         GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
@@ -22,6 +24,7 @@ class RenderGuiData {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!SkyHanniDebugsAndTests.globalRenderToggle) return
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return

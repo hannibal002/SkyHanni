@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
@@ -39,6 +40,7 @@ class ItemTipHelper {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!SkyHanniDebugsAndTests.globalRenderToggle) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return

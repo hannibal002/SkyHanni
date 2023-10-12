@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -65,6 +66,7 @@ class GuiEditManager {
         @JvmStatic
         fun renderLast() {
             if (!isInGui()) return
+            if (!SkyHanniDebugsAndTests.globalRenderToggle) return
 
             GlStateManager.translate(0f, 0f, 200f)
 

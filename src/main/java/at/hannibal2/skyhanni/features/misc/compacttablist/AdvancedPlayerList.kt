@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -114,7 +115,10 @@ object AdvancedPlayerList {
         return newList
     }
 
-    fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && KeyboardManager.isControlKeyDown()
+    fun ignoreCustomTabList(): Boolean {
+        val denyKeyPressed = SkyHanniMod.feature.dev.debugEnabled && KeyboardManager.isControlKeyDown()
+        return denyKeyPressed || !SkyHanniDebugsAndTests.globalRenderToggle
+    }
 
     private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
         "hannibal2",

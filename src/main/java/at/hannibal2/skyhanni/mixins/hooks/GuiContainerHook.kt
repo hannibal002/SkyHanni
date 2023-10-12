@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -21,6 +22,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        if (!SkyHanniDebugsAndTests.globalRenderToggle) return
         GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
