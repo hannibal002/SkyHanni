@@ -16,6 +16,7 @@
     "MixinItemStack",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
+    "MixinPatcherFontRendererHook",
     "MixinRendererLivingEntity",
     "MixinRenderGlobal",
     "MixinRenderItem",
