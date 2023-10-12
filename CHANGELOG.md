@@ -27,10 +27,18 @@
     + Marking partly members with a bright outline to better find them in the world.
 + Added Shift Click Equipment. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
+    + Will not break with emblems.
+    + Optional if left or right side of name.
+    + Should not break with other mods.
 
 #### Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
+    + Thanks Tobbbb for the coordinates!
+    + Support for hiding basket waypoints once you have clicked on them. - hannibal2
+    + Option to show only the closest basket. - hannibal2
 
 ### Changes
 
@@ -46,6 +54,7 @@
 + Added buttons to change the format of the price and the number in the sack display. - HiZe
 + Made Smoldering same as Fatal Tempo and Chimera in Estimated Item Value. - jani
 + Added an option to change where to get the items from in the composter overlay: from the bazaar or from sacks. - HiZe
++ Added mouse button support for key binds. - CalMWolfs
 
 ### Bug Fixes
 
@@ -60,6 +69,13 @@
 + Fixed double rendering of item tooltips with chat triggers. - nea
 + Fixed Sacks Display integer limit error. - HiZe & hannibal2
 + Fixed the vitality attribute is wrongly labeled as "mending" in Estimated Item Value. - walker
++ Fixed lever clicks getting highlighted in the water room. - hannibal2
+    + This solution might not work for iron man in full parties.
++ Fixed slayer profit tracker showing Bazaar/AH price as NPC price. - hannibal2
++ Fixed Hyper reforge/End Stone Geode detection. - hannibal2
++ Better limbo leave detection. - hannibal2
++ Fixed rare crash when trying to read neu config. - hannibal2
++ Fixed rare case where the visitor description is empty. - hannibal2
 
 #### Config
 

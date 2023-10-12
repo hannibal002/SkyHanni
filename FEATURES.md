@@ -2,17 +2,6 @@
 
 Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
-## Chat Filter
-
-- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message,
-  radiating generosity, Hypixel tournaments)
-- Hiding Empty messages.
-- Warping messages (Sending requests and switching servers)
-- Welcome Message when entering SkyBlock.
-- Powder Mining messages hider
-- Winter gift messages hider
-- Many other messages (Not separated into own categories yet)
-
 ## Chat
 
 + Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
@@ -33,6 +22,21 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
++ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
+    + Will not break with emblems.
+    + Optional if left or right side of name.
+    + Should not break with other mods.
+
+#### Chat Filter
+
+- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message,
+  radiating generosity, Hypixel tournaments)
+- Hiding Empty messages.
+- Warping messages (Sending requests and switching servers)
+- Welcome Message when entering SkyBlock.
+- Powder Mining messages hider
+- Winter gift messages hider
+- Many other messages (Not separated into own categories yet)
 
 ## Dungeon
 
@@ -514,6 +518,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 ## Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
+    + Thanks Tobbbb for the coordinates!
+    + Support for hiding basket waypoints once you have clicked on them. - hannibal2
+    + Option to show only the closest basket. - hannibal2
 
 ## Commands
 
