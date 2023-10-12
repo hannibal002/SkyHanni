@@ -359,6 +359,7 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Basket Waypoints", desc = "Show all Halloween Basket waypoints.\nShoutout to §bTobbbb §7for the coordinates.\n(AS OF 2023)")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean allWaypoints = false;
 
         @Expose
@@ -369,7 +370,7 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint")
         @ConfigEditorBoolean
-        public boolean onlyClosest = false;
+        public boolean onlyClosest = true;
     }
 
 }
