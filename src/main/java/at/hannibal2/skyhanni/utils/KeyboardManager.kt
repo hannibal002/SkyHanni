@@ -41,7 +41,6 @@ object KeyboardManager {
         if (Mouse.getEventButton() == -1 && lastClickedMouseButton != -1) {
             if (lastClickedMouseButton.isKeyHeld()) {
                 LorenzKeyPressEvent(lastClickedMouseButton).postAndCatch()
-                println("still holding")
                 return
             }
             lastClickedMouseButton = -1
