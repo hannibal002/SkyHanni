@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.SlayerProfitList
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -188,7 +187,7 @@ object SlayerItemProfitTracker {
             LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
         }
         if (config.titleWarning && price > config.minimumPriceWarning) {
-            TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
 

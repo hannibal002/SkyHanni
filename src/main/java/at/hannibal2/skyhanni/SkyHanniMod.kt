@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
-import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -329,7 +329,7 @@ class SkyHanniMod {
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
         loadModule(MinecraftData())
-        loadModule(TitleUtils())
+        loadModule(TitleManager())
         loadModule(ItemTipHelper())
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
