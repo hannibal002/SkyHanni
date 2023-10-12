@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import com.google.gson.JsonArray
 import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
@@ -29,7 +29,7 @@ class Translator {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message.getPlayerName() == "-") return
+        if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
         if (editedComponent.chatStyle?.chatClickEvent?.action == ClickEvent.Action.OPEN_URL) return
