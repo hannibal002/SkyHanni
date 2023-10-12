@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
@@ -21,6 +22,7 @@ object VisitorAPI {
     val config get() = SkyHanniMod.feature.garden
     private val logger = LorenzLogger("garden/visitors/api")
 
+    fun getVisitorsMap() = visitors
     fun getVisitors() = visitors.values
     fun getVisitor(id: Int) = visitors.map { it.value }.find { it.entityId == id }
 
@@ -65,10 +67,28 @@ object VisitorAPI {
         return null
     }
 
-    fun addVisitor(name: String) {
+    fun removeVisitor(name: String): Boolean {
+        if (!visitors.containsKey(name)) return false
+        val visitor = visitors[name] ?: return false
+        visitors = visitors.editCopy { remove(name) }
+        VisitorLeftEvent(visitor).postAndCatch()
+        return true
+    }
+
+    fun addVisitor(name: String): Boolean {
+        if (visitors.containsKey(name)) return false
         val visitor = Visitor(name, status = VisitorStatus.NEW)
         visitors = visitors.editCopy { this[name] = visitor }
         VisitorArrivalEvent(visitor).postAndCatch()
+        return true
+    }
+
+    fun fromHypixelName(line: String): String {
+        var name = line.trim().replace("§r", "").trim()
+        if (!name.contains("§")) {
+            name = "§f$name"
+        }
+        return name
     }
 
     class VisitorOffer(

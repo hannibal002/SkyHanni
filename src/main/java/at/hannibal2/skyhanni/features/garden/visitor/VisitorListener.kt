@@ -5,14 +5,15 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.Visitor
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -29,6 +30,7 @@ import org.lwjgl.input.Keyboard
 
 class VisitorListener {
     private var lastClickedNpc = 0
+    private val logger = LorenzLogger("garden/visitors/listener")
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
@@ -46,6 +48,54 @@ class VisitorListener {
         val entityId = entity.entityId
 
         lastClickedNpc = entityId
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (!GardenAPI.inGarden()) return
+        var found = false
+        val visitorsInTab = mutableListOf<String>()
+        for (line in event.tabList) {
+            if (line.startsWith("§b§lVisitors:")) {
+                found = true
+                continue
+            }
+            if (!found) continue
+
+            if (line.isEmpty()) {
+                found = false
+                continue
+            }
+            val name = VisitorAPI.fromHypixelName(line)
+
+            // Hide hypixel watchdog entries
+            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
+                logger.log("Ignore wrong red name: '$name'")
+                continue
+            }
+
+            //hide own player name
+            if (name.contains(LorenzUtils.getPlayerName())) {
+                logger.log("Ignore wrong own name: '$name'")
+                continue
+            }
+
+            visitorsInTab.add(name)
+        }
+
+        VisitorAPI.getVisitors().forEach {
+            val name = it.visitorName
+            val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
+            val removed = name !in visitorsInTab && time > 2_000
+            if (removed) {
+                logger.log("Removed old visitor: '$name'")
+                VisitorAPI.removeVisitor(name)
+            }
+        }
+
+        for (name in visitorsInTab) {
+           VisitorAPI.addVisitor(name)
+        }
     }
 
     @SubscribeEvent
@@ -88,7 +138,7 @@ class VisitorListener {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
-        if (!GardenVisitorFeatures.inVisitorInventory) return
+        if (!VisitorAPI.inVisitorInventory) return
         if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
@@ -127,7 +177,7 @@ class VisitorListener {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.onBarnPlot) return
-        if (!GardenVisitorFeatures.inVisitorInventory) return
+        if (!VisitorAPI.inVisitorInventory) return
         if (event.itemStack.name != "§aAccept Offer") return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
@@ -159,7 +209,7 @@ class VisitorListener {
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {
                 if (it.distanceToPlayer() > 15) return@let
-                VisitorRenderEvent(visitor, event.exactLocation(it))
+                VisitorRenderEvent(visitor, event.exactLocation(it)).postAndCatch()
             }
         }
     }

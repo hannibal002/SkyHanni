@@ -19,7 +19,7 @@ class VisitorTooltipParser {
     companion object {
         fun parse(lore: List<String>, config: GardenConfig?): ParsedTooltip {
             var section = ParsingSection.ITEMS_NEEDED
-            val parsedData = ParsedTooltip(lore, mutableMapOf(), mutableMapOf(), config ?: GardenConfig())
+            val parsedData = ParsedTooltip(mutableMapOf(), mutableMapOf(), config ?: GardenConfig())
             for (line in lore) {
                 if (line.isBlank()) continue
                 val isRewardSection = line.contains("Rewards:")

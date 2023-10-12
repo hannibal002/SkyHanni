@@ -3,17 +3,13 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -34,13 +30,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -48,7 +41,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -65,7 +57,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
@@ -389,76 +380,11 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inVisitorInventory = false
-    }
-
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
-        var found = false
-        val visitorsInTab = mutableListOf<String>()
-        for (line in event.tabList) {
-            if (line.startsWith("§b§lVisitors:")) {
-                found = true
-                continue
-            }
-            if (found) {
-                if (line.isEmpty()) {
-                    found = false
-                    continue
-                }
-                val name = fromHypixelName(line)
-
-                // Hide hypixel watchdog entries
-                if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
-                    logger.log("Ignore wrong red name: '$name'")
-                    continue
-                }
-
-                //hide own player name
-                if (name.contains(LorenzUtils.getPlayerName())) {
-                    logger.log("Ignore wrong own name: '$name'")
-                    continue
-                }
-
-                visitorsInTab.add(name)
-            }
-        }
-        val removedVisitors = mutableListOf<String>()
-        visitors.forEach {
-            val name = it.key
-            val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-            val removed = name !in visitorsInTab && time > 2_000
-            if (removed) {
-                logger.log("Removed old visitor: '$name'")
-                removedVisitors.add(name)
-            }
-        }
-        var dirty = false
-        if (removedVisitors.isNotEmpty()) {
-            visitors = visitors.editCopy {
-                keys.removeIf { it in removedVisitors }
-            }
-            dirty = true
-        }
-        for (name in visitorsInTab) {
-            if (!visitors.containsKey(name)) {
-                VisitorAPI.addVisitor(name)
-                dirty = true
-            }
-        }
-        if (dirty) {
-            updateDisplay()
-        }
-    }
-
-    @SubscribeEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         val visitor = event.visitor
         val name = visitor.visitorName
 
-        updateDisplay()
+        update()
 
         logger.log("New visitor detected: '$name'")
 
@@ -482,20 +408,12 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun fromHypixelName(line: String): String {
-        var name = line.trim().replace("§r", "").trim()
-        if (!name.contains("§")) {
-            name = "§f$name"
-        }
-        return name
-    }
-
     @SubscribeEvent
     fun onTabListText(event: TabListLineRenderEvent) {
         if (!GardenAPI.inGarden()) return
         if (!SkyHanniMod.feature.garden.visitorColoredName) return
         val text = event.text
-        val replace = fromHypixelName(text)
+        val replace = VisitorAPI.fromHypixelName(text)
         val visitor = visitors[replace]
         visitor?.let {
             event.text = " " + GardenVisitorColorNames.getColoredName(it.visitorName)
@@ -527,7 +445,8 @@ class GardenVisitorFeatures {
     }
 
     private fun checkVisitorsReady() {
-        for ((visitorName, visitor) in visitors) {
+        for (visitor in VisitorAPI.getVisitors()) {
+            val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
             if (entity == null) {
                 findNametag(visitorName.removeColor())?.let {
@@ -537,9 +456,9 @@ class GardenVisitorFeatures {
 
             if (!visitor.inSacks) {
                 val status = visitor.status
-                if (status == VisitorStatus.WAITING || status == VisitorStatus.READY) {
-                    val newStatus = if (hasItemsInInventory(visitor)) VisitorStatus.READY else VisitorStatus.WAITING
-                    changeStatus(visitor, newStatus, "hasItemsInInventory")
+                if (status == VisitorAPI.VisitorStatus.WAITING || status == VisitorAPI.VisitorStatus.READY) {
+                    val newStatus = if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
+                    VisitorAPI.changeStatus(visitor, newStatus, "hasItemsInInventory")
                 }
             }
 
@@ -557,14 +476,7 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun changeStatus(visitor: Visitor, newStatus: VisitorStatus, reason: String) {
-        val old = visitor.status
-        if (old == newStatus) return
-        visitor.status = newStatus
-        logger.log("Visitor status change for '${visitor.visitorName}': $old -> $newStatus ($reason)")
-    }
-
-    private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
+    private fun findEntity(nameTag: EntityArmorStand, visitor: VisitorAPI.Visitor) {
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityArmorStand) continue
             if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
@@ -601,7 +513,7 @@ class GardenVisitorFeatures {
         return foundVisitorNameTags[0]
     }
 
-    private fun hasItemsInInventory(visitor: Visitor): Boolean {
+    private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, need) in visitor.items) {
             val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
