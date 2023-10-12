@@ -289,7 +289,7 @@ object EstimatedItemValue {
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        var rawReforgeName = stack.getReforgeName() ?: return 0.0
+        val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
             val stoneJson = values.asJsonObject
@@ -302,8 +302,7 @@ object EstimatedItemValue {
                 val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
                 val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
 
-                val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
-                list.add("§7Reforge: §9$realReforgeName")
+                list.add("§7Reforge: §9$reforgeName")
                 list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
                 list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
                 return reforgeStonePrice + applyCost
