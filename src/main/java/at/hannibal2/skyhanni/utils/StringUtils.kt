@@ -200,7 +200,7 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerName(): String? {
+    fun String.getPlayerNameFromChatMessage(): String? {
         if (!playerChatPattern.matcher(this).matches()) return null
 
         var username = this.removeColor().split(":")[0]

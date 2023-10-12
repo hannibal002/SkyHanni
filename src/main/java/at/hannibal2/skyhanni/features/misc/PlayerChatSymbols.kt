@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.getPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
@@ -24,7 +24,7 @@ class PlayerChatSymbols {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
-        val username = event.message.getPlayerName() ?: return
+        val username = event.message.getPlayerNameFromChatMessage() ?: return
 
         updateSymbolFromTabList(username)
 
