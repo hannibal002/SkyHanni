@@ -365,6 +365,11 @@ public class EventConfig {
         @ConfigOption(name = "Helper Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
         @ConfigEditorBoolean
         public boolean allEntranceWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint")
+        @ConfigEditorBoolean
+        public boolean onlyClosest = false;
     }
 
 }

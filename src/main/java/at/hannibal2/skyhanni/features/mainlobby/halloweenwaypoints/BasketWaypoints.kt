@@ -10,15 +10,13 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BasketWaypoints {
     private val config get() = SkyHanniMod.feature.event.halloweenBasket
-    private var waypoint: LorenzVec? = null
-    private var waypointName: String? = null
+    private var closest: Basket? = null
     private var isHalloween: Boolean = false
 
     @SubscribeEvent
@@ -30,8 +28,10 @@ class BasketWaypoints {
         if (message.startsWith("§a§lYou found a Candy Basket! §r") || message == "§cYou already found this Candy Basket!") {
             val basket = Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             basket.found = true
+            if (closest == basket) {
+                closest = null
+            }
         }
-
     }
 
     @SubscribeEvent
@@ -43,6 +43,16 @@ class BasketWaypoints {
         if (event.repeatSeconds(1)) {
             isHalloween = chechScoreboardHalloweenSpecific()
         }
+
+        if (isHalloween) {
+            if (config.onlyClosest) {
+                if (closest == null) {
+                    val notFoundBaskets = Basket.entries.filter { !it.found }
+                    if (notFoundBaskets.isEmpty()) return
+                    closest = notFoundBaskets.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -51,7 +61,7 @@ class BasketWaypoints {
 
         if (config.allWaypoints) {
             for (basket in Basket.entries) {
-                if (basket.found) continue
+                if (!basket.shouldShow()) continue
                 event.drawWaypointFilled(basket.waypoint, LorenzColor.GOLD.toColor())
                 event.drawDynamicText(basket.waypoint, "§6" + basket.basketName, 1.5)
             }
@@ -59,7 +69,7 @@ class BasketWaypoints {
 
         if (config.allEntranceWaypoints) {
             for (basketEntrance in BasketEntrances.entries) {
-                if (!basketEntrance.basket.any { !it.found }) continue
+                if (!basketEntrance.basket.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(basketEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(basketEntrance.waypoint, "§e" + basketEntrance.basketEntranceName, 1.5)
             }
@@ -67,11 +77,14 @@ class BasketWaypoints {
         }
 
         if (LorenzUtils.skyBlockArea == "?") return
+    }
 
-        waypoint?.let {
-            event.drawWaypointFilled(it, LorenzColor.GOLD.toColor())
-            event.drawDynamicText(it, "§6" + waypointName!!, 1.5)
+    private fun Basket.shouldShow(): Boolean {
+        if (found) {
+            return false
         }
+
+        return if (config.onlyClosest) closest == this else true
     }
 
     private fun chechScoreboardHalloweenSpecific(): Boolean {
