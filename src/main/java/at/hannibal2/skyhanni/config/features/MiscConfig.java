@@ -544,7 +544,7 @@ public class MiscConfig {
     public static class HighlightPartyMembers {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Marking partly members with a bright outline to better find them in the world.")
+        @ConfigOption(name = "Enabled", desc = "Marking party members with a bright outline to better find them in the world.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;

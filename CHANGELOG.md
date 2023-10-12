@@ -24,7 +24,7 @@
     + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
 + Added Highlight Party Members. - Cad
-    + Marking partly members with a bright outline to better find them in the world.
+    + Marking party members with a bright outline to better find them in the world.
 + Added Shift Click Equipment. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 + Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
