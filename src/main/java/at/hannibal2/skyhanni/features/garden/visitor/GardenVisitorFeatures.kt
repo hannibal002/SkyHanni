@@ -253,12 +253,12 @@ class GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        drawString(location.add(0.0, 2.23, 0.0), text)
+        event.parent.drawString(location.add(0.0, 2.23, 0.0), text)
         if (config.visitorRewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
+                event.parent.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
             }
         }
     }

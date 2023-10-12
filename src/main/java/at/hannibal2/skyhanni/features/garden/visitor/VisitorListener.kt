@@ -209,7 +209,7 @@ class VisitorListener {
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {
                 if (it.distanceToPlayer() > 15) return@let
-                VisitorRenderEvent(visitor, event.exactLocation(it)).postAndCatch()
+                VisitorRenderEvent(visitor, event.exactLocation(it), event).postAndCatch()
             }
         }
     }
