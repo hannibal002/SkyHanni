@@ -363,7 +363,7 @@ public class EventConfig {
         public boolean allWaypoints = false;
 
         @Expose
-        @ConfigOption(name = "Helper Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
+        @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
         @ConfigEditorBoolean
         public boolean allEntranceWaypoints = false;
 
