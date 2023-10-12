@@ -217,8 +217,7 @@ object StringUtils {
 
         val matcher = chatUsernamePattern.matcher(username)
 
-        if (!matcher.matches()) return "-"
-        username = matcher.group("username")
-        return username
+        if (!matcher.matches()) return null
+        return matcher.group("username")
     }
 }
