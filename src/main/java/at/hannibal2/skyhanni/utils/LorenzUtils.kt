@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
@@ -537,4 +538,8 @@ object LorenzUtils {
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
+
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
+        TitleManager.sendTitle(text, duration, height)
+    }
 }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -142,12 +141,13 @@ object VampireSlayerFeatures {
                                 if (nextClawSend < System.currentTimeMillis()) {
                                     if (shouldSendSound)
                                         playTwinclawsSound()
-                                    if (shouldSendTitle)
-                                        TitleUtils.sendTitle(
+                                    if (shouldSendTitle) {
+                                        LorenzUtils.sendTitle(
                                             "§6§lTWINCLAWS",
                                             (1750 - config.twinclawsDelay).milliseconds,
                                             2.6
                                         )
+                                    }
                                     nextClawSend = System.currentTimeMillis() + 5_000
                                 }
                             }
@@ -198,8 +198,9 @@ object VampireSlayerFeatures {
                 else if (canUseSteak && configOtherBoss.steakAlert && taggedEntityList.contains(this.entityId)) true
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
-            if (shouldSendSteakTitle)
-                TitleUtils.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
+            if (shouldSendSteakTitle) {
+                LorenzUtils.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
+            }
 
             if (shouldRender) {
                 RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }

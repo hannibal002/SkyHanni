@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -579,7 +578,7 @@ class GardenVisitorFeatures {
         logger.log("New visitor detected: '$name'")
 
         if (config.visitorNotificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
-            TitleUtils.sendTitle("§eNew Visitor", 5.seconds)
+            LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
         }
         if (config.visitorNotificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
