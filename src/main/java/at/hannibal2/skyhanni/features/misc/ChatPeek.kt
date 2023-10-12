@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.OSUtils
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -21,6 +21,6 @@ object ChatPeek {
 
         if (NEUItems.neuHasFocus()) return false
 
-        return OSUtils.isKeyHeld(key)
+        return key.isKeyHeld()
     }
 }

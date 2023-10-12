@@ -675,6 +675,28 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Player Chat Symbols", desc = "")
+    @Accordion
+    public ChatSymbols chatSymbols = new ChatSymbols();
+
+    public static class ChatSymbols {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Adds extra symbols to the chat such as those from ironman, " +
+                "stranded, bingo or nether factions and places them next to your regular player emblems. " +
+                "Also allows emblems without sb level in chat.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Chat Symbol Location", desc = "Determines where the symbols should go in chat in relation to the " +
+                "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
+        @ConfigEditorDropdown(values = {"Left", "Right", "Hidden"})
+        public int symbolLocation = 0;
+    }
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
