@@ -283,6 +283,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
@@ -353,6 +354,7 @@ class SkyHanniMod {
         loadModule(BlockData())
         loadModule(DefaultConfigFeatures)
         loadModule(EntityOutlineRenderer)
+        loadModule(KeyboardManager)
 
         // APIs
         loadModule(BazaarApi())

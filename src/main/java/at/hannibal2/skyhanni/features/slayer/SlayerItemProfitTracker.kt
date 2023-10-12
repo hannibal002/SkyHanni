@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -251,7 +252,7 @@ object SlayerItemProfitTracker {
             ) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
 
-                    if (LorenzUtils.isControlKeyDown()) {
+                    if (KeyboardManager.isControlKeyDown()) {
                         itemLog.items.remove(internalName)
                         LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
                         lastClickDelay = System.currentTimeMillis() + 500

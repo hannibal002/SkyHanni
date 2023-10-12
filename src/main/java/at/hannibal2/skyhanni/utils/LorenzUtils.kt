@@ -24,8 +24,6 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import org.apache.commons.lang3.SystemUtils
-import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -290,13 +288,6 @@ object LorenzUtils {
         }
     }
 
-    fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
-
-    fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
-
-    // A mac-only key, represents Windows key on windows (but different key code)
-    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_RMETA)
-
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
         for (property in properties) {
@@ -524,11 +515,6 @@ object LorenzUtils {
                 runnable()
             }
         }, duration.inWholeMilliseconds)
-    }
-
-    fun isPastingKeysDown(): Boolean {
-        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
-        return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
     }
 
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
