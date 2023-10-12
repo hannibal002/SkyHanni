@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
 import at.hannibal2.skyhanni.events.VisitorAcceptEvent
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -29,7 +27,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -49,11 +46,9 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -64,9 +59,7 @@ import kotlin.time.Duration.Companion.seconds
 private val config get() = SkyHanniMod.feature.garden
 
 class GardenVisitorFeatures {
-    private var visitors = mapOf<String, Visitor>()
     private var display = emptyList<List<Any>>()
-    private var lastClickedNpc = 0
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
@@ -112,17 +105,6 @@ class GardenVisitorFeatures {
             }
             update()
         }
-    }
-
-    private fun readReward(offerItem: ItemStack): VisitorReward? {
-        for (line in offerItem.getLore()) {
-            for (reward in VisitorReward.entries) {
-                if (line.contains(reward.displayName)) {
-                    return reward
-                }
-            }
-        }
-        return null
     }
 
     private fun updateDisplay() {
@@ -409,7 +391,7 @@ class GardenVisitorFeatures {
         if (!SkyHanniMod.feature.garden.visitorColoredName) return
         val text = event.text
         val replace = VisitorAPI.fromHypixelName(text)
-        val visitor = visitors[replace]
+        val visitor = VisitorAPI.getVisitor(replace)
         visitor?.let {
             event.text = " " + GardenVisitorColorNames.getColoredName(it.visitorName)
         }
@@ -431,7 +413,7 @@ class GardenVisitorFeatures {
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
-        return visitors.keys.any { it.removeColor() == name }
+        return VisitorAPI.getVisitorsMap().keys.any { it.removeColor() == name }
     } ?: false
 
     private fun update() {
@@ -519,19 +501,6 @@ class GardenVisitorFeatures {
         return ready
     }
 
-    // TODO make event
-    @SubscribeEvent
-    fun onSendEvent(event: PacketEvent.SendEvent) {
-        val packet = event.packet
-        if (packet !is C02PacketUseEntity) return
-
-        val theWorld = Minecraft.getMinecraft().theWorld
-        val entity = packet.getEntityFromWorld(theWorld) ?: return
-        val entityId = entity.entityId
-
-        lastClickedNpc = entityId
-    }
-
     @SubscribeEvent
     fun onRenderInSigns(event: DrawScreenEvent.Post) {
         if (!GardenAPI.inGarden()) return
@@ -573,47 +542,11 @@ class GardenVisitorFeatures {
         if (!SkyHanniMod.feature.garden.visitorColoredName) return
         val entity = event.entity
         val entityId = entity.entityId
-        for (visitor in visitors.values) {
+        for (visitor in VisitorAPI.getVisitors()) {
             if (visitor.nameTagEntityId == entityId) {
                 entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
             }
         }
-    }
-
-    class Visitor(
-        val visitorName: String,
-        var entityId: Int = -1,
-        var nameTagEntityId: Int = -1,
-        var status: VisitorStatus,
-        var inSacks: Boolean = false,
-        val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
-    ) {
-
-        var allRewards = listOf<NEUInternalName>()
-        var lastLore = listOf<String>()
-        fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
-
-        fun getNameTagEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
-
-        fun hasReward(): VisitorReward? {
-            for (internalName in allRewards) {
-                val reward = VisitorReward.getByInternalName(internalName) ?: continue
-
-                if (config.visitorRewardWarning.drops.contains(reward.ordinal)) {
-                    return reward
-                }
-            }
-
-            return null
-        }
-    }
-
-    enum class VisitorStatus(val displayName: String, val color: Int) {
-        NEW("§eNew", LorenzColor.YELLOW.toColor().withAlpha(100)),
-        WAITING("Waiting", -1),
-        READY("§aItems Ready", LorenzColor.GREEN.toColor().withAlpha(80)),
-        ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
-        REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
     }
 }
 

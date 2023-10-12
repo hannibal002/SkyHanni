@@ -25,6 +25,7 @@ object VisitorAPI {
     fun getVisitorsMap() = visitors
     fun getVisitors() = visitors.values
     fun getVisitor(id: Int) = visitors.map { it.value }.find { it.entityId == id }
+    fun getVisitor(name: String) = visitors[name]
 
     fun reset() {
         visitors = emptyMap()
