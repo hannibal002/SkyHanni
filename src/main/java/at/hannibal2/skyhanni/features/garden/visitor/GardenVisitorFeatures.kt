@@ -388,10 +388,15 @@ class GardenVisitorFeatures {
 
         val visitor = getVisitor(lastClickedNpc) ?: return
 
-        event.toolTip.let {
-            it.clear()
-            it.addAll(visitor.lastLore)
+        val toolTip = event.toolTip ?: return
+        toolTip.clear()
+
+        if (visitor.lastLore.isEmpty()) {
+            readToolTip(visitor, event.itemStack)
+            LorenzUtils.chat("§e[SkyHanni] Reloaded the visitor data of that inventory, this should not happen.")
         }
+
+        toolTip.addAll(visitor.lastLore)
     }
 
     private fun readToolTip(visitor: Visitor, itemStack: ItemStack?) {
