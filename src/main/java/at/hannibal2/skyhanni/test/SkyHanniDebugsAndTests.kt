@@ -71,7 +71,6 @@ class SkyHanniDebugsAndTests {
 //            a.start()
 //            b.start()
 
-
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
 //                println("$i: '$s'")
 //            }
@@ -81,7 +80,6 @@ class SkyHanniDebugsAndTests {
 //            val sound = SoundUtils.createSound("note.harp", 1.35f)
 //            val sound = SoundUtils.createSound("random.orb", 11.2f)
 //            SoundUtils.createSound(name, pitch).playSound()
-
 
 //            a = args[0].toDouble()
 //            b = args[1].toDouble()
@@ -213,7 +211,13 @@ class SkyHanniDebugsAndTests {
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
             builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
-            builder.append("globalRenderToggle: ${globalRender}\n")
+            if (!config.repoAutoUpdate) {
+                builder.append("REPO DOES NOT AUTO UPDATE\n")
+            }
+            builder.append("globalRender: ${globalRender}\n")
+            if (!globalRender) {
+                builder.append("GLOBAL RENDERER IS DISABLED\n")
+            }
             builder.append("\n")
 
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
@@ -396,7 +400,6 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-
         //diana ancestral spade
 //        if (soundName == "note.harp") {
 //            val list = mutableListOf<Float>()
@@ -520,7 +523,6 @@ class SkyHanniDebugsAndTests {
 //                return
 //            }
 //        }
-
 
 //        if (soundName == "game.player.hurt") return
 //        if (soundName.startsWith("step.")) return
