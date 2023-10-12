@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -29,7 +29,7 @@ class SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                TitleUtils.sendTitle("§cSlayer boss soon!", 2.seconds)
+                LorenzUtils.sendTitle("§cSlayer boss soon!", 2.seconds)
                 warned = true
             }
         } else {

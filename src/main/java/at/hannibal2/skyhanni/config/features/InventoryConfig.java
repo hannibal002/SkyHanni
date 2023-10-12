@@ -376,6 +376,16 @@ public class InventoryConfig {
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
 
     @Expose
+    @ConfigOption(
+            name = "Quick Craft Confirmation",
+            desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+                    "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quickCraftingConfirmation = false;
+
+    @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -408,5 +418,10 @@ public class InventoryConfig {
     @FeatureToggle
     public boolean highlightAuctions = true;
 
+    @Expose
+    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickForEquipment = false;
 
 }

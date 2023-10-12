@@ -64,26 +64,25 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Inventory
 
-- Not Clickable Items
-    - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
++ Not Clickable Items
+    + Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
       around items that meet that requirement.
-    - Works in:
-        - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
-        - bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
-        - chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
-    - Option to allow/block clicks
-- Option to change the gray-out opacity for 'Not Clickable Items'.
-- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and
+    + Works in:
+        + In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
+        + bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
+        + chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
+    + Option to allow/block clicks
++ Option to change the gray-out opacity for 'Not Clickable Items'.
++ Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and
   diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and
   collection level)
-- Sack name (show short name of sacks)
-- Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same
++ Sack name (show short name of sacks)
++ Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same
   enchantment are highlighted in the inventory)
-- compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors,
++ compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors,
   cloaks and fishing rods)
-- RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a
++ RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a
   drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
-
 + Show the tuning stats in the Thaumaturgy inventory.
 + Show the amount of selected tuning points in the stats tuning inventory.
 + Highlight the selected template in the stats tuning inventory.
@@ -105,6 +104,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ **Quick Craft Confirmation**. - Cad
+    + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
+    + Sack items can be crafted normally.
++ **Shift Click Equipment**. - Thunderblade73
+    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 
 ## Item Abilities
 
@@ -151,7 +155,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
 + Saves missing items from canceled buy orders to clipboard for faster re-entry.
 + Update Timer showing when the next api data update happens.
-+ Added Price Website button. - hannibal2
++ Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
 
 ## Fishing
@@ -184,7 +188,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Chum/Chumcap Bucket.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
-+ Added Fishing Hook Display. - hannibal2
++ Fishing Hook Display. - hannibal2
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
 
@@ -297,7 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ Added a countdown for Arachne spawn. - Cad
++ Countdown for Arachne spawn. - Cad
     + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
 
@@ -650,6 +654,24 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
     + Change the scale with plus and minus keys. - CalMWolfs
++ **Compact Tab List**.
+    + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
+    + Option to hide Hypixel advertisment banners. - CalMWolfs
+    + **Advanced Player List**. - hannibal2
+        + Customize the player list (inside the tab list) in various ways.
+        + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
+          party/friends/guild
+        + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
+          level
++ Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send a warning and sound after a custom amount of seconds.
++ Time In Limbo. - hannibal2
+    + Show the time since you entered limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
++ Highlight Party Members. - Cad
+    + Marking partly members with a bright outline to better find them in the world.
 
 ## Cosmetics
 
