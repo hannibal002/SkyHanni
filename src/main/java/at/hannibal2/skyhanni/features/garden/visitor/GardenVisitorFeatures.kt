@@ -76,10 +76,6 @@ class GardenVisitorFeatures {
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
 
-    companion object {
-        var inVisitorInventory = false
-    }
-
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
         display = emptyList()
