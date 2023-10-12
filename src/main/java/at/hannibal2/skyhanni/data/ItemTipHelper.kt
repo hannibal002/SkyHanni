@@ -40,7 +40,7 @@ class ItemTipHelper {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniDebugsAndTests.globalRenderToggle) return
+        if (!SkyHanniDebugsAndTests.globalRender) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return

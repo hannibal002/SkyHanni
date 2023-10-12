@@ -43,7 +43,7 @@ class SkyHanniDebugsAndTests {
         var displayLine = ""
         var displayList = emptyList<List<Any>>()
 
-        var globalRenderToggle = true
+        var globalRender = true
 
         var a = 1.0
         var b = 60.0
@@ -213,7 +213,7 @@ class SkyHanniDebugsAndTests {
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
             builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
-            builder.append("globalRenderToggle: ${globalRenderToggle}\n")
+            builder.append("globalRenderToggle: ${globalRender}\n")
             builder.append("\n")
 
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
@@ -274,11 +274,11 @@ class SkyHanniDebugsAndTests {
         }
 
         fun toggleRender() {
-            globalRenderToggle = !globalRenderToggle
-            if (globalRenderToggle) {
-                LorenzUtils.chat("§e[SkyHanni] §cEnabled global render toggle! Run this command again to show SkyHanni elements again.")
+            globalRender = !globalRender
+            if (globalRender) {
+                LorenzUtils.chat("§e[SkyHanni] §aEnabled global renderer!")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] §aDisabled global render toggle!")
+                LorenzUtils.chat("§e[SkyHanni] §cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
         }
     }

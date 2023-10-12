@@ -22,7 +22,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        if (!SkyHanniDebugsAndTests.globalRenderToggle) return
+        if (!SkyHanniDebugsAndTests.globalRender) return
         GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 

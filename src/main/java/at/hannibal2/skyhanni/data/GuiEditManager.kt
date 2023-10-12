@@ -66,7 +66,7 @@ class GuiEditManager {
         @JvmStatic
         fun renderLast() {
             if (!isInGui()) return
-            if (!SkyHanniDebugsAndTests.globalRenderToggle) return
+            if (!SkyHanniDebugsAndTests.globalRender) return
 
             GlStateManager.translate(0f, 0f, 200f)
 

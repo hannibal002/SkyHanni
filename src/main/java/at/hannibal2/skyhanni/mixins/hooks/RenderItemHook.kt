@@ -13,7 +13,7 @@ fun renderItemOverlayPost(
     yPosition: Int,
     text: String?,
 ) {
-    if (!SkyHanniDebugsAndTests.globalRenderToggle) return
+    if (!SkyHanniDebugsAndTests.globalRender) return
     GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost(
         fr,
         stack,
@@ -24,6 +24,6 @@ fun renderItemOverlayPost(
 }
 
 fun renderItemReturn(stack: ItemStack, x: Int, y: Int) {
-    if (!SkyHanniDebugsAndTests.globalRenderToggle) return
+    if (!SkyHanniDebugsAndTests.globalRender) return
     RenderRealOverlayEvent(stack, x, y).postAndCatch()
 }
