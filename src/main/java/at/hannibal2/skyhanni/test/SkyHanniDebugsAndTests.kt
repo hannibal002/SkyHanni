@@ -297,6 +297,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onShowInternalName(event: ItemTooltipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.showInternalName) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalName()
@@ -307,6 +308,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun showItemRarity(event: ItemTooltipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.showItemRarity) return
         val itemStack = event.itemStack ?: return
 
@@ -316,6 +318,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onSHowNpcPrice(event: ItemTooltipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.showNpcPrice) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalNameOrNull() ?: return
