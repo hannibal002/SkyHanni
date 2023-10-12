@@ -24,6 +24,9 @@ class BasketWaypoints {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isHalloween) return
 
+        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
+        if (LorenzUtils.inSkyBlock) return
+
         val message = event.message
         if (message.startsWith("§a§lYou found a Candy Basket! §r") || message == "§cYou already found this Candy Basket!") {
             val basket = Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
@@ -57,6 +60,8 @@ class BasketWaypoints {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
+        if (LorenzUtils.inSkyBlock) return
         if (!isHalloween) return
 
         if (config.allWaypoints) {
