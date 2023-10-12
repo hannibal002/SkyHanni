@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -78,7 +77,7 @@ class SummoningSoulsName {
 
         for ((entity, name) in souls) {
             val vec = entity.getLorenzVec()
-            event.drawString(vec.add(0.0, 2.5, 0.0), name)
+            drawString(vec.add(0.0, 2.5, 0.0), name)
         }
     }
 

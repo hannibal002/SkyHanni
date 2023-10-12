@@ -81,7 +81,7 @@ class DungeonHighlightClickedBlocks {
         blocks.removeAll { System.currentTimeMillis() > it.time + 3000 }
         blocks.forEach {
             event.drawColor(it.position, it.color)
-            event.drawString(it.position.add(0.5, 0.5, 0.5), it.displayText, true)
+            drawString(it.position.add(0.5, 0.5, 0.5), it.displayText, true)
         }
     }
 

@@ -50,7 +50,7 @@ class SlayerItemsOnGround {
         }
 
         for ((location, text) in itemsOnGround.asMap().values) {
-            event.drawString(location, text)
+            drawString(location, text)
         }
     }
 }

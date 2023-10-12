@@ -221,7 +221,7 @@ object TrevorFeatures {
             { config.trapperTalkCooldown }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
+                    drawString(it.add(0.0, 2.23, 0.0), currentLabel)
                 }
             }
         }

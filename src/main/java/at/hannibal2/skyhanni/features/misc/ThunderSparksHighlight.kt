@@ -53,7 +53,7 @@ class ThunderSparksHighlight {
                 sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks
             )
             if (sparkLocation.distance(playerLocation) < 10) {
-                event.drawString(sparkLocation.add(0.0, 1.5, 0.0), "Thunder Spark", seeThroughBlocks = seeThroughBlocks)
+                drawString(sparkLocation.add(0.0, 1.5, 0.0), "Thunder Spark", seeThroughBlocks = seeThroughBlocks)
             }
         }
     }
