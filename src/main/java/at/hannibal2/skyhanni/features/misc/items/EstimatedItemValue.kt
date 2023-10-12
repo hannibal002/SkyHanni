@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTunerCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
@@ -202,6 +203,7 @@ object EstimatedItemValue {
         totalPrice += addWoodSingularity(stack, list)
         totalPrice += addJalapenoBook(stack, list)
         totalPrice += addStatsBook(stack, list)
+        totalPrice += addEnrichment(stack, list)
 
         // counted
         totalPrice += addMasterStars(stack, list)
@@ -563,6 +565,18 @@ object EstimatedItemValue {
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
+        return price
+    }
+
+    private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
+
+        val enrichmentName = stack.getEnrichment() ?: return 0.0
+        val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".asInternalName()
+
+
+        val price = internalName.getPrice()
+        val name = internalName.getItemName()
+        list.add("§7Enrichment: $name §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 
