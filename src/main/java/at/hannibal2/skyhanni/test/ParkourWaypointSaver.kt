@@ -29,15 +29,18 @@ class ParkourWaypointSaver {
         if (NEUItems.neuHasFocus()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
-        if (config.deleteKey == event.keyCode) {
-            locations = locations.dropLast(1).toMutableList()
-            update()
-        }
-        if (config.saveKey == event.keyCode) {
-            val newLocation = LorenzVec.getBlockBelowPlayer()
-            if (locations.isNotEmpty() && newLocation == locations.last()) return
-            locations.add(newLocation)
-            update()
+        when (event.keyCode) {
+            config.deleteKey -> {
+                locations = locations.dropLast(1).toMutableList()
+                update()
+            }
+
+            config.saveKey -> {
+                val newLocation = LorenzVec.getBlockBelowPlayer()
+                if (locations.isNotEmpty() && newLocation == locations.last()) return
+                locations.add(newLocation)
+                update()
+            }
         }
     }
 

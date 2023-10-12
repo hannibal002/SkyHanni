@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.utils.KeyboardUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import io.github.moulberry.moulconfig.internal.GlScissorStack
@@ -59,7 +59,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 )
             }
             if (mouseX in 0..w && mouseY in 0..(size * 10) && (isMouseButtonDown && !wasMouseButtonDown)) {
-                if (KeyboardUtils.isShiftKeyDown()) {
+                if (KeyboardManager.isShiftKeyDown()) {
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
                     LorenzUtils.chat("Copied structured chat line to clipboard")
                 } else {

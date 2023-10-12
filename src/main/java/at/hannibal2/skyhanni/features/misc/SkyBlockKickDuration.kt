@@ -24,6 +24,7 @@ class SkyBlockKickDuration {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message == "§cYou were kicked while joining that server!") {
+            //if is in hub: enable rn
             kickMessage = true
         }
     }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.KeyboardUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -30,7 +30,7 @@ object CopyErrorCommand {
         }
 
         val id = array[0]
-        val fullErrorMessage = KeyboardUtils.isControlKeyDown()
+        val fullErrorMessage = KeyboardManager.isControlKeyDown()
         val errorMessage = if (fullErrorMessage) {
             fullErrorMessages[id]
         } else {

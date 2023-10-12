@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.KeyboardUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -39,7 +39,7 @@ class QuickCraftFeatures {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (KeyboardUtils.isControlKeyDown()) return
+        if (KeyboardManager.isControlKeyDown()) return
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
 
@@ -62,7 +62,7 @@ class QuickCraftFeatures {
 
         val clickedItem = event.slot?.stack ?: return
 
-        if (!KeyboardUtils.isControlKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
+        if (!KeyboardManager.isControlKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
             event.isCanceled = true
         }
     }

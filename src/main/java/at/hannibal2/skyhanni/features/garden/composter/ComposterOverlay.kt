@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.KeyboardUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
@@ -422,7 +422,7 @@ class ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (KeyboardUtils.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                if (KeyboardManager.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
                     retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
                 }

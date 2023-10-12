@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -177,7 +177,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         val position = positions[clickedPos]
         if (position.clicked) return
 
-        val dist = if (KeyboardUtils.isShiftKeyDown()) 10 else 1
+        val dist = if (KeyboardManager.isShiftKeyDown()) 10 else 1
         val elementWidth = position.getDummySize(true).x
         val elementHeight = position.getDummySize(true).y
         when (keyCode) {
