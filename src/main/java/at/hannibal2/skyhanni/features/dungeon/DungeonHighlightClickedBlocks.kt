@@ -56,7 +56,7 @@ class DungeonHighlightClickedBlocks {
         }
 
         // Water room
-        if (DungeonAPI.getFloorId() == "-60,-60") {
+        if (DungeonAPI.getRoomID() == "-60,-60") {
             return
         }
 
