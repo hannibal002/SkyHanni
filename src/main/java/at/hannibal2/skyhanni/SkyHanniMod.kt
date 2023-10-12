@@ -189,6 +189,7 @@ import at.hannibal2.skyhanni.features.misc.PasteIntoSigns
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
+import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
@@ -587,6 +588,7 @@ class SkyHanniMod {
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
+        loadModule(PlayerChatSymbols())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
         loadModule(SkyBlockKickDuration())
