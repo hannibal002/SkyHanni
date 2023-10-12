@@ -1,11 +1,8 @@
-package at.hannibal2.skyhanni.features.misc.halloweenlobbywaypoints
+package at.hannibal2.skyhanni.features.mainlobby.halloweenwaypoints
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 
-enum class Basket(
-    val basketName: String,
-    val waypoint: LorenzVec
-) {
+enum class Basket(val basketName: String, val waypoint: LorenzVec) {
     BASKET_1("#1", LorenzVec(-31, 91, -19)),
     BASKET_2("#2", LorenzVec(-14, 85, -78)),
     BASKET_3("#3", LorenzVec(24, 68, -29)),
@@ -31,4 +28,7 @@ enum class Basket(
     BASKET_23("#23", LorenzVec(-84, 72, 8)),
     BASKET_24("#24", LorenzVec(-13, 31, -26)),
     BASKET_25("#25 (get your code first!)", LorenzVec(-32, 14, 102)),
+    ;
+
+    var found = false
 }
