@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
+import at.hannibal2.skyhanni.utils.KeyboardUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
@@ -165,7 +166,7 @@ class HideNotClickableItems {
         }
     }
 
-    private fun bypasssActive() = config.notClickableItemsBypass && LorenzUtils.isControlKeyDown()
+    private fun bypasssActive() = config.notClickableItemsBypass && KeyboardUtils.isControlKeyDown()
 
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true

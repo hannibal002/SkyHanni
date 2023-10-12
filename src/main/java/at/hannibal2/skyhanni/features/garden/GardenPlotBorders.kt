@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -23,12 +23,12 @@ class GardenPlotBorders {
     private fun LorenzVec.addXZ(x: Int, z: Int) = add(x, 0, z)
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
-
-        val keyPressed = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter() else Keyboard.getEventKey()
-
-        if (keyPressed == Keyboard.KEY_G && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+        if (event.keyCode == Keyboard.KEY_G && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+            showBorders = !showBorders
+        }
+        if (event.keyCode == Keyboard.KEY_F3 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
             showBorders = !showBorders
         }
     }
