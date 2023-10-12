@@ -282,14 +282,14 @@ class MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                drawString(location.add(0.0, 0.65, 0.0), name, true)
+                event.drawString(location.add(0.0, 0.65, 0.0), name, true)
             }
 
             if (config.emptiedTimeDisplay && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
                 val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                drawString(location.add(0.0, 1.15, 0.0), text, true)
+                event.drawString(location.add(0.0, 1.15, 0.0), text, true)
             }
         }
     }

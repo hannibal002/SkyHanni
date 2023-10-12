@@ -78,7 +78,7 @@ class ShowFishingItemName {
         }
 
         for ((location, text) in cache.asMap().values) {
-            drawString(location, text)
+            event.drawString(location, text)
         }
     }
 

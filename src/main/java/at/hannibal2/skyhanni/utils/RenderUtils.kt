@@ -197,11 +197,11 @@ object RenderUtils {
         tessellator.draw()
     }
 
-    fun drawString(
-            location: LorenzVec,
-            text: String,
-            seeThroughBlocks: Boolean = false,
-            color: Color? = null,
+    fun RenderWorldLastEvent.drawString(
+        location: LorenzVec,
+        text: String,
+        seeThroughBlocks: Boolean = false,
+        color: Color? = null,
     ) {
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()

@@ -221,7 +221,7 @@ object GriffinBurrowHelper {
                 animationLocation?.let {
                     event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
                     if (it.distanceToPlayer() < 10) {
-                        drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
+                        event.drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
                     }
                     return
                 }

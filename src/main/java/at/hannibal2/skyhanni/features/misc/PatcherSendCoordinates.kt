@@ -55,7 +55,7 @@ class PatcherSendCoordinates {
             val location = beacon.location
             event.drawColor(location, LorenzColor.DARK_GREEN, alpha = 1f)
             event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), true, true)
-            drawString(location.add(0.5, 0.5, 0.5), beacon.name, true, LorenzColor.DARK_BLUE.toColor())
+            event.drawString(location.add(0.5, 0.5, 0.5), beacon.name, true, LorenzColor.DARK_BLUE.toColor())
         }
     }
 
