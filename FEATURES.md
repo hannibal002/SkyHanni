@@ -107,6 +107,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Quick Craft Confirmation**. - Cad
     + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
     + Sack items can be crafted normally.
++ **Shift Click Equipment**. - Thunderblade73
+    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 
 ## Item Abilities
 
@@ -153,7 +155,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
 + Saves missing items from canceled buy orders to clipboard for faster re-entry.
 + Update Timer showing when the next api data update happens.
-+ Added Price Website button. - hannibal2
++ Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
 
 ## Fishing
@@ -186,7 +188,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Chum/Chumcap Bucket.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
-+ Added Fishing Hook Display. - hannibal2
++ Fishing Hook Display. - hannibal2
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
 
@@ -299,7 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ Added a countdown for Arachne spawn. - Cad
++ Countdown for Arachne spawn. - Cad
     + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
 
@@ -652,22 +654,24 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
     + Change the scale with plus and minus keys. - CalMWolfs
-+ Added **Compact Tab List**.
++ **Compact Tab List**.
     + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
     + Option to hide Hypixel advertisment banners. - CalMWolfs
-    + Added **Advanced Player List**. - hannibal2
+    + **Advanced Player List**. - hannibal2
         + Customize the player list (inside the tab list) in various ways.
         + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
           party/friends/guild
         + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
           level
-+ Added Kick Duration. - hannibal2
++ Kick Duration. - hannibal2
     + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
     + Useful if you get blocked because of 'You were kicked while joining that server!'.
     + Send a warning and sound after a custom amount of seconds.
-+ Added Time In Limbo. - hannibal2
++ Time In Limbo. - hannibal2
     + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
++ Highlight Party Members. - Cad
+    + Marking partly members with a bright outline to better find them in the world.
 
 ## Cosmetics
 

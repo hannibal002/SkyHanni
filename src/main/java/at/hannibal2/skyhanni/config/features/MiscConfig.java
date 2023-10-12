@@ -535,6 +535,31 @@ public class MiscConfig {
 
     }
 
+
+    @Expose
+    @ConfigOption(name = "Highlight Party Members", desc = "")
+    @Accordion
+    public HighlightPartyMembers highlightPartyMembers = new HighlightPartyMembers();
+
+    public static class HighlightPartyMembers {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Marking partly members with a bright outline to better find them in the world.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Outline Color",
+                desc = "The color to outline party members in."
+        )
+        @ConfigEditorColour
+        public String outlineColor = "0:245:85:255:85";
+
+    }
+
+
     @Expose
     @ConfigOption(name = "Compact Tab List", desc = "")
     @Accordion

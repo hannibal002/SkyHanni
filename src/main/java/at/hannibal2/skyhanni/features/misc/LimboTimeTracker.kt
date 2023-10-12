@@ -19,7 +19,7 @@ class LimboTimeTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§cYou are AFK. Move around to return from AFK.") {
+        if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
         }
@@ -30,11 +30,8 @@ class LimboTimeTracker {
         if (!inLimbo) return
 
         val passedSince = limboJoinTime.passedSince()
-        val duration = passedSince.format()
         if (passedSince > 5.seconds) {
-            inLimbo = false
-            if (!isEnabled()) return
-            LorenzUtils.run { chat("§e[SkyHanni] You left the limbo after §b$duration") }
+            leaveLimbo()
         }
     }
 
@@ -43,8 +40,21 @@ class LimboTimeTracker {
         if (!isEnabled()) return
         if (!inLimbo) return
 
+        if (LorenzUtils.inSkyBlock) {
+            leaveLimbo()
+            return
+        }
+
         val duration = limboJoinTime.passedSince().format()
         config.showTimeInLimboPosition.renderString("§eIn limbo since §b$duration", posLabel = "Limbo Time Tracker")
+    }
+
+    private fun leaveLimbo() {
+        inLimbo = false
+        if (!isEnabled()) return
+        val passedSince = limboJoinTime.passedSince()
+        val duration = passedSince.format()
+        LorenzUtils.run { chat("§e[SkyHanni] You left the limbo after §b$duration") }
     }
 
     fun isEnabled() = config.showTimeInLimbo

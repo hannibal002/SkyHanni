@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -69,7 +68,7 @@ class SkyBlockKickDuration {
     }
 
     private fun warn() {
-        TitleUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        LorenzUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
     }
 
     fun isEnabled() = config.enabled
