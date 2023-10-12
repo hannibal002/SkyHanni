@@ -15,14 +15,17 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.VisitorAcceptEvent
-import at.hannibal2.skyhanni.events.VisitorArrivalEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -44,7 +47,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -53,7 +55,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -65,10 +66,8 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
@@ -93,38 +92,13 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
         display = emptyList()
-        visitors = emptyMap()
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
-        val npcItem = event.inventoryItems[13] ?: return
-        val lore = npcItem.getLore()
-        var isVisitor = false
-        if (lore.size == 4) {
-            val line = lore[3]
-            if (line.startsWith("§7Offers Accepted: §a")) {
-                isVisitor = true
-            }
-        }
-        if (!isVisitor) return
+    fun onVisitorOpen(event: VisitorOpenEvent) {
+        val visitor = event.visitor
+        val offerItem = visitor.offer!!.offerItem
 
-        val offerItem = event.inventoryItems[29] ?: return
-        if (offerItem.name != "§aAccept Offer") return
-
-        inVisitorInventory = true
-
-        if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
-
-        var name = npcItem.name ?: return
-        if (name.length == name.removeColor().length + 4) {
-            name = name.substring(2)
-        }
-
-        val visitor = getOrCreateVisitor(name) ?: return
-
-        visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
@@ -138,41 +112,20 @@ class GardenVisitorFeatures {
             val internalName = NEUInternalName.fromItemName(itemName)
             visitor.items[internalName] = amount
         }
-        readToolTip(visitor, event.inventoryItems[29])
 
-        if (visitor.status == VisitorStatus.NEW) {
-            val alreadyReady = event.inventoryItems[29]?.getLore()?.any { it == "§eClick to give!" } == true
+        readToolTip(visitor, offerItem)
+
+        if (visitor.status == VisitorAPI.VisitorStatus.NEW) {
+            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" } == true
             if (alreadyReady) {
-                changeStatus(visitor, VisitorStatus.READY, "inSacks")
+                VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
                 update()
             } else {
-                val waiting = VisitorStatus.WAITING
-                changeStatus(visitor, waiting, "firstContact")
+                VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
             }
             update()
         }
-    }
-
-    private fun getOrCreateVisitor(name: String): Visitor? {
-        var visitor = visitors[name]
-        if (visitor == null) {
-            // workaround if the tab list has not yet updated when opening the visitor
-            addVisitor(name)
-            LorenzUtils.debug("Found visitor from npc that is not in tab list. Adding it still.")
-            updateDisplay()
-            visitor = visitors[name]
-        }
-
-        if (visitor != null) return visitor
-
-        println("visitors: $visitors")
-        println("name: $name")
-        CopyErrorCommand.logErrorState(
-            "Error finding the visitor `$name§c`. Try to reopen the inventory",
-            "visitor is null! name='$name', visitors=`$visitors`"
-        )
-        return null
     }
 
     private fun readReward(offerItem: ItemStack): VisitorReward? {
@@ -294,108 +247,37 @@ class GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
-        if (!inVisitorInventory) return
-        if (event.clickType != 0) return
-
-        val visitor = getVisitor(lastClickedNpc) ?: return
-
-        if (event.slotId == 33) {
-            if (event.slot.stack?.name != "§cRefuse Offer") return
-
-            visitor.hasReward()?.let {
-                if (config.visitorRewardWarning.preventRefusing) {
-                    if (OSUtils.isKeyHeld(config.visitorRewardWarning.bypassKey)) {
-                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                        return
-                    }
-                    event.isCanceled = true
-                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                    if (config.visitorRewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        LorenzUtils.clickableChat(
-                            "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                            "sh bypass"
-                        )
-                    }
-                    Minecraft.getMinecraft().thePlayer.closeScreen()
-                    return
-                }
-            }
-
-            changeStatus(visitor, VisitorStatus.REFUSED, "refused")
-            update()
-            GardenVisitorDropStatistics.deniedVisitors += 1
-            GardenVisitorDropStatistics.saveAndUpdate()
-            return
-        }
-        if (event.slotId == 29 && event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
-            changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
-            acceptVisitor(visitor)
-            update()
-            GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-            GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
-            return
-        }
-    }
-
-    private fun acceptVisitor(visitor: Visitor) {
-        VisitorAcceptEvent(visitor).postAndCatch()
-    }
-
-    private fun getVisitor(id: Int) = visitors.map { it.value }.find { it.entityId == id }
-
     @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!GardenAPI.inGarden()) return
-        if (!GardenAPI.onBarnPlot) return
-        if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
-
-        val entity = event.entity
-        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
-            event.isCanceled = true
-        }
+    fun onVisitorRefused(event: VisitorRefusedEvent) {
+        update()
+        GardenVisitorDropStatistics.deniedVisitors += 1
+        GardenVisitorDropStatistics.saveAndUpdate()
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!GardenAPI.onBarnPlot) return
-        if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
+    fun onVisitorAccepted(event: VisitorAcceptedEvent) {
+        VisitorAcceptEvent(event.visitor).postAndCatch()
+        update()
+        GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
+        GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
+    }
 
-        for (visitor in visitors.values) {
-            visitor.getNameTagEntity()?.let {
-                val location = event.exactLocation(it)
-                if (it.distanceToPlayer() < 15) {
-                    val text = visitor.status.displayName
-                    event.drawString(location.add(0.0, 2.23, 0.0), text)
-                    if (config.visitorRewardWarning.showOverName) {
-                        visitor.hasReward()?.let { reward ->
-                            val name = reward.displayName
+    @SubscribeEvent
+    fun onVisitorRender(event: VisitorRenderEvent) {
+        val visitor = event.visitor
+        val text = visitor.status.displayName
+        val location = event.location
+        drawString(location.add(0.0, 2.23, 0.0), text)
+        if (config.visitorRewardWarning.showOverName) {
+            visitor.hasReward()?.let { reward ->
+                val name = reward.displayName
 
-                            event.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
-                        }
-                    }
-                }
+                drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onTooltip(event: ItemTooltipEvent) {
-        if (!GardenAPI.onBarnPlot) return
-        if (!inVisitorInventory) return
-        if (event.itemStack.name != "§aAccept Offer") return
-
-        val visitor = getVisitor(lastClickedNpc) ?: return
-
-        event.toolTip.let {
-            it.clear()
-            it.addAll(visitor.lastLore)
-        }
-    }
-
-    private fun readToolTip(visitor: Visitor, itemStack: ItemStack?) {
+    private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
         var totalPrice = 0.0
         var timeRequired = -1L
@@ -562,7 +444,7 @@ class GardenVisitorFeatures {
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
-                addVisitor(name)
+                VisitorAPI.addVisitor(name)
                 dirty = true
             }
         }
@@ -571,10 +453,12 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun addVisitor(name: String) {
-        val visitor = Visitor(name, status = VisitorStatus.NEW)
-        visitors = visitors.editCopy { this[name] = visitor }
-        VisitorArrivalEvent(visitor).postAndCatch()
+    @SubscribeEvent
+    fun onVisitorArrival(event: VisitorArrivalEvent) {
+        val visitor = event.visitor
+        val name = visitor.visitorName
+
+        updateDisplay()
 
         logger.log("New visitor detected: '$name'")
 
