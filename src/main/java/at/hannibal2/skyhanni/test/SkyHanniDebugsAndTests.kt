@@ -235,7 +235,12 @@ class SkyHanniDebugsAndTests {
                     builder.append("In dungeon!\n")
                     builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
                     builder.append(" started: ${DungeonAPI.started}\n")
+                    builder.append(" getRoomID: ${DungeonAPI.getRoomID()}\n")
                     builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
+                    builder.append(" ")
+                    builder.append(" playerClass: ${DungeonAPI.playerClass}\n")
+                    builder.append(" isUniqueClass: ${DungeonAPI.isUniqueClass}\n")
+                    builder.append(" playerClassLevel: ${DungeonAPI.playerClassLevel}\n")
                 }
                 if (SlayerAPI.hasActiveSlayerQuest()) {
                     builder.append("\n")
