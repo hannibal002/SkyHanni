@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.SlayerProfitList
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -188,7 +188,7 @@ object SlayerItemProfitTracker {
             LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
         }
         if (config.titleWarning && price > config.minimumPriceWarning) {
-            TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
 
@@ -252,7 +252,7 @@ object SlayerItemProfitTracker {
             ) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
 
-                    if (LorenzUtils.isControlKeyDown()) {
+                    if (KeyboardManager.isControlKeyDown()) {
                         itemLog.items.remove(internalName)
                         LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
                         lastClickDelay = System.currentTimeMillis() + 500

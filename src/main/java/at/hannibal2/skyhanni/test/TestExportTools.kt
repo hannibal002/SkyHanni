@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.KSerializable
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NBTTypeAdapter
@@ -47,7 +48,7 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
+        if (!SkyHanniMod.feature.dev.copyNBTDataCompressed.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return

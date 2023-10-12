@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
@@ -112,7 +112,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        if (config.useHotkey && !OSUtils.isKeyHeld(config.hotkey)) {
+        if (config.useHotkey && !config.hotkey.isKeyHeld()) {
             return
         }
 
@@ -162,7 +162,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     fun showLocations() = when (config.showLocation) {
         0 -> true
-        1 -> OSUtils.isKeyHeld(config.hotkey)
+        1 -> config.hotkey.isKeyHeld()
         else -> false
     }
 }

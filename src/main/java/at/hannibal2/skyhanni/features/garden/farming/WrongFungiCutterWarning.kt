@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -45,7 +45,7 @@ class WrongFungiCutterWarning {
     private fun notifyWrong() {
         if (!SkyHanniMod.feature.garden.fungiCutterWarn) return
 
-        TitleUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
+        LorenzUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
             SoundUtils.playBeepSound()

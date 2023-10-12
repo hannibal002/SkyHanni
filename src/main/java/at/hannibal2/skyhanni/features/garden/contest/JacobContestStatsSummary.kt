@@ -35,6 +35,7 @@ class JacobContestStatsSummary {
                 LorenzUtils.chat("§e[SkyHanni] Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = System.currentTimeMillis()
             }
+
             FarmingContestPhase.STOP -> {
                 val duration = System.currentTimeMillis() - startTime
                 val durationInSeconds = duration.toDouble() / 1000
@@ -47,6 +48,7 @@ class JacobContestStatsSummary {
                 LorenzUtils.chat("§e[SkyHanni] §7Average Blocks Per Second: $color$blocksPerSecond")
                 LorenzUtils.chat("§e[SkyHanni] §7Participated for §b$time")
             }
+
             FarmingContestPhase.CHANGE -> {
                 LorenzUtils.chat("§e[SkyHanni] You changed the crop during the contest, resetting the Blocks Per Second calculation..")
                 startTime = System.currentTimeMillis()
