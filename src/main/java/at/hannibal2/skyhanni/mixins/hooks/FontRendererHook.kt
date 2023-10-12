@@ -58,8 +58,8 @@ object FontRendererHook {
 
     @JvmStatic
     fun beginChromaRendering(text: String, shadow: Boolean) {
-        if (!SkyHanniMod.feature.chroma.enabled) return
         if (!LorenzUtils.inSkyBlock) return
+        if (!SkyHanniMod.feature.chroma.enabled) return
 
         if (text == "§fPlease star the mod on GitHub!") {
             previewChroma = true

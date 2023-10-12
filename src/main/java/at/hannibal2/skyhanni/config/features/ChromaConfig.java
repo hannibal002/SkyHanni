@@ -3,7 +3,12 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class ChromaConfig {
 
@@ -35,7 +40,7 @@ public class ChromaConfig {
 
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
-    @ConfigEditorDropdown(values = {"Forward Slant + Right", "Forward Slant + Left", "Backward Slant + Right", "Backward Slant + Left"})
+    @ConfigEditorDropdown(values = {"Forward + Right", "Forward + Left", "Backward + Right", "Backward + Left"})
     public int chromaDirection = 0;
 
     @ConfigOption(name = "Reset to Default", desc = "Resets all chroma settings to the default.")
@@ -52,5 +57,6 @@ public class ChromaConfig {
         SkyHanniMod.getFeature().chroma.chromaSpeed = 6f;
         SkyHanniMod.getFeature().chroma.chromaSaturation = 0.75f;
         SkyHanniMod.getFeature().chroma.allChroma = false;
+        SkyHanniMod.getFeature().chroma.chromaDirection = 0;
     }
 }
