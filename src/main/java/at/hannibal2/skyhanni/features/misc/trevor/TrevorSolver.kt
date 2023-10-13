@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -69,7 +69,7 @@ object TrevorSolver {
                     }
                     if (canSee) {
                         if (mobLocation != CurrentMobArea.FOUND) {
-                            TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
+                            LorenzUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
                         }
                         mobLocation = CurrentMobArea.FOUND
                         mobCoordinates = entity.position.toLorenzVec()

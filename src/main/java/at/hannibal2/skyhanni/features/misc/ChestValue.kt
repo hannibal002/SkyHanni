@@ -1,16 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.OtherMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
@@ -33,7 +31,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
 class ChestValue {
@@ -248,16 +245,12 @@ class ChestValue {
     }
 
     private val isNeuStorageEnabled = RecalculatingValue(1.seconds) {
-        val configPath = OtherMod.NEU.configPath
-        if (File(configPath).exists()) {
-            val json = ConfigManager.gson.fromJson(
-                APIUtil.readFile(File(configPath)),
-                com.google.gson.JsonObject::class.java
-            )
-            json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
-        } else false
+        try {
+            NotEnoughUpdates.INSTANCE.config.storageGUI.enableStorageGUI3
+        } catch (e: Exception) {
+            false
+        }
     }
-
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
         val mc = Minecraft.getMinecraft()
