@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameAndRankFromChatMessa
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -29,9 +28,14 @@ class PlayerChatSymbols {
 
         val username = event.message.getPlayerNameFromChatMessage() ?: return
 
-        updateSymbolFromTabList(username)
+        var usernameWithSymbols = TabListData.getTabList()
+            .find { playerName -> TabStringType.usernameFromLine(playerName) == username }
 
-        val usernameWithSymbols = nameSymbols[username] ?: return
+        if (usernameWithSymbols != null) {
+            nameSymbols[username] = usernameWithSymbols
+        }
+
+        usernameWithSymbols = nameSymbols[username] ?: return
 
         val split = usernameWithSymbols.split("$username ")
         var emblemText = if (split.size > 1) split[1].removeResets() else ""
@@ -59,16 +63,6 @@ class PlayerChatSymbols {
 
         StringUtils.modifyFirstChatComponent(event.chatComponent) { component ->
             modify(component, emblemText, rankAndName)
-        }
-    }
-
-    private fun updateSymbolFromTabList(username: String) {
-        val talkingPlayer = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(username)
-        nameSymbols[username] = if (talkingPlayer != null) {
-            talkingPlayer.displayName.siblings[0].unformattedText
-        } else {
-            TabListData.getTabList()
-                .find { playerName -> TabStringType.usernameFromLine(playerName) == username } ?: return
         }
     }
 
