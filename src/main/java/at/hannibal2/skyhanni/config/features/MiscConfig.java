@@ -634,10 +634,4 @@ public class MiscConfig {
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Crimson Isle Quest Items", desc = "Automatically gets the items from your sacks when you open the \"get x amount of items\" daily quest menu in the Crimson Isle. ")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean crimsonQuestItems = false;
 }
