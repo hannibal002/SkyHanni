@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameAndRankFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
@@ -18,6 +19,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class PlayerChatSymbols {
     private val config get() = SkyHanniMod.feature.misc.chatSymbols
     private val nameSymbols = mutableMapOf<String, String>()
+    private val symbolsPattern = "^(?<symbols>(?:(?:§\\w)+\\S)+) ".toPattern()
+    private val symbolPattern = "((?:§\\w)+\\S)".toPattern()
 
     @SubscribeEvent
     fun onChatReceived(event: LorenzChatEvent) {
@@ -31,14 +34,31 @@ class PlayerChatSymbols {
         val usernameWithSymbols = nameSymbols[username] ?: return
 
         val split = usernameWithSymbols.split("$username ")
-        var emblemText = if (split.size > 1) split[1] else ""
-        emblemText = emblemText.removeResets()
+        var emblemText = if (split.size > 1) split[1].removeResets() else ""
 
-        if (emblemText == "") return
-        event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblemText ", "")
+        var matcher = symbolsPattern.matcher("$emblemText ")
+        emblemText = if (matcher.find()) {
+            matcher.group("symbols")
+        } else ""
+
+        if (emblemText == "") {
+            return
+        }
+
+        val emblems = mutableListOf<String>()
+        matcher = symbolPattern.matcher(emblemText)
+        while (matcher.find()) {
+            emblems.add(matcher.group(1))
+        }
+
+        for (emblem in emblems) {
+            event.chatComponent = StringUtils.replaceFirstChatText(event.chatComponent, "$emblem ", "")
+        }
+
+        val rankAndName = event.message.getPlayerNameAndRankFromChatMessage() ?: return
 
         StringUtils.modifyFirstChatComponent(event.chatComponent) { component ->
-            modify(component, username, emblemText)
+            modify(component, emblemText, rankAndName)
         }
     }
 
@@ -52,29 +72,19 @@ class PlayerChatSymbols {
         }
     }
 
-    private fun modify(component: IChatComponent, username: String, emblemText: String): Boolean {
+    private fun modify(component: IChatComponent, emblemText: String, rankAndName: String): Boolean {
         if (component !is ChatComponentText) return false
         component as AccessorChatComponentText
-        if (!component.text_skyhanni().contains(username)) return false
+        if (!component.text_skyhanni().contains(rankAndName)) return false
         val oldText = component.text_skyhanni()
 
-        component.setText_skyhanni(component.text_skyhanni().replace(oldText, getNewText(emblemText, oldText)))
+        component.setText_skyhanni(component.text_skyhanni().replace(oldText, getNewText(emblemText, oldText, rankAndName)))
         return true
     }
 
-    private fun getNewText(emblemText: String, oldText: String): String = when (config.symbolLocation) {
-        0 -> "$emblemText $oldText"
-        1 -> iconAfterName(oldText, emblemText)
-
+    private fun getNewText(emblemText: String, oldText: String, rankAndName: String): String = when (config.symbolLocation) {
+        0 -> oldText.replace(rankAndName, "$emblemText $rankAndName")
+        1 -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
         else -> oldText
-    }
-
-    private fun iconAfterName(oldText: String, emblemText: String): String {
-        if (!oldText.contains("§f:")) return "$oldText $emblemText "
-
-        // fixing it for when you type a message as the chat isn't split the same
-        val ownChatSplit = oldText.split("§f:")
-        if (ownChatSplit.size <= 1) return oldText
-        return "${ownChatSplit[0]} $emblemText §f:${ownChatSplit[1]}"
     }
 }
