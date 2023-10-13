@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -143,7 +142,7 @@ class ComposterDisplay {
 
         if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter && System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
             if (config.composterNotifyLowTitle) {
-                TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
+                LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
             hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
@@ -153,7 +152,7 @@ class ComposterDisplay {
             System.currentTimeMillis() >= hidden.informedAboutLowFuel
         ) {
             if (config.composterNotifyLowTitle) {
-                TitleUtils.sendTitle("§cYour Fuel is low", 4.seconds)
+                LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
             hidden.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
@@ -161,7 +160,7 @@ class ComposterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (GardenAPI.inGarden() && config.composterDisplayEnabled) {
@@ -203,6 +202,6 @@ class ComposterDisplay {
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
         LorenzUtils.chat("§e[SkyHanni] $warningMessage")
-        TitleUtils.sendTitle("§eComposter Warning!", 3.seconds)
+        LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 }

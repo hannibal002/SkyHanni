@@ -54,7 +54,6 @@ object SkyHanniConfigSearchResetCommand {
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
-            println("size: $affectedElements")
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
@@ -83,13 +82,19 @@ object SkyHanniConfigSearchResetCommand {
             rawJson = readFromClipboard
         }
 
-        val root: Any = if (term.startsWith("config")) {
-            SkyHanniMod.feature
-        } else if (term.startsWith("playerSpecific")) {
-            ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
-        } else if (term.startsWith("profileSpecific")) {
-            ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
-        } else return "§cUnknown config location!"
+        val root: Any = when {
+            term.startsWith("config") -> SkyHanniMod.feature
+
+            term.startsWith("playerSpecific") -> {
+                ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
+            }
+
+            term.startsWith("profileSpecific") -> {
+                ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
+            }
+
+            else -> return "§cUnknown config location!"
+        }
 
         val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
         if (affectedElements > 3 && !args.contentEquals(lastCommand)) {

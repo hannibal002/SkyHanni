@@ -61,7 +61,7 @@ object CropMoneyDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         if (!GardenAPI.hideExtraGuis()) {
@@ -164,7 +164,6 @@ object CropMoneyDisplay {
             if (!isSpeedDataEmpty()) {
                 val message = "money/hr empty but speed data not empty, retry"
                 LorenzUtils.debug(message)
-                println(message)
                 newDisplay.addAsSingletonList("§eStill Loading...")
                 ready = false
                 loaded = false

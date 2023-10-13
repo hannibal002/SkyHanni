@@ -43,7 +43,7 @@ class TabListData {
     private fun readTabList(): List<String>? {
         val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
-        val result: MutableList<String> = ArrayList()
+        val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
@@ -53,12 +53,9 @@ class TabListData {
         return result.dropLast(1)
     }
 
-    private var ticks = 0
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-
-        if (ticks++ % 5 != 0) return
+        if (!event.isMod(5)) return
 
         val tabList = readTabList() ?: return
         if (cache != tabList) {
