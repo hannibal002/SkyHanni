@@ -13,7 +13,8 @@ object ModifyVisualWords {
 
     var modifiedWords = mutableListOf<VisualWord>()
 
-    fun modifyText(originalText: String): String {
+    fun modifyText(originalText: String?): String? {
+        var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
         if (!LorenzUtils.inSkyBlock && !config.workOutside) return originalText
@@ -28,7 +29,6 @@ object ModifyVisualWords {
             return cachedResult
         }
 
-        var modifiedText = originalText
         var replacements = 0
 
         for (modifiedWord in modifiedWords) {
