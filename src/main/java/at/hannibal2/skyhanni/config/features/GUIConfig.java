@@ -117,6 +117,24 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(
+                name = "Use Scoreboard for Date",
+                desc = "Uses the scoreboard instead to find the current month, date, and time. Greater \"accuracy\", depending on who's asking."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean useScoreboard = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Show Sun/Moon",
+                desc = "Show the sun or moon symbol seen on the scoreboard."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean includeSunMoon = true;
+
+        @Expose
+        @ConfigOption(
                 name = "Refresh Rate",
                 desc = "Change the time in seconds you would like to refresh the In-Game Date Display."
         )
@@ -125,7 +143,7 @@ public class GUIConfig {
                 maxValue = 60,
                 minStep = 1
         )
-        public int RefreshSeconds = 10;
+        public int refreshSeconds = 30;
     }
 
 
