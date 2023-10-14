@@ -296,7 +296,7 @@ class ChatFilter {
         else -> false
     }
 
-    private fun empty(message: String) = message.removeColor().trimWhiteSpaceAndResets() == ""
+    private fun empty(message: String) = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     private fun isWinterGift(message: String) = when {
         //winter gifts useless
