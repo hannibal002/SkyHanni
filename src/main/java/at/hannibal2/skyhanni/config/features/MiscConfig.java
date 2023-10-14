@@ -633,6 +633,11 @@ public class MiscConfig {
             public boolean showBingoRankNumber = false;
 
             @Expose
+            @ConfigOption(name = "Hide Factions", desc = "Hide the icon of the Crimson Isle Faction in the tab list.")
+            @ConfigEditorBoolean
+            public boolean hideFactions = false;
+
+            @Expose
             @ConfigOption(name = "Mark Special Persons", desc = "Show speical icons behind the name of guild members, party members, friends, and marked players.")
             @ConfigEditorBoolean
             public boolean markSpecialPersons = false;
