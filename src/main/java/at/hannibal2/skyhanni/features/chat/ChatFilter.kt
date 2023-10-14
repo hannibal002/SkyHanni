@@ -200,7 +200,7 @@ class ChatFilter {
 
         if (message == "§eYou received kill credit for assisting on a slayer miniboss!") return true
 
-        if (message.matchRegex("§e✆(?: Ring\\.\\.\\.)+ ")) return true
+        if (message.startsWith("§e✆ RING... ")) return true
 
         return false
     }
