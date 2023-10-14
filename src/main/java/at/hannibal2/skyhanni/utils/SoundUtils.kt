@@ -55,6 +55,7 @@ object SoundUtils {
     fun playClickSound() {
         clickSound.playSound()
     }
+    
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
             LorenzUtils.chat("§c[SkyHanni] Specify a sound effect to test")

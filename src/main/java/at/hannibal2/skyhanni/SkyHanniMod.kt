@@ -88,7 +88,13 @@ import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
-import at.hannibal2.skyhanni.features.fishing.*
+import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
+import at.hannibal2.skyhanni.features.fishing.FishingTimer
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
+import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
+import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
