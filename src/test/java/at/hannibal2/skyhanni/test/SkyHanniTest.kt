@@ -12,6 +12,13 @@ import org.junit.jupiter.api.Test
 
 class SkyHanniTest {
 
+    /* BIG FAT TODO: find out how NEU has mutliple test files, and borrow their strategy.
+     * this is a hotfix so that all JUnit-reliant test code remains intact without
+     * everyone's jar files failing to compile because of some BS double block
+     * registration nonsense during compiletime.
+     */
+
+    //ItemUtilsTest
     val items: MutableMap<String, Pair<String, Int>> = mutableMapOf(
             "§5Hoe of Greatest Tilling" to Pair("§5Hoe of Greatest Tilling", 1),
             "§fSilver medal §8x2" to Pair("§fSilver medal", 2),
@@ -39,6 +46,7 @@ class SkyHanniTest {
         }
     }
 
+    //ItemModifierTest
     @Test
     fun testUpgradeLevelMasterStars() {
         val itemStack = TestExportTools.getTestData(TestExportTools.Item, "10starnecronhead")
