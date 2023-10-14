@@ -97,96 +97,120 @@ open class FFGuideGUI : GuiScreen() {
             GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
             if (currentCrop == null) {
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.HELMET.getItem(), guiLeft + 142, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.LEGGINGS.getItem(), guiLeft + 182, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 3) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BOOTS.getItem(), guiLeft + 202, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 4) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.NECKLACE.getItem(), guiLeft + 262, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.CLOAK.getItem(), guiLeft + 282, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BELT.getItem(), guiLeft + 302, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 3) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BRACELET.getItem(), guiLeft + 322, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 4) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.ELEPHANT.getItem(), guiLeft + 142, guiTop + 130, mouseX, mouseY,
                     if (currentPet == FarmingItems.ELEPHANT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 162, guiTop + 130, mouseX, mouseY,
                     if (currentPet == FarmingItems.MOOSHROOM_COW) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.RABBIT.getItem(), guiLeft + 182, guiTop + 130, mouseX, mouseY,
                     if (currentPet == FarmingItems.RABBIT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BEE.getItem(), guiLeft + 202, guiTop + 130, mouseX, mouseY,
                     if (currentPet == FarmingItems.BEE) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
             } else {
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.ELEPHANT.getItem(), guiLeft + 142, guiTop + 160, mouseX, mouseY,
                     if (currentPet == FarmingItems.ELEPHANT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 162, guiTop + 160, mouseX, mouseY,
                     if (currentPet == FarmingItems.MOOSHROOM_COW) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.RABBIT.getItem(), guiLeft + 182, guiTop + 160, mouseX, mouseY,
                     if (currentPet == FarmingItems.RABBIT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BEE.getItem(), guiLeft + 202, guiTop + 160, mouseX, mouseY,
                     if (currentPet == FarmingItems.BEE) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140, mouseX, mouseY
                 )
 
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
+                    tooltipToDisplay,
                     FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY
                 )
             }

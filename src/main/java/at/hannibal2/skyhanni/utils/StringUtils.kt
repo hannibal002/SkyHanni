@@ -228,4 +228,8 @@ object StringUtils {
         matcher = chatUsernamePattern.matcher(username)
         return if (matcher.matches()) matcher else null
     }
+
+    fun String.convertToFormatted(): String {
+        return this.replace("&&", "§")
+    }
 }

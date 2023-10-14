@@ -13,6 +13,9 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
@@ -144,6 +147,49 @@ object ItemUtils {
         val nbt = tagCompound
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
+    }
+
+    // Taken from NEU
+    fun createSkull(displayName: String, uuid: String, value: String): ItemStack {
+        return createSkull(displayName, uuid, value, null)
+    }
+
+    // Taken from NEU
+    fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
+        val render = ItemStack(Items.skull, 1, 3)
+        val tag = NBTTagCompound()
+        val skullOwner = NBTTagCompound()
+        val properties = NBTTagCompound()
+        val textures = NBTTagList()
+        val textures0 = NBTTagCompound()
+
+        skullOwner.setString("Id", uuid)
+        skullOwner.setString("Name", uuid)
+        textures0.setString("Value", value)
+
+        textures.appendTag(textures0)
+
+        addNameAndLore(tag, displayName, lore)
+
+        properties.setTag("textures", textures)
+        skullOwner.setTag("Properties", properties)
+        tag.setTag("SkullOwner", skullOwner)
+        render.tagCompound = tag
+        return render
+    }
+
+    // Taken from NEU
+    private fun addNameAndLore(tag: NBTTagCompound, displayName: String, lore: Array<String>?) {
+        val display = NBTTagCompound()
+        display.setString("Name", displayName)
+        if (lore != null) {
+            val tagLore = NBTTagList()
+            for (line in lore) {
+                tagLore.appendTag(NBTTagString(line))
+            }
+            display.setTag("Lore", tagLore)
+        }
+        tag.setTag("display", display)
     }
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
