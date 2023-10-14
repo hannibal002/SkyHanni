@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
@@ -258,7 +258,10 @@ class ChestValue {
                 )
                 json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
             } else false
-        } catch (e: Exception) { false }
+        } catch (e: Exception) {
+            CopyErrorCommand.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            false
+        }
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
