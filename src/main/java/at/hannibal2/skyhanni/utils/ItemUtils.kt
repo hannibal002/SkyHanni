@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -18,6 +19,7 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
+import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
@@ -239,7 +241,7 @@ object ItemUtils {
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName_old() == "SKYBLOCK_MENU"
 
-    private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
+    private val patternInFront = "(?: *§8(\\+§[\\d\\w])?(?<amount>[\\d\\.km,]+)(x )?)?(?<name>.*)".toPattern()
     private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
@@ -258,10 +260,7 @@ object ItemUtils {
         if (matcher.matches()) {
             val itemName = matcher.group("name")
             if (!itemName.contains("§8x")) {
-                val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
-                val pair = Pair(itemName.trim(), amount)
-                itemAmountCache[input] = pair
-                return pair
+                return makePair(input, itemName.trim(), matcher)
             }
         }
 
@@ -277,7 +276,12 @@ object ItemUtils {
         }
 
         val itemName = color + matcher.group("name").trim()
-        val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
+        return makePair(input, itemName, matcher)
+    }
+
+    private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
+        val matcherAmount = matcher.group("amount")
+        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1;
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
