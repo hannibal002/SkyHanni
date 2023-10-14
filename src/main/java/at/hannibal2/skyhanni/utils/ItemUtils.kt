@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -217,7 +217,7 @@ object ItemUtils {
         val rarity = LorenzRarity.readItemRarity(this)
         data.itemRarity = rarity
         if (rarity == null && logError) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not read rarity for item $name",
                 "getItemRarityOrNull not found for: $internalName, name:'$name''"
             )
@@ -310,7 +310,7 @@ object ItemUtils {
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not read rarity for pet $name",
                 "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
             )

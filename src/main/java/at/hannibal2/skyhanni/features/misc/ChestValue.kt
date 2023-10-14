@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -259,7 +259,7 @@ class ChestValue {
                 json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
             } else false
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
             false
         }
     }

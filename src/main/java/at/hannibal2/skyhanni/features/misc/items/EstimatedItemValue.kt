@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
@@ -326,7 +326,7 @@ object EstimatedItemValue {
             if (stack.isRecombobulated()) {
                 val oneBelow = itemRarity.oneBelow()
                 if (oneBelow == null) {
-                    CopyErrorCommand.logErrorState(
+                    ErrorManager.logErrorState(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
                         "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
                     )
@@ -338,7 +338,7 @@ object EstimatedItemValue {
         val rarityName = itemRarity.name
         if (!reforgeCosts.has(rarityName)) {
             val reforgesFound = reforgeCosts.entrySet().map { it.key }
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Can not calculate reforge cost for item ${stack.name}",
                 "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
             )
@@ -748,7 +748,7 @@ object EstimatedItemValue {
         if (gemstoneUnlockCosts.isEmpty()) return 0.0
 
         if (internalName !in gemstoneUnlockCosts) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not find gemstone slot price for ${stack.name}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
             )

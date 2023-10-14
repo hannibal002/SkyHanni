@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -167,7 +167,7 @@ class GardenVisitorFeatures {
 
         println("visitors: $visitors")
         println("name: $name")
-        CopyErrorCommand.logErrorState(
+        ErrorManager.logErrorState(
             "Error finding the visitor `$name§c`. Try to reopen the inventory",
             "visitor is null! name='$name', visitors=`$visitors`"
         )

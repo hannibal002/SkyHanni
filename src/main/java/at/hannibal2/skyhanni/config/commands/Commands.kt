@@ -34,12 +34,12 @@ import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.CopyTabListCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -270,7 +270,7 @@ object Commands {
 
     private fun internalCommands() {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
-        registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
+        registerCommand("shcopyerror", "") { ErrorManager.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
