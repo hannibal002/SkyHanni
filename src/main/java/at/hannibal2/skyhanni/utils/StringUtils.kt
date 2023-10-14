@@ -220,4 +220,8 @@ object StringUtils {
         if (!matcher.matches()) return null
         return matcher.group("username")
     }
+
+    fun String.convertToFormatted(): String {
+        return this.replace("&&", "§")
+    }
 }
