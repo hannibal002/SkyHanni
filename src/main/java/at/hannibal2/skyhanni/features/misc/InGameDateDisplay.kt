@@ -25,13 +25,13 @@ class InGameDateDisplay {
     }
 
     private fun checkDate() {
-        val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
         val date = SkyBlockTime.now()
-        val time = list.find{ it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
         var theBaseString = ""
         if (config.useScoreboard) {
-            val monthAndDate = list.find{ (it.contains(" Winter ") || it.contains(" Spring ") || it.contains(" Summer ") || it.contains(" Autumn ")) && (it.contains("st") || it.contains("nd") || it.contains("rd") || it.contains("th")) } ?: "??"
+            val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
+            val monthAndDate = list.find{ (it.contains(" Winter ") || it.contains(" Spring ") || it.contains(" Summer ") || it.contains(" Autumn ")) && (it.contains("st") || it.contains("nd") || it.contains("rd") || it.contains("th")) } ?: "??"
+            val time = list.find{ it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) theBaseString = theBaseString.replace("☽", "").replace("☀", "")
         } else {
