@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -40,8 +39,8 @@ class GardenYawAndPitch {
 
         if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 
-        val yawText = yaw.round(config.yawPrecision).addSeparators()
-        val pitchText = pitch.round(config.pitchPrecision).addSeparators()
+        val yawText = yaw.round(config.yawPrecision)
+        val pitchText = pitch.round(config.pitchPrecision)
         val displayList = listOf(
             "§aYaw: §f$yawText",
             "§aPitch: §f$pitchText",

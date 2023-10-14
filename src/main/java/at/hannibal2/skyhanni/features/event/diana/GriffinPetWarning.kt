@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -23,7 +22,7 @@ class GriffinPetWarning {
 
         if (!DianaAPI.hasGriffinPet() && lastWarnTime.passedSince() > 30.seconds) {
             lastWarnTime = SimpleTimeMark.now()
-            TitleUtils.sendTitle("§cGriffin Pet!", 3.seconds)
+            LorenzUtils.sendTitle("§cGriffin Pet!", 3.seconds)
             LorenzUtils.chat("§e[SkyHanni] Reminder to use a Griffin pet for Mythological Ritual!")
         }
     }

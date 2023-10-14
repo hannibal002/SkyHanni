@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.OSUtils
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -25,6 +25,6 @@ object ChatPeek {
         if (NEUItems.neuHasFocus()) return false
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui() || VisualWordGui.isInGui()) return false
 
-        return OSUtils.isKeyHeld(key)
+        return key.isKeyHeld()
     }
 }

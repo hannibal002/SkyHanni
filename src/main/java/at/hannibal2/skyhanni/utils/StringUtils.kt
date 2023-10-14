@@ -200,8 +200,8 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerName(): String {
-        if (!playerChatPattern.matcher(this).matches()) return "-"
+    fun String.getPlayerNameFromChatMessage(): String? {
+        if (!playerChatPattern.matcher(this).matches()) return null
 
         var username = this.removeColor().split(":")[0]
 
@@ -217,9 +217,8 @@ object StringUtils {
 
         val matcher = chatUsernamePattern.matcher(username)
 
-        if (!matcher.matches()) return "-"
-        username = matcher.group("username")
-        return username
+        if (!matcher.matches()) return null
+        return matcher.group("username")
     }
 
     fun String.convertToFormatted(): String {

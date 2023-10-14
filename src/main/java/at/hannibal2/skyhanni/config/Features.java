@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
 import at.hannibal2.skyhanni.config.features.BazaarConfig;
 import at.hannibal2.skyhanni.config.features.ChatConfig;
+import at.hannibal2.skyhanni.config.features.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.CombatConfig;
 import at.hannibal2.skyhanni.config.features.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.CrimsonIsleConfig;
@@ -66,6 +67,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
     public GUIConfig gui = new GUIConfig();
+
+    @Expose
+    @Category(name = "Chroma", desc = "Settings for Chroma text. (Credit to SBA)")
+    public ChromaConfig chroma = new ChromaConfig();
 
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")

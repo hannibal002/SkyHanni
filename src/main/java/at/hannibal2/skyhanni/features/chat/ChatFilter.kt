@@ -11,8 +11,6 @@ class ChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel) return
-
         val blockReason = block(event.message)
         if (blockReason != "") {
             event.blockedReason = blockReason

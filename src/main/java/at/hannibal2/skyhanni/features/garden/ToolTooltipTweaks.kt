@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -85,7 +85,7 @@ class ToolTooltipTweaks {
                 }
                 iterator.set(fortuneLine)
 
-                if (OSUtils.isKeyHeld(config.fortuneTooltipKeybind)) {
+                if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)

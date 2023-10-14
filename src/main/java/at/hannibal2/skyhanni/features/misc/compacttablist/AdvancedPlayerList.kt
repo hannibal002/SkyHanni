@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -103,7 +105,7 @@ object AdvancedPlayerList {
         if (config.reverseSort) {
             newPlayerList = newPlayerList.reversed().toMutableList()
         }
-        if (extraTitles > 0) {
+        if (extraTitles > 0 && newPlayerList.size >= 19) {
             newPlayerList.add(19, original.first())
         }
         newList.addAll(newPlayerList)
@@ -113,7 +115,18 @@ object AdvancedPlayerList {
         return newList
     }
 
-    fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && LorenzUtils.isControlKeyDown()
+    fun ignoreCustomTabList(): Boolean {
+        val denyKeyPressed = SkyHanniMod.feature.dev.debugEnabled && KeyboardManager.isControlKeyDown()
+        return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
+    }
+
+    private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
+        "hannibal2",
+        "CalMWolfs",
+        "HiZe_",
+        "lrg89",
+        "Eisengolem",
+    )
 
     private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
@@ -132,6 +145,9 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
+        }
+        if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding) {
+            suffix += " §c:O"
         }
 
         return "$level $playerName ${suffix.trim()}"
@@ -164,8 +180,8 @@ object AdvancedPlayerList {
 //        10 -> "§c§lME"
         10 -> ""
         8 -> "§e§lMARKED"
-        5 -> "§7§lP"
-        4 -> "§6§lF"
+        5 -> "§9§lP"
+        4 -> "§d§lF"
         3 -> "§2§lG"
 
         else -> ""

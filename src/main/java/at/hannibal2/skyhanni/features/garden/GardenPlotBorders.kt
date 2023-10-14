@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
@@ -23,18 +23,18 @@ class GardenPlotBorders {
     private fun LorenzVec.addXZ(x: Int, z: Int) = add(x, 0, z)
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
-
-        val keyPressed = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter() else Keyboard.getEventKey()
-
-        if (keyPressed == Keyboard.KEY_G && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+        if (event.keyCode == Keyboard.KEY_G && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+            showBorders = !showBorders
+        }
+        if (event.keyCode == Keyboard.KEY_F3 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
             showBorders = !showBorders
         }
     }
 
     @SubscribeEvent
-    fun render(event: RenderWorldLastEvent) {
+    fun render(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
 
@@ -94,7 +94,7 @@ class GardenPlotBorders {
         }
     }
 
-    private fun RenderWorldLastEvent.tryDraw3DLine(
+    private fun LorenzRenderWorldEvent.tryDraw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,

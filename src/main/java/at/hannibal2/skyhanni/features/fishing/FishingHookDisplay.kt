@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -23,9 +24,16 @@ class FishingHookDisplay {
     private var display = ""
 
     @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = ""
+        bobberLocation = null
+        armorStand = null
+    }
+
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
+        if (!event.isMod(config.debugUpdateInterval)) return
 
         val entities = EntityUtils.getEntities<EntityFishHook>()
         bobberLocation = entities.firstOrNull { it.angler is EntityPlayerSP }?.getLorenzVec()
@@ -39,7 +47,7 @@ class FishingHookDisplay {
         val bobberLocation = bobberLocation ?: return
 
         val distance = entity.getLorenzVec().distance(bobberLocation)
-        if (distance > 0.1) return
+        if (distance > config.debugMaxDistance) return
         if (entity is EntityArmorStand) {
             armorStand = entity
         }

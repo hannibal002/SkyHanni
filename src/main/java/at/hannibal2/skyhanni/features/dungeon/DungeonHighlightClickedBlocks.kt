@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonHighlightClickedBlocks {
@@ -55,6 +55,11 @@ class DungeonHighlightClickedBlocks {
             else -> return
         }
 
+        // Water room
+        if (DungeonAPI.getRoomID() == "-60,-60") {
+            return
+        }
+
         if (type == ClickedBlockType.WITHER_ESSENCE) {
             val text = BlockUtils.getTextureFromSkull(position.toBlocPos())
             if (text != "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQ" +
@@ -74,7 +79,7 @@ class DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
 
