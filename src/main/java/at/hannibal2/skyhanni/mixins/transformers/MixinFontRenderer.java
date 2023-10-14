@@ -82,4 +82,9 @@ public abstract class MixinFontRenderer {
     private String renderStringAtPos(String text) {
         return ModifyVisualWords.INSTANCE.modifyText(text);
     }
+
+    @ModifyVariable(method = "getStringWidth", at = @At("HEAD"), argsOnly = true)
+    private String getStringWidth(String text) {
+        return ModifyVisualWords.INSTANCE.modifyText(text);
+    }
 }
