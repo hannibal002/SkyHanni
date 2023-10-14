@@ -14,6 +14,9 @@ abstract class LorenzEvent : Event() {
         return runCatching {
             postWithoutCatch()
         }.onFailure {
+            if (this is ErrorLoggableEvent) {
+                thereWasAnError()
+            }
             CopyErrorCommand.logError(
                 it,
                 "Caught an ${it::class.simpleName ?: "error"} at ${eventName}: '${it.message}'"

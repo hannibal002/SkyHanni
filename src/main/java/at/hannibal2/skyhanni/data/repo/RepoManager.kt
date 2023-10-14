@@ -117,13 +117,14 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
-        val comp = CompletableFuture<Void?>()
+    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Boolean> {
+        val comp = CompletableFuture<Boolean>()
         if (!atomicShouldManuallyReload.get()) return comp
         Minecraft.getMinecraft().addScheduledTask {
             try {
-                RepositoryReloadEvent(repoLocation, gson).postAndCatch()
-                comp.complete(null)
+                val event = RepositoryReloadEvent(repoLocation, gson)
+                event.postAndCatch()
+                comp.complete(event.wasThereAnError())
                 if (answerMessage.isNotEmpty()) {
                     LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
                 }

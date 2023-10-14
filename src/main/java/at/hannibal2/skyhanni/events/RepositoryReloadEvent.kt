@@ -6,7 +6,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import java.io.File
 
-class RepositoryReloadEvent(val repoLocation: File, val gson: Gson) : LorenzEvent() {
+class RepositoryReloadEvent(val repoLocation: File, val gson: Gson) : LorenzEvent(), ErrorLoggableEvent {
+    var error = false
     fun getConstant(constant: String) = getConstant<JsonObject>(constant)
 
     inline fun <reified T : Any> getConstant(constant: String) = try {
@@ -18,4 +19,10 @@ class RepositoryReloadEvent(val repoLocation: File, val gson: Gson) : LorenzEven
         )
         null
     }
+
+    override fun thereWasAnError() {
+        error = true
+    }
+
+    override fun wasThereAnError() = error
 }
