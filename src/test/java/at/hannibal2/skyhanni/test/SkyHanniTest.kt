@@ -16,6 +16,8 @@ class SkyHanniTest {
      * this is a hotfix so that all JUnit-reliant test code remains intact without
      * everyone's jar files failing to compile because of some BS double block
      * registration nonsense during compiletime.
+     * 
+     * FOR NOW THOUGH: DO NOT HAVE MAKE TEST FILES UNTIL FURTHER NOTICE.
      */
 
     //ItemUtilsTest
