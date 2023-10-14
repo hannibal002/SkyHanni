@@ -8,6 +8,8 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.sin
@@ -79,6 +81,12 @@ data class LorenzVec(
     fun inverse() = LorenzVec(1.0 / x, 1.0 / y, 1.0 / z)
 
     fun absolut() = sqrt(x * x + y * y + z * z)
+
+    fun min() = min(x,min(y,z))
+    fun max() = max(x,max(y,z))
+
+    fun minOfEachElement(other: LorenzVec) = LorenzVec(min(x,other.x),min(y,other.y),min(z,other.z))
+    fun maxOfEachElement(other: LorenzVec) = LorenzVec(max(x,other.x),max(y,other.y),max(z,other.z))
 
     fun printWithAccuracy(accuracy: Int): String {
         val x = (round(x * accuracy) / accuracy)

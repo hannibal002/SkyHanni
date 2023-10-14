@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.testIfSkyBlockMob
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -42,11 +44,11 @@ object EntityKill {
         //Despawned EntityLiving
         (previousEntityLiving - currentEntityLiving).forEach { EntityLivingDeathEvent(it).postAndCatch() }
 
-        if(config.mobKilldetetctionLogMobHitList) {
-            if(config.mobKilldetetctionLogMobHitListId) {
-                val id = mobHitList.map{it.baseEntity.entityId}
+        if (config.mobKilldetetctionLogMobHitList) {
+            if (config.mobKilldetetctionLogMobHitListId) {
+                val id = mobHitList.map { it.baseEntity.entityId }
                 LorenzDebug.log("Hit List: $id")
-            }else{
+            } else {
                 LorenzDebug.log("Hit List: $mobHitList")
             }
         }
@@ -76,7 +78,8 @@ object EntityKill {
         mobHitList.firstOrNull { it.baseEntity == event.entity }
             ?.let {
                 LorenzDebug.log("Hi i'm not living anymore")
-                SkyblockMobKillEvent(it, false).postAndCatch() }
+                SkyblockMobKillEvent(it, false).postAndCatch()
+            }
     }
 
     @SubscribeEvent
@@ -119,10 +122,16 @@ object EntityKill {
     }
 
     @SubscribeEvent
-    fun onWorldLastEvent(event: LorenzRenderWorldEvent){
-        if(!config.skyblockMobHighlight) return
-        currentEntityLiving.forEach{
-            event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(),0.5f)
+    fun onWorldLastEvent(event: LorenzRenderWorldEvent) {
+        if (config.skyblockMobHighlight) {
+            currentEntityLiving.forEach {
+                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.5f)
+            }
+        }
+        if (config.skyblockMobHighlightRayHit) {
+            rayTraceForSkyblockMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.forEach {
+                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.5f)
+            }
         }
     }
 

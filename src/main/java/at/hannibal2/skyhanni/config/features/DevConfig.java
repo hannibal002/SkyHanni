@@ -250,6 +250,12 @@ public class DevConfig {
     public boolean skyblockMobHighlight = false;
 
     @Expose
+    @ConfigOption(name = "skyblockMobHighlightRayHit", desc = "")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean skyblockMobHighlightRayHit = false;
+
+    @Expose
     @ConfigOption(name = "mobKilldetetctionLogMobHitList", desc = "")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)

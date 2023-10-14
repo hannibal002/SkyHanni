@@ -11,24 +11,24 @@ import net.minecraft.entity.item.EntityArmorStand
 
 object SkyblockMobUtils {
     val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex() //TODO change it so it works also with Dungeon Mobs
+
     class SkyblockMob(val baseEntity: Entity) {
         //Fun Fact the corresponding ArmorStand for a mob has always the mobId + 1
-        val armorStand = EntityUtils.getEntityById(baseEntity.entityId+1)
+        val armorStand = EntityUtils.getEntityById(baseEntity.entityId + 1)
 
         val name: String = armorStand?.name?.let { mobNameFilter.find(it.removeColor())?.groupValues?.get(1) }
             ?: "Skyblock Name of Mob ${baseEntity.name} found"
 
-        override fun toString() : String = name
+        override fun toString(): String = name
     }
 
     fun testIfSkyBlockMob(entity: Entity): Boolean {
-        if(entity !is EntityLivingBase) return false
+        if (entity !is EntityLivingBase) return false
         if (entity is EntityArmorStand || entity is EntityPlayerSP) return false
         //Protection that no real Player gets added. Only difference to a custom mob is that every SkyblockItem has a nbtTag
         if (entity.inventory != null) { //TODO fix this
-            if (entity.inventory.isNotEmpty() && entity.inventory.any { it != null && it.tagCompound == null })
-            {
-                if(EntityKill.config.mobKilldetetctionLogPlayerCantBeAdded) {
+            if (entity.inventory.isNotEmpty() && entity.inventory.any { it != null && it.tagCompound == null }) {
+                if (EntityKill.config.mobKilldetetctionLogPlayerCantBeAdded) {
                     LorenzDebug.log("Entity ${entity.name} is not allowed in HitList")
                 }
                 return false
@@ -36,20 +36,33 @@ object SkyblockMobUtils {
         }
         return true
     }
+
     fun Entity.isSkyBlockMob() = testIfSkyBlockMob(this)
 
 
-    fun rayTraceForSkyblockMob(entity: Entity, distance : Double,partialTicks: Float): Entity? {
-        val hit = rayTraceForSkyblockMob(entity,partialTicks) ?: return null
-        return if(hit.distanceTo(entity.getLorenzVec()) > distance) null else hit
+    fun rayTraceForSkyblockMob(entity: Entity, distance: Double, partialTicks: Float): Entity? {
+        val hit = rayTraceForSkyblockMob(entity, partialTicks) ?: return null
+        return if (hit.distanceTo(entity.getLorenzVec()) > distance) null else hit
     }
 
-    fun rayTraceForSkyblockMob(entity: Entity,partialTicks: Float): Entity? {
+    fun rayTraceForSkyblockMobs(entity: Entity, distance: Double, partialTicks: Float): List<Entity>? {
+        val hits = rayTraceForSkyblockMobs(entity, partialTicks) ?: return null
+        val inDistance = hits.filter { it.distanceTo(entity.getLorenzVec()) <= distance }
+        if(inDistance.isEmpty()) return null
+        return inDistance
+    }
+
+    fun rayTraceForSkyblockMob(entity: Entity, partialTicks: Float): Entity? {
+        val hits = rayTraceForSkyblockMobs(entity, partialTicks) ?: return null
+        return hits.first()
+    }
+
+    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float): List<Entity>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec()
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntitys = EntityKill.currentEntityLiving.filter { it.entityBoundingBox.rayIntersects(pos, look) }
         if (possibleEntitys.isEmpty()) return null
         possibleEntitys.sortedBy { it.distanceTo(pos) }
-        return possibleEntitys.first()
+        return possibleEntitys
     }
 }
