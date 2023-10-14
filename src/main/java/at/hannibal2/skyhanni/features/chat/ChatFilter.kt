@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChatFilter {
@@ -198,9 +200,7 @@ class ChatFilter {
 
         if (message == "§eYou received kill credit for assisting on a slayer miniboss!") return true
 
-        if (message == "§e✆ Ring... ") return true
-        if (message == "§e✆ Ring... Ring... ") return true
-        if (message == "§e✆ Ring... Ring... Ring... ") return true
+        if (message.matchRegex("§e✆(?: Ring\\.\\.\\.)+ ")) return true
 
         return false
     }
@@ -251,10 +251,7 @@ class ChatFilter {
 
     private fun lobby(message: String) = when {
         //player join
-        message.matchRegex(".* §6joined the lobby!") -> true
-        message.matchRegex(" §b>§c>§a>§r §r.*§f §6slid into the lobby!§r §a<§c<§b<") -> true
-        message.matchRegex(".* §6slid into the lobby!") -> true
-        message.matchRegex(" §b>§c>§a>§r .* §6joined the lobby!§r §a<§c<§b<") -> true
+        message.matchRegex("(?: §b>§c>§a>§r §r)?.* §6(?:joined|(?:spooked|slid) into) the lobby!(?:§r §a<§c<§b<)?") -> true
 
         //mystery box
         message.matchRegex("§b✦ §r.* §r§7found a §r§e.* §r§bMystery Box§r§7!") -> true
@@ -297,20 +294,7 @@ class ChatFilter {
         else -> false
     }
 
-    private fun empty(message: String) = when (message) {
-        "§8 §r§8 §r§1 §r§3 §r§3 §r§7 §r§8 ",
-
-        "§f §r§f §r§1 §r§0 §r§2 §r§4§r§f §r§f §r§2 §r§0 §r§4 §r§8§r§0§r§1§r§0§r§1§r§2§r§f§r§f§r§0§r§1§r§3§r§4§r§f§r§f§r§0§r§1§r§5§r§f§r§f§r§0§r§1§r§6§r§f§r§f§r§0§r§1§r§8§r§9§r§a§r§b§r§f§r§f§r§0§r§1§r§7§r§f§r§f§r§3 §r§9 §r§2 §r§0 §r§0 §r§1§r§3 §r§9 §r§2 §r§0 §r§0 §r§2§r§3 §r§9 §r§2 §r§0 §r§0 §r§3§r§0§r§0§r§1§r§f§r§e§r§0§r§0§r§2§r§f§r§e§r§0§r§0§r§3§r§4§r§5§r§6§r§7§r§8§r§f§r§e§r§3 §r§6 §r§3 §r§6 §r§3 §r§6 §r§e§r§3 §r§6 §r§3 §r§6 §r§3 §r§6 §r§d",
-
-        "§f §r§r§r§f §r§r§r§1 §r§r§r§0 §r§r§r§2 §r§r§r§f §r§r§r§f §r§r§r§2 §r§r§r§0 §r§r§r§4 §r§r§r§3 §r§r§r§9 §r§r§r§2 §r§r§r§0 §r§r§r§0 §r§r§r§3 §r§r§r§9 §r§r§r§2 §r§r§r§0 §r§r§r§0 §r§r§r§3 §r§r§r§9 §r§r§r§2 §r§r§r§0 §r§r§r§0 ",
-
-        "",
-        "§f",
-        "§c",
-        -> true
-
-        else -> false
-    }
+    private fun empty(message: String) = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     private fun isWinterGift(message: String) = when {
         //winter gifts useless
