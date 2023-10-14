@@ -311,6 +311,21 @@ public class EventConfig {
         public Position pos = new Position(150, 150, false, true);
     }
 
+    @ConfigOption(name = "Mayor Jerry's Jerrypocalypse", desc = "")
+    @Accordion
+    @Expose
+    public MayorJerryConfig jerry = new MayorJerryConfig();
+
+    public static class MayorJerryConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight Jerries", desc = "Highlights Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightJerries = true;
+
+    }
+
     // comment in if the event is needed again
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion
@@ -332,6 +347,30 @@ public class EventConfig {
         @Expose
         @ConfigEditorBoolean
         public boolean enableActiveAlert = false;
+    }
+
+    @Expose
+    @ConfigOption(name = "Main Lobby Halloween Basket Waypoints", desc = "")
+    @Accordion
+    public halloweenBasketConfig halloweenBasket = new halloweenBasketConfig();
+
+    public static class halloweenBasketConfig {
+
+        @Expose
+        @ConfigOption(name = "Basket Waypoints", desc = "Show all Halloween Basket waypoints.\nShoutout to §bTobbbb §7for the coordinates.\n(AS OF 2023)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean allWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
+        @ConfigEditorBoolean
+        public boolean allEntranceWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint")
+        @ConfigEditorBoolean
+        public boolean onlyClosest = true;
     }
 
 }

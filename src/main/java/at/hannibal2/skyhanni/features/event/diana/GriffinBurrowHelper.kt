@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -141,7 +141,7 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()
@@ -203,7 +203,7 @@ object GriffinBurrowHelper {
         event.move(2, "diana", "event.diana")
     }
 
-    private fun sendTip(event: RenderWorldLastEvent) {
+    private fun sendTip(event: LorenzRenderWorldEvent) {
         teleportedLocation?.let {
             teleportedLocation = null
 
@@ -235,7 +235,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun moveAnimation(animation: LorenzVec, event: RenderWorldLastEvent): LorenzVec? {
+    private fun moveAnimation(animation: LorenzVec, event: LorenzRenderWorldEvent): LorenzVec? {
         val list = mutableListOf<LorenzVec>()
         if (config.burrowsNearbyDetection) {
             list.addAll(particleBurrows.keys)

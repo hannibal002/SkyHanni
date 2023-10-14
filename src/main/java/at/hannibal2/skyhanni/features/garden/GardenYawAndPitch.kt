@@ -18,7 +18,7 @@ class GardenYawAndPitch {
     private var lastPitch = 0f
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return
@@ -39,9 +39,11 @@ class GardenYawAndPitch {
 
         if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 
+        val yawText = yaw.round(config.yawPrecision)
+        val pitchText = pitch.round(config.pitchPrecision)
         val displayList = listOf(
-            "§aYaw: §f${yaw.round(config.yawPrecision)}",
-            "§aPitch: §f${pitch.round(config.pitchPrecision)}",
+            "§aYaw: §f$yawText",
+            "§aPitch: §f$pitchText",
         )
         if (GardenAPI.inGarden()) {
             config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")

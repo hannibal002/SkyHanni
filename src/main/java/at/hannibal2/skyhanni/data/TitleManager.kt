@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
-class TitleUtils {
+class TitleManager {
 
     companion object {
         private var display = ""
@@ -30,7 +30,7 @@ class TitleUtils {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (endTime.isInPast()) return
 
         val scaledResolution = ScaledResolution(Minecraft.getMinecraft())

@@ -94,7 +94,7 @@ public class DevConfig {
     public boolean copyRngMeter = false;
 
     @Expose
-    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the besiary data from the inventory as json to clipboard.")
+    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the bestiary data from the inventory as json to clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyBestiaryData = false;

@@ -13,6 +13,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
+import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
@@ -105,7 +106,11 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
-                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
+                            true,
+                            bypassChecks
+                        )
+                    ) {
                         onClick()
                     }
                     wasDown = isDown
@@ -225,6 +230,10 @@ interface Renderable {
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
                 GlStateManager.popMatrix()
             }
+        }
+
+        fun singeltonString(string: String): List<Renderable> {
+            return Collections.singletonList(string(string))
         }
 
         fun string(string: String) = object : Renderable {

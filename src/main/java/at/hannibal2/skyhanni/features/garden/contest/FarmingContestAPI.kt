@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 object FarmingContestAPI {
     private val timePattern = "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)".toPattern()
@@ -22,6 +24,7 @@ object FarmingContestAPI {
     private val cropPattern = "§8(?<crop>.*) Contest".toPattern()
     var inContest = false
     var contestCrop: CropType? = null
+    private var startTime = SimpleTimeMark.farPast()
     private val sidebarCropPattern = "§e○ §f(?<crop>.*) §a.*".toPattern()
 
     var inInventory = false
@@ -37,19 +40,28 @@ object FarmingContestAPI {
     }
 
     private fun checkActiveContest() {
+        if (inContest && startTime.passedSince() > 20.minutes) {
+            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            inContest = false
+        }
+
         val currentCrop = readCurrentCrop()
         val currentContest = currentCrop != null
 
         if (inContest != currentContest) {
             if (currentContest) {
                 FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).postAndCatch()
+                startTime = SimpleTimeMark.now()
             } else {
-                FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                if (startTime.passedSince() > 2.minutes) {
+                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                }
             }
             inContest = currentContest
         } else {
-            if (currentCrop != contestCrop) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.CHANGE).postAndCatch()
+            if (currentCrop != contestCrop && currentCrop != null) {
+                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).postAndCatch()
+                startTime = SimpleTimeMark.now()
             }
         }
         contestCrop = currentCrop

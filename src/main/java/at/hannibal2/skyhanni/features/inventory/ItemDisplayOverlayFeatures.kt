@@ -43,7 +43,7 @@ class ItemDisplayOverlayFeatures {
             return itemName.substring(itemName.length - 1)
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && itemName.contains("Golden ") || itemName.contains("Diamond ")) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
             when {
                 itemName.contains("Bonzo") -> return "1"
                 itemName.contains("Scarf") -> return "2"
