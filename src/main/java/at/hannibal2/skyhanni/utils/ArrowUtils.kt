@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.mobs.EntityKill
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -153,7 +154,7 @@ object ArrowUtils {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if(!config.arrowDebug) return
         upComingArrows.forEach {
             event.draw3DLine(

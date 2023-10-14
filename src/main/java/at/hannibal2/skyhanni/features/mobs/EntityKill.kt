@@ -1,14 +1,21 @@
 package at.hannibal2.skyhanni.features.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.EntityLivingDeathEvent
+import at.hannibal2.skyhanni.events.EntityLivingSpawnEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyblockMobKillEvent
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.testIfSkyBlockMob
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityKill {
@@ -112,10 +119,10 @@ object EntityKill {
     }
 
     @SubscribeEvent
-    fun onWorldLastEvent(event: RenderWorldLastEvent){
+    fun onWorldLastEvent(event: LorenzRenderWorldEvent){
         if(!config.skyblockMobHighlight) return
         currentEntityLiving.forEach{
-            event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(),LorenzColor.GREEN.toColor(),0.5f)
+            event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(),0.5f)
         }
     }
 
