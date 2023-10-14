@@ -332,7 +332,7 @@ class SkyHanniMod {
         loadModule(TestExportTools)
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
-        loadModule(MinecraftData())
+        loadModule(MinecraftData)
         loadModule(TitleManager())
         loadModule(ItemTipHelper())
         loadModule(RenderLivingEntityHelper())
