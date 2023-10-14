@@ -680,6 +680,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a chat message for how long you were in limbo once you leave it.
 + Highlight Party Members. - Cad
     + Marking party members with a bright outline to better find them in the world.
++ Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
+    + Options to change speed, size, saturation and direction.
++ Added Modify Visual Words (command /shwords). - CalMWolfs
+    + Allows you to replace text on your screen with different text (like the SBE one, just less costly).
+    + Supports all color codes, even chroma (use &&Z)
++ Added In-Game Date display. - Erymanthus
+    + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
+    + Includes the SkyBlock year.
 
 ## Cosmetics
 
