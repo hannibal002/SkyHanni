@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.getFormattedSkyblockTime
+import at.hannibal2.skyhanni.utils.LorenzUtils.formatted
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -180,7 +180,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     TIME({
-        SkyBlockTime.now().getFormattedSkyblockTime()
+        SkyBlockTime.now().formatted()
     }),
 
     PROFILE({

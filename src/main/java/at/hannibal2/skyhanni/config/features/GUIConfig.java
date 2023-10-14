@@ -94,23 +94,39 @@ public class GUIConfig {
     @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
 
-    @Expose
-    @ConfigOption(name = "In-game Date", desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n(Though this one includes the SkyBlock year!)")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean inGameDateDisplay = true;
 
     @Expose
-    public Position inGameDateDisplayPosition = new Position(10, 10, false, true);
+    @ConfigOption(name = "In-Game Date", desc = "")
+    @Accordion
+    public InGameDateConfig inGameDateConfig = new InGameDateConfig();
 
-    @Expose
-    @ConfigOption(name = "In-game Date Refresh Rate", desc = "Change the amount of time in seconds you would like to refresh the in-game time display.")
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 60,
-            minStep = 1
-    )
-    public int inGameDateDisplayRefreshSeconds = 10;
+    public static class InGameDateConfig {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n" +
+                        "(Though this one includes the SkyBlock year!)"
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        public Position position = new Position(10, 10, false, true);
+
+        @Expose
+        @ConfigOption(
+                name = "Refresh Rate",
+                desc = "Change the time in seconds you would like to refresh the In-Game Date Display."
+        )
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 60,
+                minStep = 1
+        )
+        public int RefreshSeconds = 10;
+    }
 
 
     @Expose
