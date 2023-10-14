@@ -335,9 +335,9 @@ open class VisualWordGui : GuiScreen() {
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
-                currentText = if (LorenzUtils.isControlKeyDown()) {
+                currentText = if (KeyboardManager.isControlKeyDown()) {
                     ""
-                } else if (LorenzUtils.isShiftKeyDown()) {
+                } else if (KeyboardManager.isShiftKeyDown()) {
                     val lastSpaceIndex = currentText.lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) {
                         currentText.substring(0, lastSpaceIndex)
@@ -359,7 +359,7 @@ open class VisualWordGui : GuiScreen() {
             return
         }
 
-        if (LorenzUtils.isPastingKeysDown()) {
+        if (KeyboardManager.isPastingKeysDown()) {
             SkyHanniMod.coroutineScope.launch {
                 val clipboard = OSUtils.readFromClipboard() ?: ""
                 for (char in clipboard) {

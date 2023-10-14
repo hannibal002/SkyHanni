@@ -149,11 +149,12 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
-    // Next 3 functions taken from NEU
+    // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String): ItemStack {
         return createSkull(displayName, uuid, value, null)
     }
 
+    // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
         val render = ItemStack(Items.skull, 1, 3)
         val tag = NBTTagCompound()
@@ -177,6 +178,7 @@ object ItemUtils {
         return render
     }
 
+    // Taken from NEU
     private fun addNameAndLore(tag: NBTTagCompound, displayName: String, lore: Array<String>?) {
         val display = NBTTagCompound()
         display.setString("Name", displayName)

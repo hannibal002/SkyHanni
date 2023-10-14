@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
 import net.minecraft.client.gui.FontRenderer;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -71,5 +76,10 @@ public abstract class MixinFontRenderer {
     @Inject(method = "renderStringAtPos", at = @At("RETURN"))
     public void insertEndOfString(String text, boolean shadow, CallbackInfo ci) {
         FontRendererHook.endChromaRendering();
+    }
+
+    @ModifyVariable(method = "renderStringAtPos", at = @At("HEAD"), argsOnly = true)
+    private String renderStringAtPos(String text) {
+        return ModifyVisualWords.INSTANCE.modifyText(text);
     }
 }
