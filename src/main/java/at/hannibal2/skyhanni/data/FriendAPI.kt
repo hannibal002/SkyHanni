@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -114,7 +114,7 @@ class FriendAPI {
                     try {
                         UUID.fromString(it)
                     } catch (e: IllegalArgumentException) {
-                        CopyErrorCommand.logError(e, "Error reading friend list.")
+                        ErrorManager.logError(e, "Error reading friend list.")
                         return
                     }
                 }

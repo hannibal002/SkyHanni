@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
@@ -40,7 +40,7 @@ class ParkourHelper(
 
     fun render(event: LorenzRenderWorldEvent) {
         if (locations.isEmpty()) {
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 IllegalArgumentException("locations is empty"),
                 "Trying to render an empty parkour"
             )
@@ -118,7 +118,7 @@ class ParkourHelper(
                 }
             }
         } catch (e: Throwable) {
-            CopyErrorCommand.logError(e, "Error while rendering a parkour")
+            ErrorManager.logError(e, "Error while rendering a parkour")
         }
     }
 

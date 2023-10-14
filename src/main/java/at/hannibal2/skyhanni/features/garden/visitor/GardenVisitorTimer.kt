@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -53,7 +53,7 @@ class GardenVisitorTimer {
             try {
                 updateVisitorDisplay()
             } catch (error: Throwable) {
-                CopyErrorCommand.logError(error, "Encountered an error when updating visitor display")
+                ErrorManager.logError(error, "Encountered an error when updating visitor display")
             }
             try {
                 GardenVisitorDropStatistics.saveAndUpdate()
