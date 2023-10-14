@@ -1,0 +1,168 @@
+package at.hannibal2.skyhanni.features.mobs
+
+import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.EntityClickEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMob
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+object MobHitTrigger {
+    // Implement TODOs
+    // TODO(Dungeon Ability's)
+    // TODO(Voodoo Doll) Crazy Pain
+    // TODO(Firewand)
+    // TODO(Wither Implosion)
+    // TODO(Wither Impact)
+    // TODO(Frozen Scythe)
+    // TODO(Terminater Beam)
+    // TODO(Thornes) I don't know if it even counts for anything
+    // TODO(Celeste Wand)
+    // TODO(Vampire Mask) No clue how to implement
+    // TODO(Starlight Wand)
+    // TODO(Fire Veil Wand)
+    // TODO(Staff of the Volcano)
+    // TODO(Hellstorm Wand)
+    // TODO(Jerrychine Gun)
+    // TODO(Midas Staff)
+    // TODO(Bonzo Staff)
+    // TODO(Spirit Scepter)
+    // TODO(Implosion Belt)
+    // TODO(Horrow Wand) I don't like this one
+    // TODO(Ice Spray Wand)
+    // TODO(Damaging Pets) Guardian, Bal
+    // TODO(Swing Range) Pain
+    // TODO(Berserk Swing Range) Even more Pain
+    // TODO(Exlosion Bow)
+    // TODO(Multi Arrow)
+    // TODO(Fishing Rod)
+    // TODO(Special Fishing Rods)
+    // TODO(Special Arrows)
+    // TODO(Blaze Armor)
+    // TODO(Flower of Truth)
+    // TODO(Livid Dagger Ability)
+    // TODO(Bingo Blaster)
+    // TODO(Alchemist Wand)
+
+    //Working on it
+    // TODO(Bow) Priority, separate System
+
+    //Needs Testing
+
+    //Needs Bugfixing
+    // TODO(Left Click Mage, Aurora Staff) bug: Ray isn't precise enough
+
+    @SubscribeEvent
+    fun onEntityHit(event: EntityClickEvent) {
+        val entity = event.clickedEntity ?: return
+        if (!SkyblockMobUtils.testIfSkyBlockMob(entity)) return
+
+        //Base Melee Hit
+        if (event.clickType == ClickType.LEFT_CLICK) {
+            EntityKill.checkAndAddToMobHitList(entity)
+
+            val itemInHand = InventoryUtils.getItemInHand() ?: return
+            val enchantmentsOfItemInHand = itemInHand.getEnchantments()
+
+            //Cleave Hit (range isn't 100% correct) //TODO fix Range and add Blacklist for certain mobs (Star Sentry etc.)
+            if (enchantmentsOfItemInHand != null && enchantmentsOfItemInHand.any { it.key == "cleave" }) {
+                val range: Double = when (enchantmentsOfItemInHand.getValue("cleave")) {
+                    1 -> 3.3
+                    2 -> 3.6
+                    3 -> 3.9
+                    4 -> 4.2
+                    5 -> 4.5
+                    6 -> 4.8
+                    else -> 0.0
+                }
+                var i = 0
+                EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
+                    .filterNot { SkyblockMobUtils.testIfSkyBlockMob(it) }.forEach {
+                        EntityKill.checkAndAddToMobHitList(it)
+                        i++
+                        LorenzDebug.log("Name: ${it.name}")
+                    }
+                LorenzDebug.log("Cleave Triggers: $i")
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onBlockClickSend(event: BlockClickEvent) {
+        handleItemClick(event.itemInHand, event.clickType)
+    }
+
+    @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        //LorenzDebug.log("Mouse Button" + Mouse.getEventButton().toString())
+        handleItemClick(event.itemInHand, ClickType.LEFT_CLICK)
+    }
+
+    private const val renderRangeInBlocks = 128.0 //Should be 16*8 because Hypixels max render Range is 8 (or not?)
+
+    private fun handleItemClick(itemInHand: ItemStack?, clickType: ClickType) {
+        if (itemInHand == null) return
+
+        val lastLore = itemInHand.getLore().last().removeColor()
+        val itemName = itemInHand.displayName ?: "How"
+        val armor = InventoryUtils.getArmor()
+        val player = Minecraft.getMinecraft().thePlayer
+        val classInDungeon = DungeonAPI.playerClass
+        val partialTick = 0.0f //IDK how to make it correctly but ignoring partialTicks(=0.0) works fine
+        LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
+
+        when {
+            //Bow TODO(Cooldown)
+            lastLore.endsWith("BOW") && (clickType == ClickType.RIGHT_CLICK || (clickType == ClickType.LEFT_CLICK && itemName.contains(
+                "Shortbow"
+            ))) -> {
+                val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
+                    ?: 0) + if (itemName.contains("Juju")) 3 else 0
+                val bowStrength = 4.5  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
+                val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0))
+                val direction = player.getLook(partialTick).toLorenzVec().normalize().multiply(bowStrength)
+                //TODO(Terror Armor)
+                when {
+                    itemName.contains("Runaan") -> ArrowUtils.newArrows(
+                        origin,
+                        direction,
+                        3,
+                        12.5,
+                        piercingDepth,
+                        false
+                    )  //{val arrowCount = 3; val spread = 12.5}
+                    itemName.contains("Terminator") -> ArrowUtils.newArrows(
+                        origin,
+                        direction,
+                        3,
+                        5.0,
+                        piercingDepth,
+                        false
+                    )//{val arrowCount = 3; val spread = 5.0}
+                    else -> ArrowUtils.newArrows(origin, direction, piercingDepth, itemName.contains("Juju"))
+                }
+
+            }
+            //Terminator Ability
+            itemName.contains("Terminator") -> {
+
+            }
+            //Aurora Staff and Mage Left Click
+            classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType == ClickType.LEFT_CLICK || itemName.contains("Aurora Staff") && clickType == ClickType.RIGHT_CLICK -> {
+                LorenzDebug.log("Magic")
+                val entity = rayTraceForSkyblockMob(player,renderRangeInBlocks ,partialTick) ?: return
+                EntityKill.checkAndAddToMobHitList(entity)
+            }
+
+        }
+    }
+}

@@ -65,14 +65,20 @@ data class LorenzVec(
     fun multiply(d: Int): LorenzVec =
         LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
 
-    fun dotPorduct(other : LorenzVec) : Double =
-            x multiplyZeroSave other.x + y multiplyZeroSave  other.y + z multiplyZeroSave  other.z
+    fun multiply(v: LorenzVec) = LorenzVec(x multiplyZeroSave v.x, y multiplyZeroSave v.y, z multiplyZeroSave v.z)
+
+    fun dotProduct(other: LorenzVec): Double =
+        x multiplyZeroSave other.x + y multiplyZeroSave other.y + z multiplyZeroSave other.z
 
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
 
     fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
 
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
+
+    fun inverse() = LorenzVec(1.0 / x, 1.0 / y, 1.0 / z)
+
+    fun absolut() = sqrt(x * x + y * y + z * z)
 
     fun printWithAccuracy(accuracy: Int): String {
         val x = (round(x * accuracy) / accuracy)

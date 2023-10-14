@@ -244,6 +244,12 @@ public class DevConfig {
     public boolean mobKilldetetction = false;
 
     @Expose
+    @ConfigOption(name = "skyblockMobHighlight", desc = "")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean skyblockMobHighlight = false;
+
+    @Expose
     @ConfigOption(name = "mobKilldetetctionLogMobHitList", desc = "")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
