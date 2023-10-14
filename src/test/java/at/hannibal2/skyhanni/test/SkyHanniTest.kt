@@ -20,7 +20,7 @@ class SkyHanniTest {
      * FOR NOW THOUGH: DO NOT HAVE MAKE TEST FILES UNTIL FURTHER NOTICE.
      */
 
-    //ItemUtilsTest
+    //ItemUtilsTest - by helfull
     val items: MutableMap<String, Pair<String, Int>> = mutableMapOf(
             "§5Hoe of Greatest Tilling" to Pair("§5Hoe of Greatest Tilling", 1),
             "§fSilver medal §8x2" to Pair("§fSilver medal", 2),
