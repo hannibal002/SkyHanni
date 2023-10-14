@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -44,7 +45,7 @@ class ChestValue {
     private val inInventory get() = InventoryUtils.openInventoryName().removeColor().isValidStorage()
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "") return
         if (inInventory) {
@@ -248,16 +249,20 @@ class ChestValue {
     }
 
     private val isNeuStorageEnabled = RecalculatingValue(1.seconds) {
-        val configPath = OtherMod.NEU.configPath
-        if (File(configPath).exists()) {
-            val json = ConfigManager.gson.fromJson(
-                APIUtil.readFile(File(configPath)),
-                com.google.gson.JsonObject::class.java
-            )
-            json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
-        } else false
+        try {
+            val configPath = OtherMod.NEU.configPath
+            if (File(configPath).exists()) {
+                val json = ConfigManager.gson.fromJson(
+                    APIUtil.readFile(File(configPath)),
+                    com.google.gson.JsonObject::class.java
+                )
+                json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
+            } else false
+        } catch (e: Exception) {
+            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            false
+        }
     }
-
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
         val mc = Minecraft.getMinecraft()

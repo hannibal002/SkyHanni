@@ -78,7 +78,7 @@ object StringUtils {
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     fun String.cleanPlayerName(): String {
-        val split = split(" ")
+        val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {
@@ -200,8 +200,8 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerName(): String {
-        if (!playerChatPattern.matcher(this).matches()) return "-"
+    fun String.getPlayerNameFromChatMessage(): String? {
+        if (!playerChatPattern.matcher(this).matches()) return null
 
         var username = this.removeColor().split(":")[0]
 
@@ -217,8 +217,11 @@ object StringUtils {
 
         val matcher = chatUsernamePattern.matcher(username)
 
-        if (!matcher.matches()) return "-"
-        username = matcher.group("username")
-        return username
+        if (!matcher.matches()) return null
+        return matcher.group("username")
+    }
+
+    fun String.convertToFormatted(): String {
+        return this.replace("&&", "§")
     }
 }

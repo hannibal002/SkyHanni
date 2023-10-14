@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -24,7 +23,6 @@ class SlayerQuestWarning {
     private var currentReason = ""
     private var dirtySidebar = false
     private var hasAutoSlayer = false
-    private var activeSlayer: SlayerType? = null
 
     //TODO add check if player has clicked on an item, before mobs around you gets damage
 
@@ -53,7 +51,6 @@ class SlayerQuestWarning {
         }
 
         if (message == "§aYour Slayer Quest has been cancelled!") {
-            activeSlayer = null
             needSlayerQuest = false
         }
 
@@ -102,8 +99,6 @@ class SlayerQuestWarning {
             }
         }
 
-        activeSlayer = SlayerType.getByDisplayName(slayerTypeName)
-
         if (loaded) {
             dirtySidebar = false
             if (slayerQuest && !needSlayerQuest) {
@@ -139,7 +134,7 @@ class SlayerQuestWarning {
         LorenzUtils.chat("§e[SkyHanni] $chatMessage")
 
         if (config.questWarningTitle) {
-            TitleUtils.sendTitle("§e$titleMessage", 2.seconds)
+            LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)
         }
     }
 
@@ -154,18 +149,18 @@ class SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val area = LorenzUtils.skyBlockArea
-        val slayerType = SlayerType.getByArea(area) ?: return false
+        val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
+
+        val activeSlayer = SlayerAPI.getActiveSlayer()
 
         if (activeSlayer != null) {
-            val activeSlayer = activeSlayer!!
             if (slayerType != activeSlayer) {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
                 SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and are in the $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
                 )
             }
         }

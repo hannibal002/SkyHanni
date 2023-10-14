@@ -839,7 +839,7 @@ public class GardenConfig {
     public boolean dicerCounter = false;
 
     @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigOption(name = "RNG Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     @FeatureToggle
@@ -1119,6 +1119,12 @@ public class GardenConfig {
     public int composterOverlayPriceType = 0;
 
     @Expose
+    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
+    @ConfigEditorDropdown(values = {"Bazaar", "Sacks"})
+    @ConfigAccordionId(id = 17)
+    public int composterOverlayRetrieveFrom = 0;
+
+    @Expose
     public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
 
     @Expose
@@ -1264,7 +1270,7 @@ public class GardenConfig {
 
     @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
-    public Runnable positions = Commands::openFortuneGuide;
+    public Runnable open = Commands::openFortuneGuide;
 
     @Expose
     public Position farmingFortunePos = new Position(5, -180, false, true);

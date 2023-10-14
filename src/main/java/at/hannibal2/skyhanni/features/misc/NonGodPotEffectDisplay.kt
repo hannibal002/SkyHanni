@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -164,7 +164,7 @@ class NonGodPotEffectDisplay {
                         val duration = try {
                             TimeUtils.getMillis(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {
-                            CopyErrorCommand.logError(
+                            ErrorManager.logError(
                                 Exception("'§f' not found in line '$line'", e),
                                 "Error while reading Non God-Potion effects from tab list"
                             )
@@ -212,7 +212,7 @@ class NonGodPotEffectDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (RiftAPI.inRift()) return
 

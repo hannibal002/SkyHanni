@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -37,6 +38,9 @@ public class Storage {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
+    public List<VisualWord> modifiedWords = new ArrayList<>();
+
+    @Expose
     public Boolean contestSendingAsked = false;
 
     @Expose
@@ -58,6 +62,9 @@ public class Storage {
 
         @Expose
         public long nextAccountUpgradeCompletionTime = -1L;
+
+        @Expose
+        public List<String> guildMembers = new ArrayList<>();
     }
 
     public static class ProfileSpecific {

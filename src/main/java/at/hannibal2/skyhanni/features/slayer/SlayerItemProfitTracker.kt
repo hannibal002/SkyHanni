@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.SlayerProfitList
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -14,18 +13,18 @@ import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -76,7 +75,7 @@ object SlayerItemProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInSlayerArea) {
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
             logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
             addMobKillCoins(coins.toInt())
         }
@@ -141,7 +140,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (sackChange in event.sackChanges) {
@@ -156,7 +155,7 @@ object SlayerItemProfitTracker {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         val packet = event.packet
@@ -189,7 +188,7 @@ object SlayerItemProfitTracker {
             LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
         }
         if (config.titleWarning && price > config.minimumPriceWarning) {
-            TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
 
@@ -253,7 +252,7 @@ object SlayerItemProfitTracker {
             ) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
 
-                    if (LorenzUtils.isControlKeyDown()) {
+                    if (KeyboardManager.isControlKeyDown()) {
                         itemLog.items.remove(internalName)
                         LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
                         lastClickDelay = System.currentTimeMillis() + 500
@@ -344,20 +343,17 @@ object SlayerItemProfitTracker {
         list.slayerCompletedCount = 0
     }
 
-    private fun getPrice(internalName: NEUInternalName) =
-        internalName.getBazaarData()?.let { getPrice(internalName, it) } ?: internalName.getPrice()
+    private fun getPrice(internalName: NEUInternalName) = when (config.priceFrom) {
+        0 -> internalName.getBazaarData()?.sellPrice ?: internalName.getPriceOrNull() ?: 0.0
+        1 -> internalName.getBazaarData()?.buyPrice ?: internalName.getPriceOrNull() ?: 0.0
 
-    private fun getPrice(internalName: NEUInternalName, bazaarData: BazaarData) = when (config.priceFrom) {
-        0 -> bazaarData.sellPrice
-        1 -> bazaarData.buyPrice
-
-        else -> internalName.getNpcPrice()
+        else -> internalName.getNpcPriceOrNull() ?: 0.0
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {

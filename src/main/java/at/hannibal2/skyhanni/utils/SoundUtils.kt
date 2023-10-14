@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation
 object SoundUtils {
     private val beepSound by lazy { createSound("random.orb", 1f) }
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
+    private val errorSound by lazy {createSound("mob.endermen.portal", 0f)}
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
@@ -54,9 +55,8 @@ object SoundUtils {
     fun playClickSound() {
         clickSound.playSound()
     }
-
     fun command(args: Array<String>) {
-         if (args.isEmpty()) {
+        if (args.isEmpty()) {
             LorenzUtils.chat("§c[SkyHanni] Specify a sound effect to test")
             return
         }
@@ -66,5 +66,9 @@ object SoundUtils {
         val volume = args.getOrNull(2)?.toFloat() ?: 50.0f
 
         createSound(soundName, pitch, volume).playSound()
+    }
+
+    fun playErrorSound() {
+        errorSound.playSound()
     }
 }
