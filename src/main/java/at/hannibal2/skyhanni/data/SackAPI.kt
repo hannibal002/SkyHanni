@@ -286,7 +286,7 @@ object SackAPI {
         return sackData[item] ?: return SackItem(0, 0, -1)
     }
 
-    fun getFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
+    fun commandGetFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData

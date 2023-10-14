@@ -143,8 +143,8 @@ public class CrimsonIsleConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Crimson Isle Quest Items", desc = "Automatically gets the items from your sacks when you open the \"get x amount of items\" daily quest menu in the Crimson Isle. ")
+    @ConfigOption(name = "Fetch Quest from Sacks", desc = "Gets the items from your sacks when you open a 'item fetch' daily quest in the town board.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean crimsonQuestItems = false;
+    public boolean questdailyFetchItemsFromSacks = false;
 }
