@@ -6,10 +6,12 @@ import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
@@ -196,5 +198,13 @@ object DiscordRPCManager : IPCListener {
         } catch (e: Exception) {
             LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.")
         }
+    }
+
+
+    // Events that change things in DiscordStatus
+    @SubscribeEvent
+    fun onKeybind(event: LorenzKeyPressEvent) {
+        if (!isEnabled() || !feature.misc.discordRPC.autoPriority.contains(4)) return // autoPriority 4 is dynamic afk
+        beenAfkFor = SimpleTimeMark.now()
     }
 }

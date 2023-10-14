@@ -276,9 +276,10 @@ public class MiscConfig {
                         "Slayer",
                         "Stacking Enchantment",
                         "Dungeon",
+                        "AFK Indicator"
                 }
         )
-        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
         @Expose
         @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
