@@ -1,67 +1,38 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.hours
 
 class QuestItemHelper {
-    private val config get() = SkyHanniMod.feature.crimsonIsle
 
     private val itemCollectionPattern = ". (?<name>[\\w ]+) x(?<amount>\\d+)".toPattern()
-    private var hasGottenItemsFromSack = false
-    private var inInventory = false
     private var questItem = ""
     private var questAmount = 0
+    private var lastSentMessage = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
-        // double check just in case onInventoryClose fails to fire
-        inInventory = event.inventoryName == "Fetch"
-        if (!inInventory) return
-
-        items@ for (item in event.inventoryItems.values) {
+        if (!SkyHanniMod.feature.crimsonIsle.crimsonQuestItems) return
+        if (event.inventoryName != "Fetch") return
+        if (lastSentMessage.passedSince() < 1.hours) return
+        loop@ for ((_, item) in event.inventoryItems) {
             itemCollectionPattern.matchMatcher(item.displayName.removeColor()) {
+                if (!matches()) continue@loop
                 questItem = group("name")
                 questAmount = group("amount").toInt()
-                break@items
+                LorenzUtils.clickableChat(
+                    "§e[SkyHanni] Get x$questAmount $questItem from sacks",
+                    "gfs $questItem $questAmount"
+                )
+                lastSentMessage = SimpleTimeMark.now()
+                break@loop
             }
         }
     }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-    }
-
-    @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
-        if (!isEnabled()) return
-        if (!inInventory) return
-        if (event.toolTip[0].contains("Close")) return
-
-        event.toolTip.add("§eGet x$questAmount $questItem from sacks!")
-    }
-
-    @SubscribeEvent
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled()) return
-        if (!inInventory) return
-
-        if (!hasGottenItemsFromSack) {
-            SackAPI.commandGetFromSacks(questItem, questAmount)
-            hasGottenItemsFromSack = true
-        }
-    }
-
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.questdailyFetchItemsFromSacks
-
 }
