@@ -21,4 +21,9 @@ public class MarkedPlayerConfig {
     @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
     @ConfigEditorBoolean()
     public Property<Boolean> markOwnName = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "Mark Outside SB", desc = "Show marked players outside of SkyBlock.")
+    @ConfigEditorBoolean
+    public boolean markOutsideSB = true;
 }

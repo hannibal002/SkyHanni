@@ -4,13 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -43,6 +37,11 @@ public class GUIConfig {
         public boolean enabled = false;
 
         @Expose
+        @ConfigOption(name = "Show Outside SB", desc = "Show textbox outside of SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean showTextBoxOutsideSB = false;
+
+        @Expose
         @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
                 "§eUse '&' as the colour code character.\n" +
                 "§eUse '\\n' as the line break character.")
@@ -65,6 +64,11 @@ public class GUIConfig {
     public boolean realTimeFormatToggle = false;
 
     @Expose
+    @ConfigOption(name = "Show Outside SB", desc = "Show the time outside of SkyBlock.")
+    @ConfigEditorBoolean
+    public boolean showTimeOutsideSB = false;
+
+    @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
@@ -72,6 +76,11 @@ public class GUIConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tpsDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Show Outside SB", desc = "Shows the TPS outside of SkyBlock.")
+    @ConfigEditorBoolean
+    public boolean showTPSOutsideSB = false;
 
     @Expose
     public Position tpsDisplayPosition = new Position(10, 10, false, true);

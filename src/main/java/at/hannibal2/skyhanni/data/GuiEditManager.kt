@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.client.Minecraft
@@ -22,8 +21,6 @@ class GuiEditManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
         }

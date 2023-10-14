@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class MovementSpeedDisplay {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.playerMovementSpeed
     private var lastLocation: LorenzVec? = null
     private var display = ""
 
@@ -44,5 +44,5 @@ class MovementSpeedDisplay {
         config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.playerMovementSpeed
+    fun isEnabled() = LorenzUtils.onHypixel && (LorenzUtils.inSkyBlock || config.showOutsideSB) && config.enabled
 }

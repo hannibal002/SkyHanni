@@ -29,7 +29,7 @@ class TimeFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.showTimeOutsideSB) return
 
         if (config.realTime) {
             val currentTime = (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())

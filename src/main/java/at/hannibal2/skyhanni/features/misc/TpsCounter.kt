@@ -29,7 +29,7 @@ class TpsCounter {
 
     init {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
-            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
+            if (!LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock && !config.showTPSOutsideSB) return@fixedRateTimer
             if (!config.tpsDisplay) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
@@ -59,7 +59,7 @@ class TpsCounter {
             }
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
-            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
+            if (!LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock && !config.showTPSOutsideSB) return@fixedRateTimer
             if (!config.tpsDisplay) return@fixedRateTimer
 
             if (hasPacketReceived) {
@@ -85,7 +85,7 @@ class TpsCounter {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock && !config.showTPSOutsideSB) return
         if (!config.tpsDisplay) return
 
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")

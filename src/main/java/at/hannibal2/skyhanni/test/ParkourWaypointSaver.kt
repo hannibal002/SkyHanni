@@ -26,7 +26,7 @@ class ParkourWaypointSaver {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (!Keyboard.getEventKeyState()) return
         if (NEUItems.neuHasFocus()) return
         if (System.currentTimeMillis() - timeLastSaved < 250) return
@@ -70,7 +70,7 @@ class ParkourWaypointSaver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
 
         if (locations.size > 1) {
             parkourHelper?.render(event)

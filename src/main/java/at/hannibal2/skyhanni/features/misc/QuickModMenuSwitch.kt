@@ -189,5 +189,5 @@ object QuickModMenuSwitch {
         GlStateManager.popMatrix()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = (LorenzUtils.inSkyBlock || config.showModsOutsideSB) && config.enabled
 }

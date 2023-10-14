@@ -221,7 +221,7 @@ object EntityOutlineRenderer {
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
         // SkyBlock Conditions
-        if (!LorenzUtils.inSkyBlock) {
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.highlightPartyMembers.highlightPartyOutsideSB) {
             return false
         }
 

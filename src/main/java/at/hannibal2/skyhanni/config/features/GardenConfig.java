@@ -6,17 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -834,6 +824,18 @@ public class GardenConfig {
     public boolean eliteFarmingWeightIgnoreLow = false;
 
     @Expose
+    @ConfigOption(name = "Show outside garden", desc = "Show the farming weight outside of the garden.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean showWeightOutsideGarden = false;
+
+    @Expose
+    @ConfigOption(name = "Show outside SB", desc = "Show the farming weight outside of SkyBlock.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean showWeightOutsideSB = false;
+
+    @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean dicerCounter = false;
@@ -998,10 +1000,16 @@ public class GardenConfig {
     public boolean nextJacobContestDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in Garden but everywhere in SkyBlock.")
+    @ConfigOption(name = "Show Outside Garden", desc = "Show the timer not only in Garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
-    public boolean nextJacobContestEverywhere = false;
+    public boolean nextJacobContestOutsideGarden = false;
+
+    @Expose
+    @ConfigOption(name = "Show Outside SB", desc = "Show the timer outside of SkyBlock.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestOutsideSB = false;
 
     @Expose
     @ConfigOption(name = "In Other Guis", desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.")
@@ -1366,9 +1374,14 @@ public class GardenConfig {
         public boolean showWithoutTool = false;
 
         @Expose
-        @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the Garden.")
+        @ConfigOption(name = "Show Outside Garden", desc = "Show the overlay outside of the Garden.")
         @ConfigEditorBoolean
-        public boolean showEverywhere = false;
+        public boolean showOutsideGarden = false;
+
+        @Expose
+        @ConfigOption(name = "Show Outside SB", desc = "Show the overlay outside of SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean showOutsideSB = false;
 
         @Expose
         @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")

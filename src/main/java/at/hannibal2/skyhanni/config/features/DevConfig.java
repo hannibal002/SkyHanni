@@ -2,12 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
@@ -131,6 +126,11 @@ public class DevConfig {
         @ConfigOption(name = "Show Platform Number", desc = "Show the index number over the platform for every parkour.")
         @ConfigEditorBoolean
         public boolean showPlatformNumber = false;
+
+        @Expose
+        @ConfigOption(name = "Outside SB", desc = "Make parkour waypoints outside of SkyBlock too.")
+        @ConfigEditorBoolean
+        public boolean parkourOutsideSB = false;
 
     }
 
