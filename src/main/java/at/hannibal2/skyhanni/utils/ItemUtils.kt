@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -281,7 +281,7 @@ object ItemUtils {
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
         val matcherAmount = matcher.group("amount")
-        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1;
+        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
