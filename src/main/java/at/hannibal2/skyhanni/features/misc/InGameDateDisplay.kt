@@ -19,7 +19,8 @@ class InGameDateDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!LorenzUtils.inSkyBlock) return
-        if (!event.repeatSeconds(config.refreshSeconds)) return
+        if (!config.useScoreboard && !event.repeatSeconds(config.refreshSeconds)) return
+        if (config.useScoreboard && !event.repeatSeconds(1)) return
 
         checkDate()
     }

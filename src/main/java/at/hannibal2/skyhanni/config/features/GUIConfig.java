@@ -136,7 +136,7 @@ public class GUIConfig {
         @Expose
         @ConfigOption(
                 name = "Refresh Rate",
-                desc = "Change the time in seconds you would like to refresh the In-Game Date Display."
+                desc = "Change the time in seconds you would like to refresh the In-Game Date Display.\n§eNOTE: If \"Use Scoreboard for Date\" is enabled, this setting is ignored."
         )
         @ConfigEditorSlider(
                 minValue = 1,
