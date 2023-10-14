@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.GemstoneSlotType
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -97,7 +97,7 @@ object EstimatedItemValue {
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
-        if (!OSUtils.isKeyHeld(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
+        if (!config.estimatedItemValueHotkey.isKeyHeld() && !config.estimatedIemValueAlwaysEnabled) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
@@ -289,7 +289,7 @@ object EstimatedItemValue {
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        var rawReforgeName = stack.getReforgeName() ?: return 0.0
+        val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
             val stoneJson = values.asJsonObject
@@ -302,8 +302,7 @@ object EstimatedItemValue {
                 val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
                 val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
 
-                val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
-                list.add("§7Reforge: §9$realReforgeName")
+                list.add("§7Reforge: §9$reforgeName")
                 list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
                 list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
                 return reforgeStonePrice + applyCost
@@ -327,7 +326,7 @@ object EstimatedItemValue {
             if (stack.isRecombobulated()) {
                 val oneBelow = itemRarity.oneBelow()
                 if (oneBelow == null) {
-                    CopyErrorCommand.logErrorState(
+                    ErrorManager.logErrorState(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
                         "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
                     )
@@ -339,7 +338,7 @@ object EstimatedItemValue {
         val rarityName = itemRarity.name
         if (!reforgeCosts.has(rarityName)) {
             val reforgesFound = reforgeCosts.entrySet().map { it.key }
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Can not calculate reforge cost for item ${stack.name}",
                 "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
             )
@@ -749,7 +748,7 @@ object EstimatedItemValue {
         if (gemstoneUnlockCosts.isEmpty()) return 0.0
 
         if (internalName !in gemstoneUnlockCosts) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not find gemstone slot price for ${stack.name}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
             )

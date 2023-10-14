@@ -40,8 +40,8 @@ class GardenYawAndPitch {
 
         if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 
-        val yawText = yaw.round(config.yawPrecision)
-        val pitchText = pitch.round(config.pitchPrecision)
+        val yawText = yaw.round(config.yawPrecision).toBigDecimal().toPlainString()
+        val pitchText = pitch.round(config.pitchPrecision).toBigDecimal().toPlainString()
         val displayList = listOf(
             "§aYaw: §f$yawText",
             "§aPitch: §f$pitchText",

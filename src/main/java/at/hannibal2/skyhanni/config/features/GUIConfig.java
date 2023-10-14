@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
@@ -23,6 +24,32 @@ public class GUIConfig {
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
     @ConfigEditorSlider(minValue = 0.1F, maxValue = 10, minStep = 0.05F)
     public float globalScale = 1F;
+
+
+    @Expose
+    @ConfigOption(name = "Modify Visual Words", desc = "")
+    @Accordion
+    public ModifyWords modifyWords = new ModifyWords();
+
+    public static class ModifyWords {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enables replacing all instances of a word or phrase with another word or phrase.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Work Outside SkyBlock", desc = "Allows modifying visual words anywhere on Hypixel.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean workOutside = false;
+
+        @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /shwords")
+        @ConfigEditorButton(buttonText = "Open")
+        public Runnable open = Commands::openVisualWords;
+
+    }
 
     @Expose
     @ConfigOption(name = "Custom Text Box", desc = "")
@@ -70,6 +97,41 @@ public class GUIConfig {
 
     @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
+
+
+    @Expose
+    @ConfigOption(name = "In-Game Date", desc = "")
+    @Accordion
+    public InGameDateConfig inGameDateConfig = new InGameDateConfig();
+
+    public static class InGameDateConfig {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n" +
+                        "(Though this one includes the SkyBlock year!)"
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        public Position position = new Position(10, 10, false, true);
+
+        @Expose
+        @ConfigOption(
+                name = "Refresh Rate",
+                desc = "Change the time in seconds you would like to refresh the In-Game Date Display."
+        )
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 60,
+                minStep = 1
+        )
+        public int RefreshSeconds = 10;
+    }
+
 
     @Expose
     @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")

@@ -544,7 +544,7 @@ public class MiscConfig {
     public static class HighlightPartyMembers {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Marking partly members with a bright outline to better find them in the world.")
+        @ConfigOption(name = "Enabled", desc = "Marking party members with a bright outline to better find them in the world.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
@@ -638,6 +638,11 @@ public class MiscConfig {
             public boolean showBingoRankNumber = false;
 
             @Expose
+            @ConfigOption(name = "Hide Factions", desc = "Hide the icon of the Crimson Isle Faction in the tab list.")
+            @ConfigEditorBoolean
+            public boolean hideFactions = false;
+
+            @Expose
             @ConfigOption(name = "Mark Special Persons", desc = "Show speical icons behind the name of guild members, party members, friends, and marked players.")
             @ConfigEditorBoolean
             public boolean markSpecialPersons = false;
@@ -699,6 +704,27 @@ public class MiscConfig {
 
         @Expose
         public Position playerMovementSpeedPos = new Position(394, 124, false, true);
+    }
+  
+    @ConfigOption(name = "Player Chat Symbols", desc = "")
+    @Accordion
+    public ChatSymbols chatSymbols = new ChatSymbols();
+
+    public static class ChatSymbols {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Adds extra symbols to the chat such as those from ironman, " +
+                "stranded, bingo or nether factions and places them next to your regular player emblems. " +
+                "Also allows emblems without sb level in chat.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Chat Symbol Location", desc = "Determines where the symbols should go in chat in relation to the " +
+                "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
+        @ConfigEditorDropdown(values = {"Left", "Right", "Hidden"})
+        public int symbolLocation = 0;
     }
 
     @Expose

@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -53,7 +53,7 @@ class GardenVisitorTimer {
             try {
                 updateVisitorDisplay()
             } catch (error: Throwable) {
-                CopyErrorCommand.logError(error, "Encountered an error when updating visitor display")
+                ErrorManager.logError(error, "Encountered an error when updating visitor display")
             }
             try {
                 GardenVisitorDropStatistics.saveAndUpdate()
@@ -116,7 +116,7 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis < 0) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    TitleUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                    LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
                 }

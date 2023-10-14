@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -176,7 +176,7 @@ object QuickModMenuSwitch {
                 }
             }
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Error trying to open the gui for mod " + mod.name)
+            ErrorManager.logError(e, "Error trying to open the gui for mod " + mod.name)
         }
     }
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ class PasteIntoSigns {
         if (!LorenzUtils.onHypixel) return
         if (!SkyHanniMod.feature.misc.pasteIntoSigns) return
 
-        val currentlyClicked = LorenzUtils.isPastingKeysDown()
+        val currentlyClicked = KeyboardManager.isPastingKeysDown()
         if (!lastClicked && currentlyClicked) {
             SkyHanniMod.coroutineScope.launch {
                 OSUtils.readFromClipboard()?.let {
