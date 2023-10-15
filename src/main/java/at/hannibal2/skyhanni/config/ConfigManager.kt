@@ -4,12 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
@@ -39,6 +35,7 @@ class ConfigManager {
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
+            .registerTypeAdapterFactory(FeatureTogglesByDefaultAdapter)
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
                 override fun write(out: JsonWriter, value: UUID) {
