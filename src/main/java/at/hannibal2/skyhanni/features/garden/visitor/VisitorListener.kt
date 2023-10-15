@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,7 +31,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 class VisitorListener {
-    private var lastClickedNpc = 0
+    companion object {
+        private var lastClickedNpc = 0
+
+        val lastClickedNpcId: Int
+            get() {
+                return lastClickedNpc
+            }
+    }
+
     private val logger = LorenzLogger("garden/visitors/listener")
 
     @SubscribeEvent
@@ -148,7 +158,7 @@ class VisitorListener {
 
             visitor.hasReward()?.let {
                 if (VisitorAPI.config.visitorRewardWarning.preventRefusing) {
-                    if (OSUtils.isKeyHeld(VisitorAPI.config.visitorRewardWarning.bypassKey)) {
+                    if (VisitorAPI.config.visitorRewardWarning.bypassKey.isKeyHeld()) {
                         LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
@@ -201,7 +211,7 @@ class VisitorListener {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
         if (VisitorAPI.config.visitorHighlightStatus != 1 && VisitorAPI.config.visitorHighlightStatus != 2) return

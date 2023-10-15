@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -136,7 +136,7 @@ object GardenVisitorDropStatistics {
             )
         } else {
             addAsSingletonList("§c?")
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
                 "Error rendering visitor drop statistics"
             )

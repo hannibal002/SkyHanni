@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.commands;
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand;
+import at.hannibal2.skyhanni.test.command.ErrorManager;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
@@ -54,7 +54,7 @@ public class SimpleCommand extends CommandBase {
         try {
             runnable.processCommand(sender, args);
         } catch (Throwable e) {
-            CopyErrorCommand.INSTANCE.logError(e, "Error while running command /" + commandName);
+            ErrorManager.INSTANCE.logError(e, "Error while running command /" + commandName);
         }
     }
 

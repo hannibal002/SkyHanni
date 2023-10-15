@@ -6,13 +6,14 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,24 +22,20 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-
 
 object TrevorFeatures {
     private val trapperPattern =
@@ -54,10 +51,10 @@ object TrevorFeatures {
     private var currentLabel = "§2Ready"
     private var trapperID: Int = 56
     private var backupTrapperID: Int = 17
-    private var timeLastWarped: Long = 0
+    private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
-    private var lastChatPromptTime = -1L
-    private var teleportBlock = -1L
+    private var lastChatPromptTime = SimpleTimeMark.farPast()
+    private var teleportBlock = SimpleTimeMark.farPast()
 
     var questActive = false
     var inBetweenQuests = false
@@ -75,7 +72,7 @@ object TrevorFeatures {
                         if (questActive) TrevorSolver.findMob()
                     }
                 } catch (error: Throwable) {
-                    CopyErrorCommand.logError(error, "Encountered an error when updating the trapper solver")
+                    ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }
@@ -110,7 +107,7 @@ object TrevorFeatures {
             trapperReady = false
             TrevorTracker.startQuest(matcher)
             updateTrapper()
-            lastChatPromptTime = -1L
+            lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
         matcher = talbotPatternAbove.matcher(event.message.removeColor())
@@ -126,7 +123,7 @@ object TrevorFeatures {
         }
 
         if (event.message.removeColor() == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
-            teleportBlock = System.currentTimeMillis()
+            teleportBlock = SimpleTimeMark.now()
         }
 
         if (event.message.contains("§r§7Click an option: §r§a§l[YES]§r§7 - §r§c§l[NO]")) {
@@ -135,7 +132,7 @@ object TrevorFeatures {
 
             for (sibling in siblings) {
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
-                    lastChatPromptTime = System.currentTimeMillis()
+                    lastChatPromptTime = SimpleTimeMark.now()
                     lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
                 }
             }
@@ -210,7 +207,7 @@ object TrevorFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!onFarmingIsland()) return
         var entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper =
@@ -244,28 +241,27 @@ object TrevorFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!onFarmingIsland()) return
-        if (!Keyboard.getEventKeyState()) return
-
-        Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
-        }
+        if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (config.keyBindWarpTrapper == key) {
-            if (lastChatPromptTime != -1L && config.acceptQuest && !questActive && System.currentTimeMillis() - 200 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
-                lastChatPromptTime = -1L
+
+        if (event.keyCode != config.keyBindWarpTrapper) return
+
+        if (config.acceptQuest) {
+            val timeSince = lastChatPromptTime.passedSince()
+            if (timeSince > 200.milliseconds && timeSince < 5.seconds) {
+                lastChatPromptTime = SimpleTimeMark.farPast()
                 LorenzUtils.sendCommandToServer(lastChatPrompt)
                 lastChatPrompt = ""
-                timeLastWarped = System.currentTimeMillis()
+                timeLastWarped = SimpleTimeMark.now()
                 return
             }
-            if (System.currentTimeMillis() - timeLastWarped > 3000 && config.warpToTrapper) {
-                if (System.currentTimeMillis() < teleportBlock + 5000) return
-                LorenzUtils.sendCommandToServer("warp trapper")
-                timeLastWarped = System.currentTimeMillis()
-            }
+        }
+
+        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
+            LorenzUtils.sendCommandToServer("warp trapper")
+            timeLastWarped = SimpleTimeMark.now()
         }
     }
 

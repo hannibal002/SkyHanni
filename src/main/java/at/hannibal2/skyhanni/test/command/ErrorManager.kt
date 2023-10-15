@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -9,7 +10,7 @@ import net.minecraft.client.Minecraft
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-object CopyErrorCommand {
+object ErrorManager {
     // random id -> error message
     private val errorMessages = mutableMapOf<String, String>()
     private val fullErrorMessages = mutableMapOf<String, String>()
@@ -29,7 +30,7 @@ object CopyErrorCommand {
         }
 
         val id = array[0]
-        val fullErrorMessage = LorenzUtils.isControlKeyDown()
+        val fullErrorMessage = KeyboardManager.isControlKeyDown()
         val errorMessage = if (fullErrorMessage) {
             fullErrorMessages[id]
         } else {

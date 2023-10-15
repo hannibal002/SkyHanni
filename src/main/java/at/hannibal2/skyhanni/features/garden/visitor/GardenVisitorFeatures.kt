@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -51,6 +52,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
@@ -243,6 +245,25 @@ class GardenVisitorFeatures {
                 event.parent.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onTooltip(event: ItemTooltipEvent) {
+        if (!GardenAPI.onBarnPlot) return
+        if (!VisitorAPI.inVisitorInventory) return
+        if (event.itemStack.name != "§aAccept Offer") return
+
+        val visitor = VisitorAPI.getVisitor(VisitorListener.lastClickedNpcId) ?: return
+
+        val toolTip = event.toolTip ?: return
+        toolTip.clear()
+
+        if (visitor.lastLore.isEmpty()) {
+            readToolTip(visitor, event.itemStack)
+            LorenzUtils.chat("§e[SkyHanni] Reloaded the visitor data of that inventory, this should not happen.")
+        }
+
+        toolTip.addAll(visitor.lastLore)
     }
 
     private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {

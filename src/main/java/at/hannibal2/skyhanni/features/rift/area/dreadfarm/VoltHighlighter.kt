@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
@@ -17,7 +18,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration
@@ -46,7 +46,7 @@ class VoltHighlighter {
     }
 
     @SubscribeEvent
-    fun onRender(event: RenderWorldLastEvent) {
+    fun onRender(event: LorenzRenderWorldEvent) {
         if (!RiftAPI.inRift() || !(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {
             val state = getVoltState(entity)
