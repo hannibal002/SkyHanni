@@ -19,14 +19,15 @@ java {
 }
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/kotlin/main"))
+    output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
+    java.srcDir(layout.projectDirectory.dir("src/main/kotlin"))
+    kotlin.destinationDirectory.set(java.destinationDirectory)
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
     maven("https://repo.spongepowered.org/maven/")
-    // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://jitpack.io") {
         content {
@@ -37,15 +38,15 @@ repositories {
     maven("https://maven.notenoughupdates.org/releases")
 }
 
-val shadowImpl by configurations.creating {
+val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
-val shadowModImpl by configurations.creating {
+val shadowModImpl: Configuration by configurations.creating {
     configurations.modImplementation.get().extendsFrom(this)
 }
 
-val devenvMod by configurations.creating {
+val devenvMod: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
@@ -74,16 +75,13 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    @Suppress("VulnerableLibrariesLocal")
     modImplementation("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    @Suppress("VulnerableLibrariesLocal")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha22:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -118,22 +116,17 @@ kotlin {
 loom {
     launchConfigs {
         "client" {
-            // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
             property("asmhelper.verbose", "true")
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--mixin", "mixins.skyhanni.json")
-            val modFiles = devenvMod
-                .incoming.artifacts.resolvedArtifacts.get()
-            arg("--mods", modFiles.joinToString(",") { it.file.relativeTo(file("run")).path })
+            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }
     forge {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
         mixinConfig("mixins.skyhanni.json")
     }
-    // If you don't want mixins, remove these lines
+    @Suppress("UnstableApiUsage")
     mixin {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
@@ -152,6 +145,10 @@ tasks.processResources {
     }
 }
 
+tasks.compileJava {
+    dependsOn(tasks.processResources)
+}
+
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -164,7 +161,6 @@ tasks.withType(Jar::class) {
         this["ForceLoadAsMod"] = "true"
         this["Main-Class"] = "SkyHanniInstallerFrame"
 
-        // If you don't want mixins, remove these lines
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
