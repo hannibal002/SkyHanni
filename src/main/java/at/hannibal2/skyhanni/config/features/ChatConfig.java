@@ -2,14 +2,9 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
-@SuppressWarnings("deprecation")
 public class ChatConfig {
 
     @Expose
@@ -19,113 +14,103 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean filterTypes = false;
+    @Accordion
+    public FilterTypesConfig filterType = new FilterTypesConfig();
 
-    @Expose
-    @ConfigOption(name = "Hypixel Hub", desc = "Block messages outside SkyBlock in the Hypixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and Hypixel tournaments.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean hypixelHub = true;
+    public static class FilterTypesConfig{
+        @Expose
+        @ConfigOption(name = "Hypixel Hub", desc = "Block messages outside SkyBlock in the Hypixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and Hypixel tournaments.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hypixelHub = true;
 
-    @Expose
-    @ConfigOption(name = "Empty", desc = "Hide all the empty messages from the chat.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean empty = true;
+        @Expose
+        @ConfigOption(name = "Empty", desc = "Hide all the empty messages from the chat.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean empty = true;
 
-    @Expose
-    @ConfigOption(name = "Warping", desc = "Block 'Sending request to join...' and 'Warping...' messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean warping = true;
+        @Expose
+        @ConfigOption(name = "Warping", desc = "Block 'Sending request to join...' and 'Warping...' messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean warping = true;
 
-    @Expose
-    @ConfigOption(name = "Welcome", desc = "Hide the 'Welcome to SkyBlock' message.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean welcome = true;
+        @Expose
+        @ConfigOption(name = "Welcome", desc = "Hide the 'Welcome to SkyBlock' message.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean welcome = true;
 
-    @Expose
-    @ConfigOption(name = "Guild Exp", desc = "Hide Guild EXP messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean guildExp = true;
+        @Expose
+        @ConfigOption(name = "Guild Exp", desc = "Hide Guild EXP messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean guildExp = true;
 
-    @Expose
-    @ConfigOption(name = "Friend Join Left", desc = "Hide friend join/left messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean friendJoinLeft = false;
+        @Expose
+        @ConfigOption(name = "Friend Join Left", desc = "Hide friend join/left messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean friendJoinLeft = false;
 
-    @Expose
-    @ConfigOption(name = "Winter Gifts", desc = "Hide useless Winter Gift messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean winterGift = false;
+        @Expose
+        @ConfigOption(name = "Winter Gifts", desc = "Hide useless Winter Gift messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean winterGift = false;
 
-    @Expose
-    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
-            "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean powderMining = true;
+        @Expose
+        @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
+                "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean powderMining = true;
 
-    @Expose
-    @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current Kill Combo from the Grandma Wolf Pet.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean killCombo = false;
+        @Expose
+        @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current Kill Combo from the Grandma Wolf Pet.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean killCombo = false;
 
-    @Expose
-    @ConfigOption(name = "Watchdog", desc = "Hide the message where Hypixel is flexing how many players they have banned over the last week.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean watchDog = true;
+        @Expose
+        @ConfigOption(name = "Watchdog", desc = "Hide the message where Hypixel is flexing how many players they have banned over the last week.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean watchDog = true;
 
-    @Expose
-    @ConfigOption(name = "Profile Join", desc = "Hide 'You are playing on profile' and 'Profile ID' chat messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean profileJoin = true;
+        @Expose
+        @ConfigOption(name = "Profile Join", desc = "Hide 'You are playing on profile' and 'Profile ID' chat messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean profileJoin = true;
 
-    //TODO remove
-    @Expose
-    @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean others = false;
+        //TODO remove
+        @Expose
+        @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean others = false;
+    }
 
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean playerMessages = false;
+    @Accordion
+    public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
-    @Expose
-    @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in all chat messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean playerRankHider = false;
+    public static class PlayerMessagesConfig{
+        @Expose
+        @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in all chat messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean playerRankHider = false;
 
-    @Expose
-    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean chatFilter = false;
+        @Expose
+        @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean chatFilter = false;
+    }
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in Dungeons.")

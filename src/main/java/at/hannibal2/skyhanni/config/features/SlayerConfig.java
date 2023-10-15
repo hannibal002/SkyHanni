@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -17,137 +15,131 @@ public class SlayerConfig {
 
     @Expose
     @ConfigOption(name = "Enderman Slayer Features", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean enderman = false;
-
-    @Expose
-    @ConfigOption(name = "Yang Glyph (beacon)", desc = "")
-    @ConfigAccordionId(id = 0)
     @Accordion
-    public EndermanBeaconConfig endermanBeaconConfig = new EndermanBeaconConfig();
+    public EndermanConfig endermen =  new EndermanConfig();
+    public static class EndermanConfig{
+        @Expose
+        @ConfigOption(name = "Yang Glyph (beacon)", desc = "")
+        @Accordion
+        public EndermanBeaconConfig endermanBeaconConfig = new EndermanBeaconConfig();
 
-    public static class EndermanBeaconConfig {
+        public static class EndermanBeaconConfig {
+
+            @Expose
+            @ConfigOption(name = "Highlight Beacon",
+                    desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
+                            "Supports beacon in hand and beacon flying.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean highlightBeacon = true;
+
+            @Expose
+            @ConfigOption(name = "Beacon Color", desc = "Color of the beacon.")
+            @ConfigEditorColour
+            public String beaconColor = "0:255:255:0:88";
+
+            @Expose
+            @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen when the Enderman Slayer throws a Yang Glyph (beacon).")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean showWarning = false;
+
+            @Expose
+            @ConfigOption(name = "Show Line", desc = "Draw a line starting at your crosshair to the beacon.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean showLine = false;
+
+            @Expose
+            @ConfigOption(name = "Line Color", desc = "Color of the line.")
+            @ConfigEditorColour
+            public String lineColor = "0:255:255:0:88";
+
+            @Expose
+            @ConfigOption(name = "Line Width", desc = "Width of the line.")
+            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+            public int lineWidth = 3;
+        }
 
         @Expose
-        @ConfigOption(name = "Highlight Beacon",
-                desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
-                        "Supports beacon in hand and beacon flying.")
+        @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean highlightBeacon = true;
+        public boolean highlightNukekebi = false;
 
         @Expose
-        @ConfigOption(name = "Beacon Color", desc = "Color of the beacon.")
-        @ConfigEditorColour
-        public String beaconColor = "0:255:255:0:88";
+        @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indcator.")
+        @ConfigEditorBoolean
+        public boolean phaseDisplay = false;
 
         @Expose
-        @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen when the Enderman Slayer throws a Yang Glyph (beacon).")
+        @ConfigOption(name = "Hide Particles", desc = "Hide particles around Enderman Slayer bosses and Mini-Bosses.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean showWarning = false;
-
-        @Expose
-        @ConfigOption(name = "Show Line", desc = "Draw a line starting at your crosshair to the beacon.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean showLine = false;
-
-        @Expose
-        @ConfigOption(name = "Line Color", desc = "Color of the line.")
-        @ConfigEditorColour
-        public String lneColor = "0:255:255:0:88";
-
-        @Expose
-        @ConfigOption(name = "Line Width", desc = "Width of the line.")
-        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
-        public int lineWidth = 3;
+        public boolean hideParticles = false;
     }
 
-    @Expose
-    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @ConfigAccordionId(id = 0)
-    public boolean endermanHighlightNukekebi = false;
-
-    @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indcator.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean endermanPhaseDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide particles around Enderman Slayer bosses and Mini-Bosses.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean endermanHideParticles = false;
 
     @Expose
     @ConfigOption(name = "Blaze", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean blaze = false;
+    @Accordion
+    public BlazeConfig blazes = new BlazeConfig();
+    public static class BlazeConfig{
+        @Expose
+        @ConfigOption(name = "Hellion Shields", desc = "")
+        @Accordion
+        public BlazeHellionConfig hellion = new BlazeHellionConfig();
+        public static class BlazeHellionConfig{
+            @Expose
+            @ConfigOption(name = "Colored Mobs", desc = "Color the Blaze Slayer boss and the demons in the right hellion shield color.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean coloredMobs = false;
 
-    @Expose
-    @ConfigOption(name = "Hellion Shields", desc = "")
-    @ConfigEditorAccordion(id = 2)
-    @ConfigAccordionId(id = 1)
-    public boolean blazeHellion = false;
+            @Expose
+            @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the Blaze Slayer daggers.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean daggers = false;
 
-    @Expose
-    @ConfigOption(name = "Colored Mobs", desc = "Color the Blaze Slayer boss and the demons in the right hellion shield color.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean blazeColoredMobs = false;
+            @Expose
+            @ConfigOption(name = "Right Dagger", desc = "Mark the right dagger to use for Blaze Slayer in the dagger overlay.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean markRightHellionShield = false;
 
-    @Expose
-    @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the Blaze Slayer daggers.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean blazeDaggers = false;
+            @Expose
+            @ConfigOption(name = "First Dagger", desc = "Select the first, left sided dagger for the display.")
+            @ConfigEditorDropdown(values = {"Spirit/Crystal", "Ashen/Auric"})
+            public int firstDagger = 0;
 
-    @Expose
-    @ConfigOption(name = "Right Dagger", desc = "Mark the right dagger to use for Blaze Slayer in the dagger overlay.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean blazeMarkRightHellionShield = false;
+            @Expose
+            @ConfigOption(name = "Hide Chat", desc = "Remove the wrong Blaze Slayer dagger messages from chat.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean hideDaggerWarning = false;
+        }
 
-    @Expose
-    @ConfigOption(name = "First Dagger", desc = "Select the first, left sided dagger for the display.")
-    @ConfigEditorDropdown(values = {"Spirit/Crystal", "Ashen/Auric"})
-    @ConfigAccordionId(id = 2)
-    public int blazeFirstDagger = 0;
 
-    @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Remove the wrong Blaze Slayer dagger messages from chat.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean blazeHideDaggerWarning = false;
+        @Expose
+        @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean firePitsWarning = false;
 
-    @Expose
-    @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean firePitsWarning = false;
+        @Expose
+        @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Blaze Slayer boss.")
+        @ConfigEditorBoolean
+        public boolean phaseDisplay = false;
 
-    @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Blaze Slayer boss.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    public boolean blazePhaseDisplay = false;
+        @Expose
+        @ConfigOption(name = "Clear View", desc = "Hide particles and fireballs near Blaze Slayer bosses and demons.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean clearView = false;
+    }
 
-    @Expose
-    @ConfigOption(name = "Clear View", desc = "Hide particles and fireballs near Blaze Slayer bosses and demons.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean blazeClearView = false;
+
 
     @Expose
     @ConfigOption(name = "Vampire Slayer Features", desc = "")
@@ -159,9 +151,9 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Your Boss", desc = "")
         @Accordion
-        public OwnBoss ownBoss = new OwnBoss();
+        public OwnBossConfig ownBoss = new OwnBossConfig();
 
-        public static class OwnBoss {
+        public static class OwnBossConfig {
 
             @Expose
             @ConfigOption(name = "Highlight Your Boss", desc = "Highlight your own Vampire Slayer boss.")
@@ -196,9 +188,9 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Others Boss", desc = "")
         @Accordion
-        public OthersBoss othersBoss = new OthersBoss();
+        public OthersBossConfig othersBoss = new OthersBossConfig();
 
-        public static class OthersBoss {
+        public static class OthersBossConfig {
 
             @Expose
             @ConfigOption(name = "Highlight Others Boss", desc = "Highlight others players boss.\nYou need to hit them first.")
@@ -233,9 +225,9 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Co-op Boss", desc = "")
         @Accordion
-        public CoopBossHighlight coopBoss = new CoopBossHighlight();
+        public CoopBossHighlightConfig coopBoss = new CoopBossHighlightConfig();
 
-        public static class CoopBossHighlight {
+        public static class CoopBossHighlightConfig {
             @Expose
             @ConfigOption(name = "Highlight Co-op Boss", desc = "Highlight boss of your co-op member.")
             @ConfigEditorBoolean
@@ -317,9 +309,9 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")
         @Accordion
-        public BloodIchor bloodIchor = new BloodIchor();
+        public BloodIchorConfig bloodIchor = new BloodIchorConfig();
 
-        public static class BloodIchor {
+        public static class BloodIchorConfig {
             @Expose
             @ConfigOption(name = "Highlight Blood Ichor", desc = "Highlight the Blood Ichor.")
             @ConfigEditorBoolean
@@ -353,9 +345,9 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Killer Spring", desc = "")
         @Accordion
-        public KillerSpring killerSpring = new KillerSpring();
+        public KillerSpringConfig killerSpring = new KillerSpringConfig();
 
-        public static class KillerSpring {
+        public static class KillerSpringConfig {
             @Expose
             @ConfigOption(name = "Highlight Killer Spring", desc = "Highlight the Killer Spring tower.")
             @ConfigEditorBoolean
@@ -383,9 +375,9 @@ public class SlayerConfig {
     @Expose
     @ConfigOption(name = "Item Profit Tracker", desc = "")
     @Accordion
-    public ItemProfitTracker itemProfitTracker = new ItemProfitTracker();
+    public ItemProfitTrackerConfig itemProfitTracker = new ItemProfitTrackerConfig();
 
-    public static class ItemProfitTracker {
+    public static class ItemProfitTrackerConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Count all items you pick up while doing slayer, " +
@@ -429,9 +421,9 @@ public class SlayerConfig {
     @Expose
     @ConfigOption(name = "Items on Ground", desc = "")
     @Accordion
-    public ItemsOnGround itemsOnGround = new ItemsOnGround();
+    public ItemsOnGroundConfig itemsOnGround = new ItemsOnGroundConfig();
 
-    public static class ItemsOnGround {
+    public static class ItemsOnGroundConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the name and price of items laying on the ground. §cOnly in slayer areas!")
@@ -448,9 +440,9 @@ public class SlayerConfig {
     @Expose
     @ConfigOption(name = "RNG Meter Display", desc = "")
     @Accordion
-    public RngMeterDisplay rngMeterDisplay = new RngMeterDisplay();
+    public RngMeterDisplayConfig rngMeterDisplay = new RngMeterDisplayConfig();
 
-    public static class RngMeterDisplay {
+    public static class RngMeterDisplayConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Display amount of bosses needed until next RNG meter drop.")
@@ -476,9 +468,9 @@ public class SlayerConfig {
     @Expose
     @ConfigOption(name = "Boss Spawn Warning", desc = "")
     @Accordion
-    public SlayerBossWarning slayerBossWarning = new SlayerBossWarning();
+    public SlayerBossWarningConfig slayerBossWarning = new SlayerBossWarningConfig();
 
-    public static class SlayerBossWarning {
+    public static class SlayerBossWarningConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Send a title when your boss is about to spawn.")

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -18,7 +19,7 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 class ToolTooltipTweaks {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.tooltipTweak
     private val tooltipFortunePattern =
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
@@ -151,5 +152,12 @@ class ToolTooltipTweaks {
         if (value.toDouble() != 0.0) {
             add("$description${value.formatStat()}")
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"garden.compactToolTooltips", "garden.tooltipTweak.compactToolTooltips")
+        event.move(3,"garden.fortuneTooltipKeybind", "garden.tooltipTweak.fortuneTooltipKeybind")
+        event.move(3,"garden.cropTooltipFortune", "garden.tooltipTweak.cropTooltipFortune")
     }
 }

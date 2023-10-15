@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -21,6 +22,7 @@ import java.awt.Color
 
 class ThunderSparksHighlight {
 
+    private val config get() = SkyHanniMod.feature.fishing.thunderSpark
     private val texture =
         "ewogICJ0aW1lc3RhbXAiIDogMTY0MzUwNDM3MjI1NiwKICAicHJvZmlsZUlkIiA6ICI2MzMyMDgwZTY3YTI0Y2MxYjE3ZGJhNzZmM2MwMGYxZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJUZWFtSHlkcmEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2IzMzI4ZDNlOWQ3MTA0MjAzMjI1NTViMTcyMzkzMDdmMTIyNzBhZGY4MWJmNjNhZmM1MGZhYTA0YjVjMDZlMSIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
     private val sparks = mutableListOf<EntityArmorStand>()
@@ -39,7 +41,7 @@ class ThunderSparksHighlight {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val special = SkyHanniMod.feature.fishing.thunderSparkColor
+        val special = config.color
         val color = Color(SpecialColour.specialToChromaRGB(special), true)
 
         val playerLocation = LocationUtils.playerLocation()
@@ -64,6 +66,12 @@ class ThunderSparksHighlight {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.fishing.thunderSparkHighlight
+        return LorenzUtils.inSkyBlock && config.highlight
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "fishing.thunderSparkHighlight", "fishing.thunderSpark.highlight")
+        event.move(3, "fishing.thunderSparkColor", "fishing.thunderSpark.color")
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,13 +13,13 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.estimatedIemValueArmor) return
+        if (!config.armor) return
         if (!InventoryUtils.openInventoryName().contains("Wardrobe")) return
 
         val slot = event.slot.slotNumber
@@ -47,7 +48,7 @@ class EstimatedWardrobePrice {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.estimatedIemValueArmor) return
+        if (!config.armor) return
         if (!event.inventoryName.startsWith("Wardrobe")) return
 
         val map = mutableMapOf<Int, MutableList<ItemStack>>()
@@ -61,5 +62,10 @@ class EstimatedWardrobePrice {
             list.add(item)
         }
         data = map
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"misc.estimatedIemValueArmor", "misc.estimatedItemValues.armor")
     }
 }
