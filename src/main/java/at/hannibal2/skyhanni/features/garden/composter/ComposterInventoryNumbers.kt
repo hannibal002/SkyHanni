@@ -69,7 +69,7 @@ class ComposterInventoryNumbers {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterInventoryNumbers", "garden.composters.inventoryNumbers")
     }
 }

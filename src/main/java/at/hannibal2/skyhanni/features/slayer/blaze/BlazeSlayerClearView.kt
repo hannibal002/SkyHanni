@@ -57,7 +57,7 @@ class BlazeSlayerClearView {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.blazeClearView", "slayer.blazes.clearView")
     }
 }

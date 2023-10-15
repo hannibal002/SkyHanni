@@ -28,7 +28,7 @@ class DungeonCleanEnd {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!config.toggle) return
+        if (!config.enabled) return
 
         val message = event.message
 
@@ -39,7 +39,7 @@ class DungeonCleanEnd {
 
     private fun shouldBlock(): Boolean {
         if (!LorenzUtils.inDungeons) return false
-        if (!config.toggle) return false
+        if (!config.enabled) return false
 
         if (!bossDone) return false
 
@@ -66,7 +66,7 @@ class DungeonCleanEnd {
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!config.toggle) return
+        if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return
         if (event.entity.entityId != lastBossId) return
@@ -117,7 +117,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.toggle")
+        event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
     }
 

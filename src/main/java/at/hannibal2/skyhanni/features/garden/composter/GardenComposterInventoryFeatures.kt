@@ -98,7 +98,7 @@ class GardenComposterInventoryFeatures {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterUpgradePrice", "garden.composters.upgradePrice")
         event.move(3, "garden.composterHighLightUpgrade", "garden.composters.highlightUpgrade")
     }

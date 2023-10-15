@@ -568,7 +568,7 @@ class ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterOverlay", "garden.composters.overlay")
         event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
         event.move(3, "garden.composterOverlayRetrieveFrom", "garden.composters.retrieveFrom")

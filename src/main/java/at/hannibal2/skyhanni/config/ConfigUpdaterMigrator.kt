@@ -21,7 +21,6 @@ object ConfigUpdaterMigrator {
         return obj?.at(chain.drop(1), init)
     }
 
-
     data class ConfigFixEvent(
         val old: JsonObject,
         val new: JsonObject,

@@ -70,7 +70,7 @@ class ThunderSparksHighlight {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "fishing.thunderSparkHighlight", "fishing.thunderSpark.highlight")
         event.move(3, "fishing.thunderSparkColor", "fishing.thunderSpark.color")
     }

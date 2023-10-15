@@ -570,7 +570,7 @@ class SkyHanniDebugsAndTests {
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
         event.move(3, "dev.showEmptyNames", "dev.debug.showEmptyNames")
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
-        event.move(3,"dev.copyInternalName", "dev.debug.copyInternalName")
+        event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
 
     }

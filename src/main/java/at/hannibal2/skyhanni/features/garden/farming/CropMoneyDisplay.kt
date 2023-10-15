@@ -420,7 +420,7 @@ object CropMoneyDisplay {
     private fun isEnabled() = GardenAPI.inGarden() && config.display
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.moneyPerHourDisplay", "garden.moneyPerHours.display")
         event.move(3, "garden.moneyPerHourShowOnlyBest", "garden.moneyPerHours.showOnlyBest")
         event.move(3, "garden.moneyPerHourShowCurrent", "garden.moneyPerHours.showCurrent")

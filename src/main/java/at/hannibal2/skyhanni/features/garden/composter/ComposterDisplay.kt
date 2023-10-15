@@ -207,7 +207,7 @@ class ComposterDisplay {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterDisplayEnabled", "garden.composters.displayEnabled")
         event.move(3, "garden.composterDisplayOutsideGarden", "garden.composters.displayOutsideGarden")
         event.move(3, "garden.composterWarnAlmostClose", "garden.composters.warnAlmostClose")

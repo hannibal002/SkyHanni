@@ -37,13 +37,13 @@ public class DungeonConfig {
     @ConfigOption(name = "Clean End", desc = "")
     @Accordion
     public CleanEndConfig cleanEnd = new CleanEndConfig();
-    public static class CleanEndConfig{
+    public static class CleanEndConfig {
         @Expose
-        @ConfigOption(name = "Clean Ending", desc = "After the last Dungeon boss has died, all entities and " +
+        @ConfigOption(name = "Enabled", desc = "After the last Dungeon boss has died, all entities and " +
                 "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean toggle = false;
+        public boolean enabled = false;
 
         @Expose
         @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 Guardians from the clean end feature when " +

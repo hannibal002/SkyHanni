@@ -29,7 +29,7 @@ public class GardenConfig {
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
     public SkyMartConfig skyMart = new SkyMartConfig();
-    public static class SkyMartConfig{
+    public static class SkyMartConfig {
         @Expose
         @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
         @ConfigEditorBoolean
@@ -49,12 +49,12 @@ public class GardenConfig {
     @ConfigOption(name = "Visitor", desc = "")
     @Accordion
     public VisitorConfig visitors = new VisitorConfig();
-    public static class VisitorConfig{
+    public static class VisitorConfig {
         @Expose
         @ConfigOption(name = "Visitor Timer", desc = "")
         @Accordion
         public TimerConfig timer = new TimerConfig();
-        public static class TimerConfig{
+        public static class TimerConfig {
             @Expose
             @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
                     "and a number for how many visitors are already waiting.")
@@ -82,7 +82,7 @@ public class GardenConfig {
         @ConfigOption(name = "Visitor Items Needed", desc = "")
         @Accordion
         public NeedsConfig needs = new NeedsConfig();
-        public static class NeedsConfig{
+        public static class NeedsConfig {
             @Expose
             @ConfigOption(name = "Items Needed", desc = "Show all items needed for the visitors.")
             @ConfigEditorBoolean
@@ -119,7 +119,7 @@ public class GardenConfig {
         @ConfigOption(name = "Visitor Inventory", desc = "")
         @Accordion
         public InventoryConfig inventory = new InventoryConfig();
-        public static class InventoryConfig{
+        public static class InventoryConfig {
             @Expose
             @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
             @ConfigEditorBoolean

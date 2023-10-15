@@ -25,7 +25,7 @@ public class MiscConfig {
     @ConfigOption(name = "Pet", desc = "")
     @Accordion
     public PetConfig pets = new PetConfig();
-    public static class PetConfig{
+    public static class PetConfig {
         @Expose
         @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
         @ConfigEditorBoolean
@@ -84,7 +84,7 @@ public class MiscConfig {
     @ConfigOption(name = "Potion Effects", desc = "")
     @Accordion
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
-    public static class PotionEffectsConfig{
+    public static class PotionEffectsConfig {
         @Expose
         @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
         @ConfigEditorBoolean
@@ -105,7 +105,7 @@ public class MiscConfig {
     @ConfigOption(name = "Particle Hider", desc = "")
     @Accordion
     public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
-    public static class ParticleHiderConfig{
+    public static class ParticleHiderConfig {
         @Expose
         @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
         @ConfigEditorBoolean
@@ -153,7 +153,7 @@ public class MiscConfig {
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
     @Accordion
     public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
-    public static class EstimatedItemValueConfig{
+    public static class EstimatedItemValueConfig {
         @Expose
         @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
         @ConfigEditorBoolean

@@ -65,7 +65,7 @@ class EstimatedWardrobePrice {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"misc.estimatedIemValueArmor", "misc.estimatedItemValues.armor")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.estimatedIemValueArmor", "misc.estimatedItemValues.armor")
     }
 }

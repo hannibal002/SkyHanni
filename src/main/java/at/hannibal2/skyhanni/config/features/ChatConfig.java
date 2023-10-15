@@ -2,7 +2,10 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class ChatConfig {
@@ -17,7 +20,7 @@ public class ChatConfig {
     @Accordion
     public FilterTypesConfig filterType = new FilterTypesConfig();
 
-    public static class FilterTypesConfig{
+    public static class FilterTypesConfig {
         @Expose
         @ConfigOption(name = "Hypixel Hub", desc = "Block messages outside SkyBlock in the Hypixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and Hypixel tournaments.")
         @ConfigEditorBoolean
@@ -98,7 +101,7 @@ public class ChatConfig {
     @Accordion
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
-    public static class PlayerMessagesConfig{
+    public static class PlayerMessagesConfig {
         @Expose
         @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in all chat messages.")
         @ConfigEditorBoolean

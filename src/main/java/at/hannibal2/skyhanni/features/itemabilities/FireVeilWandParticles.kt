@@ -15,13 +15,14 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FireVeilWandParticles {
+    private val config get() = SkyHanniMod.feature.itemAbilities.fireVeilWands
 
     var lastClick = 0L
 
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (SkyHanniMod.feature.itemAbilities.fireVeilWands.display == 0) return
+        if (config.display == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
         if (event.type == EnumParticleTypes.FLAME && event.count == 1 && event.speed == 0f && event.offset.isZero()) {
@@ -45,17 +46,17 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (SkyHanniMod.feature.itemAbilities.fireVeilWands.display != 1) return
+        if (config.display != 1) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
-        val color = SkyHanniMod.feature.itemAbilities.fireVeilWands.displayColor.toChromaColor()
+        val color = config.displayColor.toChromaColor()
 
         RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
-        event.move(3,"itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
+        event.move(3, "itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")
     }
 }
