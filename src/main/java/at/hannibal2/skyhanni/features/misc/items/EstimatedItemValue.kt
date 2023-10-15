@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -72,7 +73,7 @@ import java.util.Locale
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -96,8 +97,8 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.estimatedIemValueEnabled) return
-        if (!config.estimatedItemValueHotkey.isKeyHeld() && !config.estimatedIemValueAlwaysEnabled) return
+        if (!config.enabled) return
+        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
@@ -111,7 +112,7 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.estimatedIemValueEnchantmentsCap.onToggle {
+        config.enchantmentsCap.onToggle {
             cache.clear()
         }
     }
@@ -119,7 +120,7 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.estimatedIemValueEnabled) return
+        if (!config.enabled) return
 
         val item = event.stack
         val oldData = cache[item]
@@ -170,7 +171,7 @@ object EstimatedItemValue {
 
         if (basePrice == totalPrice) return listOf()
 
-        val numberFormat = if (config.estimatedIemValueExactPrice) {
+        val numberFormat = if (config.exactPrice) {
             totalPrice.roundToLong().addSeparators()
         } else {
             NumberUtil.format(totalPrice)
@@ -682,7 +683,7 @@ object EstimatedItemValue {
 
             map[" $name §7(§6$format§7)"] = price
         }
-        val enchantmentsCap: Int = config.estimatedIemValueEnchantmentsCap.get().toInt()
+        val enchantmentsCap: Int = config.enchantmentsCap.get().toInt()
         if (map.isNotEmpty()) {
             list.add("§7Enchantments: §6" + NumberUtil.format(totalPrice))
             var i = 0
@@ -786,5 +787,15 @@ object EstimatedItemValue {
         list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
         list += priceMap.sortedDesc().keys
         return totalPrice
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
+        event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")
+        event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")
+        event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
+        event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
+        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
@@ -18,6 +19,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonCleanEnd {
 
+    private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+
     private var bossDone = false
     private var chestsSpawned = false
     private var lastBossId: Int = -1
@@ -25,7 +28,7 @@ class DungeonCleanEnd {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return
+        if (!config.toggle) return
 
         val message = event.message
 
@@ -36,7 +39,7 @@ class DungeonCleanEnd {
 
     private fun shouldBlock(): Boolean {
         if (!LorenzUtils.inDungeons) return false
-        if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return false
+        if (!config.toggle) return false
 
         if (!bossDone) return false
 
@@ -63,7 +66,7 @@ class DungeonCleanEnd {
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return
+        if (!config.toggle) return
         if (bossDone) return
         if (lastBossId == -1) return
         if (event.entity.entityId != lastBossId) return
@@ -83,7 +86,7 @@ class DungeonCleanEnd {
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
-        if (SkyHanniMod.feature.dungeon.cleanEndF3IgnoreGuardians
+        if (config.F3IgnoreGuardians
             && DungeonAPI.isOneOf("F3", "M3")
             && entity is EntityGuardian
             && entity.entityId != lastBossId
@@ -111,4 +114,11 @@ class DungeonCleanEnd {
             event.isCanceled = true
         }
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.toggle")
+        event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
+    }
+
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -62,7 +63,7 @@ object QuickModMenuSwitch {
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
 
-            if (SkyHanniMod.feature.dev.modMenuLog) {
+            if (SkyHanniMod.feature.dev.debug.modMenuLog) {
                 LorenzUtils.debug("Open GUI: $latestGuiPath")
             }
         }
@@ -190,4 +191,9 @@ object QuickModMenuSwitch {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
+    }
 }

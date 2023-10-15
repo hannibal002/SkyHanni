@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
@@ -22,7 +23,7 @@ class GardenCropMilestoneInventory {
 
     @SubscribeEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
-        if (!config.numberAverageCropMilestone) return
+        if (!config.number.averageCropMilestone) return
 
         val tiers = mutableListOf<Double>()
         for (cropType in CropType.entries) {
@@ -53,7 +54,7 @@ class GardenCropMilestoneInventory {
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.cropMilestoneTotalProgress) return
+        if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 
         val itemStack = event.itemStack ?: return
         val crop = GardenCropMilestones.getCropTypeByLore(itemStack) ?: return
@@ -73,5 +74,11 @@ class GardenCropMilestoneInventory {
         val progressBar = StringUtils.progressBar(percentage)
         event.toolTip.add(index, "$progressBar §e${counter.addSeparators()}§6/§e${NumberUtil.format(maxCounter)}")
         event.toolTip.add(index, "§7Progress to Tier $maxTier: §e$percentageFormat")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(3,"garden.numberAverageCropMilestone", "garden.number.averageCropMilestone")
+        event.move(3, "garden.cropMilestoneTotalProgress", "garden.tooltipTweak.cropMilestoneTotalProgress")
     }
 }
