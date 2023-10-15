@@ -31,8 +31,13 @@ import org.lwjgl.input.Keyboard
 
 class VisitorListener {
     private var lastClickedNpc = 0
-
     private val logger = LorenzLogger("garden/visitors/listener")
+
+    companion object {
+        private val VISITOR_INFO_ITEM_SLOT = 13
+        private val VISITOR_ACCEPT_ITEM_SLOT = 29
+        private val VISITOR_REFUSE_ITEM_SLOT = 33
+    }
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
@@ -103,18 +108,11 @@ class VisitorListener {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        val npcItem = event.inventoryItems[13] ?: return
+        val npcItem = event.inventoryItems[VISITOR_INFO_ITEM_SLOT] ?: return
         val lore = npcItem.getLore()
-        var isVisitor = false
-        if (lore.size == 4) {
-            val line = lore[3]
-            if (line.startsWith("§7Offers Accepted: §a")) {
-                isVisitor = true
-            }
-        }
-        if (!isVisitor) return
+        if(!VisitorAPI.isVisitorInfo(lore)) return
 
-        val offerItem = event.inventoryItems[29] ?: return
+        val offerItem = event.inventoryItems[VISITOR_ACCEPT_ITEM_SLOT] ?: return
         if (offerItem.name != "§aAccept Offer") return
 
         VisitorAPI.inVisitorInventory = true
@@ -145,7 +143,7 @@ class VisitorListener {
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
 
-        if (event.slotId == 33) {
+        if (event.slotId == VISITOR_REFUSE_ITEM_SLOT) {
             if (event.slot.stack?.name != "§cRefuse Offer") return
 
             visitor.hasReward()?.let {
@@ -170,7 +168,7 @@ class VisitorListener {
             VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             return
         }
-        if (event.slotId == 29 && event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
+        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
             VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
             return
         }
