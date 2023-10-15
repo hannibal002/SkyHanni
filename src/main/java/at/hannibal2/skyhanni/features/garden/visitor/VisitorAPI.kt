@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -61,7 +61,7 @@ object VisitorAPI {
 
         println("visitors: $visitors")
         println("name: $name")
-        CopyErrorCommand.logErrorState(
+        ErrorManager.logErrorState(
                 "Error finding the visitor `$name§c`. Try to reopen the inventory",
                 "visitor is null! name='$name', visitors=`$visitors`"
         )
