@@ -94,7 +94,7 @@ class DungeonAPI {
             return DungeonFloor.valueOf(floor.replace("M", "F"))
         }
 
-        fun getFloorId() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
+        fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
     }
 
     @SubscribeEvent

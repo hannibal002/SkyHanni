@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-object CopyErrorCommand {
+object ErrorManager {
     // random id -> error message
     private val errorMessages = mutableMapOf<String, String>()
     private val fullErrorMessages = mutableMapOf<String, String>()

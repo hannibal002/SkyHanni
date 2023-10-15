@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.RenderGuiData
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -155,6 +155,7 @@ import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mainlobby.halloweenwaypoints.BasketWaypoints
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
@@ -177,6 +178,7 @@ import at.hannibal2.skyhanni.features.misc.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.misc.HarpFeatures
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.HideDamageSplash
+import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -189,6 +191,7 @@ import at.hannibal2.skyhanni.features.misc.PasteIntoSigns
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
+import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
@@ -218,10 +221,12 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.mobs.SpawnTimers
+import at.hannibal2.skyhanni.features.nether.QuestItemHelper
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazes
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazingSouls
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
@@ -308,7 +313,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.5",
+    version = "0.21.Beta.7",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -329,14 +334,14 @@ class SkyHanniMod {
         loadModule(TestExportTools)
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
-        loadModule(MinecraftData())
+        loadModule(MinecraftData)
         loadModule(TitleManager())
         loadModule(ItemTipHelper())
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
         loadModule(OtherInventoryData)
         loadModule(TabListData())
-        loadModule(RenderGuiData())
+        loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
         loadModule(OwnInventoryData())
@@ -426,6 +431,7 @@ class SkyHanniMod {
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
+        loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
         loadModule(HellionShieldHelper())
@@ -458,6 +464,7 @@ class SkyHanniMod {
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
+        loadModule(BasketWaypoints())
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
         loadModule(MinionCraftHelper())
@@ -582,11 +589,14 @@ class SkyHanniMod {
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
+        loadModule(ModifyVisualWords)
         loadModule(TabListReader)
         loadModule(TabListRenderer)
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
+        loadModule(QuestItemHelper())
+        loadModule(PlayerChatSymbols())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
         loadModule(SkyBlockKickDuration())

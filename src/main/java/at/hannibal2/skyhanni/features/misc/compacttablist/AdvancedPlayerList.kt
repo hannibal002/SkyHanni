@@ -4,10 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
@@ -66,6 +69,15 @@ object AdvancedPlayerList {
                         } else {
                             playerData.bingoLevel = BingoAPI.getRank(line)
                         }
+                        if (IslandType.CRIMSON_ISLE.isInIsland()) {
+                            playerData.faction = if (line.contains("§c⚒")) {
+                                CrimsonIsleFaction.BARBARIAN
+                            } else if (line.contains("§5ቾ")) {
+                                CrimsonIsleFaction.MAGE
+                            } else {
+                                CrimsonIsleFaction.NONE
+                            }
+                        }
                     } else {
                         playerData.nameSuffix = ""
                     }
@@ -114,7 +126,10 @@ object AdvancedPlayerList {
         return newList
     }
 
-    fun ignoreCustomTabList() = SkyHanniMod.feature.dev.debugEnabled && KeyboardManager.isControlKeyDown()
+    fun ignoreCustomTabList(): Boolean {
+        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isControlKeyDown()
+        return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
+    }
 
     private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
         "hannibal2",
@@ -144,6 +159,10 @@ object AdvancedPlayerList {
         }
         if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding) {
             suffix += " §c:O"
+        }
+
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
+            suffix += data.faction.icon
         }
 
         return "$level $playerName ${suffix.trim()}"
@@ -199,5 +218,12 @@ object AdvancedPlayerList {
         var levelText: String = "?"
         var ironman: Boolean = false
         var bingoLevel: Int? = null
+        var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
+    }
+
+    enum class CrimsonIsleFaction(val icon: String) {
+        BARBARIAN(" §c⚒"),
+        MAGE(" §5ቾ"),
+        NONE("")
     }
 }

@@ -7,12 +7,13 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -30,13 +31,11 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-
 
 object TrevorFeatures {
     private val trapperPattern =
@@ -73,7 +72,7 @@ object TrevorFeatures {
                         if (questActive) TrevorSolver.findMob()
                     }
                 } catch (error: Throwable) {
-                    CopyErrorCommand.logError(error, "Encountered an error when updating the trapper solver")
+                    ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }
@@ -208,7 +207,7 @@ object TrevorFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!onFarmingIsland()) return
         var entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper =

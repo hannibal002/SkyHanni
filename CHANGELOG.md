@@ -24,13 +24,29 @@
     + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
 + Added Highlight Party Members. - Cad
-    + Marking partly members with a bright outline to better find them in the world.
+    + Marking party members with a bright outline to better find them in the world.
 + Added Shift Click Equipment. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
+    + Will not break with emblems.
+    + Optional if left or right side of name.
+    + Should not break with other mods.
++ Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
+    + Options to change speed, size, saturation and direction.
++ Added Modify Visual Words (command /shwords). - CalMWolfs
+    + Allows you to replace text on your screen with different text (like the SBE one, just less costly).
+    + Supports all color codes, even chroma (use &&Z)
++ Added In-Game Date display. - Erymanthus
+    + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
+    + Includes the SkyBlock year.
 
 #### Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
+    + Thanks Tobbbb for the coordinates!
+    + Support for hiding basket waypoints once you have clicked on them. - hannibal2
+    + Option to show only the closest basket. - hannibal2
 
 ### Changes
 
@@ -46,6 +62,10 @@
 + Added buttons to change the format of the price and the number in the sack display. - HiZe
 + Made Smoldering same as Fatal Tempo and Chimera in Estimated Item Value. - jani
 + Added an option to change where to get the items from in the composter overlay: from the bazaar or from sacks. - HiZe
++ Added mouse button support for key binds. - CalMWolfs
++ Added 'spooked into the lobby' chat message to the Outside Hypixel filter. - CalMWolfs
++ Changed the Yaw/Pitch Display to not show scientific notations at very small numbers. - Obsidian
++ Added an option to the Advanced Player List to hide Crimson Isle faction icons. - hannibal2
 
 ### Bug Fixes
 
@@ -60,6 +80,19 @@
 + Fixed double rendering of item tooltips with chat triggers. - nea
 + Fixed Sacks Display integer limit error. - HiZe & hannibal2
 + Fixed the vitality attribute is wrongly labeled as "mending" in Estimated Item Value. - walker
++ Fixed lever clicks getting highlighted in the water room. - hannibal2
+    + This solution might not work for iron man in full parties.
++ Fixed slayer profit tracker showing Bazaar/AH price as NPC price. - hannibal2
++ Fixed Hyper reforge/End Stone Geode detection. - hannibal2
++ Better limbo leave detection. - hannibal2
++ Fixed rare crash when trying to read neu config. - hannibal2
++ Fixed rare case where the visitor description is empty. - hannibal2
++ Fixed a typo in the config. - hannibal2
++ Fixed the chat filter not applying immediately after joining the Hypixel lobby. - hannibal2
++ Fixed the selected drop in the catacombs RNG meter inventory not getting highlighted. - hannibal2
++ Fixed Fishing Hook Display showing wrong damage numbers. - hannibal2
++ Fixed Abiphone ring message not getting filtered correctly. - hannibal2
++ Fixed the bug that faction icons in Crimson Isle are always hidden in the tab list. - hannibal2
 
 #### Config
 

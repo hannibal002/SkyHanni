@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
@@ -34,7 +34,7 @@ class GardenPlotBorders {
     }
 
     @SubscribeEvent
-    fun render(event: RenderWorldLastEvent) {
+    fun render(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
 
@@ -94,7 +94,7 @@ class GardenPlotBorders {
         }
     }
 
-    private fun RenderWorldLastEvent.tryDraw3DLine(
+    private fun LorenzRenderWorldEvent.tryDraw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -65,7 +65,7 @@ class ParkourWaypointSaver {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (locations.size > 1) {
