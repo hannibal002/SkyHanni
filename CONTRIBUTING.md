@@ -35,7 +35,9 @@ follow [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/m
 
 ## Creating a Pull Request
 
-_An explanation how to use intellij and branches will follow here soon_
+If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
+
+_An explanation how to use intellij and branches will follow here soon.
 
 Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
 

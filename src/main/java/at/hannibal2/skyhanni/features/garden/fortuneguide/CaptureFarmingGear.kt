@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -129,10 +130,10 @@ class CaptureFarmingGear {
             }
 
             // setting to current saved level -1 to stop later pages saving low rarity pets
-            var highestElephantRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT]) - 1
-            var highestMooshroomRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW]) - 1
-            var highestRabbitRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT]) - 1
-            var highestBeeRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE]) - 1
+            var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestMooshroomRarity = (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName().asString().split(";")

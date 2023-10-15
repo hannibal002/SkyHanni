@@ -45,9 +45,9 @@ public class RiftConfig {
     @ConfigOption(name = "Crux Talisman Progress", desc = "")
     @Accordion
     @Expose
-    public CruxTalismanDisplay cruxTalisman = new CruxTalismanDisplay();
+    public CruxTalismanDisplayConfig cruxTalisman = new CruxTalismanDisplayConfig();
 
-    public static class CruxTalismanDisplay {
+    public static class CruxTalismanDisplayConfig {
         @Expose
         @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
         @ConfigEditorBoolean
@@ -162,9 +162,9 @@ public class RiftConfig {
             @ConfigOption(name = "Kloon Hacking", desc = "")
             @Accordion
             @Expose
-            public KloonHacking hacking = new KloonHacking();
+            public KloonHackingConfig hacking = new KloonHackingConfig();
 
-            public static class KloonHacking {
+            public static class KloonHackingConfig {
 
                 @Expose
                 @ConfigOption(name = "Hacking Solver", desc = "Highlights the correct button to click in the hacking inventory.")
@@ -259,9 +259,9 @@ public class RiftConfig {
         @ConfigOption(name = "Mirrorverse", desc = "")
         @Accordion
         @Expose
-        public MirrorVerse mirrorVerseConfig = new MirrorVerse();
+        public MirrorVerseConfig mirrorVerseConfig = new MirrorVerseConfig();
 
-        public static class MirrorVerse {
+        public static class MirrorVerseConfig {
 
             @ConfigOption(name = "Lava Maze", desc = "")
             @Accordion
@@ -302,9 +302,9 @@ public class RiftConfig {
             @ConfigOption(name = "Upside Down Parkour", desc = "")
             @Accordion
             @Expose
-            public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
+            public UpsideDownParkourConfig upsideDownParkour = new UpsideDownParkourConfig();
 
-            public static class UpsideDownParkour {
+            public static class UpsideDownParkourConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the Mirrorverse by showing the correct way.")
@@ -343,9 +343,9 @@ public class RiftConfig {
             @ConfigOption(name = "Dance Room Helper", desc = "")
             @Accordion
             @Expose
-            public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+            public DanceRoomHelperConfig danceRoomHelper = new DanceRoomHelperConfig();
 
-            public static class DanceRoomHelper {
+            public static class DanceRoomHelperConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
@@ -377,9 +377,9 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Formatting", desc = "")
                 @Accordion
-                public DanceRoomFormatting danceRoomFormatting = new DanceRoomFormatting();
+                public DanceRoomFormattingConfig danceRoomFormatting = new DanceRoomFormattingConfig();
 
-                public static class DanceRoomFormatting {
+                public static class DanceRoomFormattingConfig {
 
                     @Expose
                     @ConfigOption(name = "Now", desc = "Formatting for \"Now:\"")
@@ -399,9 +399,9 @@ public class RiftConfig {
                     @Expose
                     @ConfigOption(name = "Color Option", desc = "")
                     @Accordion
-                    public Color color = new Color();
+                    public ColorConfig color = new ColorConfig();
 
-                    public static class Color {
+                    public static class ColorConfig {
                         @Expose
                         @ConfigOption(name = "Move", desc = "Color for the Move instruction")
                         @ConfigEditorText
@@ -504,9 +504,9 @@ public class RiftConfig {
             @Expose
             @ConfigOption(name = "Living Metal Suit Progress", desc = "")
             @Accordion
-            public LivingMetalSuitProgress livingMetalSuitProgress = new LivingMetalSuitProgress();
+            public LivingMetalSuitProgressConfig livingMetalSuitProgress = new LivingMetalSuitProgressConfig();
 
-            public static class LivingMetalSuitProgress {
+            public static class LivingMetalSuitProgressConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Display Living Metal Suit progress.")
@@ -642,9 +642,9 @@ public class RiftConfig {
     @Expose
     @ConfigOption(name = "Motes Sell Price", desc = "")
     @Accordion
-    public Motes motes = new Motes();
+    public MotesConfig motes = new MotesConfig();
 
-    public static class Motes {
+    public static class MotesConfig {
 
         @Expose
         @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
@@ -660,9 +660,9 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Inventory Value", desc = "")
         @Accordion
-        public InventoryValue inventoryValue = new InventoryValue();
+        public InventoryValueConfig inventoryValue = new InventoryValueConfig();
 
-        public static class InventoryValue {
+        public static class InventoryValueConfig {
             @Expose
             @ConfigOption(name = "Inventory Value", desc = "Show total Motes NPC price for the current opened inventory.")
             @ConfigEditorBoolean

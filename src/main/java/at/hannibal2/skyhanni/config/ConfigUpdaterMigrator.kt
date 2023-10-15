@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = LorenzLogger("ConfigMigration")
-    val configVersion = 2
+    val configVersion = 3
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -20,7 +20,6 @@ object ConfigUpdaterMigrator {
         }
         return obj?.at(chain.drop(1), init)
     }
-
 
     data class ConfigFixEvent(
         val old: JsonObject,
