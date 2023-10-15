@@ -30,7 +30,7 @@ class QuestItemHelper {
                 questItem = group("name")
                 questAmount = group("amount").toInt()
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Get x$questAmount $questItem from sacks",
+                    "§e[SkyHanni] Click here go grab x$questAmount $questItem from sacks!",
                     "gfs $questItem $questAmount"
                 )
                 lastSentMessage = SimpleTimeMark.now()
@@ -39,5 +39,5 @@ class QuestItemHelper {
         }
     }
 
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.questdailyFetchItemsFromSacks
+    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.questItemHelper
 }
