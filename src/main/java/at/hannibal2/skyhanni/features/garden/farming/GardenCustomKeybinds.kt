@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
@@ -55,7 +55,7 @@ object GardenCustomKeybinds {
         if (!isActive()) return
         val override = map[keyBinding] ?: return
         val keyCode = override()
-        cir.returnValue = OSUtils.isKeyHeld(keyCode)
+        cir.returnValue = keyCode.isKeyHeld()
     }
 
     @JvmStatic

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -72,8 +71,8 @@ class GardenOptimalSpeed {
         CropType.CARROT -> configCustomSpeed.carrot
         CropType.POTATO -> configCustomSpeed.potato
         CropType.NETHER_WART -> configCustomSpeed.netherWart
-        CropType.PUMPKIN ->  configCustomSpeed.pumpkin
-        CropType.MELON ->  configCustomSpeed.melon
+        CropType.PUMPKIN -> configCustomSpeed.pumpkin
+        CropType.MELON -> configCustomSpeed.melon
         CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
         CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
         CropType.CACTUS -> configCustomSpeed.cactus
@@ -89,7 +88,7 @@ class GardenOptimalSpeed {
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
             config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
-             warn()
+            warn()
         } else {
             config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
@@ -102,7 +101,7 @@ class GardenOptimalSpeed {
         if (System.currentTimeMillis() < lastWarnTime + 20_000) return
 
         lastWarnTime = System.currentTimeMillis()
-        TitleUtils.sendTitle("§cWrong speed!", 3.seconds)
+        LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
             LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
         }

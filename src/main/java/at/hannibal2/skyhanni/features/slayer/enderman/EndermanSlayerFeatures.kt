@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.slayer.enderman
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -66,8 +66,9 @@ class EndermanSlayerFeatures {
                     flyingBeacons = flyingBeacons.editCopy {
                         add(entity)
                     }
-                    if (beaconConfig.showWarning)
-                        TitleUtils.sendTitle("§4Beacon", 2.seconds)
+                    if (beaconConfig.showWarning) {
+                        LorenzUtils.sendTitle("§4Beacon", 2.seconds)
+                    }
                     logger.log("Added flying beacons at ${entity.getLorenzVec()}")
                 }
             }
@@ -99,7 +100,7 @@ class EndermanSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 
 

@@ -347,4 +347,28 @@ public class EventConfig {
         public boolean enableActiveAlert = false;
     }
 
+    @Expose
+    @ConfigOption(name = "Main Lobby Halloween Basket Waypoints", desc = "")
+    @Accordion
+    public halloweenBasketConfig halloweenBasket = new halloweenBasketConfig();
+
+    public static class halloweenBasketConfig {
+
+        @Expose
+        @ConfigOption(name = "Basket Waypoints", desc = "Show all Halloween Basket waypoints.\nShoutout to §bTobbbb §7for the coordinates.\n(AS OF 2023)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean allWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
+        @ConfigEditorBoolean
+        public boolean allEntranceWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint")
+        @ConfigEditorBoolean
+        public boolean onlyClosest = true;
+    }
+
 }

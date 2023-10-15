@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.File
@@ -88,7 +88,7 @@ object RepoUtils {
 
         val jsonFile = File(repo, "constants/$constant.json")
         if (!jsonFile.isFile) {
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 Error("File '$jsonFile' not found!"),
                 "File in repo missing! ($jsonFile). Try §e/shupdaterepo"
             )

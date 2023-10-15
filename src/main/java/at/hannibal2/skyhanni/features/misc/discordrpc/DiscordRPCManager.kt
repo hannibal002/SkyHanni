@@ -194,7 +194,7 @@ object DiscordRPCManager : IPCListener {
         try {
             start(true)
         } catch (e: Exception) {
-            LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping NetheriteMiner#6267.")
+            LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.")
         }
     }
 }

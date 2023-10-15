@@ -49,7 +49,7 @@ class RngMeterInventory {
         if (config.selectedDrop && chestName.endsWith(" RNG Meter")) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
-                if (stack.getLore().any { it.contains("§aSELECTED") }) {
+                if (stack.getLore().any { it.contains("§a§lSELECTED") }) {
                     slot highlight LorenzColor.YELLOW
                 }
             }
