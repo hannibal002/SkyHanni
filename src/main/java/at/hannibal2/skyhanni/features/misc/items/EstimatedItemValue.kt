@@ -98,7 +98,7 @@ object EstimatedItemValue {
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!config.hotkey.isKeyHeld() && !config.estimatedIemValueAlwaysEnabled) return
+        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
