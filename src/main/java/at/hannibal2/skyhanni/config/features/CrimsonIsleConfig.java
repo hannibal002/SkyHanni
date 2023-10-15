@@ -143,8 +143,9 @@ public class CrimsonIsleConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Fetch Quest from Sacks", desc = "Gets the items from your sacks when you open a 'item fetch' daily quest in the town board.")
+    @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
+            "it shows a clickable chat message that will grab the items needed from the sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean questdailyFetchItemsFromSacks = false;
+    public boolean questItemHelper = false;
 }
