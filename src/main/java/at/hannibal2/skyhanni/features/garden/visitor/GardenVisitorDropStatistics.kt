@@ -231,7 +231,7 @@ object GardenVisitorDropStatistics {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorDropsStatistics.enabled", "garden.visitors.dropsStatistics.enabled")
         event.move(3, "garden.visitorDropsStatistics.textFormat", "garden.visitors.dropsStatistics.textFormat")
         event.move(3, "garden.visitorDropsStatistics.displayNumbersFirst", "garden.visitors.dropsStatistics.displayNumbersFirst")

@@ -69,7 +69,7 @@ object GardenCustomKeybinds {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.keyBindEnabled", "garden.keyBind.enabled")
         event.move(3, "garden.keyBindAttack", "garden.keyBind.attack")
         event.move(3, "garden.keyBindUseItem", "garden.keyBind.useItem")

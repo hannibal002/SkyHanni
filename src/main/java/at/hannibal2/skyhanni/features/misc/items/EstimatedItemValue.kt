@@ -790,7 +790,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
         event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")
         event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")

@@ -501,7 +501,7 @@ object GardenNextJacobContest {
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
         event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")
         event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContests.otherGuis")

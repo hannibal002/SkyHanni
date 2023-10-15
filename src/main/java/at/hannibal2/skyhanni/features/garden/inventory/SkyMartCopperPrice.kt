@@ -82,7 +82,7 @@ class SkyMartCopperPrice {
     private fun isEnabled() = GardenAPI.inGarden() && config.copperPrice
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
         event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
         event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")

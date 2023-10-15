@@ -67,7 +67,7 @@ class BlazeSlayerFirePitsWarning {
         )
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.firePitsWarning", "slayer.blazes.firePitsWarning")
     }
 }

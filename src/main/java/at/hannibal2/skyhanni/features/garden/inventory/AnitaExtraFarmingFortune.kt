@@ -82,7 +82,7 @@ class AnitaExtraFarmingFortune {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"garden.extraFarmingFortune", "garden.anitaShop.extraFarmingFortune")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.extraFarmingFortune", "garden.anitaShop.extraFarmingFortune")
     }
 }

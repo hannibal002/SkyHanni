@@ -49,7 +49,7 @@ class EndermanSlayerHideParticles {
     fun isEnabled() = IslandType.THE_END.isInIsland() && SkyHanniMod.feature.slayer.endermen.hideParticles
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
-        event.move(3,"slayer.endermanHideParticles", "slayer.endermen.hideParticles")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "slayer.endermanHideParticles", "slayer.endermen.hideParticles")
     }
 }

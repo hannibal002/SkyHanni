@@ -113,7 +113,7 @@ class GardenLevelDisplay {
     private fun isEnabled() = GardenAPI.inGarden() && config.display
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevels.display")
         event.move(3, "garden.gardenLevelPos", "garden.gardenLevels.pos")
     }

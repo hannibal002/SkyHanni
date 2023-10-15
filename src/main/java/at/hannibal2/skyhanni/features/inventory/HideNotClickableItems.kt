@@ -507,7 +507,7 @@ class HideNotClickableItems {
     }
 
     @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
         event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")
         event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
