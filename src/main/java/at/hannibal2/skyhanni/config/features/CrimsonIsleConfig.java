@@ -141,4 +141,10 @@ public class CrimsonIsleConfig {
         @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
         public int showLocation = 1;
     }
+
+    @Expose
+    @ConfigOption(name = "Fetch Quest from Sacks", desc = "Gets the items from your sacks when you open a 'item fetch' daily quest in the town board.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean questdailyFetchItemsFromSacks = false;
 }
