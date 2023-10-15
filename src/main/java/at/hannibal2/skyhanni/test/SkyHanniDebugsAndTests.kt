@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -39,8 +41,11 @@ class SkyHanniDebugsAndTests {
 
     companion object {
         private val config get() = SkyHanniMod.feature.dev
+        private val debugConfig get() = config.debug
         var displayLine = ""
         var displayList = emptyList<List<Any>>()
+
+        var globalRender = true
 
         var a = 1.0
         var b = 60.0
@@ -68,7 +73,6 @@ class SkyHanniDebugsAndTests {
 //            a.start()
 //            b.start()
 
-
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
 //                println("$i: '$s'")
 //            }
@@ -78,7 +82,6 @@ class SkyHanniDebugsAndTests {
 //            val sound = SoundUtils.createSound("note.harp", 1.35f)
 //            val sound = SoundUtils.createSound("random.orb", 11.2f)
 //            SoundUtils.createSound(name, pitch).playSound()
-
 
 //            a = args[0].toDouble()
 //            b = args[1].toDouble()
@@ -210,6 +213,13 @@ class SkyHanniDebugsAndTests {
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
             builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
+            if (!config.repoAutoUpdate) {
+                builder.append("REPO DOES NOT AUTO UPDATE\n")
+            }
+            builder.append("globalRender: ${globalRender}\n")
+            if (!globalRender) {
+                builder.append("GLOBAL RENDERER IS DISABLED\n")
+            }
             builder.append("\n")
 
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
@@ -231,7 +241,12 @@ class SkyHanniDebugsAndTests {
                     builder.append("In dungeon!\n")
                     builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
                     builder.append(" started: ${DungeonAPI.started}\n")
+                    builder.append(" getRoomID: ${DungeonAPI.getRoomID()}\n")
                     builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
+                    builder.append(" ")
+                    builder.append(" playerClass: ${DungeonAPI.playerClass}\n")
+                    builder.append(" isUniqueClass: ${DungeonAPI.isUniqueClass}\n")
+                    builder.append(" playerClassLevel: ${DungeonAPI.playerClassLevel}\n")
                 }
                 if (SlayerAPI.hasActiveSlayerQuest()) {
                     builder.append("\n")
@@ -263,11 +278,20 @@ class SkyHanniDebugsAndTests {
             OSUtils.copyToClipboard(rawInternalName)
             LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
         }
+
+        fun toggleRender() {
+            globalRender = !globalRender
+            if (globalRender) {
+                LorenzUtils.chat("§e[SkyHanni] §aEnabled global renderer!")
+            } else {
+                LorenzUtils.chat("§e[SkyHanni] §cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+            }
+        }
     }
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyInternalName)) return
+        if (!debugConfig.copyInternalName.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
@@ -279,17 +303,19 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onShowInternalName(event: ItemTooltipEvent) {
-        if (!config.showInternalName) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalName()
-        if ((internalName == NEUInternalName.NONE) && !config.showEmptyNames) return
+        if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
 
     }
 
     @SubscribeEvent
     fun showItemRarity(event: ItemTooltipEvent) {
-        if (!config.showItemRarity) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack ?: return
 
         val rarity = itemStack.getItemRarityOrNull(logError = false)
@@ -298,7 +324,8 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onSHowNpcPrice(event: ItemTooltipEvent) {
-        if (!config.showNpcPrice) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showNpcPrice) return
         val itemStack = event.itemStack ?: return
         val internalName = itemStack.getInternalNameOrNull() ?: return
 
@@ -324,7 +351,7 @@ class SkyHanniDebugsAndTests {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.debugEnabled) return
+        if (!debugConfig.enabled) return
 
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
@@ -374,7 +401,6 @@ class SkyHanniDebugsAndTests {
 //                return
 //            }
 //        }
-
 
         //diana ancestral spade
 //        if (soundName == "note.harp") {
@@ -500,7 +526,6 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-
 //        if (soundName == "game.player.hurt") return
 //        if (soundName.startsWith("step.")) return
 
@@ -537,5 +562,16 @@ class SkyHanniDebugsAndTests {
 //        println("particleCount: $particleCount")
 //        println("particleSpeed: $particleSpeed")
 //        println("offset: $offset")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.debugEnabled", "dev.debug.enabled")
+        event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
+        event.move(3, "dev.showEmptyNames", "dev.debug.showEmptyNames")
+        event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
+        event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
+        event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+
     }
 }

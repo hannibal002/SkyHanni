@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -182,7 +182,7 @@ object NEUItems {
             if (definite) {
                 Utils.showOutdatedRepoNotification()
             }
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
                         "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +

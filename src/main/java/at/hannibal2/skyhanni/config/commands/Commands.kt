@@ -28,20 +28,22 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.CopyTabListCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -195,6 +197,10 @@ object Commands {
             "Prints the SkyHanni version in the chat"
         ) { SkyHanniDebugsAndTests.debugVersion() }
         registerCommand(
+            "shrendertoggle",
+            "Disables/enables the rendering of all skyhanni guis."
+        ) { SkyHanniDebugsAndTests.toggleRender() }
+        registerCommand(
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
@@ -261,11 +267,15 @@ object Commands {
             "shpartydebug",
             "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
+        registerCommand(
+                "shplaysound",
+                "Play the specified sound effect at the given pitch and volume."
+        ) { SoundUtils.command(it) }
     }
 
     private fun internalCommands() {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
-        registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
+        registerCommand("shcopyerror", "") { ErrorManager.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
@@ -273,6 +283,7 @@ object Commands {
 //            "shsendtranslation",
 //            "Respond with a translation of the message that the user clicks"
 //        ) { Translator.toEnglish(it) }
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun commandHelp(args: Array<String>) {
@@ -318,6 +329,15 @@ object Commands {
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
+        }
+    }
+
+    @JvmStatic
+    fun openVisualWords() {
+        if (!LorenzUtils.onHypixel) {
+            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
+        } else {
+            SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
 

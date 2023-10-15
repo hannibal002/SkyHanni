@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ object ClipboardUtils {
                 getClipboard()?.setContents(StringSelection(text), null)
             } catch (e: Exception) {
                 if (step == 3) {
-                    CopyErrorCommand.logError(e, "Error while trying to access the clipboard.")
+                    ErrorManager.logError(e, "Error while trying to access the clipboard.")
                 } else {
                     copyToClipboard(text, step + 1)
                 }
@@ -63,7 +63,7 @@ object ClipboardUtils {
             }
         } catch (e: Exception) {
             return if (step == 3) {
-                CopyErrorCommand.logError(e, "Error while trying to access the clipboard.")
+                ErrorManager.logError(e, "Error while trying to access the clipboard.")
                 null
             } else {
                 readFromClipboard(step + 1)

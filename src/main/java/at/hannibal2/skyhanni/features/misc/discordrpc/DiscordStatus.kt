@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils.formatted
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -100,21 +101,28 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val island = LorenzUtils.skyBlockIsland
 
         if (location == "Your Island") location = "Private Island"
-        if (island == IslandType.PRIVATE_ISLAND_GUEST) lastKnownDisplayStrings[LOCATION] =
-            "${getVisitingName()}'s Island"
-        else if (island == IslandType.GARDEN) {
-            if (location.startsWith("Plot: ")) {
-                lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
-            } else {
-                lastKnownDisplayStrings[LOCATION] = "Personal Garden"
+        when {
+            island == IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
+                "${getVisitingName()}'s Island"
+
+            island == IslandType.GARDEN -> {
+                if (location.startsWith("Plot: ")) {
+                    lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
+                } else {
+                    lastKnownDisplayStrings[LOCATION] = "Personal Garden"
+                }
             }
-        } else if (island == IslandType.GARDEN_GUEST) {
-            lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
-            if (location.startsWith("Plot: ")) {
-                lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
-            } // "MelonKingDe's Garden (Plot: 8)"
-        } else if (location != "None" && location != "invalid") {
-            lastKnownDisplayStrings[LOCATION] = location
+
+            island == IslandType.GARDEN_GUEST -> {
+                lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
+                if (location.startsWith("Plot: ")) {
+                    lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
+                } // "MelonKingDe's Garden (Plot: 8)"
+            }
+
+            location != "None" && location != "invalid" -> {
+                lastKnownDisplayStrings[LOCATION] = location
+            }
         }
         lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
     }),
@@ -128,14 +136,13 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
             motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
-        if (coins == "1") {
-            lastKnownDisplayStrings[PURSE] = "1 Coin"
-        } else if (coins != "" && coins != null) {
-            lastKnownDisplayStrings[PURSE] = "$coins Coins"
-        } else if (motes == "1") {
-            lastKnownDisplayStrings[PURSE] = "1 Mote"
-        } else if (motes != "" && motes != null) {
-            lastKnownDisplayStrings[PURSE] = "$motes Motes"
+        lastKnownDisplayStrings[PURSE] = when {
+            coins == "1" -> "1 Coin"
+            coins != "" && coins != null -> "$coins Coins"
+            motes == "1" -> "1 Mote"
+            motes != "" && motes != null -> "$motes Motes"
+
+            else -> lastKnownDisplayStrings[PURSE] ?: ""
         }
         lastKnownDisplayStrings[PURSE] ?: ""
     }),
@@ -173,23 +180,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     TIME({
-        fun formatNum(num: Int): Int {
-            val rem = num % 10
-            var returnNum = num - rem // floor()
-            if (returnNum == 0) {
-                returnNum = "0$num".toInt()
-                /**
-                 * and this is so that if the minute value is ever
-                 * a single digit (0 after being floored), it displays as 00 because 12:0pm looks bad
-                 */
-            }
-            return returnNum
-        }
-
-        val date: SkyBlockTime = SkyBlockTime.now()
-        val hour = if (date.hour > 12) date.hour - 12 else date.hour
-        val timeOfDay = if (date.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        "${SkyBlockTime.monthName(date.month)} ${date.day}${SkyBlockTime.daySuffix(date.day)}, $hour:${formatNum(date.minute)}$timeOfDay" // Early Winter 1st, 12:00pm
+        SkyBlockTime.now().formatted()
     }),
 
     PROFILE({
@@ -209,12 +200,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
         var profile = "SkyBlock Level: [$sbLevel] on "
 
-        profile += (
-                if (HypixelData.ironman) "♲"
-                else if (HypixelData.bingo) "Ⓑ"
-                else if (HypixelData.stranded) "☀"
-                else ""
-                )
+        profile += when {
+            HypixelData.ironman -> "♲"
+            HypixelData.bingo -> "Ⓑ"
+            HypixelData.stranded -> "☀"
+            else -> ""
+        }
 
         val fruit = HypixelData.profileName.firstLetterUppercase()
         if (fruit == "") profile =
@@ -235,18 +226,24 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val noColorLine = line.removeColor()
             val match = slayerRegex.matcher(noColorLine)
-            if (match.matches()) {
-                slayerName = match.group("name")
-                slayerLevel = match.group("level")
-            } else if (noColorLine == "Slay the boss!") bossAlive = "slaying"
-            else if (noColorLine == "Boss slain!") bossAlive = "slain"
+            when {
+                match.matches() -> {
+                    slayerName = match.group("name")
+                    slayerLevel = match.group("level")
+                }
+
+                noColorLine == "Slay the boss!" -> bossAlive = "slaying"
+                noColorLine == "Boss slain!" -> bossAlive = "slain"
+            }
         }
 
-        if (slayerLevel == "") AutoStatus.SLAYER.placeholderText // selected slayer in rpc but hasn't started a quest
-        else if (bossAlive == "spawning") "Spawning a $slayerName $slayerLevel boss."
-        else if (bossAlive == "slaying") "Slaying a $slayerName $slayerLevel boss."
-        else if (bossAlive == "slain") "Finished slaying a $slayerName $slayerLevel boss."
-        else "Something went wrong with slayer detection!"
+        when {
+            slayerLevel == "" -> AutoStatus.SLAYER.placeholderText // selected slayer in rpc but hasn't started a quest
+            bossAlive == "spawning" -> "Spawning a $slayerName $slayerLevel boss."
+            bossAlive == "slaying" -> "Slaying a $slayerName $slayerLevel boss."
+            bossAlive == "slain" -> "Finished slaying a $slayerName $slayerLevel boss."
+            else -> "Something went wrong with slayer detection!"
+        }
     }),
 
     CUSTOM({

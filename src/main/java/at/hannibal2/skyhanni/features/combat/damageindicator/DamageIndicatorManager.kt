@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -42,7 +43,6 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -102,7 +102,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
         GlStateManager.disableDepth()
@@ -455,7 +455,7 @@ class DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazePhaseDisplay) return ""
+        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -610,7 +610,7 @@ class DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong()
         ).getChatColor() + NumberUtil.format(calcHealth)
 
-        if (!SkyHanniMod.feature.slayer.endermanPhaseDisplay) {
+        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }
@@ -854,6 +854,8 @@ class DamageIndicatorManager {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
+        event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
+        event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

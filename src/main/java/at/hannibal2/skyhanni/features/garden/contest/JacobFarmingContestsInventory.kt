@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -24,7 +25,7 @@ class JacobFarmingContestsInventory {
 
     private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)
     private val formatTime = SimpleDateFormat("HH:mm", Locale.US)
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.jacobFarmingContests
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
@@ -55,7 +56,7 @@ class JacobFarmingContestsInventory {
             }
             val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
             FarmingContestAPI.addContest(time, item)
-            if (config.jacobFarmingContestRealTime) {
+            if (config.realTime) {
                 readRealTime(time, slot)
             }
         }
@@ -73,7 +74,7 @@ class JacobFarmingContestsInventory {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
-        if (!config.jacobFarmingContestHighlightRewards) return
+        if (!config.highlightRewards) return
 
         // hide green border for a tick
         if (hideEverything) return
@@ -98,7 +99,7 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val slot = event.slot.slotNumber
-        if (config.jacobFarmingContestRealTime) {
+        if (config.realTime) {
             realTime[slot]?.let {
                 val toolTip = event.toolTip
                 if (toolTip.size > 1) {
@@ -111,7 +112,7 @@ class JacobFarmingContestsInventory {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.jacobFarmingContestMedalIcon) return
+        if (!config.medalIcon) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val stack = event.stack ?: return
@@ -129,7 +130,7 @@ class JacobFarmingContestsInventory {
                 var y = event.y + 1
                 var scale = .7f
 
-                if (finneganContest && config.jacobFarmingContestFinneganIcon) {
+                if (finneganContest && config.finneganIcon) {
                     stackTip = "§${medalEarned.color}▲"
                     x = event.x + 5
                     y = event.y - 2
@@ -139,5 +140,13 @@ class JacobFarmingContestsInventory {
                 event.drawSlotText(x, y, stackTip, scale)
             }
         }
+    }
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "inventory.jacobFarmingContestHighlightRewards", "inventory.jacobFarmingContests.highlightRewards")
+        event.move(3, "inventory.jacobFarmingContestHideDuplicates", "inventory.jacobFarmingContests.hideDuplicates")
+        event.move(3, "inventory.jacobFarmingContestRealTime", "inventory.jacobFarmingContests.realTime")
+        event.move(3, "inventory.jacobFarmingContestFinneganIcon", "inventory.jacobFarmingContests.finneganIcon")
+        event.move(3, "inventory.jacobFarmingContestMedalIcon", "inventory.jacobFarmingContests.medalIcon")
     }
 }

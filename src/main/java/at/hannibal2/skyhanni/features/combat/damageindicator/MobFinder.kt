@@ -206,10 +206,8 @@ class MobFinder {
                 if (entity.name == "Mage Outlaw") {
                     return EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
                 }
-                if (entity.name == "DukeBarb ") {
-                    if (entity.getLorenzVec().distanceToPlayer() < 30) {
-                        return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
-                    }
+                if (entity.name == "DukeBarb " && entity.getLorenzVec().distanceToPlayer() < 30) {
+                    return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
                 }
             }
             if (entity is EntityWither && entity.hasNameTagWith(4, "§8[§7Lv100§8] §c§5Vanquisher§r ")) {
@@ -300,14 +298,12 @@ class MobFinder {
                 }
                 checkArachne(entity)?.let { return it }
             }
-            if (entity is EntityWolf) {
-                if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
-                    when {
-                        entity.hasMaxHealth(2_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
-                        entity.hasMaxHealth(40_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
-                        entity.hasMaxHealth(750_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
-                        entity.hasMaxHealth(2_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
-                    }
+            if (entity is EntityWolf && entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
+                when {
+                    entity.hasMaxHealth(2_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
+                    entity.hasMaxHealth(40_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
+                    entity.hasMaxHealth(750_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
+                    entity.hasMaxHealth(2_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
                 }
             }
             if (entity is EntityOtherPlayerMP) {
