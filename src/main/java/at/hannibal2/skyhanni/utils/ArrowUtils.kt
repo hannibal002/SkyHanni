@@ -12,6 +12,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
+import kotlin.math.PI
 import kotlin.math.pow
 
 object ArrowUtils {
@@ -27,14 +28,18 @@ object ArrowUtils {
         val origin: LorenzVec,
         val direction: LorenzVec,
         val pierce: Int,
-        val canHitEnderman: Boolean
+        val canHitEnderman: Boolean,
+        val spawnTick: Long = getCurrentTick()
     ) {
         fun parabola(time: Int) = parabola(origin, direction, time)
+        fun isOnParabola(arrow: EntityArrow) = isOnParabola(origin, direction, getLivingTime(), arrow)
+
+        fun getLivingTime() = (getCurrentTick() - spawnTick).toInt() // The value loss only makes a difference when an arrow didn't get cough for 59652 hours or more
     }
 
     private val upComingArrows: Queue<SkyblockArrowSpawn> = LinkedList()
 
-    fun newArrows(origin: LorenzVec, facingDirection: LorenzVec, pierce: Int, canHitEnderman: Boolean) =
+    fun newArrow(origin: LorenzVec, facingDirection: LorenzVec, pierce: Int, canHitEnderman: Boolean) =
         newArrows(origin, facingDirection, 1, 0.0, pierce, canHitEnderman)
 
     fun newArrows(
@@ -43,11 +48,31 @@ object ArrowUtils {
         amount: Int,
         spread: Double,
         pierce: Int,
-        canHitEnderman: Boolean
+        canHitEnderman: Boolean,
     ) {
         if (amount < 1) return
         upComingArrows.add(SkyblockArrowSpawn(origin, facingDirection, pierce, canHitEnderman))
-        //TODO(Multi Arrow)
+        if (amount < 2) return
+        if (amount % 2 == 0) throw NotImplementedError("Even Number of Arrows are not supported")
+        val spreadInRad = Math.toRadians(spread)
+        for (i in 1..amount / 2) {
+            upComingArrows.add(
+                SkyblockArrowSpawn(
+                    origin,
+                    facingDirection.rotateXZ(spreadInRad * i),
+                    pierce,
+                    canHitEnderman
+                )
+            )
+            upComingArrows.add(
+                SkyblockArrowSpawn(
+                    origin,
+                    facingDirection.rotateXZ(-spreadInRad * i),
+                    pierce,
+                    canHitEnderman
+                )
+            )
+        }
     }
 
 
@@ -56,7 +81,8 @@ object ArrowUtils {
     private val currentArrowsInWorld = mutableSetOf<EntityArrow>()
     private val previousArrowsInWorld = mutableSetOf<EntityArrow>()
 
-    private val renderLineList = mutableListOf<Line>()
+    private val renderRealArrowLineList = mutableListOf<Line>()
+    private val renderArrowDetectLineList = mutableListOf<Line>()
 
     data class Line(val start: LorenzVec, val end: LorenzVec)
 
@@ -76,38 +102,67 @@ object ArrowUtils {
         //    val speed = LorenzVec(arrow.posX-arrow.lastTickPosX,arrow.posY-arrow.lastTickPosY,arrow.posZ-arrow.lastTickPosZ).multiply(20).length()
         //    LorenzDebug.log("Arrow Speed: $speed")
         //}
+        if (!config.arrowDebug) return
         currentArrowsInWorld.forEach {
-            renderLineList.add(
+            renderRealArrowLineList.add(
                 Line(
                     LorenzVec(it.prevPosX, it.prevPosY, it.prevPosZ),
                     LorenzVec(it.posX, it.posY, it.posZ)
                 )
             )
         }
+
+        if(event.repeatSeconds(3)){
+            val index = upComingArrows.indexOfLast { it.getLivingTime() > 60 }
+            for(i in 0..index){
+                upComingArrows.remove()
+            }
+            //upComingArrows.removeIf { it.getLivingTime() > 50 }
+        }
     }
 
     private fun onArrowSpawn(arrow: EntityArrow) {
-        val match = upComingArrows.firstOrNull { isOnParabola(it.origin, it.direction, arrow) } ?: return
+        val match = upComingArrows.firstOrNull { it.isOnParabola(arrow) } ?: return
         playerArrows.add(SkyblockArrow(arrow, match.pierce, match.canHitEnderman))
         upComingArrows.remove(match)
         LorenzDebug.log("Added Arrow, needs to find still: ${upComingArrows.count()}")
     }
-    //arrow.position.toLorenzVec().subtract(it.origin)
-    //                .dotPorduct(it.direction.normalize()).absoluteValue < 1.5
 
-    private fun isOnParabola(origin: LorenzVec, direction: LorenzVec, arrow: EntityArrow): Boolean {
-        var onIt = false
-        for (i in 0..50) { //TODO Quick Solution but I have a better but more complicated in mind
-            if(parabola(origin,direction,i).distance(arrow.position.toLorenzVec())  < 3.0){
-                onIt = true
+    private const val ANGLE_TOLERANCE = PI * (2.0 / 3.0)
+    private const val DISTANCE_TOLERANCE = 4.0
+    private const val TICK_ADJUST = 4
+    private fun isOnParabola(origin: LorenzVec, direction: LorenzVec, tick: Int, arrow: EntityArrow): Boolean {
+        val p = tick - TICK_ADJUST
+        val pointOnParabola = parabola(origin, direction, p)    //TODO Check if the parabola is correct
+        if (pointOnParabola.distance(arrow.getLorenzVec()) < DISTANCE_TOLERANCE) {
+            if (config.arrowDebug) {
+                LorenzDebug.log("Caught Arrow at $p Tick")
+                renderArrowDetectLineList.add(
+                    Line(
+                        pointOnParabola,
+                        arrow.getLorenzVec()
+                    )
+                )
             }
+        } else {
+            LorenzDebug.log("Caught Arrow not at $p Tick")
+            renderArrowDetectLineList.add(
+                Line(
+                    pointOnParabola,
+                    arrow.getLorenzVec()
+                )
+            )
+            return false
         }
-        //TODO(account for orientation)
-        return onIt
+        //TODO Debug Angle
+        val angleDiffer = arrow.getLook(0.0f).toLorenzVec()
+            .angleInRad(vectorFromPoints(parabola(origin, direction, p - 1), parabola(origin, direction, p)))
+        LorenzDebug.log("Soll: $ANGLE_TOLERANCE, Ist: $angleDiffer")
+        return angleDiffer < ANGLE_TOLERANCE
     }
 
-    private const val GRAVITY = 0.05 //0.05 in Ticks
-    private const val DRAG = 0.99 //velocity is every Tick reduced by 1%
+    private const val GRAVITY = 0.05
+    private const val DRAG = 0.99
 
     /**parabola(origin, direction, time) = origin + [time * direction - (0, GRAVITY * time^2, 0)] * DRAG^time
      * Time is in Ticks*/
@@ -122,11 +177,18 @@ object ArrowUtils {
 
     private fun onArrowDeSpawn(arrow: EntityArrow) {
         val playerArrow = playerArrows.firstOrNull { it.base == arrow } ?: return
-        val hitEntity = EntityKill.currentEntityLiving.firstOrNull{LorenzVec(it.prevPosX,it.prevPosY,it.prevPosZ).distance(arrow.position.toLorenzVec()) < 4.0 }
-        if(hitEntity == null){
-            if(config.arrowDebug){
-            LorenzDebug.log("Arrow hit the ground")}
-        }else{
+        val hitEntity = EntityKill.currentEntityLiving.firstOrNull {
+            LorenzVec(
+                it.prevPosX,
+                it.prevPosY,
+                it.prevPosZ
+            ).distance(arrow.position.toLorenzVec()) < 4.0
+        }
+        if (hitEntity == null) {
+            if (config.arrowDebug) {
+                LorenzDebug.log("Arrow hit the ground")
+            }
+        } else {
             EntityKill.checkAndAddToMobHitList(hitEntity)
         }
         playerArrows.remove(playerArrow)
@@ -139,7 +201,7 @@ object ArrowUtils {
 
     @SubscribeEvent
     fun onTickForHighlight(event: RenderWorldLastEvent) {
-        if(!config.arrowDebug) return
+        if (!config.arrowDebug) return
         playerArrows.forEach {
             RenderUtils.drawCylinderInWorld(
                 LorenzColor.GOLD.toColor(),
@@ -153,9 +215,11 @@ object ArrowUtils {
         }
     }
 
+    fun getCurrentTick() = Minecraft.getMinecraft().theWorld.worldTime //TODO move it to the "correct" place
+
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if(!config.arrowDebug) return
+        if (!config.arrowDebug) return
         upComingArrows.forEach {
             event.draw3DLine(
                 it.origin,
@@ -179,8 +243,11 @@ object ArrowUtils {
         val direction = player.getLook(event.partialTicks).toLorenzVec()
         event.draw3DLine(position, position.add(direction), LorenzColor.DARK_GREEN.toColor(), 5, true)
 
-        renderLineList.forEach {
+        renderRealArrowLineList.forEach {
             event.draw3DLine(it.start, it.end, LorenzColor.GREEN.toColor(), 5, true)
+        }
+        renderArrowDetectLineList.forEach {
+            event.draw3DLine(it.start, it.end, LorenzColor.YELLOW.toColor(), 10, true)
         }
     }
 }

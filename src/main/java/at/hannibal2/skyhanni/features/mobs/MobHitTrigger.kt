@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMob
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -41,7 +40,7 @@ object MobHitTrigger {
     // TODO(Ice Spray Wand)
     // TODO(Damaging Pets) Guardian, Bal
     // TODO(Swing Range) Pain
-    // TODO(Berserk Swing Range) Even more Pain
+    // TODO(Berserk Swing Cone) Even more Pain
     // TODO(Exlosion Bow)
     // TODO(Multi Arrow)
     // TODO(Fishing Rod)
@@ -57,9 +56,10 @@ object MobHitTrigger {
     // TODO(Bow) Priority, separate System
 
     //Needs Testing
+    // TODO(Left Click Mage, Aurora Staff)
 
     //Needs Bugfixing
-    // TODO(Left Click Mage, Aurora Staff) bug: Ray isn't precise enough
+
 
     @SubscribeEvent
     fun onEntityHit(event: EntityClickEvent) {
@@ -128,27 +128,28 @@ object MobHitTrigger {
                 val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
                     ?: 0) + if (itemName.contains("Juju")) 3 else 0
                 val bowStrength = 4.5  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
-                val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0))
-                val direction = player.getLook(partialTick).toLorenzVec().normalize().multiply(bowStrength)
+                val direction = player.getLook(partialTick).toLorenzVec().normalize()
+                val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0)).add(direction.multiply(0.15))
+                val velocity = direction.multiply(bowStrength)
                 //TODO(Terror Armor)
                 when {
                     itemName.contains("Runaan") -> ArrowUtils.newArrows(
                         origin,
-                        direction,
+                        velocity,
                         3,
                         12.5,
                         piercingDepth,
                         false
-                    )  //{val arrowCount = 3; val spread = 12.5}
+                    ) //{val arrowCount = 3; val spread = 12.5}
                     itemName.contains("Terminator") -> ArrowUtils.newArrows(
                         origin,
-                        direction,
+                        velocity,
                         3,
                         5.0,
                         piercingDepth,
                         false
                     )//{val arrowCount = 3; val spread = 5.0}
-                    else -> ArrowUtils.newArrows(origin, direction, piercingDepth, itemName.contains("Juju"))
+                    else -> ArrowUtils.newArrow(origin, velocity, piercingDepth, itemName.contains("Juju"))
                 }
 
             }
@@ -156,9 +157,8 @@ object MobHitTrigger {
             itemName.contains("Terminator") -> {
 
             }
-            //Aurora Staff and Mage Left Click
+            //Aurora Staff and Mage Left Click TODO(Cooldown)
             classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType == ClickType.LEFT_CLICK || itemName.contains("Aurora Staff") && clickType == ClickType.RIGHT_CLICK -> {
-                LorenzDebug.log("Magic")
                 val entity = rayTraceForSkyblockMob(player,renderRangeInBlocks ,partialTick) ?: return
                 EntityKill.checkAndAddToMobHitList(entity)
             }
