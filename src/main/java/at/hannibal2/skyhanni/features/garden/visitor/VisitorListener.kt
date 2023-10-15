@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -31,14 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 class VisitorListener {
-    companion object {
-        private var lastClickedNpc = 0
-
-        val lastClickedNpcId: Int
-            get() {
-                return lastClickedNpc
-            }
-    }
+    private var lastClickedNpc = 0
 
     private val logger = LorenzLogger("garden/visitors/listener")
 
@@ -188,14 +182,8 @@ class VisitorListener {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inVisitorInventory) return
-        if (event.itemStack.name != "§aAccept Offer") return
-
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-
-        event.toolTip.let {
-            it.clear()
-            it.addAll(visitor.lastLore)
-        }
+        VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
     }
 
     @SubscribeEvent

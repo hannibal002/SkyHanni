@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -248,14 +249,11 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onTooltip(event: ItemTooltipEvent) {
-        if (!GardenAPI.onBarnPlot) return
-        if (!VisitorAPI.inVisitorInventory) return
+    fun onVisitorTooltip(event: VisitorToolTipEvent) {
         if (event.itemStack.name != "§aAccept Offer") return
 
-        val visitor = VisitorAPI.getVisitor(VisitorListener.lastClickedNpcId) ?: return
-
-        val toolTip = event.toolTip ?: return
+        val visitor = event.visitor
+        val toolTip = event.toolTip
         toolTip.clear()
 
         if (visitor.lastLore.isEmpty()) {
