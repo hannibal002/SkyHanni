@@ -109,6 +109,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.asInternalName()
 
+    fun ItemStack.getEnrichment() = getAttributeString("talisman_enrichment")
+
     fun ItemStack.getHelmetSkin() = getAttributeString("skin")?.asInternalName()
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
