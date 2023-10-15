@@ -22,8 +22,7 @@ class SharkFishCounter {
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
-        val displayName = event.seaCreature.displayName
-        if (displayName.contains("Shark")) {
+        if (event.seaCreature.name.contains("Shark")) {
             counter += if (event.doubleHook) 2 else 1
             display = "§7Sharks caught: §e${counter.addSeparators()}"
         }
