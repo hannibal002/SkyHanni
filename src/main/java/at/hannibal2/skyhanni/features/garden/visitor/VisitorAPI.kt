@@ -92,6 +92,11 @@ object VisitorAPI {
         return name
     }
 
+    fun isVisitorInfo(lore: List<String>): Boolean {
+        if (lore.size != 4) return false
+        return lore[3].startsWith("§7Offers Accepted: §a")
+    }
+
     class VisitorOffer(
             val offerItem: ItemStack
     )
