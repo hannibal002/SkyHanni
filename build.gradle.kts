@@ -96,6 +96,7 @@ dependencies {
 
 //    testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("io.mockk:mockk:1.12.5")
 }
 
 tasks.withType(Test::class) {
