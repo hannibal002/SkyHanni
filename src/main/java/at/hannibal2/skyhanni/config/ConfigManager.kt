@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -84,6 +85,15 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): NEUInternalName {
                     return reader.nextString().asInternalName()
+                }
+            }.nullSafe())
+            .registerTypeAdapter(LorenzRarity::class.java, object : TypeAdapter<LorenzRarity>() {
+                override fun write(out: JsonWriter, value: LorenzRarity) {
+                    out.value(value.name)
+                }
+
+                override fun read(reader: JsonReader): LorenzRarity {
+                    return LorenzRarity.valueOf(reader.nextString())
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()

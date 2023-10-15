@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -266,6 +267,10 @@ object Commands {
             "shpartydebug",
             "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
+        registerCommand(
+                "shplaysound",
+                "Play the specified sound effect at the given pitch and volume."
+        ) { SoundUtils.command(it) }
     }
 
     private fun internalCommands() {
