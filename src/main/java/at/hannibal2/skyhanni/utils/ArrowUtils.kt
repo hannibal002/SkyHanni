@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.mobs.EntityKill
+import at.hannibal2.skyhanni.events.hitTrigger
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.projectile.EntityArrow
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
@@ -34,7 +34,8 @@ object ArrowUtils {
         fun parabola(time: Int) = parabola(origin, direction, time)
         fun isOnParabola(arrow: EntityArrow) = isOnParabola(origin, direction, getLivingTime(), arrow)
 
-        fun getLivingTime() = (getCurrentTick() - spawnTick).toInt() // The value loss only makes a difference when an arrow didn't get cough for 59652 hours or more
+        fun getLivingTime() =
+            (getCurrentTick() - spawnTick).toInt() // The value loss only makes a difference when an arrow didn't get cough for 59652 hours or more
     }
 
     private val upComingArrows: Queue<SkyblockArrowSpawn> = LinkedList()
@@ -112,9 +113,9 @@ object ArrowUtils {
             )
         }
 
-        if(event.repeatSeconds(3)){
+        if (event.repeatSeconds(3)) {
             val index = upComingArrows.indexOfLast { it.getLivingTime() > 60 }
-            for(i in 0..index){
+            for (i in 0..index) {
                 upComingArrows.remove()
             }
             //upComingArrows.removeIf { it.getLivingTime() > 50 }
@@ -178,18 +179,14 @@ object ArrowUtils {
     private fun onArrowDeSpawn(arrow: EntityArrow) {
         val playerArrow = playerArrows.firstOrNull { it.base == arrow } ?: return
         val hitEntity = EntityKill.currentEntityLiving.firstOrNull {
-            LorenzVec(
-                it.prevPosX,
-                it.prevPosY,
-                it.prevPosZ
-            ).distance(arrow.position.toLorenzVec()) < 4.0
+            it.getPrevLorenzVec().distance(arrow.getLorenzVec()) < 4.0
         }
         if (hitEntity == null) {
             if (config.arrowDebug) {
                 LorenzDebug.log("Arrow hit the ground")
             }
         } else {
-            EntityKill.checkAndAddToMobHitList(hitEntity)
+            EntityKill.addToMobHitList(hitEntity, hitTrigger.Bow)
         }
         playerArrows.remove(playerArrow)
     }
@@ -200,7 +197,7 @@ object ArrowUtils {
     }
 
     @SubscribeEvent
-    fun onTickForHighlight(event: RenderWorldLastEvent) {
+    fun onTickForHighlight(event: LorenzRenderWorldEvent) {
         if (!config.arrowDebug) return
         playerArrows.forEach {
             RenderUtils.drawCylinderInWorld(

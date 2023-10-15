@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SkyblockMobKillEvent
+import at.hannibal2.skyhanni.events.hitTrigger
+import at.hannibal2.skyhanni.events.onMobHitEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -28,7 +30,6 @@ object EntityKill {
 
     val currentEntityLiving = mutableSetOf<EntityLivingBase>()
     private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
-
 
     val config get() = SkyHanniMod.feature.dev
 
@@ -94,35 +95,33 @@ object EntityKill {
         mobHitList.clear()
     }
 
-    private fun addToMobHitList(mobId: Int) {
-        EntityUtils.getEntityById(mobId)?.let {
-            addToMobHitList(it)
+    fun addToMobHitList(entity: Entity, trigger: hitTrigger) {
+        mobHitList.firstOrNull { it.baseEntity == entity }?.let {
+            if(checkIfBlacklisted(it.name,trigger)) return
+            onMobHitEvent(it, trigger, false).postAndCatch()
+            return
         }
+        val mob = SkyblockMobUtils.SkyblockMob(entity)
+        if(checkIfBlacklisted(mob.name,trigger)) return
+        mobHitList.add(mob)
+        onMobHitEvent(mob, trigger, true).postAndCatch()
     }
 
-    private fun addToMobHitList(entity: Entity) {
-        if (!testIfSkyBlockMob(entity)) return
-        mobHitList.add(SkyblockMobUtils.SkyblockMob(entity))
-    }
+    val magicBlacklist = setOf<String>() //Get it from repo
 
-    fun checkAndAddToMobHitList(mobId: Int) {
-        EntityUtils.getEntityById(mobId)?.let {
-            checkAndAddToMobHitList(it)
+    private fun checkIfBlacklisted(name: String, trigger: hitTrigger) : Boolean{
+        if(trigger.isMagic()){
+            return magicBlacklist.contains(name)
         }
-    }
-
-    fun checkAndAddToMobHitList(entity: Entity) {
-        if (!isInMobHitList(entity)) {
-            addToMobHitList(entity)
+        if(trigger == hitTrigger.Cleave){
+            return name.contains("Star Sentry") // Do not know if more exist
         }
+        return false
     }
 
-    private fun isInMobHitList(entity: Entity): Boolean {
-        return mobHitList.any { it.baseEntity == entity }
-    }
 
     @SubscribeEvent
-    fun onWorldLastEvent(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (config.skyblockMobHighlight) {
             currentEntityLiving.forEach {
                 event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.5f)
@@ -136,4 +135,3 @@ object EntityKill {
     }
 
 }
-

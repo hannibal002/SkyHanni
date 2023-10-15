@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.hitTrigger
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -67,8 +68,8 @@ object MobHitTrigger {
         if (!SkyblockMobUtils.testIfSkyBlockMob(entity)) return
 
         //Base Melee Hit
-        if (event.clickType == ClickType.LEFT_CLICK) {
-            EntityKill.checkAndAddToMobHitList(entity)
+        if (event.clickType.isLeftClick()) {
+            EntityKill.addToMobHitList(entity, hitTrigger.Melee)
 
             val itemInHand = InventoryUtils.getItemInHand() ?: return
             val enchantmentsOfItemInHand = itemInHand.getEnchantments()
@@ -86,8 +87,8 @@ object MobHitTrigger {
                 }
                 var i = 0
                 EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
-                    .filterNot { SkyblockMobUtils.testIfSkyBlockMob(it) }.forEach {
-                        EntityKill.checkAndAddToMobHitList(it)
+                    .filter { SkyblockMobUtils.testIfSkyBlockMob(it) && it != entity }.forEach {
+                        EntityKill.addToMobHitList(it, hitTrigger.Cleave)
                         i++
                         LorenzDebug.log("Name: ${it.name}")
                     }
@@ -122,14 +123,15 @@ object MobHitTrigger {
 
         when {
             //Bow TODO(Cooldown)
-            lastLore.endsWith("BOW") && (clickType == ClickType.RIGHT_CLICK || (clickType == ClickType.LEFT_CLICK && itemName.contains(
+            lastLore.endsWith("BOW") && (clickType.isRightClick()  || (clickType.isLeftClick() && itemName.contains(
                 "Shortbow"
             ))) -> {
                 val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
                     ?: 0) + if (itemName.contains("Juju")) 3 else 0
                 val bowStrength = 4.5  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
                 val direction = player.getLook(partialTick).toLorenzVec().normalize()
-                val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0)).add(direction.multiply(0.15))
+                val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0))
+                    .add(direction.multiply(0.15))
                 val velocity = direction.multiply(bowStrength)
                 //TODO(Terror Armor)
                 when {
@@ -158,9 +160,26 @@ object MobHitTrigger {
 
             }
             //Aurora Staff and Mage Left Click TODO(Cooldown)
-            classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType == ClickType.LEFT_CLICK || itemName.contains("Aurora Staff") && clickType == ClickType.RIGHT_CLICK -> {
-                val entity = rayTraceForSkyblockMob(player,renderRangeInBlocks ,partialTick) ?: return
-                EntityKill.checkAndAddToMobHitList(entity)
+            classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType.isLeftClick() -> rayTraceForSkyblockMob(
+                player,
+                renderRangeInBlocks,
+                partialTick
+            )?.let {
+                EntityKill.addToMobHitList(
+                    it,
+                    hitTrigger.LMage
+                )
+            }
+
+            itemName.contains("Aurora Staff") && clickType.isRightClick() -> rayTraceForSkyblockMob(
+                player,
+                renderRangeInBlocks,
+                partialTick
+            )?.let {
+                EntityKill.addToMobHitList(
+                    it,
+                    hitTrigger.AuroraStaff
+                )
             }
 
         }
