@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,7 +38,7 @@ class ParkourHelper(
         visible = false
     }
 
-    fun render(event: RenderWorldLastEvent) {
+    fun render(event: LorenzRenderWorldEvent) {
         if (locations.isEmpty()) {
             CopyErrorCommand.logError(
                 IllegalArgumentException("locations is empty"),

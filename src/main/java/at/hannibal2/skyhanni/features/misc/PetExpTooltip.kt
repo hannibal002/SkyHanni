@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
@@ -26,7 +27,7 @@ class PetExpTooltip {
     fun onItemTooltipLow(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.petDisplay) return
-        if (!LorenzUtils.isShiftKeyDown() && !config.showAlways) return
+        if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
         val itemStack = event.itemStack ?: return
         val petExperience = itemStack.getPetExp()?.round(1) ?: return

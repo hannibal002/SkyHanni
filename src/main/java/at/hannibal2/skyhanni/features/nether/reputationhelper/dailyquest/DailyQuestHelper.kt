@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
@@ -189,7 +189,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
@@ -205,7 +205,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: RenderWorldLastEvent) {
+    private fun renderTownBoard(event: LorenzRenderWorldEvent) {
         if (quests.any { it.state == QuestState.READY_TO_COLLECT || it.state == QuestState.NOT_ACCEPTED }) {
             val location = when (reputationHelper.factionType) {
                 FactionType.BARBARIAN -> townBoardBarbarian
@@ -300,11 +300,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishKuudra(kuudraTier: KuudraTier) {
         val kuudraQuest = getQuest<KuudraQuest>() ?: return
-        if (kuudraQuest.kuudraTier == kuudraTier) {
-            //TODO make inline method for this two lines
-            if (kuudraQuest.state == QuestState.ACCEPTED) {
-                kuudraQuest.state = QuestState.READY_TO_COLLECT
-            }
+        //TODO make inline method for this two lines
+        if (kuudraQuest.kuudraTier == kuudraTier && kuudraQuest.state == QuestState.ACCEPTED) {
+            kuudraQuest.state = QuestState.READY_TO_COLLECT
         }
     }
 

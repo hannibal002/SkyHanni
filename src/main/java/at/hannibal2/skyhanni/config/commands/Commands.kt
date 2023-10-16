@@ -195,6 +195,10 @@ object Commands {
             "Prints the SkyHanni version in the chat"
         ) { SkyHanniDebugsAndTests.debugVersion() }
         registerCommand(
+            "shrendertoggle",
+            "Disables/enables the rendering of all skyhanni guis."
+        ) { SkyHanniDebugsAndTests.toggleRender() }
+        registerCommand(
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
