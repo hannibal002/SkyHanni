@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.CopyItemCommand.copyItemToClipboard
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.KSerializable
@@ -21,6 +22,8 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 object TestExportTools {
+    private val config get() = SkyHanniMod.feature.dev.debug
+
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
@@ -49,13 +52,17 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!SkyHanniMod.feature.dev.debug.copyNBTDataCompressed.isKeyHeld()) return
+        if (!config.copyNBTDataCompressed.isKeyHeld() && !config.copyNBTData.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
+        if (config.copyNBTData.isKeyHeld()) {
+            copyItemToClipboard(stack)
+            return
+        }
         val json = toJson(Item, stack)
         OSUtils.copyToClipboard(json)
-        LorenzUtils.chat("Copied test importable to clipbooard")
+        LorenzUtils.chat("Copied test importable to clipboard")
     }
 
 
