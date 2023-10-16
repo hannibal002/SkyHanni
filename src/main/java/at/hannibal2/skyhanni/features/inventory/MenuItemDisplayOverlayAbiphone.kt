@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -37,7 +38,7 @@ class MenuItemDisplayOverlayAbiphone {
         if ((stackSizeConfig.contains(1)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone"))) {
             val nameWithColor = item.name ?: return ""
             val lore = item.getLore()
-            if ((nameWithColor.startsWith("§f§")) && (lore.any { it.contains("§cDo Not Disturb") }) && lore.any { it.contains("enabled!") }) {
+            if ((nameWithColor.startsWith("§f§")) && (lore.anyContains("§cDo Not Disturb")) && lore.anyContains("enabled!")) {
                 return "§c§l✖"
             }
         }

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -116,7 +117,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
             if (chestName == "Rift Guide") {
                 if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
-                    if (lore.any { it.contains("Enigma Souls: ") }) {
+                    if (lore.anyContains("Enigma Souls: ")) {
                         for (line in lore) {
                             if (line.contains("Enigma Souls: ")) {
                                 enigmaSoulsPattern.matchMatcher(line) {
@@ -233,7 +234,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
         if (stackSizeConfig.contains(7) && chestName.contains("Bank")) {
             val lore = item.getLore()
-            if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%") && lore.any { it.contains("Amount to withdraw: ") }) {
+            if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%") && lore.anyContains("Amount to withdraw: ")) {
                 for (line in lore) {
                     if (line.contains("Amount to withdraw: ")) {
                         amtToWithdrawPattern.matchMatcher(line) {
@@ -285,7 +286,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 val nameWithColor = item.name ?: return ""
                 if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (!(lore.isEmpty())) {
-                    if (lore.any { it.contains("Candidate") }) {
+                    if (lore.anyContains("Candidate")) {
                         val colorCode = nameWithColor.take(2)
                         var numPerks = 0
                         for (line in item.getLore()) {
@@ -309,7 +310,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName.contains("Mayor ")) {
                     if (itemName.lowercase().contains("dante")) return "§c§l✖"
                     val nameWithColor = item.name ?: return ""
-                    if (lore.any { it.contains(" the closing of") }) {
+                    if (lore.anyContains(" the closing of")) {
                         if (!(itemName.contains("Jerry")) || chestName.contains("Mayor")) {
                             val colorCode = nameWithColor.take(2)
                             var numPerks = 0
@@ -321,7 +322,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                             return "" + colorCode + numPerks
                         } else {
                             for (line in lore) {
-                                if (lore. any { it.contains("Perkpocalypse") }) {
+                                if (lore.anyContains("Perkpocalypse")) {
                                     return grabPerkpocalypseMayor(lore)
                                 }
                             }
@@ -345,7 +346,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                     return result
                 }
-                if (itemName == "Instasell Ignore List" && lore.any { it.contains("Ignored: ") }) {
+                if (itemName == "Instasell Ignore List" && lore.anyContains("Ignored: ")) {
                     for (line in lore) {
                         if (line.contains("Ignored: ")) { //§7Ignored: §c47 Products --> Ignored: 47 Products --> Ignored: 47 Product --> 47
                             return line.removeColor().replace("Products", "Product").between("Ignored: ", " Product")
@@ -356,7 +357,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     return itemName.take(3)
                 }
             }
-            if (chestName.contains(" ➜ ") && itemName.contains("Instasell Ignore") && lore.any { it.contains("Bulk Instasell: ") }) {
+            if (chestName.contains(" ➜ ") && itemName.contains("Instasell Ignore") && lore.anyContains("Bulk Instasell: ")) {
                 for (line in lore) {
                     if (line.contains("Bulk Instasell: ")) {
                         //§cIgnored!
@@ -416,14 +417,14 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     }
 
     private fun grabPerkpocalypseMayor(lore: List<String>): String {
-        if (lore.any { it.contains("SLASHED Pricing") } || lore.any { it.contains("Slayer XP Buff") } || lore.any { it.contains("Pathfinder") }) return "§bAtx"
-        if (lore.any { it.contains("Prospection") } || lore.any { it.contains("Mining XP Buff") } || lore.any { it.contains("Mining Fiesta") }) return "§bCle"
-        if (lore.any { it.contains("Lucky!") } || lore.any { it.contains("Pet XP Buff") } || lore.any { it.contains("Mythological Ritual") }) return "§bDna"
-        if (lore.any { it.contains("Barrier Street") } || lore.any { it.contains("Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
-        if (lore.any { it.contains("Farming Simulator") } || lore.any { it.contains("Pelt-pocalypse") } || lore.any { it.contains("GOATed") }) return "§bFng"
-        if (lore.any { it.contains("Sweet Tooth") } || lore.any { it.contains("Benevolence") } || lore.any { it.contains("Extra Event") }) return "§bFxy"
-        if (lore.any { it.contains("Luck of the Sea 2.0") } || lore.any { it.contains("Fishing XP Buff") } || lore.any { it.contains("Fishing Festival") }) return "§bMrn"
-        if (lore.any { it.contains("Marauder") } || lore.any { it.contains("EZPZ") } || lore.any { it.contains("Benediction") }) return "§bPul"
+        if (lore.anyContains("SLASHED Pricing") || lore.anyContains("Slayer XP Buff") || lore.anyContains("Pathfinder")) return "§bAtx"
+        if (lore.anyContains("Prospection") || lore.anyContains("Mining XP Buff") || lore.anyContains("Mining Fiesta")) return "§bCle"
+        if (lore.anyContains("Lucky!") || lore.anyContains("Pet XP Buff") || lore.anyContains("Mythological Ritual")) return "§bDna"
+        if (lore.anyContains("Barrier Street") || lore.anyContains("Shopping Spree")) return "§c§l✖" //diaz gets an automatic X.
+        if (lore.anyContains("Farming Simulator") || lore.anyContains("Pelt-pocalypse") || lore.anyContains("GOATed")) return "§bFng"
+        if (lore.anyContains("Sweet Tooth") || lore.anyContains("Benevolence") || lore.anyContains("Extra Event")) return "§bFxy"
+        if (lore.anyContains("Luck of the Sea 2.0") || lore.anyContains("Fishing XP Buff") || lore.anyContains("Fishing Festival")) return "§bMrn"
+        if (lore.anyContains("Marauder") || lore.anyContains("EZPZ") || lore.anyContains("Benediction")) return "§bPul"
         else return "§c?"
     }
 }

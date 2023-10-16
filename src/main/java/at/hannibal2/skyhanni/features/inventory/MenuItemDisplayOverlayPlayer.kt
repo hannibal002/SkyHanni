@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -52,7 +53,7 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(1)) {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
-                if (item.getLore().any { it.contains("Click to view!") }) {
+                if (item.getLore().anyContains("Click to view!")) {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
                         if (itemName.removeColor().split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
@@ -83,7 +84,7 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(3)) {
             if (chestName.endsWith(" Collections")) {
                 val lore = item.getLore()
-                if (lore.any { it.contains("Click to view!") }) {
+                if (lore.anyContains("Click to view!")) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
                         if (it.startsWith("§e")) {
@@ -122,7 +123,7 @@ class MenuItemDisplayOverlayPlayer {
                     }
                 }
             }
-            if (lore.any { it.contains("Click to view ") }) {
+            if (lore.anyContains("Click to view ")) {
                 var tiersToSubtract = 0
                 var totalTiers = 0
                 for (line in lore) {
@@ -164,7 +165,7 @@ class MenuItemDisplayOverlayPlayer {
             }
             if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) || (chestName.endsWith(" Essence"))) {
                 val lore = item.getLore()
-                if ((lore.any { it.contains("Your ") }) && (lore.any { it.contains(" Essence: ") })) {
+                if ((lore.anyContains("Your ")) && (lore.anyContains(" Essence: "))) {
                     for (line in lore) {
                         if (line.contains("Your ") && line.contains(" Essence: ")) {
                             essenceCountPattern.matchMatcher(line) {
@@ -190,7 +191,7 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(9) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
             //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
             val lore = item.getLore()
-            if ((lore.any {it.contains("You need ")}) && (lore.any {it.contains("more")})) {
+            if ((lore.anyContains("You need ")) && (lore.anyContains("more"))) {
                 for (line in lore) {
                     if (line.contains("You need ") && line.contains("more")) {
                         return line.removeColor().between("You need ", " more")
