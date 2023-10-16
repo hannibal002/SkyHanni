@@ -57,7 +57,7 @@ import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
-import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
+import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
@@ -367,7 +367,7 @@ class SkyHanniMod {
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI())
-        loadModule(PartyAPI())
+        loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
@@ -416,7 +416,7 @@ class SkyHanniMod {
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
-        loadModule(PartyTransferCommand())
+        loadModule(PartyCommands)
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())

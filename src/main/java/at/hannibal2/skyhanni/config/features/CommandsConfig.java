@@ -38,10 +38,10 @@ public class CommandsConfig {
         public boolean onlyBestFriends = false;
 
         @Expose
-        @ConfigOption(name = "Party", desc = "Tab complete Party Members.")
+        @ConfigOption(name = "Party", desc = "Tab complete commonly used party commands.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean party = true;
+        public boolean partyCommands = true;
 
         @Expose
         @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users with cake souls on it.")
@@ -62,12 +62,11 @@ public class CommandsConfig {
     @FeatureToggle
     public boolean useFandomWiki = false;
 
+    @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
+            "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
     @Expose
-    @ConfigOption(name = "Party transfer", desc = "Allows §e/pt <player> §7as alias for §e/party transfer§7.\n" +
-            "§7SkyBlock command §e/pt §7to check the play time still works.")
     @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean usePartyTransferAlias = true;
+    public boolean shortCommands = true;
 
     @Expose
     @ConfigOption(name = "Replace Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
