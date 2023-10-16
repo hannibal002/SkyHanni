@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -81,10 +82,10 @@ class RiftWiltedBerberisHelper {
         }
 
         val x = location.x
-        val y = location.y
+        val h = location.y
         val z = location.z
-        val string = "x = $x, y = $y, z = $z"
-        LorenzUtils.chat(x, y, z)
+        val string = "#goto $x $h $z"
+        LorenzUtils.chat(string)
 
         with(berberis) {
             val isMoving = currentParticles != location
