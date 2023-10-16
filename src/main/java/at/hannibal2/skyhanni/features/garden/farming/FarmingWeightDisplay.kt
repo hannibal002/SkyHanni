@@ -29,9 +29,9 @@ class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        val shouldShow = apiError || (config.eliteFarmingWeightIgnoreLow || weight >= 200)
+        val shouldShow = apiError || (config.ignoreLow || weight >= 200)
         if (isEnabled() && shouldShow) {
-            config.eliteFarmingWeightPos.renderRenderables(display, posLabel = "Farming Weight Display")
+            config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
         }
     }
 
@@ -72,10 +72,18 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
+        event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
+        event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
+        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage", "garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
+        event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
+        event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden
+        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
 
         private var display = emptyList<Renderable>()
@@ -166,7 +174,7 @@ class FarmingWeightDisplay {
                 openWebsite(LorenzUtils.getPlayerName())
             })
 
-            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.eliteFarmingWeightOvertakeETAAlways)) {
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
                 getETA()?.let {
                     list.add(it)
                 }
@@ -175,7 +183,7 @@ class FarmingWeightDisplay {
         }
 
         private fun getLeaderboard(): String {
-            if (!config.eliteFarmingWeightLeaderboard) return ""
+            if (!config.leaderboard) return ""
 
             // Fetching new leaderboard position every 10.5 minutes
             if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
@@ -204,7 +212,7 @@ class FarmingWeightDisplay {
         }
 
         private fun getRankGoal(): Int {
-            val value = config.eliteFarmingWeightETAGoalRank
+            val value = config.ETAGoalRank
             var goal = 10000
 
             // Check that the provided string is valid
@@ -212,7 +220,7 @@ class FarmingWeightDisplay {
             if (parsed < 1 || parsed > goal) {
                 LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
                 LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
-                config.eliteFarmingWeightETAGoalRank = goal.toString()
+                config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
             }
@@ -312,8 +320,8 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
-        private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
+        private fun isEnabled() = GardenAPI.inGarden() && config.display
+        private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
             val before = getExactWeight()
@@ -345,7 +353,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded && config.eliteFarmingWeightOffScreenDropMessage) {
+                if (wasNotLoaded && config.offScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =

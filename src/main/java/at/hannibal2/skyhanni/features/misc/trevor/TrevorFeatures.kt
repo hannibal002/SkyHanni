@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -72,7 +72,7 @@ object TrevorFeatures {
                         if (questActive) TrevorSolver.findMob()
                     }
                 } catch (error: Throwable) {
-                    CopyErrorCommand.logError(error, "Encountered an error when updating the trapper solver")
+                    ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }

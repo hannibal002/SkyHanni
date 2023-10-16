@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -22,7 +23,7 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -71,7 +72,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-private val config get() = SkyHanniMod.feature.garden
+private val config get() = SkyHanniMod.feature.garden.visitors
 
 class GardenVisitorFeatures {
     private var visitors = mapOf<String, Visitor>()
@@ -114,7 +115,7 @@ class GardenVisitorFeatures {
 
         inVisitorInventory = true
 
-        if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
+        if (!config.needs.display && config.highlightStatus == 3) return
 
         var name = npcItem.name ?: return
         if (name.length == name.removeColor().length + 4) {
@@ -167,7 +168,7 @@ class GardenVisitorFeatures {
 
         println("visitors: $visitors")
         println("name: $name")
-        CopyErrorCommand.logErrorState(
+        ErrorManager.logErrorState(
             "Error finding the visitor `$name§c`. Try to reopen the inventory",
             "visitor is null! name='$name', visitors=`$visitors`"
         )
@@ -191,7 +192,7 @@ class GardenVisitorFeatures {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-        if (!config.visitorNeedsDisplay) return newDisplay
+        if (!config.needs.display) return newDisplay
 
         val requiredItems = mutableMapOf<NEUInternalName, Int>()
         val newVisitors = mutableListOf<String>()
@@ -226,7 +227,7 @@ class GardenVisitorFeatures {
                     }
                 }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 
-                if (config.visitorNeedsShowPrice) {
+                if (config.needs.showPrice) {
                     val price = internalName.getPrice() * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)
@@ -253,7 +254,7 @@ class GardenVisitorFeatures {
                 val list = mutableListOf<Any>()
                 list.add(" §7- $displayName")
 
-                if (config.visitorItemPreview) {
+                if (config.needs.itemPreview) {
                     val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
                     if (items == null) {
                         val text = "Visitor '$visitor' has no items in repo!"
@@ -304,14 +305,14 @@ class GardenVisitorFeatures {
             if (event.slot.stack?.name != "§cRefuse Offer") return
 
             visitor.hasReward()?.let {
-                if (config.visitorRewardWarning.preventRefusing) {
-                    if (config.visitorRewardWarning.bypassKey.isKeyHeld()) {
+                if (config.rewardWarning.preventRefusing) {
+                    if (config.rewardWarning.bypassKey.isKeyHeld()) {
                         LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                    if (config.visitorRewardWarning.bypassKey == Keyboard.KEY_NONE) {
+                    if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
                             "sh bypass"
@@ -348,7 +349,7 @@ class GardenVisitorFeatures {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
+        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
 
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -360,7 +361,7 @@ class GardenVisitorFeatures {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
+        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
 
         for (visitor in visitors.values) {
             visitor.getNameTagEntity()?.let {
@@ -368,7 +369,7 @@ class GardenVisitorFeatures {
                 if (it.distanceToPlayer() < 15) {
                     val text = visitor.status.displayName
                     event.drawString(location.add(0.0, 2.23, 0.0), text)
-                    if (config.visitorRewardWarning.showOverName) {
+                    if (config.rewardWarning.showOverName) {
                         visitor.hasReward()?.let { reward ->
                             val name = reward.displayName
 
@@ -433,7 +434,7 @@ class GardenVisitorFeatures {
             visitor.allRewards = foundRewards
             if (wasEmpty) {
                 visitor.hasReward()?.let { reward ->
-                    if (config.visitorRewardWarning.notifyInChat) {
+                    if (config.rewardWarning.notifyInChat) {
                         LorenzUtils.chat("§e[SkyHanni] Found Visitor Reward ${reward.displayName}§e!")
                     }
                 }
@@ -445,7 +446,7 @@ class GardenVisitorFeatures {
         var offset = 0
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
             val index = i + offset
-            if (config.visitorExperiencePrice) {
+            if (config.inventory.experiencePrice) {
                 gardenExperiencePattern.matchMatcher(formattedLine) {
                     val gardenExp = group("amount").replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
@@ -458,8 +459,8 @@ class GardenVisitorFeatures {
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
                 val timePerCopper = TimeUtils.formatDuration((timeRequired / copper) * 1000)
                 var copperLine = formattedLine
-                if (config.visitorCopperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
-                if (config.visitorCopperTime) {
+                if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
+                if (config.inventory.copperTime) {
                     copperLine += if (timeRequired != -1L) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
                 }
                 finalList.set(index, copperLine)
@@ -473,7 +474,7 @@ class GardenVisitorFeatures {
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
             val price = internalName.getPrice() * amount
 
-            if (config.visitorShowPrice) {
+            if (config.inventory.showPrice) {
                 val format = NumberUtil.format(price)
                 finalList[index] = "$formattedLine §7(§6$format§7)"
             }
@@ -491,7 +492,7 @@ class GardenVisitorFeatures {
                 val duration = TimeUtils.formatDuration(timeRequired * 1000)
                 "in §b$duration"
             } ?: "§cno speed data!"
-            if (config.visitorExactAmountAndTime) {
+            if (config.inventory.exactAmountAndTime) {
                 finalList.add(index + 1, "§7- $formattedName($formattedSpeed§7)")
                 offset++
             }
@@ -502,10 +503,10 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
+        if (!config.needs.display && config.highlightStatus == 3) return
         if (!event.isMod(10)) return
 
-        if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
+        if (GardenAPI.onBarnPlot && config.highlightStatus != 3) {
             checkVisitorsReady()
         }
     }
@@ -582,10 +583,10 @@ class GardenVisitorFeatures {
 
         logger.log("New visitor detected: '$name'")
 
-        if (config.visitorNotificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (config.notificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
             LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
         }
-        if (config.visitorNotificationChat) {
+        if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
             LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
         }
@@ -613,7 +614,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTabListText(event: TabListLineRenderEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.visitorColoredName) return
+        if (!config.coloredName) return
         val text = event.text
         val replace = fromHypixelName(text)
         val visitor = visitors[replace]
@@ -624,11 +625,11 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (config.visitorHypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+        if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
 
-        if (GardenAPI.inGarden() && config.visitorHideChat && hideVisitorMessage(event.message)) {
+        if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
         }
     }
@@ -663,13 +664,13 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if ((config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) && entity is EntityLivingBase) {
+            if ((config.highlightStatus == 0 || config.highlightStatus == 2) && entity is EntityLivingBase) {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
                         color
-                    ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
+                    ) { config.highlightStatus == 0 || config.highlightStatus == 2 }
                 }
                 // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
                 if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
@@ -748,42 +749,42 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onRenderInSigns(event: DrawScreenEvent.Post) {
         if (!GardenAPI.inGarden()) return
-        if (!config.visitorNeedsDisplay) return
+        if (!config.needs.display) return
         val gui = event.gui
         if (gui !is GuiEditSign) return
 
-        if (config.visitorNeedsOnlyWhenClose && !GardenAPI.onBarnPlot) return
+        if (config.needs.onlyWhenClose && !GardenAPI.onBarnPlot) return
 
         if (!GardenAPI.hideExtraGuis()) {
-            config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+            config.needs.pos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.visitorNeedsDisplay) return
+        if (!config.needs.display) return
 
         if (showGui()) {
-            config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+            config.needs.pos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
         }
     }
 
     private fun showGui(): Boolean {
-        if (config.visitorNeedsInBazaarAlley && LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+        if (config.needs.inBazaarAlley && LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
             return true
         }
 
         if (GardenAPI.hideExtraGuis()) return false
         if (GardenAPI.inGarden()) {
             if (GardenAPI.onBarnPlot) return true
-            if (!config.visitorNeedsOnlyWhenClose) return true
+            if (!config.needs.onlyWhenClose) return true
         }
         return false
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!SkyHanniMod.feature.garden.visitorColoredName) return
+        if (!config.coloredName) return
         val entity = event.entity
         val entityId = entity.entityId
         for (visitor in visitors.values) {
@@ -812,7 +813,7 @@ class GardenVisitorFeatures {
             for (internalName in allRewards) {
                 val reward = VisitorReward.getByInternalName(internalName) ?: continue
 
-                if (config.visitorRewardWarning.drops.contains(reward.ordinal)) {
+                if (config.rewardWarning.drops.contains(reward.ordinal)) {
                     return reward
                 }
             }
@@ -828,5 +829,32 @@ class GardenVisitorFeatures {
         ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
         REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.visitorNeedsDisplay", "garden.visitors.needs.display")
+        event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")
+        event.move(3, "garden.visitorNeedsOnlyWhenClose", "garden.visitors.needs.onlyWhenClose")
+        event.move(3, "garden.visitorNeedsInBazaarAlley", "garden.visitors.needs.inBazaarAlley")
+        event.move(3,"garden.visitorNeedsShowPrice", "garden.visitors.needs.showPrice")
+        event.move(3,"garden.visitorItemPreview", "garden.visitors.needs.itemPreview")
+        event.move(3, "garden.visitorShowPrice", "garden.visitors.inventory.showPrice")
+        event.move(3, "garden.visitorExactAmountAndTime", "garden.visitors.inventory.exactAmountAndTime")
+        event.move(3, "garden.visitorCopperPrice", "garden.visitors.inventory.copperPrice")
+        event.move(3, "garden.visitorCopperTime", "garden.visitors.inventory.copperTime")
+        event.move(3, "garden.visitorExperiencePrice", "garden.visitors.inventory.experiencePrice")
+        event.move(3,"garden.visitorRewardWarning.notifyInChat","garden.visitors.rewardWarning.notifyInChat")
+        event.move(3,"garden.visitorRewardWarning.showOverName","garden.visitors.rewardWarning.showOverName")
+        event.move(3,"garden.visitorRewardWarning.preventRefusing","garden.visitors.rewardWarning.preventRefusing")
+        event.move(3,"garden.visitorRewardWarning.bypassKey","garden.visitors.rewardWarning.bypassKey")
+        event.move(3,"garden.visitorRewardWarning.drops","garden.visitors.rewardWarning.drops")
+        event.move(3, "garden.visitorNotificationChat", "garden.visitors.notificationChat")
+        event.move(3, "garden.visitorNotificationTitle", "garden.visitors.notificationTitle")
+        event.move(3, "garden.visitorHighlightStatus", "garden.visitors.highlightStatus")
+        event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
+        event.move(3,"garden.visitorHypixelArrivedMessage","garden.visitors.hypixelArrivedMessage")
+        event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
+    }
+
 }
 

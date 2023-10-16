@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
@@ -271,7 +271,7 @@ object EntityOutlineRenderer {
     // Add new features that need the entity outline logic here
     private fun isEnabled(): Boolean {
         if (isMissingMixin) return false
-        if (SkyHanniMod.feature.fishing.rareSeaCreatureHighlight) return true
+        if (SkyHanniMod.feature.fishing.rareCatches.highlight) return true
         if (SkyHanniMod.feature.misc.glowingDroppedItems.enabled) return true
         if (SkyHanniMod.feature.dungeon.highlightTeammates) return true
         if (SkyHanniMod.feature.misc.highlightPartyMembers.enabled) return true
@@ -366,7 +366,7 @@ object EntityOutlineRenderer {
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
         } catch (e: NoClassDefFoundError) {
-            CopyErrorCommand.logError(e, "Unable to enable entity outlines, the required mixin is not loaded")
+            ErrorManager.logError(e, "Unable to enable entity outlines, the required mixin is not loaded")
             isMissingMixin = true
             return
         }

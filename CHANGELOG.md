@@ -31,6 +31,19 @@
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
+    + Options to change speed, size, saturation and direction.
++ Added Modify Visual Words (command /shwords). - CalMWolfs
+    + Allows you to replace text on your screen with different text (like the SBE one, just less costly).
+    + Supports all color codes, even chroma (use &&Z)
++ Added In-Game Date display. - Erymanthus
+    + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
+    + Includes the SkyBlock year.
++ Added Quest Item Helper. - NetheriteMiner
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items needed from the sacks.
++ Added alerts when the player catches a Legendary Sea Creature. - Cad
++ Added Soulweaver Skull Hider to the Dungeon Object Hider. - nea
+    + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 
 #### Events
 
@@ -55,6 +68,10 @@
 + Made Smoldering same as Fatal Tempo and Chimera in Estimated Item Value. - jani
 + Added an option to change where to get the items from in the composter overlay: from the bazaar or from sacks. - HiZe
 + Added mouse button support for key binds. - CalMWolfs
++ Added 'spooked into the lobby' chat message to the Outside Hypixel filter. - CalMWolfs
++ Changed the Yaw/Pitch Display to not show scientific notations at very small numbers. - Obsidian
++ Added an option to the Advanced Player List to hide Crimson Isle faction icons. - hannibal2
++ Added Enrichment to Estimated Item Value. - jani
 
 ### Bug Fixes
 
@@ -76,6 +93,13 @@
 + Better limbo leave detection. - hannibal2
 + Fixed rare crash when trying to read neu config. - hannibal2
 + Fixed rare case where the visitor description is empty. - hannibal2
++ Fixed a typo in the config. - hannibal2
++ Fixed the chat filter not applying immediately after joining the Hypixel lobby. - hannibal2
++ Fixed the selected drop in the catacombs RNG meter inventory not getting highlighted. - hannibal2
++ Fixed Fishing Hook Display showing wrong damage numbers. - hannibal2
++ Fixed Abiphone ring message not getting filtered correctly. - hannibal2
++ Fixed the bug that faction icons in Crimson Isle are always hidden in the tab list. - hannibal2
++ Fixed SkyHanni GUI Edit Button not working inside storage even if neu storage is not disabled. - hannibal2
 
 #### Config
 

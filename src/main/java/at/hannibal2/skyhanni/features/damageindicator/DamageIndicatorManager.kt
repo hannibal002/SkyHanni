@@ -455,7 +455,7 @@ class DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazePhaseDisplay) return ""
+        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -610,7 +610,7 @@ class DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong()
         ).getChatColor() + NumberUtil.format(calcHealth)
 
-        if (!SkyHanniMod.feature.slayer.endermanPhaseDisplay) {
+        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }
@@ -854,6 +854,8 @@ class DamageIndicatorManager {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
+        event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
+        event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

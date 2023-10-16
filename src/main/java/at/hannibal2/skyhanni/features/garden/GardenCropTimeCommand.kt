@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropTimeCommand {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.moneyPerHours
 
     fun onCommand(args: Array<String>) {
-        if (!config.moneyPerHourDisplay) {
+        if (!config.display) {
             LorenzUtils.chat("§c[SkyHanni] §cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }

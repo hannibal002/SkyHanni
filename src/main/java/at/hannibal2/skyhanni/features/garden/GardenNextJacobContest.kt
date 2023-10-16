@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -98,7 +99,7 @@ object GardenNextJacobContest {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.nextJacobContestDisplay) return
+        if (!config.display) return
 
         val backItem = event.inventoryItems[48] ?: return
         val backName = backItem.name
@@ -215,7 +216,7 @@ object GardenNextJacobContest {
     fun shareContestConfirmed(array: Array<String>) {
         if (array.size == 1) {
             if (array[0] == "enable") {
-                config.nextJacobContestsShareAutomatically = 1
+                config.shareAutomatically = 1
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 LorenzUtils.chat("§e[SkyHanni] §2Enabled automatic sharing of future contests!")
             }
@@ -224,7 +225,7 @@ object GardenNextJacobContest {
         if (contests.size == maxContestsPerYear) {
             sendContests()
         }
-        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.nextJacobContestsShareAutomatically == 0) {
+        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == 0) {
             LorenzUtils.clickableChat(
                 "§e[SkyHanni] §2Click here to automatically share future contests!",
                 "shsendcontests enable"
@@ -311,8 +312,8 @@ object GardenNextJacobContest {
     }
 
     private fun warn(timeInMillis: Long, crops: List<CropType>) {
-        if (!config.nextJacobContestWarn) return
-        if (config.nextJacobContestWarnTime <= timeInMillis / 1000) return
+        if (!config.warn) return
+        if (config.warnTime <= timeInMillis / 1000) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
@@ -322,7 +323,7 @@ object GardenNextJacobContest {
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
-        if (config.nextJacobContestWarnPopup && !Display.isActive()) {
+        if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
                     "Farming Contest soon!\n" +
@@ -375,15 +376,15 @@ object GardenNextJacobContest {
         if (!isEnabled()) return
 
         if (display.isEmpty()) {
-            config.nextJacobContestPos.renderStrings(simpleDisplay, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderStrings(simpleDisplay, posLabel = "Garden Next Jacob Contest")
         } else {
-            config.nextJacobContestPos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!config.nextJacobContestDisplay) return
+        if (!config.display) return
         if (!inCalendar) return
 
         if (display.isNotEmpty()) {
@@ -394,13 +395,13 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay
-            && (GardenAPI.inGarden() || config.nextJacobContestEverywhere)
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display
+            && (GardenAPI.inGarden() || config.everywhere)
 
-    private fun isFetchEnabled() = isEnabled() && config.nextJacobContestsFetchAutomatically
-    private fun isSendEnabled() = isFetchEnabled() && config.nextJacobContestsShareAutomatically != 2 // 2 = Disabled
+    private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
+    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != 2 // 2 = Disabled
     private fun askToSendContests() =
-        config.nextJacobContestsShareAutomatically == 0 // 0 = Ask, 1 = Send (Only call if isSendEnabled())
+        config.shareAutomatically == 0 // 0 = Ask, 1 = Send (Only call if isSendEnabled())
 
     private fun fetchContestsIfAble() {
         if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
@@ -494,8 +495,21 @@ object GardenNextJacobContest {
         null
     }
 
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.nextJacobContests
     private val nextContestCrops = mutableListOf<CropType>()
 
-    fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.nextJacobContestOtherGuis
+    fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
+        event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")
+        event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContests.otherGuis")
+        event.move(3, "garden.nextJacobContestsFetchAutomatically", "garden.nextJacobContests.fetchAutomatically")
+        event.move(3, "garden.nextJacobContestsShareAutomatically", "garden.nextJacobContests.shareAutomatically")
+        event.move(3, "garden.nextJacobContestWarn", "garden.nextJacobContests.warn")
+        event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContests.warnTime")
+        event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
+        event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
+    }
 }
