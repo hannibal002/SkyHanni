@@ -37,11 +37,8 @@ class DungeonMilestonesDisplay {
     }
 
     private fun checkVisibility() {
-        if (currentMilestone >= 3) {
-            if (System.currentTimeMillis() > timeReached + 3_000)
-                if (display != "") {
-                    display = display.substring(1)
-                }
+        if (currentMilestone >= 3 && System.currentTimeMillis() > timeReached + 3_000 && display != "") {
+            display = display.substring(1)
         }
     }
 
@@ -83,7 +80,7 @@ class DungeonMilestonesDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + display, posLabel = "Dungeon Milestone")

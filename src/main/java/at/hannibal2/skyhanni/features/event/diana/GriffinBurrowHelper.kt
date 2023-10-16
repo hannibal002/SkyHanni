@@ -3,18 +3,27 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.EntityMoveEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -87,10 +96,8 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (event.distance > 10) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                teleportedLocation = event.newLocation
-            }
+        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+            teleportedLocation = event.newLocation
         }
     }
 
@@ -134,7 +141,7 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()
@@ -163,10 +170,8 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
-            if (config.inquisitorSharing.focusInquisitor) {
-                return
-            }
+        if (InquisitorWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+            return
         }
 
         if (config.burrowsNearbyDetection) {
@@ -198,7 +203,7 @@ object GriffinBurrowHelper {
         event.move(2, "diana", "event.diana")
     }
 
-    private fun sendTip(event: RenderWorldLastEvent) {
+    private fun sendTip(event: LorenzRenderWorldEvent) {
         teleportedLocation?.let {
             teleportedLocation = null
 
@@ -230,7 +235,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun moveAnimation(animation: LorenzVec, event: RenderWorldLastEvent): LorenzVec? {
+    private fun moveAnimation(animation: LorenzVec, event: LorenzRenderWorldEvent): LorenzVec? {
         val list = mutableListOf<LorenzVec>()
         if (config.burrowsNearbyDetection) {
             list.addAll(particleBurrows.keys)

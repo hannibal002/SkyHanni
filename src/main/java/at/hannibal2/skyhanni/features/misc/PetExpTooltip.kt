@@ -1,25 +1,34 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
+import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PetExpTooltip {
-    private val config get() = SkyHanniMod.feature.misc.petExperienceToolTip
+    private val config get() = SkyHanniMod.feature.misc.pets.petExperienceToolTip
+    private val level100Common = 5_624_785
+    private val level100Legendary = 25_353_230
+    private val level200 = 210_255_385
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onItemTooltipLow(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.petDisplay) return
-        if (!LorenzUtils.isShiftKeyDown() && !config.showAlways) return
+        if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
         val itemStack = event.itemStack ?: return
         val petExperience = itemStack.getPetExp()?.round(1) ?: return
@@ -27,8 +36,7 @@ class PetExpTooltip {
 
         val index = findIndex(event.toolTip) ?: return
 
-        val maxLevel = ItemUtils.maxPetLevel(name)
-        val maxXp = maxPetExp(name) // lvl 100 legendary
+        val (maxLevel, maxXp) = getMaxValues(name, petExperience)
 
         val percentage = petExperience / maxXp
         val percentageFormat = LorenzUtils.formatPercentage(percentage)
@@ -53,17 +61,45 @@ class PetExpTooltip {
 
         index = toolTip.indexOfFirst { it.contains("Progress to Level") }
         if (index != -1) {
-            val offset = if (NotEnoughUpdates.INSTANCE.config.tooltipTweaks.petExtendExp) 4 else 3
+
+            val offset = if (isNeuExtendedExpEnabled) 4 else 3
             return index + offset
         }
 
         return null
     }
 
-    private fun maxPetExp(petName: String) = when {
-        petName.contains("Golden Dragon") && config.goldenDragon200 -> 210_255_385 // lvl 200 legendary
-        petName.contains("Bingo") -> 5_624_785 // lvl 100 common
+    private val isNeuExtendedExpEnabled get() = fieldPetExtendExp.get(objectNeuTooltipTweaks) as Boolean
 
-        else -> 25_353_230 // lvl 100 legendary
+    private val objectNeuTooltipTweaks by lazy {
+        val field = NotEnoughUpdates.INSTANCE.config.javaClass.getDeclaredField("tooltipTweaks")
+        field.makeAccessible().get(NotEnoughUpdates.INSTANCE.config)
+    }
+
+    private val fieldPetExtendExp by lazy {
+        objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
+    }
+
+    private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {
+        val useGoldenDragonLevels =
+            petName.contains("Golden Dragon") && (!config.showGoldenDragonEgg || petExperience >= level100Legendary)
+
+        val maxLevel = if (useGoldenDragonLevels) 200 else 100
+
+        val maxXp = when {
+            useGoldenDragonLevels -> level200 // lvl 200 legendary
+            petName.contains("Bingo") -> level100Common
+
+            else -> level100Legendary
+        }
+
+        return Pair(maxLevel, maxXp)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pets.petExperienceToolTip.petDisplay")
+        event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pets.petExperienceToolTip.showAlways")
+        event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showGoldenDragonEgg")
     }
 }

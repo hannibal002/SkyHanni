@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
@@ -13,7 +12,7 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 /**
- * Taken from NotEnoughUpdates
+ * Some functions taken from NotEnoughUpdates
  */
 object GuiRenderUtils {
 
@@ -60,7 +59,6 @@ object GuiRenderUtils {
 
         Minecraft.getMinecraft().fontRendererObj.drawString(firstString, x, y - 5, 0xffffff, true)
         Minecraft.getMinecraft().fontRendererObj.drawString(secondString, x, y + 5, 0xffffff, true)
-
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -72,6 +70,10 @@ object GuiRenderUtils {
             true,
             0xffffff
         )
+    }
+
+    fun drawStringCentered(str: String?, x: Float, y: Float) {
+        drawStringCentered(str, x.toInt(), y.toInt())
     }
 
     fun renderItemStack(item: ItemStack, x: Int, y: Int) {
@@ -179,18 +181,19 @@ object GuiRenderUtils {
         )
     }
 
-    fun renderItemAndTip(item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
+    fun renderItemAndTip(list: MutableList<String>, item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
         if (item != null) {
             renderItemStack(item, x, y)
             if (isPointInRect(mouseX, mouseY, x, y, 16, 16)) {
                 val tt: List<String> = item.getTooltip(Minecraft.getMinecraft().thePlayer, false)
-                FFGuideGUI.tooltipToDisplay.addAll(tt)
+                list.addAll(tt)
             }
         }
     }
 
     fun renderItemAndTip(
+        list: MutableList<String>,
         item: ItemStack?,
         x: Float,
         y: Float,
@@ -198,7 +201,7 @@ object GuiRenderUtils {
         mouseY: Float,
         color: Int = 0xFF43464B.toInt()
     ) {
-        renderItemAndTip(item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
+        renderItemAndTip(list, item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
 
     // assuming 70% font size
@@ -254,12 +257,10 @@ object GuiRenderUtils {
             if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor
         )
 
-        if (tooltip != "") {
-            if (isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
-                val split = tooltip.split("\n")
-                for (line in split) {
-                    output.add(line)
-                }
+        if (tooltip != "" && isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
+            val split = tooltip.split("\n")
+            for (line in split) {
+                output.add(line)
             }
         }
     }
@@ -273,5 +274,15 @@ object GuiRenderUtils {
     fun Int.darkenColor(): Int {
         val color = Color(this)
         return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
+    }
+
+    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, colour: Int, inverseScale: Float) {
+        GuiScreen.drawRect((left * inverseScale).toInt(), (top * inverseScale).toInt(),
+            (right * inverseScale).toInt(), (bottom * inverseScale).toInt(), colour)
+    }
+
+    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {
+        renderItemStack(item, x, y)
+        GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
     }
 }

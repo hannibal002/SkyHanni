@@ -9,11 +9,15 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import kotlin.reflect.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KParameter
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.javaType
+import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 
 @Retention(AnnotationRetention.RUNTIME)

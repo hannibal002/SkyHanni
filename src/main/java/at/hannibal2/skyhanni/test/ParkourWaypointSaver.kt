@@ -1,47 +1,46 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.milliseconds
 
 class ParkourWaypointSaver {
     private val config get() = SkyHanniMod.feature.dev.waypoint
-    private var timeLastSaved: Long = 0
+    private var timeLastSaved = SimpleTimeMark.farPast()
     private var locations = mutableListOf<LorenzVec>()
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!Keyboard.getEventKeyState()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
-        if (System.currentTimeMillis() - timeLastSaved < 250) return
+        if (timeLastSaved.passedSince() < 250.milliseconds) return
 
-        Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
-        }
-
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (config.deleteKey == key) {
-            locations = locations.dropLast(1).toMutableList()
-            update()
-        }
-        if (config.saveKey == key) {
-            val newLocation = LorenzVec.getBlockBelowPlayer()
-            if (locations.isNotEmpty()) {
-                if (newLocation == locations.last()) return
+        when (event.keyCode) {
+            config.deleteKey -> {
+                locations = locations.dropLast(1).toMutableList()
+                update()
             }
-            locations.add(newLocation)
-            update()
+
+            config.saveKey -> {
+                val newLocation = LorenzVec.getBlockBelowPlayer()
+                if (locations.isNotEmpty() && newLocation == locations.last()) return
+                locations.add(newLocation)
+                update()
+            }
         }
     }
 
@@ -55,7 +54,7 @@ class ParkourWaypointSaver {
 
     private fun MutableList<LorenzVec>.copyLocations() {
         val resultList = mutableListOf<String>()
-        timeLastSaved = System.currentTimeMillis()
+        timeLastSaved = SimpleTimeMark.now()
         for (location in this) {
             val x = location.x.toString().replace(",", ".")
             val y = location.y.toString().replace(",", ".")
@@ -66,7 +65,7 @@ class ParkourWaypointSaver {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (locations.size > 1) {

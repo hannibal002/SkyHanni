@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 
@@ -14,7 +14,7 @@ abstract class LorenzEvent : Event() {
         return runCatching {
             postWithoutCatch()
         }.onFailure {
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 it,
                 "Caught an ${it::class.simpleName ?: "error"} at ${eventName}: '${it.message}'"
             )

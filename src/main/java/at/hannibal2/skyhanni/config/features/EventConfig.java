@@ -3,7 +3,11 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -23,9 +27,9 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Bingo Card", desc = "")
         @Accordion
-        public BingoCard bingoCard = new BingoCard();
+        public BingoCardConfig bingoCard = new BingoCardConfig();
 
-        public static class BingoCard {
+        public static class BingoCardConfig {
             @Expose
             @ConfigOption(name = "Enable", desc = "Displays the Bingo Card.")
             @ConfigEditorBoolean
@@ -65,9 +69,9 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Compact Chat Messages", desc = "")
         @Accordion
-        public CompactChat compactChat = new CompactChat();
+        public CompactChatConfig compactChat = new CompactChatConfig();
 
-        public static class CompactChat {
+        public static class CompactChatConfig {
 
             @Expose
             @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
@@ -155,10 +159,9 @@ public class EventConfig {
         @Expose
         @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
         @Accordion
-        @ConfigAccordionId(id = 9)
-        public InquisitorSharing inquisitorSharing = new InquisitorSharing();
+        public InquisitorSharingConfig inquisitorSharing = new InquisitorSharingConfig();
 
-        public static class InquisitorSharing {
+        public static class InquisitorSharingConfig {
 
             @Expose
             @ConfigOption(name = "Enabled", desc = "Shares your Inquisitor and receiving other Inquisitors via Party Chat.")
@@ -167,12 +170,12 @@ public class EventConfig {
             public boolean enabled = true;
 
             @Expose
-            @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds a Inquisitor.")
+            @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds an Inquisitor.")
             @ConfigEditorBoolean
             public boolean focusInquisitor = false;
 
             @Expose
-            @ConfigOption(name = "Instant Share", desc = "Share the waypoint as soon as you find a Inquisitor. As alternative, you can share it only via key press")
+            @ConfigOption(name = "Instant Share", desc = "Share the waypoint as soon as you find an Inquisitor. As an alternative, you can share it only via key press.")
             @ConfigEditorBoolean
             public boolean instantShare = true;
 
@@ -188,7 +191,7 @@ public class EventConfig {
         }
 
         @Expose
-        @ConfigOption(name = "Griffin Pet Warning", desc = "Warn when holding an Ancestral Spade if a Griffin pet is not equipped.")
+        @ConfigOption(name = "Griffin Pet Warning", desc = "Warn when holding an Ancestral Spade if a Griffin Pet is not equipped.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean petWarning = true;
@@ -252,13 +255,13 @@ public class EventConfig {
             public boolean onlyInCave = true;
 
             @Expose
-            @ConfigOption(name = "Show as drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
+            @ConfigOption(name = "Show as Drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
                     "E.g. 3 Ice Bait -> 48 Ice Bait")
             @ConfigEditorBoolean
             public boolean showAsDrops = false;
 
             @Expose
-            @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from Frozen Treasures.")
+            @ConfigOption(name = "Hide Chat Messages", desc = "Hides the chat messages from Frozen Treasures.")
             @ConfigEditorBoolean
             public boolean hideMessages = false;
 
@@ -306,15 +309,30 @@ public class EventConfig {
         public Position pos = new Position(150, 150, false, true);
     }
 
+    @ConfigOption(name = "Mayor Jerry's Jerrypocalypse", desc = "")
+    @Accordion
+    @Expose
+    public MayorJerryConfig jerry = new MayorJerryConfig();
+
+    public static class MayorJerryConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight Jerries", desc = "Highlights Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightJerries = true;
+
+    }
+
     // comment in if the event is needed again
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion
     @Expose
-    public Century century = new Century();
+    public CenturyConfig century = new CenturyConfig();
 
-    public static class Century {
+    public static class CenturyConfig {
 
-        @ConfigOption(name = "Enable Active Player Timer", desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket")
+        @ConfigOption(name = "Enable Active Player Timer", desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket.")
         @Expose
         @ConfigEditorBoolean
         @FeatureToggle
@@ -323,10 +341,34 @@ public class EventConfig {
         @Expose
         public Position activeTimerPosition = new Position(100, 100, false, true);
 
-        @ConfigOption(name = "Enable Active Player Alert", desc = "Loudly proclaim when it is time to break some wheat")
+        @ConfigOption(name = "Enable Active Player Alert", desc = "Loudly proclaim when it is time to break some wheat.")
         @Expose
         @ConfigEditorBoolean
         public boolean enableActiveAlert = false;
+    }
+
+    @Expose
+    @ConfigOption(name = "Main Lobby Halloween Basket Waypoints", desc = "")
+    @Accordion
+    public halloweenBasketConfig halloweenBasket = new halloweenBasketConfig();
+
+    public static class halloweenBasketConfig {
+
+        @Expose
+        @ConfigOption(name = "Basket Waypoints", desc = "Show all Halloween Basket waypoints.\nShoutout to §bTobbbb §7for the coordinates.\n(AS OF 2023)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean allWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
+        @ConfigEditorBoolean
+        public boolean allEntranceWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint")
+        @ConfigEditorBoolean
+        public boolean onlyClosest = true;
     }
 
 }

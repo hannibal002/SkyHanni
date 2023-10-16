@@ -1,7 +1,14 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.DungeonStartEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
@@ -58,7 +65,7 @@ class DungeonCopilot {
             foundKeyOrDoor = true
         }
 
-        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilterKeysAndDoors) {
+        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) {
             event.blockedReason = "dungeon_keys_and_doors"
         }
 
@@ -119,13 +126,20 @@ class DungeonCopilot {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.copilotEnabled
+        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.dungeonCopilot.enabled
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.copilotPos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        SkyHanniMod.feature.dungeon.dungeonCopilot.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
+        event.move(3, "dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
+        event.move(3, "dungeon.copilotPos", "dungeon.dungeonCopilot.pos")
     }
 }

@@ -5,7 +5,15 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
 import java.util.ArrayList;
@@ -105,7 +113,7 @@ public class CombatConfig {
         public static class EnderSlayerConfig {
 
             @Expose
-            @ConfigOption(name = "Laser phase timer", desc = "Show a timer when the laser phase will end.")
+            @ConfigOption(name = "Laser Phase Timer", desc = "Show a timer when the laser phase will end.")
             @ConfigEditorBoolean
             public boolean laserPhaseTimer = false;
 
@@ -118,11 +126,11 @@ public class CombatConfig {
         @Expose
         @ConfigOption(name = "Vampire Slayer", desc = "")
         @Accordion
-        public DamageIndicatorConfig.VampireSlayerConfig vampireSlayer = new DamageIndicatorConfig.VampireSlayerConfig();
+        public VampireSlayerConfig vampireSlayer = new VampireSlayerConfig();
 
         public static class VampireSlayerConfig {
             @Expose
-            @ConfigOption(name = "HP until Steak", desc = "Show the amount of HP missing until the steak can be used on the Vampire Slayer on top of the boss.")
+            @ConfigOption(name = "HP Until Steak", desc = "Show the amount of HP missing until the Steak can be used on the Vampire Slayer on top of the boss.")
             @ConfigEditorBoolean
             public boolean hpTillSteak = false;
 
@@ -185,14 +193,14 @@ public class CombatConfig {
         @ConfigOption(name = "Text Formatting", desc = "")
         @Accordion
         @Expose
-        public TextFormatting textFormatting = new TextFormatting();
+        public TextFormattingConfig textFormatting = new TextFormattingConfig();
 
-        public static class TextFormatting {
+        public static class TextFormattingConfig {
 
             @ConfigOption(name = "§eText Formatting Info", desc = "§e%session% §ris §e§lalways §rreplaced with\n" +
                     "§7the count for your current session.\n" +
                     "§7Reset when restarting the game.\n" +
-                    "§7You can use §e&Z §7color code to use SBA chroma")
+                    "§7You can use §e&Z §7color code to use SBA chroma.")
             @ConfigEditorInfoText
             public boolean formatInfo = false;
 
@@ -295,9 +303,9 @@ public class CombatConfig {
             @ConfigOption(name = "Bestiary Formatting", desc = "")
             @Accordion
             @Expose
-            public BestiaryFormatting bestiaryFormatting = new BestiaryFormatting();
+            public BestiaryFormattingConfig bestiaryFormatting = new BestiaryFormattingConfig();
 
-            public static class BestiaryFormatting {
+            public static class BestiaryFormattingConfig {
 
                 @Expose
                 @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §7is replaced with\n" +
@@ -337,9 +345,9 @@ public class CombatConfig {
             @ConfigOption(name = "XP Per Hour Formatting", desc = "")
             @Accordion
             @Expose
-            public XPHourFormatting xpHourFormatting = new XPHourFormatting();
+            public XPHourFormattingConfig xpHourFormatting = new XPHourFormattingConfig();
 
-            public static class XPHourFormatting {
+            public static class XPHourFormattingConfig {
 
                 @Expose
                 @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n" +
@@ -363,9 +371,9 @@ public class CombatConfig {
             @ConfigOption(name = "ETA Formatting", desc = "")
             @Accordion
             @Expose
-            public ETAFormatting etaFormatting = new ETAFormatting();
+            public ETAFormattingConfig etaFormatting = new ETAFormattingConfig();
 
-            public static class ETAFormatting {
+            public static class ETAFormattingConfig {
                 @Expose
                 @ConfigOption(name = "ETA to next level", desc = "ETA To Next Level Line.\n" +
                         "§e%value% §7is replaced with one of the text below.")
@@ -405,9 +413,9 @@ public class CombatConfig {
             @ConfigOption(name = "Kill Per Hour Formatting", desc = "")
             @Expose
             @Accordion
-            public KillHourFormatting killHourFormatting = new KillHourFormatting();
+            public KillHourFormattingConfig killHourFormatting = new KillHourFormattingConfig();
 
-            public static class KillHourFormatting {
+            public static class KillHourFormattingConfig {
                 @Expose
                 @ConfigOption(name = "Kill/h", desc = "Kill Per Hour line.\n§e%value% §7is replaced with\nEstimated kills per hour you get.")
                 @ConfigEditorText
@@ -484,7 +492,7 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
-                "§cNot working in dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
+                "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean summoningSoulDisplay = false;
@@ -520,7 +528,6 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(name = "Highlighters", desc = "")
-        @ConfigEditorAccordion(id = 0)
         public boolean highlighters = false;
 
         @Expose
@@ -599,7 +606,7 @@ public class CombatConfig {
         public boolean endermanTeleportationHider = true;
 
         @Expose
-        @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above arachne minis.")
+        @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above Arachne minis.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideNameTagArachneMinis = true;
@@ -637,7 +644,7 @@ public class CombatConfig {
         public int displayType = 0;
 
         @Expose
-        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs")
+        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs.")
         @ConfigEditorBoolean
         public boolean hideMaxed = false;
 

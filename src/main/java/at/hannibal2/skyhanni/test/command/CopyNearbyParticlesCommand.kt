@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

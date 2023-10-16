@@ -1,11 +1,17 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
+import java.lang.reflect.Type
 
 object RepoUtils {
 
@@ -78,12 +84,12 @@ object RepoUtils {
         return false
     }
 
-    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
+    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T? {
         if (!repo.exists()) return null
 
         val jsonFile = File(repo, "constants/$constant.json")
         if (!jsonFile.isFile) {
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 Error("File '$jsonFile' not found!"),
                 "File in repo missing! ($jsonFile). Try §e/shupdaterepo"
             )
@@ -95,7 +101,11 @@ object RepoUtils {
                 StandardCharsets.UTF_8
             )
         ).use { reader ->
-            return gson.fromJson(reader, clazz)
+            if (type == null) {
+                return gson.fromJson(reader, clazz)
+            } else {
+                return gson.fromJson(reader, type)
+            }
         }
     }
 }

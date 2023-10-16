@@ -7,9 +7,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import java.util.*
+import net.minecraft.util.ResourceLocation
+import java.util.Locale
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
@@ -106,6 +109,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.asInternalName()
 
+    fun ItemStack.getEnrichment() = getAttributeString("talisman_enrichment")
+
     fun ItemStack.getHelmetSkin() = getAttributeString("skin")?.asInternalName()
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
@@ -142,7 +147,14 @@ object SkyBlockItemModifierUtils {
             }.sortedBy { it.first }
         }
 
-    fun ItemStack.getReforgeName() = getAttributeString("modifier")
+    fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
+        when {
+            it == "pitchin" -> "pitchin_koi"
+            it == "warped" && name!!.removeColor().startsWith("Hyper ") -> "endstone_geode"
+
+            else -> it
+        }
+    }
 
     fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")
 
@@ -177,6 +189,10 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getRecipientName() = getAttributeString("recipient_name")
 
     fun ItemStack.getItemUuid() = getAttributeString("uuid")
+
+    fun ItemStack.getItemId() = getAttributeString("id")
+
+    fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()

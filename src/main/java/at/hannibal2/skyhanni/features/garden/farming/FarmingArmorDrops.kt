@@ -1,14 +1,25 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class FarmingArmorDrops {
     private var display = emptyList<String>()
@@ -16,7 +27,7 @@ class FarmingArmorDrops {
 
     private var hasArmor = false
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.farmingArmorDrop
 
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
@@ -35,7 +46,7 @@ class FarmingArmorDrops {
         for (dropType in ArmorDropType.entries) {
             if (dropType.chatMessage == event.message) {
                 addDrop(dropType)
-                if (config.farmingArmorDropsHideChat) {
+                if (config.hideChat) {
                     event.blockedReason = "farming_armor_drops"
                 }
             }
@@ -69,18 +80,18 @@ class FarmingArmorDrops {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.farmingArmorDropsEnabled) return
+        if (!config.enabled) return
         if (!hasArmor) return
 
-        config.farmingArmorDropsPos.renderStrings(display, posLabel = "Farming Armor Drops")
+        config.pos.renderStrings(display, posLabel = "Farming Armor Drops")
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.farmingArmorDropsEnabled) return
+        if (!config.enabled) return
 
         if (event.isMod(30)) {
             checkArmor()
@@ -92,5 +103,51 @@ class FarmingArmorDrops {
             .mapNotNull { it?.getInternalName_old() }
             .count { armorPattern.matcher(it).matches() }
         hasArmor = armorPieces > 1
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        try {
+            val data = event.getConstant<ArmorDropsJson>("ArmorDrops") ?: error("ArmorDrops not found in repo")
+            armorDropInfo = data.special_crops
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LorenzUtils.error("error in RepositoryReloadEvent")
+        }
+    }
+
+    companion object {
+        var armorDropInfo = mapOf<String, ArmorDropsJson.DropInfo>()
+        private var currentArmorDropChance = 0.0
+        private var lastCalculationTime = SimpleTimeMark.farPast()
+
+        fun getDropsPerHour(crop: CropType?): Double {
+            if (crop == null) return 0.0
+
+            if (lastCalculationTime.passedSince() > 5.seconds) {
+                lastCalculationTime = SimpleTimeMark.now()
+
+                val armorDropName = crop.specialDropType
+                val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
+                val pieceCount = InventoryUtils.getArmor()
+                    .mapNotNull { it?.getInternalName_old() }
+                    .count { it.contains(armorName) || it.contains("FERMENTO") }
+
+                val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
+                var dropRate = 0.0
+                if (pieceCount > 0 && dropRates.size >= pieceCount) {
+                    dropRate = dropRates[pieceCount - 1]
+                }
+                currentArmorDropChance = (dropRate * 60 * 60.0) / 100
+            }
+            return currentArmorDropChance
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.farmingArmorDropsEnabled", "garden.farmingArmorDrop.enabled")
+        event.move(3, "garden.farmingArmorDropsHideChat", "garden.farmingArmorDrop.hideChat")
+        event.move(3, "garden.farmingArmorDropsPos", "garden.farmingArmorDrop.pos")
     }
 }
