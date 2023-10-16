@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -65,7 +66,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
             if (!(chestName.contains("Auction")) && !(chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && !(chestName.contains("Contacts Directory"))) {
-                if (((itemName.contains("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)) && (lore.any { it.contains("▶ ") }))) || ((itemName.contains("Filter") && (item.getItem() is ItemEnderEye)) && (lore.any { it.contains("▶ ") }))) {
+                if (((itemName.contains("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)) && (lore.anyContains("▶ ") ))) || ((itemName.contains("Filter") && (item.getItem() is ItemEnderEye)) && (lore.anyContains("▶ ")))) {
                     for (line in lore) {
                         if (line.contains("▶ ")) {
                             return line.removeColor().replace("▶ ","").replace(" ","").take(3)
@@ -232,7 +233,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 return "${totalSlotsResult}"
             }
             if (chestName.contains("Stats Tuning") && itemName == ("Stats Tuning")) {
-                if (lore.any { it.contains("Tuning Points: ") }) {
+                if (lore.anyContains("Tuning Points: ")) {
                     for (line in lore) {
                         if (line.contains("Tuning Points: ")) {
                             tuningPointsPattern.matchMatcher(line) {
@@ -281,7 +282,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             val lore = item.getLore()
             var theStringToUse = ""
             if (!(lore.isEmpty()) && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
-                if (lore.any { it.contains(" in: ") }) {
+                if (lore.anyContains(" in: ")) {
                     for (line in lore) {
                         if (line.contains(" in: ")) {
                             theStringToUse = line
@@ -291,7 +292,6 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
             if (!(lore.isEmpty()) && lore.first().contains(" in: ") && chestName == ("Calendar and Events")) {
                 theStringToUse = lore.first()
-            }
                 genericDurationPattern.matchMatcher(theStringToUse) {
                     val yString = group("years") ?: ""
                     val dString = group("days") ?: ""
@@ -304,6 +304,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return "§a${mString}"
                     if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return "§a${sString}"
                 }
+            }
         }
 
         if (stackSizeConfig.contains(9) && (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements"))) {

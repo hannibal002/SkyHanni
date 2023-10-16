@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -27,7 +28,7 @@ class MenuItemDisplayOverlayMining {
         
         if (stackSizeConfig.contains(0) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
-            if (lore.last().contains("Right-click to ") && lore.last().contains("disable") && lore.any { it.contains("Your Current Effect") }) {
+            if (lore.last().contains("Right-click to ") && lore.last().contains("disable") && lore.anyContains("Your Current Effect")) {
                 // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
                 /*
                 "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
@@ -82,7 +83,7 @@ class MenuItemDisplayOverlayMining {
             if (nameWithColor.contains("§a")) return ""
             val lore = item.getLore()
             if (lore != null && !(lore.isEmpty())) {
-                if ((lore.any { it.contains("Progress: ") }) && (lore.any { it.contains("%") })) {
+                if ((lore.anyContains("Progress: ")) && (lore.anyContains("%"))) {
                     for (line in lore) {
                         if (line.contains("Progress: ") && line.contains("%")) {
                             return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
