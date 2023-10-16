@@ -42,7 +42,7 @@ class FandomWikiFromMenus {
         } else if (event.slotId == 15 && itemClickedName.contains("Wikithis Command") && chestName.contains("Wiki")) {
             placeHolderOne = itemInHandName
             placeHolderTwo = internalName
-        } else if (itemClickedStack.getLore().any { it.lowercase().contains("wiki") }) { //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
+        } else if (itemClickedStack.getLore().anyContains("wiki") && !(itemClickedStack.getLore().anyContains("wikipedia"))) { //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
             placeHolderOne = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
             placeHolderTwo = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
         } else return
