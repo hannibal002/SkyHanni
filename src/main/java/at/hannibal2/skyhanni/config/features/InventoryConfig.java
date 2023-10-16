@@ -158,6 +158,11 @@ public class InventoryConfig {
         public boolean enabled = true;
 
         @Expose
+        @ConfigOption(name = "Highlight Full", desc = "Highlight items that are full in red.\n§eDo not need the option above to be enabled.")
+        @ConfigEditorBoolean
+        public boolean highlightFull = true;
+
+        @Expose
         @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers.\n" +
                 "§eDefault: §72,240/2.2k\n" +
                 "§eFormatted: §72.2k/2.2k\n" +

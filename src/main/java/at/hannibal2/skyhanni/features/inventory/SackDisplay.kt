@@ -2,18 +2,19 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,6 +32,20 @@ object SackDisplay {
                 display, extraSpace = config.extraSpace, itemScale = 1.3, posLabel = "Sacks Items"
             )
         }
+    }
+
+    @SubscribeEvent
+    fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!SackAPI.inSackInventory) return
+        if (!config.highlightFull) return
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val stack = slot.stack
+            val lore = stack.getLore()
+            if (lore.any { it.startsWith("§7Stored: §a")}) {
+                slot highlight LorenzColor.RED
+            }
+        }
+
     }
 
     fun update(savingSacks: Boolean) {
@@ -94,7 +109,7 @@ object SackDisplay {
                                 listOf(
                                     "§6Magmafish: §b${magmaFish.toLong().addSeparators()}",
                                     "§6Magmafish value: §b${price / magmaFish.toLong()}",
-                                    "§6Magmafish per: §b${magmaFish.toLong()/stored.toLong()}"
+                                    "§6Magmafish per: §b${magmaFish.toLong() / stored.toLong()}"
 
                                 )
                             )
