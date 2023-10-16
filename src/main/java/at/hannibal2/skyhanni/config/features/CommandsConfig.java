@@ -38,12 +38,6 @@ public class CommandsConfig {
         public boolean onlyBestFriends = false;
 
         @Expose
-        @ConfigOption(name = "Party", desc = "Tab complete commonly used party commands.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean partyCommands = true;
-
-        @Expose
         @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users with cake souls on it.")
         @ConfigEditorBoolean
         @FeatureToggle
@@ -54,6 +48,12 @@ public class CommandsConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean gfsSack = true;
+
+        @Expose
+        @ConfigOption(name = "Party Commands", desc = "Tab complete commonly used party commands.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean partyCommands = true;
     }
 
     @Expose
