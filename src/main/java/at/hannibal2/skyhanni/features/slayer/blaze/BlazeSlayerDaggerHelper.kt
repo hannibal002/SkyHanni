@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -36,7 +37,7 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blazeHideDaggerWarning) return
+        if (!SkyHanniMod.feature.slayer.blazes.hellion.hideDaggerWarning) return
 
         val message = event.message
         if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
@@ -67,7 +68,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazeFirstDagger]
+        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazes.hellion.firstDagger]
         val second = first.other()
 
         textTopLeft = format(holding, true, first)
@@ -77,7 +78,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun findNearest(): HellionShield? {
-        if (!SkyHanniMod.feature.slayer.blazeMarkRightHellionShield) return null
+        if (!SkyHanniMod.feature.slayer.blazes.hellion.markRightHellionShield) return null
 
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()
@@ -193,7 +194,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazeDaggers
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.daggers
     }
 
     @SubscribeEvent
@@ -311,6 +312,15 @@ class BlazeSlayerDaggerHelper {
         )
         GlStateManager.popMatrix()
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "slayer.blazeDaggers", "slayer.blazes.hellion.daggers")
+        event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
+        event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
+        event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
+    }
+
 }
 
 private fun HellionShield.other(): HellionShield {

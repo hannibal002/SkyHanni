@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatModifier {
 
+    private val config get() = SkyHanniMod.feature.chat.playerMessage
     private val patterns = mutableListOf<Regex>()
 
     init {
@@ -58,7 +60,7 @@ class PlayerChatModifier {
     private fun cutMessage(input: String): String {
         var string = input
 
-        if (SkyHanniMod.feature.chat.playerRankHider) {
+        if (config.playerRankHider) {
             for (pattern in patterns) {
                 string = string.replace(pattern, "§b$1")
             }
@@ -72,7 +74,7 @@ class PlayerChatModifier {
             }
         }
 
-        if (SkyHanniMod.feature.chat.chatFilter && string.contains("§r§f: ") && PlayerChatFilter.shouldChatFilter(string)) {
+        if (config.chatFilter && string.contains("§r§f: ") && PlayerChatFilter.shouldChatFilter(string)) {
             string = string.replace("§r§f: ", "§r§7: ")
         }
 
@@ -84,4 +86,12 @@ class PlayerChatModifier {
 
         return string
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
+        event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")
+    }
+
+
 }

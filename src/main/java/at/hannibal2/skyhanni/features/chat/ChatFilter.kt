@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
@@ -9,7 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChatFilter {
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.filterType
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -347,5 +348,19 @@ class ChatFilter {
         message == "§6You have successfully picked the lock on this chest!" -> true
 
         else -> false
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
+        event.move(3, "chat.empty", "chat.filterType.empty")
+        event.move(3, "chat.warping", "chat.filterType.warping")
+        event.move(3, "chat.guildExp", "chat.filterType.guildExp")
+        event.move(3, "chat.friendJoinLeft", "chat.filterType.friendJoinLeft")
+        event.move(3, "chat.winterGift", "chat.filterType.winterGift")
+        event.move(3, "chat.powderMining", "chat.filterType.powderMining")
+        event.move(3, "chat.killCombo", "chat.filterType.killCombo")
+        event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
+        event.move(3, "chat.others", "chat.filterType.others")
     }
 }
