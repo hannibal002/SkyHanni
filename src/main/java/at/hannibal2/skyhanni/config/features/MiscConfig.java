@@ -669,8 +669,8 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Adds extra symbols to the chat such as those from ironman, " +
-                "stranded, bingo or nether factions and places them next to your regular player emblems. " +
-                "Also allows emblems without sb level in chat.")
+                "stranded, bingo or nether factions and places them next to your regular player emblems. §eDoes" +
+                " not work with hide rank hider!")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
