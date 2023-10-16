@@ -37,7 +37,8 @@ class FandomWikiFromMenus {
         var placeHolderTwo = ""
 
         if ((itemInHandName == "") || (event.slotId == 11 && itemClickedName.contains("Wiki Command") && chestName.contains("Wiki"))) {
-            LorenzUtils.clickableChat("§e[SkyHanni] Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki") return
+            LorenzUtils.clickableChat("§e[SkyHanni] Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
+            return
         } else if (event.slotId == 15 && itemClickedName.contains("Wikithis Command") && chestName.contains("Wiki")) {
             placeHolderOne = itemInHandName
             placeHolderTwo = internalName
