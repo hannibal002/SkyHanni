@@ -25,7 +25,7 @@ class FandomWikiFromMenus {
     fun onSlotClick(event: SlotClickEvent) {
         val chestName = InventoryUtils.openInventoryName()
 
-        if (chestName.isEmpty() || !isEnabled()) return
+        if (chestName.isEmpty() || !isEnabled() || !LorenzUtils.inSkyBlock) return
 
         val itemClickedStack = event.slot.stack
         val itemClickedName = itemClickedStack.displayName

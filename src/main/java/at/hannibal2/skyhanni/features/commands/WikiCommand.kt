@@ -16,7 +16,7 @@ class WikiCommand {
     fun onSendPacket(event: PacketEvent.SendEvent) {
         val packet = event.packet
 
-        if (!SkyHanniMod.feature.commands.useFandomWiki) return
+        if (!SkyHanniMod.feature.commands.useFandomWiki || !LorenzUtils.inSkyBlock) return
 
         if (packet is C01PacketChatMessage) {
             val message = packet.message.lowercase()
