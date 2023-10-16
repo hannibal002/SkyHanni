@@ -224,20 +224,21 @@ object SackAPI {
             val internalName = NEUInternalName.fromItemName(item)
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
-        SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved).postAndCatch()
+        val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
+        updateSacks(sackEvent)
+        sackEvent.postAndCatch()
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }
     }
 
-    @SubscribeEvent
-    fun sackChange(event: SackChangeEvent) {
+    private fun updateSacks(changes: SackChangeEvent) {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
 
         // if it gets added and subtracted but only 1 shows it will be outdated
         val justChanged = mutableMapOf<NEUInternalName, Int>()
 
-        for (change in event.sackChanges) {
+        for (change in changes.sackChanges) {
             if (change.internalName in justChanged) {
                 justChanged[change.internalName] = (justChanged[change.internalName] ?: 0) + change.delta
             } else {
@@ -254,36 +255,37 @@ object SackAPI {
                     newAmount = 0
                     changed = 0
                 }
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.outdatedStatus) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.status) }
             } else {
                 val newAmount = if (item.value > 0) item.value else 0
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount.toLong(), newAmount, 2) }
+                sackData =
+                    sackData.editCopy { this[item.key] = SackItem(newAmount.toLong(), newAmount, SackStatus.OUTDATED) }
             }
         }
 
-        if (event.otherItemsAdded || event.otherItemsRemoved) {
+        if (changes.otherItemsAdded || changes.otherItemsRemoved) {
             for (item in sackData) {
                 if (item.key in justChanged) continue
                 val oldData = sackData[item.key]
-                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 0, 1) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 0, SackStatus.ALRIGHT) }
             }
         }
         saveSackData()
     }
 
     private fun setSackItem(item: NEUInternalName, amount: Long) {
-        sackData = sackData.editCopy { this[item] = SackItem(amount, 0, 0) }
+        sackData = sackData.editCopy { this[item] = SackItem(amount, 0, SackStatus.CORRECT) }
     }
 
     fun fetchSackItem(item: NEUInternalName): SackItem {
-        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, -1)
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, SackStatus.MISSING)
 
         if (sackData.containsKey(item)) {
-            return sackData[item] ?: return SackItem(0, 0, -1)
+            return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
         }
 
-        sackData = sackData.editCopy { this[item] = SackItem(0, 0, 2) }
-        return sackData[item] ?: return SackItem(0, 0, -1)
+        sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.OUTDATED) }
+        return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
     }
 
     fun commandGetFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
@@ -321,13 +323,10 @@ object SackAPI {
     )
 }
 
-// status -1 = fetching data failed, 0 = < 1% of being wrong, 1 = 10% of being wrong, 2 = is 100% wrong
-// lastChange is set to 0 when value is refreshed in the sacks gui and when being set initially
-// if it didn't change in an update the lastChange value will stay the same and not be set to 0
 data class SackItem(
     @Expose val amount: Long,
     @Expose val lastChange: Int,
-    @Expose val outdatedStatus: Int
+    @Expose val status: SackStatus
 )
 
 private val gemstoneMap = mapOf(
@@ -340,3 +339,11 @@ private val gemstoneMap = mapOf(
     "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
     "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
 )
+
+// ideally should be correct but using alright should also be fine unless they sold their whole sacks
+enum class SackStatus {
+    MISSING,
+    CORRECT,
+    ALRIGHT,
+    OUTDATED;
+}
