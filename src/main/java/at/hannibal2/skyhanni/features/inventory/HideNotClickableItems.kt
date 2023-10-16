@@ -401,10 +401,8 @@ class HideNotClickableItems {
         }
 
         if (!ItemUtils.isRecombobulated(stack)) {
-            if (LorenzUtils.noTradeMode) {
-                if (BazaarApi.isBazaarItem(stack)) {
-                    return false
-                }
+            if (LorenzUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) {
+                return false
             }
 
             if (hideNpcSellFilter.match(name)) return false
