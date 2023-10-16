@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -20,7 +21,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.visitors.timer
     private val patternNextVisitor = " Next Visitor: §r§b(?<time>.*)".toPattern()
     private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
     private var render = ""
@@ -147,7 +148,7 @@ class GardenVisitorTimer {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")
+        config.pos.renderString(render, posLabel = "Garden Visitor Timer")
     }
 
     @SubscribeEvent
@@ -172,7 +173,15 @@ class GardenVisitorTimer {
         }
     }
 
-    private fun isSixthVisitorEnabled() = config.visitorTimerSixthVisitorEnabled
-    private fun isSixthVisitorWarningEnabled() = config.visitorTimerSixthVisitorWarning
-    private fun isEnabled() = GardenAPI.inGarden() && config.visitorTimerEnabled
+    private fun isSixthVisitorEnabled() = config.sixthVisitorEnabled
+    private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.visitorTimerEnabled", "garden.visitors.timer.enabled")
+        event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
+        event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitors.timer.sixthVisitorWarning")
+        event.move(3, "garden.visitorTimerPos", "garden.visitors.timer.pos")
+    }
 }
