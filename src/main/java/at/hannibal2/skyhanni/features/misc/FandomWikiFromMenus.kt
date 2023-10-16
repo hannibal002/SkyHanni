@@ -43,13 +43,13 @@ class FandomWikiFromMenus {
         } else if (event.slotId == 15 && itemClickedName.contains("Wikithis Command") && chestName.contains("Wiki")) {
             placeHolderOne = itemInHandName
             placeHolderTwo = internalName
-        } else if (itemClickedStack.getLore().anyContains("wiki") && !(itemClickedStack.getLore().anyContains("wikipedia"))) { //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
+        } else if ((itemClickedStack.getLore().anyContains("Wiki") || itemClickedStack.getLore().anyContains("wiki")) && !(itemClickedStack.getLore().anyContains("wikipedia"))) { //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
             placeHolderOne = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
             placeHolderTwo = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
         } else return
-        LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $placeHolderOne §eon the Hypixel Skyblock Fandom Wiki!", "wiki $placeHolderTwo")
+        LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for $placeHolderOne §eon the Hypixel Skyblock Fandom Wiki!", "wiki $placeHolderTwo")
         event.isCanceled = true
 
     }
-    private fun isEnabled() = SkyHanniMod.feature.commands.useFandomWiki
+    private fun isEnabled() = SkyHanniMod.feature.commands.fandomWiki.useFandomWiki
 }

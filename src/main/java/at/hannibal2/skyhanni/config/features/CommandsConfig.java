@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class CommandsConfig {
 
@@ -56,11 +58,24 @@ public class CommandsConfig {
         public boolean gfsSack = true;
     }
 
+    @ConfigOption(name = "Fandom Wiki for §e/wiki", desc = "")
+    @Accordion
     @Expose
-    @ConfigOption(name = "Fandom Wiki", desc = "Use Fandom wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7).")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean useFandomWiki = false;
+    public FandomWikiCommmandConfig fandomWiki = new FandomWikiCommmandConfig();
+
+    public static class FandomWikiCommmandConfig {
+
+        @Expose
+        @ConfigOption(name = "Use Fandom", desc = "Use Fandom wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7).")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean useFandomWiki = false;
+
+        @Expose
+        @ConfigOption(name = "Fandom Wiki Key", desc = "Search for an item on Fandom Wiki with this keybind.\n§4For optimal experiences, do §lNOT§r §4bind this to a mouse button.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int fandomWikiKeybind = Keyboard.KEY_NONE;
+    }
 
     @Expose
     @ConfigOption(name = "Party transfer", desc = "Allows §e/pt <player> §7as alias for §e/party transfer§7.\n" +
