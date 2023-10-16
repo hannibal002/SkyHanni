@@ -19,13 +19,11 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class FandomWiki {
+class FandomWikiFromMenus {
     private var inInventory = false
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        inInventory = false
-        if (!event.inventoryName.contains("Wiki")) return
         inInventory = true
     }
 
