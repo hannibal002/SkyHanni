@@ -32,6 +32,7 @@ class SeaCreatureManager {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         seaCreatureMap.clear()
+        allFishingMobs.clear()
         var counter = 0
 
         try {
@@ -52,6 +53,7 @@ class SeaCreatureManager {
                     counter++
                 }
             }
+            SeaCreatureManager.allFishingMobs = allFishingMobs
             LorenzUtils.debug("Loaded $counter sea creatures from repo")
 
         } catch (e: Exception) {
