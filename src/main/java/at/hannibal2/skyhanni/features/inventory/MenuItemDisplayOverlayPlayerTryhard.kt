@@ -321,11 +321,11 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     val hString = group("hours") ?: ""
                     val mString = group("minutes") ?: ""
                     val sString = group("seconds") ?: ""
-                    if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return yString
-                    if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return dString
-                    if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return hString
-                    if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return mString
-                    if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return sString
+                    if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return "§a" + yString
+                    if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return "§a" + dString
+                    if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return "§a" + hString
+                    if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return "§a" + mString
+                    if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return "§a" + sString
                 }
         }
 
