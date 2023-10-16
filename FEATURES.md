@@ -5,6 +5,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Chat
 </summary>
+
 + Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
   player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
 + Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
@@ -43,6 +44,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Dungeon
 </summary>
+
 + Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, Wither Essence or a lever)
 + Current milestone display.
 + Death Counter (Changing color depending on amount, hidden at 0 deaths)
@@ -75,6 +77,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Inventory
 </summary>
+
 + Not Clickable Items
     + Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
       around items that meet that requirement.
@@ -125,6 +128,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Item Abilities
 </summary>
+
 + Show the **cooldown of items** in the inventory. - hannibal2
     + Option to change the item background according to the cooldown.
     + Supports dungeon mage cooldown reduction. - Cad
@@ -135,6 +139,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Summoning Mobs
 </summary>
+
 - Summoning Soul Display (Show the name of dropped soul lying on the ground, not working in dungeon when Skytils' "Hide
   Non-Starred Mobs Nametags" is enabled)
 - Option to hide the nametag of your spawned summoning mobs.
@@ -146,6 +151,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Ashfang
 </summary>
+
 - Show a cooldown when the player gets an ability block effect during the ashfang fight.
 - Display a timer until Ashfang brings his underlings back to him.
 - Ashfang Gravity Orbs display.
@@ -159,6 +165,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Minion
 </summary>
+
 - A display that show the last time the hopper inside a minion has been emptied.
 - A marker to the last opened minion for a couple of seconds (seen through walls)
 - Option to hide mob nametags close to minions.
@@ -172,6 +179,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Bazaar
 </summary>
+
 + Showing colors in the order inventory for outbid or fully bought/sold items.
 + Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
 + Saves missing items from canceled buy orders to clipboard for faster re-entry.
@@ -183,6 +191,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Fishing
 </summary>
+
 + **Trophy Counter**
     + After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total.
     + **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - appable0
@@ -220,6 +229,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Damage Indicator
 </summary>
+
 - Show the remaining health of selected bosses in the game in a bigger GUI.
 - Send a chat message when the boss is healing himself.
 - Option to hide or shorten the boss name above the health display.
@@ -243,6 +253,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Slayer
 </summary>
+
 + Hide poor slayer drop chat messages.
 + Slayer **Mini Boss:**
     + Highlight the mob.
@@ -311,6 +322,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Marked Players
 </summary>
+
 + Adding or removing players as marked with command /shmarkplayer
 + Highlight marked players in the world.
 + Highlight marked player names in chat.
@@ -320,6 +332,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Bingo
 </summary>
+
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
 </details>
@@ -327,6 +340,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Mobs
 </summary>
+
 + Arachne keeper highlighter.
 + Area boss highlighter.
 + Area boss spawn timer.
@@ -343,6 +357,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Garden Features
 </summary>
+
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + **Visitor Display** - Show all items needed for the visitors.
 + **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs
@@ -541,6 +556,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Mining
 </summary>
+
 + **Highlight Commission Mobs** - hannibal2
     + Highlight Mobs that are part of active commissions
 + Show the names of the **4 areas** while in the center of **crystal Hollows**.
@@ -556,6 +572,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Events
 </summary>
+
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
 + Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
     + Thanks Tobbbb for the coordinates!
@@ -566,6 +583,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Commands
 </summary>
+
 + **/shcommands**
     + Show all commands in SkyHanni
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
@@ -584,6 +602,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Misc
 </summary>
+
 + Allow to paste text from clipboard in signs
 + Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with
   auto-pet support)
@@ -739,6 +758,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Cosmetics
 </summary>
+
 + **Following Line** - hannibal2
     + Draws a colored line behind the player.
     + Change the color, width, and duration of the line.
