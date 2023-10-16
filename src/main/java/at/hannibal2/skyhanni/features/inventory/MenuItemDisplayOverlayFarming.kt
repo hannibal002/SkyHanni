@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -51,7 +50,7 @@ class MenuItemDisplayOverlayFarming {
         if (stackSizeConfig.contains(2) && (chestName == "Visitor Milestones")) {
             val lore = item.getLore()
             if (!(lore.isEmpty())) {
-                if ((lore.anyContains("Progress ")) && (lore.anyContains(": ")) && (lore.anyContains("%"))) {
+                if ((lore.any { it.contains("Progress ") }) && (lore.any { it.contains(": ") }) && (lore.any { it.contains("%") })) {
                     for (line in lore) {
                         if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
                             return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
@@ -63,12 +62,12 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(3) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
-            if (!(lore.isEmpty()) && (lore.anyContains("Times Visited: "))) {
+            if (!(lore.isEmpty()) && (lore.any { it.contains("Times Visited: ") })) {
                 return lore.first().take(5).replace("T", "☉")
             }
         }
 
-        if (stackSizeConfig.contains(4) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from ")) && (item.getLore().anyContains("Totalling "))) {
+        if (stackSizeConfig.contains(4) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from ")) && (item.getLore().any { (it.contains("Totalling ")) })) {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.contains("Totalling ")) {

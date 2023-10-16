@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -88,7 +87,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(5) && (itemName.contains(" Minion ")) && !(itemName.endsWith(" Recipes")) && (item.getLore().anyContains("Place this minion"))) {
+        if (stackSizeConfig.contains(5) && (itemName.contains(" Minion ")) && !(itemName.endsWith(" Recipes")) && (item.getLore().any { it.contains("Place this minion") })) {
             val array = itemName.split(" ")
             val last = array[array.size - 1]
             return last.romanToDecimal().toString()
@@ -166,7 +165,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(13) && itemName.contains("Fruit Bowl")) {
             val lore = item.getLore()
-            if (lore.anyContains(" found:")) {
+            if (lore.any { it.contains(" found:") }) {
                 var numFound = 0
                 for (line in lore) {
                     if (line.contains("§e")) {
@@ -206,7 +205,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(18) && internalName == ("THE_SHREDDER")) {
             val lore = item.getLore()
-                if ((lore.anyContains("cap): ")) && (lore.anyContains("Bonus Damage "))) {
+                if ((lore.any { it.contains("cap): ") }) && (lore.any { it.contains("Bonus Damage ") })) {
                     for (line in lore) {
                         whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern.matchMatcher(line) {
                             return group("dmgbonus")
@@ -217,7 +216,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(19) && internalName == ("BOTTLE_OF_JYRRE")) {
             val lore = item.getLore()
-            if (lore.anyContains("Intelligence Bonus: ")) {
+            if (lore.any { it.contains("Intelligence Bonus: ")}) {
                 for (line in lore) {
                     iReallyHateTheBottleOfJerryPattern.matchMatcher(line) {
                         return group("intelbonus")
@@ -322,10 +321,10 @@ class ItemDisplayOverlayFeatures {
 		
 		if (stackSizeConfig.contains(25)) {
             var thatNumber = ""
-            if (item.getLore().anyContains("Auction ")) {
+            if (item.getLore().any { it.contains("Auction ") }) {
                 thatNumber = item.getAuctionNumber().toString()
             }
-            if (item.getLore().anyContains("Edition ")) {
+            if (item.getLore().any { it.contains("Edition ") }) {
                 thatNumber = item.getEdition().toString()
             }
             if (thatNumber == "null") { return "" }
