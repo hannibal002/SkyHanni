@@ -67,7 +67,6 @@ object PartyCommands {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "commands.usePartyTransferAlias", "commands.shortCommands")
-        event.move(3, "commands.tabComplete.party", "commands.tabComplete.partyCommands")
     }
 }
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
+import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.jsonobjects.VipVisitsJson
@@ -60,6 +61,12 @@ object PlayerTabComplete {
                     if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
                         add(entity.name)
                     }
+                }
+            }
+
+            if (config.party) {
+                for (member in PartyAPI.partyMembers) {
+                    add(member)
                 }
             }
 

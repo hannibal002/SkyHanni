@@ -38,6 +38,12 @@ public class CommandsConfig {
         public boolean onlyBestFriends = false;
 
         @Expose
+        @ConfigOption(name = "Party", desc = "Tab complete Party Members.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean party = true;
+
+        @Expose
         @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users with cake souls on it.")
         @ConfigEditorBoolean
         @FeatureToggle
