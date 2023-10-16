@@ -34,8 +34,8 @@ class WikiCommand {
                     LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$itemInHandName")
                     url = "$url$internalName&scope=internal"
                 } else {
-                    val search = message.split("/wiki ").last()
-                    LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a${search.capitalize()}") //.capitalize() to undo the manipulation in line 22
+                    val search = packet.message.split("/wiki ").last()
+                    LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$search")
                     url = "$url$search&scope=internal"
                 }
                 OSUtils.openBrowser(url.replace(' ', '+'))
