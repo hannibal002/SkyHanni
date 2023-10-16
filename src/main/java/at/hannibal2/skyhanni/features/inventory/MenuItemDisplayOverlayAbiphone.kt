@@ -25,28 +25,6 @@ class MenuItemDisplayOverlayAbiphone {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberAbiphoneAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        /*
-        -------------------------------IMPORTANT------------------------------------
-        
-        If at *any* point someone tells you to not nest your code, do the following
-        (in any order, but more importantly in the order given below):
-        - tell them to "cope and seethe", especially if they cite CodeAesthetic
-        - kindly remind them that the last time someone attempted this, friendships
-          were almost shattered in the process
-        - you will lose your sanity as you try to figure out what the fuck went wrong
-          in your forays with string manipulation
-        - remind them of the Single-responsibility Principle:
-          https://en.wikipedia.org/wiki/Single-responsibility_principle
-        - make sure you have an IDE capable of debugging within your reach
-        
-        This concludes the PSA. Happy writing! -Erymanthus
-
-        PS: T'was all a joke. Just don't do stupid shit like
-        ` if (!(chestName == "Visitor's Logbook")) return "" `
-        and you *should* be fine for the most part.
-        ----------------------------------------------------------------------------
-        */
-
         //NOTE: IT'S String.length, NOT String.length()!
         
         if ((stackSizeConfig.contains(0)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && (itemName == ("Contacts Directory"))) {
