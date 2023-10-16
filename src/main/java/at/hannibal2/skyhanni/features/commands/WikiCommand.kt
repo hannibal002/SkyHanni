@@ -51,8 +51,9 @@ class WikiCommand {
     @SubscribeEvent
     fun onKeyClickWithTooltipActive(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getMinecraft().currentScreen == null) return
         if (NEUItems.neuHasFocus()) return //because good heavens if this worked on neuitems...
+
 
         if (Keyboard.isKeyDown(config.fandomWikiKeybind)) {
             val itemUnderCursor = event.itemStack ?: return
