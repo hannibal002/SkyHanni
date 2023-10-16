@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -66,7 +67,7 @@ class WikiCommand {
         val internalName = item.getInternalName().asString() ?: return
         LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$itemDisplayName")
         if (internalName != "NONE") wikiUrlSearch = "$urlSearchPrefix$internalName&scope=internal"
-        else wikiUrlSearch = "$urlSearchPrefix$itemDisplayName&scope=internal"
+        else wikiUrlSearch = "$urlSearchPrefix${itemDisplayName.removeColor()}&scope=internal"
         OSUtils.openBrowser(wikiUrlSearch.replace(' ', '+'))
     }
 
