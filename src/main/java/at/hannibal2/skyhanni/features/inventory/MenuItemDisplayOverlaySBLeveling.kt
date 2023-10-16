@@ -26,7 +26,6 @@ class MenuItemDisplayOverlaySBLeveling {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberSBLevelingAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
         
         if (stackSizeConfig.contains(0)) {
             if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (!(itemName.isEmpty()))) {

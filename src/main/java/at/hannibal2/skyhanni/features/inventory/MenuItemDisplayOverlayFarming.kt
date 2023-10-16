@@ -25,7 +25,6 @@ class MenuItemDisplayOverlayFarming {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberFarmingAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
 
         if (stackSizeConfig.contains(0) && ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!"))) {
             var gold = "§60"

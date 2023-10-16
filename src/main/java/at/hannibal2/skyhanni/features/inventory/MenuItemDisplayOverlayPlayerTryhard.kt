@@ -45,7 +45,6 @@ class MenuItemDisplayOverlayPlayerTryhard {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerTryhardAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
         
         if (stackSizeConfig.contains(0)) {
             val lore = item.getLore()

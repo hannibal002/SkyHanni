@@ -39,7 +39,6 @@ class MenuItemDisplayOverlayPlayer {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
 
         if (stackSizeConfig.contains(0) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
             for (line in item.getLore()) {

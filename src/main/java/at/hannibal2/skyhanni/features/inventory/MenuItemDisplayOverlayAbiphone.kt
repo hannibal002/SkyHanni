@@ -25,7 +25,6 @@ class MenuItemDisplayOverlayAbiphone {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberAbiphoneAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
         
         if ((stackSizeConfig.contains(0)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && (itemName == ("Contacts Directory"))) {
             for (line in item.getLore()) {

@@ -30,7 +30,6 @@ class MenuItemDisplayOverlayCombat {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberCombatAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
 
         if (stackSizeConfig.contains(0) && ((chestName.contains("Bestiary")) && !(itemName.isEmpty()) && (itemName.contains("Bestiary Milestone ")))) {
             return itemName.split(" ").last()

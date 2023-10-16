@@ -24,8 +24,7 @@ class MenuItemDisplayOverlayMining {
         if (SkyHanniMod.feature.inventory.menuItemNumberMiningAsStackSize.isEmpty()) return ""
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberMiningAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
-
+        
         if (stackSizeConfig.contains(0) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
             if (lore.last().contains("Right-click to ") && lore.last().contains("disable") && lore.any { it.contains("Your Current Effect") }) {

@@ -42,7 +42,6 @@ class ItemDisplayOverlayFeatures {
         val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
         val chestName = InventoryUtils.openInventoryName()
         val internalName = item.getInternalName().asString()
-        //NOTE: IT'S String.length, NOT String.length()!
 
         if (stackSizeConfig.contains(0)) {
             when (itemName) {

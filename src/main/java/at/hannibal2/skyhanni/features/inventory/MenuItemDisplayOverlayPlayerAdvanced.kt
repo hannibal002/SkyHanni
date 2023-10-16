@@ -74,7 +74,6 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerAdvancedAsStackSize
         val chestName = InventoryUtils.openInventoryName()
-        //NOTE: IT'S String.length, NOT String.length()!
 
         if (stackSizeConfig.contains(0)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
