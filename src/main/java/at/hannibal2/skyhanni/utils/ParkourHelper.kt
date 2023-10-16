@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,9 +38,9 @@ class ParkourHelper(
         visible = false
     }
 
-    fun render(event: RenderWorldLastEvent) {
+    fun render(event: LorenzRenderWorldEvent) {
         if (locations.isEmpty()) {
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 IllegalArgumentException("locations is empty"),
                 "Trying to render an empty parkour"
             )
@@ -53,10 +53,8 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        if (location.offsetCenter().distanceToPlayer() < detectionRange) {
-                            if (Minecraft.getMinecraft().thePlayer.onGround) {
-                                current = index
-                            }
+                        if (location.offsetCenter().distanceToPlayer() < detectionRange && Minecraft.getMinecraft().thePlayer.onGround) {
+                            current = index
                         }
                     }
                 }
@@ -64,10 +62,8 @@ class ParkourHelper(
                 val distanceToPlayer = locations.first().offsetCenter().distanceToPlayer()
                 if (distanceToPlayer < detectionRange) {
                     visible = true
-                } else if (distanceToPlayer > 15) {
-                    if (current < 1) {
-                        visible = false
-                    }
+                } else if (distanceToPlayer > 15 && current < 1) {
+                    visible = false
                 }
 
                 if (!visible) return
@@ -117,14 +113,12 @@ class ParkourHelper(
                     event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), 1f)
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }
-                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber) {
-                    if (!isMovingPlatform) {
-                        event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
-                    }
+                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
+                    event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
                 }
             }
         } catch (e: Throwable) {
-            CopyErrorCommand.logError(e, "Error while rendering a parkour")
+            ErrorManager.logError(e, "Error while rendering a parkour")
         }
     }
 

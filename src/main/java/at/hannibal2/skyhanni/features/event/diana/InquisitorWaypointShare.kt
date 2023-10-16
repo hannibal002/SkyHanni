@@ -3,20 +3,29 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 object InquisitorWaypointShare {
@@ -86,11 +95,9 @@ object InquisitorWaypointShare {
         }
 
         // TODO: Change the check to only one line once we have a confirmed inquis message line
-        if (message.contains("§r§eYou dug out ")) {
-            if (message.contains("Inquis")) {
-                time = System.currentTimeMillis()
-                logger.log("found Inquisitor")
-            }
+        if (message.contains("§r§eYou dug out ") && message.contains("Inquis")) {
+            time = System.currentTimeMillis()
+            logger.log("found Inquisitor")
         }
     }
 
@@ -134,7 +141,7 @@ object InquisitorWaypointShare {
             // add repo kill switch
             sendInquisitor()
         } else {
-            val keyName = OSUtils.getKeyName(config.keyBindShare)
+            val keyName = KeyboardManager.getKeyName(config.keyBindShare)
             val message =
                 "§e[SkyHanni] §l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
             LorenzUtils.clickableChat(message, "shshareinquis")
@@ -156,13 +163,9 @@ object InquisitorWaypointShare {
     }
 
     @SubscribeEvent
-    fun onKeyBindPressed(event: InputEvent.KeyInputEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
-        if (!Keyboard.getEventKeyState()) return
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (config.keyBindShare == key) {
-            sendInquisitor()
-        }
+        if (event.keyCode == config.keyBindShare) sendInquisitor()
     }
 
     private fun sendDeath() {
@@ -226,7 +229,7 @@ object InquisitorWaypointShare {
             if (!waypoints.containsKey(cleanName)) {
                 LorenzUtils.chat("§e[SkyHanni] $playerName §l§efound an inquisitor at §l§c$x $y $z!")
                 if (cleanName != LorenzUtils.getPlayerName()) {
-                    TitleUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5.seconds)
+                    LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5.seconds)
                     SoundUtils.playBeepSound()
                 }
             }

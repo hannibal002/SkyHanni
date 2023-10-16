@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -61,16 +61,12 @@ class RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
-//        if (event.distanceToPlayer > 10) return
-
         val location = event.location
         val berberis = nearestBerberis(location)
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
-            if (config.hideparticles) {
-                if (berberis != null) {
-                    event.isCanceled = true
-                }
+            if (config.hideparticles && berberis != null) {
+                event.isCanceled = true
             }
             return
         }
@@ -107,7 +103,7 @@ class RiftWiltedBerberisHelper {
 
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 

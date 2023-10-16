@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -182,7 +182,7 @@ object NEUItems {
             if (definite) {
                 Utils.showOutdatedRepoNotification()
             }
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
                         "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
@@ -246,36 +246,24 @@ object NEUItems {
                 val count = ingredient.count.toInt()
                 var internalItemId = ingredient.internalItemId
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN") {
-                    if (internalItemId == "INK_SACK-2") {
-                        internalItemId = "CACTUS"
-                    }
+                if (internalName == "ENCHANTED_CACTUS_GREEN" && internalItemId == "INK_SACK-2") {
+                    internalItemId = "CACTUS"
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE") {
-                    if (internalItemId == "WHEAT") {
-                        continue
-                    }
+                if (internalName == "ENCHANTED_COOKIE" && internalItemId == "WHEAT") {
+                    continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT") {
-                    if (internalItemId == "GOLDEN_CARROT") {
-                        continue
-                    }
+                if (internalName == "ENCHANTED_GOLDEN_CARROT" && internalItemId == "GOLDEN_CARROT") {
+                    continue
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER") {
-                    if (internalItemId == "RABBIT_HIDE") {
-                        continue
-                    }
+                if (internalName == "LEATHER" && internalItemId == "RABBIT_HIDE") {
+                    continue
                 }
-
-//                println("")
-//                println("rawId: $rawId")
-//                println("internalItemId: $internalItemId")
 
                 val old = map.getOrDefault(internalItemId, 0)
                 map[internalItemId] = old + count
@@ -310,7 +298,7 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
-        if (InventoryUtils.inStorage()) return true
+        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled.getValue()) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
         return false
@@ -332,9 +320,7 @@ object NEUItems {
         if (!jsonObject.has("internalname")) {
             jsonObject.add("internalname", JsonPrimitive("_"))
         }
-        if (removeLore) {
-            if (jsonObject.has("lore")) jsonObject.remove("lore")
-        }
+        if (removeLore && jsonObject.has("lore")) jsonObject.remove("lore")
         val jsonString = jsonObject.toString()
         return StringUtils.encodeBase64(jsonString)
     }

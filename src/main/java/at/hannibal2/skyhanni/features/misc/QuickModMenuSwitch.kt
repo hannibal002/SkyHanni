@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -62,7 +63,7 @@ object QuickModMenuSwitch {
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
 
-            if (SkyHanniMod.feature.dev.modMenuLog) {
+            if (SkyHanniMod.feature.dev.debug.modMenuLog) {
                 LorenzUtils.debug("Open GUI: $latestGuiPath")
             }
         }
@@ -139,8 +140,6 @@ object QuickModMenuSwitch {
         try {
             when (mod.command) {
                 "patcher" -> {
-                    println("try opening patcher")
-                    // GuiUtil.open(Objects.requireNonNull(Patcher.instance.getPatcherConfig().gui()))
                     val patcher = Class.forName("club.sk1er.patcher.Patcher")
                     val instance = patcher.getDeclaredField("instance").get(null)
                     val config = instance.javaClass.getDeclaredMethod("getPatcherConfig").invoke(instance)
@@ -149,7 +148,6 @@ object QuickModMenuSwitch {
                     for (method in guiUtils.declaredMethods) {
                         try {
                             method.invoke(null, gui)
-                            println("opened patcher")
                             return
                         } catch (_: Exception) {
                         }
@@ -158,8 +156,6 @@ object QuickModMenuSwitch {
                 }
 
                 "hytil" -> {
-                    println("try opening hytil")
-                    // HytilsReborn.INSTANCE.getConfig().openGui()
                     val hytilsReborn = Class.forName("cc.woverflow.hytils.HytilsReborn")
                     val instance = hytilsReborn.getDeclaredField("INSTANCE").get(null)
                     val config = instance.javaClass.getDeclaredMethod("getConfig").invoke(instance)
@@ -168,7 +164,6 @@ object QuickModMenuSwitch {
                     for (method in guiUtils.declaredMethods) {
                         try {
                             method.invoke(null, gui)
-                            println("opened hytil")
                             return
                         } catch (_: Exception) {
                         }
@@ -182,7 +177,7 @@ object QuickModMenuSwitch {
                 }
             }
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Error trying to open the gui for mod " + mod.name)
+            ErrorManager.logError(e, "Error trying to open the gui for mod " + mod.name)
         }
     }
 
@@ -196,4 +191,9 @@ object QuickModMenuSwitch {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
+    }
 }

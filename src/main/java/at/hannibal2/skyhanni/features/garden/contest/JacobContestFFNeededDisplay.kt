@@ -106,7 +106,7 @@ class JacobContestFFNeededDisplay {
 
     private fun formatFarmingFortune(farmingFortune: Double): String {
         var ff = farmingFortune
-        if (!config.farmingFortuneDropMultiplier) {
+        if (!config.farmingFortunes.dropMultiplier) {
             ff -= 100
             if (ff < 100) {
                 ff = 0.0
@@ -124,7 +124,7 @@ class JacobContestFFNeededDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return

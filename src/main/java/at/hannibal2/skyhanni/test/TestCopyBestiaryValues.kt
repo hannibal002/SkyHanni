@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
@@ -43,26 +44,22 @@ object TestCopyBestiaryValues {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
-        if (!SkyHanniMod.feature.dev.copyBestiaryData) return
+        if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = ""
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3]
         if (backItem == null) {
-//            println("first is null!")
             return
         }
         if (backItem.getLore().none { it.contains("Bestiary Milestone") }) {
-//            println("wrong first: ${backItem.getLore()}")
             return
         }
 
         val rankingItem = event.inventoryItems[3 + 9 * 5 + 2]
         if (rankingItem == null) {
-//            println("second is null!")
             return
         }
         if (rankingItem.getLore().none { it.contains("Ranking") }) {
-//            println("wrong second: ${rankingItem.getLore()}")
             return
         }
 
@@ -113,5 +110,10 @@ object TestCopyBestiaryValues {
         OSUtils.copyToClipboard(text)
 
         SkyHanniDebugsAndTests.displayLine = "Bestiary for $titleName"
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.copyBestiaryData", "dev.debug.copyBestiaryData")
     }
 }

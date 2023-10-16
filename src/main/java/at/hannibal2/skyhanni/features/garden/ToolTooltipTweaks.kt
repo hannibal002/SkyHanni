@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -17,7 +19,7 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 class ToolTooltipTweaks {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.tooltipTweak
     private val tooltipFortunePattern =
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
@@ -32,8 +34,10 @@ class ToolTooltipTweaks {
         if (!LorenzUtils.inSkyBlock) return
 
         val itemStack = event.itemStack
+        val itemLore = itemStack.getLore()
+        val internalName = itemStack.getInternalName()
         val crop = itemStack.getCropType()
-        val toolFortune = FarmingFortuneDisplay.getToolFortune(itemStack)
+        val toolFortune = FarmingFortuneDisplay.getToolFortune(internalName)
         val counterFortune = FarmingFortuneDisplay.getCounterFortune(itemStack)
         val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(itemStack)
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
@@ -44,7 +48,7 @@ class ToolTooltipTweaks {
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)
         val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(itemStack)
         val cultivatingFortune = FarmingFortuneDisplay.getCultivatingFortune(itemStack)
-        val abilityFortune = getAbilityFortune(itemStack)
+        val abilityFortune = getAbilityFortune(internalName, itemLore)
 
         val ffdFortune = itemStack.getFarmingForDummiesCount() ?: 0
         val hiddenFortune =
@@ -82,7 +86,7 @@ class ToolTooltipTweaks {
                 }
                 iterator.set(fortuneLine)
 
-                if (OSUtils.isKeyHeld(config.fortuneTooltipKeybind)) {
+                if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
@@ -137,7 +141,7 @@ class ToolTooltipTweaks {
         }
 
         // Fixing a hypixel bug. TODO remove once hypixel fixes it. use disabled features repo maybe?
-        if (itemStack.getInternalName().contains("LOTUS")) {
+        if (internalName.contains("LOTUS")) {
             event.toolTip.replaceAll { it.replace("Kills:", "Visitors:") }
         }
     }
@@ -148,5 +152,12 @@ class ToolTooltipTweaks {
         if (value.toDouble() != 0.0) {
             add("$description${value.formatStat()}")
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.compactToolTooltips", "garden.tooltipTweak.compactToolTooltips")
+        event.move(3, "garden.fortuneTooltipKeybind", "garden.tooltipTweak.fortuneTooltipKeybind")
+        event.move(3, "garden.cropTooltipFortune", "garden.tooltipTweak.cropTooltipFortune")
     }
 }

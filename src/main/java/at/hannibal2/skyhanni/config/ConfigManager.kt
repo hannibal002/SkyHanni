@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -19,11 +20,18 @@ import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.item.ItemStack
-import java.io.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.*
+import java.util.UUID
 import kotlin.concurrent.fixedRateTimer
 
 class ConfigManager {
@@ -77,6 +85,15 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): NEUInternalName {
                     return reader.nextString().asInternalName()
+                }
+            }.nullSafe())
+            .registerTypeAdapter(LorenzRarity::class.java, object : TypeAdapter<LorenzRarity>() {
+                override fun write(out: JsonWriter, value: LorenzRarity) {
+                    out.value(value.name)
+                }
+
+                override fun read(reader: JsonReader): LorenzRarity {
+                    return LorenzRarity.valueOf(reader.nextString())
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()

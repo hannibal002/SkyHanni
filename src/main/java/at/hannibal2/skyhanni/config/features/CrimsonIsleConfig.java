@@ -3,7 +3,12 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class CrimsonIsleConfig {
@@ -107,9 +112,9 @@ public class CrimsonIsleConfig {
     @ConfigOption(name = "Reputation Helper", desc = "")
     @Accordion
     @Expose
-    public ReputatioHelperConfig reputationHelper = new ReputatioHelperConfig();
+    public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
-    public static class ReputatioHelperConfig {
+    public static class ReputationHelperConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Enable features around Reputation features in the Crimson Isle.")
@@ -136,4 +141,11 @@ public class CrimsonIsleConfig {
         @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
         public int showLocation = 1;
     }
+
+    @Expose
+    @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
+            "it shows a clickable chat message that will grab the items needed from the sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean questItemHelper = false;
 }

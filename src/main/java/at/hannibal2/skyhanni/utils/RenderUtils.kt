@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -19,7 +21,6 @@ import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.cos
@@ -55,7 +56,7 @@ object RenderUtils {
         GlStateManager.popAttrib()
     }
 
-    fun RenderWorldLastEvent.drawColor(
+    fun LorenzRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: LorenzColor,
         beacon: Boolean = false,
@@ -64,7 +65,7 @@ object RenderUtils {
         drawColor(location, color.toColor(), beacon, alpha)
     }
 
-    fun RenderWorldLastEvent.drawColor(
+    fun LorenzRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: Color,
         beacon: Boolean = false,
@@ -196,7 +197,7 @@ object RenderUtils {
         tessellator.draw()
     }
 
-    fun RenderWorldLastEvent.drawString(
+    fun LorenzRenderWorldEvent.drawString(
         location: LorenzVec,
         text: String,
         seeThroughBlocks: Boolean = false,
@@ -230,7 +231,6 @@ object RenderUtils {
         GlStateManager.translate(0f, -0.25f, 0f)
         GlStateManager.rotate(-renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-//    RenderUtil.drawNametag(EnumChatFormatting.YELLOW.toString() + dist.roundToInt() + "m")
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
 
@@ -333,9 +333,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
-//        GlStateManager.scale(scale, scale, scale)
         GlStateManager.scale(finalScale, finalScale, finalScale)
-//        GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
@@ -403,6 +401,20 @@ object RenderUtils {
             offsetY += 10 + extraSpace
         }
         GuiEditManager.add(this, posLabel, longestX, offsetY)
+    }
+
+    fun Position.renderRenderables(
+        renderables: List<Renderable>,
+        extraSpace: Int = 0,
+        itemScale: Double = 1.0,
+        posLabel: String,
+    ) {
+        if (renderables.isEmpty()) return
+        val list = mutableListOf<List<Any>>()
+        for (line in renderables) {
+            list.addAsSingletonList(line)
+        }
+        renderStringsAndItems(list, extraSpace, itemScale, posLabel)
     }
 
     /**
@@ -596,7 +608,7 @@ object RenderUtils {
         TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, colour, factor)
     }
 
-    fun RenderWorldLastEvent.drawDynamicText(
+    fun LorenzRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
@@ -691,7 +703,7 @@ object RenderUtils {
         }
     }
 
-    fun RenderWorldLastEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun LorenzRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         GlStateManager.disableCull()
 
         val render = Minecraft.getMinecraft().renderViewEntity
@@ -729,9 +741,9 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    fun RenderWorldLastEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
+    fun LorenzRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun RenderWorldLastEvent.exactPlayerEyeLocation(): LorenzVec {
+    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player).add(add)
@@ -811,7 +823,7 @@ object RenderUtils {
     }
 
     // TODO nea please merge with 'drawFilledBoundingBox'
-    fun RenderWorldLastEvent.drawFilledBoundingBox_nea(
+    fun LorenzRenderWorldEvent.drawFilledBoundingBox_nea(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
@@ -915,7 +927,7 @@ object RenderUtils {
         GlStateManager.disableBlend()
     }
 
-    fun RenderWorldLastEvent.outlineTopFace(boundingBox: AxisAlignedBB, lineWidth: Int, colour: Color, depth: Boolean) {
+    fun LorenzRenderWorldEvent.outlineTopFace(boundingBox: AxisAlignedBB, lineWidth: Int, colour: Color, depth: Boolean) {
         val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
         val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
         val cornerThree = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
@@ -927,7 +939,7 @@ object RenderUtils {
     }
 
     // TODO nea please merge with 'draw3DLine'
-    fun RenderWorldLastEvent.draw3DLine_nea(
+    fun LorenzRenderWorldEvent.draw3DLine_nea(
         p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean
     ) {
         GlStateManager.disableDepth()

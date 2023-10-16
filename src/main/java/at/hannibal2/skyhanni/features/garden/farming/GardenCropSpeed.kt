@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
@@ -85,7 +86,7 @@ object GardenCropSpeed {
             if (blocksSpeedList.isEmpty()) return
             secondsStopped++
         } else {
-            if (secondsStopped >= config.blocksBrokenResetTime) {
+            if (secondsStopped >= config.cropMilestones.blocksBrokenResetTime) {
                 resetSpeed()
             }
             blocksSpeedList = blocksSpeedList.editCopy {
@@ -114,7 +115,7 @@ object GardenCropSpeed {
                             toolName.endsWith("DICER_3") -> 2
                             else -> -1
                         }
-                        if (tier != -1 && melonDicer.size > 0 && pumpkinDicer.size > 0) {
+                        if (tier != -1 && melonDicer.isNotEmpty() && pumpkinDicer.isNotEmpty()) {
                             if (it == CropType.MELON) {
                                 latestMelonDicer = melonDicer[tier]
                             } else if (it == CropType.PUMPKIN) {
@@ -194,4 +195,10 @@ object GardenCropSpeed {
     fun CropType.getLatestBlocksPerSecond() = latestBlocksPerSecond?.get(this)
 
     fun isSpeedDataEmpty() = cropsPerSecond?.values?.sum()?.let { it == 0 } ?: true
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3,"garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
+
+    }
 }

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -54,11 +54,10 @@ object SkyHanniConfigSearchResetCommand {
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
-            println("size: $affectedElements")
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Could not reset config element '$term'")
+            ErrorManager.logError(e, "Could not reset config element '$term'")
             "§cCould not reset config element '$term'"
         }
     }
@@ -69,7 +68,7 @@ object SkyHanniConfigSearchResetCommand {
         return try {
             startSearch(args)
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Error while trying to search config")
+            ErrorManager.logError(e, "Error while trying to search config")
             "§cError while trying to search config"
         }
     }
@@ -83,13 +82,19 @@ object SkyHanniConfigSearchResetCommand {
             rawJson = readFromClipboard
         }
 
-        val root: Any = if (term.startsWith("config")) {
-            SkyHanniMod.feature
-        } else if (term.startsWith("playerSpecific")) {
-            ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
-        } else if (term.startsWith("profileSpecific")) {
-            ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
-        } else return "§cUnknown config location!"
+        val root: Any = when {
+            term.startsWith("config") -> SkyHanniMod.feature
+
+            term.startsWith("playerSpecific") -> {
+                ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
+            }
+
+            term.startsWith("profileSpecific") -> {
+                ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
+            }
+
+            else -> return "§cUnknown config location!"
+        }
 
         val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
         if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
@@ -103,7 +108,7 @@ object SkyHanniConfigSearchResetCommand {
             shimmy.setJson(element)
             "§eChanged config element $term."
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Could not change config element '$term' to '$rawJson'")
+            ErrorManager.logError(e, "Could not change config element '$term' to '$rawJson'")
             "§cCould not change config element '$term' to '$rawJson'"
         }
     }
@@ -220,12 +225,8 @@ object SkyHanniConfigSearchResetCommand {
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
-            if (newObj != null) {
-                if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double) {
-                    if (newObj !is Position && !newObj.javaClass.isEnum) {
-                        map.putAll(loadAllFields(fieldName, newObj, depth + 1))
-                    }
-                }
+            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum) {
+                map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }
 

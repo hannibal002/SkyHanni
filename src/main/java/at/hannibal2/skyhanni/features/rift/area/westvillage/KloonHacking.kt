@@ -1,7 +1,13 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -13,7 +19,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -76,10 +81,8 @@ class KloonHacking {
                     slot highlight if (correctButton) LorenzColor.GREEN else LorenzColor.RED
                     continue
                 }
-                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18) {
-                    if (slot.stack!!.displayName.removeColor() == correctButtons[i]) {
-                        slot highlight LorenzColor.YELLOW
-                    }
+                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 && slot.stack!!.displayName.removeColor() == correctButtons[i]) {
+                    slot highlight LorenzColor.YELLOW
                 }
                 if (slot.slotIndex == i * 9 + 17) {
                     i += 1
@@ -104,7 +107,7 @@ class KloonHacking {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!RiftAPI.inRift()) return
         if (!config.waypoints) return
         if (!wearingHelmet) return

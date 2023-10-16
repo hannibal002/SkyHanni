@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -17,7 +18,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.gardenLevels
     private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
@@ -43,15 +44,13 @@ class GardenLevelDisplay {
         val oldLevel = GardenAPI.getGardenLevel()
         GardenAPI.gardenExp = gardenExp + moreExp
         val newLevel = GardenAPI.getGardenLevel()
-        if (newLevel == oldLevel + 1) {
-            if (newLevel > 15) {
-                LorenzUtils.runDelayed(50.milliseconds) {
-                    LorenzUtils.clickableChat(
-                        " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                                " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                        "/gardenlevels"
-                    )
-                }
+        if (newLevel == oldLevel + 1 && newLevel > 15) {
+            LorenzUtils.runDelayed(50.milliseconds) {
+                LorenzUtils.clickableChat(
+                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
+                            " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
+                    "/gardenlevels"
+                )
             }
         }
         update()
@@ -105,11 +104,17 @@ class GardenLevelDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.gardenLevelPos.renderString(display, posLabel = "Garden Level")
+        config.pos.renderString(display, posLabel = "Garden Level")
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.gardenLevelDisplay
+    private fun isEnabled() = GardenAPI.inGarden() && config.display
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevels.display")
+        event.move(3, "garden.gardenLevelPos", "garden.gardenLevels.pos")
+    }
 }

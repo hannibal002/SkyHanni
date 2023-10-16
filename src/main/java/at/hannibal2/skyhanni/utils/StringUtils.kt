@@ -7,14 +7,16 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import org.intellij.lang.annotations.Language
-import java.util.*
+import java.util.Base64
+import java.util.NavigableMap
+import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
-    private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
+    private val chatUsernamePattern = "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
 
@@ -76,7 +78,7 @@ object StringUtils {
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     fun String.cleanPlayerName(): String {
-        val split = split(" ")
+        val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {
@@ -135,7 +137,7 @@ object StringUtils {
     fun optionalPlural(number: Int, singular: String, plural: String) =
         "$number " + if (number == 1) singular else plural
 
-    fun progressBar(percentage: Double, steps: Int = 25): Any {
+    fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
         val prefix = "§5§o§2"
         val step = "§l§m "
@@ -148,11 +150,9 @@ object StringUtils {
         for (i in 0..steps) {
             val toDouble = i.toDouble()
             val stepPercentage = toDouble / steps
-            if (stepPercentage >= percentage) {
-                if (!inMissingArea) {
-                    builder.append(missing)
-                    inMissingArea = true
-                }
+            if (stepPercentage >= percentage && !inMissingArea) {
+                builder.append(missing)
+                inMissingArea = true
             }
             builder.append(step)
         }
@@ -200,25 +200,36 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerName(): String {
-        if (!playerChatPattern.matcher(this).matches()) return "-"
+    fun String.getPlayerNameFromChatMessage(): String? {
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("username")
+    }
 
-        var username = this.removeColor().split(":")[0]
+    fun String.getPlayerNameAndRankFromChatMessage(): String? {
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("rankedName")
+    }
+
+    private fun matchPlayerChatMessage(string: String): Matcher? {
+        var username = ""
+        var matcher = playerChatPattern.matcher(string)
+        if (matcher.matches()) {
+            username = matcher.group("important").removeResets()
+        }
+        if (username == "") return null
 
         if (username.contains(">")) {
             username = username.substring(username.indexOf('>') + 1).trim()
         }
-        if (username.startsWith("From ")) {
-            username = username.removePrefix("From ")
-        }
-        if (username.startsWith("To ")) {
-            username = username.removePrefix("To ")
-        }
 
-        val matcher = chatUsernamePattern.matcher(username)
+        username = username.removePrefix("§dFrom ")
+        username = username.removePrefix("§dTo ")
 
-        if (!matcher.matches()) return "-"
-        username = matcher.group("username")
-        return username
+        matcher = chatUsernamePattern.matcher(username)
+        return if (matcher.matches()) matcher else null
+    }
+
+    fun String.convertToFormatted(): String {
+        return this.replace("&&", "§")
     }
 }

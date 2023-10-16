@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
+import java.util.TreeMap
 import kotlin.math.pow
 import kotlin.math.roundToInt
 

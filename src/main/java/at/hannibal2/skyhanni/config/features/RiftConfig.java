@@ -3,7 +3,13 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftConfig {
@@ -22,7 +28,7 @@ public class RiftConfig {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Max time", desc = "Show max time.")
+        @ConfigOption(name = "Max Time", desc = "Show max time.")
         @ConfigEditorBoolean
         public boolean maxTime = true;
 
@@ -39,9 +45,9 @@ public class RiftConfig {
     @ConfigOption(name = "Crux Talisman Progress", desc = "")
     @Accordion
     @Expose
-    public CruxTalismanDisplay cruxTalisman = new CruxTalismanDisplay();
+    public CruxTalismanDisplayConfig cruxTalisman = new CruxTalismanDisplayConfig();
 
-    public static class CruxTalismanDisplay {
+    public static class CruxTalismanDisplayConfig {
         @Expose
         @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
         @ConfigEditorBoolean
@@ -156,9 +162,9 @@ public class RiftConfig {
             @ConfigOption(name = "Kloon Hacking", desc = "")
             @Accordion
             @Expose
-            public KloonHacking hacking = new KloonHacking();
+            public KloonHackingConfig hacking = new KloonHackingConfig();
 
-            public static class KloonHacking {
+            public static class KloonHackingConfig {
 
                 @Expose
                 @ConfigOption(name = "Hacking Solver", desc = "Highlights the correct button to click in the hacking inventory.")
@@ -167,7 +173,7 @@ public class RiftConfig {
                 public boolean solver = true;
 
                 @Expose
-                @ConfigOption(name = "Color Guide", desc = "Tells you which colour to pick.")
+                @ConfigOption(name = "Color Guide", desc = "Tells you which color to pick.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean colour = true;
@@ -201,7 +207,7 @@ public class RiftConfig {
             public static class VoltCruxConfig {
 
                 @Expose
-                @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a volt is discharging lightning.")
+                @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a Volt is discharging lightning.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean voltWarning = true;
@@ -213,12 +219,12 @@ public class RiftConfig {
                 public boolean voltRange = true;
 
                 @Expose
-                @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the volt range be highlighted?")
+                @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the Volt range be highlighted?")
                 @ConfigEditorColour
                 public String voltColour = "0:60:0:0:255";
 
                 @Expose
-                @ConfigOption(name = "Volt mood color", desc = "Change the color of the volt enemy depending on their mood.")
+                @ConfigOption(name = "Volt Mood Color", desc = "Change the color of the Volt enemy depending on their mood.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean voltMoodMeter = false;
@@ -243,7 +249,7 @@ public class RiftConfig {
                 public boolean onlyOnFarmland = false;
 
                 @Expose
-                @ConfigOption(name = "Hide Particles", desc = "Hide the wilted berberis particles.")
+                @ConfigOption(name = "Hide Particles", desc = "Hide the Wilted Berberis particles.")
                 @ConfigEditorBoolean
                 public boolean hideparticles = false;
 
@@ -253,9 +259,9 @@ public class RiftConfig {
         @ConfigOption(name = "Mirrorverse", desc = "")
         @Accordion
         @Expose
-        public MirrorVerse mirrorVerseConfig = new MirrorVerse();
+        public MirrorVerseConfig mirrorVerseConfig = new MirrorVerseConfig();
 
-        public static class MirrorVerse {
+        public static class MirrorVerseConfig {
 
             @ConfigOption(name = "Lava Maze", desc = "")
             @Accordion
@@ -286,7 +292,7 @@ public class RiftConfig {
                 public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+                @ConfigOption(name = "Hide Others Players", desc = "Hide other players while doing the lava maze.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean hidePlayers = false;
@@ -296,9 +302,9 @@ public class RiftConfig {
             @ConfigOption(name = "Upside Down Parkour", desc = "")
             @Accordion
             @Expose
-            public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
+            public UpsideDownParkourConfig upsideDownParkour = new UpsideDownParkourConfig();
 
-            public static class UpsideDownParkour {
+            public static class UpsideDownParkourConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the Mirrorverse by showing the correct way.")
@@ -327,7 +333,7 @@ public class RiftConfig {
                 public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the upside down parkour.")
+                @ConfigOption(name = "Hide Others Players", desc = "Hide other players while doing the upside down parkour.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean hidePlayers = false;
@@ -337,9 +343,9 @@ public class RiftConfig {
             @ConfigOption(name = "Dance Room Helper", desc = "")
             @Accordion
             @Expose
-            public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+            public DanceRoomHelperConfig danceRoomHelper = new DanceRoomHelperConfig();
 
-            public static class DanceRoomHelper {
+            public static class DanceRoomHelperConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
@@ -348,7 +354,7 @@ public class RiftConfig {
                 public boolean enabled = false;
 
                 @Expose
-                @ConfigOption(name = "Lines to show", desc = "How many tasks you should see.")
+                @ConfigOption(name = "Lines to Show", desc = "How many tasks you should see.")
                 @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
                 public int lineToShow = 3;
 
@@ -358,7 +364,7 @@ public class RiftConfig {
                 public int extraSpace = 0;
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players inside the dance room.")
+                @ConfigOption(name = "Hide Other Players", desc = "Hide other players inside the dance room.")
                 @ConfigEditorBoolean
                 public boolean hidePlayers = false;
 
@@ -371,9 +377,9 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Formatting", desc = "")
                 @Accordion
-                public DanceRoomFormatting danceRoomFormatting = new DanceRoomFormatting();
+                public DanceRoomFormattingConfig danceRoomFormatting = new DanceRoomFormattingConfig();
 
-                public static class DanceRoomFormatting {
+                public static class DanceRoomFormattingConfig {
 
                     @Expose
                     @ConfigOption(name = "Now", desc = "Formatting for \"Now:\"")
@@ -393,9 +399,9 @@ public class RiftConfig {
                     @Expose
                     @ConfigOption(name = "Color Option", desc = "")
                     @Accordion
-                    public Color color = new Color();
+                    public ColorConfig color = new ColorConfig();
 
-                    public static class Color {
+                    public static class ColorConfig {
                         @Expose
                         @ConfigOption(name = "Move", desc = "Color for the Move instruction")
                         @ConfigEditorText
@@ -472,7 +478,7 @@ public class RiftConfig {
                 public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
                 @Expose
-                @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+                @ConfigOption(name = "Hide Other Players", desc = "Hide other players while doing the lava maze.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean hidePlayers = false;
@@ -498,12 +504,12 @@ public class RiftConfig {
             @Expose
             @ConfigOption(name = "Living Metal Suit Progress", desc = "")
             @Accordion
-            public LivingMetalSuitProgress livingMetalSuitProgress = new LivingMetalSuitProgress();
+            public LivingMetalSuitProgressConfig livingMetalSuitProgress = new LivingMetalSuitProgressConfig();
 
-            public static class LivingMetalSuitProgress {
+            public static class LivingMetalSuitProgressConfig {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Display progress Living Metal Suit")
+                @ConfigOption(name = "Enabled", desc = "Display Living Metal Suit progress.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean enabled = false;
@@ -531,7 +537,7 @@ public class RiftConfig {
                 public boolean enabled = true;
 
                 @Expose
-                @ConfigOption(name = "Hide Particles", desc = "Hide particles around Defense Blocks")
+                @ConfigOption(name = "Hide Particles", desc = "Hide particles around Defense Blocks.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean hideParticles = false;
@@ -594,7 +600,7 @@ public class RiftConfig {
             public static class EffigiesConfig {
 
                 @Expose
-                @ConfigOption(name = "Enabled", desc = "Show locations of inactive Blood Effigy.")
+                @ConfigOption(name = "Enabled", desc = "Show locations of inactive Blood Effigies.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean enabled = false;
@@ -636,9 +642,9 @@ public class RiftConfig {
     @Expose
     @ConfigOption(name = "Motes Sell Price", desc = "")
     @Accordion
-    public Motes motes = new Motes();
+    public MotesConfig motes = new MotesConfig();
 
-    public static class Motes {
+    public static class MotesConfig {
 
         @Expose
         @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
@@ -652,19 +658,19 @@ public class RiftConfig {
         public int burgerStacks = 0;
 
         @Expose
-        @ConfigOption(name = "Inventory value", desc = "")
+        @ConfigOption(name = "Inventory Value", desc = "")
         @Accordion
-        public InventoryValue inventoryValue = new InventoryValue();
+        public InventoryValueConfig inventoryValue = new InventoryValueConfig();
 
-        public static class InventoryValue {
+        public static class InventoryValueConfig {
             @Expose
-            @ConfigOption(name = "Inventory value", desc = "Show total Motes NPC price for the current opened inventory.")
+            @ConfigOption(name = "Inventory Value", desc = "Show total Motes NPC price for the current opened inventory.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean enabled = true;
 
             @Expose
-            @ConfigOption(name = "Number format type", desc = "Short: 1.2M\n" +
+            @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
                     "Long: 1,200,000")
             @ConfigEditorDropdown(values = {"Short", "Long"})
             public int formatType = 0;
@@ -688,7 +694,7 @@ public class RiftConfig {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Hide Particles", desc = "Hide normal motes orbs particles.")
+        @ConfigOption(name = "Hide Particles", desc = "Hide normal Motes Orbs particles.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideParticles = false;
