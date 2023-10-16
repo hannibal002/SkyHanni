@@ -227,6 +227,12 @@ public class InventoryConfig {
         public boolean enabled = false;
 
         @Expose
+        @ConfigOption(name = "Disable in dungeons", desc = "Disable the feature in dungeons")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean disabledInDungeons = false;
+
+        @Expose
         @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")
         @ConfigEditorBoolean
         public boolean showStacks = true;

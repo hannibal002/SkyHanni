@@ -40,6 +40,7 @@ class ChestValue {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (LorenzUtils.inDungeons && config.disabledInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
         if (inInventory) {
             config.position.renderStringsAndItems(
@@ -274,4 +275,5 @@ class ChestValue {
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
 }
