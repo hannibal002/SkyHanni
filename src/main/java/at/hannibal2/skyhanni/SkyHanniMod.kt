@@ -201,7 +201,7 @@ class SkyHanniMod {
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
-        loadModule(FandomWikiIsSoMuchBetter())
+        loadModule(FandomWiki())
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())

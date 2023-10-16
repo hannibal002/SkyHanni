@@ -17,11 +17,11 @@ class WikiCommand {
 
         if (packet is C01PacketChatMessage) {
             val message = packet.message.lowercase()
-            if (message == "/wiki" || message == "/shwiki") {
+            if (message == "/wiki") {
                 event.isCanceled = true
                 OSUtils.openBrowser("https://hypixel-skyblock.fandom.com/wiki/Hypixel_SkyBlock_Wiki")
                 LorenzUtils.chat("§e[SkyHanni] Opening the Fandom Wiki..")
-            } else if (message.startsWith("/wiki ") || message.startsWith("/shwiki ")) {
+            } else if (message.startsWith("/wiki ")) {
                 event.isCanceled = true
                 val search = packet.message.substring(6).replace("i ", "")
                 LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §c$search")
