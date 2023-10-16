@@ -16,6 +16,7 @@ class ItemUtilsTest {
             " §8+§215 §7Garden Experience" to Pair("§7Garden Experience", 15),
             " §8+§c21 Copper" to Pair("Copper", 21),
             " §8+§b10 Bits" to Pair("Bits", 10),
+            " §8+§37.2k §7Farming XP" to Pair("§7Farming XP", 7_200),
     )
 
     @Test
