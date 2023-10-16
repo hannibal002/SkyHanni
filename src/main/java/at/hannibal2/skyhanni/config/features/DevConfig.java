@@ -71,7 +71,12 @@ public class DevConfig {
         public boolean showItemUuid = false;
 
         @Expose
-        @ConfigOption(name = "Copy NBT Data", desc = "Copies compressed NBT data on key press in a GUI")
+        @ConfigOption(name = "Copy NBT Data", desc = "Copies NBT data on key press in a GUI")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int copyNBTData = Keyboard.KEY_NONE;
+
+        @Expose
+        @ConfigOption(name = "Copy Compressed NBT Data", desc = "Copies compressed NBT data on key press in a GUI")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int copyNBTDataCompressed = Keyboard.KEY_NONE;
 
@@ -81,7 +86,7 @@ public class DevConfig {
         public boolean copyRngMeter = false;
 
         @Expose
-    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the bestiary data from the inventory as json to clipboard.")
+        @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the bestiary data from the inventory as json to clipboard.")
         @ConfigEditorBoolean
         public boolean copyBestiaryData = false;
 
