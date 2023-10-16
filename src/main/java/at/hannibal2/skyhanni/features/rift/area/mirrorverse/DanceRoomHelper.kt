@@ -80,7 +80,7 @@ object DanceRoomHelper {
             "Jump" -> jump
             "Punch" -> punch
             else -> fallback
-        } + this
+        } + this@addColor
     }
 
     @SubscribeEvent
