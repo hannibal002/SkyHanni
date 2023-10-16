@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack
 object VisitorAPI {
     private var visitors = mapOf<String, Visitor>()
     var inVisitorInventory = false
-    val config get() = SkyHanniMod.feature.garden
+    val config get() = SkyHanniMod.feature.garden.visitors
     private val logger = LorenzLogger("garden/visitors/api")
 
     fun getVisitorsMap() = visitors
@@ -121,7 +121,7 @@ object VisitorAPI {
             for (internalName in allRewards) {
                 val reward = VisitorReward.getByInternalName(internalName) ?: continue
 
-                if (config.visitorRewardWarning.drops.contains(reward.ordinal)) {
+                if (config.rewardWarning.drops.contains(reward.ordinal)) {
                     return reward
                 }
             }

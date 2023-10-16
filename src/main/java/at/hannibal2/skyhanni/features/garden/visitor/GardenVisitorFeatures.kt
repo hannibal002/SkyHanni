@@ -59,7 +59,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-private val config get() = SkyHanniMod.feature.garden.visitors
+private val config get() = VisitorAPI.config
 
 class GardenVisitorFeatures {
     private var display = emptyList<List<Any>>()
@@ -239,7 +239,7 @@ class GardenVisitorFeatures {
         val text = visitor.status.displayName
         val location = event.location
         event.parent.drawString(location.add(0.0, 2.23, 0.0), text)
-        if (config.visitorRewardWarning.showOverName) {
+        if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 

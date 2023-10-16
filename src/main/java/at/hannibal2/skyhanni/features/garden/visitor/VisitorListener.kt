@@ -29,6 +29,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
+private val config get() = VisitorAPI.config
+
 class VisitorListener {
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
@@ -147,14 +149,14 @@ class VisitorListener {
             if (event.slot.stack?.name != "§cRefuse Offer") return
 
             visitor.hasReward()?.let {
-                if (VisitorAPI.config.visitorRewardWarning.preventRefusing) {
-                    if (VisitorAPI.config.visitorRewardWarning.bypassKey.isKeyHeld()) {
+                if (config.rewardWarning.preventRefusing) {
+                    if (config.rewardWarning.bypassKey.isKeyHeld()) {
                         LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                    if (VisitorAPI.config.visitorRewardWarning.bypassKey == Keyboard.KEY_NONE) {
+                    if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
                                 "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
                                 "sh bypass"
@@ -186,7 +188,7 @@ class VisitorListener {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (VisitorAPI.config.visitorHighlightStatus != 1 && VisitorAPI.config.visitorHighlightStatus != 2) return
+        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
 
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -198,7 +200,7 @@ class VisitorListener {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (VisitorAPI.config.visitorHighlightStatus != 1 && VisitorAPI.config.visitorHighlightStatus != 2) return
+        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
 
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {
