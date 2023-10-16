@@ -195,6 +195,11 @@ public class EventConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean petWarning = true;
+
+        @Expose
+        @ConfigOption(name = "Always Diana", desc = "Forcefully set the Diana event to be active. This is useful if the auto mayor detection fails.")
+        @ConfigEditorBoolean
+        public boolean alwaysDiana = false;
     }
 
     @ConfigOption(name = "Winter Season on Jerry's Island", desc = "")
