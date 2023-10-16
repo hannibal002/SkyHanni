@@ -54,7 +54,6 @@ class WikiCommand {
         if (Minecraft.getMinecraft().currentScreen == null) return
         if (NEUItems.neuHasFocus()) return //because good heavens if this worked on neuitems...
 
-
         if (Keyboard.isKeyDown(config.fandomWikiKeybind)) {
             val itemUnderCursor = event.itemStack ?: return
             wikiTheItem(itemUnderCursor)
@@ -62,10 +61,12 @@ class WikiCommand {
     }
 
     private fun wikiTheItem(item: ItemStack) {
+        var wikiUrlSearch = ""
         val itemDisplayName = item.nameWithEnchantment ?: return
         val internalName = item.getInternalName().asString() ?: return
         LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$itemDisplayName")
-        val wikiUrlSearch = "$urlSearchPrefix$internalName&scope=internal"
+        if (internalName != "NONE") wikiUrlSearch = "$urlSearchPrefix$internalName&scope=internal"
+        else wikiUrlSearch = "$urlSearchPrefix$itemDisplayName&scope=internal"
         OSUtils.openBrowser(wikiUrlSearch.replace(' ', '+'))
     }
 
