@@ -38,7 +38,7 @@ class FandomWikiFromMenus {
         } else if (event.slotId == 15 && itemClickedName.contains("Wikithis Command") && chestName.contains("Wiki")) {
             LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $itemInHandName §eon the Hypixel Skyblock Fandom Wiki!", "wiki $internalName")
         } else if (itemClickedStack.getLore().any { it.lowercase().contains("wiki") }) { //.lowercase() to match "Wiki!" and "wiki" lore lines in one fell swoops
-            LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $itemClickedName §eon the Hypixel Skyblock Fandom Wiki!", "wiki ${itemClickedName.removeColor()}")
+            LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $itemClickedName §eon the Hypixel Skyblock Fandom Wiki!", "wiki ${itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")}")
         } else return
         event.isCanceled = true
 
