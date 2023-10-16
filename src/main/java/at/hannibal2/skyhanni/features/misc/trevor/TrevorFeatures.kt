@@ -38,6 +38,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorFeatures {
+    // TODO USE SH-REPO
     private val trapperPattern =
         "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
     private val talbotPatternAbove =

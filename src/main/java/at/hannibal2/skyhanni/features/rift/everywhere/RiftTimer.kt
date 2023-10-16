@@ -30,6 +30,7 @@ class RiftTimer {
 
         val message = event.message
         for (entry in message.split("     ")) {
+            // TODO USE SH-REPO
             "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern().matchMatcher(entry) {
                 val color = group("color")
                 if (color == "7") {

@@ -123,7 +123,7 @@ class KloonHacking {
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
-
+        // TODO USE SH-REPO
         "You've set the color of this terminal to (?<colour>.*)!".toPattern().matchMatcher(event.message.removeColor()) {
             val hidden = ProfileStorageData.profileSpecific?.rift ?: return
             val colour = group("colour")

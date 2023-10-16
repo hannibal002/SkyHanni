@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ShowMotesNpcSellPrice {
     private val config get() = RiftAPI.config.motes
     private var display = emptyList<List<Any>>()
+    // TODO USE SH-REPO
     private val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
     private val itemMap = mutableMapOf<String, Pair<MutableList<Int>, Double>>()
     private var inInventory = false

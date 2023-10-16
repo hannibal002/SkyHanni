@@ -31,7 +31,7 @@ object AdvancedPlayerList {
         if (LorenzUtils.inDungeons) return original
 
         if (ignoreCustomTabList()) return original
-
+        // TODO USE SH-REPO
         val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
         val currentData = mutableMapOf<String, PlayerData>()

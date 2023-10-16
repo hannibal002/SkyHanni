@@ -22,6 +22,7 @@ object CruxTalismanDisplay {
     private var display = emptyList<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
+    // TODO USE SH-REPO
     private val progressPattern =
         ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|(?:§[0-9a-z]\\d+§[0-9a-z]\\/§[0-9a-z]\\d+)).*".toPattern()
     private var maxed = false

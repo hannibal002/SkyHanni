@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 class ServerRestartTitle {
     private val config get() = SkyHanniMod.feature.misc
     private val pattern = "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) §8.*".toPattern()
-
+    // TODO USE SH-REPO
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return

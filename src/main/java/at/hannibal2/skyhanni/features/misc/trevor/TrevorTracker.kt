@@ -16,7 +16,7 @@ import java.util.regex.Matcher
 object TrevorTracker {
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
     private var display = emptyList<List<Any>>()
-
+    // TODO USE SH-REPO
     private val selfKillMobPattern = "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
     private val killMobPattern = "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.".toPattern()
 

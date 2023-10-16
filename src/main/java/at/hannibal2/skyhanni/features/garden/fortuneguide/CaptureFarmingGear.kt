@@ -25,7 +25,7 @@ import kotlin.math.round
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.config?.fortune?.outdatedItems
-
+    // TODO USE SH-REPO
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()

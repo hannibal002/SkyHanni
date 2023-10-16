@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ArachneChatMessageHider {
     private val config get() = SkyHanniMod.feature.chat
     private var hideArachneDeadMessage = false
+    // TODO USE SH-REPO
     private val arachneCallingPattern = "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*".toPattern()
     private val arachneCrystalPattern = "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!".toPattern()
 

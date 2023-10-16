@@ -46,7 +46,7 @@ class CurrentPetDisplay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-
+        // TODO USE SH-REPO
         val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 

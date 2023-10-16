@@ -33,7 +33,7 @@ class RiftBloodEffigies {
         4 to -1L,
         5 to -1L,
     )
-
+    // TODO USE SH-REPO
     private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
 
     @SubscribeEvent

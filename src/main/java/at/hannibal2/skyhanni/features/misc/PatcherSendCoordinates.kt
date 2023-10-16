@@ -22,7 +22,7 @@ class PatcherSendCoordinates {
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
     private val pattern = "(?<playerName>.*): x: (?<x>.*), y: (?<y>.*), z: (?<z>.*)".toPattern()
-
+    // TODO USE SH-REPO
 
     @SubscribeEvent
     fun onPatcherCoordinates(event: LorenzChatEvent) {

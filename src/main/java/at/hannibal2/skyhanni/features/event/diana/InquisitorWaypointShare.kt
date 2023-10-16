@@ -33,7 +33,7 @@ object InquisitorWaypointShare {
     private val partyPattern =
         "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
     private val diedPattern = "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!".toPattern()
-
+    // TODO USE SH-REPO
     private var time = 0L
     private var testTime = 0L
     private var lastInquisitorMessage = ""

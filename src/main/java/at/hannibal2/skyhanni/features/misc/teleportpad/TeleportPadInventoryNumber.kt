@@ -59,6 +59,7 @@ class TeleportPadInventoryNumber {
     }
 
     private var inTeleportPad = false
+    // TODO USE SH-REPO
     private val pattern = "§.(?<number>.*) teleport pad".toPattern()
 
     @SubscribeEvent
