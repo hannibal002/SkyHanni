@@ -123,6 +123,15 @@ public class DungeonConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideHealerFairy = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Hide Soulweaver Skulls",
+                desc = "Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideSoulweaverSkulls = false;
+
     }
 
     @Expose

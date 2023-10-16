@@ -3,13 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -27,6 +21,8 @@ class DungeonHideItems {
     private val hideParticles = mutableMapOf<EntityArmorStand, Long>()
     private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
 
+    private val soulWeaverHider =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYyNGVkNjg3NTMwNGZhNGExZjBjNzg1YjJjYjZhNmE3MjU2M2U5ZjNlMjRlYTU1ZTE4MTc4NDUyMTE5YWE2NiJ9fX0="
     private val blessingTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTkzZTIwNjg2MTc4NzJjNTQyZWNkYTFkMjdkZjRlY2U5MWM2OTk5MDdiZjMyN2M0ZGRiODUzMDk0MTJkMzkzOSJ9fX0="
 
@@ -75,12 +71,14 @@ class DungeonHideItems {
 
         if (entity !is EntityArmorStand) return
 
+        val head = entity.inventory[4]
+        val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
             if (entity.name.startsWith("§9Superboom TNT")) {
                 event.isCanceled = true
             }
 
-            val itemStack = entity.inventory[4]
+            val itemStack = head
             if (itemStack != null && itemStack.cleanName() == "Superboom TNT") {
                 event.isCanceled = true
                 hideParticles[entity] = System.currentTimeMillis()
@@ -92,8 +90,7 @@ class DungeonHideItems {
                 event.isCanceled = true
             }
 
-            val itemStack = entity.inventory[4]
-            if (itemStack != null && itemStack.getSkullTexture() == blessingTexture) {
+            if (skullTexture == blessingTexture) {
                 event.isCanceled = true
             }
         }
@@ -103,8 +100,7 @@ class DungeonHideItems {
                 event.isCanceled = true
             }
 
-            val itemStack = entity.inventory[4]
-            if (itemStack != null && itemStack.getSkullTexture() == reviveStoneTexture) {
+            if (skullTexture == reviveStoneTexture) {
                 event.isCanceled = true
                 hideParticles[entity] = System.currentTimeMillis()
             }
@@ -116,8 +112,7 @@ class DungeonHideItems {
                 hideParticles[entity] = System.currentTimeMillis()
             }
 
-            val itemStack = entity.inventory[4]
-            if (itemStack != null && itemStack.getSkullTexture() == premiumFleshTexture) {
+            if (skullTexture == premiumFleshTexture) {
                 event.isCanceled = true
             }
         }
@@ -140,24 +135,27 @@ class DungeonHideItems {
                 entity.name.startsWith("§a§lDEFENSE §e") -> event.isCanceled = true
             }
 
-            val itemStack = entity.inventory[4]
-            if (itemStack != null) {
-                when (itemStack.getSkullTexture()) {
-                    abilityOrbTexture,
-                    supportOrbTexture,
-                    damageOrbTexture,
-                    -> {
-                        event.isCanceled = true
-                        hideParticles[entity] = System.currentTimeMillis()
-                        return
-                    }
+            when (skullTexture) {
+                abilityOrbTexture,
+                supportOrbTexture,
+                damageOrbTexture,
+                -> {
+                    event.isCanceled = true
+                    hideParticles[entity] = System.currentTimeMillis()
+                    return
                 }
             }
         }
 
         if (config.hideHealerFairy) {
-            val itemStack = entity.inventory[0]
-            if (itemStack != null && itemStack.getSkullTexture() == healerFairyTexture) {
+            if (skullTexture == healerFairyTexture) {
+                event.isCanceled = true
+                return
+            }
+        }
+
+        if (config.hideSoulweaverSkulls) {
+            if (skullTexture == soulWeaverHider) {
                 event.isCanceled = true
                 return
             }
