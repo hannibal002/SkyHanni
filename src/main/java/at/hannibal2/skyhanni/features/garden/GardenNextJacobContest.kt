@@ -37,6 +37,7 @@ import javax.swing.UIManager
 import kotlin.time.Duration.Companion.seconds
 
 object GardenNextJacobContest {
+    private var dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
     private var contests = mutableMapOf<Long, FarmingContest>()
@@ -421,7 +422,7 @@ object GardenNextJacobContest {
     private suspend fun fetchUpcomingContests() {
         try {
             val url = "https://api.elitebot.dev/contests/at/now"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             val newContests = mutableMapOf<Long, FarmingContest>()
 
@@ -482,7 +483,7 @@ object GardenNextJacobContest {
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted)
 
-        val result = withContext(Dispatchers.IO) { APIUtil.postJSONIsSuccessful(url, body) }
+        val result = withContext(dispatcher) { APIUtil.postJSONIsSuccessful(url, body) }
 
         if (result) {
             LorenzUtils.chat("§e[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")

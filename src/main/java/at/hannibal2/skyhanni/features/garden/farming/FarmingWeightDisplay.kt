@@ -85,6 +85,7 @@ class FarmingWeightDisplay {
     companion object {
         private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
+        private var dispatcher = Dispatchers.IO
 
         private var display = emptyList<Renderable>()
         private var profileId = ""
@@ -394,7 +395,7 @@ class FarmingWeightDisplay {
             val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
             val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
                 nextPlayers.clear()
@@ -419,7 +420,7 @@ class FarmingWeightDisplay {
             val url = "https://api.elitebot.dev/weight/$uuid"
 
             try {
-                val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+                val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
                 for (profileEntry in result["profiles"].asJsonArray) {
                     val profile = profileEntry.asJsonObject
                     val profileName = profile["profileName"].asString.lowercase()
@@ -499,7 +500,7 @@ class FarmingWeightDisplay {
             attemptingCropWeightFetch = true
 
             val url = "https://api.elitebot.dev/weights"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             for (crop in result.entrySet()) {
                 val cropType = CropType.getByName(crop.key)
