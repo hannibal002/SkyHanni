@@ -45,7 +45,6 @@ object SackDisplay {
                 slot highlight LorenzColor.RED
             }
         }
-
     }
 
     fun update(savingSacks: Boolean) {
@@ -163,7 +162,6 @@ object SackDisplay {
                 )
                 newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
             }
-
         }
 
         if (SackAPI.runeItem.isNotEmpty()) {
