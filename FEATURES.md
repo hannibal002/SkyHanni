@@ -65,6 +65,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Outline Dungeon Teammates. - Cad
 + Dungeon Colored Class Level. - hannibal2
     + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
++ Soulweaver Skull Hider in the Dungeon Object Hider. - nea
+    + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 
 ## Inventory
 
@@ -195,6 +197,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Fishing Hook Display. - hannibal2
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
++ Alerts when the player catches a Legendary Sea Creature. - Cad
 
 ## Damage Indicator
 
@@ -555,6 +558,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Wishing compass uses amount display.
 + Brewing Stand Overlay.
 + Crimson Isle Reputation Helper.
++ Quest Item Helper. (Crimson Isle) - NetheriteMiner
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
+      needed from the sacks.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
