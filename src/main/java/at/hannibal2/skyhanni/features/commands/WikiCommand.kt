@@ -15,11 +15,12 @@ class WikiCommand {
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
         val packet = event.packet
-        val message = packet.message.lowercase()
 
-        if (!SkyHanniMod.feature.commands.useFandomWiki || !(message.startsWith("/wiki"))) return
+        if (!SkyHanniMod.feature.commands.useFandomWiki) return
 
         if (packet is C01PacketChatMessage) {
+            val message = packet.message.lowercase()
+            if (!(message.startsWith("/wiki"))) return
             event.isCanceled = true
             if (message == "/wiki") {
                 OSUtils.openBrowser("https://hypixel-skyblock.fandom.com/wiki/Hypixel_SkyBlock_Wiki")
@@ -33,6 +34,7 @@ class WikiCommand {
                     LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$itemInHandName")
                     url = "$url$internalName&scope=internal"
                 } else {
+                    val search = message.split("/wiki ").last()
                     LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$search")
                     url = "$url$search&scope=internal"
                 }
