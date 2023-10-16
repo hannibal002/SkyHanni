@@ -43,8 +43,8 @@ class FandomWikiFromMenus {
             placeHolderOne = itemInHandName
             placeHolderTwo = internalName
         } else if (itemClickedStack.getLore().any { it.lowercase().contains("wiki") }) { //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
-            placeHolderOne = itemClickedName.replace("✔ ", "").replace("✖ ", "")
-            placeHolderTwo = itemClickedName.replace("✔ ", "").replace("✖ ", "")
+            placeHolderOne = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
+            placeHolderTwo = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
         } else return
         LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for the $placeHolderOne §eon the Hypixel Skyblock Fandom Wiki!", "wiki $placeHolderTwo")
         event.isCanceled = true
