@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.mobs.EntityKill
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
@@ -10,17 +11,62 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
 object SkyblockMobUtils {
-    val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex() //TODO change it so it works also with Dungeon Mobs
+    val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
+    val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
 
-    class SkyblockMob(val baseEntity: Entity) {
-        //Fun Fact the corresponding ArmorStand for a mob has always the mobId + 1
+    //TODO find exceptions to the Rule and Analyse it
+
+    open class SkyblockMob(val baseEntity: Entity) {
+        //Fun Fact the corresponding ArmorStand for a mob has always the ID + 1
         val armorStand = EntityUtils.getEntityById(baseEntity.entityId + 1)
 
-        val name: String = armorStand?.name?.let { mobNameFilter.find(it.removeColor())?.groupValues?.get(1) }
+        open val name: String = armorStand?.name?.let { mobNameFilter.find(it.removeColor())?.groupValues?.get(1) }
             ?: "Skyblock Name of Mob ${baseEntity.name} found"
 
         override fun toString(): String = name
     }
+
+    class DungeonMob(baseEntity: Entity) : SkyblockMob(baseEntity) {
+
+        val Attribute: String?
+        val hasStar: Boolean
+        override val name: String
+
+        init { //TODO test with every dungeon boss
+            var initStartIndex = 0
+            val nameWithoutColor = armorStand?.name?.removeColor()
+            if (nameWithoutColor != null) {
+                val words = nameWithoutColor.split(
+                    " ",
+                    ignoreCase = true,
+                    limit = 6
+                ) // if new Dungeon Mobs get added that have a name longer than 3 words this must be changed (limit =
+                // max words in name + 1x Attribute name + 1x Health + 1x Star
+                hasStar = words[initStartIndex] == "✯"
+                if (hasStar) initStartIndex++
+
+                if (dungeonAttribute.contains(words[initStartIndex])) {
+                    Attribute = words[initStartIndex]
+                    initStartIndex++
+                } else Attribute = null
+
+                if (words[initStartIndex].startsWith("[")) {
+                    initStartIndex++ // For a wierd reason the Undead Skeletons (or similar)
+                    // can spawn with a level if they are summoned with the 3 skulls
+                }
+
+                name = words.subList(initStartIndex, words.lastIndex).joinToString(separator = " ")
+            } else {
+                Attribute = null
+                hasStar = false
+                name = "Skyblock Name of Mob ${baseEntity.name} found"
+            }
+        }
+    }
+
+    /** baseEntity must pass the testIfSkyBlockMob function */
+    fun createSkyblockMob(baseEntity: Entity): SkyblockMob = if (DungeonAPI.inDungeon()) DungeonMob(baseEntity) else
+        SkyblockMob(baseEntity)
 
     fun testIfSkyBlockMob(entity: Entity): Boolean {
         if (entity !is EntityLivingBase) return false
@@ -48,7 +94,7 @@ object SkyblockMobUtils {
     fun rayTraceForSkyblockMobs(entity: Entity, distance: Double, partialTicks: Float): List<Entity>? {
         val hits = rayTraceForSkyblockMobs(entity, partialTicks) ?: return null
         val inDistance = hits.filter { it.distanceTo(entity.getLorenzVec()) <= distance }
-        if(inDistance.isEmpty()) return null
+        if (inDistance.isEmpty()) return null
         return inDistance
     }
 

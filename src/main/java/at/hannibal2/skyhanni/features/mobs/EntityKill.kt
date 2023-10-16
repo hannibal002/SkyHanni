@@ -33,6 +33,7 @@ object EntityKill {
 
     val config get() = SkyHanniMod.feature.dev
 
+    // TODO(fix mob exiting Renderrange to count as Death/Kill)
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         previousEntityLiving.clear()
@@ -91,8 +92,7 @@ object EntityKill {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        //Backup to avoid Memory Leak (if any exists)
-        mobHitList.clear()
+        mobHitList.clear() //TODO Clear before the Kill trigger is activated
     }
 
     fun addToMobHitList(entity: Entity, trigger: hitTrigger) {
@@ -101,7 +101,7 @@ object EntityKill {
             onMobHitEvent(it, trigger, false).postAndCatch()
             return
         }
-        val mob = SkyblockMobUtils.SkyblockMob(entity)
+        val mob = SkyblockMobUtils.createSkyblockMob(entity)
         if(checkIfBlacklisted(mob.name,trigger)) return
         mobHitList.add(mob)
         onMobHitEvent(mob, trigger, true).postAndCatch()

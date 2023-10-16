@@ -53,6 +53,9 @@ object MobHitTrigger {
     // TODO(Bingo Blaster)
     // TODO(Alchemist Wand)
 
+    // TODO(Summons) IDK
+
+
     //Working on it
     // TODO(Bow) Priority, separate System
 
@@ -90,9 +93,9 @@ object MobHitTrigger {
                     .filter { SkyblockMobUtils.testIfSkyBlockMob(it) && it != entity }.forEach {
                         EntityKill.addToMobHitList(it, hitTrigger.Cleave)
                         i++
-                        LorenzDebug.log("Name: ${it.name}")
+                        //LorenzDebug.log("Name: ${it.name}")
                     }
-                LorenzDebug.log("Cleave Triggers: $i")
+                //LorenzDebug.log("Cleave Triggers: $i")
             }
         }
     }
@@ -119,7 +122,7 @@ object MobHitTrigger {
         val player = Minecraft.getMinecraft().thePlayer
         val classInDungeon = DungeonAPI.playerClass
         val partialTick = 0.0f //IDK how to make it correctly but ignoring partialTicks(=0.0) works fine
-        LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
+        //LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
 
         when {
             //Bow TODO(Cooldown)
