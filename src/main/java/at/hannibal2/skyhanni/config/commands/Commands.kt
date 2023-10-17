@@ -166,8 +166,8 @@ object Commands {
 //                    "Language codes are at the end of the translation when you click on a message."
 //        ) { Translator.fromEnglish(it) }
         registerCommand(
-                "shmouselock",
-                "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+            "shmouselock",
+            "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
     }
 
