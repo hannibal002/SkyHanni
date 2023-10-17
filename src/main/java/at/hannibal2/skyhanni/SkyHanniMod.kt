@@ -61,6 +61,7 @@ import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
@@ -597,6 +598,7 @@ class SkyHanniMod {
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
         loadModule(ShiftClickEquipment())
+        loadModule(ArrowTrail)
 
         init()
 

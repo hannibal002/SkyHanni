@@ -507,6 +507,51 @@ public class MiscConfig {
             @ConfigEditorBoolean
             public boolean behindBlocks = false;
         }
+
+        @Expose
+        @ConfigOption(name = "Arrow Trail", desc = "")
+        @Accordion
+        public ArrowTrailConfig arrowTrailConfig = new ArrowTrailConfig();
+
+        public static class ArrowTrailConfig{
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Draw a colored line behind the player.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Nonplayer Arrows", desc = "Only shows the arrows the player has shot")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean hideOtherArrows = true;
+
+            @Expose
+            @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
+            @ConfigEditorColour
+            public String arrowColor = "0:255:255:255:255";
+
+            @Expose
+            @ConfigOption(name = "Player Arrows", desc = "Different Color for arrow that you have shot")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean handlePlayerArrowsDifferently = false;
+
+            @Expose
+            @ConfigOption(name = "Player Arrow Color", desc = "Color of the line.")
+            @ConfigEditorColour
+            public String playerArrowColor = "0:255:255:255:255";
+
+            @Expose
+            @ConfigOption(name = "Time Alive", desc = "Time in seconds until the trail fades out.")
+            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 30)
+            public int secondsAlive = 2;
+
+            @Expose
+            @ConfigOption(name = "Line Width", desc = "Width of the line.")
+            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+            public int lineWidth = 4;
+        }
     }
 
 
