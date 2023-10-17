@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -33,7 +33,7 @@ object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
     private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.cropMilestones
     private val bestCropTime = GardenBestCropTime()
 
     private var lastPlaySoundTime = 0L
@@ -42,8 +42,8 @@ object GardenCropMilestoneDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         LorenzUtils.onToggle(
-            config.cropMilestoneBestShowMaxedNeeded,
-            config.cropMilestoneHighestTimeFormat,
+            config.bestShowMaxedNeeded,
+            config.highestTimeFormat,
         ) {
             GardenBestCropTime.updateTimeTillNextCrop()
             update()
@@ -51,22 +51,22 @@ object GardenCropMilestoneDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
 
-        config.cropMilestoneProgressDisplayPos.renderStringsAndItems(
+        config.progressDisplayPos.renderStringsAndItems(
             progressDisplay, posLabel = "Crop Milestone Progress"
         )
 
-        if (config.cropMilestoneMushroomPetPerkEnabled) {
-            config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(
+        if (config.mushroomPetPerk.enabled) {
+            config.mushroomPetPerk.pos.renderStringsAndItems(
                 mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk"
             )
         }
 
-        if (config.cropMilestoneBestDisplay) {
-            config.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time")
+        if (config.next.bestDisplay) {
+            config.next.displayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time")
         }
     }
 
@@ -122,7 +122,7 @@ object GardenCropMilestoneDisplay {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.cropMilestoneBestDisplay && config.cropMilestoneBestAlwaysOn || currentCrop != null) {
+        if (config.next.bestDisplay && config.next.bestAlwaysOn || currentCrop != null) {
             bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
         }
     }
@@ -133,7 +133,7 @@ object GardenCropMilestoneDisplay {
         lineMap[0] = Collections.singletonList("§6Crop Milestones")
 
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
-        val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
+        val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
 
         val list = mutableListOf<Any>()
         list.addCropIcon(crop)
@@ -145,7 +145,7 @@ object GardenCropMilestoneDisplay {
         lineMap[1] = list
 
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop)
-        val (have, need) = if (config.cropMilestoneBestShowMaxedNeeded.get()) {
+        val (have, need) = if (config.bestShowMaxedNeeded.get()) {
             Pair(counter, cropsForNextTier)
         } else {
             val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
@@ -176,7 +176,7 @@ object GardenCropMilestoneDisplay {
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
-                val biggestUnit = TimeUnit.entries[config.cropMilestoneHighestTimeFormat.get()]
+                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
                 val duration = TimeUtils.formatDuration(millis, biggestUnit)
                 tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
                 val speedText = "§7In §b$duration"
@@ -209,7 +209,7 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun tryWarn(millis: Long, title: String) {
-        if (!config.cropMilestoneWarnClose) return
+        if (!config.warnClose) return
         if (GardenCropSpeed.lastBrokenTime + 500 <= System.currentTimeMillis()) return
         if (millis > 5_900) return
 
@@ -218,13 +218,13 @@ object GardenCropMilestoneDisplay {
             SoundUtils.playBeepSound()
         }
         if (!needsInventory) {
-            TitleUtils.sendTitle(title, 1.5.seconds)
+            LorenzUtils.sendTitle(title, 1.5.seconds)
         }
     }
 
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
-        for (index in config.cropMilestoneText) {
+        for (index in config.text) {
             lineMap[index]?.let {
                 newList.add(it)
             }
@@ -270,7 +270,7 @@ object GardenCropMilestoneDisplay {
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
-            val biggestUnit = TimeUnit.entries[config.cropMilestoneHighestTimeFormat.get()]
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
             val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
             lineMap[3] = Collections.singletonList("§7In §b$duration")
         }
@@ -279,7 +279,7 @@ object GardenCropMilestoneDisplay {
         lineMap[4] = Collections.singletonList("§7Percentage: §e$percentageFormat")
 
         val newList = mutableListOf<List<Any>>()
-        for (index in config.cropMilestoneMushroomPetPerkText) {
+        for (index in config.mushroomPetPerk.text) {
             lineMap[index]?.let {
                 newList.add(it)
             }
@@ -287,5 +287,22 @@ object GardenCropMilestoneDisplay {
         mushroomCowPerkDisplay = newList
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.cropMilestoneProgress
+    private fun isEnabled() = GardenAPI.inGarden() && config.progress
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.cropMilestoneProgress", "garden.cropMilestones.progress")
+        event.move(3, "garden.cropMilestoneWarnClose", "garden.cropMilestones.warnClose")
+        event.move(3, "garden.cropMilestoneHighestTimeFormat", "garden.cropMilestones.highestTimeFormat")
+        event.move(3, "garden.cropMilestoneBestShowMaxedNeeded", "garden.cropMilestones.bestShowMaxedNeeded")
+        event.move(3, "garden.cropMilestoneText", "garden.cropMilestones.text")
+        event.move(3, "garden.blocksBrokenPrecision", "garden.cropMilestones.blocksBrokenPrecision")
+        event.move(3, "garden.cropMilestoneProgressDisplayPos", "garden.cropMilestones.progressDisplayPos")
+        event.move(3, "garden.cropMilestoneBestDisplay", "garden.cropMilestones.next.bestDisplay")
+        event.move(3, "garden.cropMilestoneBestAlwaysOn", "garden.cropMilestones.next.bestAlwaysOn")
+        event.move(3, "garden.cropMilestoneNextDisplayPos", "garden.cropMilestones.next.displayPos")
+        event.move(3, "garden.cropMilestoneMushroomPetPerkEnabled", "garden.cropMilestones.mushroomPetPerk.enabled")
+        event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropMilestones.mushroomPetPerk.text")
+        event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropMilestones.mushroomPetPerk.pos")
+    }
 }

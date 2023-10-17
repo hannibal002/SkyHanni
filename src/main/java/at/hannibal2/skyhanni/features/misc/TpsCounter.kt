@@ -84,7 +84,7 @@ class TpsCounter {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.tpsDisplay) return
 
@@ -97,17 +97,12 @@ class TpsCounter {
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
     }
 
-    private fun getColor(tps: Double): String {
-        return if (tps > 19.8) {
-            "§2"
-        } else if (tps > 19) {
-            "§a"
-        } else if (tps > 17.5) {
-            "§6"
-        } else if (tps > 12) {
-            "§c"
-        } else {
-            "§4"
-        }
+    private fun getColor(tps: Double) = when {
+        tps > 19.8 -> "§2"
+        tps > 19 -> "§a"
+        tps > 17.5 -> "§6"
+        tps > 12 -> "§c"
+
+        else -> "§4"
     }
 }

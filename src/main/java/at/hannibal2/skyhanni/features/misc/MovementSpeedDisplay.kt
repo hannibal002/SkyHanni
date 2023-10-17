@@ -38,7 +38,7 @@ class MovementSpeedDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")

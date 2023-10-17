@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import java.awt.Color
 
 object GriffinUtils {
 
-    fun RenderWorldLastEvent.drawWaypointFilled(
+    fun LorenzRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
         color: Color,
         seeThroughBlocks: Boolean = false,

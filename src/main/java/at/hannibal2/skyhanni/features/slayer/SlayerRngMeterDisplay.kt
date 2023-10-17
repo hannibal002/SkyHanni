@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -53,7 +52,7 @@ class SlayerRngMeterDisplay {
 
         if (!isEnabled()) return
 
-        if (config.hideChat && SlayerAPI.isInSlayerArea) {
+        if (config.hideChat && SlayerAPI.isInCorrectArea) {
             changedItemPattern.matchMatcher(event.message) {
                 event.blockedReason = "slayer_rng_meter"
             }
@@ -71,8 +70,8 @@ class SlayerRngMeterDisplay {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
-                LorenzUtils.warning("§c[Skyhanni] No Slayer RNG Meter Item selected!")
-                TitleUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
+                LorenzUtils.warning("§c[SkyHanni] No Slayer RNG Meter Item selected!")
+                LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
@@ -117,7 +116,7 @@ class SlayerRngMeterDisplay {
 
         val storage = getStorage() ?: return
 
-        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§aSELECTED") } }
+        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         if (selectedItem == null) {
             storage.itemGoal = ""
             storage.goalNeeded = -1
@@ -165,12 +164,12 @@ class SlayerRngMeterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        config.pos.renderString(display, posLabel = "Rng Meter Display")
+        config.pos.renderString(display, posLabel = "RNG Meter Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -8,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -28,7 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class NonGodPotEffectDisplay {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.potionEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
@@ -41,11 +42,11 @@ class NonGodPotEffectDisplay {
 
         INVISIBILITY("invisibility", "§8Invisibility I"), // when wearing sorrow armor
 
-        REV("ZOMBIE_BRAIN", "§9Zombie Brain Mixin", true),
-        TARA("SPIDER_EGG", "§9Spider Egg Mixin", true),
-        SVEN("WOLF_FUR", "§9Wolf Fur Mixin", true),
-        VOID("END_PORTAL_FUMES", "§9End Portal Fumes", true),
-        BLAZE("GABAGOEY", "§9Gabagoey", true),
+        REV("ZOMBIE_BRAIN", "§cZombie Brain Mixin", true),
+        TARA("SPIDER_EGG", "§6Spider Egg Mixin", true),
+        SVEN("WOLF_FUR", "§bWolf Fur Mixin", true),
+        VOID("END_PORTAL_FUMES", "§6Ender Portal Fumes", true),
+        BLAZE("GABAGOEY", "§fGabagoey", true),
 
         DEEP_TERROR("DEEPTERROR", "§4Deepterror", true),
         ;
@@ -155,7 +156,7 @@ class NonGodPotEffectDisplay {
         for (stack in event.inventoryItems.values) {
             val name = stack.name ?: continue
             for (effect in NonGodPotEffect.entries) {
-                if (name != effect.displayName) continue
+                if (!name.contains(effect.displayName)) continue
                 for (line in stack.getLore()) {
                     if (line.contains("Remaining") &&
                         line != "§7Time Remaining: §aCompleted!" &&
@@ -164,7 +165,7 @@ class NonGodPotEffectDisplay {
                         val duration = try {
                             TimeUtils.getMillis(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {
-                            CopyErrorCommand.logError(
+                            ErrorManager.logError(
                                 Exception("'§f' not found in line '$line'", e),
                                 "Error while reading Non God-Potion effects from tab list"
                             )
@@ -212,7 +213,7 @@ class NonGodPotEffectDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (RiftAPI.inRift()) return
 
@@ -221,6 +222,13 @@ class NonGodPotEffectDisplay {
             extraSpace = 3,
             posLabel = "Non God Pot Effects"
         )
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
+        event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
+        event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
     private fun isEnabled() =
