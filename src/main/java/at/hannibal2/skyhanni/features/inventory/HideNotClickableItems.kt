@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
@@ -386,7 +385,7 @@ class HideNotClickableItems {
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
         if (!tradeNpcFilter.match(chestName)) return false
-        if (VisitorAPI.inVisitorInventory) return false
+        if (VisitorAPI.inInventory) return false
         reverseColor = true
 
         var name = stack.cleanName()

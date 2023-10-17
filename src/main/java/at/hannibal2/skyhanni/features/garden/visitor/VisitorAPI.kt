@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 
 object VisitorAPI {
     private var visitors = mapOf<String, Visitor>()
-    var inVisitorInventory = false
+    var inInventory = false
     val config get() = SkyHanniMod.feature.garden.visitors
     private val logger = LorenzLogger("garden/visitors/api")
 
@@ -41,9 +41,11 @@ object VisitorAPI {
             VisitorStatus.ACCEPTED -> {
                 VisitorAcceptedEvent(visitor).postAndCatch()
             }
+
             VisitorStatus.REFUSED -> {
                 VisitorRefusedEvent(visitor).postAndCatch()
             }
+
             else -> {}
         }
     }
@@ -62,8 +64,8 @@ object VisitorAPI {
         println("visitors: $visitors")
         println("name: $name")
         ErrorManager.logErrorState(
-                "Error finding the visitor `$name§c`. Try to reopen the inventory",
-                "visitor is null! name='$name', visitors=`$visitors`"
+            "Error finding the visitor `$name§c`. Try to reopen the inventory",
+            "visitor is null! name='$name', visitors=`$visitors`"
         )
         return null
     }
@@ -98,17 +100,17 @@ object VisitorAPI {
     }
 
     class VisitorOffer(
-            val offerItem: ItemStack
+        val offerItem: ItemStack
     )
 
     class Visitor(
-            val visitorName: String,
-            var entityId: Int = -1,
-            var nameTagEntityId: Int = -1,
-            var status: VisitorStatus,
-            var inSacks: Boolean = false,
-            val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
-            var offer: VisitorOffer? = null,
+        val visitorName: String,
+        var entityId: Int = -1,
+        var nameTagEntityId: Int = -1,
+        var status: VisitorStatus,
+        var inSacks: Boolean = false,
+        val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
+        var offer: VisitorOffer? = null,
     ) {
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
