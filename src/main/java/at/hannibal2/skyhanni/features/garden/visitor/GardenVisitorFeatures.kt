@@ -528,10 +528,12 @@ class GardenVisitorFeatures {
 
         if (config.needs.onlyWhenClose && !GardenAPI.onBarnPlot) return
 
-        if (!GardenAPI.hideExtraGuis()) {
+        if (!hideExtraGuis()) {
             config.needs.pos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
         }
     }
+
+    private fun hideExtraGuis() = GardenAPI.hideExtraGuis() && !VisitorAPI.inInventory
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -547,7 +549,7 @@ class GardenVisitorFeatures {
             return true
         }
 
-        if (GardenAPI.hideExtraGuis()) return false
+        if (hideExtraGuis()) return false
         if (GardenAPI.inGarden()) {
             if (GardenAPI.onBarnPlot) return true
             if (!config.needs.onlyWhenClose) return true
