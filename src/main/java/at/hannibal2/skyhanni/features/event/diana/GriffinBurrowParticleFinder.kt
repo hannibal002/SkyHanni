@@ -8,9 +8,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -120,12 +122,15 @@ class GriffinBurrowParticleFinder {
         if (!config.burrowsSoopyGuess) return
 
         val pos = event.position
-        if (!DianaAPI.hasSpadeInHand() || pos.getBlockAt() !== Blocks.grass) return
+        if (event.itemInHand?.isSpade != true || pos.getBlockAt() !== Blocks.grass) return
 
         if (burrows.containsKey(pos)) {
             lastDugParticleBurrow = pos
         }
     }
+
+    private val ItemStack.isSpade
+        get() = getInternalName_old() == "ANCESTRAL_SPADE"
 
     class Burrow(
         var location: LorenzVec,
