@@ -18,7 +18,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class MinecraftData {
+object MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onSoundPacket(event: PacketEvent.ReceiveEvent) {
@@ -64,13 +64,13 @@ class MinecraftData {
         }
     }
 
-    private var tick = 0
+    var totalTicks = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
-        tick++
-        LorenzTickEvent(tick).postAndCatch()
+        totalTicks++
+        LorenzTickEvent(totalTicks).postAndCatch()
     }
 
     @SubscribeEvent

@@ -1,10 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.OtherMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 object InventoryUtils {
     var itemInHandId = NEUInternalName.NONE
@@ -39,14 +44,28 @@ object InventoryUtils {
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
-    fun inStorage() =
-        openInventoryName().let {
-            (it.contains("Storage") && !it.contains("Rift Storage")) || it.contains("Ender Chest") || it.contains(
-                "Backpack"
-            )
-        }
+    fun inStorage() = openInventoryName().let {
+        (it.contains("Storage") && !it.contains("Rift Storage"))
+                || it.contains("Ender Chest") || it.contains("Backpack")
+    }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
 
     fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+
+    val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
+        try {
+            val configPath = OtherMod.NEU.configPath
+            if (File(configPath).exists()) {
+                val json = ConfigManager.gson.fromJson(
+                    APIUtil.readFile(File(configPath)),
+                    com.google.gson.JsonObject::class.java
+                )
+                json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
+            } else false
+        } catch (e: Exception) {
+            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            false
+        }
+    }
 }

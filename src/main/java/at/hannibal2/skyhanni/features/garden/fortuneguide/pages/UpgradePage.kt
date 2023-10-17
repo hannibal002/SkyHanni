@@ -23,10 +23,10 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
 
         GlStateManager.scale(0.75f, 0.75f, 1f)
         GuiRenderUtils.drawString("Upgrade", (FFGuideGUI.guiLeft + 45) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
+        GuiRenderUtils.drawString("Item", (FFGuideGUI.guiLeft + 190) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
         GuiRenderUtils.drawString("FF increase", (FFGuideGUI.guiLeft + 240) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
         GuiRenderUtils.drawString("Cost/FF", (FFGuideGUI.guiLeft + 290) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
         GuiRenderUtils.drawString("Total", (FFGuideGUI.guiLeft + 330) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
-        GuiRenderUtils.drawString("Item", (FFGuideGUI.guiLeft + 190) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
 
         val upgradeList = if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
         listLength = upgradeList.size
@@ -43,12 +43,12 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
                 formattedUpgrade = "$formattedUpgrade §fx${upgrade.itemQuantity}"
             }
             GuiRenderUtils.drawTwoLineString(upgrade.description, (FFGuideGUI.guiLeft + 15) * inverseScale, (adjustedY + 25 * index) * inverseScale)
+            GuiRenderUtils.renderItemAndTip(FFGuideGUI.tooltipToDisplay, upgradeItem, (FFGuideGUI.guiLeft + 155) * inverseScale, (adjustedY + 25 * index - 5) * inverseScale,
+                mouseX * inverseScale, mouseY * inverseScale, 0x00FFFFFF)
+            GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 180) * inverseScale, (adjustedY + 25 * index) * inverseScale)
             GuiRenderUtils.drawString("§a${DecimalFormat("0.##").format(upgrade.fortuneIncrease)}", (FFGuideGUI.guiLeft + 270) * inverseScale, (adjustedY + 25 * index) * inverseScale)
             GuiRenderUtils.drawString("§6" + upgrade.costPerFF?.let { NumberUtil.format(it) }, (FFGuideGUI.guiLeft + 300) * inverseScale, (adjustedY + 25 * index) * inverseScale)
             GuiRenderUtils.drawString(("§6" + upgrade.cost?.let { NumberUtil.format(it) }), (FFGuideGUI.guiLeft + 335) * inverseScale, (adjustedY + 25 * index) * inverseScale)
-            GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 180) * inverseScale, (adjustedY + 25 * index) * inverseScale)
-            GuiRenderUtils.renderItemAndTip(upgradeItem, (FFGuideGUI.guiLeft + 155) * inverseScale, (adjustedY + 25 * index - 5) * inverseScale,
-                mouseX * inverseScale, mouseY * inverseScale, 0x00FFFFFF)
         }
         GlStateManager.scale(inverseScale, inverseScale, 1f)
         scrollScreen()

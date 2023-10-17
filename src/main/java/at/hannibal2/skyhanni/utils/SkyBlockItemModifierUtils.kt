@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -108,6 +109,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.asInternalName()
 
+    fun ItemStack.getEnrichment() = getAttributeString("talisman_enrichment")
+
     fun ItemStack.getHelmetSkin() = getAttributeString("skin")?.asInternalName()
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
@@ -145,7 +148,12 @@ object SkyBlockItemModifierUtils {
         }
 
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
-        if (it == "pitchin") "pitchin_koi" else it
+        when {
+            it == "pitchin" -> "pitchin_koi"
+            it == "warped" && name!!.removeColor().startsWith("Hyper ") -> "endstone_geode"
+
+            else -> it
+        }
     }
 
     fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")

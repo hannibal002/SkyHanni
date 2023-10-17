@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,7 +17,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaExtraFarmingFortune {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.anitaShop
     private var levelPrice = emptyMap<Int, AnitaUpgradeCostsJson.Price>()
 
     @SubscribeEvent
@@ -78,5 +79,10 @@ class AnitaExtraFarmingFortune {
             }
             levelPrice = map
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.extraFarmingFortune", "garden.anitaShop.extraFarmingFortune")
     }
 }

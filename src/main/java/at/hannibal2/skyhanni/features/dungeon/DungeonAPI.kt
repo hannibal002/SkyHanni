@@ -93,6 +93,8 @@ class DungeonAPI {
             val floor = dungeonFloor ?: return null
             return DungeonFloor.valueOf(floor.replace("M", "F"))
         }
+
+        fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
     }
 
     @SubscribeEvent

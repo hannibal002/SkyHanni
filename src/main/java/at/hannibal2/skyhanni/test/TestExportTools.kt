@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.test.command.CopyItemCommand.copyItemToClipboard
 import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.KSerializable
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NBTTypeAdapter
@@ -19,6 +22,8 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 object TestExportTools {
+    private val config get() = SkyHanniMod.feature.dev.debug
+
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
@@ -47,18 +52,28 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
+        if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
-        val focussedSlot = gui.slotUnderMouse ?: return
-        val stack = focussedSlot.stack ?: return
+        val stack = gui.slotUnderMouse?.stack ?: return
+        if (config.copyItemData.isKeyHeld()) {
+            copyItemToClipboard(stack)
+            return
+        }
         val json = toJson(Item, stack)
         OSUtils.copyToClipboard(json)
-        LorenzUtils.chat("Copied test importable to clipbooard")
+        LorenzUtils.chat("§e[SkyHanni] Compressed item info copied into the clipboard!")
     }
 
 
     inline fun <reified T> getTestData(category: Key<T>, name: String): T {
         val reader = InputStreamReader(javaClass.getResourceAsStream("/testdata/${category.name}/$name.json")!!)
         return fromJson(category, reader)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
+        event.move(4, "dev.debug.copyNBTData", "dev.debug.copyItemData")
+        event.move(4, "dev.debug.copyNBTDataCompressed", "dev.debug.copyItemDataCompressed")
     }
 }

@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
@@ -35,7 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HideNotClickableItems {
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
     private var hideReason = ""
     private var reverseColor = false
@@ -99,10 +101,10 @@ class HideNotClickableItems {
             if (slot.stack == null) continue
 
             if (hide(chestName, slot.stack)) {
-                val opacity = config.hideNotClickableOpacity
+                val opacity = config.opacity
                 val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
                 slot.stack.background = color.rgb
-            } else if (reverseColor && config.hideNotClickableItemsGreenLine) {
+            } else if (reverseColor && config.itemsGreenLine) {
                 val color = LorenzColor.GREEN.addOpacity(200)
                 slot.stack.borderLine = color.rgb
             }
@@ -133,7 +135,7 @@ class HideNotClickableItems {
                 LorenzUtils.warning("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
-                if (config.notClickableItemsBypass) {
+                if (config.itemsBypass) {
                     event.toolTip.add("  §7(Disable with holding the control key)")
                 }
             }
@@ -143,7 +145,7 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (isDisabled()) return
-        if (!config.hideNotClickableItemsBlockClicks) return
+        if (!config.itemsBlockClicks) return
         if (bypasssActive()) return
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
@@ -165,12 +167,12 @@ class HideNotClickableItems {
         }
     }
 
-    private fun bypasssActive() = config.notClickableItemsBypass && LorenzUtils.isControlKeyDown()
+    private fun bypasssActive() = config.itemsBypass && KeyboardManager.isControlKeyDown()
 
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true
 
-        return !config.hideNotClickableItems
+        return !config.items
     }
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
@@ -335,6 +337,7 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
+        val name = stack.cleanName()
         reverseColor = true
         if (ItemUtils.isSack(stack)) return false
 
@@ -382,7 +385,7 @@ class HideNotClickableItems {
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
         if (!tradeNpcFilter.match(chestName)) return false
-        if (GardenVisitorFeatures.inVisitorInventory) return false
+        if (VisitorAPI.inInventory) return false
         reverseColor = true
 
         var name = stack.cleanName()
@@ -397,8 +400,8 @@ class HideNotClickableItems {
             return true
         }
 
-        if (!ItemUtils.isRecombobulated(stack) && LorenzUtils.noTradeMode) {
-            if (BazaarApi.isBazaarItem(stack)) {
+        if (!ItemUtils.isRecombobulated(stack)) {
+            if (LorenzUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) {
                 return false
             }
 
@@ -502,5 +505,15 @@ class HideNotClickableItems {
         val result = notAuctionableFilter.match(name)
         if (result) hideReason = "This item cannot be auctioned!"
         return result
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
+        event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")
+        event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
+        event.move(3, "inventory.notClickableItemsBypass", "inventory.hideNotClickable.itemsBypass")
+        event.move(3, "inventory.hideNotClickableItemsGreenLine", "inventory.hideNotClickable.itemsGreenLine")
+
     }
 }
