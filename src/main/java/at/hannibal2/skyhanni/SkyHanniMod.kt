@@ -61,6 +61,7 @@ import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
@@ -416,6 +417,7 @@ class SkyHanniMod {
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
+        loadModule(ViewRecipeCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
