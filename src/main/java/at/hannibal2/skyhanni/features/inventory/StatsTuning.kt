@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -24,71 +25,83 @@ class StatsTuning {
 
         val stack = event.stack
 
-        if (config.templateStats && inventoryName == "Stats Tuning") {
-            val name = stack.name ?: return
-            if (name == "§aLoad") {
-                var grab = false
-                val list = mutableListOf<String>()
-                for (line in stack.getLore()) {
-                    if (line == "§7You are loading:") {
-                        grab = true
-                        continue
-                    }
-                    if (grab) {
-                        if (line == "") {
-                            grab = false
-                            continue
-                        }
-                        val text = line.split(":")[0]
-                        list.add(text)
-                    }
-                }
-                if (list.isNotEmpty()) {
-                    event.stackTip = list.joinToString(" + ")
-                    event.offsetX = 20
-                    event.offsetY = -5
-                    event.alignLeft = false
-                    return
-                }
-            }
-        }
-        if (config.selectedStats && inventoryName == "Accessory Bag Thaumaturgy") {
-            val name = stack.name ?: return
-            if (name == "§aStats Tuning") {
-                var grab = false
-                val list = mutableListOf<String>()
-                for (line in stack.getLore()) {
-                    if (line == "§7Your tuning:") {
-                        grab = true
-                        continue
-                    }
-                    if (grab) {
-                        if (line == "") {
-                            grab = false
-                            continue
-                        }
-                        val text = line.split(":")[0].split(" ")[0] + "§7"
-                        list.add(text)
-                    }
-                }
-                if (list.isNotEmpty()) {
-                    event.stackTip = list.joinToString(" + ")
-                    event.offsetX = 3
-                    event.offsetY = -5
-                    event.alignLeft = false
-                    return
-                }
-            }
-        }
-        if (config.points && inventoryName == "Stats Tuning") {
-            for (line in stack.getLore()) {
-                patternStatPoints.matchMatcher(line) {
-                    val points = group("amount")
-                    event.stackTip = points
-                }
-            }
-        }
+        if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
+        if (config.selectedStats && inventoryName == "Accessory Bag Thaumaturgy") if (selectedStats(
+                stack,
+                event
+            )
+        ) return
+        if (config.points && inventoryName == "Stats Tuning") points(stack, event)
 
+    }
+
+    private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
+        val name = stack.name ?: return true
+        if (name == "§aLoad") {
+            var grab = false
+            val list = mutableListOf<String>()
+            for (line in stack.getLore()) {
+                if (line == "§7You are loading:") {
+                    grab = true
+                    continue
+                }
+                if (grab) {
+                    if (line == "") {
+                        grab = false
+                        continue
+                    }
+                    val text = line.split(":")[0]
+                    list.add(text)
+                }
+            }
+            if (list.isNotEmpty()) {
+                event.stackTip = list.joinToString(" + ")
+                event.offsetX = 20
+                event.offsetY = -5
+                event.alignLeft = false
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun selectedStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
+        val name = stack.name ?: return true
+        if (name == "§aStats Tuning") {
+            var grab = false
+            val list = mutableListOf<String>()
+            for (line in stack.getLore()) {
+                if (line == "§7Your tuning:") {
+                    grab = true
+                    continue
+                }
+                if (grab) {
+                    if (line == "") {
+                        grab = false
+                        continue
+                    }
+                    val text = line.split(":")[0].split(" ")[0] + "§7"
+                    list.add(text)
+                }
+            }
+            if (list.isNotEmpty()) {
+                event.stackTip = list.joinToString(" + ")
+                event.offsetX = 3
+                event.offsetY = -5
+                event.alignLeft = false
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun points(stack: ItemStack, event: RenderInventoryItemTipEvent) {
+        for (line in stack.getLore()) {
+            patternStatPoints.matchMatcher(line) {
+                val points = group("amount")
+                event.stackTip = points
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -107,6 +120,7 @@ class StatsTuning {
             }
         }
     }
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.statsTuningSelectedStats", "inventory.statsTuning.selectedStats")
