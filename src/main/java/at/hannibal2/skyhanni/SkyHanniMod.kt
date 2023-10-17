@@ -597,8 +597,8 @@ class SkyHanniMod {
         loadModule(SkyBlockKickDuration())
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
-        loadModule(ShiftClickEquipment())
         loadModule(ArrowTrail)
+        loadModule(ShiftClickEquipment())
 
         init()
 
