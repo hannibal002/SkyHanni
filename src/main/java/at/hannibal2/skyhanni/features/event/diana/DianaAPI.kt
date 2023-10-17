@@ -15,5 +15,5 @@ object DianaAPI {
 
     fun hasGriffinPet() = ProfileStorageData.profileSpecific?.currentPet?.contains("Griffin") ?: false
 
-    fun featuresEnabled() = isRitualActive() && IslandType.HUB.isInIsland()
+    fun featuresEnabled() = IslandType.HUB.isInIsland() && isRitualActive()
 }
