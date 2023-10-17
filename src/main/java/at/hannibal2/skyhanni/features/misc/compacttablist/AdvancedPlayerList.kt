@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.DevListJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ContributorListJson
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -134,11 +134,12 @@ object AdvancedPlayerList {
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
     }
 
-    private var listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding: List<String> = emptyList()
+    private var contributors: List<String> = emptyList()
+
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<DevListJson>("DevList")?.usernames?.let {
-            listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding = it
+        event.getConstant<ContributorListJson>("ContributorList")?.usernames?.let {
+            contributors = it
         }
     }
 
@@ -160,7 +161,7 @@ object AdvancedPlayerList {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
-        if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopleWhoKnowALotAboutModdingSceneButAreBadInCoding) {
+        if (config.markSkyHanniDevs && data.name in contributors) {
             suffix += " §c:O"
         }
 
