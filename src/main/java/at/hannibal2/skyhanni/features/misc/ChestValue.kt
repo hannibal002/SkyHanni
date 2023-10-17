@@ -1,17 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.OtherMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SpecialColour
@@ -34,15 +29,13 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import java.io.File
-import kotlin.time.Duration.Companion.seconds
 
 class ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<NEUInternalName, Item>()
-    private val inInventory get() = InventoryUtils.openInventoryName().removeColor().isValidStorage()
+    private val inInventory get() = isValidStorage()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -234,34 +227,19 @@ class ChestValue {
         COMPACT("Aligned")
     }
 
-    private fun String.isValidStorage(): Boolean {
+    private fun isValidStorage(): Boolean {
+        val name = InventoryUtils.openInventoryName().removeColor()
         if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
 
-        if ((contains("Backpack") && contains("Slot #") || startsWith("Ender Chest (")) &&
-            !isNeuStorageEnabled.getValue()
+        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest (")) &&
+            !InventoryUtils.isNeuStorageEnabled.getValue()
         ) {
             return true
         }
 
-        val inMinion = contains("Minion") && !contains("Recipe") &&
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
                 LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
-        return this == "Chest" || this == "Large Chest" || inMinion || this == "Personal Vault"
-    }
-
-    private val isNeuStorageEnabled = RecalculatingValue(1.seconds) {
-        try {
-            val configPath = OtherMod.NEU.configPath
-            if (File(configPath).exists()) {
-                val json = ConfigManager.gson.fromJson(
-                    APIUtil.readFile(File(configPath)),
-                    com.google.gson.JsonObject::class.java
-                )
-                json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
-            } else false
-        } catch (e: Exception) {
-            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
-            false
-        }
+        return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {

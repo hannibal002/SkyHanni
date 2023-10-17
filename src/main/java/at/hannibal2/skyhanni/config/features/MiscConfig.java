@@ -3,7 +3,15 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -704,27 +712,6 @@ public class MiscConfig {
 
         @Expose
         public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-    }
-  
-    @ConfigOption(name = "Player Chat Symbols", desc = "")
-    @Accordion
-    public ChatSymbols chatSymbols = new ChatSymbols();
-
-    public static class ChatSymbols {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Adds extra symbols to the chat such as those from ironman, " +
-                "stranded, bingo or nether factions and places them next to your regular player emblems. " +
-                "Also allows emblems without sb level in chat.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = true;
-
-        @Expose
-        @ConfigOption(name = "Chat Symbol Location", desc = "Determines where the symbols should go in chat in relation to the " +
-                "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
-        @ConfigEditorDropdown(values = {"Left", "Right", "Hidden"})
-        public int symbolLocation = 0;
     }
 
     @Expose

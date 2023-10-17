@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -190,4 +191,9 @@ object QuickModMenuSwitch {
     }
 
     fun isEnabled() = (LorenzUtils.inSkyBlock || config.showModsOutsideSB) && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
+    }
 }

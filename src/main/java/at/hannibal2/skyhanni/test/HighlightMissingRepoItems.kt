@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -22,7 +23,7 @@ class HighlightMissingRepoItems {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.dev.highlightMissingRepo) return
+        if (!SkyHanniMod.feature.dev.debug.highlightMissingRepo) return
 
         val gui = event.gui
 
@@ -55,5 +56,10 @@ class HighlightMissingRepoItems {
         event.getConstant("IgnoredItems")?.let {
             ignoreItems.load(it.asJsonObject)
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.highlightMissingRepo", "dev.debug.highlightMissingRepo")
     }
 }

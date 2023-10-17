@@ -123,7 +123,7 @@ class FarmingWeightDisplay {
         }
 
         private fun update() {
-            if (!GardenAPI.inGarden() && (!config.showWeightOutsideGarden && (!LorenzUtils.inSkyBlock && !config.showWeightOutsideSB))) return
+            if (!GardenAPI.inGarden()) return
             if (apiError) {
                 display = errorMessage
                 return
@@ -312,8 +312,8 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = (GardenAPI.inGarden() || config.showWeightOutsideGarden) && (LorenzUtils.inSkyBlock || config.showWeightOutsideSB) && config.eliteFarmingWeightDisplay
-        private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
+        private fun isEnabled() = (GardenAPI.inGarden() || config.showWeightOutsideGarden) && (LorenzUtils.inSkyBlock || config.showWeightOutsideSB) && config.display
+        private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
             val before = getExactWeight()
