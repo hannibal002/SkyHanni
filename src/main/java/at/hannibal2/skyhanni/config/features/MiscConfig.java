@@ -630,7 +630,7 @@ public class MiscConfig {
                             "§eThose are the folks that coded the mod for you for free :)"
             )
             @ConfigEditorBoolean
-            public boolean markSkyHanniDevs = false;
+            public boolean markSkyHanniContributors = false;
         }
     }
 

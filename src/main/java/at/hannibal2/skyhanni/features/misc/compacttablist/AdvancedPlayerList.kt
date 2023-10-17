@@ -161,7 +161,7 @@ object AdvancedPlayerList {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
-        if (config.markSkyHanniDevs && data.name in contributors) {
+        if (config.markSkyHanniContributors && data.name in contributors) {
             suffix += " §c:O"
         }
 
