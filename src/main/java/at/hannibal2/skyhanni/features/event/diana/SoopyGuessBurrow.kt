@@ -259,7 +259,6 @@ class SoopyGuessBurrow {
 
             if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
 
-
             val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
 
             distance = distance2!!
