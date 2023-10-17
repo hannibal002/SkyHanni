@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -67,6 +68,7 @@ class FishingTimer {
 
         if (inHollows && newCount >= 60 && config.wormLimitAlert) {
             SoundUtils.playBeepSound()
+            TitleManager.sendTitle("§cWORM CAP FULL!", 1.seconds, 3.6)
         }
     }
 
