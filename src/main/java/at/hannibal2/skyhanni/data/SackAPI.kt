@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SackItem.Companion.getStatus
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -24,7 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
 
 object SackAPI {
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
@@ -329,11 +327,7 @@ data class SackItem(
     @Expose val lastChange: Int,
     @Expose private val status: SackStatus?
 ) {
-    companion object {
-        fun SackItem.getStatus(): SackStatus {
-            return status ?: SackStatus.MISSING
-        }
-    }
+    fun getStatus() = status ?: SackStatus.MISSING
 }
 
 private val gemstoneMap = mapOf(
