@@ -108,6 +108,21 @@ object LorenzUtils {
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
+    fun SkyBlockTime.formatted(): String {
+        val hour = if (this.hour > 12) this.hour - 12 else this.hour
+        val timeOfDay = if (this.hour > 11) "pm" else "am" // hooray for 12-hour clocks
+        var minute = this.minute.toString()
+        if (minute.length != 2) {
+            minute = minute.padStart(2, '0')
+        }
+
+        val month = SkyBlockTime.monthName(this.month)
+        val day = this.day
+        val daySuffix = SkyBlockTime.daySuffix(day)
+        val year = this.year
+        return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
+    }
+
     fun stripVanillaMessage(originalMessage: String): String {
         var message = originalMessage
 
