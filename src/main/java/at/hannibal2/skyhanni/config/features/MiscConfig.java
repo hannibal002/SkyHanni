@@ -529,7 +529,7 @@ public class MiscConfig {
             @Expose
             @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
             @ConfigEditorColour
-            public String arrowColor = "0:255:255:255:255";
+            public String arrowColor = "120:67:100:123:0";
 
             @Expose
             @ConfigOption(name = "Player Arrows", desc = "Different Color for arrow that you have shot")
@@ -540,12 +540,12 @@ public class MiscConfig {
             @Expose
             @ConfigOption(name = "Player Arrow Color", desc = "Color of the line.")
             @ConfigEditorColour
-            public String playerArrowColor = "0:255:255:255:255";
+            public String playerArrowColor = "180:67:100:123:0";
 
             @Expose
             @ConfigOption(name = "Time Alive", desc = "Time in seconds until the trail fades out.")
-            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 30)
-            public int secondsAlive = 2;
+            @ConfigEditorSlider(minStep = 0.1f, minValue = 0.1f, maxValue = 30)
+            public float secondsAlive = 0.5f;
 
             @Expose
             @ConfigOption(name = "Line Width", desc = "Width of the line.")
