@@ -142,6 +142,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
@@ -345,6 +346,7 @@ class SkyHanniMod {
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
+        loadModule(VisitorListener())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
         loadModule(GuiEditManager())
