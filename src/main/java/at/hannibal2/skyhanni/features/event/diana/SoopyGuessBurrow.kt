@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -282,6 +281,6 @@ class SoopyGuessBurrow {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
+        return DianaAPI.featuresEnabled() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
     }
 }
