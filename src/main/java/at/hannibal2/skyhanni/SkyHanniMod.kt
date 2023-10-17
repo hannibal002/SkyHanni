@@ -182,6 +182,7 @@ import at.hannibal2.skyhanni.features.misc.HideDamageSplash
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
@@ -314,7 +315,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.8",
+    version = "0.21.Beta.8.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -605,6 +606,7 @@ class SkyHanniMod {
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
         loadModule(ShiftClickEquipment())
+        loadModule(LockMouseLook)
 
         init()
 

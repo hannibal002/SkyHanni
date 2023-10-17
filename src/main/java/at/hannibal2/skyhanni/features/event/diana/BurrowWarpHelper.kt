@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -19,8 +18,7 @@ class BurrowWarpHelper {
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
