@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -455,10 +456,10 @@ class ComposterOverlay {
             return
         }
 
-        val (amountInSacks, _, sacksLoaded) = SackAPI.fetchSackItem(internalName.asInternalName())
+        val (amountInSacks, _, sackStatus) = SackAPI.fetchSackItem(internalName.asInternalName())
 
-        if (sacksLoaded == -1 || sacksLoaded == 2) {
-            if (sacksLoaded == 2) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
+        if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
+            if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
             val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
             LorenzUtils.clickableChat(
                 "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
