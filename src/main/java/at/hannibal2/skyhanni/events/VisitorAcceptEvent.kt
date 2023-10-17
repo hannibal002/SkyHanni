@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 
-class VisitorAcceptEvent(val visitor: GardenVisitorFeatures.Visitor) : LorenzEvent()
+class VisitorAcceptEvent(val visitor: VisitorAPI.Visitor) : LorenzEvent()
