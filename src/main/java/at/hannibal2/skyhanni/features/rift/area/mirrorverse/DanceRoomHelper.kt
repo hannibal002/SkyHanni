@@ -167,7 +167,7 @@ object DanceRoomHelper {
 
     fun start(interval: Long): Job {
         return CoroutineScope(Dispatchers.Default).launch {
-            while (isActive && found) {
+            while (NonCancellable.isActive && found) {
                 index++
                 startCountdown(0, 500)
                 delay(interval)
