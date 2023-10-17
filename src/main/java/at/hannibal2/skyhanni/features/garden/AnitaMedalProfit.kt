@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -48,7 +47,7 @@ class AnitaMedalProfit {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
-        if (VisitorAPI.inVisitorInventory) return
+        if (VisitorAPI.inInventory) return
 
         inInventory = true
 

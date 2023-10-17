@@ -6,18 +6,18 @@ import org.junit.jupiter.api.Test
 
 class VisitorToolTipParserTest {
     private val lore = mutableListOf(
-            "§7Items Required:",
-            " §aEnchanted Hay Bale §8x28",
-            "",
-            "§7Rewards:",
-            " §8+§37.2k §7Farming XP",
-            " §8+§215 §7Garden Experience",
-            " §8+§c23 Copper",
-            " §8+§b10 Bits",
-            " §aJacob's Ticket",
-            " §9Flowering Bouquet",
-            "",
-            "§eClick to give!"
+        "§7Items Required:",
+        " §aEnchanted Hay Bale §8x28",
+        "",
+        "§7Rewards:",
+        " §8+§37.2k §7Farming XP",
+        " §8+§215 §7Garden Experience",
+        " §8+§c23 Copper",
+        " §8+§b10 Bits",
+        " §aJacob's Ticket",
+        " §9Flowering Bouquet",
+        "",
+        "§eClick to give!"
     )
 
     @Test
@@ -39,12 +39,12 @@ class VisitorToolTipParserTest {
         }
 
         val assertions = mutableMapOf(
-                "§7Farming XP" to 7200,
-                "§7Garden Experience" to 15,
-                "Copper" to 23,
-                "Bits" to 10,
-                "§aJacob's Ticket" to 1,
-                "§9Flowering Bouquet" to 1
+            "§7Farming XP" to 7200,
+            "§7Garden Experience" to 15,
+            "Copper" to 23,
+            "Bits" to 10,
+            "§aJacob's Ticket" to 1,
+            "§9Flowering Bouquet" to 1
         )
 
         for ((itemName, amount) in assertions) {

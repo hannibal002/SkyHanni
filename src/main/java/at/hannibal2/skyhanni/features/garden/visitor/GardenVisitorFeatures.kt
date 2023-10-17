@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -9,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
-import at.hannibal2.skyhanni.events.VisitorAcceptEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -574,23 +573,23 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")
         event.move(3, "garden.visitorNeedsOnlyWhenClose", "garden.visitors.needs.onlyWhenClose")
         event.move(3, "garden.visitorNeedsInBazaarAlley", "garden.visitors.needs.inBazaarAlley")
-        event.move(3,"garden.visitorNeedsShowPrice", "garden.visitors.needs.showPrice")
-        event.move(3,"garden.visitorItemPreview", "garden.visitors.needs.itemPreview")
+        event.move(3, "garden.visitorNeedsShowPrice", "garden.visitors.needs.showPrice")
+        event.move(3, "garden.visitorItemPreview", "garden.visitors.needs.itemPreview")
         event.move(3, "garden.visitorShowPrice", "garden.visitors.inventory.showPrice")
         event.move(3, "garden.visitorExactAmountAndTime", "garden.visitors.inventory.exactAmountAndTime")
         event.move(3, "garden.visitorCopperPrice", "garden.visitors.inventory.copperPrice")
         event.move(3, "garden.visitorCopperTime", "garden.visitors.inventory.copperTime")
         event.move(3, "garden.visitorExperiencePrice", "garden.visitors.inventory.experiencePrice")
-        event.move(3,"garden.visitorRewardWarning.notifyInChat","garden.visitors.rewardWarning.notifyInChat")
-        event.move(3,"garden.visitorRewardWarning.showOverName","garden.visitors.rewardWarning.showOverName")
-        event.move(3,"garden.visitorRewardWarning.preventRefusing","garden.visitors.rewardWarning.preventRefusing")
-        event.move(3,"garden.visitorRewardWarning.bypassKey","garden.visitors.rewardWarning.bypassKey")
-        event.move(3,"garden.visitorRewardWarning.drops","garden.visitors.rewardWarning.drops")
+        event.move(3, "garden.visitorRewardWarning.notifyInChat", "garden.visitors.rewardWarning.notifyInChat")
+        event.move(3, "garden.visitorRewardWarning.showOverName", "garden.visitors.rewardWarning.showOverName")
+        event.move(3, "garden.visitorRewardWarning.preventRefusing", "garden.visitors.rewardWarning.preventRefusing")
+        event.move(3, "garden.visitorRewardWarning.bypassKey", "garden.visitors.rewardWarning.bypassKey")
+        event.move(3, "garden.visitorRewardWarning.drops", "garden.visitors.rewardWarning.drops")
         event.move(3, "garden.visitorNotificationChat", "garden.visitors.notificationChat")
         event.move(3, "garden.visitorNotificationTitle", "garden.visitors.notificationTitle")
         event.move(3, "garden.visitorHighlightStatus", "garden.visitors.highlightStatus")
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
-        event.move(3,"garden.visitorHypixelArrivedMessage","garden.visitors.hypixelArrivedMessage")
+        event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
     }
 

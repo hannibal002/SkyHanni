@@ -21,31 +21,37 @@ class VisitorAPITest {
 
         // To short
         assert(
-            VisitorAPI.isVisitorInfo(mutableListOf(
-                "§a§lVisitor Info",
-                "§7§oClick to view info about this visitor."
-            )) == false
+            !VisitorAPI.isVisitorInfo(
+                mutableListOf(
+                    "§a§lVisitor Info",
+                    "§7§oClick to view info about this visitor."
+                )
+            )
         )
 
         // To long
         assert(
-            VisitorAPI.isVisitorInfo(mutableListOf(
-                "§a§lVisitor Info",
-                "§7§oClick to view info about this visitor.",
-                "§7§oClick to view info about this visitor.",
-                "§7§oClick to view info about this visitor.",
-                "§7§oClick to view info about this visitor.",
-            )) == false
+            !VisitorAPI.isVisitorInfo(
+                mutableListOf(
+                    "§a§lVisitor Info",
+                    "§7§oClick to view info about this visitor.",
+                    "§7§oClick to view info about this visitor.",
+                    "§7§oClick to view info about this visitor.",
+                    "§7§oClick to view info about this visitor.",
+                )
+            )
         )
 
         // Third line is §7Offers Accepted: §a
         assert(
-            VisitorAPI.isVisitorInfo(mutableListOf(
-                "§a§lVisitor Info",
-                "§7§oClick to view info about this visitor.",
-                "§7§oClick to view info about this visitor.",
-                "§7Offers Accepted: §a",
-            )) == true
+            VisitorAPI.isVisitorInfo(
+                mutableListOf(
+                    "§a§lVisitor Info",
+                    "§7§oClick to view info about this visitor.",
+                    "§7§oClick to view info about this visitor.",
+                    "§7Offers Accepted: §a",
+                )
+            )
         )
     }
 }

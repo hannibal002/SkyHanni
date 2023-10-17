@@ -117,7 +117,7 @@ class VisitorListener {
         val offerItem = event.inventoryItems[VISITOR_ACCEPT_ITEM_SLOT] ?: return
         if (offerItem.name != "§aAccept Offer") return
 
-        VisitorAPI.inVisitorInventory = true
+        VisitorAPI.inInventory = true
 
         val visitorOffer = VisitorAPI.VisitorOffer(offerItem)
 
@@ -135,12 +135,12 @@ class VisitorListener {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        VisitorAPI.inVisitorInventory = false
+        VisitorAPI.inInventory = false
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
-        if (!VisitorAPI.inVisitorInventory) return
+        if (!VisitorAPI.inInventory) return
         if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
@@ -179,7 +179,7 @@ class VisitorListener {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.onBarnPlot) return
-        if (!VisitorAPI.inVisitorInventory) return
+        if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
     }
