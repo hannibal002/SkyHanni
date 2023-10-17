@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -33,9 +32,8 @@ class TitleManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (endTime.isInPast()) return
 
-        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
-        val width = scaledResolution.scaledWidth
-        val height = scaledResolution.scaledHeight
+        val width = MinecraftData.scaledWidth()
+        val height = MinecraftData.scaledHeight()
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)

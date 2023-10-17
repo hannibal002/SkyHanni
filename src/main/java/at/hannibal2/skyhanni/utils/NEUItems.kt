@@ -223,6 +223,10 @@ object NEUItems {
         GlStateManager.popMatrix()
     }
 
+    fun ItemStack.renderOnScreen(x: Int, y: Int, scaleMultiplier: Double = 1.0) {
+        this.renderOnScreen(x.toFloat(), y.toFloat(), scaleMultiplier)
+    }
+
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         val pair = getMultiplier(internalName.asString(), tryCount)
         return Pair(pair.first.asInternalName(), pair.second)

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -246,9 +246,8 @@ class BlazeSlayerDaggerHelper {
 
         if (Minecraft.getMinecraft().currentScreen != null) return
 
-        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
-        val width = scaledResolution.scaledWidth
-        val height = scaledResolution.scaledHeight
+        val width = MinecraftData.scaledWidth()
+        val height = MinecraftData.scaledHeight()
 
         val sizeFactor = (width.toFloat() / 960f).roundToPrecision(3)
 

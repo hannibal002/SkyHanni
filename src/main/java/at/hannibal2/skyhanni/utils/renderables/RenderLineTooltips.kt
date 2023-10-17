@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
@@ -27,7 +27,6 @@ object RenderLineTooltips {
             val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)
             val borderColorStart = Color(colourInt).darker().rgb and 0x00FFFFFF or (200 shl 24)
             val font = Minecraft.getMinecraft().fontRendererObj
-            val scaled = ScaledResolution(Minecraft.getMinecraft())
             GlStateManager.disableRescaleNormal()
             RenderHelper.disableStandardItemLighting()
             GlStateManager.disableLighting()
@@ -42,13 +41,13 @@ object RenderLineTooltips {
             var needsWrap = false
             var titleLinesCount = 1
             var tooltipX = x
-            if (tooltipX + tooltipTextWidth + 4 > scaled.scaledWidth) {
+            if (tooltipX + tooltipTextWidth + 4 > MinecraftData.scaledWidth()) {
                 tooltipX = x - 16 - tooltipTextWidth
                 if (tooltipX < 4) {
-                    tooltipTextWidth = if (x > scaled.scaledWidth / 2) {
+                    tooltipTextWidth = if (x > MinecraftData.scaledWidth() / 2) {
                         x - 12 - 8
                     } else {
-                        scaled.scaledWidth - 16 - x
+                        MinecraftData.scaledWidth() - 16 - x
                     }
                     needsWrap = true
                 }
@@ -72,7 +71,7 @@ object RenderLineTooltips {
                 }
                 tooltipTextWidth = wrappedTooltipWidth
                 textLines = wrappedTextLines.toList()
-                tooltipX = if (x > scaled.scaledWidth / 2) {
+                tooltipX = if (x > MinecraftData.scaledWidth() / 2) {
                     x - 16 - tooltipTextWidth
                 } else {
                     x + 12
@@ -87,8 +86,8 @@ object RenderLineTooltips {
                 }
             }
 
-            if (tooltipY + tooltipHeight + 6 > scaled.scaledHeight) {
-                tooltipY = scaled.scaledHeight - tooltipHeight - 6
+            if (tooltipY + tooltipHeight + 6 > MinecraftData.scaledHeight()) {
+                tooltipY =  MinecraftData.scaledHeight() - tooltipHeight - 6
             }
             val zLevel = 300
             val backgroundColor = -0xfeffff0

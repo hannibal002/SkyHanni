@@ -8,6 +8,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
@@ -143,4 +144,40 @@ public class GUIConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean configButtonOnPause = true;
+
+    @Expose
+    @ConfigOption(name = "Toasts", desc = "")
+    @Accordion
+    public Toasts toasts = new Toasts();
+
+    public static class Toasts {
+        @ConfigOption(name = "Enabled", desc = "Shows toasts.")
+        @Expose
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Toast Corner", desc = "What corner do you want the toast to display in?")
+        @ConfigEditorDropdown(values = {"Top Left", "Top Right"})
+        public int corner = 0;
+
+        @Expose
+        @ConfigOption(name = "Animation Direction", desc = "What axis do you want the animation to play on?")
+        @ConfigEditorDropdown(values = {"Horizontal", "Vertical"})
+        public int direction = 0;
+
+        @ConfigOption(name = "Enable Animations", desc = "Animates the toasts appearing and disappearing.")
+        @Expose
+        @ConfigEditorBoolean
+        public boolean animations = true;
+
+        @ConfigOption(name = "Show Items", desc = "Will attempt to show an item relevant to the toast.")
+        @Expose
+        @ConfigEditorBoolean
+        public boolean items = true;
+
+        @ConfigOption(name = "Display Duration", desc = "The amount of time in seconds that this toast shows for.")
+        @ConfigEditorSlider(minValue = 1.5f, maxValue = 10, minStep = .5f)
+        public float displayDuration = 5;
+    }
 }

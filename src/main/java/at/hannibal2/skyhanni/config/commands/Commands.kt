@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.ToastsManager
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -219,6 +220,10 @@ object Commands {
             "shconfigsave",
             "Manually saving the config"
         ) { SkyHanniMod.configManager.saveConfig("manual-command") }
+        registerCommand(
+            "shtesttoast",
+        "Renders a test toast with each word on a new line and a dummy item"
+        ) { ToastsManager.command(it) }
     }
 
     private fun developersCodingHelp() {

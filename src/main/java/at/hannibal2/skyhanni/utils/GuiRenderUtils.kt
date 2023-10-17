@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
@@ -284,5 +286,30 @@ object GuiRenderUtils {
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {
         renderItemStack(item, x, y)
         GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
+    }
+
+    //From NEU
+    fun drawAlphaRectangle(posX: Int, posY: Int, width: Int, height: Int, transparency: Double = 0.92) {
+        var alpha = (transparency.coerceIn(0.0, 1.0) * 255).toInt() shl 24
+
+        if (OpenGlHelper.isFramebufferEnabled()) {
+            //todo blurred background from neu
+        } else {
+            alpha = 0xff000000.toInt()
+        }
+
+        val background = alpha or 0x202026
+        val light = alpha or 0x303036
+        val dark = alpha or 0x101016
+        val shadow = alpha or 0x000000
+
+        Gui.drawRect(posX, posY, posX + 1, posY + height, light) // Left
+        Gui.drawRect(posX + 1, posY, posX + width, posY + 1, light) // Top
+        Gui.drawRect(posX + width - 1, posY + 1, posX + width, posY + height, dark) // Right
+        Gui.drawRect(posX + 1, posY + height - 1, posX + width - 1, posY + height, dark) // Bottom
+        Gui.drawRect(posX + 1, posY + 1, posX + width - 1, posY + height - 1, background) // Middle
+
+        Gui.drawRect(posX + width, posY + 2, posX + width + 2, posY + height + 2, shadow) // Right shadow
+        Gui.drawRect(posX + 2, posY + height, posX + width, posY + height + 2, shadow) // Bottom shadow
     }
 }

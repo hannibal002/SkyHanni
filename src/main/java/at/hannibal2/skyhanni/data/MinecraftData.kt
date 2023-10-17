@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
@@ -95,4 +96,9 @@ object MinecraftData {
         InventoryUtils.itemInHandId = NEUInternalName.NONE
         InventoryUtils.recentItemsInHand.clear()
     }
+
+    private fun scaledResolution() = ScaledResolution(Minecraft.getMinecraft())
+
+    fun scaledHeight() = scaledResolution().scaledHeight
+    fun scaledWidth() = scaledResolution().scaledWidth
 }

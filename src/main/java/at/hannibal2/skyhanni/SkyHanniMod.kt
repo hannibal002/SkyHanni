@@ -292,6 +292,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.ToastsManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -360,6 +361,7 @@ class SkyHanniMod {
         loadModule(DefaultConfigFeatures)
         loadModule(EntityOutlineRenderer)
         loadModule(KeyboardManager)
+        loadModule(ToastsManager)
 
         // APIs
         loadModule(BazaarApi())
