@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -30,6 +29,13 @@ class GlowingDroppedItems {
         "Barrier Street",
         "Village Plaza",
         "Déjà Vu Alley"
+    )
+
+    private val showcaseItemIslands = setOf(
+        IslandType.HUB,
+        IslandType.PRIVATE_ISLAND,
+        IslandType.PRIVATE_ISLAND_GUEST,
+        IslandType.CRIMSON_ISLE
     )
 
     @SubscribeEvent
@@ -55,18 +61,12 @@ class GlowingDroppedItems {
         return rarity?.color?.toColor()?.rgb
     }
 
-    private fun isShowcaseArea() = RecalculatingValue(1.seconds) {
-        showcaseItemLocations.contains(LorenzUtils.skyBlockArea) ||
-            LorenzUtils.skyBlockIsland.equalsOneOf(
-                IslandType.HUB,
-                IslandType.PRIVATE_ISLAND,
-                IslandType.PRIVATE_ISLAND_GUEST,
-                IslandType.CRIMSON_ISLE
-            )
+    private val isShowcaseArea = RecalculatingValue(1.seconds) {
+        showcaseItemIslands.contains(LorenzUtils.skyBlockIsland) || showcaseItemLocations.contains(LorenzUtils.skyBlockArea)
     }
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {
-        if (!isShowcaseArea().getValue() || config.highlightShowcase) return false
+        if (!isShowcaseArea.getValue() || config.highlightShowcase) return false
 
         for (entityArmorStand in entity.worldObj.getEntitiesWithinAABB(
             EntityArmorStand::class.java,
