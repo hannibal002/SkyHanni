@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SackItem.Companion.getStatus
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -255,7 +256,7 @@ object SackAPI {
                     newAmount = 0
                     changed = 0
                 }
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.status) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.getStatus()) }
             } else {
                 val newAmount = if (item.value > 0) item.value else 0
                 sackData =
@@ -326,8 +327,14 @@ object SackAPI {
 data class SackItem(
     @Expose val amount: Long,
     @Expose val lastChange: Int,
-    @Expose val status: SackStatus = SackStatus.MISSING
-)
+    @Expose private val status: SackStatus?
+) {
+    companion object {
+        fun SackItem.getStatus(): SackStatus {
+            return status ?: SackStatus.MISSING
+        }
+    }
+}
 
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackItem.Companion.getStatus
 import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -456,7 +457,9 @@ class ComposterOverlay {
             return
         }
 
-        val (amountInSacks, _, sackStatus) = SackAPI.fetchSackItem(internalName.asInternalName())
+        val sackItem = SackAPI.fetchSackItem(internalName.asInternalName())
+        val amountInSacks = sackItem.amount
+        val sackStatus = sackItem.getStatus()
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
             if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
