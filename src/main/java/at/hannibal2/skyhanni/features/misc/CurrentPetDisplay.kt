@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -37,7 +38,7 @@ class CurrentPetDisplay {
             blocked = true
         }
 
-        if (blocked && SkyHanniMod.feature.misc.petDisplay) {
+        if (blocked && SkyHanniMod.feature.misc.pets.display) {
             event.blockedReason = "pets"
         }
     }
@@ -65,9 +66,14 @@ class CurrentPetDisplay {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
 
-        if (!SkyHanniMod.feature.misc.petDisplay) return
+        if (!SkyHanniMod.feature.misc.pets.display) return
         val config = ProfileStorageData.profileSpecific ?: return
 
         SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.petDisplay", "misc.pets.display")
     }
 }

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -253,7 +252,7 @@ class MinionCraftHelper {
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        TitleUtils.sendTitle("Can craft $minionName", 3.seconds)
+        LorenzUtils.sendTitle("Can craft $minionName", 3.seconds)
         alreadyNotified.add(minionName)
     }
 

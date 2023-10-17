@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -67,7 +67,7 @@ object APIUtil {
                             e.printStackTrace()
 
                         } else {
-                            CopyErrorCommand.logError(
+                            ErrorManager.logError(
                                 Error("$apiName error for url: '$urlString'", e),
                                 "Failed to load data from $apiName"
                             )
@@ -79,7 +79,7 @@ object APIUtil {
             if (silentError) {
                 throw throwable
             } else {
-                CopyErrorCommand.logError(
+                ErrorManager.logError(
                     Error("$apiName error for url: '$urlString'", throwable),
                     "Failed to load data from $apiName"
                 )

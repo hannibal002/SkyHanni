@@ -40,11 +40,9 @@ object FarmingContestAPI {
     }
 
     private fun checkActiveContest() {
-        if (inContest) {
-            if (startTime.passedSince() > 20.minutes) {
-                FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
-                inContest = false
-            }
+        if (inContest && startTime.passedSince() > 20.minutes) {
+            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            inContest = false
         }
 
         val currentCrop = readCurrentCrop()

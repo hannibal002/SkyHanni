@@ -91,13 +91,12 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
 
         line = if (currentArmor == 0) "§7§2The base fortune from your armor\n§2Select a piece for more info"
         else "§7§2Base fortune from your\n${armorItem.getItem().displayName}"
-        value = if (currentArmor == 0) {
-            if (FFStats.usingSpeedBoots) 160 else 130
-        } else if (currentArmor == 1) 30
-        else if (currentArmor == 2) 35
-        else if (currentArmor == 3) 35
-        else {
-            if (FFStats.usingSpeedBoots) 60 else 30
+        value = when (currentArmor) {
+            0 -> if (FFStats.usingSpeedBoots) 160 else 130
+            1 -> 30
+            2 -> 35
+            3 -> 35
+            else -> if (FFStats.usingSpeedBoots) 60 else 30
         }
         GuiRenderUtils.drawFarmingBar("§2Base $word Fortune", line, armorFF[FFTypes.BASE] ?: 0,
             value, FFGuideGUI.guiLeft + 135,
