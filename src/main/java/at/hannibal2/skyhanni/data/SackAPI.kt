@@ -326,7 +326,7 @@ object SackAPI {
 data class SackItem(
     @Expose val amount: Long,
     @Expose val lastChange: Int,
-    @Expose val status: SackStatus
+    @Expose val status: SackStatus = SackStatus.MISSING
 )
 
 private val gemstoneMap = mapOf(
