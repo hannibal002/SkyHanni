@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.hours
 
 class ChestValue {
 
@@ -40,7 +41,7 @@ class ChestValue {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.inDungeons && config.disabledInDungeons) return
+        if (LorenzUtils.inDungeons && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
         if (inInventory) {
             config.position.renderStringsAndItems(

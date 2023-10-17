@@ -221,16 +221,16 @@ public class InventoryConfig {
 
     public static class ChestValueConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enabled estimated value of chest")
+        @ConfigOption(name = "Enabled", desc = "Enable estimated value of chest")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Disable in dungeons", desc = "Disable the feature in dungeons")
+        @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean disabledInDungeons = false;
+        public boolean enableInDungeons = false;
 
         @Expose
         @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")
