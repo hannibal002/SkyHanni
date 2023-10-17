@@ -18,7 +18,6 @@ object ModifyVisualWords {
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
         if (!LorenzUtils.inSkyBlock && !config.workOutside) return originalText
-        if (VisualWordGui.isInGui()) return originalText
 
         if (modifiedWords.isEmpty()) {
             modifiedWords = SkyHanniMod.feature.storage.modifiedWords
@@ -29,19 +28,20 @@ object ModifyVisualWords {
             return cachedResult
         }
 
-        var replacements = 0
+        if (originalText.startsWith("§§")) {
+            modifiedText = modifiedText.removePrefix("§§")
+        } else {
+            for (modifiedWord in modifiedWords) {
+                if (!modifiedWord.enabled) continue
+                val phrase = modifiedWord.phrase.convertToFormatted()
 
-        for (modifiedWord in modifiedWords) {
-            if (!modifiedWord.enabled) continue
-            val phrase = modifiedWord.phrase.convertToFormatted()
+                if (phrase.isEmpty()) continue
 
-            if (phrase.isEmpty()) continue
-
-            replacements += 1
-            modifiedText = modifiedText.replace(phrase, modifiedWord.replacement.convertToFormatted())
+                modifiedText = modifiedText.replace(phrase, modifiedWord.replacement.convertToFormatted())
+            }
         }
-        // if not many are done it is better to not cache it
-        if (replacements > 2) textCache.put(originalText, modifiedText)
+
+        textCache.put(originalText, modifiedText)
         return modifiedText
     }
 }
