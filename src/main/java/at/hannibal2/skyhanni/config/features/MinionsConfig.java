@@ -3,7 +3,11 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class MinionsConfig {
 
@@ -22,6 +26,7 @@ public class MinionsConfig {
     @ConfigOption(name = "Last Clicked", desc = "")
     @Accordion
     public LastClickedMinionConfig lastClickedMinion = new LastClickedMinionConfig();
+
     public static class LastClickedMinionConfig {
         @Expose
         @ConfigOption(name = "Last Minion Display", desc = "Marks the location of the last clicked minion, even through walls.")
@@ -54,7 +59,8 @@ public class MinionsConfig {
     @ConfigOption(name = "Emptied Time", desc = "")
     @Accordion
     public EmptiedTimeConfig emptiedTime = new EmptiedTimeConfig();
-    public static class EmptiedTimeConfig{
+
+    public static class EmptiedTimeConfig {
         @Expose
         @ConfigOption(name = "Emptied Time Display", desc = "Show the time when the hopper in the minion was last emptied.")
         @ConfigEditorBoolean
