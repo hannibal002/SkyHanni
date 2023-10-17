@@ -21,7 +21,7 @@ class RenderData {
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         if (!SkyHanniDebugsAndTests.globalRender) return
-        if (GuiEditManager.isInGui() || FFGuideGUI.isInGui() || VisualWordGui.isInGui()) return
+        if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
         ToastRenderEvent().postAndCatch()
@@ -30,7 +30,7 @@ class RenderData {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        if (GuiEditManager.isInGui() || FFGuideGUI.isInGui() || VisualWordGui.isInGui()) return
+        if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 

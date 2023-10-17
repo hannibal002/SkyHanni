@@ -142,6 +142,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
@@ -181,6 +182,7 @@ import at.hannibal2.skyhanni.features.misc.HideDamageSplash
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
@@ -345,6 +347,7 @@ class SkyHanniMod {
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
+        loadModule(VisitorListener())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
         loadModule(GuiEditManager())
@@ -605,6 +608,7 @@ class SkyHanniMod {
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
         loadModule(ShiftClickEquipment())
+        loadModule(LockMouseLook)
 
         init()
 

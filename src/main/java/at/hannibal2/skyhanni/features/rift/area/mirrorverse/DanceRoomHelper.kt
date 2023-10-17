@@ -12,12 +12,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -80,7 +75,7 @@ object DanceRoomHelper {
             "Jump" -> jump
             "Punch" -> punch
             else -> fallback
-        } + this
+        } + this@addColor
     }
 
     @SubscribeEvent
@@ -172,7 +167,7 @@ object DanceRoomHelper {
 
     fun start(interval: Long): Job {
         return CoroutineScope(Dispatchers.Default).launch {
-            while (NonCancellable.isActive && found) {
+            while (isActive && found) {
                 index++
                 startCountdown(0, 500)
                 delay(interval)
