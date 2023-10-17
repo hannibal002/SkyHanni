@@ -69,7 +69,7 @@ class FishingTimer {
 
         if (inHollows && newCount >= 60 && config.wormLimitAlert) {
             SoundUtils.playBeepSound()
-            TitleManager.sendTitle("§cWORM CAP FULL!", 1.seconds, 3.6)
+            TitleManager.sendTitle("§cWORM CAP FULL!", 1.seconds, 7.2)
         }
     }
 
