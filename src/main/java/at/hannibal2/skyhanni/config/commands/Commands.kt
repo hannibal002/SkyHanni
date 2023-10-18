@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
@@ -43,6 +44,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -163,6 +165,10 @@ object Commands {
 //                    "Copies the translation for a given message to your clipboard. " +
 //                    "Language codes are at the end of the translation when you click on a message."
 //        ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shmouselock",
+            "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+        ) { LockMouseLook.toggleLock() }
     }
 
     private fun usersBugFix() {
@@ -266,6 +272,10 @@ object Commands {
             "shpartydebug",
             "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
+        registerCommand(
+                "shplaysound",
+                "Play the specified sound effect at the given pitch and volume."
+        ) { SoundUtils.command(it) }
     }
 
     private fun internalCommands() {

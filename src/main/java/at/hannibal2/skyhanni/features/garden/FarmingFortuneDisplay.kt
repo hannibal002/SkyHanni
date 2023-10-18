@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -80,7 +81,8 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.farmingFortunePos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
+        if (GardenAPI.hideExtraGuis()) return
+        config.pos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
     @SubscribeEvent
@@ -137,18 +139,18 @@ class FarmingFortuneDisplay {
             toolCounterFortune + getTurboCropFortune(tool, currentCrop) + getDedicationFortune(tool, currentCrop)
     }
 
-    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.farmingFortuneDisplay
+    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden
+        private val config get() = SkyHanniMod.feature.garden.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestTrueFarmingFortune
 
         private val currentCrop get() = GardenAPI.getCurrentlyFarmedCrop()
 
         private var tabFortune: Double = 0.0
         private var toolFortune: Double = 0.0
-        private val baseFortune: Double get() = if (config.farmingFortuneDropMultiplier) 100.0 else 0.0
+        private val baseFortune: Double get() = if (config.dropMultiplier) 100.0 else 0.0
         private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
         private val accessoryFortune: Double?
             get() = currentCrop?.let {
@@ -280,5 +282,12 @@ class FarmingFortuneDisplay {
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
+        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
+        event.move(3,"garden.farmingFortunePos", "garden.farmingFortunes.pos")
     }
 }

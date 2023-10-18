@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -18,7 +19,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FishingTimer {
-    private val config get() = SkyHanniMod.feature.fishing
+    private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private val barnLocation = LorenzVec(108, 89, -252)
 
     private var rightLocation = false
@@ -29,7 +30,7 @@ class FishingTimer {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.barnTimer) return
+        if (!config.enabled) return
 
         if (event.repeatSeconds(3)) {
             rightLocation = isRightLocation()
@@ -46,7 +47,7 @@ class FishingTimer {
         if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime
-        val barnTimerAlertTime = config.barnTimerAlertTime * 1_000
+        val barnTimerAlertTime = config.alertTime * 1_000
         if (duration > barnTimerAlertTime && duration < barnTimerAlertTime + 3_000) {
             SoundUtils.playBeepSound()
         }
@@ -73,7 +74,7 @@ class FishingTimer {
         .map { entity ->
             val name = entity.name
             val isSummonedSoul = name.contains("'")
-            val hasFishingMobName = SeaCreatureManager.allFishingMobNames.any { name.contains(it) }
+            val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
             if (hasFishingMobName && !isSummonedSoul) {
                 if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
             } else 0
@@ -82,9 +83,9 @@ class FishingTimer {
     private fun isRightLocation(): Boolean {
         inHollows = false
 
-        if (config.barnTimerForStranded && LorenzUtils.isStrandedProfile) return true
+        if (config.forStranded && LorenzUtils.isStrandedProfile) return true
 
-        if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
+        if (config.crystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             inHollows = true
             return true
         }
@@ -99,17 +100,28 @@ class FishingTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.barnTimer) return
+        if (!config.enabled) return
         if (!rightLocation) return
         if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime
-        val barnTimerAlertTime = config.barnTimerAlertTime * 1_000
+        val barnTimerAlertTime = config.alertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
         val name = if (currentCount == 1) "sea creature" else "sea creatures"
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
-        config.barnTimerPos.renderString(text, posLabel = "BarnTimer")
+        config.pos.renderString(text, posLabel = "BarnTimer")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "fishing.barnTimer", "fishing.barnTimer.enabled")
+        event.move(3, "fishing.barnTimerAlertTime", "fishing.barnTimer.alertTime")
+        event.move(3, "fishing.barnTimerCrystalHollows", "fishing.barnTimer.crystalHollows")
+        event.move(3, "fishing.barnTimerForStranded", "fishing.barnTimer.forStranded")
+        event.move(3, "fishing.wormLimitAlert", "fishing.barnTimer.wormLimitAlert")
+        event.move(3, "fishing.manualResetTimer", "fishing.barnTimer.manualResetTimer")
+        event.move(3, "fishing.barnTimerPos", "fishing.barnTimer.pos")
     }
 }

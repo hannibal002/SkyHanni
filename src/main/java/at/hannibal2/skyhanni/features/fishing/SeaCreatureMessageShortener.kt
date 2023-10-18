@@ -16,7 +16,7 @@ class SeaCreatureMessageShortener {
         event.chatEvent.blockedReason = "sea_creature_caught"
 
         var message = if (config.shortenFishingMessage) {
-            "§9You caught a $seaCreature§9!"
+            "§9You caught a ${seaCreature.displayName}§9!"
         } else event.chatEvent.message
 
         if (config.compactDoubleHook && event.doubleHook) {
@@ -25,7 +25,7 @@ class SeaCreatureMessageShortener {
         LorenzUtils.chat(message)
 
         if (seaCreature.fishingExperience == 0) {
-            LorenzUtils.debug("no fishing exp set for " + seaCreature.displayName)
+            LorenzUtils.debug("no fishing exp set for " + seaCreature.name)
         }
     }
 }

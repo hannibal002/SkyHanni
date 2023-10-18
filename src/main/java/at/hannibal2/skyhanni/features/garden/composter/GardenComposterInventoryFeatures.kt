@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -18,12 +19,12 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenComposterInventoryFeatures {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.composters
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.composterUpgradePrice) return
+        if (!config.upgradePrice) return
 
         if (InventoryUtils.openInventoryName() != "Composter Upgrades") return
 
@@ -77,7 +78,7 @@ class GardenComposterInventoryFeatures {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.composterHighLightUpgrade) return
+        if (!config.highlightUpgrade) return
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (event.gui !is GuiChest) return
@@ -94,5 +95,11 @@ class GardenComposterInventoryFeatures {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.composterUpgradePrice", "garden.composters.upgradePrice")
+        event.move(3, "garden.composterHighLightUpgrade", "garden.composters.highlightUpgrade")
     }
 }

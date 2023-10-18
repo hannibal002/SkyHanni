@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 class LimboTimeTracker {
     private val config get() = SkyHanniMod.feature.misc
@@ -28,11 +27,7 @@ class LimboTimeTracker {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (!inLimbo) return
-
-        val passedSince = limboJoinTime.passedSince()
-        if (passedSince > 5.seconds) {
-            leaveLimbo()
-        }
+        leaveLimbo()
     }
 
     @SubscribeEvent

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -96,14 +97,14 @@ class MinionFeatures {
     fun onRenderLastClickedMinion(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!config.lastClickedMinionDisplay) return
+        if (!config.lastClickedMinion.display) return
 
-        val special = config.lastOpenedMinionColor
+        val special = config.lastClickedMinion.color
         val color = Color(SpecialColour.specialToChromaRGB(special), true)
 
         val loc = lastMinion
         if (loc != null) {
-            val time = config.lastOpenedMinionTime * 1_000
+            val time = config.lastClickedMinion.time * 1_000
             if (lastMinionOpened + time > System.currentTimeMillis()) {
                 event.drawWaypointFilled(
                     loc.add(-0.5, 0.0, -0.5),
@@ -275,7 +276,7 @@ class MinionFeatures {
             if (!LocationUtils.canSee(playerEyeLocation, location)) continue
 
             val lastEmptied = minion.value.lastClicked
-            if (playerLocation.distance(location) >= config.distance) continue
+            if (playerLocation.distance(location) >= config.emptiedTime.distance) continue
 
             if (config.nameDisplay) {
                 val displayName = minion.value.displayName
@@ -285,7 +286,7 @@ class MinionFeatures {
                 event.drawString(location.add(0.0, 0.65, 0.0), name, true)
             }
 
-            if (config.emptiedTimeDisplay && lastEmptied != 0L) {
+            if (config.emptiedTime.display && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
                 val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
@@ -337,5 +338,14 @@ class MinionFeatures {
             minions = mutableMapOf()
             LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "minions.lastClickedMinionDisplay", "minions.lastClickedMinion.display")
+        event.move(3, "minions.lastOpenedMinionColor", "minions.lastClickedMinion.color")
+        event.move(3, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
+        event.move(3, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
+        event.move(3, "minions.distance", "minions.emptiedTime.distance")
     }
 }
