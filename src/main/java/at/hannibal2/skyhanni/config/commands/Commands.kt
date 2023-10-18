@@ -211,7 +211,7 @@ object Commands {
         ) { CaptureFarmingGear.reverseCarrotFortune() }
         registerCommand(
             "shrepostatus",
-        "Shows the status of all the mods constants"
+            "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
     }
 

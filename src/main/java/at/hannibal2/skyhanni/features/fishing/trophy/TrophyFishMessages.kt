@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.Companion.fishes
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.fishes
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
@@ -16,16 +18,22 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TrophyFishMessages {
     private val trophyFishPattern =
-        Regex("§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.")
+        "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.".toPattern()
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        var displayName = ""
+        var displayRarity = ""
 
-        val match = trophyFishPattern.matchEntire(event.message)?.groups ?: return
-        val displayName = match["displayName"]!!.value.replace("§k", "")
-        val displayRarity = match["displayRarity"]!!.value
+        trophyFishPattern.matchMatcher(event.message) {
+            displayName = group("displayName").replace("§k", "")
+            displayRarity = group("displayRarity")
+        } ?: run {
+            println("did not match")
+            return
+        }
 
         val internalName = displayName.replace("Obfuscated", "Obfuscated Fish")
             .replace("[- ]".toRegex(), "").lowercase().removeColor()
