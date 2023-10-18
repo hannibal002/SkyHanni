@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -37,7 +36,7 @@ class WildStrawberryDyeNotification {
             val internalName = event.itemStack.getInternalName()
             if (internalName.equals("DYE_WILD_STRAWBERRY")) {
                 val name = event.itemStack.name!!
-                TitleUtils.sendTitle(name, 5.seconds)
+                LorenzUtils.sendTitle(name, 5.seconds)
                 LorenzUtils.chat("§e[SkyHanni] You found a $name§e!")
                 SoundUtils.playBeepSound()
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("DYE_WILD_STRAWBERRY"), 5_000)

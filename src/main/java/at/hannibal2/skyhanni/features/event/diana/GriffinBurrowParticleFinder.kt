@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
@@ -28,9 +27,8 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val packet = event.packet
 
         if (packet is S2APacketParticles) {
@@ -100,8 +98,8 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
@@ -121,9 +119,8 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
 
         val pos = event.position
         if (event.itemInHand?.isSpade != true || pos.getBlockAt() !== Blocks.grass) return

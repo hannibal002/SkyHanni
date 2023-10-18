@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -37,7 +38,7 @@ object SackDisplay {
 
     private fun drawDisplay(savingSacks: Boolean): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-        var totalPrice = 0
+        var totalPrice = 0L
         var rendered = 0
         SackAPI.getSacksData(savingSacks)
 
@@ -83,7 +84,7 @@ object SackDisplay {
                     )
 
                     if (colorCode == "§a") add(" §c§l(Full!)")
-                    if (config.showPrice && price != 0) add(" §7(§6${format(price)}§7)")
+                    if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
                 rendered++
             }
@@ -98,9 +99,15 @@ object SackDisplay {
                     config.sortingType = it.ordinal
                     update(false)
                 })
-
+            newDisplay.addButton(
+                prefix = "§7Number format: ",
+                getName = NumberFormat.entries[config.numberFormat].DisplayName,
+                onChange = {
+                    config.numberFormat = (config.numberFormat + 1) % 3
+                    update(false)
+                }
+            )
             if (config.showPrice) {
-                newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
                 newDisplay.addSelector<PriceFrom>(" ",
                     getName = { type -> type.displayName },
                     isCurrent = { it.ordinal == config.priceFrom },
@@ -108,6 +115,15 @@ object SackDisplay {
                         config.priceFrom = it.ordinal
                         update(false)
                     })
+                newDisplay.addButton(
+                    prefix = "§7Price Format: ",
+                    getName = PriceFormat.entries[config.priceFormat].displayName,
+                    onChange = {
+                        config.priceFormat = (config.priceFormat + 1) % 2
+                        update(false)
+                    }
+                )
+                newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
             }
         }
 
@@ -135,9 +151,9 @@ object SackDisplay {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
                     add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
-                    val price = (roughprice + flawedprice + fineprice + flawlessprice)
+                    val price = roughprice + flawedprice + fineprice + flawlessprice
                     totalPrice += price
-                    if (config.showPrice && price != 0) add(" §7(§6${format(price)}§7)")
+                    if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
             }
             if (config.showPrice) newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
@@ -145,7 +161,7 @@ object SackDisplay {
         return newDisplay
     }
 
-    private fun format(price: Int) = if (config.priceFormat == 0) NumberUtil.format(price) else price.addSeparators()
+    private fun format(price: Long) = if (config.priceFormat == 0) NumberUtil.format(price) else price.addSeparators()
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
@@ -161,5 +177,17 @@ object SackDisplay {
         BAZAAR("Bazaar Price"),
         NPC("Npc Price"),
         ;
+    }
+
+    enum class PriceFormat(val displayName: String) {
+        FORMATED("Formatted"),
+        UNFORMATED("Unformatted")
+        ;
+    }
+
+    enum class NumberFormat(val DisplayName: String) {
+        DEFAULT("Default"),
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted")
     }
 }

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -25,7 +24,20 @@ class SkyBlockKickDuration {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message == "§cYou were kicked while joining that server!") {
-            kickMessage = true
+
+            if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
+                kickMessage = false
+                showTime = true
+                lastKickTime = SimpleTimeMark.farPast()
+            } else {
+                kickMessage = true
+            }
+        }
+
+        if (event.message == "§cThere was a problem joining SkyBlock, try again in a moment!") {
+            kickMessage = false
+            showTime = true
+            lastKickTime = SimpleTimeMark.farPast()
         }
     }
 
@@ -69,7 +81,7 @@ class SkyBlockKickDuration {
     }
 
     private fun warn() {
-        TitleUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        LorenzUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
     }
 
     fun isEnabled() = config.enabled
