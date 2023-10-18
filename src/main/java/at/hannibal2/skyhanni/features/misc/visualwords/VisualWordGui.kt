@@ -309,6 +309,13 @@ open class VisualWordGui : GuiScreen() {
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
             SoundUtils.playClickSound()
             if (currentlyEditing) {
+                val currentVisualWord = modifiedWords.elementAt(currentIndex)
+
+                if (currentVisualWord.phrase == "" && currentVisualWord.replacement == "") {
+                    modifiedWords.remove(currentVisualWord)
+                    saveChanges()
+                }
+
                 currentIndex = -1
                 currentTextBox = SelectedTextBox.NONE
             } else {
