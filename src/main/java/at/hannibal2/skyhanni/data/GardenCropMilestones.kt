@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -98,13 +96,7 @@ object GardenCropMilestones {
         return (progress - startCrops) / (end - startCrops)
     }
 
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<GardenJson>("Garden")?.let { data ->
-            cropMilestoneData = data.crop_milestones
-            SkyHanniMod.repo.successfulConstants.add("Garden-Milestones")
-        } ?: run {
-            SkyHanniMod.repo.unsuccessfulConstants.add("Garden-Milestones")
-        }
+    fun onRepoReload(data: GardenJson) {
+        cropMilestoneData = data.crop_milestones
     }
 }

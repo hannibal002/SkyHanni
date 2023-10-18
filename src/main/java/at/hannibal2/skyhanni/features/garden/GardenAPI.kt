@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -244,9 +246,12 @@ object GardenAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         event.getConstant<GardenJson>("Garden")?.let { data ->
             gardenExperience = data.garden_exp
-            SkyHanniMod.repo.successfulConstants.add("Garden-Experience")
+            GardenCropMilestones.onRepoReload(data)
+            GardenVisitorColorNames.onRepoReload(data)
+            ComposterOverlay.onRepoReload(data)
+            SkyHanniMod.repo.successfulConstants.add("Garden")
         } ?: run {
-            SkyHanniMod.repo.unsuccessfulConstants.add("Garden-Experience")
+            SkyHanniMod.repo.unsuccessfulConstants.add("Garden")
         }
     }
 

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -47,7 +46,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 
-class ComposterOverlay {
+object ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
     private var fuelFactors: Map<String, Double> = emptyMap()
     private var organicMatter: Map<String, Double> = emptyMap()
@@ -69,32 +68,31 @@ class ComposterOverlay {
     private var lastHovered = 0L
     private var lastAttemptTime = SimpleTimeMark.farPast()
 
-    companion object {
-        var currentOrganicMatterItem: String?
-            get() = GardenAPI.config?.composterCurrentOrganicMatterItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentOrganicMatterItem = value
-            }
+    var inInventory = false
 
-        var currentFuelItem: String?
-            get() = GardenAPI.config?.composterCurrentFuelItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentFuelItem = value
-            }
+    private var testOffset = 0
 
-        var testOffset = 0
-
-        fun onCommand(args: Array<String>) {
-            if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
-                return
-            }
-            testOffset = args[0].toInt()
-            LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+    var currentOrganicMatterItem: String?
+        get() = GardenAPI.config?.composterCurrentOrganicMatterItem
+        private set(value) {
+            GardenAPI.config?.composterCurrentOrganicMatterItem = value
         }
 
-        var inInventory = false
+    var currentFuelItem: String?
+        get() = GardenAPI.config?.composterCurrentFuelItem
+        private set(value) {
+            GardenAPI.config?.composterCurrentFuelItem = value
+        }
+
+    fun onCommand(args: Array<String>) {
+        if (args.size != 1) {
+            LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+            return
+        }
+        testOffset = args[0].toInt()
+        LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
     }
+
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -504,16 +502,10 @@ class ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<GardenJson>("Garden")?.let { data ->
-            organicMatter = data.organic_matter
-            fuelFactors = data.fuel
-            updateOrganicMatterFactors()
-            SkyHanniMod.repo.successfulConstants.add("Garden-Composter")
-        } ?: run {
-            SkyHanniMod.repo.unsuccessfulConstants.add("Garden-Composter")
-        }
+    fun onRepoReload(data: GardenJson) {
+        organicMatter = data.organic_matter
+        fuelFactors = data.fuel
+        updateOrganicMatterFactors()
     }
 
     private fun updateOrganicMatterFactors() {

@@ -512,7 +512,7 @@ class SkyHanniMod {
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
         loadModule(TeleportPadInventoryNumber())
-        loadModule(ComposterOverlay())
+        loadModule(ComposterOverlay)
         loadModule(DiscordRPCManager)
         loadModule(GardenCropMilestoneFix())
         loadModule(GardenBurrowingSporesNotifier())
