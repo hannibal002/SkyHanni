@@ -11,14 +11,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson.ShortCut
 import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
     val locations: List<LorenzVec>,
-    private val shortCuts: List<ParkourJson.ShortCut>,
+    private val shortCuts: List<ShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0
 ) {

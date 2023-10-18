@@ -50,6 +50,7 @@ import kotlin.time.DurationUnit
 class ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
     private var fuelFactors: Map<String, Double> = emptyMap()
+    private var organicMatter: Map<String, Double> = emptyMap()
 
     private val config get() = SkyHanniMod.feature.garden.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
@@ -94,8 +95,6 @@ class ComposterOverlay {
 
         var inInventory = false
     }
-
-    var garden: GardenJson? = null
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -507,16 +506,19 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant<GardenJson>("Garden")
-        updateOrganicMatterFactors()
+        event.getConstant<GardenJson>("Garden")?.let { data ->
+            organicMatter = data.organic_matter
+            fuelFactors = data.fuel
+            updateOrganicMatterFactors()
+            SkyHanniMod.repo.successfulConstants.add("Garden-Composter")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("Garden-Composter")
+        }
     }
 
     private fun updateOrganicMatterFactors() {
         try {
-            val garden = this.garden ?: return
-            organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
-            fuelFactors = garden.fuel
-
+            organicMatterFactors = updateOrganicMatterFactors(organicMatter)
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")

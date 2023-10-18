@@ -138,7 +138,8 @@ class RepoManager(private val configLocation: File) {
                 } else if (answerMessage.isNotEmpty()) {
                     LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
                 }
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
+                unsuccessfulConstants.add("All Constants")
                 ErrorManager.logError(e, "Error reading repo data!")
             }
         }

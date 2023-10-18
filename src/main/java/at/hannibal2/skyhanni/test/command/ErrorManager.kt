@@ -49,8 +49,8 @@ object ErrorManager {
 
     fun logError(throwable: Throwable, message: String) {
         val error = Error(message, throwable)
-        Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
         val pair = if (throwable.stackTrace.isNotEmpty()) {
             throwable.stackTrace[0].let { it.fileName to it.lineNumber }

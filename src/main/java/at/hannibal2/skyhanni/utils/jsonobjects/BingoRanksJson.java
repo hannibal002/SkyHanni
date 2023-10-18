@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.utils.jsonobjects;
 
 import com.google.gson.annotations.Expose;
 
-import java.util.List;
+import java.util.Map;
 
-public class SackListJson {
+public class BingoRanksJson {
     @Expose
-    public List<String> sackList;
+    public Map<String, Integer> ranks;
 }

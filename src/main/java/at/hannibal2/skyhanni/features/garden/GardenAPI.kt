@@ -242,10 +242,14 @@ object GardenAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<GardenJson>("Garden") ?: return
-        gardenExperience = data.garden_exp
+        event.getConstant<GardenJson>("Garden")?.let { data ->
+            gardenExperience = data.garden_exp
+            SkyHanniMod.repo.successfulConstants.add("Garden-Experience")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("Garden-Experience")
+        }
     }
 
     private var gardenExperience = listOf<Int>()
-    private const val gardenOverflowExp = 10000 // can be changed I guess
+    private const val gardenOverflowExp = 10000
 }

@@ -13,12 +13,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson.Price
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaExtraFarmingFortune {
     private val config get() = SkyHanniMod.feature.garden.anitaShop
-    private var levelPrice = emptyMap<Int, AnitaUpgradeCostsJson.Price>()
+    private var levelPrice = mapOf<Int, Price>()
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
@@ -72,12 +73,11 @@ class AnitaExtraFarmingFortune {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")?.let {
-            val map = mutableMapOf<Int, AnitaUpgradeCostsJson.Price>()
-            for ((rawNumber, price) in it.level_price) {
-                map[rawNumber.toInt()] = price
-            }
-            levelPrice = map
+        event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")?.let { data ->
+            levelPrice = data.level_price
+            SkyHanniMod.repo.successfulConstants.add("AnitaUpgradeCosts")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("AnitaUpgradeCosts")
         }
     }
 

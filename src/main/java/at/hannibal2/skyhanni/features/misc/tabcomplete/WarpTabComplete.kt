@@ -8,18 +8,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object WarpTabComplete {
     private val config get() = SkyHanniMod.feature.commands.tabComplete
-    private var warpsJson: WarpsJson? = null
+    private var warps = listOf<String>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        warpsJson = event.getConstant<WarpsJson>("Warps")
+        event.getConstant<WarpsJson>("Warps")?.let { data ->
+            warps = data.warpCommands
+            SkyHanniMod.repo.successfulConstants.add("Warps")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("Warps")
+        }
     }
 
     fun handleTabComplete(command: String): List<String>? {
         if (!isEnabled()) return null
         if (command != "warp") return null
 
-        return warpsJson?.warpCommands
+        return warps
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.warps

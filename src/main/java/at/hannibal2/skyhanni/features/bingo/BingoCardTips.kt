@@ -20,8 +20,11 @@ class BingoCardTips {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<BingoJson>("Bingo")?.let {
-            tips = it.bingo_tips
+        event.getConstant<BingoJson>("Bingo")?.let {data ->
+            tips = data.bingo_tips
+            SkyHanniMod.repo.successfulConstants.add("Bingo")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("Bingo")
         }
     }
 

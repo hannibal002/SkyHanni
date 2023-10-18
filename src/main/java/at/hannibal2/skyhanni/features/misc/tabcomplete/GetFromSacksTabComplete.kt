@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.SackListJson
+import at.hannibal2.skyhanni.utils.jsonobjects.SacksJson
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -15,7 +15,12 @@ object GetFromSacksTabComplete {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        sackList = event.getConstant<SackListJson>("Sacks")?.sackList ?: return
+        event.getConstant<SacksJson>("Sacks")?.let { data ->
+            sackList = data.sackList
+            SkyHanniMod.repo.successfulConstants.add("Sacks")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("Sacks")
+        }
     }
 
     fun handleTabComplete(command: String): List<String>? {

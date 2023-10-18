@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -50,11 +51,11 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.locations?.let {
-            if (it.size != 6) {
-                error("Invalid rift effigies size: ${it.size} (expeced 6)")
-            }
-            locations = it
+        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.let {data ->
+            locations = data.locations
+            SkyHanniMod.repo.successfulConstants.add("RiftEffigies")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("RiftEffigies")
         }
     }
 
@@ -95,7 +96,7 @@ class RiftBloodEffigies {
 
         for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 6.0)) {
             effigiesTimerPattern.matchMatcher(entity.name) {
-                val nearest = locations.sortedBy { it.distanceSq(entity.getLorenzVec()) }.firstOrNull() ?: return
+                val nearest = locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) } ?: return
                 val index = locations.indexOf(nearest)
 
                 val string = group("time")

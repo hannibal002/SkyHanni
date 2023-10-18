@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.jsonobjects.BingoRanks
+import at.hannibal2.skyhanni.utils.jsonobjects.BingoRanksJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BingoAPI {
@@ -9,8 +10,11 @@ object BingoAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<BingoRanks>("BingoRanks")?.let {
-            ranks = it.ranks
+        event.getConstant<BingoRanksJson>("BingoRanks")?.let { data ->
+            ranks = data.ranks
+            SkyHanniMod.repo.successfulConstants.add("BingoRanks")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("BingoRanks")
         }
     }
 
