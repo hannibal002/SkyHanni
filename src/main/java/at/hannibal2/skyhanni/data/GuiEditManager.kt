@@ -22,6 +22,7 @@ class GuiEditManager {
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (isInGui()) return
 
         Minecraft.getMinecraft().currentScreen?.let {
@@ -31,7 +32,7 @@ class GuiEditManager {
 
         if (NEUItems.neuHasFocus()) return
 
-        if (event.keyCode == SkyHanniMod.feature.gui.keyBindOpen) openGuiPositionEditor()
+        openGuiPositionEditor()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -93,6 +93,7 @@ public class FishingConfig {
     @ConfigOption(name = "Thunder Spark", desc = "")
     @Accordion
     public ThunderSparkConfig thunderSpark = new ThunderSparkConfig();
+
     public static class ThunderSparkConfig {
         @Expose
         @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder.")
@@ -110,7 +111,8 @@ public class FishingConfig {
     @ConfigOption(name = "Barn Fishing Timer", desc = "")
     @Accordion
     public BarnTimerConfig barnTimer = new BarnTimerConfig();
-    public static class BarnTimerConfig{
+
+    public static class BarnTimerConfig {
         @Expose
         @ConfigOption(
                 name = "Barn Fishing Timer",
@@ -229,31 +231,6 @@ public class FishingConfig {
 
         @Expose
         public Position position = new Position(460, -240, 3.4f);
-
-        @Expose
-        @ConfigOption(
-                name = "Debug: Update Interval",
-                desc = "Changes the time in ticks between updates (should be as high as possible). Default is 20"
-        )
-        @ConfigEditorSlider(
-                minValue = 1,
-                maxValue = 80,
-                minStep = 1
-        )
-        public int debugUpdateInterval = 20;
-
-        @Expose
-        @ConfigOption(
-                name = "Debug: Distance",
-                desc = "Changes the maximal detection distance between the fishing rod bobber and " +
-                        "the armor stand that shows the hypixel timer (should be as low as possible). Default is 0.1"
-        )
-        @ConfigEditorSlider(
-                minValue = 0.01f,
-                maxValue = 5f,
-                minStep = 0.01f
-        )
-        public double debugMaxDistance = 0.1;
     }
 
     @Expose

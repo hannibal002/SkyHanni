@@ -24,6 +24,7 @@ import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.passive.EntitySquid
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -110,6 +111,7 @@ class SeaCreatureFeatures {
         GREAT_WHITE_SHARK(EntityPlayer::class.java, "Great White Shark", 1_500_000),
         THUNDER(EntityGuardian::class.java, "Thunder", 35_000_000),
         LORD_JAWBUS(EntityIronGolem::class.java, "Lord Jawbus", 100_000_000),
+        PLHLEGBLAST(EntitySquid::class.java, "Plhlegblast", 500_000_000),
         ;
     }
 }
