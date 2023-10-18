@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenVisitorColorNames {
+object GardenVisitorColorNames {
+    private var visitorColours = mutableMapOf<String, String>()
+    var visitorItems = mutableMapOf<String, List<String>>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -23,17 +25,12 @@ class GardenVisitorColorNames {
         }
     }
 
-    companion object {
-        private var visitorColours = mutableMapOf<String, String>()
-        var visitorItems = mutableMapOf<String, List<String>>()
+    fun getColoredName(name: String): String {
+        if (!SkyHanniMod.feature.garden.visitors.coloredName) return name
 
-        fun getColoredName(name: String): String {
-            if (!SkyHanniMod.feature.garden.visitors.coloredName) return name
-
-            val cleanName = name.removeColor()
-            val color = visitorColours[cleanName] ?: return name
-            return color + cleanName
-        }
+        val cleanName = name.removeColor()
+        val color = visitorColours[cleanName] ?: return name
+        return color + cleanName
     }
 
     private fun getColor(rarity: String) = when (rarity) {
