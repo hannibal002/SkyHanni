@@ -813,6 +813,7 @@ public class MiscConfig {
                         "§aGems",
                         "§7Location",
                         "§7Ingame Time",
+                        "§7IRL Time",
                         "§7Current Server",
                         "§2Mithril §r/ §dGemstone §7Powder",
                         "§cSlayer",
@@ -826,7 +827,7 @@ public class MiscConfig {
                         "§7Maxwell Power"
                 }
         )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 14, 15, 16, 17, 18, 19));
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20));
 
 
         @Expose

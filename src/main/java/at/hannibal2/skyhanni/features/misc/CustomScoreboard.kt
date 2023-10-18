@@ -1,4 +1,7 @@
-// https://discord.com/channels/997079228510117908/1162844830360146080
+//
+// Requested by alpaka8123 (https://discord.com/channels/997079228510117908/1162844830360146080)
+// Done by J10a1n15, with lots of help from hanni, and snippets from item tracker features <3
+//
 
 
 package at.hannibal2.skyhanni.features.misc
@@ -7,12 +10,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
+import kotlin.collections.HashMap
 
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.misc.customScoreboard
@@ -26,58 +32,71 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onTick(event: TickEvent) {
-        update()
+        display = drawScoreboard()
     }
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
+    private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
-            newList.add(map[index])
+            lineMap[index]?.let {
+                newList.add(it)
+            }
         }
+
         return newList
     }
 
-    private fun update() {
-        display = formatDisplay(drawScoreboard())
-    }
-
     private fun drawScoreboard() = buildList<List<Any>> {
-        addAsSingletonList("§6§lSKYBLOCK")
-        addAsSingletonList("${getProfileTypeAsSymbol()} ${HypixelData.profileName.firstLetterUppercase()}")
-        addAsSingletonList("§ePurse")
-        addAsSingletonList("§eBank")
-        addAsSingletonList("§bBits")
-        addAsSingletonList("§cCopper")
-        addAsSingletonList("§aGems")
-        addAsSingletonList("§7Location")
-        addAsSingletonList("§7Ingame Time")
-        addAsSingletonList("§7Current Server")
-        addAsSingletonList("§2Mithril §r/§2Gemstone §7Powder")
-        addAsSingletonList("§cSlayer")
-        addAsSingletonList("§7Next Event")
-        addAsSingletonList("§7Current Event")
-        addAsSingletonList("§2Soulflow")
-        addAsSingletonList("§cHeat")
+        val lineMap = HashMap<Int, List<Any>>()
+        lineMap[0] = Collections.singletonList("§6§lSKYBLOCK")
+        lineMap[1] = Collections.singletonList("${getProfileTypeAsSymbol()}${HypixelData.profileName.firstLetterUppercase()}")
+        lineMap[2] = Collections.singletonList("§ePurse")
+        lineMap[3] = Collections.singletonList("§eBank")
+        lineMap[4] = Collections.singletonList("§bBits")
+        lineMap[5] = Collections.singletonList("§cCopper")
+        lineMap[6] = Collections.singletonList("§aGems")
+        lineMap[7] = Collections.singletonList("§7Location")
+        lineMap[8] = Collections.singletonList("§7Ingame Time")
+        lineMap[9] = Collections.singletonList("§7IRL Time")
+        lineMap[10] = Collections.singletonList("§7Current Server")
+        lineMap[11] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //could be multiline, need to decide
 
-        addAsSingletonList("§9Party")
+        val slayerList = mutableListOf<Any>()
+        slayerList.add("§7Slayer") //get slayer stuff
+        lineMap[12] = slayerList
+
+        lineMap[13] = Collections.singletonList("§7Next Event")
+
+        val eventList = mutableListOf<Any>()
+        eventList.add("§cCurrent Event") //get event stuff
+        lineMap[14] = eventList
+
+        lineMap[15] = Collections.singletonList("§7Soulflow")
+        lineMap[16] = Collections.singletonList("§cHeat")
+
+        val partyList = mutableListOf<Any>()
+        partyList.add("§9Party")
         for (member in PartyAPI.partyMembers){
-            addAsSingletonList(" §7- §7$member")
+            partyList.add(" §7- §7$member") //TODO: add max member amount, default 4 ig (since the player doenst count to the list)
         }
+        lineMap[17] = partyList
 
-        addAsSingletonList("§7Pet")
-        addAsSingletonList("§7Quiver (approximation)")
-        addAsSingletonList("§7Maxwell Power")
+        lineMap[18] = Collections.singletonList("§7Pet")
+        lineMap[19] = Collections.singletonList("§7Quiver")
+        lineMap[20] = Collections.singletonList("§7Maxwell Power")
+
+        return formatDisplay(lineMap)
     }
 
     private fun getProfileTypeAsSymbol() : String{
         if (HypixelData.ironman){
-            return "§7♲"
+            return "§7♲ "
         }
         if (HypixelData.stranded){
-            return "§a☀"
+            return "§a☀ "
         }
         if (HypixelData.bingo){
-            return "§cⒷ" //TODO GET FUNNY BINGO SYMBOL, ALSO COLORS LOL
+            return "§cⒷ " //TODO COLORS LOL, maybe bingoAPI? idk
         }
         return "§e"
     }
