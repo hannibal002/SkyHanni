@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SlayerProfitTrackerItemsJson {
-
     @Expose
     public Map<String, List<NEUInternalName>> slayers;
 }
