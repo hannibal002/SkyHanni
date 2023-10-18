@@ -65,7 +65,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (!currentlyEditing) {
             val adjustedY = guiTop + 30 + pageScroll
-            var toRemove = -1
+            var toRemove: VisualWord? = null
 
             val x = guiLeft + 180
             val y = guiTop + 170
@@ -90,7 +90,7 @@ open class VisualWordGui : GuiScreen() {
                 if (adjustedY + 30 * index > guiTop + 125) continue
 
                 if (phrase.phrase == "" && phrase.replacement == "") {
-                    toRemove = index
+                    toRemove = phrase
                 }
 
                 var inBox = false
@@ -164,8 +164,8 @@ open class VisualWordGui : GuiScreen() {
                 modifiedWords = SkyHanniMod.feature.storage.modifiedWords
             }
 
-            if (toRemove != -1) {
-                modifiedWords.removeAt(toRemove)
+            if (toRemove != null) {
+                modifiedWords.remove(toRemove)
                 saveChanges()
             }
 
