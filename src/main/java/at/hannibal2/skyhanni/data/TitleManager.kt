@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
-class TitleUtils {
+class TitleManager {
 
     companion object {
         private var display = ""

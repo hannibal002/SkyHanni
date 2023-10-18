@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
@@ -23,8 +24,6 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import org.apache.commons.lang3.SystemUtils
-import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -70,7 +69,7 @@ object LorenzUtils {
     var lastButtonClicked = 0L
 
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled && internalChat(DEBUG_PREFIX + message)) {
+        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -288,13 +287,6 @@ object LorenzUtils {
             thePlayer.sendChatMessage(message)
         }
     }
-
-    fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
-
-    fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
-
-    // A mac-only key, represents Windows key on windows (but different key code)
-    fun isCommandKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LMETA) || OSUtils.isKeyHeld(Keyboard.KEY_RMETA)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -525,11 +517,6 @@ object LorenzUtils {
         }, duration.inWholeMilliseconds)
     }
 
-    fun isPastingKeysDown(): Boolean {
-        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
-        return modifierHeld && OSUtils.isKeyHeld(Keyboard.KEY_V)
-    }
-
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
@@ -537,4 +524,10 @@ object LorenzUtils {
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
+
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
+        TitleManager.sendTitle(text, duration, height)
+    }
+
+    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 }

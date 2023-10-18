@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
@@ -127,7 +126,7 @@ public class CombatConfig {
         @Expose
         @ConfigOption(name = "Vampire Slayer", desc = "")
         @Accordion
-        public DamageIndicatorConfig.VampireSlayerConfig vampireSlayer = new DamageIndicatorConfig.VampireSlayerConfig();
+        public VampireSlayerConfig vampireSlayer = new VampireSlayerConfig();
 
         public static class VampireSlayerConfig {
             @Expose
@@ -194,9 +193,9 @@ public class CombatConfig {
         @ConfigOption(name = "Text Formatting", desc = "")
         @Accordion
         @Expose
-        public TextFormatting textFormatting = new TextFormatting();
+        public TextFormattingConfig textFormatting = new TextFormattingConfig();
 
-        public static class TextFormatting {
+        public static class TextFormattingConfig {
 
             @ConfigOption(name = "§eText Formatting Info", desc = "§e%session% §ris §e§lalways §rreplaced with\n" +
                     "§7the count for your current session.\n" +
@@ -304,9 +303,9 @@ public class CombatConfig {
             @ConfigOption(name = "Bestiary Formatting", desc = "")
             @Accordion
             @Expose
-            public BestiaryFormatting bestiaryFormatting = new BestiaryFormatting();
+            public BestiaryFormattingConfig bestiaryFormatting = new BestiaryFormattingConfig();
 
-            public static class BestiaryFormatting {
+            public static class BestiaryFormattingConfig {
 
                 @Expose
                 @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §7is replaced with\n" +
@@ -346,9 +345,9 @@ public class CombatConfig {
             @ConfigOption(name = "XP Per Hour Formatting", desc = "")
             @Accordion
             @Expose
-            public XPHourFormatting xpHourFormatting = new XPHourFormatting();
+            public XPHourFormattingConfig xpHourFormatting = new XPHourFormattingConfig();
 
-            public static class XPHourFormatting {
+            public static class XPHourFormattingConfig {
 
                 @Expose
                 @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n" +
@@ -372,9 +371,9 @@ public class CombatConfig {
             @ConfigOption(name = "ETA Formatting", desc = "")
             @Accordion
             @Expose
-            public ETAFormatting etaFormatting = new ETAFormatting();
+            public ETAFormattingConfig etaFormatting = new ETAFormattingConfig();
 
-            public static class ETAFormatting {
+            public static class ETAFormattingConfig {
                 @Expose
                 @ConfigOption(name = "ETA to next level", desc = "ETA To Next Level Line.\n" +
                         "§e%value% §7is replaced with one of the text below.")
@@ -414,9 +413,9 @@ public class CombatConfig {
             @ConfigOption(name = "Kill Per Hour Formatting", desc = "")
             @Expose
             @Accordion
-            public KillHourFormatting killHourFormatting = new KillHourFormatting();
+            public KillHourFormattingConfig killHourFormatting = new KillHourFormattingConfig();
 
-            public static class KillHourFormatting {
+            public static class KillHourFormattingConfig {
                 @Expose
                 @ConfigOption(name = "Kill/h", desc = "Kill Per Hour line.\n§e%value% §7is replaced with\nEstimated kills per hour you get.")
                 @ConfigEditorText
@@ -529,7 +528,6 @@ public class CombatConfig {
 
         @Expose
         @ConfigOption(name = "Highlighters", desc = "")
-        @ConfigEditorAccordion(id = 0)
         public boolean highlighters = false;
 
         @Expose

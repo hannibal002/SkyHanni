@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -12,6 +14,9 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.message.Message
 
 class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
+
+    private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
+    private val filterConfig get() = config.consoleFilter
 
     private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
     private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
@@ -39,25 +44,25 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         val formattedMessage = message.formattedMessage
         val thrown = event.thrown
 
-        if (SkyHanniMod.feature.dev.filterChat && formattedMessage.startsWith("[CHAT] ")) {
+        if (filterConfig.filterChat && formattedMessage.startsWith("[CHAT] ")) {
             filterConsole("chat")
             return Filter.Result.DENY
         }
-        if (SkyHanniMod.feature.dev.filterGrowBuffer && formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
+        if (filterConfig.filterGrowBuffer && formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
             filterConsole("Grow BufferBuilder buffer")
             return Filter.Result.DENY
         }
-        if (SkyHanniMod.feature.dev.filterUnknownSound && formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
+        if (filterConfig.filterUnknownSound && formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
             filterConsole("Unknown soundEvent (minecraft:)")
             return Filter.Result.DENY
         }
         //TODO testing
-        if (SkyHanniMod.feature.dev.filterParticleVillagerHappy && formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
+        if (filterConfig.filterParticleVillagerHappy && formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
             filterConsole("particle VILLAGER_HAPPY")
             return Filter.Result.DENY
         }
 
-        if (SkyHanniMod.feature.dev.filterOptiFine) {
+        if (filterConfig.filterOptiFine) {
             if (formattedMessage.startsWith("[OptiFine] CustomItems: ")) {
                 filterConsole("OptiFine CustomItems")
                 return Filter.Result.DENY
@@ -67,12 +72,12 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 return Filter.Result.DENY
             }
         }
-        if (loggerName == "AsmHelper" && SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
+        if (loggerName == "AsmHelper" && filterConfig.filterAmsHelperTransformer) {
                 if (formattedMessage.startsWith("Transforming class ")) {
                     filterConsole("AsmHelper Transforming")
                     return Filter.Result.DENY
             }
-            if (SkyHanniMod.feature.dev.filterAsmHelperApplying && formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
+            if (filterConfig.filterAsmHelperApplying && formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
                 filterConsole("AsmHelper Applying AsmWriter")
                 return Filter.Result.DENY
             }
@@ -106,14 +111,14 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 //                return Filter.Result.DENY
 //            }
 //        }
-        if (SkyHanniMod.feature.dev.filterBiomeIdBounds) {
+        if (filterConfig.filterBiomeIdBounds) {
             patternBiomeIdBounds.matchMatcher(formattedMessage) {
                 filterConsole("Biome ID bounds")
                 return Filter.Result.DENY
             }
         }
 
-        if (thrown != null  && SkyHanniMod.feature.dev.filterScoreboardErrors) {
+        if (thrown != null  && filterConfig.filterScoreboardErrors) {
             val cause = thrown.cause
             if (cause != null && cause.stackTrace.isNotEmpty()) {
                 val first = cause.stackTrace[0]
@@ -141,8 +146,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
 
-        if (!SkyHanniMod.feature.dev.printUnfilteredDebugs) return Filter.Result.ACCEPT
-        if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
+        if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT
+        if (!config.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
         if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
         debug(" ")
@@ -180,7 +185,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     }
 
     private fun debug(text: String) {
-        if (SkyHanniMod.feature.dev.logUnfilteredFile) {
+        if (config.logUnfilteredFile) {
             loggerUnfiltered.log(text)
         } else {
             LorenzUtils.consoleLog(text)
@@ -189,7 +194,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     private fun filterConsole(message: String) {
         loggerFiltered.log(message)
-        if (SkyHanniMod.feature.dev.printFilteredReason) {
+        if (config.printFilteredReason) {
             LorenzUtils.consoleLog("filtered console: $message")
         }
     }
@@ -230,5 +235,22 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         t: Throwable?,
     ): Filter.Result {
         return Filter.Result.ACCEPT
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
+        event.move(3, "dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")
+        event.move(3, "dev.printUnfilteredDebugsOutsideSkyBlock", "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock")
+        event.move(3, "dev.printFilteredReason", "dev.minecraftConsoles.printFilteredReason")
+        event.move(3, "dev.filterChat", "dev.minecraftConsoles.consoleFilter.filterChat")
+        event.move(3, "dev.filterGrowBuffer", "dev.minecraftConsoles.consoleFilter.filterGrowBuffer")
+        event.move(3, "dev.filterUnknownSound", "dev.minecraftConsoles.consoleFilter.filterUnknownSound")
+        event.move(3, "dev.filterParticleVillagerHappy", "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy")
+        event.move(3, "dev.filterAmsHelperTransformer", "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer")
+        event.move(3, "dev.filterAsmHelperApplying", "dev.minecraftConsoles.consoleFilter.filterAsmHelperApplying")
+        event.move(3, "dev.filterBiomeIdBounds", "dev.minecraftConsoles.consoleFilter.filterBiomeIdBounds")
+        event.move(3, "dev.filterScoreboardErrors", "dev.minecraftConsoles.consoleFilter.filterScoreboardErrors")
+        event.move(3, "dev.filterOptiFine", "dev.minecraftConsoles.consoleFilter.filterOptiFine")
     }
 }
