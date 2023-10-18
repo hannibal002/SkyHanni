@@ -34,12 +34,12 @@ open class VisualWordGui : GuiScreen() {
     private var lastClickedHeight = 0
     private var lastClickedWidth = 0
     private var changedIndex = -1
-    private var changedAction = ""
+    private var changedAction = ActionType.NONE
 
     private var currentlyEditing = false
     private var currentIndex = -1
 
-    private var currentTextBox = ""
+    private var currentTextBox = SelectedTextBox.NONE
     private var currentText = ""
 
     private var modifiedWords = mutableListOf<VisualWord>()
@@ -110,14 +110,14 @@ open class VisualWordGui : GuiScreen() {
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
-                    changedAction = "up"
+                    changedAction = ActionType.UP
                 } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 315,
                         adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
-                    changedAction = "down"
+                    changedAction = ActionType.DOWN
                 } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft, adjustedY + 30 * index, sizeX, 30)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
@@ -197,14 +197,14 @@ open class VisualWordGui : GuiScreen() {
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
                     drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50303030)
                 }
-                if (currentTextBox == "phrase") {
+                if (currentTextBox == SelectedTextBox.PHRASE) {
                     drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50828282)
                 }
 
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
                     drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50303030)
                 }
-                if (currentTextBox == "replacement") {
+                if (currentTextBox == SelectedTextBox.REPLACEMENT) {
                     drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50828282)
                 }
 
@@ -227,14 +227,14 @@ open class VisualWordGui : GuiScreen() {
         }
 
         if (changedIndex != -1) {
-            if (changedAction == "up") {
+            if (changedAction == ActionType.UP) {
                 if (changedIndex > 0) {
                     val temp = modifiedWords[changedIndex]
                     modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
                     modifiedWords[changedIndex - 1] = temp
                 }
             }
-            else if (changedAction == "down") {
+            else if (changedAction == ActionType.DOWN) {
                 if (changedIndex < modifiedWords.size - 1) {
                     val temp = modifiedWords[changedIndex]
                     modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
@@ -243,7 +243,7 @@ open class VisualWordGui : GuiScreen() {
             }
 
             changedIndex = -1
-            changedAction = ""
+            changedAction = ActionType.NONE
             saveChanges()
         }
 
@@ -281,7 +281,7 @@ open class VisualWordGui : GuiScreen() {
                 modifiedWords.removeAt(currentIndex)
                 currentIndex = -1
                 saveChanges()
-                currentTextBox = ""
+                currentTextBox = SelectedTextBox.NONE
             }
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 y = guiTop + 20
@@ -291,16 +291,16 @@ open class VisualWordGui : GuiScreen() {
                     saveChanges()
                 } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
                     SoundUtils.playClickSound()
-                    currentTextBox = "phrase"
+                    currentTextBox = SelectedTextBox.PHRASE
                     currentText = modifiedWords[currentIndex].phrase
                 } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
                     SoundUtils.playClickSound()
-                    currentTextBox = "replacement"
+                    currentTextBox = SelectedTextBox.REPLACEMENT
                     currentText = modifiedWords[currentIndex].replacement
                 } else {
-                    if (currentTextBox != "") {
+                    if (currentTextBox != SelectedTextBox.NONE) {
                         SoundUtils.playClickSound()
-                        currentTextBox = ""
+                        currentTextBox = SelectedTextBox.NONE
                     }
                 }
             }
@@ -310,10 +310,10 @@ open class VisualWordGui : GuiScreen() {
             SoundUtils.playClickSound()
             if (currentlyEditing) {
                 currentIndex = -1
-                currentTextBox = ""
+                currentTextBox = SelectedTextBox.NONE
             } else {
                 modifiedWords.add(VisualWord("", "", true))
-                currentTextBox = "phrase"
+                currentTextBox = SelectedTextBox.PHRASE
                 currentText = ""
                 currentIndex = modifiedWords.size - 1
                 saveChanges()
@@ -326,14 +326,8 @@ open class VisualWordGui : GuiScreen() {
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         super.keyTyped(typedChar, keyCode)
         if (!currentlyEditing) return
-        if (currentTextBox == "") return
+        if (currentTextBox == SelectedTextBox.NONE) return
         if (currentIndex >= modifiedWords.size || currentIndex == -1) return
-
-        if (keyCode == Keyboard.KEY_ESCAPE) {
-            saveTextChanges()
-            currentTextBox = ""
-            return
-        }
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
@@ -381,9 +375,9 @@ open class VisualWordGui : GuiScreen() {
     }
 
     private fun saveTextChanges() {
-        if (currentTextBox == "phrase") {
+        if (currentTextBox == SelectedTextBox.PHRASE) {
             modifiedWords[currentIndex].phrase = currentText
-        } else if (currentTextBox == "replacement") {
+        } else if (currentTextBox == SelectedTextBox.REPLACEMENT) {
             modifiedWords[currentIndex].replacement = currentText
         }
         saveChanges()
@@ -429,4 +423,16 @@ open class VisualWordGui : GuiScreen() {
     private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {
         drawUnmodifiedStringCentered(str, x.toInt(), y.toInt())
     }
+}
+
+private enum class ActionType {
+    UP,
+    DOWN,
+    NONE
+}
+
+private enum class SelectedTextBox {
+    PHRASE,
+    REPLACEMENT,
+    NONE
 }
