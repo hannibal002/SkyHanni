@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import com.google.gson.annotations.Expose
@@ -41,7 +41,7 @@ data class TrophyFishInfo(
 
     fun getFilletValue(rarity: TrophyRarity): Int {
         if (fillet == null) {
-            CopyErrorCommand.logError(Error("fillet is null for '$displayName'"), "Error trying to read trophy fish info")
+            ErrorManager.logError(Error("fillet is null for '$displayName'"), "Error trying to read trophy fish info")
             return -1
         }
         return fillet.getOrDefault(rarity, -1)

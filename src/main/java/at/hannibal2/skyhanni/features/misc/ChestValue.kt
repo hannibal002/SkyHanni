@@ -17,13 +17,11 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
@@ -31,14 +29,13 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import kotlin.time.Duration.Companion.seconds
 
 class ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<NEUInternalName, Item>()
-    private val inInventory get() = InventoryUtils.openInventoryName().removeColor().isValidStorage()
+    private val inInventory get() = isValidStorage()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -230,26 +227,19 @@ class ChestValue {
         COMPACT("Aligned")
     }
 
-    private fun String.isValidStorage(): Boolean {
+    private fun isValidStorage(): Boolean {
+        val name = InventoryUtils.openInventoryName().removeColor()
         if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
 
-        if ((contains("Backpack") && contains("Slot #") || startsWith("Ender Chest (")) &&
-            !isNeuStorageEnabled.getValue()
+        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest (")) &&
+            !InventoryUtils.isNeuStorageEnabled.getValue()
         ) {
             return true
         }
 
-        val inMinion = contains("Minion") && !contains("Recipe") &&
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
                 LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
-        return this == "Chest" || this == "Large Chest" || inMinion || this == "Personal Vault"
-    }
-
-    private val isNeuStorageEnabled = RecalculatingValue(1.seconds) {
-        try {
-            NotEnoughUpdates.INSTANCE.config.storageGUI.enableStorageGUI3
-        } catch (e: Exception) {
-            false
-        }
+        return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {

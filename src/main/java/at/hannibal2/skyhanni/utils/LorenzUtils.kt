@@ -69,7 +69,7 @@ object LorenzUtils {
     var lastButtonClicked = 0L
 
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled && internalChat(DEBUG_PREFIX + message)) {
+        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -528,4 +528,6 @@ object LorenzUtils {
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
         TitleManager.sendTitle(text, duration, height)
     }
+
+    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 }

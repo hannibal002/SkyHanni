@@ -2,17 +2,6 @@
 
 Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
-## Chat Filter
-
-- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message,
-  radiating generosity, Hypixel tournaments)
-- Hiding Empty messages.
-- Warping messages (Sending requests and switching servers)
-- Welcome Message when entering SkyBlock.
-- Powder Mining messages hider
-- Winter gift messages hider
-- Many other messages (Not separated into own categories yet)
-
 ## Chat
 
 + Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
@@ -33,6 +22,21 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
++ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
+    + Will not break with emblems.
+    + Optional if left or right side of name.
+    + Should not break with other mods.
+
+#### Chat Filter
+
+- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message,
+  radiating generosity, Hypixel tournaments)
+- Hiding Empty messages.
+- Warping messages (Sending requests and switching servers)
+- Welcome Message when entering SkyBlock.
+- Powder Mining messages hider
+- Winter gift messages hider
+- Many other messages (Not separated into own categories yet)
 
 ## Dungeon
 
@@ -61,6 +65,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Outline Dungeon Teammates. - Cad
 + Dungeon Colored Class Level. - hannibal2
     + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
++ Soulweaver Skull Hider in the Dungeon Object Hider. - nea
+    + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 
 ## Inventory
 
@@ -191,6 +197,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Fishing Hook Display. - hannibal2
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
++ Alerts when the player catches a Legendary Sea Creature. - Cad
 
 ## Damage Indicator
 
@@ -428,6 +435,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
++ /shmouselock command to lock mouse rotation for farming. - Cad
 
 ## The Rift
 
@@ -514,6 +522,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 ## Events
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
+    + Thanks Tobbbb for the coordinates!
+    + Support for hiding basket waypoints once you have clicked on them. - hannibal2
+    + Option to show only the closest basket. - hannibal2
 
 ## Commands
 
@@ -547,6 +559,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Wishing compass uses amount display.
 + Brewing Stand Overlay.
 + Crimson Isle Reputation Helper.
++ Quest Item Helper. (Crimson Isle) - NetheriteMiner
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
+      needed from the sacks.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -671,7 +686,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show the time since you entered limbo.
     + Show a chat message for how long you were in limbo once you leave it.
 + Highlight Party Members. - Cad
-    + Marking partly members with a bright outline to better find them in the world.
+    + Marking party members with a bright outline to better find them in the world.
++ Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
+    + Options to change speed, size, saturation and direction.
++ Added Modify Visual Words (command /shwords). - CalMWolfs
+    + Allows you to replace text on your screen with different text (like the SBE one, just less costly).
+    + Supports all color codes, even chroma (use &&Z)
++ Added In-Game Date display. - Erymanthus
+    + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
+    + Includes the SkyBlock year.
 
 ## Cosmetics
 

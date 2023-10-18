@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.events.VisitorAcceptEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -22,7 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
-    private val config get() = SkyHanniMod.feature.garden.visitorDropsStatistics
+    private val config get() = SkyHanniMod.feature.garden.visitors.dropsStatistics
     private var display = emptyList<List<Any>>()
 
     private var acceptedVisitors = 0
@@ -136,7 +137,7 @@ object GardenVisitorDropStatistics {
             )
         } else {
             addAsSingletonList("§c?")
-            CopyErrorCommand.logError(
+            ErrorManager.logError(
                 RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
                 "Error rendering visitor drop statistics"
             )
@@ -226,7 +227,17 @@ object GardenVisitorDropStatistics {
         if (!GardenAPI.inGarden()) return
         if (GardenAPI.hideExtraGuis()) return
         if (config.onlyOnBarn && !GardenAPI.onBarnPlot) return
-        config.visitorDropPos.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.pos.renderStringsAndItems(display, posLabel = "Visitor Stats")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.visitorDropsStatistics.enabled", "garden.visitors.dropsStatistics.enabled")
+        event.move(3, "garden.visitorDropsStatistics.textFormat", "garden.visitors.dropsStatistics.textFormat")
+        event.move(3, "garden.visitorDropsStatistics.displayNumbersFirst", "garden.visitors.dropsStatistics.displayNumbersFirst")
+        event.move(3, "garden.visitorDropsStatistics.displayIcons", "garden.visitors.dropsStatistics.displayIcons")
+        event.move(3, "garden.visitorDropsStatistics.onlyOnBarn", "garden.visitors.dropsStatistics.onlyOnBarn")
+        event.move(3, "garden.visitorDropsStatistics.visitorDropPos", "garden.visitors.dropsStatistics.pos")
     }
 }
 

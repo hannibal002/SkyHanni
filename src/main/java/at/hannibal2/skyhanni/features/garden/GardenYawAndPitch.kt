@@ -21,6 +21,7 @@ class GardenYawAndPitch {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
+        if (GardenAPI.hideExtraGuis()) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
@@ -39,8 +40,8 @@ class GardenYawAndPitch {
 
         if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 
-        val yawText = yaw.round(config.yawPrecision)
-        val pitchText = pitch.round(config.pitchPrecision)
+        val yawText = yaw.round(config.yawPrecision).toBigDecimal().toPlainString()
+        val pitchText = pitch.round(config.pitchPrecision).toBigDecimal().toPlainString()
         val displayList = listOf(
             "§aYaw: §f$yawText",
             "§aPitch: §f$pitchText",

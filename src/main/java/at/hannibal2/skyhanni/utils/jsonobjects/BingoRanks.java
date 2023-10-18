@@ -7,5 +7,4 @@ import java.util.Map;
 public class BingoRanks {
     @Expose
     public Map<String, Integer> ranks;
-
 }

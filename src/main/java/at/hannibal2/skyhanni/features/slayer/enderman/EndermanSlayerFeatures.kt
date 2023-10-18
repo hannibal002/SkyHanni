@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.slayer.enderman
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
@@ -32,12 +34,11 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class EndermanSlayerFeatures {
-    private val config get() = SkyHanniMod.feature.slayer
+    private val config get() = SkyHanniMod.feature.slayer.endermen
     private val beaconConfig get() = config.endermanBeaconConfig
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private var flyingBeacons = listOf<EntityArmorStand>()
@@ -72,7 +73,7 @@ class EndermanSlayerFeatures {
                 }
             }
 
-            if (config.endermanHighlightNukekebi && entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture } && entity !in nukekubiSkulls) {
+            if (config.highlightNukekebi && entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture } && entity !in nukekubiSkulls) {
                 nukekubiSkulls.add(entity)
                 logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
             }
@@ -93,13 +94,13 @@ class EndermanSlayerFeatures {
             event.color = beaconConfig.beaconColor.toChromaColor().withAlpha(1)
         }
 
-        if (config.endermanHighlightNukekebi && event.entity in nukekubiSkulls) {
+        if (config.highlightNukekebi && event.entity in nukekubiSkulls) {
             event.color = LorenzColor.GOLD.toColor().withAlpha(1)
         }
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 
 
@@ -116,7 +117,7 @@ class EndermanSlayerFeatures {
                 event.draw3DLine(
                     event.exactPlayerEyeLocation(),
                     location.add(0.5, 1.0, 0.5),
-                    beaconConfig.lneColor.toChromaColor(),
+                    beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
                     true
                 )
@@ -142,14 +143,14 @@ class EndermanSlayerFeatures {
                 event.draw3DLine(
                     event.exactPlayerEyeLocation(),
                     beaconLocation.add(0.5, 1.0, 0.5),
-                    beaconConfig.lneColor.toChromaColor(),
+                    beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
                     true
                 )
             }
         }
 
-        config.endermanHighlightNukekebi
+        config.highlightNukekebi
         for (skull in nukekubiSkulls) {
             if (!skull.isDead) {
                 event.drawDynamicText(
@@ -214,5 +215,16 @@ class EndermanSlayerFeatures {
         nukekubiSkulls.clear()
         sittingBeacon = emptyMap()
         logger.log("Reset everything (world change)")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.endermen.endermanBeaconConfig.highlightBeacon")
+        event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.endermen.endermanBeaconConfig.beaconColor")
+        event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.endermen.endermanBeaconConfig.showWarning")
+        event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.endermen.endermanBeaconConfig.showLine")
+        event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
+        event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
+        event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
     }
 }
