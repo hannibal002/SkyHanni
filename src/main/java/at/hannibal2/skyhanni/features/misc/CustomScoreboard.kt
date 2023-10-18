@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.time.Duration.Companion.seconds
 
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.misc.customScoreboard
@@ -39,6 +40,18 @@ class CustomScoreboard {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
             lineMap[index]?.let {
+
+                //Multiline for Party Members (breaks nothing)
+                if (it[0] == "§9Party"){
+                    newList.add(listOf(it[0]))
+                    for (item in it){
+                        if (item != it[0]){
+                            newList.add(listOf(item))
+                        }
+                    }
+                    continue
+                }
+
                 newList.add(it)
             }
         }
@@ -75,9 +88,12 @@ class CustomScoreboard {
         lineMap[16] = Collections.singletonList("§cHeat")
 
         val partyList = mutableListOf<Any>()
+        var partyCount = 0
         partyList.add("§9Party")
         for (member in PartyAPI.partyMembers){
-            partyList.add(" §7- §7$member") //TODO: add max member amount, default 4 ig (since the player doenst count to the list)
+            if (partyCount == config.maxPartyList.get()) break
+            partyList.add(" §7- §7$member")
+            partyCount++
         }
         lineMap[17] = partyList
 

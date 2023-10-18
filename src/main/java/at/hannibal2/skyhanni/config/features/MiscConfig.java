@@ -829,6 +829,14 @@ public class MiscConfig {
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20));
 
+        @Expose
+        @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 25, // why do I even set it so high
+                minStep = 1
+        )
+        public Property<Integer> maxPartyList = Property.of(4);
 
         @Expose
         public Position position = new Position(10, 80, false, true);
