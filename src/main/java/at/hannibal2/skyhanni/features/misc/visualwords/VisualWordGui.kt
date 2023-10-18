@@ -371,6 +371,12 @@ open class VisualWordGui : GuiScreen() {
                 }
                 saveTextChanges()
             }
+            return
+        }
+
+        if (KeyboardManager.isCopyingKeysDown()) {
+            OSUtils.copyToClipboard(currentText)
+            return
         }
     }
 

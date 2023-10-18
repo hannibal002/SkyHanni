@@ -22,6 +22,11 @@ object KeyboardManager {
         return modifierHeld && Keyboard.KEY_V.isKeyHeld()
     }
 
+    fun isCopyingKeysDown(): Boolean {
+        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+        return modifierHeld && Keyboard.KEY_C.isKeyHeld()
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
