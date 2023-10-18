@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 class TrophyFishFillet {
-
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
@@ -37,5 +36,4 @@ class TrophyFishFillet {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.fishing.trophyFishing.filletTooltip
-
 }
