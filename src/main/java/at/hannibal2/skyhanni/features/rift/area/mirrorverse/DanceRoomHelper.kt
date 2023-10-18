@@ -12,7 +12,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,7 +37,7 @@ object DanceRoomHelper {
         display = buildList {
             if (instructions.isEmpty()) {
                 add("§cError fetching Dance Room Instructions!")
-                add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
+                add("§cTry §e/shreloadrepo §cor §e/shupdaterepo")
             }
             for ((lineIndex, line) in instructions.withIndex()) {
                 addLine(lineIndex, line)?.let { add(it) }

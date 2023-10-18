@@ -26,6 +26,9 @@ class RepoManager(private val configLocation: File) {
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
 
+    val successfulConstants = mutableListOf<String>()
+    val unsuccessfulConstants = mutableListOf<String>()
+
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
         if (SkyHanniMod.feature.dev.repoAutoUpdate) {
@@ -63,11 +66,14 @@ class RepoManager(private val configLocation: File) {
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
                 if (File(configLocation, "repo").exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
-                    if (command) {
-                        LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
-                        atomicShouldManuallyReload.set(false)
+                    if (unsuccessfulConstants.isEmpty()) {
+
+                        if (command) {
+                            LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
+                            atomicShouldManuallyReload.set(false)
+                        }
+                        return@supplyAsync false
                     }
-                    return@supplyAsync false
                 }
                 RepoUtils.recursiveDelete(repoLocation)
                 repoLocation.mkdirs()
@@ -122,9 +128,14 @@ class RepoManager(private val configLocation: File) {
         if (!atomicShouldManuallyReload.get()) return comp
         Minecraft.getMinecraft().addScheduledTask {
             try {
+                successfulConstants.clear()
+                unsuccessfulConstants.clear()
+
                 RepositoryReloadEvent(repoLocation, gson).postAndCatch()
                 comp.complete(null)
-                if (answerMessage.isNotEmpty()) {
+                if (unsuccessfulConstants.isNotEmpty()) {
+                    LorenzUtils.chat("§e[SkyHanni] error reloading repository")
+                } else if (answerMessage.isNotEmpty()) {
                     LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
                 }
             } catch (e: java.lang.Exception) {
@@ -134,6 +145,31 @@ class RepoManager(private val configLocation: File) {
         return comp
     }
 
+    fun displayRepoStatus(joinEvent: Boolean) {
+        if (joinEvent) {
+            if (unsuccessfulConstants.isNotEmpty()) {
+                LorenzUtils.chat("§c[SkyHanni] §7Repo Issue! Features may not work please report this on the Discord!")
+                LorenzUtils.chat("§7If you have repo auto update off try turning that on. §cUnsuccessful Constants:")
+                for (constant in unsuccessfulConstants) {
+                    LorenzUtils.chat("   §a- §7$constant")
+                }
+            }
+            return
+        }
+        if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
+            LorenzUtils.chat("§a[SkyHanni] Repo working fine!")
+            return
+        }
+        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("§a[SkyHanni] Successful Constants:")
+        for (constant in successfulConstants) {
+            LorenzUtils.chat("   §a- §7$constant")
+        }
+        LorenzUtils.chat("§c[SkyHanni] Unsuccessful Constants:")
+        for (constant in unsuccessfulConstants) {
+            LorenzUtils.chat("   §a- §7$constant")
+        }
+    }
+    
     /**
      * Parses a file in to a JsonObject.
      */

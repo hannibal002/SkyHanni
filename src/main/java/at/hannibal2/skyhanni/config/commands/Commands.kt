@@ -209,6 +209,10 @@ object Commands {
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
+        registerCommand(
+            "shrepostatus",
+        "Shows the status of all the mods constants"
+        ) { SkyHanniMod.repo.displayRepoStatus(false) }
     }
 
     private fun developersDebugFeatures() {
@@ -228,7 +232,7 @@ object Commands {
 
     private fun developersCodingHelp() {
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
+        registerCommand("shreloadrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
             "shstoplisteners",

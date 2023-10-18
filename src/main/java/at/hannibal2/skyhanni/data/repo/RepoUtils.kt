@@ -8,10 +8,10 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
-import java.lang.reflect.Type
 
 object RepoUtils {
 
