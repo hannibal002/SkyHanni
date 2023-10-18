@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.hitTrigger
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.mobs.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -52,6 +53,7 @@ object MobHitTrigger {
     // TODO(Livid Dagger Ability)
     // TODO(Bingo Blaster)
     // TODO(Alchemist Wand)
+    // TODO(Adaptive Blade)
 
     // TODO(Summons) IDK
 
@@ -72,7 +74,7 @@ object MobHitTrigger {
 
         //Base Melee Hit
         if (event.clickType.isLeftClick()) {
-            EntityKill.addToMobHitList(entity, hitTrigger.Melee)
+            addToMobHitList(entity, hitTrigger.Melee)
 
             val itemInHand = InventoryUtils.getItemInHand() ?: return
             val enchantmentsOfItemInHand = itemInHand.getEnchantments()
@@ -91,7 +93,7 @@ object MobHitTrigger {
                 var i = 0
                 EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
                     .filter { SkyblockMobUtils.testIfSkyBlockMob(it) && it != entity }.forEach {
-                        EntityKill.addToMobHitList(it, hitTrigger.Cleave)
+                        addToMobHitList(it, hitTrigger.Cleave)
                         i++
                         //LorenzDebug.log("Name: ${it.name}")
                     }
@@ -113,6 +115,10 @@ object MobHitTrigger {
 
     private const val renderRangeInBlocks = 128.0 //Should be 16*8 because Hypixels max render Range is 8 (or not?)
 
+    private val abilityRegex = Regex("Ability:(.*?)\\s(RIGHT|LEFT)\\sCLICK")
+
+    private data class Ability(val name: String, val clickType: ClickType)
+
     private fun handleItemClick(itemInHand: ItemStack?, clickType: ClickType) {
         if (itemInHand == null) return
 
@@ -124,9 +130,37 @@ object MobHitTrigger {
         val partialTick = 0.0f //IDK how to make it correctly but ignoring partialTicks(=0.0) works fine
         //LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
 
+        //Ability
+        val abilityLores = itemInHand.getLore().filter { it.removeColor().contains("Ability:") }
+        val abilityList = mutableListOf<Ability>()
+
+        abilityLores.map { it.removeColor()}.forEach {
+            val match = abilityRegex.find(it) ?: return@forEach
+            abilityList.add(
+                Ability(
+                    match.groupValues[1].trim(), if (match.groupValues[2] == "RIGHT") ClickType.RIGHT_CLICK else
+                        ClickType.LEFT_CLICK
+                )
+            )
+        }
+
+        //TODO(Cooldowns)
+        abilityList.forEach { ability ->
+            if (ability.clickType != clickType) return@forEach
+            when (ability.name) {
+                //Aurora Staff
+                "Arcane Zap" -> rayTraceForSkyblockMob( //TODO fix inaccuracy when moving + correct range
+                    player, renderRangeInBlocks, partialTick
+                )?.let { addToMobHitList(it, hitTrigger.AuroraStaff) }
+
+                else -> return@forEach
+            }
+        }
+
+        //Special Cases
         when {
             //Bow TODO(Cooldown)
-            lastLore.endsWith("BOW") && (clickType.isRightClick()  || (clickType.isLeftClick() && itemName.contains(
+            lastLore.endsWith("BOW") && (clickType.isRightClick() || (clickType.isLeftClick() && itemName.contains(
                 "Shortbow"
             ))) -> {
                 val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
@@ -158,33 +192,17 @@ object MobHitTrigger {
                 }
 
             }
-            //Terminator Ability
-            itemName.contains("Terminator") -> {
-
-            }
-            //Aurora Staff and Mage Left Click TODO(Cooldown)
+            //Mage Left Click TODO(Cooldown)
             classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType.isLeftClick() -> rayTraceForSkyblockMob(
                 player,
                 renderRangeInBlocks,
                 partialTick
             )?.let {
-                EntityKill.addToMobHitList(
+                addToMobHitList(
                     it,
                     hitTrigger.LMage
                 )
             }
-
-            itemName.contains("Aurora Staff") && clickType.isRightClick() -> rayTraceForSkyblockMob(
-                player,
-                renderRangeInBlocks,
-                partialTick
-            )?.let {
-                EntityKill.addToMobHitList(
-                    it,
-                    hitTrigger.AuroraStaff
-                )
-            }
-
         }
     }
 }
