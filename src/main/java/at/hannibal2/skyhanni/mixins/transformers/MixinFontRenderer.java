@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
 import net.minecraft.client.gui.FontRenderer;
@@ -31,8 +30,7 @@ public abstract class MixinFontRenderer {
      */
     @ModifyConstant(method = "renderStringAtPos", constant = @Constant(stringValue = "0123456789abcdefklmnor"))
     public String insertZColorCode(String constant) {
-        if (!SkyHanniMod.getFeature().chroma.enabled) return constant;
-        return "0123456789abcdefklmnorz";
+        return FontRendererHook.insertZColorCode(constant);
     }
 
     /**
@@ -54,10 +52,8 @@ public abstract class MixinFontRenderer {
      */
     @Inject(method = "renderStringAtPos", at = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0, shift = At.Shift.BY, by = 2), locals = LocalCapture.CAPTURE_FAILHARD)
     public void toggleChromaCondition(String text, boolean shadow, CallbackInfo ci, int i, char c0, int i1) {
-        if (!SkyHanniMod.getFeature().chroma.enabled) return;
-        if (i1 == 22) {
+        if (FontRendererHook.toggleChromaCondition_shouldResetStyles(text, shadow, ci, i, c0, i1)) {
             this.resetStyles();
-            FontRendererHook.toggleChromaOn();
         }
     }
 

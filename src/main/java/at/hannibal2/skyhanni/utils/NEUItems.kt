@@ -252,17 +252,17 @@ object NEUItems {
 
                 // ignore wheat in enchanted cookie
                 if (internalName == "ENCHANTED_COOKIE" && internalItemId == "WHEAT") {
-                        continue
+                    continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
                 if (internalName == "ENCHANTED_GOLDEN_CARROT" && internalItemId == "GOLDEN_CARROT") {
-                        continue
+                    continue
                 }
 
                 // ignore rabbit hide in leather
                 if (internalName == "LEATHER" && internalItemId == "RABBIT_HIDE") {
-                        continue
+                    continue
                 }
 
                 val old = map.getOrDefault(internalItemId, 0)
@@ -298,7 +298,7 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
-        if (InventoryUtils.inStorage()) return true
+        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled.getValue()) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
         return false

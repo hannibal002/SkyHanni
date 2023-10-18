@@ -6,36 +6,18 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
 object CopyItemCommand {
 
     fun command() {
-        try {
-            val resultList = mutableListOf<String>()
-            val itemStack = InventoryUtils.getItemInHand() ?: return
-            resultList.add("ITEM LORE")
-            resultList.add("display name: '" + itemStack.displayName.toString() + "'")
-            val itemID = itemStack.getInternalName().asString()
-            resultList.add("internalName: '$itemID'")
-            resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
-            resultList.add("lore:")
-            for (line in itemStack.getLore()) {
-                resultList.add(" '$line'")
-            }
-            resultList.add("")
-            resultList.add("getTagCompound")
-            if (itemStack.hasTagCompound()) {
-                val tagCompound = itemStack.tagCompound
-                recurseTag(tagCompound, "  ", resultList)
-            }
-
-            val string = resultList.joinToString("\n")
-            OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] Item info copied into the clipboard!")
-        } catch (_: Throwable) {
+        val itemStack = InventoryUtils.getItemInHand()
+        if (itemStack == null) {
             LorenzUtils.chat("§c[SkyHanni] No item in hand!")
+            return
         }
+        copyItemToClipboard(itemStack)
     }
 
     private fun recurseTag(compound: NBTTagCompound, text: String, list: MutableList<String>) {
@@ -53,4 +35,26 @@ object CopyItemCommand {
         }
     }
 
+    fun copyItemToClipboard(itemStack: ItemStack) {
+        val resultList = mutableListOf<String>()
+        resultList.add(itemStack.getInternalName().toString())
+        resultList.add("display name: '" + itemStack.displayName.toString() + "'")
+            val itemID = itemStack.getInternalName().asString()
+            resultList.add("internalName: '$itemID'")
+        resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
+        resultList.add("lore:")
+        for (line in itemStack.getLore()) {
+            resultList.add(" '$line'")
+        }
+        resultList.add("")
+        resultList.add("getTagCompound")
+        if (itemStack.hasTagCompound()) {
+            val tagCompound = itemStack.tagCompound
+            recurseTag(tagCompound, "  ", resultList)
+        }
+
+        val string = resultList.joinToString("\n")
+        OSUtils.copyToClipboard(string)
+        LorenzUtils.chat("§e[SkyHanni] Item info copied into the clipboard!")
+    }
 }

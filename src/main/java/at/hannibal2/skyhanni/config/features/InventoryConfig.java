@@ -62,6 +62,7 @@ public class InventoryConfig {
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
+
     public static class RngMeterConfig {
         @Expose
         @ConfigOption(name = "Floor Names", desc = "Show the Floor names in the Catacombs RNG Meter inventory.")
@@ -86,6 +87,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Stats Tuning", desc = "")
     @Accordion
     public StatsTuningConfig statsTuning = new StatsTuningConfig();
+
     public static class StatsTuningConfig {
         @Expose
         @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
@@ -116,6 +118,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Jacob Farming Contest", desc = "")
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
+
     public static class JacobFarmingContestConfig {
         @Expose
         @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the Jacob inventory.")
@@ -141,7 +144,6 @@ public class InventoryConfig {
         @ConfigEditorBoolean
         public boolean finneganIcon = true;
     }
-
 
 
     @Expose

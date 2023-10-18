@@ -39,6 +39,12 @@
 + Added In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
++ Added Quest Item Helper. - NetheriteMiner
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items needed from the sacks.
++ Added alerts when the player catches a Legendary Sea Creature. - Cad
++ Added Soulweaver Skull Hider to the Dungeon Object Hider. - nea
+    + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
++ Added /shmouselock command to lock mouse rotation for farming. - Cad
 
 #### Events
 
@@ -66,6 +72,10 @@
 + Added 'spooked into the lobby' chat message to the Outside Hypixel filter. - CalMWolfs
 + Changed the Yaw/Pitch Display to not show scientific notations at very small numbers. - Obsidian
 + Added an option to the Advanced Player List to hide Crimson Isle faction icons. - hannibal2
++ Added Enrichment to Estimated Item Value. - jani
++ Added Plhlegblast to the Rare Sea Creature Warning and Highlight. - hannibal2
++ Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election API check failed. - CalMWolfs
++ Hiding a bunch of garden GUIs in a bunch of garden inventories. - hannibal2
 
 ### Bug Fixes
 
@@ -93,6 +103,10 @@
 + Fixed Fishing Hook Display showing wrong damage numbers. - hannibal2
 + Fixed Abiphone ring message not getting filtered correctly. - hannibal2
 + Fixed the bug that faction icons in Crimson Isle are always hidden in the tab list. - hannibal2
++ Fixed SkyHanni GUI Edit Button not working inside storage even if neu storage is not disabled. - hannibal2
++ Hide "click" texts with the Fishing Hook Display. - hannibal2
++ Fixed Highlight Showcase Items not working in some areas. - Obsidian
++ Fixed the Blaze Slayer Damage Indicator not working and no longer causing FPS drops. - hannibal2
 
 #### Config
 
