@@ -54,10 +54,11 @@ class HighlightMissingRepoItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<MultiFilterJson>("IgnoredItems")?.let { data ->
+        try {
+            val data = event.getConstant<MultiFilterJson>("IgnoredItems") ?: throw Exception()
             ignoreItems.load(data)
             SkyHanniMod.repo.successfulConstants.add("IgnoredItems")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("IgnoredItems")
         }
     }

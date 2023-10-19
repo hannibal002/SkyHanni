@@ -73,10 +73,11 @@ class AnitaExtraFarmingFortune {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")?.let { data ->
+        try {
+            val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts") ?: throw Exception()
             levelPrice = data.level_price
             SkyHanniMod.repo.successfulConstants.add("AnitaUpgradeCosts")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("AnitaUpgradeCosts")
         }
     }

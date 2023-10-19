@@ -107,10 +107,11 @@ class FarmingArmorDrops {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<ArmorDropsJson>("ArmorDrops")?.let { data ->
+        try {
+            val data = event.getConstant<ArmorDropsJson>("ArmorDrops") ?: throw Exception()
             armorDropInfo = data.special_crops
             SkyHanniMod.repo.successfulConstants.add("ArmorDrops")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("ArmorDrops")
         }
     }

@@ -18,10 +18,11 @@ object TrophyFishManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<TrophyFishJson>("TrophyFish")?.let { data ->
+        try {
+            val data = event.getConstant<TrophyFishJson>("TrophyFish") ?: throw Exception()
             trophyFishInfo = data.trophy_fish
             SkyHanniMod.repo.successfulConstants.add("TrophyFish")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("TrophyFish")
         }
     }

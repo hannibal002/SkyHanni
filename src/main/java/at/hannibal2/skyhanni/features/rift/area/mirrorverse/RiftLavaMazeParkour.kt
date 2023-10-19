@@ -19,7 +19,8 @@ class RiftLavaMazeParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<ParkourJson>("RiftLavaMazeParkour")?.let { data ->
+        try {
+            val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour") ?: throw Exception()
             parkourHelper = ParkourHelper(
                 data.locations,
                 data.shortCuts,
@@ -28,7 +29,7 @@ class RiftLavaMazeParkour {
             )
             updateConfig()
             SkyHanniMod.repo.successfulConstants.add("RiftLavaMazeParkour")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("RiftLavaMazeParkour")
         }
     }

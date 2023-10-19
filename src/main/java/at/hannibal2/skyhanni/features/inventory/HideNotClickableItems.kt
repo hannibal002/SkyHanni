@@ -56,20 +56,22 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<MultiFilterJson>("TradeNpcs")?.let { data ->
+        try {
+            val data = event.getConstant<MultiFilterJson>("TradeNpcs") ?: throw Exception()
             tradeNpcFilter.load(data)
             SkyHanniMod.repo.successfulConstants.add("TradeNpcs")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("TradeNpcs")
         }
-        event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")?.let { data ->
+        try {
+            val data = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems") ?: throw Exception()
             hideNpcSellFilter.load(data.hide_npc_sell)
             hideInStorageFilter.load(data.hide_in_storage)
             hidePlayerTradeFilter.load(data.hide_player_trade)
             notAuctionableFilter.load(data.not_auctionable)
             updateSalvageList(data.salvage)
             SkyHanniMod.repo.successfulConstants.add("HideNotClickableItems")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("HideNotClickableItems")
         }
     }

@@ -51,10 +51,11 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.let {data ->
+        try {
+            val data = event.getConstant<RiftEffigiesJson>("RiftEffigies") ?: throw Exception()
             locations = data.locations
             SkyHanniMod.repo.successfulConstants.add("RiftEffigies")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("RiftEffigies")
         }
     }

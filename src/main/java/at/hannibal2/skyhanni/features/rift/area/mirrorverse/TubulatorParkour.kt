@@ -21,7 +21,8 @@ class TubulatorParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<ParkourJson>("RiftTubulator")?.let { data ->
+        try {
+            val data = event.getConstant<ParkourJson>("RiftTubulator") ?: throw Exception()
             parkourHelper = ParkourHelper(
                 data.locations,
                 data.shortCuts,
@@ -30,7 +31,7 @@ class TubulatorParkour {
             )
             updateConfig()
             SkyHanniMod.repo.successfulConstants.add("RiftTubulator")
-        } ?: run { 
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("RiftTubulator")
         }
     }

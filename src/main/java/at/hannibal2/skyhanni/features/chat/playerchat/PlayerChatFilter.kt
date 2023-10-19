@@ -30,7 +30,8 @@ class PlayerChatFilter {
         var countCategories = 0
         var countFilters = 0
 
-        event.getConstant<PlayerChatFilterJson>("PlayerChatFilter")?.let { data ->
+        try {
+            val data = event.getConstant<PlayerChatFilterJson>("PlayerChatFilter") ?: throw Exception()
             for (category in data.filters) {
                 val description = category.description
                 val filter = MultiFilter()
@@ -41,7 +42,7 @@ class PlayerChatFilter {
                 countFilters += filter.count()
             }
             SkyHanniMod.repo.successfulConstants.add("PlayerChatFilter")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("PlayerChatFilter")
         }
     }

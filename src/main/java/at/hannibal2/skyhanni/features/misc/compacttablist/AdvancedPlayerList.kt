@@ -138,10 +138,11 @@ object AdvancedPlayerList {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<ContributorListJson>("ContributorList")?.usernames?.let { data ->
-            contributors = data
+        try {
+            val data = event.getConstant<ContributorListJson>("ContributorList") ?: throw Exception()
+            contributors = data.usernames
             SkyHanniMod.repo.successfulConstants.add("ContributorList")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("ContributorList")
         }
     }

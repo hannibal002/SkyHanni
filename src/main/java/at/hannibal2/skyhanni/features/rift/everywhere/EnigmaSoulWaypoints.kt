@@ -145,7 +145,8 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<EnigmaSoulsJson>("EnigmaSouls")?.let { data ->
+        try {
+            val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls") ?: throw Exception()
             soulLocations = buildMap {
                 for ((_, locations) in data.areas) {
                     for (location in locations) {
@@ -154,7 +155,7 @@ object EnigmaSoulWaypoints {
                 }
             }
             SkyHanniMod.repo.successfulConstants.add("EnigmaSouls")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("EnigmaSouls")
         }
     }

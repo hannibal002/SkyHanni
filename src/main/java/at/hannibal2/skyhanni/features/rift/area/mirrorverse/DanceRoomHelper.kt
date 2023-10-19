@@ -166,10 +166,11 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions")?.let {data ->
+        try {
+            val data = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions") ?: throw Exception()
             instructions = data.instructions
             SkyHanniMod.repo.successfulConstants.add("DanceRoomInstructions")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("DanceRoomInstructions")
         }
     }

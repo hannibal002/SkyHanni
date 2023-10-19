@@ -17,10 +17,11 @@ object PlayerTabComplete {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<VipVisitsJson>("VipVisits")?.let { data ->
+        try {
+            val data = event.getConstant<VipVisitsJson>("VipVisits") ?: throw Exception()
             vipVisits = data.vipVisits
             SkyHanniMod.repo.successfulConstants.add("VipVisits")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("VipVisits")
         }
     }

@@ -15,10 +15,11 @@ object GetFromSacksTabComplete {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<SacksJson>("Sacks")?.let { data ->
+        try {
+            val data = event.getConstant<SacksJson>("Sacks") ?: throw Exception()
             sackList = data.sackList
             SkyHanniMod.repo.successfulConstants.add("Sacks")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("Sacks")
         }
     }

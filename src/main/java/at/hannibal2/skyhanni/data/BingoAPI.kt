@@ -10,10 +10,11 @@ object BingoAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<BingoRanksJson>("BingoRanks")?.let { data ->
+        try {
+            val data = event.getConstant<BingoRanksJson>("BingoRanks") ?: throw Exception()
             ranks = data.ranks
             SkyHanniMod.repo.successfulConstants.add("BingoRanks")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("BingoRanks")
         }
     }

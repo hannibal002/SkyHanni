@@ -28,7 +28,8 @@ object QuickModMenuSwitch {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")?.let { data ->
+        try {
+            val data = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")?: throw Exception()
             mods = buildList {
                 out@ for ((name, mod) in data.mods) {
                     for (path in mod.guiPath) {
@@ -42,7 +43,7 @@ object QuickModMenuSwitch {
                 }
             }
             SkyHanniMod.repo.successfulConstants.add("ModGuiSwitcher")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("ModGuiSwitcher")
         }
     }

@@ -12,10 +12,11 @@ object WarpTabComplete {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<WarpsJson>("Warps")?.let { data ->
+        try {
+            val data = event.getConstant<WarpsJson>("Warps") ?: throw Exception()
             warps = data.warpCommands
             SkyHanniMod.repo.successfulConstants.add("Warps")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("Warps")
         }
     }

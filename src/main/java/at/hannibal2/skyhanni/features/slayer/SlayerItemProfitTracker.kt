@@ -67,10 +67,11 @@ object SlayerItemProfitTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems")?.let { data ->
+        try {
+            val data = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems") ?: throw Exception()
             allowedItems = data.slayers
             SkyHanniMod.repo.successfulConstants.add("SlayerProfitTrackerItems")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("SlayerProfitTrackerItems")
         }
     }

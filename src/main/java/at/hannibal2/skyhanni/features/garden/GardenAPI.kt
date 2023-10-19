@@ -244,13 +244,14 @@ object GardenAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<GardenJson>("Garden")?.let { data ->
+        try {
+            val data = event.getConstant<GardenJson>("Garden") ?: throw Exception()
             gardenExperience = data.garden_exp
             GardenCropMilestones.onRepoReload(data)
             GardenVisitorColorNames.onRepoReload(data)
             ComposterOverlay.onRepoReload(data)
             SkyHanniMod.repo.successfulConstants.add("Garden")
-        } ?: run {
+        } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("Garden")
         }
     }
