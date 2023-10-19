@@ -196,7 +196,7 @@ open class VisualWordGui : GuiScreen() {
 
                 x += 200
                 drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
-                status = if (currentPhrase.isCaseSensitive()) "§2True" else "§4False"
+                status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
                 colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
@@ -341,6 +341,8 @@ open class VisualWordGui : GuiScreen() {
                 currentText = ""
                 currentIndex = modifiedWords.size - 1
                 saveChanges()
+                pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
+                scrollScreen()
             }
             currentlyEditing = !currentlyEditing
         }
@@ -349,7 +351,25 @@ open class VisualWordGui : GuiScreen() {
     @Throws(IOException::class)
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         super.keyTyped(typedChar, keyCode)
-        if (!currentlyEditing) return
+        if (!currentlyEditing) {
+            if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
+                if (KeyboardManager.isControlKeyDown()) {
+                    pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
+                } else {
+                    pageScroll -= 30
+                }
+                scrollScreen()
+            }
+            if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_W) {
+                if (KeyboardManager.isControlKeyDown()) {
+                    pageScroll = 0
+                } else {
+                    pageScroll += 30
+                }
+                scrollScreen()
+            }
+            return
+        }
         if (currentTextBox == SelectedTextBox.NONE) return
         if (currentIndex >= modifiedWords.size || currentIndex == -1) return
 
