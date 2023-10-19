@@ -435,6 +435,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
++ /shmouselock command to lock mouse rotation for farming. - Cad
 
 ## The Rift
 

@@ -24,7 +24,6 @@ import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-
 object SackAPI {
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
     private val chatConfig get() = SkyHanniMod.feature.chat
@@ -255,7 +254,7 @@ object SackAPI {
                     newAmount = 0
                     changed = 0
                 }
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.status) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.getStatus()) }
             } else {
                 val newAmount = if (item.value > 0) item.value else 0
                 sackData =
@@ -326,8 +325,10 @@ object SackAPI {
 data class SackItem(
     @Expose val amount: Long,
     @Expose val lastChange: Int,
-    @Expose val status: SackStatus = SackStatus.MISSING
-)
+    @Expose private val status: SackStatus?
+) {
+    fun getStatus() = status ?: SackStatus.MISSING
+}
 
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
