@@ -3,16 +3,14 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
 import net.minecraft.item.ItemEnderEye
@@ -290,7 +288,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     }
                 }
             }
-            if (!(lore.isEmpty()) && lore.first().contains(" in: ") && chestName == ("Calendar and Events")) {
+            if (!(lore.isEmpty()) && lore.first().contains(" in: ") && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
                 theStringToUse = lore.first()
             }
             genericDurationPattern.matchMatcher(theStringToUse) {
@@ -299,11 +297,11 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 val hString = group("hours") ?: ""
                 val mString = group("minutes") ?: ""
                 val sString = group("seconds") ?: ""
-                if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return "§a${yString}"
-                if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return "§a${dString}"
-                if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return "§a${hString}"
-                if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return "§a${mString}"
-                if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return "§a${sString}"
+                if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return "${yString}"
+                if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return "${dString}"
+                if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return "${hString}"
+                if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return "${mString}"
+                if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return "${sString}"
             }
         }
 
