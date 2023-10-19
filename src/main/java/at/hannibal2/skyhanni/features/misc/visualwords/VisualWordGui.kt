@@ -174,7 +174,7 @@ open class VisualWordGui : GuiScreen() {
             scrollScreen()
         }
         else {
-            val x = guiLeft + 180
+            var x = guiLeft + 180
             var y = guiTop + 140
             drawUnmodifiedStringCentered("§cDelete", x, y)
             var colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
@@ -185,9 +185,18 @@ open class VisualWordGui : GuiScreen() {
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
-                y -= 150
                 val currentPhrase = modifiedWords[currentIndex]
-                val status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
+
+                x -= 100
+                drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
+                var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
+                drawUnmodifiedStringCentered(status, x, y)
+                colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+
+                x += 200
+                drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
+                status = if (currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
                 colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
@@ -272,7 +281,7 @@ open class VisualWordGui : GuiScreen() {
                 lastClickedHeight = mouseY
             }
         }
-        val x = guiLeft + 180
+        var x = guiLeft + 180
         var y = guiTop + 140
         if (currentlyEditing) {
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
@@ -284,10 +293,17 @@ open class VisualWordGui : GuiScreen() {
                 currentTextBox = SelectedTextBox.NONE
             }
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
-                y = guiTop + 20
+                x -= 100
+                y += 30
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
                     SoundUtils.playClickSound()
                     modifiedWords[currentIndex].enabled = !modifiedWords[currentIndex].enabled
+                    saveChanges()
+                }
+                x += 200
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+                    SoundUtils.playClickSound()
+                    modifiedWords[currentIndex].setCaseSensitive(!modifiedWords[currentIndex].isCaseSensitive())
                     saveChanges()
                 } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
                     SoundUtils.playClickSound()
@@ -306,6 +322,7 @@ open class VisualWordGui : GuiScreen() {
             }
         }
         y = guiTop + 170
+        x = guiLeft + 180
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
             SoundUtils.playClickSound()
             if (currentlyEditing) {
@@ -319,7 +336,7 @@ open class VisualWordGui : GuiScreen() {
                 currentIndex = -1
                 currentTextBox = SelectedTextBox.NONE
             } else {
-                modifiedWords.add(VisualWord("", "", true))
+                modifiedWords.add(VisualWord("", "", true, false))
                 currentTextBox = SelectedTextBox.PHRASE
                 currentText = ""
                 currentIndex = modifiedWords.size - 1
