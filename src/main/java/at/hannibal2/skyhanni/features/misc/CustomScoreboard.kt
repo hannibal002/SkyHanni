@@ -49,6 +49,11 @@ class CustomScoreboard {
                     continue
                 }
 
+                if(it[0] == "<empty>"){
+                    newList.add(listOf(""))
+                    continue
+                }
+
                 newList.add(it)
             }
         }
@@ -81,8 +86,7 @@ class CustomScoreboard {
         eventList.add("§cCurrent Event") //get event stuff
         lineMap[14] = eventList
 
-        lineMap[15] = Collections.singletonList("§7Soulflow")
-        lineMap[16] = Collections.singletonList("§cHeat")
+        lineMap[15] = Collections.singletonList("§cHeat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
@@ -92,11 +96,16 @@ class CustomScoreboard {
             partyList.add(" §7- §7$member")
             partyCount++
         }
-        lineMap[17] = partyList
+        lineMap[16] = partyList
 
-        lineMap[18] = Collections.singletonList("§7Pet")
-        lineMap[19] = Collections.singletonList("§7Quiver")
-        lineMap[20] = Collections.singletonList("§7Maxwell Power")
+        lineMap[17] = Collections.singletonList("§7Pet")
+        lineMap[18] = Collections.singletonList("§7Quiver")
+        lineMap[19] = Collections.singletonList("§7Maxwell Power")
+        lineMap[20] = Collections.singletonList("§ewww.hypixel.net")
+        lineMap[21] = Collections.singletonList("<empty>")
+        lineMap[22] = Collections.singletonList("<empty>")
+        lineMap[23] = Collections.singletonList("<empty>")
+        lineMap[24] = Collections.singletonList("<empty>")
 
         return formatDisplay(lineMap)
     }
