@@ -155,38 +155,38 @@ class ChatFilter {
             message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)") -> true
             message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)") -> true
             message.matchRegex("§6§lRARE DROP! §r§5Golden Powder (.*)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§2(.*) Pestilence Rune I§r§7\\) (.*)") -> {
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§2(.*) Pestilence Rune I§r§7\\) (.*)") -> {
                 LorenzUtils.debug("check regex for this blocked message!")
                 true
             }
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)") -> true
 
             //Tarantula
             message.matchRegex("§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)") -> true
             message.matchRegex("§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)") -> true
             message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> true
             message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)") -> true
 
             //Enderman
             message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)") -> true
-            message.matchRegex("§d§lCRAZY RARE DROP!  §r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)") -> true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)") -> true
+            message.matchRegex("§d§lCRAZY RARE DROP! {2}§r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*") -> true
 
             //Blaze
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)") -> true
             message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)") -> true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)") -> true
             else -> false
         }
     }
@@ -194,14 +194,14 @@ class ChatFilter {
     private fun slayer(message: String): Boolean {
         return when {
             //start
-            message.matchRegex("  §r§5§lSLAYER QUEST STARTED!") -> true
-            message.matchRegex("   §5§l» §7Slay §c(.*) Combat XP §7worth of (.*)§7.") -> true
+            message.matchRegex(" {2}§r§5§lSLAYER QUEST STARTED!") -> true
+            message.matchRegex(" {3}§5§l» §7Slay §c(.*) Combat XP §7worth of (.*)§7.") -> true
 
             //end
-            message.matchRegex("  §r§a§lSLAYER QUEST COMPLETE!") -> true
+            message.matchRegex(" {2}§r§a§lSLAYER QUEST COMPLETE!") -> true
             message == "  §r§6§lNICE! SLAYER BOSS SLAIN!" -> true
-            message.matchRegex("   §r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!") -> true
-            message.matchRegex("   §r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!") -> true
+            message.matchRegex(" {3}§r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!") -> true
+            message.matchRegex(" {3}§r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!") -> true
             message == "§eYou received kill credit for assisting on a slayer miniboss!" -> true
             message.startsWith("§e✆ RING... ") -> true
             else -> false
