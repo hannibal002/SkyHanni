@@ -31,6 +31,7 @@ class CustomScoreboard {
     private var bits = "0"
     private var copper = "0"
     private var gems = "0"
+    private var location = "None"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -51,6 +52,13 @@ class CustomScoreboard {
             }
             if (line.startsWith(" Bank: §r§6")){
                 bank = line.removePrefix(" Bank: §r§6")
+            }
+        }
+
+        //todo add copper etc to this
+        for (line in ScoreboardData.sidebarLinesFormatted){
+            if (line.startsWith(" §7⏣ ")){
+                location = line.removePrefix(" §7⏣ ")
             }
         }
         bits = getBits()
@@ -102,7 +110,7 @@ class CustomScoreboard {
         lineMap[5] = Collections.singletonList("Copper: §c$copper")
         lineMap[6] = Collections.singletonList("Gems: §a$gems")
         lineMap[7] = Collections.singletonList("<empty>")
-        lineMap[8] = Collections.singletonList("§7⏣ ")
+        lineMap[8] = Collections.singletonList("§7⏣$location")
         lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[10] = Collections.singletonList("§7IRL Time")
         lineMap[11] = Collections.singletonList("§7Current Server")
