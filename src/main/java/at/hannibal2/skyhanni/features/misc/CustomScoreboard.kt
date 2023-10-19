@@ -70,23 +70,26 @@ class CustomScoreboard {
         lineMap[4] = Collections.singletonList("§bBits")
         lineMap[5] = Collections.singletonList("§cCopper")
         lineMap[6] = Collections.singletonList("§aGems")
-        lineMap[7] = Collections.singletonList("§7Location")
-        lineMap[8] = Collections.singletonList("§7Ingame Time")
-        lineMap[9] = Collections.singletonList("§7IRL Time")
-        lineMap[10] = Collections.singletonList("§7Current Server")
-        lineMap[11] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //could be multiline, need to decide
+        lineMap[7] = Collections.singletonList("<empty>")
+        lineMap[8] = Collections.singletonList("§7Location")
+        lineMap[9] = Collections.singletonList("§7Ingame Time")
+        lineMap[10] = Collections.singletonList("§7IRL Time")
+        lineMap[11] = Collections.singletonList("§7Current Server")
+        lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //could be multiline, need to decide
+        lineMap[13] = Collections.singletonList("<empty>")
 
         val slayerList = mutableListOf<Any>()
         slayerList.add("§7Slayer") //get slayer stuff
-        lineMap[12] = slayerList
+        lineMap[14] = slayerList
 
-        lineMap[13] = Collections.singletonList("§7Next Event")
+        lineMap[15] = Collections.singletonList("§7Next Event")
 
         val eventList = mutableListOf<Any>()
         eventList.add("§cCurrent Event") //get event stuff
-        lineMap[14] = eventList
+        lineMap[16] = eventList
+        lineMap[17] = Collections.singletonList("<empty>")
 
-        lineMap[15] = Collections.singletonList("§cHeat")
+        lineMap[18] = Collections.singletonList("§cHeat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
@@ -96,16 +99,12 @@ class CustomScoreboard {
             partyList.add(" §7- §7$member")
             partyCount++
         }
-        lineMap[16] = partyList
+        lineMap[19] = partyList
 
-        lineMap[17] = Collections.singletonList("§7Pet")
-        lineMap[18] = Collections.singletonList("§7Quiver")
-        lineMap[19] = Collections.singletonList("§7Maxwell Power")
-        lineMap[20] = Collections.singletonList("§ewww.hypixel.net")
-        lineMap[21] = Collections.singletonList("<empty>")
-        lineMap[22] = Collections.singletonList("<empty>")
-        lineMap[23] = Collections.singletonList("<empty>")
-        lineMap[24] = Collections.singletonList("<empty>")
+        lineMap[20] = Collections.singletonList("§7Pet")
+        lineMap[21] = Collections.singletonList("§7Quiver")
+        lineMap[22] = Collections.singletonList("§7Maxwell Power")
+        lineMap[23] = Collections.singletonList("§ewww.hypixel.net")
 
         return formatDisplay(lineMap)
     }
