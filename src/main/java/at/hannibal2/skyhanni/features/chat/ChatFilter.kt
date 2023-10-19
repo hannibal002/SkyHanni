@@ -21,31 +21,39 @@ class ChatFilter {
     }
 
     private fun block(message: String): String = when {
-        lobby(message) && config.hypixelHub -> "lobby"
-        empty(message) && config.empty -> "empty"
-        warping(message) && config.warping -> "warping"
-        welcome(message) && config.welcome -> "welcome"
-        isGuildExp(message) && config.guildExp -> "guild_exp"
-        killCombo(message) && config.killCombo -> "kill_combo"
-        profileJoin(message) && config.profileJoin -> "profile_join"
+        config.hypixelHub && lobby(message) -> "lobby"
+        config.empty && empty(message) -> "empty"
+        config.warping && warping(message) -> "warping"
+        config.welcome && welcome(message) -> "welcome"
+        config.guildExp && isGuildExp(message) -> "guild_exp"
+        config.killCombo && killCombo(message) -> "kill_combo"
+        config.profileJoin && profileJoin(message) -> "profile_join"
 
-        bazaarAndAHMiniMessages(message) && config.others -> "bz_ah_minis"
-        slayer(message) && config.others -> "slayer"
-        slayerDrop(message) && config.others -> "slayer_drop"
-        uselessDrop(message) && config.others -> "useless_drop"
-        uselessNotification(message) && config.others -> "useless_notification"
-        party(message) && config.others -> "party"
-        money(message) && config.others -> "money"
-        winterIsland(message) && config.others -> "winter_island"
-        uselessWarning(message) && config.others -> "useless_warning"
-        annoyingSpam(message) && config.others -> "annoying_spam"
+        config.others && others(message) -> othersMsg
 
-        isWinterGift(message) && config.winterGift -> "winter_gift"
-        isPowderMining(message) && config.powderMining -> "powder_mining"
-
-
+        config.winterGift && isWinterGift(message) -> "winter_gift"
+        config.powderMining && isPowderMining(message) -> "powder_mining"
         else -> ""
     }
+
+    private var othersMsg = ""
+    private fun others(message: String): Boolean {
+        othersMsg = when {
+            bazaarAndAHMiniMessages(message) -> "bz_ah_minis"
+            slayer(message) -> "slayer"
+            slayerDrop(message) -> "slayer_drop"
+            uselessDrop(message) -> "useless_drop"
+            uselessNotification(message) -> "useless_notification"
+            party(message) -> "party"
+            money(message) -> "money"
+            winterIsland(message) -> "winter_island"
+            uselessWarning(message) -> "useless_warning"
+            annoyingSpam(message) -> "annoying_spam"
+            else -> ""
+        }
+        return othersMsg != ""
+    }
+
 
     //TODO split into others
     private fun annoyingSpam(message: String): Boolean {
