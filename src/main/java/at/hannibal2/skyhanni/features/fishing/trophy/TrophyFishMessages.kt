@@ -30,10 +30,7 @@ class TrophyFishMessages {
         trophyFishPattern.matchMatcher(event.message) {
             displayName = group("displayName").replace("§k", "")
             displayRarity = group("displayRarity")
-        } ?: run {
-            println("did not match")
-            return
-        }
+        } ?: return
 
         val internalName = displayName.replace("Obfuscated", "Obfuscated Fish")
             .replace("[- ]".toRegex(), "").lowercase().removeColor()

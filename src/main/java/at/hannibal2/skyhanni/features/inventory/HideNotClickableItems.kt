@@ -27,7 +27,9 @@ import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.jsonobjects.HideNotClickableItemsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.utils.jsonobjects.MultiFilterJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -54,29 +56,31 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            event.getConstant("TradeNpcs")?.let {
-                tradeNpcFilter.load(it)
-            }
+        event.getConstant<MultiFilterJson>("TradeNpcs")?.let { data ->
+            tradeNpcFilter.load(data)
+            SkyHanniMod.repo.successfulConstants.add("TradeNpcs")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("TradeNpcs")
+        }
+        event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")?.let { data ->
+            hideNpcSellFilter.load(data.hide_npc_sell)
+            hideInStorageFilter.load(data.hide_in_storage)
+            hidePlayerTradeFilter.load(data.hide_player_trade)
+            notAuctionableFilter.load(data.not_auctionable)
 
-            val hideNotClickableItems = event.getConstant("HideNotClickableItems") ?: return
-            hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
-            hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
-            updateSalvageList(hideNotClickableItems)
-            hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
-            notAuctionableFilter.load(hideNotClickableItems["not_auctionable"].asJsonObject)
+            updateSalvageList(data.salvage)
 
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("Error in RepositoryReloadEvent for HideNotClickableItems")
+            SkyHanniMod.repo.successfulConstants.add("HideNotClickableItems")
+        } ?: run {
+            SkyHanniMod.repo.unsuccessfulConstants.add("HideNotClickableItems")
         }
     }
 
-    private fun updateSalvageList(hideNotClickableItems: JsonObject) {
+    private fun updateSalvageList(data: SalvageFilter) {
         itemsToSalvage.clear()
-        val salvage = hideNotClickableItems["salvage"].asJsonObject
-        itemsToSalvage.addAll(salvage.asJsonObject["items"].asJsonArray.map { it.asString })
-        for (armor in salvage.asJsonObject["armor"].asJsonArray.map { it.asString }) {
+
+        itemsToSalvage.addAll(data.items)
+        for (armor in data.armor) {
             itemsToSalvage.add("$armor Helmet")
             itemsToSalvage.add("$armor Chestplate")
             itemsToSalvage.add("$armor Leggings")
@@ -136,7 +140,7 @@ class HideNotClickableItems {
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass) {
-                    event.toolTip.add("  §7(Disable with holding the control key)")
+                    event.toolTip.add("  §7(Bypass by holding the control key)")
                 }
             }
         }
