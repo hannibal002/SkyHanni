@@ -36,7 +36,7 @@ class SeaCreatureManager {
         var counter = 0
 
         try {
-            val data = event.getConstant<Map<String, SeaCreatureJson.Variant>>("SeaCreatures", SeaCreatureJson.TYPE) ?: return
+            val data = event.getConstant<Map<String, SeaCreatureJson.Variant>>("SeaCreatures", SeaCreatureJson.TYPE) ?: throw Exception()
             val allFishingMobs = mutableMapOf<String,SeaCreature>()
 
             for (variant in data.values) {
@@ -55,10 +55,9 @@ class SeaCreatureManager {
             }
             SeaCreatureManager.allFishingMobs = allFishingMobs
             LorenzUtils.debug("Loaded $counter sea creatures from repo")
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+            SkyHanniMod.repo.successfulConstants.add("SeaCreatures")
+        } catch (_: Exception) {
+            SkyHanniMod.repo.unsuccessfulConstants.add("SeaCreatures")
         }
     }
 
