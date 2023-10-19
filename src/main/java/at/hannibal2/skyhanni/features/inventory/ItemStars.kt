@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.jsonobjects.ItemsJson
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,22 +41,16 @@ class ItemStars {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
-            val items = event.getConstant("Items") ?: return
-            if (items.has("crimson_armors")) {
-                armorNames.clear()
-                armorNames.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })
-            }
-
+            val data = event.getConstant<ItemsJson>("Items") ?: throw Exception()
+            armorNames.clear()
             tiers.clear()
-            if (items.has("crimson_tiers")) {
-                items.getAsJsonObject("crimson_tiers").entrySet().forEach {
-                    tiers[it.key] = it.value.asInt
-                }
+            armorNames.addAll(data.crimson_armors)
+            for (tier in data.crimson_tiers) {
+                tiers[tier.key] = tier.value
             }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+            SkyHanniMod.repo.successfulConstants.add("Items")
+        } catch (_: Exception) {
+            SkyHanniMod.repo.unsuccessfulConstants.add("Items")
         }
     }
 

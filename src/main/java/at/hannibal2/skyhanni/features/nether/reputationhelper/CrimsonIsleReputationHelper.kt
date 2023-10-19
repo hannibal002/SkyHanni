@@ -58,8 +58,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         } catch (_: Exception) {
             SkyHanniMod.repo.unsuccessfulConstants.add("CrimsonIsleReputation")
         }
-
-        update()
     }
 
     @SubscribeEvent
