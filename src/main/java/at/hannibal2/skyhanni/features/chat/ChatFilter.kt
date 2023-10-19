@@ -49,20 +49,21 @@ class ChatFilter {
 
     //TODO split into others
     private fun annoyingSpam(message: String): Boolean {
-        if (message.matchRegex("§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.")) return true
-        if (message.matchRegex("§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.")) return true
-        if (message == "§cThere are blocks in the way!") return true
-        if (message == "§aYour Blessing enchant got you double drops!") return true
-        if (message == "§cYou can't use the wardrobe in combat!") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fFish Bait§r§b.") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§aGrand Experience Bottle§r§b.") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§aBlessed Bait§r§b.") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fDark Bait§r§b.") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.") return true
-        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.") return true
-
-        return false
+        return when {
+            message.matchRegex("§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.") -> true
+            message.matchRegex("§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.") -> true
+            message == "§cThere are blocks in the way!" -> true
+            message == "§aYour Blessing enchant got you double drops!" -> true
+            message == "§cYou can't use the wardrobe in combat!" -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§fFish Bait§r§b." -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§aGrand Experience Bottle§r§b." -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§aBlessed Bait§r§b." -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§fDark Bait§r§b." -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b." -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b." -> true
+            message == "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b." -> true
+            else -> false
+        }
     }
 
     private fun uselessNotification(message: String): Boolean {
@@ -77,37 +78,35 @@ class ChatFilter {
         }
     }
 
-    private fun uselessWarning(message: String) = when {
-        message == "§cYou are sending commands too fast! Please slow down." -> true//TODO prevent in the future
-        message == "§cYou can't use this while in combat!" -> true
-        message == "§cYou can not modify your equipped armor set!" -> true
-        message == "§cPlease wait a few seconds between refreshing!" -> true
-        message == "§cThis item is not salvageable!" -> true//prevent in the future
-        message == "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!" -> true
-        message == "§cWhoa! Slow down there!" -> true
-        message == "§cWait a moment before confirming!" -> true
-        message == "§cYou cannot open the SkyBlock menu while in combat!" -> true
-
+    private fun uselessWarning(message: String) = when (message) {
+        "§cYou are sending commands too fast! Please slow down." -> true //TODO prevent in the future
+        "§cYou can't use this while in combat!" -> true
+        "§cYou can not modify your equipped armor set!" -> true
+        "§cPlease wait a few seconds between refreshing!" -> true
+        "§cThis item is not salvageable!" -> true//prevent in the future
+        "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!" -> true
+        "§cWhoa! Slow down there!" -> true
+        "§cWait a moment before confirming!" -> true
+        "§cYou cannot open the SkyBlock menu while in combat!" -> true
         else -> false
     }
 
     private fun uselessDrop(message: String): Boolean {
-        when {
+        return when {
             // TODO check if this is still necessary
-            message.matchRegex("§6§lRARE DROP! §r§aEnchanted Ender Pearl (.*)") -> return true
-            message == "§6§lRARE DROP! §r§aEnchanted Ender Pearl" -> return true
-            message == "§6§lRARE DROP! §r§aEnchanted End Stone" -> return true
-            message == "§6§lRARE DROP! §r§5Crystal Fragment" -> return true
+            message.matchRegex("§6§lRARE DROP! §r§aEnchanted Ender Pearl (.*)") -> true
+            message == "§6§lRARE DROP! §r§aEnchanted Ender Pearl" -> true
+            message == "§6§lRARE DROP! §r§aEnchanted End Stone" -> true
+            message == "§6§lRARE DROP! §r§5Crystal Fragment" -> true
 
-            message.matchRegex("§6§lRARE DROP! §r§fCarrot (.*)") -> return true
-            message.matchRegex("§6§lRARE DROP! §r§fPotato (.*)") -> return true
+            message.matchRegex("§6§lRARE DROP! §r§fCarrot (.*)") -> true
+            message.matchRegex("§6§lRARE DROP! §r§fPotato (.*)") -> true
 
-            message.matchRegex("§6§lRARE DROP! §r§9Machine Gun Bow (.*)") -> return true
-            message.matchRegex("§6§lRARE DROP! §r§5Earth Shard (.*)") -> return true
-            message.matchRegex("§6§lRARE DROP! §r§5Zombie Lord Chestplate (.*)") -> return true
+            message.matchRegex("§6§lRARE DROP! §r§9Machine Gun Bow (.*)") -> true
+            message.matchRegex("§6§lRARE DROP! §r§5Earth Shard (.*)") -> true
+            message.matchRegex("§6§lRARE DROP! §r§5Zombie Lord Chestplate (.*)") -> true
+            else -> false
         }
-
-        return false
     }
 
     private fun winterIsland(message: String) = when {
@@ -117,93 +116,96 @@ class ChatFilter {
     }
 
     private fun money(message: String): Boolean {
-        if (isBazaar(message)) return true
-        if (isAuctionHouse(message)) return true
-
-        return false
+        return when {
+            isBazaar(message) -> true
+            isAuctionHouse(message) -> true
+            else -> false
+        }
     }
 
     private fun isAuctionHouse(message: String): Boolean {
-        if (message == "§b-----------------------------------------------------") return true
-        if (message == "§eVisit the Auction House to collect your item!") return true
-
-        return false
+        return when (message) {
+            "§b-----------------------------------------------------" -> true
+            "§eVisit the Auction House to collect your item!" -> true
+            else -> false
+        }
     }
 
     private fun isBazaar(message: String): Boolean {
-        if (message.matchRegex("§eBuy Order Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.")) return true
-        if (message.matchRegex("§eSell Offer Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.")) return true
-        if (message.matchRegex("§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling buy order!")) return true
-        if (message.matchRegex("§cCancelled! §r§7Refunded §r§a(.*)§r§7x (.*) §r§7from cancelling sell offer!")) return true
-
-        return false
+        return when {
+            message.matchRegex("§eBuy Order Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.") -> true
+            message.matchRegex("§eSell Offer Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.") -> true
+            message.matchRegex("§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling buy order!") -> true
+            message.matchRegex("§cCancelled! §r§7Refunded §r§a(.*)§r§7x (.*) §r§7from cancelling sell offer!") -> true
+            else -> false
+        }
     }
 
     private fun party(message: String): Boolean {
-        if (message == "§9§m-----------------------------------------------------") return true
-
-        return false
+        return when (message) {
+            "§9§m-----------------------------------------------------" -> true
+            else -> false
+        }
     }
 
     private fun slayerDrop(message: String): Boolean {
-        //Zombie
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)")) return true
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)")) return true
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)")) return true
-        if (message.matchRegex("§6§lRARE DROP! §r§5Golden Powder (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§2(.*) Pestilence Rune I§r§7\\) (.*)")) {
-            LorenzUtils.debug("check regex for this blocked message!")
-            return true
+        when {
+            //Zombie
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)") -> return true
+            message.matchRegex("§6§lRARE DROP! §r§5Golden Powder (.*)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§2(.*) Pestilence Rune I§r§7\\) (.*)") -> {
+                LorenzUtils.debug("check regex for this blocked message!")
+                return true
+            }
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)") -> return true
+
+            //Tarantula
+            message.matchRegex("§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)") -> return true
+            message.matchRegex("§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)") -> return true
+
+            //Enderman
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)") -> return true
+            message.matchRegex("§d§lCRAZY RARE DROP!  §r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*") -> return true
+
+            //Blaze
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)") -> return true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)") -> return true
+            else -> return false
         }
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)")) return true
-
-        //Tarantula
-        if (message.matchRegex("§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)")) return true
-        if (message.matchRegex("§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)")) return true
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)")) return true
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)")) return true
-
-        //Enderman
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)")) return true
-        if (message.matchRegex("§d§lCRAZY RARE DROP!  §r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)")) return true
-        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*")) return true
-
-        //Blaze
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)")) return true
-        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)")) return true
-
-        return false
     }
 
     private fun slayer(message: String): Boolean {
-        //start
-        if (message.matchRegex("  §r§5§lSLAYER QUEST STARTED!")) return true
-        if (message.matchRegex("   §5§l» §7Slay §c(.*) Combat XP §7worth of (.*)§7.")) return true
+        return when {
+            //start
+            message.matchRegex("  §r§5§lSLAYER QUEST STARTED!") -> true
+            message.matchRegex("   §5§l» §7Slay §c(.*) Combat XP §7worth of (.*)§7.") -> true
 
-        //end
-        if (message.matchRegex("  §r§a§lSLAYER QUEST COMPLETE!")) return true
-        if (message == "  §r§6§lNICE! SLAYER BOSS SLAIN!") return true
-        if (message.matchRegex("   §r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!")) return true
-        if (message.matchRegex("   §r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!")) return true
-
-
-        if (message == "§eYou received kill credit for assisting on a slayer miniboss!") return true
-
-        if (message.startsWith("§e✆ RING... ")) return true
-
-        return false
+            //end
+            message.matchRegex("  §r§a§lSLAYER QUEST COMPLETE!") -> true
+            message == "  §r§6§lNICE! SLAYER BOSS SLAIN!" -> true
+            message.matchRegex("   §r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!") -> true
+            message.matchRegex("   §r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!") -> true
+            message == "§eYou received kill credit for assisting on a slayer miniboss!" -> true
+            message.startsWith("§e✆ RING... ") -> true
+            else -> false
+        }
     }
 
     private fun profileJoin(message: String) = when {
@@ -272,7 +274,7 @@ class ChatFilter {
     }
 
     private fun isGuildExp(message: String) =
-    // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
+        // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
         // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
         message.matchRegex("§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!")
 
