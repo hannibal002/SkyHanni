@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
@@ -100,8 +102,8 @@ class CustomScoreboard {
         lineMap[5] = Collections.singletonList("Copper: §c$copper")
         lineMap[6] = Collections.singletonList("Gems: §a$gems")
         lineMap[7] = Collections.singletonList("<empty>")
-        lineMap[8] = Collections.singletonList("§7Location")
-        lineMap[9] = Collections.singletonList("§7Ingame Time")
+        lineMap[8] = Collections.singletonList("§7⏣ ")
+        lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[10] = Collections.singletonList("§7IRL Time")
         lineMap[11] = Collections.singletonList("§7Current Server")
         lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //could be multiline, need to decide
