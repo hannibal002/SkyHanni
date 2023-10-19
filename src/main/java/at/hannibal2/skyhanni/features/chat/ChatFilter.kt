@@ -149,45 +149,45 @@ class ChatFilter {
     }
 
     private fun slayerDrop(message: String): Boolean {
-        when {
+        return when {
             //Zombie
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)") -> return true
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)") -> return true
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)") -> return true
-            message.matchRegex("§6§lRARE DROP! §r§5Golden Powder (.*)") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)") -> true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)") -> true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)") -> true
+            message.matchRegex("§6§lRARE DROP! §r§5Golden Powder (.*)") -> true
             message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§2(.*) Pestilence Rune I§r§7\\) (.*)") -> {
                 LorenzUtils.debug("check regex for this blocked message!")
-                return true
+                true
             }
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)") -> return true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)") -> true
 
             //Tarantula
-            message.matchRegex("§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)") -> return true
-            message.matchRegex("§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)") -> return true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)") -> return true
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> return true
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)") -> return true
+            message.matchRegex("§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)") -> true
+            message.matchRegex("§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)") -> true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)") -> true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)") -> true
 
             //Enderman
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)") -> return true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)") -> return true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)") -> return true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> return true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)") -> return true
-            message.matchRegex("§d§lCRAZY RARE DROP!  §r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)") -> return true
-            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*") -> return true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)") -> true
+            message.matchRegex("§d§lCRAZY RARE DROP!  §r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)") -> true
+            message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*") -> true
 
             //Blaze
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)") -> return true
-            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)") -> return true
-            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)") -> return true
-            else -> return false
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)") -> true
+            message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)") -> true
+            message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)") -> true
+            else -> false
         }
     }
 
