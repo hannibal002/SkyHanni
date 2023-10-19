@@ -124,7 +124,7 @@ class CustomScoreboard {
         var partyCount = 0
         partyList.add("§9Party")
         for (member in PartyAPI.partyMembers){
-            if (partyCount == config.maxPartyList.get()) break
+            if (partyCount >= config.maxPartyList.get()) break
             partyList.add(" §7- §7$member")
             partyCount++
         }
