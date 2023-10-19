@@ -150,9 +150,9 @@ class RepoManager(private val configLocation: File) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 LorenzUtils.chat("§c[SkyHanni] §7Repo Issue! Features may not work please report this on the Discord!")
-                LorenzUtils.chat("§7If you have repo auto update off try turning that on. §cUnsuccessful Constants:")
+                LorenzUtils.chat("§7If you have repo auto update off try turning that on.\n§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
                 for (constant in unsuccessfulConstants) {
-                    LorenzUtils.chat("   §a- §7$constant")
+                    LorenzUtils.chat("   §e- §7$constant")
                 }
             }
             return
@@ -161,13 +161,13 @@ class RepoManager(private val configLocation: File) {
             LorenzUtils.chat("§a[SkyHanni] Repo working fine!")
             return
         }
-        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("§a[SkyHanni] Successful Constants:")
+        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("§a[SkyHanni] Successful Constants §7(${successfulConstants.size}):")
         for (constant in successfulConstants) {
             LorenzUtils.chat("   §a- §7$constant")
         }
-        LorenzUtils.chat("§c[SkyHanni] Unsuccessful Constants:")
+        LorenzUtils.chat("§c[SkyHanni] Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
         for (constant in unsuccessfulConstants) {
-            LorenzUtils.chat("   §a- §7$constant")
+            LorenzUtils.chat("   §e- §7$constant")
         }
     }
     
