@@ -67,9 +67,7 @@ class HideNotClickableItems {
             hideInStorageFilter.load(data.hide_in_storage)
             hidePlayerTradeFilter.load(data.hide_player_trade)
             notAuctionableFilter.load(data.not_auctionable)
-
             updateSalvageList(data.salvage)
-
             SkyHanniMod.repo.successfulConstants.add("HideNotClickableItems")
         } ?: run {
             SkyHanniMod.repo.unsuccessfulConstants.add("HideNotClickableItems")
