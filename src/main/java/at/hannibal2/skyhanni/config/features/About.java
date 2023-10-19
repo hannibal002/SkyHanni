@@ -14,7 +14,7 @@ public class About {
 
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
     @ConfigVersionDisplay
-    public transient Void currentVersion = null;
+    public Void currentVersion = null;
 
     @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates on each startup")
     @Expose
