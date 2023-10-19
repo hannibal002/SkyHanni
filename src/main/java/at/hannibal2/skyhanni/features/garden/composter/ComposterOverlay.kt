@@ -456,7 +456,9 @@ class ComposterOverlay {
             return
         }
 
-        val (amountInSacks, _, sackStatus) = SackAPI.fetchSackItem(internalName.asInternalName())
+        val sackItem = SackAPI.fetchSackItem(internalName.asInternalName())
+        val amountInSacks = sackItem.amount
+        val sackStatus = sackItem.getStatus()
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
             if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
