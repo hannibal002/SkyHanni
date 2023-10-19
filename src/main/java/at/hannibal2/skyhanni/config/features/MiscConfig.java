@@ -842,6 +842,12 @@ public class MiscConfig {
         public Property<Integer> maxPartyList = Property.of(4);
 
         @Expose
+        @ConfigOption(name = "Hide lines with no info", desc = "Hide lines that have no info to display, like hiding the party when not being in one.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideEmptyLines = true;
+
+        @Expose
         public Position position = new Position(10, 80, false, true);
     }
 }

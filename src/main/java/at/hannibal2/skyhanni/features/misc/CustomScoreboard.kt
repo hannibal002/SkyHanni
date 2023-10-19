@@ -39,8 +39,10 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onTick(event: TickEvent) {
+        // Draws the custom scoreboard
         display = drawScoreboard()
 
+        // Gets some values for the scoreboard
         for (line in TabListData.getTabList()){
             if (line.startsWith(" Gems: §r§a")){
                 gems = line.removePrefix(" Gems: §r§a")
@@ -59,7 +61,7 @@ class CustomScoreboard {
         for (index in config.textFormat) {
             lineMap[index]?.let {
 
-                //Multiline for Party Members (breaks nothing)
+                // Multiline for Party Members
                 if (it[0] == "§9Party"){
                     newList.add(listOf(it[0]))
                     for (item in it){
@@ -70,8 +72,14 @@ class CustomScoreboard {
                     continue
                 }
 
+                // Adds empty lines
                 if(it[0] == "<empty>"){
                     newList.add(listOf(""))
+                    continue
+                }
+
+                // Does not display this line
+                if(it[0] == "<hidden>"){
                     continue
                 }
 
@@ -126,6 +134,19 @@ class CustomScoreboard {
         lineMap[21] = Collections.singletonList("§7Quiver")
         lineMap[22] = Collections.singletonList("§7Maxwell Power")
         lineMap[23] = Collections.singletonList("§ewww.hypixel.net")
+
+        // Hide empty lines
+        if (config.hideEmptyLines){
+            lineMap[2] = Collections.singletonList(if(purse == "0") "<hidden>" else "Purse: §6$purse")
+            lineMap[3] = Collections.singletonList(if(bank == "0") "<hidden>" else "Bank: §6$bank")
+            lineMap[4] = Collections.singletonList(if(bits == "0") "<hidden>" else "Bits: §b$bits")
+            lineMap[5] = Collections.singletonList(if(copper == "0") "<hidden>" else "Copper: §c$copper")
+            lineMap[6] = Collections.singletonList(if(gems == "0") "<hidden>" else "Gems: §a$gems")
+
+            if (partyList.size == 1){
+                lineMap[19] = Collections.singletonList("<hidden>")
+            }
+        }
 
         return formatDisplay(lineMap)
     }
