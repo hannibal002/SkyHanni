@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.client.Minecraft
@@ -21,7 +20,6 @@ import java.util.UUID
 class GuiEditManager {
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (isInGui()) return
 

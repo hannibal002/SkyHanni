@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class TpsCounter {
-    private val config get() = SkyHanniMod.feature.gui
+    private val config get() = SkyHanniMod.feature.gui.tpsDisplay
 
     companion object {
         private const val minDataAmount = 5
@@ -29,8 +29,9 @@ class TpsCounter {
 
     init {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
-            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
-            if (!config.tpsDisplay) return@fixedRateTimer
+            if (!LorenzUtils.onHypixel) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return@fixedRateTimer
+            if (!config.enabled) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
@@ -59,8 +60,9 @@ class TpsCounter {
             }
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
-            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
-            if (!config.tpsDisplay) return@fixedRateTimer
+            if (!LorenzUtils.onHypixel) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return@fixedRateTimer
+            if (!config.enabled) return@fixedRateTimer
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
@@ -79,14 +81,15 @@ class TpsCounter {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!config.tpsDisplay) return
+        if (!config.enabled) return
         hasPacketReceived = true
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.tpsDisplay) return
+        if (!LorenzUtils.onHypixel) return
+        if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+        if (!config.enabled) return
 
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
     }

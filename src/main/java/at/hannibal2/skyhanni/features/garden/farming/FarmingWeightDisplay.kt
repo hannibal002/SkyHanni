@@ -136,7 +136,8 @@ class FarmingWeightDisplay {
         }
 
         private fun update() {
-            if (!GardenAPI.inGarden()) return
+            if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+            if (!GardenAPI.inGarden() && !config.showOutsideGarden) return
             if (apiError) {
                 display = errorMessage
                 return
@@ -325,7 +326,8 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = GardenAPI.inGarden() && config.display
+        private fun isEnabled() = (LorenzUtils.inSkyBlock || config.showOutsideSB) && (GardenAPI.inGarden() || config.showOutsideGarden) && config.display
+
         private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {

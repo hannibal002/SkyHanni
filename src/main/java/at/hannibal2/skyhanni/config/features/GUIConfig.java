@@ -5,13 +5,7 @@ import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -77,22 +71,40 @@ public class GUIConfig {
         public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
         @Expose
+        @ConfigOption(name = "Show Outside SB", desc = "Show textbox outside of SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean showOutsideSB = false;
+
+        @Expose
         public Position position = new Position(10, 80, false, true);
     }
 
     @Expose
-    @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean realTime = false;
+    @ConfigOption(name = "Real Time", desc = "")
+    @Accordion
+    public RealTimeConfig realTime = new RealTimeConfig();
 
-    @Expose
-    @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
-    @ConfigEditorBoolean
-    public boolean realTimeFormatToggle = false;
+    public static class RealTimeConfig {
 
-    @Expose
-    public Position realTimePosition = new Position(10, 10, false, true);
+        @Expose
+        @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
+        @ConfigEditorBoolean
+        public boolean formatToggle = false;
+
+        @Expose
+        @ConfigOption(name = "Show Outside SB", desc = "Show the time outside of SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean showOutsideSB = false;
+
+        @Expose
+        public Position position = new Position(10, 10, false, true);
+    }
 
 
     @Expose
@@ -128,15 +140,27 @@ public class GUIConfig {
         public int RefreshSeconds = 10;
     }
 
-
     @Expose
-    @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean tpsDisplay = false;
+    @ConfigOption(name = "TPS Display", desc = "")
+    @Accordion
+    public TpsDisplayConfig tpsDisplay = new TpsDisplayConfig();
 
-    @Expose
-    public Position tpsDisplayPosition = new Position(10, 10, false, true);
+    public static class TpsDisplayConfig {
+
+        @Expose
+        @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Show Outside SB", desc = "Shows the TPS outside of SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean showOutsideSB = false;
+
+        @Expose
+        public Position tpsDisplayPosition = new Position(10, 10, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

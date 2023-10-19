@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class TimeFeatures {
-    private val config get() = SkyHanniMod.feature.gui
+    private val config get() = SkyHanniMod.feature.gui.realTime
     private val winterConfig get() = SkyHanniMod.feature.event.winter
 
     private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
@@ -29,11 +29,11 @@ class TimeFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
 
-        if (config.realTime) {
-            val currentTime = (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
-            config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
+        if (config.enabled) {
+            val currentTime = (if (config.formatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
+            config.position.renderString(currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {

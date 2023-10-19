@@ -124,6 +124,10 @@ public class DevConfig {
         @ConfigEditorBoolean
         public boolean showPlatformNumber = false;
 
+        @Expose
+        @ConfigOption(name = "Show Outside SB", desc = "Make parkour waypoints outside of SkyBlock too.")
+        @ConfigEditorBoolean
+        public boolean showOutsideSB = false;
     }
 
     @Expose
