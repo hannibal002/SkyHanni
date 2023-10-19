@@ -114,17 +114,17 @@ class CustomScoreboard {
         lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[10] = Collections.singletonList("§7IRL Time")
         lineMap[11] = Collections.singletonList("§7Current Server")
-        lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //could be multiline, need to decide
+        lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
         lineMap[13] = Collections.singletonList("<empty>")
 
         val slayerList = mutableListOf<Any>()
-        slayerList.add("§7Slayer") //get slayer stuff
+        slayerList.add("§7Slayer") //todo: get slayer stuff
         lineMap[14] = slayerList
 
         lineMap[15] = Collections.singletonList("§7Next Event")
 
         val eventList = mutableListOf<Any>()
-        eventList.add("§cCurrent Event") //get event stuff
+        eventList.add("§cCurrent Event") //todo: get event stuff
         lineMap[16] = eventList
         lineMap[17] = Collections.singletonList("<empty>")
 
@@ -187,7 +187,7 @@ class CustomScoreboard {
             return "§a☀ "
         }
         if (HypixelData.bingo){
-            return "§cⒷ " //TODO COLORS LOL, maybe bingoAPI? idk
+            return "§cⒷ " //TODO COLORS, maybe bingoAPI? idk
         }
         return "§e"
     }
