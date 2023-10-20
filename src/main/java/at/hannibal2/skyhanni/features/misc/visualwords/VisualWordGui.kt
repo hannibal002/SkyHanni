@@ -85,15 +85,7 @@ open class VisualWordGui : GuiScreen() {
             val importY = guiTop + sizeY - 10
             GuiRenderUtils.drawStringCentered("§aImport", importX, importY)
             val importColor =
-                if (GuiRenderUtils.isPointInRect(
-                        mouseX,
-                        mouseY,
-                        importX - 30,
-                        importY - 10,
-                        60,
-                        20
-                    )
-                ) 0x50828282 else 0x50303030
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 30, importY - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(importX - 20, importY - 10, importX + 20, importY + 10, importColor)
             GlStateManager.scale(scale, scale, 1f)
 
@@ -114,57 +106,34 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 var inBox = false
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, adjustedY + 30 * index, sizeX, 30)) inBox =
-                    true
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, adjustedY + 30 * index, sizeX, 30)) inBox = true
 
-                GuiRenderUtils.drawString(
-                    "${index + 1}.",
-                    (guiLeft + 5) * inverseScale,
-                    (adjustedY + 10 + 30 * index) * inverseScale
-                )
+                GuiRenderUtils.drawString("${index + 1}.", (guiLeft + 5) * inverseScale, (adjustedY + 10 + 30 * index) * inverseScale)
 
-                if (GuiRenderUtils.isPointInRect(
-                        lastClickedWidth,
-                        lastClickedHeight,
-                        guiLeft + 335,
-                        adjustedY + 30 * index + 7,
-                        16,
-                        16
-                    )
-                ) {
+                if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 335,
+                        adjustedY + 30 * index + 7, 16, 16)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     phrase.enabled = !phrase.enabled
                     saveChanges()
                     SoundUtils.playClickSound()
-                } else if (GuiRenderUtils.isPointInRect(
-                        lastClickedWidth, lastClickedHeight, guiLeft + 295,
-                        adjustedY + 30 * index + 7, 16, 16
-                    ) && index != 0
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 295,
+                        adjustedY + 30 * index + 7, 16, 16) && index != 0
                 ) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = "up"
-                } else if (GuiRenderUtils.isPointInRect(
-                        lastClickedWidth, lastClickedHeight, guiLeft + 315,
-                        adjustedY + 30 * index + 7, 16, 16
-                    ) && index != modifiedWords.size - 1
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 315,
+                        adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1
                 ) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = "down"
-                } else if (GuiRenderUtils.isPointInRect(
-                        lastClickedWidth,
-                        lastClickedHeight,
-                        guiLeft,
-                        adjustedY + 30 * index,
-                        sizeX,
-                        30
-                    )
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft, adjustedY + 30 * index, sizeX, 30)
                 ) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
@@ -174,12 +143,7 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 if (inBox) {
-                    GuiRenderUtils.drawScaledRec(
-                        guiLeft,
-                        adjustedY + 30 * index,
-                        guiLeft + sizeX,
-                        adjustedY + 30 * index + 30,
-                        0x50303030,
+                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, 0x50303030,
                         inverseScale
                     )
                 }
@@ -193,63 +157,27 @@ open class VisualWordGui : GuiScreen() {
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
-                    val skullItem = ItemUtils.createSkull(
-                        "Up",
-                        "7f68dd73-1ff6-4193-b246-820975d6fab1",
-                        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0="
-                    )
-                    GuiRenderUtils.renderItemAndBackground(
-                        skullItem,
-                        guiLeft + 295,
-                        adjustedY + 30 * index + 7,
-                        0x50828282
-                    )
+                    val skullItem = ItemUtils.createSkull("Up", "7f68dd73-1ff6-4193-b246-820975d6fab1",
+                        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0=")
+                    GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 295, adjustedY + 30 * index + 7, 0x50828282)
                 }
                 if (index != modifiedWords.size - 1) {
-                    val skullItem = ItemUtils.createSkull(
-                        "Down",
-                        "e4ace6de-0629-4719-aea3-3e113314dd3f",
+                    val skullItem = ItemUtils.createSkull("Down", "e4ace6de-0629-4719-aea3-3e113314dd3f",
                         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMzRmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
                     )
-                    GuiRenderUtils.renderItemAndBackground(
-                        skullItem,
-                        guiLeft + 315,
-                        adjustedY + 30 * index + 7,
-                        0x50828282
-                    )
+                    GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 315, adjustedY + 30 * index + 7, 0x50828282)
                 }
 
-                GuiRenderUtils.renderItemAndBackground(
-                    statusBlock,
-                    guiLeft + 335,
-                    adjustedY + 30 * index + 7,
-                    0x50828282
-                )
+                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, adjustedY + 30 * index + 7, 0x50828282)
 
                 GlStateManager.scale(scale, scale, 1f)
 
                 if (inBox) {
-                    GuiRenderUtils.drawString(
-                        phrase.phrase,
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 5 + 30 * index) * inverseScale
-                    )
-                    GuiRenderUtils.drawString(
-                        phrase.replacement,
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 15 + 30 * index) * inverseScale
-                    )
+                    GuiRenderUtils.drawString(phrase.phrase, (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
+                    GuiRenderUtils.drawString(phrase.replacement, (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
                 } else {
-                    GuiRenderUtils.drawString(
-                        phrase.phrase.convertToFormatted(),
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 5 + 30 * index) * inverseScale
-                    )
-                    GuiRenderUtils.drawString(
-                        phrase.replacement.convertToFormatted(),
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 15 + 30 * index) * inverseScale
-                    )
+                    GuiRenderUtils.drawString(phrase.phrase.convertToFormatted(), (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
+                    GuiRenderUtils.drawString(phrase.replacement.convertToFormatted(), (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
                 }
             }
 
@@ -269,13 +197,11 @@ open class VisualWordGui : GuiScreen() {
             val x = guiLeft + 180
             var y = guiTop + 140
             GuiRenderUtils.drawStringCentered("§cDelete", x, y)
-            var colour =
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            var colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
             y += 30
             GuiRenderUtils.drawStringCentered("§eBack", x, y)
-            colour =
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
@@ -283,8 +209,7 @@ open class VisualWordGui : GuiScreen() {
                 val currentPhrase = modifiedWords[currentIndex]
                 val status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 GuiRenderUtils.drawStringCentered(status, x, y)
-                colour =
-                    if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
                 GuiRenderUtils.drawString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
@@ -305,36 +230,16 @@ open class VisualWordGui : GuiScreen() {
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
 
-                GuiRenderUtils.drawTwoLineString(
-                    "§bThe top line of each section is the preview of the bottom text",
-                    (guiLeft + 10) * inverseScale, (guiTop + 17) * inverseScale
-                )
-                GuiRenderUtils.drawTwoLineString(
-                    "§bTo get the minecraft formatting sign use \"&&\"",
-                    (guiLeft + 220) * inverseScale, (guiTop + 17) * inverseScale
-                )
+                GuiRenderUtils.drawTwoLineString("§bThe top line of each section is the preview of the bottom text",
+                    (guiLeft + 10) * inverseScale, (guiTop + 17) * inverseScale)
+                GuiRenderUtils.drawTwoLineString("§bTo get the minecraft formatting sign use \"&&\"",
+                    (guiLeft + 220) * inverseScale, (guiTop + 17) * inverseScale)
 
-                GuiRenderUtils.drawString(
-                    currentPhrase.phrase.convertToFormatted(),
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 40) * inverseScale
-                )
-                GuiRenderUtils.drawString(
-                    currentPhrase.phrase,
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 55) * inverseScale
-                )
+                GuiRenderUtils.drawString(currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale)
+                GuiRenderUtils.drawString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
-                GuiRenderUtils.drawString(
-                    currentPhrase.replacement.convertToFormatted(),
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 95) * inverseScale
-                )
-                GuiRenderUtils.drawString(
-                    currentPhrase.replacement,
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 110) * inverseScale
-                )
+                GuiRenderUtils.drawString(currentPhrase.replacement.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 95) * inverseScale)
+                GuiRenderUtils.drawString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
 
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
             }
@@ -347,7 +252,8 @@ open class VisualWordGui : GuiScreen() {
                     modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
                     modifiedWords[changedIndex - 1] = temp
                 }
-            } else if (changedAction == "down") {
+            }
+            else if (changedAction == "down") {
                 if (changedIndex < modifiedWords.size - 1) {
                     val temp = modifiedWords[changedIndex]
                     modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
