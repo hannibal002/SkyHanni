@@ -7,12 +7,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -27,6 +25,7 @@ class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.misc.customScoreboard
     private var display = emptyList<List<Any>>()
     private var purse = "0"
+    private var motes = "0"
     private var bank = "0"
     private var bits = "0"
     private var copper = "0"
@@ -52,6 +51,9 @@ class CustomScoreboard {
             }
             if (line.startsWith(" Bank: §r§6")){
                 bank = line.removePrefix(" Bank: §r§6")
+            }
+            if (line.startsWith("Motes: §d")){
+                motes = line.removePrefix("Motes: §d")
             }
         }
 
@@ -156,6 +158,14 @@ class CustomScoreboard {
             if (partyList.size == 1){
                 lineMap[19] = Collections.singletonList("<hidden>")
             }
+        }
+
+        // Rift
+        if(IslandType.THE_RIFT.isInIsland()){
+            lineMap[2] = Collections.singletonList("Motes: §d$motes")
+            lineMap[3] = Collections.singletonList("<hidden>")
+            lineMap[4] = Collections.singletonList("<hidden>")
+            lineMap[5] = Collections.singletonList("<hidden>")
         }
 
         return formatDisplay(lineMap)
