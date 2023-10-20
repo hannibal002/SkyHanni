@@ -35,13 +35,7 @@ import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.CopyItemCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
-import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
-import at.hannibal2.skyhanni.test.command.CopyTabListCommand
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -273,8 +267,8 @@ object Commands {
             "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
         registerCommand(
-                "shplaysound",
-                "Play the specified sound effect at the given pitch and volume."
+            "shplaysound",
+            "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
     }
 
@@ -342,6 +336,9 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
+            if (VisualWordGui.sbeConfigPath.exists()) {
+                VisualWordGui.drawImportButton = true
+            }
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
@@ -356,14 +353,14 @@ object Commands {
     private fun registerCommand(
         name: String,
         description: String,
-        function: (Array<String>) -> Unit
+        function: (Array<String>) -> Unit,
     ) = registerCommand0(name, description, function)
 
     private fun registerCommand0(
         name: String,
         description: String,
         function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
     ) {
         ClientCommandHandler.instance.registerCommand(
             SimpleCommand(

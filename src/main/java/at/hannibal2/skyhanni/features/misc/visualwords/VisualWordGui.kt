@@ -49,10 +49,11 @@ open class VisualWordGui : GuiScreen() {
     private var currentText = ""
 
     private var modifiedWords = mutableListOf<VisualWord>()
-    private var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
 
     companion object {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
+        var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
+        var drawImportButton = false
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -81,12 +82,16 @@ open class VisualWordGui : GuiScreen() {
             val colour =
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
-            val importX = guiLeft + sizeX - 20
-            val importY = guiTop + sizeY - 10
-            GuiRenderUtils.drawStringCentered("§aImport", importX, importY)
-            val importColor =
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 20, importY - 10, 40, 20)) 0x50828282 else 0x50303030
-            drawRect(importX - 20, importY - 10, importX + 20, importY + 10, importColor)
+
+            if (!SkyHanniMod.feature.storage.visualWordsImported){
+                val importX = guiLeft + sizeX - 45
+                val importY = guiTop + sizeY - 10
+                GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
+                val importColor =
+                    if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) 0x50828282 else 0x50303030
+                drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
+            }
+
             GlStateManager.scale(scale, scale, 1f)
 
             GuiRenderUtils.drawStringCentered(
@@ -330,12 +335,13 @@ open class VisualWordGui : GuiScreen() {
             }
             currentlyEditing = !currentlyEditing
         }
-
-        val importX = guiLeft + sizeX - 20
-        val importY = guiTop + sizeY - 10
-        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 20, importY - 10, 40, 20)) {
-            SoundUtils.playClickSound()
-            tryImport()
+        if (!SkyHanniMod.feature.storage.visualWordsImported){
+            val importX = guiLeft + sizeX - 45
+            val importY = guiTop + sizeY - 10
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) {
+                SoundUtils.playClickSound()
+                tryImport()
+            }
         }
     }
 
@@ -426,11 +432,7 @@ open class VisualWordGui : GuiScreen() {
     }
 
     private fun checkForFile(): Boolean {
-        if (!sbeConfigPath.exists()) {
-            chat("§e[SkyHanni] §cSkyBlockExtas config file not found, cannot import!")
-            return false
-        }
-        return true
+        return sbeConfigPath.exists()
     }
 
     private fun tryImport() {
@@ -440,18 +442,24 @@ open class VisualWordGui : GuiScreen() {
                 JsonObject::class.java
             )
             var importedWords = 0
+            var skippedWords = 0
             val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
-            for (line in lists) {
+            loop@ for (line in lists) {
                 "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern().matchMatcher(line.asString) {
                     val from = group("from")
                     val to = group("to")
                     val state = group("state").toBoolean()
+                    if (modifiedWords.any { it.phrase == from }) {
+                        skippedWords++
+                        continue@loop
+                    }
                     modifiedWords.add(VisualWord(from, to, state))
                     importedWords++
                 }
             }
-            if (importedWords > 0) {
-                chat("§e[SkyHanni] §aSuccessfully imported $importedWords VisualWords from SkyBlockExtras !")
+            if (importedWords > 0 || skippedWords > 0) {
+                chat("§e[SkyHanni] §aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !")
+                SkyHanniMod.feature.storage.visualWordsImported = true
             }
         }
     }

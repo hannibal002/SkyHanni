@@ -41,6 +41,9 @@ public class Storage {
     public List<VisualWord> modifiedWords = new ArrayList<>();
 
     @Expose
+    public boolean visualWordsImported = false;
+
+    @Expose
     public Boolean contestSendingAsked = false;
 
     @Expose
