@@ -110,31 +110,27 @@ open class VisualWordGui : GuiScreen() {
 
                 GuiRenderUtils.drawString("${index + 1}.", (guiLeft + 5) * inverseScale, (adjustedY + 10 + 30 * index) * inverseScale)
 
-                if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 335,
-                        adjustedY + 30 * index + 7, 16, 16)) {
+                if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 335, adjustedY + 30 * index + 7, 16, 16)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     phrase.enabled = !phrase.enabled
                     saveChanges()
                     SoundUtils.playClickSound()
                 } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 295,
-                        adjustedY + 30 * index + 7, 16, 16) && index != 0
-                ) {
+                        adjustedY + 30 * index + 7, 16, 16) && index != 0) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = "up"
                 } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 315,
-                        adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1
-                ) {
+                        adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = "down"
-                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft, adjustedY + 30 * index, sizeX, 30)
-                ) {
+                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft, adjustedY + 30 * index, sizeX, 30)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
@@ -143,9 +139,7 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 if (inBox) {
-                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, 0x50303030,
-                        inverseScale
-                    )
+                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, 0x50303030, inverseScale)
                 }
 
                 val statusBlock = if (phrase.enabled) {
@@ -157,14 +151,11 @@ open class VisualWordGui : GuiScreen() {
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
-                    val skullItem = ItemUtils.createSkull("Up", "7f68dd73-1ff6-4193-b246-820975d6fab1",
-                        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0=")
+                    val skullItem = ItemUtils.createSkull("Up", "7f68dd73-1ff6-4193-b246-820975d6fab1", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0=")
                     GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 295, adjustedY + 30 * index + 7, 0x50828282)
                 }
                 if (index != modifiedWords.size - 1) {
-                    val skullItem = ItemUtils.createSkull("Down", "e4ace6de-0629-4719-aea3-3e113314dd3f",
-                        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMzRmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
-                    )
+                    val skullItem = ItemUtils.createSkull("Down", "e4ace6de-0629-4719-aea3-3e113314dd3f", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMzRmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0=")
                     GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 315, adjustedY + 30 * index + 7, 0x50828282)
                 }
 
@@ -193,7 +184,8 @@ open class VisualWordGui : GuiScreen() {
             GlStateManager.scale(inverseScale, inverseScale, 1f)
 
             scrollScreen()
-        } else {
+        }
+        else {
             val x = guiLeft + 180
             var y = guiTop + 140
             GuiRenderUtils.drawStringCentered("§cDelete", x, y)
