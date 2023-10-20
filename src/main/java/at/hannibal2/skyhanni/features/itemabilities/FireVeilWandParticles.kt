@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
@@ -18,6 +19,8 @@ class FireVeilWandParticles {
     private val config get() = SkyHanniMod.feature.itemAbilities.fireVeilWands
 
     var lastClick = 0L
+
+    val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
 
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
@@ -37,7 +40,7 @@ class FireVeilWandParticles {
         if (event.clickType == ClickType.RIGHT_CLICK) {
             val internalName = event.itemInHand?.getInternalName() ?: return
 
-            if (internalName.equals("FIRE_VEIL_WAND")) {
+            if (internalName == item) {
                 lastClick = System.currentTimeMillis()
             }
         }

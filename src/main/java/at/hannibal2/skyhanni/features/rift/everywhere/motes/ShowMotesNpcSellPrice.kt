@@ -14,7 +14,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -29,7 +30,7 @@ class ShowMotesNpcSellPrice {
     private val config get() = RiftAPI.config.motes
     private var display = emptyList<List<Any>>()
     private val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
-    private val itemMap = mutableMapOf<String, Pair<MutableList<Int>, Double>>()
+    private val itemMap = mutableMapOf<NEUInternalName, Pair<MutableList<Int>, Double>>()
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 
@@ -108,7 +109,7 @@ class ShowMotesNpcSellPrice {
         itemMap.clear()
         for ((index, stack) in stacks) {
             val itemValue = stack.motesNpcPrice() ?: continue
-            val internalName = stack.getInternalName().asString()
+            val internalName = stack.getInternalName()
             if (itemMap.contains(internalName)) {
                 val (oldIndex, oldValue) = itemMap[internalName] ?: return
                 oldIndex.add(index)
@@ -143,7 +144,7 @@ class ShowMotesNpcSellPrice {
             newDisplay.add(buildList {
                 val (index, value) = pair
                 add("  §7- ")
-                val stack = NEUItems.getItemStack(internalName)
+                val stack = internalName.getItemStack()
                 add(stack)
                 val price = value.formatPrice()
                 val valuePer = stack.motesNpcPrice() ?: continue
