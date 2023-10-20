@@ -50,10 +50,11 @@ open class VisualWordGui : GuiScreen() {
 
     private var modifiedWords = mutableListOf<VisualWord>()
 
+    private val shouldDrawImport get() = sbeConfigPath.exists() && !SkyHanniMod.feature.storage.visualWordsImported
+
     companion object {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
-        var drawImportButton = false
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -83,7 +84,7 @@ open class VisualWordGui : GuiScreen() {
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
-            if (!SkyHanniMod.feature.storage.visualWordsImported){
+            if (shouldDrawImport){
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
@@ -335,7 +336,7 @@ open class VisualWordGui : GuiScreen() {
             }
             currentlyEditing = !currentlyEditing
         }
-        if (!SkyHanniMod.feature.storage.visualWordsImported){
+        if (shouldDrawImport){
             val importX = guiLeft + sizeX - 45
             val importY = guiTop + sizeY - 10
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) {
@@ -431,12 +432,8 @@ open class VisualWordGui : GuiScreen() {
         SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 
-    private fun checkForFile(): Boolean {
-        return sbeConfigPath.exists()
-    }
-
     private fun tryImport() {
-        if (checkForFile()) {
+        if (sbeConfigPath.exists()) {
             val json = ConfigManager.gson.fromJson(
                 FileReader(sbeConfigPath),
                 JsonObject::class.java
@@ -449,11 +446,13 @@ open class VisualWordGui : GuiScreen() {
                     val from = group("from")
                     val to = group("to")
                     val state = group("state").toBoolean()
+
                     if (modifiedWords.any { it.phrase == from }) {
                         skippedWords++
                         continue@loop
                     }
-                    modifiedWords.add(VisualWord(from, to, state))
+
+                    modifiedWords.add(VisualWord(from.replace("&", "&&"), to.replace("&", "&&"), state))
                     importedWords++
                 }
             }
