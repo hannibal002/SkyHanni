@@ -39,8 +39,6 @@ object CopyItemCommand {
         val resultList = mutableListOf<String>()
         resultList.add(itemStack.getInternalName().toString())
         resultList.add("display name: '" + itemStack.displayName.toString() + "'")
-            val itemID = itemStack.getInternalName().asString()
-            resultList.add("internalName: '$itemID'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
         for (line in itemStack.getLore()) {
