@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -35,9 +35,9 @@ class FireVeilWandParticles {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.clickType == ClickType.RIGHT_CLICK) {
-            val internalName = event.itemInHand?.getInternalName_old() ?: return
+            val internalName = event.itemInHand?.getInternalName() ?: return
 
-            if (internalName == "FIRE_VEIL_WAND") {
+            if (internalName.equals("FIRE_VEIL_WAND")) {
                 lastClick = System.currentTimeMillis()
             }
         }
