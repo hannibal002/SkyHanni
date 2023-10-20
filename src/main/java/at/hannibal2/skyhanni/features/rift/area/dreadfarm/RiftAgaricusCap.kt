@@ -28,7 +28,7 @@ class RiftAgaricusCap {
     }
 
     private fun updateLocation(): LorenzVec? {
-        if (InventoryUtils.getItemInHand()?.getInternalName()?.equals("FARMING_WAND") != true) return null
+        if (InventoryUtils.getItemInHand()?.getInternalName() != RiftAPI.farmingTool) return null
         val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
 
         when (currentLocation.getBlockStateAt().toString()) {

@@ -40,7 +40,7 @@ class RiftWiltedBerberisHelper {
 
         list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
 
-        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName()?.equals("FARMING_WAND") ?: false
+        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
             val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
