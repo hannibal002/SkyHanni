@@ -85,7 +85,7 @@ open class VisualWordGui : GuiScreen() {
             val importY = guiTop + sizeY - 10
             GuiRenderUtils.drawStringCentered("§aImport", importX, importY)
             val importColor =
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 30, importY - 10, 60, 20)) 0x50828282 else 0x50303030
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 20, importY - 10, 40, 20)) 0x50828282 else 0x50303030
             drawRect(importX - 20, importY - 10, importX + 20, importY + 10, importColor)
             GlStateManager.scale(scale, scale, 1f)
 
