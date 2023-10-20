@@ -29,6 +29,7 @@ public class GardenConfig {
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
     public SkyMartConfig skyMart = new SkyMartConfig();
+
     public static class SkyMartConfig {
         @Expose
         @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
@@ -49,11 +50,13 @@ public class GardenConfig {
     @ConfigOption(name = "Visitor", desc = "")
     @Accordion
     public VisitorConfig visitors = new VisitorConfig();
+
     public static class VisitorConfig {
         @Expose
         @ConfigOption(name = "Visitor Timer", desc = "")
         @Accordion
         public TimerConfig timer = new TimerConfig();
+
         public static class TimerConfig {
             @Expose
             @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
@@ -82,6 +85,7 @@ public class GardenConfig {
         @ConfigOption(name = "Visitor Items Needed", desc = "")
         @Accordion
         public NeedsConfig needs = new NeedsConfig();
+
         public static class NeedsConfig {
             @Expose
             @ConfigOption(name = "Items Needed", desc = "Show all items needed for the visitors.")
@@ -119,6 +123,7 @@ public class GardenConfig {
         @ConfigOption(name = "Visitor Inventory", desc = "")
         @Accordion
         public InventoryConfig inventory = new InventoryConfig();
+
         public static class InventoryConfig {
             @Expose
             @ConfigOption(name = "Visitor Price", desc = "Show the Bazaar price of the items required for the visitors, like in NEU.")
@@ -154,6 +159,7 @@ public class GardenConfig {
         @ConfigOption(name = "Visitor Reward Warning", desc = "")
         @Accordion
         public RewardWarningConfig rewardWarning = new RewardWarningConfig();
+
         public static class RewardWarningConfig {
 
             @Expose
@@ -314,7 +320,8 @@ public class GardenConfig {
     @ConfigOption(name = "Numbers", desc = "")
     @Accordion
     public NumbersConfig number = new NumbersConfig();
-    public static class NumbersConfig{
+
+    public static class NumbersConfig {
         @Expose
         @ConfigOption(name = "Crop Milestone", desc = "Show the number of crop milestones in the inventory.")
         @ConfigEditorBoolean
@@ -344,7 +351,8 @@ public class GardenConfig {
     @ConfigOption(name = "Crop Milestones", desc = "")
     @Accordion
     public CropMilestonesConfig cropMilestones = new CropMilestonesConfig();
-    public static class CropMilestonesConfig{
+
+    public static class CropMilestonesConfig {
         @Expose
         @ConfigOption(
                 name = "Progress Display",
@@ -421,8 +429,9 @@ public class GardenConfig {
         @ConfigOption(name = "Best Crop", desc = "")
         @Accordion
         public NextConfig next = new NextConfig();
+
         // TODO moulconfig runnable support
-        public static class NextConfig{
+        public static class NextConfig {
             @Expose
             @ConfigOption(
                     name = "Best Display",
@@ -483,8 +492,9 @@ public class GardenConfig {
         @ConfigOption(name = "Mushroom Pet Perk", desc = "")
         @Accordion
         public MushroomPetPerkConfig mushroomPetPerk = new MushroomPetPerkConfig();
+
         // TODO moulconfig runnable support
-        public static class MushroomPetPerkConfig{
+        public static class MushroomPetPerkConfig {
             @Expose
             @ConfigOption(
                     name = "Display Enabled",
@@ -521,7 +531,7 @@ public class GardenConfig {
     @Accordion
     public KeyBindConfig keyBind = new KeyBindConfig();
 
-    public static class KeyBindConfig{
+    public static class KeyBindConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or Daedalus Axe in the hand.")
         @ConfigEditorBoolean
@@ -602,7 +612,8 @@ public class GardenConfig {
     @ConfigOption(name = "Optimal Speed", desc = "")
     @Accordion
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
-    public static class OptimalSpeedConfig{
+
+    public static class OptimalSpeedConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n" +
                 "(Thanks MelonKingDE for the default values).")
@@ -709,8 +720,10 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
+    @Accordion
     public GardenLevelConfig gardenLevels = new GardenLevelConfig();
-    public static class GardenLevelConfig{
+
+    public static class GardenLevelConfig {
         @Expose
         @ConfigOption(name = "Display", desc = "Show the current Garden level and progress to the next level.")
         @ConfigEditorBoolean
@@ -726,7 +739,7 @@ public class GardenConfig {
     @Accordion
     public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
 
-    public static class EliteFarmingWeightConfig{
+    public static class EliteFarmingWeightConfig {
         @Expose
         @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
                 "The calculation and API is provided by The Elite SkyBlock farmers. " +
@@ -775,9 +788,10 @@ public class GardenConfig {
     @ConfigOption(name = "Dicer Counter", desc = "")
     @Accordion
     public DicerCounterConfig dicerCounters = new DicerCounterConfig();
-    public static class DicerCounterConfig{
+
+    public static class DicerCounterConfig {
         @Expose
-    @ConfigOption(name = "RNG Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+        @ConfigOption(name = "RNG Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean display = true;
@@ -796,7 +810,8 @@ public class GardenConfig {
     @ConfigOption(name = "Money per Hour", desc = "")
     @Accordion
     public MoneyPerHourConfig moneyPerHours = new MoneyPerHourConfig();
-    public static class MoneyPerHourConfig{
+
+    public static class MoneyPerHourConfig {
         @Expose
         @ConfigOption(name = "Show Money per Hour",
                 desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
@@ -913,7 +928,8 @@ public class GardenConfig {
     @ConfigOption(name = "Next Jacob's Contest", desc = "")
     @Accordion
     public NextJacobContestConfig nextJacobContests = new NextJacobContestConfig();
-    public static class NextJacobContestConfig{
+
+    public static class NextJacobContestConfig {
         @Expose
         @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
         @ConfigEditorBoolean
@@ -937,7 +953,7 @@ public class GardenConfig {
 
         @Expose
         @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
-        @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
+        @ConfigEditorDropdown(values = {"Ask When Needed", "Share Automatically", "Disabled"})
         public int shareAutomatically = 0;
 
         @Expose
@@ -968,7 +984,8 @@ public class GardenConfig {
 
     @Accordion
     public FarmingArmorDropsConfig farmingArmorDrop = new FarmingArmorDropsConfig();
-    public static class FarmingArmorDropsConfig{
+
+    public static class FarmingArmorDropsConfig {
         @Expose
         @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
         @ConfigEditorBoolean
@@ -989,6 +1006,7 @@ public class GardenConfig {
     @ConfigOption(name = "Anita Shop", desc = "")
     @Accordion
     public AnitaShopConfig anitaShop = new AnitaShopConfig();
+
     public static class AnitaShopConfig {
         @Expose
         @ConfigOption(
@@ -1016,7 +1034,8 @@ public class GardenConfig {
     @ConfigOption(name = "Composter", desc = "")
     @Accordion
     public ComposterConfig composters = new ComposterConfig();
-    public static class ComposterConfig{
+
+    public static class ComposterConfig {
         @Expose
         @ConfigOption(
                 name = "Composter Overlay",
@@ -1107,6 +1126,7 @@ public class GardenConfig {
         @ConfigOption(name = "Notification When Low Composter", desc = "")
         @Accordion
         public NotifyLowConfig notifyLow = new NotifyLowConfig();
+
         public static class NotifyLowConfig {
             @Expose
             @ConfigOption(name = "Enable", desc = "Show a notification when Organic Matter or Fuel runs low in your Composter.")
@@ -1149,7 +1169,8 @@ public class GardenConfig {
     @ConfigOption(name = "Farming Fortune Display", desc = "")
     @Accordion
     public FarmingFortuneConfig farmingFortunes = new FarmingFortuneConfig();
-    public static class FarmingFortuneConfig{
+
+    public static class FarmingFortuneConfig {
         @Expose
         @ConfigOption(
                 name = "FF Display",
@@ -1180,7 +1201,8 @@ public class GardenConfig {
     @ConfigOption(name = "Tooltip Tweaks", desc = "")
     @Accordion
     public TooltipTweaksConfig tooltipTweak = new TooltipTweaksConfig();
-    public static class TooltipTweaksConfig{
+
+    public static class TooltipTweaksConfig {
         @Expose
         @ConfigOption(
                 name = "Compact Descriptions",

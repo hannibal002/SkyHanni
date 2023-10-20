@@ -479,6 +479,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
++ /shmouselock command to lock mouse rotation for farming. - Cad
 </details>
 <details open><summary>
 
@@ -496,7 +497,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
     + Customize the color
 + **Odonatas Highlighter**
-    + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+    + Highlight the small Odonatas flying around the trees while holding an Empty Odonata Bottle in the hand.
     + Customize the color
 + **Agaricus Cap** countdown
     + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.

@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.21.Beta.8"
+version = "0.21.Beta.9"
 
 // Toolchains:
 java {
@@ -94,6 +94,7 @@ dependencies {
 
 //    testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("io.mockk:mockk:1.12.5")
 }
 
 tasks.withType(Test::class) {

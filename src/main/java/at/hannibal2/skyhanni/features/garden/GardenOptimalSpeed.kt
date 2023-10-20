@@ -85,6 +85,8 @@ class GardenOptimalSpeed {
 
         if (optimalSpeed == -1) return
 
+        if (GardenAPI.hideExtraGuis()) return
+
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
             config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
