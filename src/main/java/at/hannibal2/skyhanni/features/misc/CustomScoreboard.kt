@@ -57,8 +57,8 @@ class CustomScoreboard {
 
         //todo add copper etc to this
         for (line in ScoreboardData.sidebarLinesFormatted){
-            if (line.startsWith(" §7⏣ ")){
-                location = line.removePrefix(" §7⏣ ")
+            if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
+                location = line
             }
         }
         bits = getBits()
@@ -110,7 +110,7 @@ class CustomScoreboard {
         lineMap[5] = Collections.singletonList("Copper: §c$copper")
         lineMap[6] = Collections.singletonList("Gems: §a$gems")
         lineMap[7] = Collections.singletonList("<empty>")
-        lineMap[8] = Collections.singletonList("§7⏣$location")
+        lineMap[8] = Collections.singletonList(location)
         lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[10] = Collections.singletonList("§7IRL Time")
         lineMap[11] = Collections.singletonList("§7Current Server")
