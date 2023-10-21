@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -450,7 +451,7 @@ class ComposterOverlay {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
-        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
+        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName_old() == internalName }
         if (having >= itemsNeeded) {
             LorenzUtils.chat("§e[SkyHanni] $itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
