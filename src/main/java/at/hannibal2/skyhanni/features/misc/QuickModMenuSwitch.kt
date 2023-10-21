@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.jsonobjects.ModsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ModGuiSwitcherJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -28,7 +28,7 @@ object QuickModMenuSwitch {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val modsJar = event.getConstant<ModsJson>("ModGuiSwitcher")
+        val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
         mods = buildList {
             out@ for ((name, mod) in modsJar.mods) {
                 for (path in mod.guiPath) {
