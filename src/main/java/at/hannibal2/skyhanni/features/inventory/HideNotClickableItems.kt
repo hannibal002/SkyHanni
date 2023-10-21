@@ -238,10 +238,10 @@ class HideNotClickableItems {
         reverseColor = true
 
         val internalName = stack.getInternalName_old()
-        if (internalName.equals(ComposterOverlay.currentOrganicMatterItem)) {
+        if (internalName == ComposterOverlay.currentOrganicMatterItem) {
             return false
         }
-        if (internalName.equals(ComposterOverlay.currentFuelItem)) {
+        if (internalName == ComposterOverlay.currentFuelItem) {
             return false
         }
 
