@@ -39,23 +39,17 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val items = event.getConstant("Items") ?: return
-            if (items.has("crimson_armors")) {
-                armorNames.clear()
-                armorNames.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })
-            }
+        val items = event.getConstant("Items")
+        if (items.has("crimson_armors")) {
+            armorNames.clear()
+            armorNames.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })
+        }
 
-            tiers.clear()
-            if (items.has("crimson_tiers")) {
-                items.getAsJsonObject("crimson_tiers").entrySet().forEach {
-                    tiers[it.key] = it.value.asInt
-                }
+        tiers.clear()
+        if (items.has("crimson_tiers")) {
+            items.getAsJsonObject("crimson_tiers").entrySet().forEach {
+                tiers[it.key] = it.value.asInt
             }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
         }
     }
 

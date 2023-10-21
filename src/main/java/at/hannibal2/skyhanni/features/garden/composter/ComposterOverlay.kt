@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -332,7 +331,6 @@ class ComposterOverlay {
             if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
 
-
         val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
@@ -359,7 +357,6 @@ class ComposterOverlay {
         val materialCostFormat =
             " §7Material costs per $timeText: §6${NumberUtil.format(totalCost)}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
-
 
         val priceCompost = getPrice("COMPOST")
         val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
@@ -463,7 +460,8 @@ class ComposterOverlay {
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
             if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
-            val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
+            val sackType =
+                if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
             LorenzUtils.clickableChat(
                 "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
@@ -513,15 +511,9 @@ class ComposterOverlay {
     }
 
     private fun updateOrganicMatterFactors() {
-        try {
-            val garden = this.garden ?: return
-            organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
-            fuelFactors = garden.fuel
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
-        }
+        val garden = this.garden ?: return
+        organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
+        fuelFactors = garden.fuel
     }
 
     private fun updateOrganicMatterFactors(baseValues: Map<String, Double>): Map<String, Double> {

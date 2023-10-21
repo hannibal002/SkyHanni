@@ -42,7 +42,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        repoData = event.getConstant("CrimsonIsleReputation") ?: return
+        repoData = event.getConstant("CrimsonIsleReputation")
 
         tryLoadConfig()
         update()

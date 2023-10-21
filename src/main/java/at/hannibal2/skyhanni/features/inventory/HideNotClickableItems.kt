@@ -54,22 +54,14 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            event.getConstant("TradeNpcs")?.let {
-                tradeNpcFilter.load(it)
-            }
+        tradeNpcFilter.load(event.getConstant("TradeNpcs"))
 
-            val hideNotClickableItems = event.getConstant("HideNotClickableItems") ?: return
-            hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
-            hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
-            updateSalvageList(hideNotClickableItems)
-            hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
-            notAuctionableFilter.load(hideNotClickableItems["not_auctionable"].asJsonObject)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("Error in RepositoryReloadEvent for HideNotClickableItems")
-        }
+        val hideNotClickableItems = event.getConstant("HideNotClickableItems") ?: return
+        hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
+        hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
+        updateSalvageList(hideNotClickableItems)
+        hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
+        notAuctionableFilter.load(hideNotClickableItems["not_auctionable"].asJsonObject)
     }
 
     private fun updateSalvageList(hideNotClickableItems: JsonObject) {

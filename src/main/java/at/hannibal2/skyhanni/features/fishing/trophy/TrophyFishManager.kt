@@ -6,20 +6,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.jsonobjects.TrophyFishJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-
 class TrophyFishManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val json = event.getConstant<TrophyFishJson>("TrophyFish")
-                ?: error("Could not read repo data from TrophyFish.json")
-            trophyFishInfo = json.trophy_fish
-            LorenzUtils.debug("Loaded trophy fish from repo")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
-        }
+        val json = event.getConstant<TrophyFishJson>("TrophyFish")
+        trophyFishInfo = json.trophy_fish
+        LorenzUtils.debug("Loaded trophy fish from repo")
     }
 
     companion object {

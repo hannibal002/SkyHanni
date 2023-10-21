@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -38,7 +37,6 @@ object GardenCropSpeed {
     private val pumpkinDicer = mutableListOf<Double>()
     var latestMelonDicer = 0.0
     var latestPumpkinDicer = 0.0
-
 
     init {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
@@ -151,14 +149,9 @@ object GardenCropSpeed {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val dicerJson = event.getConstant("DicerDrops") ?: error("DicerDrops not found in repo")
-            calculateAverageDicer(melonDicer, dicerJson["MELON"].asJsonObject)
-            calculateAverageDicer(pumpkinDicer, dicerJson["PUMPKIN"].asJsonObject)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
-        }
+        val dicerJson = event.getConstant("DicerDrops")
+        calculateAverageDicer(melonDicer, dicerJson["MELON"].asJsonObject)
+        calculateAverageDicer(pumpkinDicer, dicerJson["PUMPKIN"].asJsonObject)
     }
 
     fun getRecentBPS(): Double {
@@ -198,7 +191,7 @@ object GardenCropSpeed {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3,"garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
+        event.move(3, "garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
 
     }
 }

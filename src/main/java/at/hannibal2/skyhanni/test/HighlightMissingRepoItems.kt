@@ -53,9 +53,8 @@ class HighlightMissingRepoItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant("IgnoredItems")?.let {
-            ignoreItems.load(it.asJsonObject)
-        }
+        val ignoredItems = event.getConstant("IgnoredItems")
+        ignoreItems.load(ignoredItems.asJsonObject)
     }
 
     @SubscribeEvent

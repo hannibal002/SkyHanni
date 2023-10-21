@@ -28,7 +28,7 @@ object QuickModMenuSwitch {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val modsJar = event.getConstant<ModsJson>("ModGuiSwitcher") ?: return
+        val modsJar = event.getConstant<ModsJson>("ModGuiSwitcher")
         mods = buildList {
             out@ for ((name, mod) in modsJar.mods) {
                 for (path in mod.guiPath) {

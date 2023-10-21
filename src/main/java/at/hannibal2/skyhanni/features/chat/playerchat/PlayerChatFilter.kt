@@ -29,25 +29,18 @@ class PlayerChatFilter {
         var countCategories = 0
         var countFilters = 0
 
-        try {
-            val data = event.getConstant("PlayerChatFilter") ?: return
+        val data = event.getConstant("PlayerChatFilter")
+        for (category in data["filters"].asJsonArray) {
+            val jsonObject = category.asJsonObject
+            val description = jsonObject["description"].asString
+            val filter = MultiFilter()
+            filter.load(jsonObject)
+            filters[description] = filter
 
-            for (category in data["filters"].asJsonArray) {
-                val jsonObject = category.asJsonObject
-                val description = jsonObject["description"].asString
-                val filter = MultiFilter()
-                filter.load(jsonObject)
-                filters[description] = filter
-
-                countCategories++
-                countFilters += filter.count()
-            }
-
-            LorenzUtils.debug("Loaded $countFilters filters in $countCategories categories from repo")
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+            countCategories++
+            countFilters += filter.count()
         }
+
+        LorenzUtils.debug("Loaded $countFilters filters in $countCategories categories from repo")
     }
 }

@@ -17,6 +17,10 @@ object ErrorManager {
     private var cache =
         CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build<Pair<String, Int>, Unit>()
 
+    fun resetCache() {
+        cache.asMap().clear()
+    }
+
     fun skyHanniError(message: String): Nothing {
         val exception = IllegalStateException(message)
         logError(exception, message)

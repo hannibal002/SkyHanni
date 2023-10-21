@@ -25,6 +25,7 @@ class RepoManager(private val configLocation: File) {
     private val gson get() = ConfigManager.gson
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
+    private var error = false
 
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
@@ -39,12 +40,12 @@ class RepoManager(private val configLocation: File) {
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
-        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successful :)") }
+        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successful.") }
     }
 
     fun reloadLocalRepo() {
         atomicShouldManuallyReload.set(true)
-        reloadRepository("Repo loaded from local files successful :)")
+        reloadRepository("Repo loaded from local files successful.")
     }
 
     private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
@@ -62,7 +63,9 @@ class RepoManager(private val configLocation: File) {
                     e.printStackTrace()
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
-                if (File(configLocation, "repo").exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
+                val file = File(configLocation, "repo")
+                if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
+                ) {
                     if (command) {
                         LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
                         atomicShouldManuallyReload.set(false)
@@ -120,15 +123,19 @@ class RepoManager(private val configLocation: File) {
     private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
         val comp = CompletableFuture<Void?>()
         if (!atomicShouldManuallyReload.get()) return comp
+        ErrorManager.resetCache()
         Minecraft.getMinecraft().addScheduledTask {
-            try {
-                RepositoryReloadEvent(repoLocation, gson).postAndCatch()
-                comp.complete(null)
-                if (answerMessage.isNotEmpty()) {
-                    LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
-                }
-            } catch (e: java.lang.Exception) {
-                ErrorManager.logError(e, "Error reading repo data!")
+            error = false
+            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(true, true) {
+                LorenzUtils.clickableChat(
+                    "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
+                    "shupdaterepo"
+                )
+                error = true
+            }
+            comp.complete(null)
+            if (answerMessage.isNotEmpty() && !error) {
+                LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
             }
         }
         return comp

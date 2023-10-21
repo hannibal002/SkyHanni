@@ -9,9 +9,7 @@ object BingoAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<BingoRanks>("BingoRanks")?.let {
-            ranks = it.ranks
-        }
+        ranks = event.getConstant<BingoRanks>("BingoRanks").ranks
     }
 
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value

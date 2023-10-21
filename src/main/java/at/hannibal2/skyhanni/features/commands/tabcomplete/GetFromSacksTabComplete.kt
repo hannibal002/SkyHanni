@@ -15,7 +15,7 @@ object GetFromSacksTabComplete {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        sackList = event.getConstant<SackListJson>("Sacks")?.sackList ?: return
+        sackList = event.getConstant<SackListJson>("Sacks").sackList
     }
 
     fun handleTabComplete(command: String): List<String>? {

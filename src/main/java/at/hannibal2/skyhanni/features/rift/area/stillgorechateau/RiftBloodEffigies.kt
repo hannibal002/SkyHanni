@@ -50,12 +50,11 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.locations?.let {
-            if (it.size != 6) {
-                error("Invalid rift effigies size: ${it.size} (expeced 6)")
-            }
-            locations = it
+        val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
+        if (newLocations.size != 6) {
+            error("Invalid rift effigies size: ${newLocations.size} (expeced 6)")
         }
+        locations = newLocations
     }
 
     @SubscribeEvent

@@ -99,7 +99,7 @@ object GardenCropMilestones {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<GardenJson>("Garden") ?: return
+        val data = event.getConstant<GardenJson>("Garden")
         cropMilestoneData = data.crop_milestones
     }
 }
