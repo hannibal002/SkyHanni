@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -49,6 +48,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -292,7 +292,6 @@ object Commands {
 //            "shsendtranslation",
 //            "Respond with a translation of the message that the user clicks"
 //        ) { Translator.toEnglish(it) }
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun commandHelp(args: Array<String>) {
@@ -357,11 +356,10 @@ object Commands {
         config.outdatedItems.clear()
     }
 
-    private fun registerCommand(
-        name: String,
-        description: String,
-        function: (Array<String>) -> Unit
-    ) = registerCommand0(name, description, function)
+    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+        commands.add(CommandInfo(name, description, currentCategory))
+    }
 
     private fun registerCommand0(
         name: String,
@@ -369,19 +367,22 @@ object Commands {
         function: (Array<String>) -> Unit,
         autoComplete: ((Array<String>) -> List<String>) = { listOf() }
     ) {
-        ClientCommandHandler.instance.registerCommand(
-            SimpleCommand(
-                name,
-                createCommand(function)
-            ) { _, b, _ -> autoComplete(b) }
+        val command = SimpleCommand(
+            name,
+            createCommand(function),
+            object : SimpleCommand.TabCompleteRunnable {
+                override fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String> {
+                    return autoComplete(args ?: emptyArray())
+                }
+            }
         )
+        ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
 
-    private fun createCommand(function: (Array<String>) -> Unit) =
-        object : ProcessCommandRunnable() {
-            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                function(args.asList().toTypedArray())
-            }
+    private fun createCommand(function: (Array<String>) -> Unit) = object : SimpleCommand.ProcessCommandRunnable() {
+        override fun processCommand(sender: ICommandSender?, args: Array<String>?) {
+            if (args != null) function(args.asList().toTypedArray())
         }
+    }
 }
