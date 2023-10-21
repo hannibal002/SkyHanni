@@ -126,16 +126,18 @@ class RepoManager(private val configLocation: File) {
         ErrorManager.resetCache()
         Minecraft.getMinecraft().addScheduledTask {
             error = false
-            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(true, true) {
-                LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
-                    "shupdaterepo"
-                )
+            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
                 error = true
             }
             comp.complete(null)
             if (answerMessage.isNotEmpty() && !error) {
                 LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
+            }
+            if (error) {
+                LorenzUtils.clickableChat(
+                    "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
+                    "shupdaterepo"
+                )
             }
         }
         return comp

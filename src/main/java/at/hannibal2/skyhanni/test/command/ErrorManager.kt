@@ -51,16 +51,23 @@ object ErrorManager {
         logError(IllegalStateException(internalMessage), userMessage)
     }
 
+    // we love java
     fun logError(throwable: Throwable, message: String) {
+        logError(throwable, message, false)
+    }
+
+    fun logError(throwable: Throwable, message: String, ignoreErrorCache: Boolean) {
         val error = Error(message, throwable)
         Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
 
-        val pair = if (throwable.stackTrace.isNotEmpty()) {
-            throwable.stackTrace[0].let { it.fileName to it.lineNumber }
-        } else message to 0
-        if (cache.getIfPresent(pair) != null) return
-        cache.put(pair, Unit)
+        if (!ignoreErrorCache) {
+            val pair = if (throwable.stackTrace.isNotEmpty()) {
+                throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+            } else message to 0
+            if (cache.getIfPresent(pair) != null) return
+            cache.put(pair, Unit)
+        }
 
         val fullStackTrace = throwable.getExactStackTrace(true).joinToString("\n")
         val stackTrace = throwable.getExactStackTrace(false).joinToString("\n").removeSpam()

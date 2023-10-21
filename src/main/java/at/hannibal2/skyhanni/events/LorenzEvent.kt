@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
@@ -16,23 +17,30 @@ abstract class LorenzEvent : Event() {
 
     fun postAndCatchAndBlock(
         printError: Boolean = true,
-        stopOnError: Boolean = false,
+        stopOnFirstError: Boolean = false,
+        ignoreErrorCache: Boolean = false,
         onError: (Throwable) -> Unit,
     ): Boolean {
+        val visibleErrors = 3
+        var errors = 0
         for (listener in getListeners()) {
             try {
                 listener.invoke(this)
-            } catch (e: Throwable) {
-                if (printError) {
+            } catch (throwable: Throwable) {
+                errors++
+                if (printError && errors <= visibleErrors) {
                     val callerName = listener.toString().split(" ")[1].split("@")[0].split(".").last()
-                    ErrorManager.logError(
-                        e,
-                        "Caught an ${e::class.simpleName ?: "error"} at $eventName in $callerName: '${e.message}'"
-                    )
+                    val errorName = throwable::class.simpleName ?: "error"
+                    val message = "Caught an $errorName at $eventName in $callerName: '${throwable.message}'"
+                    ErrorManager.logError(throwable, message, ignoreErrorCache)
                 }
-                onError(e)
-                if (stopOnError) break
+                onError(throwable)
+                if (stopOnFirstError) break
             }
+        }
+        if (errors > visibleErrors) {
+            val hiddenErrors = errors - visibleErrors
+            LorenzUtils.chat("§c[SkyHanni] $hiddenErrors more errors in $eventName are hidden!")
         }
         return if (isCancelable) isCanceled else false
     }
