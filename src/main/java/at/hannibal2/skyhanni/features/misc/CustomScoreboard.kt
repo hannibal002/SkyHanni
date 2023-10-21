@@ -56,15 +56,15 @@ class CustomScoreboard {
             if (line.startsWith(" Bank: §r§6")){
                 bank = line.removePrefix(" Bank: §r§6")
             }
-            if (line.startsWith("Motes: §d")){
-                motes = line.removePrefix("Motes: §d")
-            }
         }
 
         //todo add copper etc to this
         for (line in ScoreboardData.sidebarLinesFormatted){
             if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
                 location = line
+            }
+            if (line.startsWith("Motes: §d")){
+                motes = line.removePrefix("Motes: §d")
             }
             if (extractLobbyCode(line) is String ){
                 lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of colorcode)
