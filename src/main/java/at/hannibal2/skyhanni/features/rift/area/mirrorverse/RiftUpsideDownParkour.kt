@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -19,19 +18,14 @@ class RiftUpsideDownParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: throw Exception()
-            parkourHelper = ParkourHelper(
-                data.locations.map { it.add(-1.0, -1.0, -1.0) },
-                data.shortCuts,
-                platformSize = 2.0,
-                detectionRange = 2.0
-            )
-            updateConfig()
-            SkyHanniMod.repo.successfulConstants.add("RiftUpsideDownParkour")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("RiftUpsideDownParkour")
-        }
+        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
+        parkourHelper = ParkourHelper(
+            data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
+            data.shortCuts,
+            platformSize = 2.0,
+            detectionRange = 2.0
+        )
+        updateConfig()
     }
 
     @SubscribeEvent

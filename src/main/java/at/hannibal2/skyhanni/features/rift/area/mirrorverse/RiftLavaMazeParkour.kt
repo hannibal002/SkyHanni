@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -19,19 +18,14 @@ class RiftLavaMazeParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour") ?: throw Exception()
-            parkourHelper = ParkourHelper(
-                data.locations,
-                data.shortCuts,
-                platformSize = 1.0,
-                detectionRange = 1.0
-            )
-            updateConfig()
-            SkyHanniMod.repo.successfulConstants.add("RiftLavaMazeParkour")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("RiftLavaMazeParkour")
-        }
+        val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
+        parkourHelper = ParkourHelper(
+            data.locations,
+            data.shortCuts,
+            platformSize = 1.0,
+            detectionRange = 1.0
+        )
+        updateConfig()
     }
 
     @SubscribeEvent

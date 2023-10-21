@@ -51,13 +51,11 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<RiftEffigiesJson>("RiftEffigies") ?: throw Exception()
-            locations = data.locations
-            SkyHanniMod.repo.successfulConstants.add("RiftEffigies")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("RiftEffigies")
+        val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
+        if (newLocations.size != 6) {
+            error("Invalid rift effigies size: ${newLocations.size} (expeced 6)")
         }
+        locations = newLocations
     }
 
     @SubscribeEvent

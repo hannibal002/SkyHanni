@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -145,18 +144,14 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls") ?: throw Exception()
-            soulLocations = buildMap {
-                for ((_, locations) in data.areas) {
-                    for (location in locations) {
-                        this[location.name] = location.position
-                    }
+        val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
+        val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
+        soulLocations = buildMap {
+            for ((area, locations) in areas) {
+                for (location in locations) {
+                    this[location.name] = location.position
                 }
             }
-            SkyHanniMod.repo.successfulConstants.add("EnigmaSouls")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("EnigmaSouls")
         }
     }
 

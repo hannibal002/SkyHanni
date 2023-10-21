@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.jsonobjects.MultiFilterJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -54,13 +53,8 @@ class HighlightMissingRepoItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<MultiFilterJson>("IgnoredItems") ?: throw Exception()
-            ignoreItems.load(data)
-            SkyHanniMod.repo.successfulConstants.add("IgnoredItems")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("IgnoredItems")
-        }
+        val ignoredItems = event.getConstant("IgnoredItems")
+        ignoreItems.load(ignoredItems.asJsonObject)
     }
 
     @SubscribeEvent

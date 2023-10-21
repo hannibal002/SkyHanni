@@ -20,13 +20,7 @@ class BingoCardTips {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<BingoJson>("Bingo") ?: throw Exception()
-            tips = data.bingo_tips
-            SkyHanniMod.repo.successfulConstants.add("Bingo")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("Bingo")
-        }
+        tips = event.getConstant<BingoJson>("Bingo").bingo_tips
     }
 
     @SubscribeEvent

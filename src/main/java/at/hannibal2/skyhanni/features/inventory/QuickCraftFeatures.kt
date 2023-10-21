@@ -24,13 +24,7 @@ class QuickCraftFeatures {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<List<String>>("QuickCraftableItems") ?: throw Exception()
-            quickCraftableItems = data
-            SkyHanniMod.repo.successfulConstants.add("QuickCraftableItems")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("QuickCraftableItems")
-        }
+        quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
     }
 
     @SubscribeEvent

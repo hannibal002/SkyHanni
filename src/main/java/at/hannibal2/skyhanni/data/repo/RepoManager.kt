@@ -25,6 +25,7 @@ class RepoManager(private val configLocation: File) {
     private val gson get() = ConfigManager.gson
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
+    private var error = false
 
     val successfulConstants = mutableListOf<String>()
     val unsuccessfulConstants = mutableListOf<String>()
@@ -42,12 +43,12 @@ class RepoManager(private val configLocation: File) {
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
-        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successful :)") }
+        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successful.") }
     }
 
     fun reloadLocalRepo() {
         atomicShouldManuallyReload.set(true)
-        reloadRepository("Repo loaded from local files successful :)")
+        reloadRepository("Repo loaded from local files successful.")
     }
 
     private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
@@ -65,7 +66,9 @@ class RepoManager(private val configLocation: File) {
                     e.printStackTrace()
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
-                if (File(configLocation, "repo").exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit) {
+                val file = File(configLocation, "repo")
+                if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
+                ) {
                     if (unsuccessfulConstants.isEmpty()) {
 
                         if (command) {
@@ -126,21 +129,29 @@ class RepoManager(private val configLocation: File) {
     private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
         val comp = CompletableFuture<Void?>()
         if (!atomicShouldManuallyReload.get()) return comp
+        ErrorManager.resetCache()
         Minecraft.getMinecraft().addScheduledTask {
-            try {
-                successfulConstants.clear()
-                unsuccessfulConstants.clear()
-
-                RepositoryReloadEvent(repoLocation, gson).postAndCatch()
-                comp.complete(null)
-                if (unsuccessfulConstants.isNotEmpty()) {
-                    LorenzUtils.chat("§e[SkyHanni] error reloading repository")
-                } else if (answerMessage.isNotEmpty()) {
-                    LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
-                }
-            } catch (e: Exception) {
+            error = false
+            successfulConstants.clear()
+            unsuccessfulConstants.clear()
+            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
+                error = true
+            }
+            comp.complete(null)
+            if (answerMessage.isNotEmpty() && !error) {
+                LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
+            }
+            if (unsuccessfulConstants.isNotEmpty()) {
+                LorenzUtils.chat("§e[SkyHanni] error reloading repository")
+            } else if (answerMessage.isNotEmpty()) {
+                LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
+            }
+            if (error) {
+                LorenzUtils.clickableChat(
+                    "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
+                    "shupdaterepo"
+                )
                 unsuccessfulConstants.add("All Constants")
-                ErrorManager.logError(e, "Error reading repo data!")
             }
         }
         return comp
@@ -171,7 +182,7 @@ class RepoManager(private val configLocation: File) {
             LorenzUtils.chat("   §e- §7$constant")
         }
     }
-    
+
     /**
      * Parses a file in to a JsonObject.
      */

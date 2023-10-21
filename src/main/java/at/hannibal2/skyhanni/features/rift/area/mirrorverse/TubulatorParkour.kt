@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -21,19 +20,14 @@ class TubulatorParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<ParkourJson>("RiftTubulator") ?: throw Exception()
-            parkourHelper = ParkourHelper(
-                data.locations,
-                data.shortCuts,
-                platformSize = 1.0,
-                detectionRange = 2.0,
-            )
-            updateConfig()
-            SkyHanniMod.repo.successfulConstants.add("RiftTubulator")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("RiftTubulator")
-        }
+        val data = event.getConstant<ParkourJson>("RiftTubulator")
+        parkourHelper = ParkourHelper(
+            data.locations,
+            data.shortCuts,
+            platformSize = 1.0,
+            detectionRange = 2.0,
+        )
+        updateConfig()
     }
 
     @SubscribeEvent

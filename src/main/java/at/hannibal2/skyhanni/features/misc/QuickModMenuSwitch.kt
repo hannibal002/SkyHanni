@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.jsonobjects.ModGuiSwitcherJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ModsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -21,30 +21,25 @@ object QuickModMenuSwitch {
     private var display = emptyList<List<Any>>()
     private var latestGuiPath = ""
 
-    private var mods: List<Mod> = emptyList()
+    private var mods: List<Mod>? = null
 
     private var currentlyOpeningMod = ""
     private var lastGuiOpen = 0L
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")?: throw Exception()
-            mods = buildList {
-                out@ for ((name, mod) in data.mods) {
-                    for (path in mod.guiPath) {
-                        try {
-                            Class.forName(path)
-                            add(Mod(name, mod.description, mod.command, mod.guiPath))
-                            continue@out
-                        } catch (_: Exception) {
-                        }
+        val modsJar = event.getConstant<ModsJson>("ModGuiSwitcher")
+        mods = buildList {
+            out@ for ((name, mod) in modsJar.mods) {
+                for (path in mod.guiPath) {
+                    try {
+                        Class.forName(path)
+                        add(Mod(name, mod.description, mod.command, mod.guiPath))
+                        continue@out
+                    } catch (_: Exception) {
                     }
                 }
             }
-            SkyHanniMod.repo.successfulConstants.add("ModGuiSwitcher")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("ModGuiSwitcher")
         }
     }
 
@@ -72,7 +67,7 @@ object QuickModMenuSwitch {
                 LorenzUtils.debug("Open GUI: $latestGuiPath")
             }
         }
-        if (mods.isEmpty()) return
+        val mods = mods ?: return
 
         display = if (!shouldShow(mods)) {
             emptyList()

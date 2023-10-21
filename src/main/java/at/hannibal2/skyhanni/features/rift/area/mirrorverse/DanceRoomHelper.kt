@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -166,13 +165,7 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions") ?: throw Exception()
-            instructions = data.instructions
-            SkyHanniMod.repo.successfulConstants.add("DanceRoomInstructions")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("DanceRoomInstructions")
-        }
+        instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 
     fun start(interval: Long): Job {

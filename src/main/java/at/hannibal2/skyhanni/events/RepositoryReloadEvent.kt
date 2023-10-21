@@ -1,20 +1,17 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.data.repo.RepoError
 import at.hannibal2.skyhanni.data.repo.RepoUtils
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.File
 import java.lang.reflect.Type
 
 class RepositoryReloadEvent(val repoLocation: File, val gson: Gson) : LorenzEvent() {
 
-    inline fun <reified T : Any> getConstant(constant: String, type: Type? = null) = try {
+    inline fun <reified T : Any> getConstant(constant: String, type: Type? = null): T = try {
+        if (!repoLocation.exists()) throw RepoError("Repo folder does not exist!")
         RepoUtils.getConstant(repoLocation, constant, gson, T::class.java, type)
     } catch (e: Exception) {
-        ErrorManager.logError(
-            Exception("Repo parsing error while trying to read constant '$constant'", e),
-            "Error reading repo data"
-        )
-        null
+        throw RepoError("Repo parsing error while trying to read constant '$constant'", e)
     }
 }
