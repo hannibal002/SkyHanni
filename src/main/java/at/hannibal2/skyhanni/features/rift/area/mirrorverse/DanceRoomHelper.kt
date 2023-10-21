@@ -38,7 +38,7 @@ object DanceRoomHelper {
         display = buildList {
             if (instructions.isEmpty()) {
                 add("§cError fetching Dance Room Instructions!")
-                add("§cTry §e/shreloadrepo §cor §e/shupdaterepo")
+                add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
             }
             for ((lineIndex, line) in instructions.withIndex()) {
                 addLine(lineIndex, line)?.let { add(it) }
