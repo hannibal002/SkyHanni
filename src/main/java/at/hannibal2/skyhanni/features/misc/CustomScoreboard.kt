@@ -34,6 +34,7 @@ class CustomScoreboard {
     private var copper = "0"
     private var gems = "0"
     private var location = "None"
+    private var lobbyCode = "None"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -64,6 +65,9 @@ class CustomScoreboard {
         for (line in ScoreboardData.sidebarLinesFormatted){
             if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
                 location = line
+            }
+            if (extractLobbyCode(line) is String ){
+                lobbyCode = extractLobbyCode(line)!!
             }
         }
         bits = getBits()
@@ -118,7 +122,7 @@ class CustomScoreboard {
         lineMap[8] = Collections.singletonList(location)
         lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[10] = Collections.singletonList((if (config.use24hFormat) timeFormat24h else timeFormat12h).format(System.currentTimeMillis()))
-        lineMap[11] = Collections.singletonList("§7Current Server")
+        lineMap[11] = Collections.singletonList("§8$lobbyCode")
         lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
         lineMap[13] = Collections.singletonList("<empty>")
 
@@ -157,6 +161,8 @@ class CustomScoreboard {
             lineMap[4] = Collections.singletonList(if(bits == "0") "<hidden>" else "Bits: §b$bits")
             lineMap[5] = Collections.singletonList(if(copper == "0") "<hidden>" else "Copper: §c$copper")
             lineMap[6] = Collections.singletonList(if(gems == "0") "<hidden>" else "Gems: §a$gems")
+            lineMap[8] = Collections.singletonList(if(location == "None") "<hidden>" else location)
+            lineMap[11] = Collections.singletonList(if(lobbyCode == "None") "<hidden>" else "§8$lobbyCode")
 
             if (partyList.size == 1){
                 lineMap[19] = Collections.singletonList("<hidden>")
@@ -172,6 +178,12 @@ class CustomScoreboard {
         }
 
         return formatDisplay(lineMap)
+    }
+
+    private fun extractLobbyCode(input: String): String? {
+        val regex = Regex("§(\\d{3}/\\d{2}/\\d{2}) §([A-Za-z0-9]+)$")
+        val matchResult = regex.find(input)
+        return matchResult?.groupValues?.lastOrNull()
     }
 
     private fun getBits() : String {
