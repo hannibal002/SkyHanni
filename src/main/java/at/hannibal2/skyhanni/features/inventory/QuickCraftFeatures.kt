@@ -24,7 +24,7 @@ class QuickCraftFeatures {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems") ?: emptyList()
+        quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
     }
 
     @SubscribeEvent

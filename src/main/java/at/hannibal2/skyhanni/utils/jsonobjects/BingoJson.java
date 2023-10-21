@@ -12,6 +12,7 @@ public class BingoJson {
     public static class BingoTip {
         @Expose
         public String difficulty;
+
         @Expose
         public List<String> note;
     }
