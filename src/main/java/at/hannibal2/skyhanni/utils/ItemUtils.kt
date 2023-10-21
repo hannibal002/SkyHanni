@@ -116,6 +116,8 @@ object ItemUtils {
         return false
     }
 
+    // TODO remove
+    fun ItemStack.getInternalName_old() = getInternalName().asString()
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
 
