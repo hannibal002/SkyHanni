@@ -50,11 +50,12 @@ open class VisualWordGui : GuiScreen() {
 
     private var modifiedWords = mutableListOf<VisualWord>()
 
-    private val shouldDrawImport get() = sbeConfigPath.exists() && !SkyHanniMod.feature.storage.visualWordsImported
+    private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
 
     companion object {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
+        var drawImport = false
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -433,7 +434,7 @@ open class VisualWordGui : GuiScreen() {
     }
 
     private fun tryImport() {
-        if (sbeConfigPath.exists()) {
+        if (drawImport) {
             val json = ConfigManager.gson.fromJson(
                 FileReader(sbeConfigPath),
                 JsonObject::class.java
@@ -459,6 +460,7 @@ open class VisualWordGui : GuiScreen() {
             if (importedWords > 0 || skippedWords > 0) {
                 chat("§e[SkyHanni] §aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !")
                 SkyHanniMod.feature.storage.visualWordsImported = true
+                drawImport = false
             }
         }
     }
