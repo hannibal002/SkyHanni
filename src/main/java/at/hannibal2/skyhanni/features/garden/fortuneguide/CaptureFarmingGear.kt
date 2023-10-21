@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -42,12 +41,7 @@ class CaptureFarmingGear {
 
         fun captureFarmingGear() {
             val farmingItems = farmingItems ?: return
-            val resultList = mutableListOf<String>()
-
             val itemStack = InventoryUtils.getItemInHand() ?: return
-            val itemID = itemStack.getInternalName().asString()
-            resultList.add(itemStack.displayName.toString())
-            resultList.add(itemID)
 
             val currentCrop = itemStack.getCropType()
 
