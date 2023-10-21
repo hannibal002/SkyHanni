@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
@@ -13,8 +14,12 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
+import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
@@ -146,6 +151,49 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
+    // Taken from NEU
+    fun createSkull(displayName: String, uuid: String, value: String): ItemStack {
+        return createSkull(displayName, uuid, value, null)
+    }
+
+    // Taken from NEU
+    fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
+        val render = ItemStack(Items.skull, 1, 3)
+        val tag = NBTTagCompound()
+        val skullOwner = NBTTagCompound()
+        val properties = NBTTagCompound()
+        val textures = NBTTagList()
+        val textures0 = NBTTagCompound()
+
+        skullOwner.setString("Id", uuid)
+        skullOwner.setString("Name", uuid)
+        textures0.setString("Value", value)
+
+        textures.appendTag(textures0)
+
+        addNameAndLore(tag, displayName, lore)
+
+        properties.setTag("textures", textures)
+        skullOwner.setTag("Properties", properties)
+        tag.setTag("SkullOwner", skullOwner)
+        render.tagCompound = tag
+        return render
+    }
+
+    // Taken from NEU
+    private fun addNameAndLore(tag: NBTTagCompound, displayName: String, lore: Array<String>?) {
+        val display = NBTTagCompound()
+        display.setString("Name", displayName)
+        if (lore != null) {
+            val tagLore = NBTTagList()
+            for (line in lore) {
+                tagLore.appendTag(NBTTagString(line))
+            }
+            display.setTag("Lore", tagLore)
+        }
+        tag.setTag("display", display)
+    }
+
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
     fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
@@ -169,7 +217,7 @@ object ItemUtils {
         val rarity = LorenzRarity.readItemRarity(this)
         data.itemRarity = rarity
         if (rarity == null && logError) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not read rarity for item $name",
                 "getItemRarityOrNull not found for: $internalName, name:'$name''"
             )
@@ -191,9 +239,9 @@ object ItemUtils {
             } else it
         }
 
-    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName_old() == "SKYBLOCK_MENU"
+    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
-    private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
+    private val patternInFront = "(?: *§8(\\+§[\\d\\w])?(?<amount>[\\d\\.km,]+)(x )?)?(?<name>.*)".toPattern()
     private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
@@ -212,10 +260,7 @@ object ItemUtils {
         if (matcher.matches()) {
             val itemName = matcher.group("name")
             if (!itemName.contains("§8x")) {
-                val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
-                val pair = Pair(itemName.trim(), amount)
-                itemAmountCache[input] = pair
-                return pair
+                return makePair(input, itemName.trim(), matcher)
             }
         }
 
@@ -231,7 +276,12 @@ object ItemUtils {
         }
 
         val itemName = color + matcher.group("name").trim()
-        val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
+        return makePair(input, itemName, matcher)
+    }
+
+    private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
+        val matcherAmount = matcher.group("amount")
+        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
@@ -248,19 +298,13 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
-    // TODO: Replace entirely some day
-    fun getPetRarityOld(petStack: ItemStack?): Int {
-        val rarity = petStack?.getItemRarityOrNull() ?: return -1
-
-        return rarity.id
-    }
 
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not read rarity for pet $name",
                 "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
             )

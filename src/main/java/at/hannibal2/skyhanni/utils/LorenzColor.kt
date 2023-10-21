@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.EnumDyeColor
 import java.awt.Color
 
@@ -49,7 +49,7 @@ enum class LorenzColor(private var chatColorCode: Char, private val color: Color
             EnumDyeColor.PURPLE -> DARK_PURPLE
             EnumDyeColor.YELLOW -> YELLOW
             else -> {
-                CopyErrorCommand.logError(
+                ErrorManager.logError(
                     Exception("Unknown dye color: $this"),
                     "Unknown dye color: $this"
                 )

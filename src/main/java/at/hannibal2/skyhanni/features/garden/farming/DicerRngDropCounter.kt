@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -18,7 +19,7 @@ class DicerRngDropCounter {
     private var display = emptyList<String>()
     private val drops = mutableMapOf<CropType, MutableMap<DropRarity, Int>>()
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.dicerCounters
 
     init {
         initDrops()
@@ -55,7 +56,7 @@ class DicerRngDropCounter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.dicerCounterHideChat && !config.dicerCounterDisplay) return
+        if (!config.hideChat && !config.display) return
 
         val message = event.message
         for (drop in itemDrops) {
@@ -63,7 +64,7 @@ class DicerRngDropCounter {
                 addDrop(drop.crop, drop.rarity)
                 saveConfig()
                 update()
-                if (config.dicerCounterHideChat) {
+                if (config.hideChat) {
                     event.blockedReason = "dicer_rng_drop_counter"
                 }
                 return
@@ -109,7 +110,7 @@ class DicerRngDropCounter {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isEnabled()) {
-            config.dicerCounterPos.renderStrings(display, posLabel = "Dicer Counter")
+            config.pos.renderStrings(display, posLabel = "Dicer Counter")
         }
     }
 
@@ -138,5 +139,12 @@ class DicerRngDropCounter {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.dicerCounterDisplay
+    fun isEnabled() = GardenAPI.inGarden() && config.display
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.dicerCounterDisplay", "garden.dicerCounters.display")
+        event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounters.hideChat")
+        event.move(3, "garden.dicerCounterPos", "garden.dicerCounters.pos")
+    }
 }

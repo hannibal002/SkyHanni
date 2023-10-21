@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -16,7 +17,7 @@ object TestCopyRngMeterValues {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!SkyHanniMod.feature.dev.copyRngMeter) return
+        if (!SkyHanniMod.feature.dev.debug.copyRngMeter) return
 
         val map = mutableMapOf<NEUInternalName, Long>()
         val slayerPattern = "§7Slayer XP: §d.*§5/§d(?<xp>.*)".toPattern()
@@ -35,5 +36,10 @@ object TestCopyRngMeterValues {
 
         OSUtils.copyToClipboard(ConfigManager.gson.toJson(map))
         LorenzUtils.debug("${map.size} items saved to clipboard.")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.copyRngMeter", "dev.debug.copyRngMeter")
     }
 }

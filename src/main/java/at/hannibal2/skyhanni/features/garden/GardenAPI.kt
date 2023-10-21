@@ -18,14 +18,17 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
@@ -120,11 +123,11 @@ object GardenAPI {
     private fun getToolInHand(toolItem: ItemStack?, crop: CropType?): String? {
         if (crop != null) return crop.cropName
 
-        val internalName = toolItem?.getInternalName_old() ?: return null
-        return if (isOtherTool(internalName)) internalName else null
+        val internalName = toolItem?.getInternalName() ?: return null
+        return if (isOtherTool(internalName)) internalName.asString() else null
     }
 
-    private fun isOtherTool(internalName: String): Boolean {
+    private fun isOtherTool(internalName: NEUInternalName): Boolean {
         if (internalName.startsWith("DAEDALUS_AXE")) return true
 
         if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
@@ -143,7 +146,7 @@ object GardenAPI {
     fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
     fun ItemStack.getCropType(): CropType? {
-        val internalName = getInternalName_old()
+        val internalName = getInternalName()
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
@@ -158,7 +161,7 @@ object GardenAPI {
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
+            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
 
     fun clearCropSpeed() {
         config?.cropsPerSecond?.clear()

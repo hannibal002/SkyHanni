@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -57,7 +57,7 @@ object SkyHanniConfigSearchResetCommand {
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Could not reset config element '$term'")
+            ErrorManager.logError(e, "Could not reset config element '$term'")
             "§cCould not reset config element '$term'"
         }
     }
@@ -68,7 +68,7 @@ object SkyHanniConfigSearchResetCommand {
         return try {
             startSearch(args)
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Error while trying to search config")
+            ErrorManager.logError(e, "Error while trying to search config")
             "§cError while trying to search config"
         }
     }
@@ -108,7 +108,7 @@ object SkyHanniConfigSearchResetCommand {
             shimmy.setJson(element)
             "§eChanged config element $term."
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Could not change config element '$term' to '$rawJson'")
+            ErrorManager.logError(e, "Could not change config element '$term' to '$rawJson'")
             "§cCould not change config element '$term' to '$rawJson'"
         }
     }
