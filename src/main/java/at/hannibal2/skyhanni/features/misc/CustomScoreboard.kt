@@ -35,6 +35,7 @@ class CustomScoreboard {
     private var gems = "0"
     private var location = "None"
     private var lobbyCode = "None"
+    private var heat = "0"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -68,6 +69,9 @@ class CustomScoreboard {
             }
             if (extractLobbyCode(line) is String ){
                 lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of colorcode)
+            }
+            if (line.startsWith("Heat: §c♨")){
+                heat = line.removePrefix("Heat: §c♨")
             }
         }
         bits = getBits()
@@ -137,7 +141,7 @@ class CustomScoreboard {
         lineMap[16] = eventList
         lineMap[17] = Collections.singletonList("<empty>")
 
-        lineMap[18] = Collections.singletonList("§cHeat")
+        lineMap[18] = Collections.singletonList("Heat: §c$heat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
