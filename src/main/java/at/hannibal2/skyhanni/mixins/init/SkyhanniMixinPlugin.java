@@ -1,26 +1,18 @@
 package at.hannibal2.skyhanni.mixins.init;
 
-import org.spongepowered.asm.lib.tree.ClassNode;
-import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
-import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.asm.lib.tree.*;
+import org.spongepowered.asm.mixin.extensibility.*;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.io.*;
+import java.net.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.*;
+import java.util.zip.*;
 
 public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
     @Override
-    public void onLoad(String s) {
+    public void onLoad(String mixinPackage) {
 
     }
 
@@ -30,12 +22,12 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public boolean shouldApplyMixin(String s, String s1) {
+    public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         return false;
     }
 
     @Override
-    public void acceptTargets(Set<String> set, Set<String> set1) {
+    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
 
     }
 
@@ -43,7 +35,7 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         String string = classUrl.toString();
         if (classUrl.getProtocol().equals("jar")) {
             try {
-                return new URL(string.substring(4).split("\\!")[0]);
+                return new URL(string.substring(4).split("!")[0]);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
@@ -51,7 +43,7 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         if (string.endsWith(".class")) {
             try {
                 return new URL(string.replace("\\", "/")
-                        .replace(getClass().getCanonicalName().replace(".", "/") + ".class", ""));
+                    .replace(getClass().getCanonicalName().replace(".", "/") + ".class", ""));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
@@ -66,8 +58,8 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
 
     public void tryAddMixinClass(String className) {
         String norm = (className.endsWith(".class") ? className.substring(0, className.length() - ".class".length()) : className)
-                .replace("\\", "/")
-                .replace("/", ".");
+            .replace("\\", "/")
+            .replace("/", ".");
         if (norm.startsWith(mixinBasePackage) && !norm.endsWith(".")) {
             mixins.add(norm.substring(mixinBasePackage.length()));
         }
@@ -77,7 +69,7 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         System.out.println("Trying to find mixins from directory");
         try (Stream<Path> classes = Files.walk(file.resolve(mixinBaseDir))) {
             classes.map(it -> file.relativize(it).toString())
-                    .forEach(this::tryAddMixinClass);
+                .forEach(this::tryAddMixinClass);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -121,12 +113,12 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void preApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 
     @Override
-    public void postApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 }
