@@ -1,8 +1,10 @@
 # SkyHanni - List of all Features
 
 Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
+<details open><summary>
 
 ## Chat
+</summary>
 
 + Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
   player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
@@ -37,8 +39,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Powder Mining messages hider
 - Winter gift messages hider
 - Many other messages (Not separated into own categories yet)
+</details>
+<details open><summary>
 
 ## Dungeon
+</summary>
 
 + Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, Wither Essence or a lever)
 + Current milestone display.
@@ -67,8 +72,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
+</details>
+<details open><summary>
 
 ## Inventory
+</summary>
 
 + Not Clickable Items
     + Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
@@ -115,16 +123,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sack items can be crafted normally.
 + **Shift Click Equipment**. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
+</details>
+<details open><summary>
 
 ## Item Abilities
+</summary>
 
 + Show the **cooldown of items** in the inventory. - hannibal2
     + Option to change the item background according to the cooldown.
     + Supports dungeon mage cooldown reduction. - Cad
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
+</details>
+<details open><summary>
 
 ## Summoning Mobs
+</summary>
 
 - Summoning Soul Display (Show the name of dropped soul lying on the ground, not working in dungeon when Skytils' "Hide
   Non-Starred Mobs Nametags" is enabled)
@@ -132,8 +146,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to mark the own summoning mobs in green.
 - Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the
   corresponding spawning/despawning chat messages)
+</details>
+<details open><summary>
 
 ## Ashfang
+</summary>
 
 - Show a cooldown when the player gets an ability block effect during the ashfang fight.
 - Display a timer until Ashfang brings his underlings back to him.
@@ -143,8 +160,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to hide all the particles around the ashfang boss.
 - Option to hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)
 - Option to hide damage splashes around ashfang.
+</details>
+<details open><summary>
 
 ## Minion
+</summary>
 
 - A display that show the last time the hopper inside a minion has been emptied.
 - A marker to the last opened minion for a couple of seconds (seen through walls)
@@ -154,8 +174,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
+</details>
+<details open><summary>
 
 ## Bazaar
+</summary>
 
 + Showing colors in the order inventory for outbid or fully bought/sold items.
 + Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
@@ -163,8 +186,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Update Timer showing when the next api data update happens.
 + Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
+</details>
+<details open><summary>
 
 ## Fishing
+</summary>
 
 + **Trophy Counter**
     + After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total.
@@ -198,8 +224,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
 + Alerts when the player catches a Legendary Sea Creature. - Cad
+</details>
+<details open><summary>
 
 ## Damage Indicator
+</summary>
 
 - Show the remaining health of selected bosses in the game in a bigger GUI.
 - Send a chat message when the boss is healing himself.
@@ -219,8 +248,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show the amount of HP missing until the steak can be used on the vampire slayer on top of the boss.
     + Show a timer until the boss leaves the invincible Mania Circles state.
     + Show the percentage of HP next to the HP.
+</details>
+<details open><summary>
 
 ## Slayer
+</summary>
 
 + Hide poor slayer drop chat messages.
 + Slayer **Mini Boss:**
@@ -285,20 +317,29 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Inquisitor Sharing**
     + Share aypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
+</details>
+<details open><summary>
 
 ## Marked Players
+</summary>
 
 + Adding or removing players as marked with command /shmarkplayer
 + Highlight marked players in the world.
 + Highlight marked player names in chat.
 + Mark the own player name.
+</details>
+<details open><summary>
 
 ## Bingo
+</summary>
 
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
+</details>
+<details open><summary>
 
 ## Mobs
+</summary>
 
 + Arachne keeper highlighter.
 + Area boss highlighter.
@@ -311,8 +352,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Countdown for Arachne spawn. - Cad
     + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
+</details>
+<details open><summary>
 
 ## Garden Features
+</summary>
 
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + **Visitor Display** - Show all items needed for the visitors.
@@ -436,8 +480,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
 + /shmouselock command to lock mouse rotation for farming. - Cad
+</details>
+<details open><summary>
 
 ## The Rift
+</summary>
 
 + **Rift Timer**
     + Show the remaining rift time, max time, percentage, and extra time changes.
@@ -450,7 +497,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
     + Customize the color
 + **Odonatas Highlighter**
-    + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+    + Highlight the small Odonatas flying around the trees while holding an Empty Odonata Bottle in the hand.
     + Customize the color
 + **Agaricus Cap** countdown
     + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
@@ -505,8 +552,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide the wilted berberis particles
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
+</details>
+<details open><summary>
 
 ## Mining
+</summary>
 
 + **Highlight Commission Mobs** - hannibal2
     + Highlight Mobs that are part of active commissions
@@ -518,16 +568,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
+</details>
+<details open><summary>
 
 ## Events
+</summary>
 
 + Highlight Jerries during the Jerrypoclaypse. - Erymanthus
 + Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
+</details>
+<details open><summary>
 
 ## Commands
+</summary>
 
 + **/shcommands**
     + Show all commands in SkyHanni
@@ -542,8 +598,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
+</details>
+<details open><summary>
 
 ## Misc
+</summary>
 
 + Allow to paste text from clipboard in signs
 + Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with
@@ -695,9 +754,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
+</details>
+<details open><summary>
 
 ## Cosmetics
+</summary>
 
 + **Following Line** - hannibal2
     + Draws a colored line behind the player.
     + Change the color, width, and duration of the line.
+</details>
