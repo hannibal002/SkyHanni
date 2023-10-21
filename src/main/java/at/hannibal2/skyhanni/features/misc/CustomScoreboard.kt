@@ -19,11 +19,14 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.text.SimpleDateFormat
 import java.util.*
 
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.misc.customScoreboard
     private var display = emptyList<List<Any>>()
+    private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
+    private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
     private var purse = "0"
     private var motes = "0"
     private var bank = "0"
@@ -114,7 +117,7 @@ class CustomScoreboard {
         lineMap[7] = Collections.singletonList("<empty>")
         lineMap[8] = Collections.singletonList(location)
         lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
-        lineMap[10] = Collections.singletonList("§7IRL Time")
+        lineMap[10] = Collections.singletonList((if (config.use24hFormat) timeFormat24h else timeFormat12h).format(System.currentTimeMillis()))
         lineMap[11] = Collections.singletonList("§7Current Server")
         lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
         lineMap[13] = Collections.singletonList("<empty>")

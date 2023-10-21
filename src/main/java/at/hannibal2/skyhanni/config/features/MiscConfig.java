@@ -814,7 +814,7 @@ public class MiscConfig {
                         "",
                         "§7Location",
                         "§7Ingame Time",
-                        "§7IRL Time",
+                        "§Real Time",
                         "§7Current Server",
                         "§2Mithril §r/ §dGemstone §7Powder",
                         "",
@@ -846,6 +846,12 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideEmptyLines = true;
+
+        @Expose
+        @ConfigOption(name = "24h format", desc = "Use 24h format for the IRL time.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean use24hFormat = false;
 
         @Expose
         public Position position = new Position(10, 80, false, true);
