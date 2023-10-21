@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -18,7 +18,7 @@ class TrophyFishFillet {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (event.slot.inventory.name.contains("Sack")) return
-        val internalName = event.itemStack.getInternalName_old()
+        val internalName = event.itemStack.getInternalName().asString()
         val trophyFishName = internalName.substringBeforeLast("_")
             .replace("_", "").lowercase()
         val trophyRarityName = internalName.substringAfterLast("_")
