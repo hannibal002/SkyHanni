@@ -136,7 +136,7 @@ class JacobContestTimeNeeded {
                 val ffNeeded = cropsPerSecond * 100 / 20 / crop.baseDrops
                 val missing = (ffNeeded - cropFF).toInt()
                 bracketText += " §7(${missing.addSeparators()} more FF needed!)"
-                "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!" + marking
+                "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal possible!" + marking
             }
             brackets.add(bracketText)
             if (bracket == currentBracket) {

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -12,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import net.minecraftforge.client.event.RenderWorldLastEvent
+import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -22,7 +23,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     private var allKuudraDone = true
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         if (!reputationHelper.config.enabled) return
@@ -98,26 +99,23 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
             .forEach { storage.kuudraTiersDone.add(it.name) }
     }
 
-    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun onRepoReload(data: Map<String, ReputationQuest>) {
         kuudraTiers.clear()
-
-        //Repo
-        val repoData = reputationHelper.repoData ?: return
-        val jsonElement = repoData["KUUDRA"]
         var tier = 1
-        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
-            val data = extraData.asJsonObject
-            val displayItem = data["item"]?.asString
-            val location = reputationHelper.readLocationData(data)
-            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
+        for ((displayName, kuudraTier) in data) {
+            val displayItem = kuudraTier.item
+            val location = reputationHelper.readLocationData(kuudraTier.location)
             if (location != null) {
                 kuudraLocation = location
             }
+            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
 
             tier++
         }
+    }
 
-        //Config
+    fun loadData(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (kuudraTiers.isEmpty()) return
         for (name in storage.kuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true
         }

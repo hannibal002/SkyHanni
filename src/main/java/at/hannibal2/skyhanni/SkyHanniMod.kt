@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.RenderGuiData
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -63,7 +63,7 @@ import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash
@@ -143,6 +143,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
@@ -156,30 +157,33 @@ import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mainlobby.halloweenwaypoints.BasketWaypoints
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.BestiaryData
+import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
-import at.hannibal2.skyhanni.features.misc.ChestValue
-import at.hannibal2.skyhanni.features.misc.ChickenHeadTimer
-import at.hannibal2.skyhanni.features.misc.ChumBucketHider
+import at.hannibal2.skyhanni.features.inventory.ChestValue
+import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
+import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
-import at.hannibal2.skyhanni.features.misc.CompactSplashPotionMessage
+import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
-import at.hannibal2.skyhanni.features.misc.EnderNodeTracker
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
-import at.hannibal2.skyhanni.features.misc.FrozenTreasureTracker
-import at.hannibal2.skyhanni.features.misc.HarpFeatures
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
+import at.hannibal2.skyhanni.features.inventory.HarpFeatures
 import at.hannibal2.skyhanni.features.misc.HideArmor
-import at.hannibal2.skyhanni.features.misc.HideDamageSplash
+import at.hannibal2.skyhanni.features.combat.HideDamageSplash
+import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
@@ -197,33 +201,36 @@ import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
-import at.hannibal2.skyhanni.features.misc.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
+import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
-import at.hannibal2.skyhanni.features.misc.powdertracker.PowderTracker
-import at.hannibal2.skyhanni.features.misc.tabcomplete.GetFromSacksTabComplete
-import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
-import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
+import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
-import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
-import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
+import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
+import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
-import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
-import at.hannibal2.skyhanni.features.mobs.MobHighlight
-import at.hannibal2.skyhanni.features.mobs.SpawnTimers
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
+import at.hannibal2.skyhanni.features.combat.mobs.AshfangMinisNametagHider
+import at.hannibal2.skyhanni.features.combat.mobs.MobHighlight
+import at.hannibal2.skyhanni.features.combat.mobs.SpawnTimers
+import at.hannibal2.skyhanni.features.nether.QuestItemHelper
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazes
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazingSouls
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
@@ -310,14 +317,14 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.5",
+    version = "0.21.Beta.9",
 )
 class SkyHanniMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         checkIfNeuIsLoaded()
 
-        // utils
+        // data
         loadModule(this)
         loadModule(ChatManager)
         loadModule(HypixelData())
@@ -331,16 +338,17 @@ class SkyHanniMod {
         loadModule(TestExportTools)
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
-        loadModule(MinecraftData())
+        loadModule(MinecraftData)
         loadModule(TitleManager())
         loadModule(ItemTipHelper())
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
         loadModule(OtherInventoryData)
         loadModule(TabListData())
-        loadModule(RenderGuiData())
+        loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
+        loadModule(VisitorListener())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
         loadModule(GuiEditManager())
@@ -357,6 +365,7 @@ class SkyHanniMod {
         loadModule(DefaultConfigFeatures)
         loadModule(EntityOutlineRenderer)
         loadModule(KeyboardManager)
+        loadModule(AdvancedPlayerList)
 
         // APIs
         loadModule(BazaarApi())
@@ -390,14 +399,13 @@ class SkyHanniMod {
         loadModule(DungeonCleanEnd())
         loadModule(DungeonBossMessages())
         loadModule(DungeonBossHideDamageSplash())
-        loadModule(TrophyFishManager())
+        loadModule(TrophyFishManager)
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
         loadModule(BazaarBestSellMethod())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
-        //        registerEvent(new GriffinBurrowFinder());
         loadModule(AshfangFreezeCooldown())
         loadModule(AshfangNextResetCooldown())
         loadModule(SummoningSoulsName())
@@ -428,6 +436,7 @@ class SkyHanniMod {
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
+        loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
         loadModule(HellionShieldHelper())
@@ -460,6 +469,7 @@ class SkyHanniMod {
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
+        loadModule(BasketWaypoints())
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
         loadModule(MinionCraftHelper())
@@ -486,7 +496,7 @@ class SkyHanniMod {
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
-        loadModule(GardenVisitorColorNames())
+        loadModule(GardenVisitorColorNames)
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
         loadModule(AnitaExtraFarmingFortune())
@@ -503,7 +513,7 @@ class SkyHanniMod {
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
         loadModule(TeleportPadInventoryNumber())
-        loadModule(ComposterOverlay())
+        loadModule(ComposterOverlay)
         loadModule(DiscordRPCManager)
         loadModule(GardenCropMilestoneFix())
         loadModule(GardenBurrowingSporesNotifier())
@@ -584,11 +594,13 @@ class SkyHanniMod {
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
+        loadModule(ModifyVisualWords)
         loadModule(TabListReader)
         loadModule(TabListRenderer)
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
+        loadModule(QuestItemHelper())
         loadModule(PlayerChatSymbols())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
@@ -596,6 +608,7 @@ class SkyHanniMod {
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
         loadModule(ShiftClickEquipment())
+        loadModule(LockMouseLook)
 
         init()
 

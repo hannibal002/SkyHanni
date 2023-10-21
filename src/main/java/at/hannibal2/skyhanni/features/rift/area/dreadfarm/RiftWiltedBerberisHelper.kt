@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -40,9 +40,7 @@ class RiftWiltedBerberisHelper {
 
         list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
 
-        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName_old()?.let {
-            it == "FARMING_WAND"
-        } ?: false
+        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
             val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
@@ -103,7 +101,7 @@ class RiftWiltedBerberisHelper {
 
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 

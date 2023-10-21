@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -41,12 +41,7 @@ class CaptureFarmingGear {
 
         fun captureFarmingGear() {
             val farmingItems = farmingItems ?: return
-            val resultList = mutableListOf<String>()
-
             val itemStack = InventoryUtils.getItemInHand() ?: return
-            val itemID = itemStack.getInternalName_old()
-            resultList.add(itemStack.displayName.toString())
-            resultList.add(itemID)
 
             val currentCrop = itemStack.getCropType()
 
@@ -62,7 +57,7 @@ class CaptureFarmingGear {
             }
             for (armor in InventoryUtils.getArmor()) {
                 if (armor == null) continue
-                val split = armor.getInternalName_old().split("_")
+                val split = armor.getInternalName().asString().split("_")
                 if (split.first() in farmingSets) {
                     for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
@@ -98,7 +93,7 @@ class CaptureFarmingGear {
         val outdatedItems = outdatedItems ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
             for ((_, slot) in event.inventoryItems) {
-                val split = slot.getInternalName_old().split("_")
+                val split = slot.getInternalName().asString().split("_")
                 if (split.first() == "LOTUS") {
                     for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
@@ -129,13 +124,13 @@ class CaptureFarmingGear {
             }
 
             // setting to current saved level -1 to stop later pages saving low rarity pets
-            var highestElephantRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT]) - 1
-            var highestMooshroomRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW]) - 1
-            var highestRabbitRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT]) - 1
-            var highestBeeRarity = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE]) - 1
+            var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestMooshroomRarity = (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
 
             for ((_, item) in event.inventoryItems) {
-                val split = item.getInternalName_old().split(";")
+                val split = item.getInternalName().asString().split(";")
                 if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
                     farmingItems[FarmingItems.ELEPHANT] = item
                     outdatedItems[FarmingItems.ELEPHANT] = false

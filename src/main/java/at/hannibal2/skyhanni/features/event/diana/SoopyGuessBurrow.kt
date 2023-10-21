@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -260,7 +259,6 @@ class SoopyGuessBurrow {
 
             if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
 
-
             val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
 
             distance = distance2!!
@@ -281,7 +279,5 @@ class SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
-    }
+    private fun isEnabled() = DianaAPI.featuresEnabled() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
 }

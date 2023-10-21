@@ -15,12 +15,14 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
-    private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
+    private val chatUsernamePattern = "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
+    private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
+    fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
@@ -201,23 +203,35 @@ object StringUtils {
     }
 
     fun String.getPlayerNameFromChatMessage(): String? {
-        if (!playerChatPattern.matcher(this).matches()) return null
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("username")
+    }
 
-        var username = this.removeColor().split(":")[0]
+    fun String.getPlayerNameAndRankFromChatMessage(): String? {
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("rankedName")
+    }
+
+    private fun matchPlayerChatMessage(string: String): Matcher? {
+        var username = ""
+        var matcher = playerChatPattern.matcher(string)
+        if (matcher.matches()) {
+            username = matcher.group("important").removeResets()
+        }
+        if (username == "") return null
 
         if (username.contains(">")) {
             username = username.substring(username.indexOf('>') + 1).trim()
         }
-        if (username.startsWith("From ")) {
-            username = username.removePrefix("From ")
-        }
-        if (username.startsWith("To ")) {
-            username = username.removePrefix("To ")
-        }
 
-        val matcher = chatUsernamePattern.matcher(username)
+        username = username.removePrefix("§dFrom ")
+        username = username.removePrefix("§dTo ")
 
-        if (!matcher.matches()) return null
-        return matcher.group("username")
+        matcher = chatUsernamePattern.matcher(username)
+        return if (matcher.matches()) matcher else null
+    }
+
+    fun String.convertToFormatted(): String {
+        return this.replace("&&", "§")
     }
 }

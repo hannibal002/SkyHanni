@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -21,6 +22,7 @@ class GuiEditManager {
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (isInGui()) return
 
         Minecraft.getMinecraft().currentScreen?.let {
@@ -30,7 +32,7 @@ class GuiEditManager {
 
         if (NEUItems.neuHasFocus()) return
 
-        if (event.keyCode == SkyHanniMod.feature.gui.keyBindOpen) openGuiPositionEditor()
+        openGuiPositionEditor()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -65,6 +67,7 @@ class GuiEditManager {
         @JvmStatic
         fun renderLast() {
             if (!isInGui()) return
+            if (!SkyHanniDebugsAndTests.globalRender) return
 
             GlStateManager.translate(0f, 0f, 200f)
 

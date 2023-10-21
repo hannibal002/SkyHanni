@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
@@ -25,28 +25,31 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.CopyTabListCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -163,6 +166,10 @@ object Commands {
                     "Copies the translation for a given message to your clipboard. " +
                     "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shmouselock",
+            "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+        ) { LockMouseLook.toggleLock() }
     }
 
     private fun usersBugFix() {
@@ -196,9 +203,17 @@ object Commands {
             "Prints the SkyHanni version in the chat"
         ) { SkyHanniDebugsAndTests.debugVersion() }
         registerCommand(
+            "shrendertoggle",
+            "Disables/enables the rendering of all skyhanni guis."
+        ) { SkyHanniDebugsAndTests.toggleRender() }
+        registerCommand(
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
+        registerCommand(
+            "shrepostatus",
+            "Shows the status of all the mods constants"
+        ) { SkyHanniMod.repo.displayRepoStatus(false) }
     }
 
     private fun developersDebugFeatures() {
@@ -262,11 +277,15 @@ object Commands {
             "shpartydebug",
             "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
+        registerCommand(
+                "shplaysound",
+                "Play the specified sound effect at the given pitch and volume."
+        ) { SoundUtils.command(it) }
     }
 
     private fun internalCommands() {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
-        registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
+        registerCommand("shcopyerror", "") { ErrorManager.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
@@ -322,6 +341,15 @@ object Commands {
         }
     }
 
+    @JvmStatic
+    fun openVisualWords() {
+        if (!LorenzUtils.onHypixel) {
+            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
+        } else {
+            SkyHanniMod.screenToOpen = VisualWordGui()
+        }
+    }
+
     private fun clearFarmingItems() {
         val config = GardenAPI.config?.fortune ?: return
         LorenzUtils.chat("§e[SkyHanni] clearing farming items")
@@ -329,11 +357,10 @@ object Commands {
         config.outdatedItems.clear()
     }
 
-    private fun registerCommand(
-        name: String,
-        description: String,
-        function: (Array<String>) -> Unit
-    ) = registerCommand0(name, description, function)
+    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+        commands.add(CommandInfo(name, description, currentCategory))
+    }
 
     private fun registerCommand0(
         name: String,
@@ -341,19 +368,22 @@ object Commands {
         function: (Array<String>) -> Unit,
         autoComplete: ((Array<String>) -> List<String>) = { listOf() }
     ) {
-        ClientCommandHandler.instance.registerCommand(
-            SimpleCommand(
-                name,
-                createCommand(function)
-            ) { _, b, _ -> autoComplete(b) }
+        val command = SimpleCommand(
+            name,
+            createCommand(function),
+            object : SimpleCommand.TabCompleteRunnable {
+                override fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String> {
+                    return autoComplete(args ?: emptyArray())
+                }
+            }
         )
+        ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
 
-    private fun createCommand(function: (Array<String>) -> Unit) =
-        object : ProcessCommandRunnable() {
-            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                function(args.asList().toTypedArray())
-            }
+    private fun createCommand(function: (Array<String>) -> Unit) = object : SimpleCommand.ProcessCommandRunnable() {
+        override fun processCommand(sender: ICommandSender?, args: Array<String>?) {
+            if (args != null) function(args.asList().toTypedArray())
         }
+    }
 }

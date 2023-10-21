@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
@@ -15,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import net.minecraftforge.client.event.RenderWorldLastEvent
+import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -37,7 +38,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         if (!reputationHelper.config.enabled) return
@@ -104,21 +105,18 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
             .forEach { storage.miniBossesDoneToday.add(it.displayName) }
     }
 
-    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun onRepoReload(data: Map<String, ReputationQuest>) {
         miniBosses.clear()
-
-        //Repo
-        val repoData = reputationHelper.repoData ?: return
-        val jsonElement = repoData["MINIBOSS"]
-        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
-            val data = extraData.asJsonObject
-            val displayItem = data["item"]?.asString
-            val patterns = " *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
-            val location = reputationHelper.readLocationData(data)
-            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, patterns))
+        for ((displayName, quest) in data) {
+            val displayItem = quest.item
+            val pattern = " *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
+            val location = reputationHelper.readLocationData(quest.location)
+            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, pattern))
         }
+    }
 
-        //Config
+    fun loadData(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (miniBosses.isEmpty()) return
         for (name in storage.miniBossesDoneToday) {
             getByDisplayName(name)!!.doneToday = true
         }

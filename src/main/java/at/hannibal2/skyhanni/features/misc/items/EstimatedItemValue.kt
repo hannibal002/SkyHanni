@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
@@ -72,7 +73,7 @@ import java.util.Locale
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -96,8 +97,8 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.estimatedIemValueEnabled) return
-        if (!config.estimatedItemValueHotkey.isKeyHeld() && !config.estimatedIemValueAlwaysEnabled) return
+        if (!config.enabled) return
+        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
@@ -111,7 +112,7 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.estimatedIemValueEnchantmentsCap.onToggle {
+        config.enchantmentsCap.onToggle {
             cache.clear()
         }
     }
@@ -119,7 +120,7 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.estimatedIemValueEnabled) return
+        if (!config.enabled) return
 
         val item = event.stack
         val oldData = cache[item]
@@ -170,7 +171,7 @@ object EstimatedItemValue {
 
         if (basePrice == totalPrice) return listOf()
 
-        val numberFormat = if (config.estimatedIemValueExactPrice) {
+        val numberFormat = if (config.exactPrice) {
             totalPrice.roundToLong().addSeparators()
         } else {
             NumberUtil.format(totalPrice)
@@ -202,6 +203,7 @@ object EstimatedItemValue {
         totalPrice += addWoodSingularity(stack, list)
         totalPrice += addJalapenoBook(stack, list)
         totalPrice += addStatsBook(stack, list)
+        totalPrice += addEnrichment(stack, list)
 
         // counted
         totalPrice += addMasterStars(stack, list)
@@ -228,7 +230,7 @@ object EstimatedItemValue {
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        var internalName = stack.getInternalName_old().removePrefix("VANQUISHED_")
+        var internalName = stack.getInternalName().asString().removePrefix("VANQUISHED_")
         val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
         var genericName = internalName
         if (kuudraSets.any { internalName.contains(it) }
@@ -326,7 +328,7 @@ object EstimatedItemValue {
             if (stack.isRecombobulated()) {
                 val oneBelow = itemRarity.oneBelow()
                 if (oneBelow == null) {
-                    CopyErrorCommand.logErrorState(
+                    ErrorManager.logErrorState(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
                         "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
                     )
@@ -338,7 +340,7 @@ object EstimatedItemValue {
         val rarityName = itemRarity.name
         if (!reforgeCosts.has(rarityName)) {
             val reforgesFound = reforgeCosts.entrySet().map { it.key }
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Can not calculate reforge cost for item ${stack.name}",
                 "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
             )
@@ -566,6 +568,18 @@ object EstimatedItemValue {
         return price
     }
 
+    private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
+
+        val enrichmentName = stack.getEnrichment() ?: return 0.0
+        val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".asInternalName()
+
+
+        val price = internalName.getPrice()
+        val name = internalName.getItemName()
+        list.add("§7Enrichment: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
     private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getRune() ?: return 0.0
 
@@ -621,6 +635,16 @@ object EstimatedItemValue {
         return price
     }
 
+    val hasAlwaysScavenger = listOf(
+        "CRYPT_DREADLORD_SWORD".asInternalName(),
+        "ZOMBIE_SOLDIER_CUTLASS".asInternalName(),
+        "CONJURING_SWORD".asInternalName(),
+        "EARTH_SHARD".asInternalName(),
+        "ZOMBIE_KNIGHT_SWORD".asInternalName(),
+        "SILENT_DEATH".asInternalName(),
+        "ZOMBIE_COMMANDER_WHIP".asInternalName(),
+    )
+
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
@@ -628,17 +652,8 @@ object EstimatedItemValue {
         val map = mutableMapOf<String, Double>()
 
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
-        val hasAlwaysScavenger = listOf(
-            "CRYPT_DREADLORD_SWORD",
-            "ZOMBIE_SOLDIER_CUTLASS",
-            "CONJURING_SWORD",
-            "EARTH_SHARD",
-            "ZOMBIE_KNIGHT_SWORD",
-            "SILENT_DEATH",
-            "ZOMBIE_COMMANDER_WHIP",
-        )
 
-        val internalName = stack.getInternalName_old()
+        val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
@@ -682,7 +697,7 @@ object EstimatedItemValue {
 
             map[" $name §7(§6$format§7)"] = price
         }
-        val enchantmentsCap: Int = config.estimatedIemValueEnchantmentsCap.get().toInt()
+        val enchantmentsCap: Int = config.enchantmentsCap.get().toInt()
         if (map.isNotEmpty()) {
             list.add("§7Enchantments: §6" + NumberUtil.format(totalPrice))
             var i = 0
@@ -748,7 +763,7 @@ object EstimatedItemValue {
         if (gemstoneUnlockCosts.isEmpty()) return 0.0
 
         if (internalName !in gemstoneUnlockCosts) {
-            CopyErrorCommand.logErrorState(
+            ErrorManager.logErrorState(
                 "Could not find gemstone slot price for ${stack.name}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
             )
@@ -786,5 +801,15 @@ object EstimatedItemValue {
         list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
         list += priceMap.sortedDesc().keys
         return totalPrice
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
+        event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")
+        event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")
+        event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
+        event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
+        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
     }
 }

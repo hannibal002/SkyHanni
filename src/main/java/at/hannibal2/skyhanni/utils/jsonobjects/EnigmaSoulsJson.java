@@ -13,6 +13,7 @@ public class EnigmaSoulsJson {
     public static class EnigmaPosition {
         @Expose
         public String name;
+
         @Expose
         public LorenzVec position;
     }
