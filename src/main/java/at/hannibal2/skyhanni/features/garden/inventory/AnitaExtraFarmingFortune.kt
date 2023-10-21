@@ -34,7 +34,7 @@ class AnitaExtraFarmingFortune {
         val anitaUpgrade = GardenAPI.config?.fortune?.anitaUpgrade ?: return
 
         var contributionFactor = 1.0
-        val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets  ?: return
+        val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets ?: return
         for (line in event.toolTip) {
             "§5§o§aJacob's Ticket §8x(?<realAmount>.*)".toPattern().matchMatcher(line) {
                 val realAmount = group("realAmount").formatNumber().toDouble()
@@ -64,7 +64,6 @@ class AnitaExtraFarmingFortune {
         event.toolTip.add(index, "§7Cost to max out")
         event.toolTip.add(index, "")
 
-
         val upgradeIndex = event.toolTip.indexOfFirst { it.contains("You have") }
         if (upgradeIndex != -1) {
             event.toolTip.add(upgradeIndex + 1, "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}")
@@ -73,13 +72,8 @@ class AnitaExtraFarmingFortune {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts") ?: throw Exception()
-            levelPrice = data.level_price
-            SkyHanniMod.repo.successfulConstants.add("AnitaUpgradeCosts")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("AnitaUpgradeCosts")
-        }
+        val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")
+        levelPrice = data.level_price
     }
 
     @SubscribeEvent

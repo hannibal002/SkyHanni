@@ -56,24 +56,15 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<MultiFilterJson>("TradeNpcs") ?: throw Exception()
-            tradeNpcFilter.load(data)
-            SkyHanniMod.repo.successfulConstants.add("TradeNpcs")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("TradeNpcs")
-        }
-        try {
-            val data = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems") ?: throw Exception()
-            hideNpcSellFilter.load(data.hide_npc_sell)
-            hideInStorageFilter.load(data.hide_in_storage)
-            hidePlayerTradeFilter.load(data.hide_player_trade)
-            notAuctionableFilter.load(data.not_auctionable)
-            updateSalvageList(data.salvage)
-            SkyHanniMod.repo.successfulConstants.add("HideNotClickableItems")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("HideNotClickableItems")
-        }
+        val data = event.getConstant<MultiFilterJson>("TradeNpcs")
+        tradeNpcFilter.load(data)
+
+        val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
+        hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
+        hideInStorageFilter.load(hideNotClickable.hide_in_storage)
+        hidePlayerTradeFilter.load(hideNotClickable.hide_player_trade)
+        notAuctionableFilter.load(hideNotClickable.not_auctionable)
+        updateSalvageList(hideNotClickable.salvage)
     }
 
     private fun updateSalvageList(data: SalvageFilter) {

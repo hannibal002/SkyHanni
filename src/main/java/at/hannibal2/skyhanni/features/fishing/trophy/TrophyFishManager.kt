@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -13,18 +12,12 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-
 object TrophyFishManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<TrophyFishJson>("TrophyFish") ?: throw Exception()
-            trophyFishInfo = data.trophy_fish
-            SkyHanniMod.repo.successfulConstants.add("TrophyFish")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("TrophyFish")
-        }
+        val data = event.getConstant<TrophyFishJson>("TrophyFish")
+        trophyFishInfo = data.trophy_fish
     }
 
     val fishes: MutableMap<String, MutableMap<TrophyRarity, Int>>?

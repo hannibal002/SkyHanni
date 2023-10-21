@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.jsonobjects.DicerDropsJson
 import at.hannibal2.skyhanni.utils.jsonobjects.DicerDropsJson.DicerType
-import kotlin.concurrent.fixedRateTimer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.concurrent.fixedRateTimer
 
 object GardenCropSpeed {
     private val config get() = SkyHanniMod.feature.garden
@@ -38,7 +38,6 @@ object GardenCropSpeed {
     private val pumpkinDicer = mutableListOf<Double>()
     var latestMelonDicer = 0.0
     var latestPumpkinDicer = 0.0
-
 
     init {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
@@ -133,14 +132,9 @@ object GardenCropSpeed {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<DicerDropsJson>("DicerDrops") ?: throw Exception()
-            calculateAverageDicer(melonDicer, data.MELON)
-            calculateAverageDicer(pumpkinDicer, data.PUMPKIN)
-            SkyHanniMod.repo.successfulConstants.add("DicerDrops")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("DicerDrops")
-        }
+        val data = event.getConstant<DicerDropsJson>("DicerDrops")
+        calculateAverageDicer(melonDicer, data.MELON)
+        calculateAverageDicer(pumpkinDicer, data.PUMPKIN)
     }
 
     private fun calculateAverageDicer(dicerList: MutableList<Double>, data: DicerType) {
@@ -195,6 +189,6 @@ object GardenCropSpeed {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3,"garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
+        event.move(3, "garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
     }
 }

@@ -42,22 +42,17 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation") ?: throw Exception()
-            miniBossHelper.onRepoReload(data.MINIBOSS)
-            kuudraBossHelper.onRepoReload(data.KUUDRA)
+        val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
+        miniBossHelper.onRepoReload(data.MINIBOSS)
+        kuudraBossHelper.onRepoReload(data.KUUDRA)
 
-            QuestLoader.quests.clear()
-            QuestLoader.loadQuests(data.FISHING, "FISHING")
-            QuestLoader.loadQuests(data.RESCUE, "RESCUE")
-            QuestLoader.loadQuests(data.FETCH, "FETCH")
-            QuestLoader.loadQuests(data.DOJO, "DOJO")
+        QuestLoader.quests.clear()
+        QuestLoader.loadQuests(data.FISHING, "FISHING")
+        QuestLoader.loadQuests(data.RESCUE, "RESCUE")
+        QuestLoader.loadQuests(data.FETCH, "FETCH")
+        QuestLoader.loadQuests(data.DOJO, "DOJO")
 
-            update()
-            SkyHanniMod.repo.successfulConstants.add("CrimsonIsleReputation")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("CrimsonIsleReputation")
-        }
+        update()
     }
 
     @SubscribeEvent

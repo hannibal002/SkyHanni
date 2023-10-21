@@ -141,11 +141,6 @@ class RepoManager(private val configLocation: File) {
             if (answerMessage.isNotEmpty() && !error) {
                 LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
             }
-            if (unsuccessfulConstants.isNotEmpty()) {
-                LorenzUtils.chat("§e[SkyHanni] error reloading repository")
-            } else if (answerMessage.isNotEmpty()) {
-                LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
-            }
             if (error) {
                 LorenzUtils.clickableChat(
                     "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",

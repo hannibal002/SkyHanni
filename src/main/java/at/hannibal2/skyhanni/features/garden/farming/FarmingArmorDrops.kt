@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
 import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson.DropInfo
-import kotlin.time.Duration.Companion.seconds
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class FarmingArmorDrops {
     private var display = emptyList<String>()
@@ -107,13 +107,8 @@ class FarmingArmorDrops {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<ArmorDropsJson>("ArmorDrops") ?: throw Exception()
-            armorDropInfo = data.special_crops
-            SkyHanniMod.repo.successfulConstants.add("ArmorDrops")
-        } catch (_: Exception) {
-            SkyHanniMod.repo.unsuccessfulConstants.add("ArmorDrops")
-        }
+        val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
+        armorDropInfo = data.special_crops
     }
 
     companion object {
