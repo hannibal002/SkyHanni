@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.Reputat
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     companion object {
-        val quests = mutableMapOf<String, Pair<String,ReputationQuest>>()
+        val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
         fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
             for ((questName, questInfo) in data) {
                 quests[questName] = Pair(questType, questInfo)

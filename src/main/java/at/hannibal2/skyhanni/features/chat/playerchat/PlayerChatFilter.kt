@@ -30,8 +30,8 @@ class PlayerChatFilter {
         var countCategories = 0
         var countFilters = 0
 
-        val data = event.getConstant<PlayerChatFilterJson>("PlayerChatFilter")
-        for (category in data.filters) {
+        val playerChatFilter = event.getConstant<PlayerChatFilterJson>("PlayerChatFilter")
+        for (category in playerChatFilter.filters) {
             val description = category.description
             val filter = MultiFilter()
             filter.load(category)

@@ -155,7 +155,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     fun readLocationData(locations: List<Double>): LorenzVec? {
         if (locations.isEmpty()) return null
-        return LorenzVec(locations[0] - 1, locations[1], locations[2] - 1)
+        val (x, y, z) = locations
+        return LorenzVec(x, y, z).add(-1, 0, -1)
     }
 
     fun showLocations() = when (config.showLocation) {

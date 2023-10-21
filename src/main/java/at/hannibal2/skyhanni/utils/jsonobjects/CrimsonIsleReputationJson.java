@@ -10,19 +10,19 @@ public class CrimsonIsleReputationJson {
     public Map<String, ReputationQuest> FISHING;
 
     @Expose
-    public Map<String, ReputationQuest>  RESCUE;
+    public Map<String, ReputationQuest> RESCUE;
 
     @Expose
-    public Map<String, ReputationQuest>  FETCH;
+    public Map<String, ReputationQuest> FETCH;
 
     @Expose
-    public Map<String, ReputationQuest>  DOJO;
+    public Map<String, ReputationQuest> DOJO;
 
     @Expose
-    public Map<String, ReputationQuest>  MINIBOSS;
+    public Map<String, ReputationQuest> MINIBOSS;
 
     @Expose
-    public Map<String, ReputationQuest>  KUUDRA;
+    public Map<String, ReputationQuest> KUUDRA;
 
     public static class ReputationQuest {
         @Expose

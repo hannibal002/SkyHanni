@@ -94,7 +94,6 @@ object ComposterOverlay {
         LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
     }
 
-
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
@@ -460,7 +459,9 @@ object ComposterOverlay {
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
             if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
-            val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
+            // TODO Add sack type repo data
+            val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining"
+            else "Enchanted Agronomy"
             LorenzUtils.clickableChat(
                 "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"

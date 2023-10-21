@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorColorNames {
-    private var visitorColours = mutableMapOf<String, String>()
+    private var visitorColours = mutableMapOf<String, String>() // name -> color code
     var visitorItems = mutableMapOf<String, List<String>>()
 
     @SubscribeEvent
