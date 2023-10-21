@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -37,13 +38,12 @@ object ArrowDetection {
         val direction: LorenzVec,
         val pierce: Int,
         val canHitEnderman: Boolean,
-        val spawnTick: Long = getCurrentTick()
+        val spawnTick: Int = MinecraftData.totalTicks
     ) {
         fun parabola(time: Int) = parabola(origin, direction, time)
         fun isOnParabola(arrow: EntityArrow) = isOnParabola(origin, direction, getLivingTime(), arrow)
 
-        fun getLivingTime() =
-            (getCurrentTick() - spawnTick).toInt() // The value loss only makes a difference when an arrow didn't get cough for 59652 hours or more
+        fun getLivingTime() = (MinecraftData.totalTicks - spawnTick)
     }
 
     private val upComingArrows: Queue<SkyblockArrowSpawn> = LinkedList()
@@ -219,8 +219,6 @@ object ArrowDetection {
             )
         }
     }
-
-    fun getCurrentTick() = Minecraft.getMinecraft().theWorld.worldTime //TODO move it to the "correct" place
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
