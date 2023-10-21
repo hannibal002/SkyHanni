@@ -855,6 +855,12 @@ public class MiscConfig {
         public boolean use24hFormat = false;
 
         @Expose
+        @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showMayorPerks = true;
+
+        @Expose
         public Position position = new Position(10, 80, false, true);
     }
 }

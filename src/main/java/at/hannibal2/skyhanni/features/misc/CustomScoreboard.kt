@@ -68,7 +68,7 @@ class CustomScoreboard {
                 motes = line.removePrefix("Motes: §d")
             }
             if (extractLobbyCode(line) is String ){
-                lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of colorcode)
+                lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
             }
             if (line.startsWith("Heat: §c♨")){
                 heat = line.removePrefix("Heat: §c♨")
@@ -86,11 +86,16 @@ class CustomScoreboard {
 
                 // Multiline for Party Members
                 if (it[0] == "§9Party"){
-                    newList.add(listOf(it[0]))
                     for (item in it){
-                        if (item != it[0]){
-                            newList.add(listOf(item))
-                        }
+                        newList.add(listOf(item))
+                    }
+                    continue
+                }
+
+                // Multiline for Mayor
+                if (it[0] == MayorElection.currentCandidate?.name){
+                    for (item in it){
+                        newList.add(listOf(item))
                     }
                     continue
                 }
@@ -140,7 +145,13 @@ class CustomScoreboard {
         eventList.add("§cCurrent Event") //todo: get event stuff
         lineMap[16] = eventList
 
-        lineMap[17] = Collections.singletonList("§7Current Mayor")
+        val mayorList = mutableListOf<Any>()
+        mayorList.add(MayorElection.currentCandidate?.name ?: "<hidden>")
+        for (perk in MayorElection.currentCandidate?.perks ?: emptyList()){
+            mayorList.add(" §7- §e${perk.name}")
+        }
+        lineMap[17] = mayorList
+
         lineMap[18] = Collections.singletonList("<empty>")
         lineMap[19] = Collections.singletonList("Heat: §c♨$heat")
 
@@ -168,6 +179,7 @@ class CustomScoreboard {
             lineMap[6] = Collections.singletonList(if(gems == "0") "<hidden>" else "Gems: §a$gems")
             lineMap[8] = Collections.singletonList(if(location == "None") "<hidden>" else location)
             lineMap[11] = Collections.singletonList(if(lobbyCode == "None") "<hidden>" else "§8$lobbyCode")
+            lineMap[19] = Collections.singletonList(if(heat == "0") "<hidden>" else "Heat: §c♨$heat")
 
             if (partyList.size == 1){
                 lineMap[20] = Collections.singletonList("<hidden>")
