@@ -145,6 +145,7 @@ class RepoManager(private val configLocation: File) {
             error = false
             successfulConstants.clear()
             unsuccessfulConstants.clear()
+            lastConstant = null
 
             RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
                 error = true
@@ -162,7 +163,9 @@ class RepoManager(private val configLocation: File) {
                     "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
                     "shupdaterepo"
                 )
-                unsuccessfulConstants.add("All Constants")
+                if (unsuccessfulConstants.isEmpty()) {
+                    unsuccessfulConstants.add("All Constants")
+                }
             }
         }
         return comp
