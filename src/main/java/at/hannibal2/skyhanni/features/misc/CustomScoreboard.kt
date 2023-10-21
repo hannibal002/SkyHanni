@@ -67,7 +67,7 @@ class CustomScoreboard {
                 location = line
             }
             if (extractLobbyCode(line) is String ){
-                lobbyCode = extractLobbyCode(line)!!
+                lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of colorcode)
             }
         }
         bits = getBits()
