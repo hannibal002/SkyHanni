@@ -27,8 +27,19 @@ class RepoManager(private val configLocation: File) {
     private val repoLocation: File = File(configLocation, "repo")
     private var error = false
 
-    val successfulConstants = mutableListOf<String>()
-    val unsuccessfulConstants = mutableListOf<String>()
+    companion object {
+        val successfulConstants = mutableListOf<String>()
+        val unsuccessfulConstants = mutableListOf<String>()
+
+        private var lastConstant: String? = null
+
+        fun setlastConstant(constant: String) {
+            lastConstant?.let {
+                successfulConstants.add(it)
+            }
+            lastConstant = constant
+        }
+    }
 
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
@@ -134,8 +145,13 @@ class RepoManager(private val configLocation: File) {
             error = false
             successfulConstants.clear()
             unsuccessfulConstants.clear()
+
             RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
                 error = true
+                lastConstant?.let {
+                    unsuccessfulConstants.add(it)
+                }
+                lastConstant = null
             }
             comp.complete(null)
             if (answerMessage.isNotEmpty() && !error) {
