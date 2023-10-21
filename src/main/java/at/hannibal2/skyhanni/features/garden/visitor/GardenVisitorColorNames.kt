@@ -3,12 +3,15 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorColorNames {
     private var visitorColours = mutableMapOf<String, String>()
     var visitorItems = mutableMapOf<String, List<String>>()
 
-    fun onRepoReload(data: GardenJson) {
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden")
         visitorColours.clear()
         visitorItems.clear()
         for ((visitor, visitorData) in data.visitors) {
