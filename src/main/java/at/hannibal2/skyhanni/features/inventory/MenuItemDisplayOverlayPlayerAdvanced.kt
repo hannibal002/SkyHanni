@@ -65,10 +65,6 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
-        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".", "").replace("a✔", "§a✔").replace("%", "")
-    }
-
     private fun getStackTip(item: ItemStack): String {
         if (SkyHanniMod.feature.inventory.menuItemNumberPlayerAdvancedAsStackSize.isEmpty()) return ""
         val itemName = item.cleanName()
@@ -239,7 +235,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         amtToWithdrawPattern.matchMatcher(line) {
                             val totalAsString = group("total").replace(",", "")
                             val usefulPartAsString = group("useful")
-                            var suffix = when (totalAsString.length) {
+                            val suffix = when (totalAsString.length) {
                                 in 1..3 -> ""
                                 in 4..6 -> "k"
                                 in 7..9 -> "M"
@@ -264,7 +260,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 bankBalancePattern.matchMatcher(lore.first()) {
                     val totalAsString = group("total").replace(",", "")
                     val usefulPartAsString = group("useful")
-                    var suffix = when (totalAsString.length) {
+                    val suffix = when (totalAsString.length) {
                         in 1..3 -> ""
                         in 4..6 -> "k"
                         in 7..9 -> "M"

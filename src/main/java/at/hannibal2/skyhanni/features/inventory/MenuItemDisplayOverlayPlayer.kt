@@ -53,7 +53,7 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
                 if (item.getLore().anyContains("Click to view!")) {
                     if (chestName == "Your Skills") {
-                        if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
+                        if (CollectionAPI.isCollectionTier0(item.getLore()) && !(itemName.contains("Dungeoneering"))) return "0"
                         if (itemName.removeColor().split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
                         if (!itemName.contains("Dungeon")) {
                             val text = itemName.removeColor().split(" ").last()
@@ -171,7 +171,7 @@ class MenuItemDisplayOverlayPlayer {
                             essenceCountPattern.matchMatcher(line) {
                                 val usefulAsString = group("useful")
                                 val totalAsString = group("total").replace(",", "")
-                                var suffix = when (totalAsString.length) {
+                                val suffix = when (totalAsString.length) {
                                     in 1..3 -> ""
                                     in 4..6 -> "k"
                                     in 7..9 -> "M"
