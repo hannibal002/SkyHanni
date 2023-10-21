@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import java.util.Map;
 
-public class BingoRanks {
+public class BingoRanksJson {
     @Expose
     public Map<String, Integer> ranks;
 }

@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.jsonobjects.DicerDropsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.DicerDropsJson.DicerType
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -129,29 +130,26 @@ object GardenCropSpeed {
         }
     }
 
-    private fun calculateAverageDicer(dicerList: MutableList<Double>, dropsJson: JsonObject) {
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<DicerDropsJson>("DicerDrops")
+        calculateAverageDicer(melonDicer, data.MELON)
+        calculateAverageDicer(pumpkinDicer, data.PUMPKIN)
+    }
+
+    private fun calculateAverageDicer(dicerList: MutableList<Double>, data: DicerType) {
         dicerList.clear()
-        val totalChance = dropsJson["total chance"].asDouble
-        val dropTypes = dropsJson["drops"].asJsonArray
-        for (dropType in dropTypes) {
-            val dropJson = dropType.asJsonObject
-            val chance = (dropJson["chance"].asDouble / totalChance)
-            dropJson["amount"].asJsonArray.forEachIndexed { index, element ->
-                val amount = element.asInt * chance
+        for (dropType in data.drops) {
+            val chance = dropType.chance / data.totalChance.toDouble()
+            for ((index, amount) in dropType.amount.withIndex()) {
+                val dropAmount = amount * chance
                 if (index < dicerList.size) {
-                    dicerList[index] += amount
+                    dicerList[index] += dropAmount
                 } else {
-                    dicerList.add(amount)
+                    dicerList.add(dropAmount)
                 }
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val dicerJson = event.getConstant("DicerDrops")
-        calculateAverageDicer(melonDicer, dicerJson["MELON"].asJsonObject)
-        calculateAverageDicer(pumpkinDicer, dicerJson["PUMPKIN"].asJsonObject)
     }
 
     fun getRecentBPS(): Double {
@@ -192,6 +190,5 @@ object GardenCropSpeed {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
-
     }
 }

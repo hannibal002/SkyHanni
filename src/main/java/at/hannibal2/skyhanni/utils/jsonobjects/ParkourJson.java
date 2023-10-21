@@ -9,12 +9,14 @@ import java.util.List;
 public class ParkourJson {
     @Expose
     public List<LorenzVec> locations;
+
     @Expose
     public List<ShortCut> shortCuts = new ArrayList<>();
 
     public static class ShortCut {
         @Expose
         public int from;
+
         @Expose
         public int to;
     }

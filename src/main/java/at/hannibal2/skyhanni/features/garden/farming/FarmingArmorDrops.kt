@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson.DropInfo
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -111,7 +112,7 @@ class FarmingArmorDrops {
     }
 
     companion object {
-        var armorDropInfo = mapOf<String, ArmorDropsJson.DropInfo>()
+        var armorDropInfo = mapOf<String, DropInfo>()
         private var currentArmorDropChance = 0.0
         private var lastCalculationTime = SimpleTimeMark.farPast()
 

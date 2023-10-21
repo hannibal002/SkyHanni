@@ -47,9 +47,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 
-class ComposterOverlay {
+object ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
     private var fuelFactors: Map<String, Double> = emptyMap()
+    private var organicMatter: Map<String, Double> = emptyMap()
 
     private val config get() = SkyHanniMod.feature.garden.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
@@ -68,34 +69,31 @@ class ComposterOverlay {
     private var lastHovered = 0L
     private var lastAttemptTime = SimpleTimeMark.farPast()
 
-    companion object {
-        var currentOrganicMatterItem: String?
-            get() = GardenAPI.config?.composterCurrentOrganicMatterItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentOrganicMatterItem = value
-            }
+    var inInventory = false
 
-        var currentFuelItem: String?
-            get() = GardenAPI.config?.composterCurrentFuelItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentFuelItem = value
-            }
+    private var testOffset = 0
 
-        var testOffset = 0
-
-        fun onCommand(args: Array<String>) {
-            if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
-                return
-            }
-            testOffset = args[0].toInt()
-            LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+    var currentOrganicMatterItem: String?
+        get() = GardenAPI.config?.composterCurrentOrganicMatterItem
+        private set(value) {
+            GardenAPI.config?.composterCurrentOrganicMatterItem = value
         }
 
-        var inInventory = false
+    var currentFuelItem: String?
+        get() = GardenAPI.config?.composterCurrentFuelItem
+        private set(value) {
+            GardenAPI.config?.composterCurrentFuelItem = value
+        }
+
+    fun onCommand(args: Array<String>) {
+        if (args.size != 1) {
+            LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+            return
+        }
+        testOffset = args[0].toInt()
+        LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
     }
 
-    var garden: GardenJson? = null
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -331,6 +329,7 @@ class ComposterOverlay {
             if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
 
+
         val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
@@ -357,6 +356,7 @@ class ComposterOverlay {
         val materialCostFormat =
             " §7Material costs per $timeText: §6${NumberUtil.format(totalCost)}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
+
 
         val priceCompost = getPrice("COMPOST")
         val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
@@ -460,8 +460,7 @@ class ComposterOverlay {
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
             if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
-            val sackType =
-                if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
+            val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
             LorenzUtils.clickableChat(
                 "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
@@ -506,14 +505,19 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant<GardenJson>("Garden")
+        val data = event.getConstant<GardenJson>("Garden")
+        organicMatter = data.organic_matter
+        fuelFactors = data.fuel
         updateOrganicMatterFactors()
     }
 
     private fun updateOrganicMatterFactors() {
-        val garden = this.garden ?: return
-        organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
-        fuelFactors = garden.fuel
+        try {
+            organicMatterFactors = updateOrganicMatterFactors(organicMatter)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LorenzUtils.error("error in RepositoryReloadEvent")
+        }
     }
 
     private fun updateOrganicMatterFactors(baseValues: Map<String, Double>): Map<String, Double> {

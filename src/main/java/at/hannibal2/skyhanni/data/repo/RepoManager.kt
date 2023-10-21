@@ -27,6 +27,20 @@ class RepoManager(private val configLocation: File) {
     private val repoLocation: File = File(configLocation, "repo")
     private var error = false
 
+    companion object {
+        val successfulConstants = mutableListOf<String>()
+        val unsuccessfulConstants = mutableListOf<String>()
+
+        private var lastConstant: String? = null
+
+        fun setlastConstant(constant: String) {
+            lastConstant?.let {
+                successfulConstants.add(it)
+            }
+            lastConstant = constant
+        }
+    }
+
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
         if (SkyHanniMod.feature.dev.repoAutoUpdate) {
@@ -66,11 +80,14 @@ class RepoManager(private val configLocation: File) {
                 val file = File(configLocation, "repo")
                 if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
                 ) {
-                    if (command) {
-                        LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
-                        atomicShouldManuallyReload.set(false)
+                    if (unsuccessfulConstants.isEmpty()) {
+
+                        if (command) {
+                            LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
+                            atomicShouldManuallyReload.set(false)
+                        }
+                        return@supplyAsync false
                     }
-                    return@supplyAsync false
                 }
                 RepoUtils.recursiveDelete(repoLocation)
                 repoLocation.mkdirs()
@@ -126,8 +143,16 @@ class RepoManager(private val configLocation: File) {
         ErrorManager.resetCache()
         Minecraft.getMinecraft().addScheduledTask {
             error = false
+            successfulConstants.clear()
+            unsuccessfulConstants.clear()
+            lastConstant = null
+
             RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
                 error = true
+                lastConstant?.let {
+                    unsuccessfulConstants.add(it)
+                }
+                lastConstant = null
             }
             comp.complete(null)
             if (answerMessage.isNotEmpty() && !error) {
@@ -138,9 +163,38 @@ class RepoManager(private val configLocation: File) {
                     "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
                     "shupdaterepo"
                 )
+                if (unsuccessfulConstants.isEmpty()) {
+                    unsuccessfulConstants.add("All Constants")
+                }
             }
         }
         return comp
+    }
+
+    fun displayRepoStatus(joinEvent: Boolean) {
+        if (joinEvent) {
+            if (unsuccessfulConstants.isNotEmpty()) {
+                LorenzUtils.chat("§c[SkyHanni] §7Repo Issue! Some features may not work. Please report this error on the Discord!")
+                LorenzUtils.chat("§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}")
+                LorenzUtils.chat("§7If you have Repo Auto Update turned off, please try turning that on.\n§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
+                for (constant in unsuccessfulConstants) {
+                    LorenzUtils.chat("   §e- §7$constant")
+                }
+            }
+            return
+        }
+        if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
+            LorenzUtils.chat("§a[SkyHanni] Repo working fine!")
+            return
+        }
+        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("§a[SkyHanni] Successful Constants §7(${successfulConstants.size}):")
+        for (constant in successfulConstants) {
+            LorenzUtils.chat("   §a- §7$constant")
+        }
+        LorenzUtils.chat("§c[SkyHanni] Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
+        for (constant in unsuccessfulConstants) {
+            LorenzUtils.chat("   §e- §7$constant")
+        }
     }
 
     /**

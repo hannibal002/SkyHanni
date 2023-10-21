@@ -58,8 +58,8 @@ object ErrorManager {
 
     fun logError(throwable: Throwable, message: String, ignoreErrorCache: Boolean) {
         val error = Error(message, throwable)
-        Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {

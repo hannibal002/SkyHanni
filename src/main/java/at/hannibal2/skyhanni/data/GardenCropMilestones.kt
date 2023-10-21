@@ -41,7 +41,7 @@ object GardenCropMilestones {
         CropMilestoneUpdateEvent().postAndCatch()
     }
 
-    private var cropMilestoneData: Map<CropType, List<Int>>? = null
+    private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
     val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
 
@@ -53,14 +53,14 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
-        val maxValue = cropMilestoneData?.get(this)?.sum() ?: 1_000_000_000 // 1 bil for now
+        val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }
 
     fun getTierForCropCount(count: Long, crop: CropType): Int {
         var tier = 0
         var totalCrops = 0L
-        val cropMilestone = cropMilestoneData?.get(crop) ?: return 0
+        val cropMilestone = cropMilestoneData[crop] ?: return 0
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             if (totalCrops > count) {
@@ -72,12 +72,12 @@ object GardenCropMilestones {
         return tier
     }
 
-    fun getMaxTier() = cropMilestoneData?.values?.firstOrNull()?.size ?: 0
+    fun getMaxTier() = cropMilestoneData.values.firstOrNull()?.size ?: 0
 
     fun getCropsForTier(requestedTier: Int, crop: CropType): Long {
         var totalCrops = 0L
         var tier = 0
-        val cropMilestone = cropMilestoneData?.get(crop) ?: return 0
+        val cropMilestone = cropMilestoneData[crop] ?: return 0
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             tier++
@@ -99,7 +99,6 @@ object GardenCropMilestones {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<GardenJson>("Garden")
-        cropMilestoneData = data.crop_milestones
+        cropMilestoneData = event.getConstant<GardenJson>("Garden").crop_milestones
     }
 }

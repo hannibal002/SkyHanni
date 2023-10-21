@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ModsJson {
+public class ModGuiSwitcherJson {
 
     @Expose
     public Map<String, Mod> mods = new HashMap<>();

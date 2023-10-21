@@ -13,11 +13,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PlayerTabComplete {
     private val config get() = SkyHanniMod.feature.commands.tabComplete
-    private var vipVisitsJson: VipVisitsJson? = null
+    private var vipVisits = listOf<String>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        vipVisitsJson = event.getConstant<VipVisitsJson>("VipVisits")
+        val data = event.getConstant<VipVisitsJson>("VipVisits")
+        vipVisits = data.vipVisits
     }
 
     @SubscribeEvent
@@ -75,10 +76,8 @@ object PlayerTabComplete {
             }
 
             if (config.vipVisits && command == "visit") {
-                vipVisitsJson?.let {
-                    for (visit in it.vipVisits) {
-                        add(visit)
-                    }
+                for (visit in vipVisits) {
+                    add(visit)
                 }
             }
         }
