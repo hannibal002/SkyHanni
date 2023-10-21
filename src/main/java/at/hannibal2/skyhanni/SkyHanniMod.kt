@@ -208,6 +208,7 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
+import at.hannibal2.skyhanni.features.combat.killDetection.ArrowDetection
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
@@ -290,7 +291,8 @@ import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
-import at.hannibal2.skyhanni.utils.ArrowUtils
+import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill
+import at.hannibal2.skyhanni.features.combat.killDetection.MobHitTrigger
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -367,7 +369,7 @@ class SkyHanniMod {
         loadModule(KeyboardManager)
         loadModule(AdvancedPlayerList)
         loadModule(EntityKill)
-        loadModule(ArrowUtils)
+        loadModule(ArrowDetection)
         loadModule(MobHitTrigger)
 
         // APIs

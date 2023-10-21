@@ -217,46 +217,43 @@ public class DevConfig {
     public boolean filterBiomeIdBounds = true;
         }
     }
+
     //Mob Kill Detection (Only temporarily)
-
     @Expose
-    @ConfigOption(name = "Mob Kill Detection", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    public boolean mobKilldetetction = false;
+    @ConfigOption(name = "Minecraft Console", desc = "")
+    @Accordion
+    public MobKillDetection mobKillDetection = new MobKillDetection();
 
-    @Expose
-    @ConfigOption(name = "skyblockMobHighlight", desc = "")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean skyblockMobHighlight = false;
+    public static class MobKillDetection {
 
-    @Expose
-    @ConfigOption(name = "skyblockMobHighlightRayHit", desc = "")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean skyblockMobHighlightRayHit = false;
+        @Expose
+        @ConfigOption(name = "skyblockMobHighlight", desc = "")
+        @ConfigEditorBoolean
+        public boolean skyblockMobHighlight = false;
 
-    @Expose
-    @ConfigOption(name = "mobKilldetetctionLogMobHitList", desc = "")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean mobKilldetetctionLogMobHitList = false;
+        @Expose
+        @ConfigOption(name = "skyblockMobHighlightRayHit", desc = "")
+        @ConfigEditorBoolean
+        public boolean skyblockMobHighlightRayHit = false;
 
-    @Expose
-    @ConfigOption(name = "mobKilldetetctionLogMobHitListId", desc = "")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean mobKilldetetctionLogMobHitListId = false;
+        @Expose
+        @ConfigOption(name = "mobKilldetetctionLogMobHitList", desc = "")
+        @ConfigEditorBoolean
+        public boolean LogMobHitList = false;
 
-    @Expose
-    @ConfigOption(name = "mobKilldetetctionLogPlayerCantBeAdded", desc = "")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean mobKilldetetctionLogPlayerCantBeAdded = false;
+        @Expose
+        @ConfigOption(name = "mobKilldetetctionLogMobHitListId", desc = "")
+        @ConfigEditorBoolean
+        public boolean LogMobHitListId = false;
 
-    @Expose
-    @ConfigOption(name = "arrowDebug", desc = "")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean arrowDebug = false;
+        @Expose
+        @ConfigOption(name = "mobKilldetetctionLogPlayerCantBeAdded", desc = "")
+        @ConfigEditorBoolean
+        public boolean LogPlayerCantBeAdded = false;
+
+        @Expose
+        @ConfigOption(name = "arrowDebug", desc = "")
+        @ConfigEditorBoolean
+        public boolean arrowDebug = false;
+    }
 }

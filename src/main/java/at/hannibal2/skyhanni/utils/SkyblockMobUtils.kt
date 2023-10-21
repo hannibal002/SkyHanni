@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.mobs.EntityKill
+import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -24,6 +24,26 @@ object SkyblockMobUtils {
             ?: "Skyblock Name of Mob ${baseEntity.name} found"
 
         override fun toString(): String = name
+
+        override fun hashCode(): Int {
+            return baseEntity.hashCode()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+
+            // If the other object is an instance of SkyblockMob, compare their baseEntity properties.
+            if (other is SkyblockMob) {
+                return baseEntity == other.baseEntity
+            }
+
+            // If the other object is an instance of Entity, compare it with this SkyblockMob's baseEntity.
+            if (other is Entity) {
+                return baseEntity == other
+            }
+
+            return false
+        }
     }
 
     class DungeonMob(baseEntity: Entity) : SkyblockMob(baseEntity) {
@@ -74,7 +94,7 @@ object SkyblockMobUtils {
         //Protection that no real Player gets added. Only difference to a custom mob is that every SkyblockItem has a nbtTag
         if (entity.inventory != null) { //TODO fix this
             if (entity.inventory.isNotEmpty() && entity.inventory.any { it != null && it.tagCompound == null }) {
-                if (EntityKill.config.mobKilldetetctionLogPlayerCantBeAdded) {
+                if (EntityKill.config.LogPlayerCantBeAdded) {
                     LorenzDebug.log("Entity ${entity.name} is not allowed in HitList")
                 }
                 return false

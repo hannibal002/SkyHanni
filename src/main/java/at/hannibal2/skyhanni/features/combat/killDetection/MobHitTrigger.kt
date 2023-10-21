@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.features.mobs
+package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.hitTrigger
+import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.mobs.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -172,7 +172,7 @@ object MobHitTrigger {
                 val velocity = direction.multiply(bowStrength)
                 //TODO(Terror Armor)
                 when {
-                    itemName.contains("Runaan") -> ArrowUtils.newArrows(
+                    itemName.contains("Runaan") -> ArrowDetection.newArrows(
                         origin,
                         velocity,
                         3,
@@ -180,7 +180,7 @@ object MobHitTrigger {
                         piercingDepth,
                         false
                     ) //{val arrowCount = 3; val spread = 12.5}
-                    itemName.contains("Terminator") -> ArrowUtils.newArrows(
+                    itemName.contains("Terminator") -> ArrowDetection.newArrows(
                         origin,
                         velocity,
                         3,
@@ -188,7 +188,7 @@ object MobHitTrigger {
                         piercingDepth,
                         false
                     )//{val arrowCount = 3; val spread = 5.0}
-                    else -> ArrowUtils.newArrow(origin, velocity, piercingDepth, itemName.contains("Juju"))
+                    else -> ArrowDetection.newArrow(origin, velocity, piercingDepth, itemName.contains("Juju"))
                 }
 
             }
