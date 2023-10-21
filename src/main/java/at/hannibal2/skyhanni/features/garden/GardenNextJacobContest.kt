@@ -511,5 +511,7 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContests.warnTime")
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
+
+        event.move(5,"garden.nextJacobContests.everywhere","garden.nextJacobContests.showOutsideGarden")
     }
 }

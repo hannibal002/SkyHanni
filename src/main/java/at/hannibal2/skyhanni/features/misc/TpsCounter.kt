@@ -91,13 +91,16 @@ class TpsCounter {
         if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
         if (!config.enabled) return
 
-        config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
+        config.position.renderString(display, posLabel = "Tps Display")
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tpsDisplayEnabled", "gui.tpsDisplay")
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
+
+        event.move(5,"gui.tpsDisplay","gui.tpsDisplay.enabled")
+        event.move(5,"gui.tpsDisplayPosition","gui.tpsDisplay.position")
     }
 
     private fun getColor(tps: Double) = when {

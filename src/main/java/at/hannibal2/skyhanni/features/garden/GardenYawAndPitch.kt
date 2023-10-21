@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -56,5 +57,10 @@ class GardenYawAndPitch {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastChange = SimpleTimeMark.farPast()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(5,"garden.yawPitchDisplay.everywhere","garden.yawPitchDisplay.showOutsideGarden")
     }
 }

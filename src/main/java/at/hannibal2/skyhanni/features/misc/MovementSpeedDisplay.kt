@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -45,4 +46,10 @@ class MovementSpeedDisplay {
     }
 
     fun isEnabled() = LorenzUtils.onHypixel && (LorenzUtils.inSkyBlock || config.showOutsideSB) && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(5,"misc.playerMovementSpeed","misc.movementSpeed.enabled")
+        event.move(5,"misc.playerMovementSpeedPos","misc.movementSpeed.position")
+    }
 }
