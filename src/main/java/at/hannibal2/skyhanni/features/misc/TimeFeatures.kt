@@ -57,6 +57,7 @@ class TimeFeatures {
         event.move(2, "misc.timeConfigs.realTimePos", "gui.realTimePosition")
 
         event.move(5,"gui.realTime","gui.realTime.enabled")
+        event.move(5,"gui.realTimeFormatToggle","gui.realTime.formatToggle")
         event.move(5,"gui.realTimePos","gui.realTime.position")
     }
 }
