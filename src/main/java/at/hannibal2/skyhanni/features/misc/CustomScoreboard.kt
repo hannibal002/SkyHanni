@@ -142,7 +142,7 @@ class CustomScoreboard {
 
         lineMap[17] = Collections.singletonList("§7Current Mayor")
         lineMap[18] = Collections.singletonList("<empty>")
-        lineMap[19] = Collections.singletonList("Heat: §c$heat")
+        lineMap[19] = Collections.singletonList("Heat: §c♨$heat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
@@ -154,7 +154,7 @@ class CustomScoreboard {
         }
         lineMap[20] = partyList
 
-        lineMap[21] = Collections.singletonList("§7Pet")
+        lineMap[21] = Collections.singletonList(ProfileStorageData.profileSpecific?.currentPet ?: "<hidden>")
         lineMap[22] = Collections.singletonList("§7Quiver")
         lineMap[23] = Collections.singletonList("§7Maxwell Power")
         lineMap[24] = Collections.singletonList("§ewww.hypixel.net")
@@ -170,7 +170,7 @@ class CustomScoreboard {
             lineMap[11] = Collections.singletonList(if(lobbyCode == "None") "<hidden>" else "§8$lobbyCode")
 
             if (partyList.size == 1){
-                lineMap[19] = Collections.singletonList("<hidden>")
+                lineMap[20] = Collections.singletonList("<hidden>")
             }
         }
 
