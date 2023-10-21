@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.misc.tabcomplete.TabComplete;
+import at.hannibal2.skyhanni.features.commands.tabcomplete.TabComplete;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;

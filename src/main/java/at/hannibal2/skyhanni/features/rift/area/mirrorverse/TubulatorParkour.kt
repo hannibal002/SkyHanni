@@ -20,7 +20,7 @@ class TubulatorParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftTubulator") ?: return
+        val data = event.getConstant<ParkourJson>("RiftTubulator")
         parkourHelper = ParkourHelper(
             data.locations,
             data.shortCuts,

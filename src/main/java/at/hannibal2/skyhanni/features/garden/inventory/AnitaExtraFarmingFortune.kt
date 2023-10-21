@@ -13,12 +13,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson.Price
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaExtraFarmingFortune {
     private val config get() = SkyHanniMod.feature.garden.anitaShop
-    private var levelPrice = emptyMap<Int, AnitaUpgradeCostsJson.Price>()
+    private var levelPrice = mapOf<Int, Price>()
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
@@ -33,7 +34,7 @@ class AnitaExtraFarmingFortune {
         val anitaUpgrade = GardenAPI.config?.fortune?.anitaUpgrade ?: return
 
         var contributionFactor = 1.0
-        val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets  ?: return
+        val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets ?: return
         for (line in event.toolTip) {
             "§5§o§aJacob's Ticket §8x(?<realAmount>.*)".toPattern().matchMatcher(line) {
                 val realAmount = group("realAmount").formatNumber().toDouble()
@@ -63,7 +64,6 @@ class AnitaExtraFarmingFortune {
         event.toolTip.add(index, "§7Cost to max out")
         event.toolTip.add(index, "")
 
-
         val upgradeIndex = event.toolTip.indexOfFirst { it.contains("You have") }
         if (upgradeIndex != -1) {
             event.toolTip.add(upgradeIndex + 1, "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}")
@@ -72,13 +72,8 @@ class AnitaExtraFarmingFortune {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")?.let {
-            val map = mutableMapOf<Int, AnitaUpgradeCostsJson.Price>()
-            for ((rawNumber, price) in it.level_price) {
-                map[rawNumber.toInt()] = price
-            }
-            levelPrice = map
-        }
+        val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")
+        levelPrice = data.level_price
     }
 
     @SubscribeEvent
