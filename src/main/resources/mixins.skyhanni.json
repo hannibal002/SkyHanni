@@ -1,43 +1,9 @@
 {
   "package": "at.hannibal2.skyhanni.mixins.transformers",
   "refmap": "mixins.skyhanni.refmap.json",
+  "plugin": "at.hannibal2.skyhanni.mixins.init.SkyhanniMixinPlugin",
   "compatibilityLevel": "JAVA_8",
   "injectors": {
     "maxShiftBy": 2
-  },
-  "mixins": [
-    "AccessorChatComponentText",
-    "AccessorGuiPlayerTabOverlay",
-    "MixinBlockFire",
-    "MixinEntityBlaze",
-    "MixinEntityEnderman",
-    "MixinEntityFireball",
-    "MixinEntityPlayerSP",
-    "MixinItemStack",
-    "MixinNetHandlerPlayClient",
-    "MixinNetworkManager",
-    "MixinPatcherFontRendererHook",
-    "MixinRendererLivingEntity",
-    "MixinRenderGlobal",
-    "MixinRenderItem",
-    "MixinRenderManager",
-    "gui.AccessorGuiContainer",
-    "gui.MixinGuiContainer",
-    "renderer.MixinRendererLivingEntity"
-  ],
-  "client": [
-    "AccessorFontRenderer",
-    "AccessorGuiEditSign",
-    "AccessorKeyBinding",
-    "AccessorMinecraft",
-    "CustomRenderGlobal",
-    "MixinEntityRenderer",
-    "MixinFontRenderer",
-    "MixinGuiChat",
-    "MixinGuiIngame",
-    "MixinGuiPlayerTabOverlay",
-    "MixinKeyBinding",
-    "gui.MixinGuiNewChat",
-    "gui.MixinGuiScreen"
-  ]
+  }
 }
