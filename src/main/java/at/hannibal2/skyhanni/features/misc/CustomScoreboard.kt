@@ -139,9 +139,10 @@ class CustomScoreboard {
         val eventList = mutableListOf<Any>()
         eventList.add("§cCurrent Event") //todo: get event stuff
         lineMap[16] = eventList
-        lineMap[17] = Collections.singletonList("<empty>")
 
-        lineMap[18] = Collections.singletonList("Heat: §c$heat")
+        lineMap[17] = Collections.singletonList("§7Current Mayor")
+        lineMap[18] = Collections.singletonList("<empty>")
+        lineMap[19] = Collections.singletonList("Heat: §c$heat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
@@ -151,12 +152,12 @@ class CustomScoreboard {
             partyList.add(" §7- §7$member")
             partyCount++
         }
-        lineMap[19] = partyList
+        lineMap[20] = partyList
 
-        lineMap[20] = Collections.singletonList("§7Pet")
-        lineMap[21] = Collections.singletonList("§7Quiver")
-        lineMap[22] = Collections.singletonList("§7Maxwell Power")
-        lineMap[23] = Collections.singletonList("§ewww.hypixel.net")
+        lineMap[21] = Collections.singletonList("§7Pet")
+        lineMap[22] = Collections.singletonList("§7Quiver")
+        lineMap[23] = Collections.singletonList("§7Maxwell Power")
+        lineMap[24] = Collections.singletonList("§ewww.hypixel.net")
 
         // Hide empty lines
         if (config.hideEmptyLines){
