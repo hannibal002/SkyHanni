@@ -14,15 +14,20 @@ import java.util.concurrent.locks.ReentrantLock
 class BootstrapHook : BeforeAllCallback, Extension {
     companion object {
         private val LOCK: Lock = ReentrantLock()
+        private var bootstrapped = false
     }
 
     override fun beforeAll(p0: ExtensionContext?) {
         LOCK.lock()
         try {
-            Bootstrap::class.java.getDeclaredField("alreadyRegistered").makeAccessible().set(null, true)
-            Block.registerBlocks()
-            BlockFire.init()
-            Item.registerItems()
+            if (!bootstrapped) {
+                bootstrapped = true
+
+                Bootstrap::class.java.getDeclaredField("alreadyRegistered").makeAccessible().set(null, true)
+                Block.registerBlocks()
+                BlockFire.init()
+                Item.registerItems()
+            }
         } finally {
             LOCK.unlock()
         }

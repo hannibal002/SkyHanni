@@ -26,7 +26,8 @@ public class ItemAbilityConfig {
     @ConfigOption(name = "Fire Veil", desc = "")
     @Accordion
     public FireVeilWandConfig fireVeilWands = new FireVeilWandConfig();
-    public static class FireVeilWandConfig{
+
+    public static class FireVeilWandConfig {
         @Expose
         @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
         @ConfigEditorDropdown(values = {"Particles", "Line", "Off"})

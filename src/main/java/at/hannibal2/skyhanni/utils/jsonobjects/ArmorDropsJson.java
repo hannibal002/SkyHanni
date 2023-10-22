@@ -12,6 +12,7 @@ public class ArmorDropsJson {
     public static class DropInfo {
         @Expose
         public String armor_type;
+
         @Expose
         public List<Double> chance;
     }

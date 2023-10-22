@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
@@ -25,9 +25,9 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
@@ -49,6 +49,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -168,6 +169,10 @@ object Commands {
 //                    "Copies the translation for a given message to your clipboard. " +
 //                    "Language codes are at the end of the translation when you click on a message."
 //        ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shmouselock",
+            "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+        ) { LockMouseLook.toggleLock() }
     }
 
     private fun usersBugFix() {
@@ -208,6 +213,10 @@ object Commands {
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
+        registerCommand(
+            "shrepostatus",
+            "Shows the status of all the mods constants"
+        ) { SkyHanniMod.repo.displayRepoStatus(false) }
     }
 
     private fun developersDebugFeatures() {
@@ -287,7 +296,6 @@ object Commands {
 //            "shsendtranslation",
 //            "Respond with a translation of the message that the user clicks"
 //        ) { Translator.toEnglish(it) }
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun shortenedCommands() {
@@ -360,11 +368,10 @@ object Commands {
         config.outdatedItems.clear()
     }
 
-    private fun registerCommand(
-        name: String,
-        description: String,
-        function: (Array<String>) -> Unit
-    ) = registerCommand0(name, description, function)
+    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+        commands.add(CommandInfo(name, description, currentCategory))
+    }
 
     private fun registerCommand0(
         name: String,
@@ -372,19 +379,22 @@ object Commands {
         function: (Array<String>) -> Unit,
         autoComplete: ((Array<String>) -> List<String>) = { listOf() }
     ) {
-        ClientCommandHandler.instance.registerCommand(
-            SimpleCommand(
-                name,
-                createCommand(function)
-            ) { _, b, _ -> autoComplete(b) }
+        val command = SimpleCommand(
+            name,
+            createCommand(function),
+            object : SimpleCommand.TabCompleteRunnable {
+                override fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String> {
+                    return autoComplete(args ?: emptyArray())
+                }
+            }
         )
+        ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
 
-    private fun createCommand(function: (Array<String>) -> Unit) =
-        object : ProcessCommandRunnable() {
-            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                function(args.asList().toTypedArray())
-            }
+    private fun createCommand(function: (Array<String>) -> Unit) = object : SimpleCommand.ProcessCommandRunnable() {
+        override fun processCommand(sender: ICommandSender?, args: Array<String>?) {
+            if (args != null) function(args.asList().toTypedArray())
         }
+    }
 }
