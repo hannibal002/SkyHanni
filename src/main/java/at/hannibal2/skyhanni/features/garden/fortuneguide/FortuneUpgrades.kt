@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -95,7 +95,7 @@ object FortuneUpgrades {
         for (piece in equipment) {
             val item = piece.getItem()
             //todo tell them to buy the missing item
-            if (!item.getInternalName_old().contains("LOTUS")) return
+            if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
             if (greenThumbLvl != 5 && visitors != 0.0) {
@@ -142,7 +142,7 @@ object FortuneUpgrades {
 
     //todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        if (currentPet.getItem().getInternalName_old().contains(";")) {
+        if (currentPet.getItem().getInternalName().contains(";")) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {

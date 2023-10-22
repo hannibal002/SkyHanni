@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -20,7 +19,7 @@ class RenderData {
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         if (!SkyHanniDebugsAndTests.globalRender) return
-        if (GuiEditManager.isInGui() || FFGuideGUI.isInGui() || VisualWordGui.isInGui()) return
+        if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
     }
@@ -28,7 +27,7 @@ class RenderData {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        if (GuiEditManager.isInGui() || FFGuideGUI.isInGui() || VisualWordGui.isInGui()) return
+        if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 

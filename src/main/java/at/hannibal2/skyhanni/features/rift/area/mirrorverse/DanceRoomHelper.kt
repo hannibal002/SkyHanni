@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
@@ -80,7 +80,7 @@ object DanceRoomHelper {
             "Jump" -> jump
             "Punch" -> punch
             else -> fallback
-        } + this
+        } + this@addColor
     }
 
     @SubscribeEvent
@@ -165,14 +165,12 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions")?.let {
-            instructions = it.instructions
-        }
+        instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 
     fun start(interval: Long): Job {
         return CoroutineScope(Dispatchers.Default).launch {
-            while (NonCancellable.isActive && found) {
+            while (isActive && found) {
                 index++
                 startCountdown(0, 500)
                 delay(interval)

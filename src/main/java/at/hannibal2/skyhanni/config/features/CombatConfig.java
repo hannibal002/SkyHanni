@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostFormatting;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;

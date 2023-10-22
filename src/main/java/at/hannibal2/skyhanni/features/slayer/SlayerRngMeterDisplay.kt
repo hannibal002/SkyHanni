@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -123,7 +123,7 @@ class SlayerRngMeterDisplay {
         } else {
             storage.itemGoal = selectedItem.nameWithEnchantment
             val jsonObject = Constants.RNGSCORE["slayer"].asJsonObject.get(getCurrentSlayer()).asJsonObject
-            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName_old()).asLong
+            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName().asString()).asLong
         }
         update()
     }

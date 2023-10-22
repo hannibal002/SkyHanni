@@ -32,6 +32,11 @@ class HellionShieldHelper {
         hellionShieldMobs.getOrDefault(event.entity, null) ?: return
         event.shouldReset = true
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "slayer.blazeColoredMobs", "slayer.blazes.hellion.coloredMobs")
+    }
 }
 
 fun EntityLiving.setHellionShield(shield: HellionShield?) {
@@ -39,10 +44,5 @@ fun EntityLiving.setHellionShield(shield: HellionShield?) {
         HellionShieldHelper.hellionShieldMobs[this] = shield
     } else {
         HellionShieldHelper.hellionShieldMobs.remove(this)
-    }
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "slayer.blazeColoredMobs", "slayer.blazes.hellion.coloredMobs")
     }
 }

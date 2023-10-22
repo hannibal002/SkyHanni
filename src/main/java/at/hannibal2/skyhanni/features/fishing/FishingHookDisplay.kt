@@ -91,7 +91,7 @@ class FishingHookDisplay {
         if (name == "§c§l!!!") {
             return true
         }
-        if (name.startsWith("§e§l")) {
+        if (name.startsWith("§e§l") && !name.contains("CLICK")) {
             return true
         }
 
