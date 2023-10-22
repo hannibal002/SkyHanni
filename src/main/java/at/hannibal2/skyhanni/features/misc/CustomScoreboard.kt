@@ -28,6 +28,7 @@ class CustomScoreboard {
     private var display = emptyList<List<Any>>()
     private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
     private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
+    private var inDungeon = false // Hotfix bc isInIsland doesnt seem to work
     private var purse = "0"
     private var motes = "0"
     private var bank = "0"
@@ -73,6 +74,11 @@ class CustomScoreboard {
             }
             if (line.startsWith("Heat: §c♨")){
                 heat = line.removePrefix("Heat: §c♨")
+            }
+            if (line.contains("catacombs", true)){
+                inDungeon = true
+            } else {
+                inDungeon = false
             }
         }
         bits = getBits()
@@ -215,6 +221,7 @@ class CustomScoreboard {
                 && !IslandType.CATACOMBS.isInIsland()
                 && !IslandType.KUUDRA_ARENA.isInIsland()
                 && !IslandType.CRIMSON_ISLE.isInIsland()
+                || inDungeon // Hotfix bc isInIsland doesnt seem to work
             ){
                 lineMap[20] = Collections.singletonList("<hidden>") // Party
             }
