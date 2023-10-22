@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -14,7 +12,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
+    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -60,12 +58,9 @@ class MenuItemDisplayOverlaySBLeveling {
 
         if (stackSizeConfig.contains(3)) {
             val nameWithColor = item.name ?: return ""
-            if ((chestName.contains("Emblems")) && (!(itemName.isEmpty()) && (nameWithColor.contains("§a")) && !(itemName.contains(" ")))) {
+            if ((chestName.contains("Emblems")) && (itemName.isNotEmpty() && (nameWithColor.contains("§a")) && !(itemName.contains(" ")))) {
                 val bruh = item.getLore().first().removeColor().split(" ").first().trim()
-                if (bruh.toInt() is Int) return bruh.toString()
-                //RE: above conditional
-                //VSCode and IntelliJ are gonna go "Check for instance is always 'true'".
-                //IGNORE THAT IF YOU RESPECT YOUR FPS PLEASE
+                if (bruh.toIntOrNull() is Int) return bruh
             }
         }
 
