@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
@@ -83,7 +84,7 @@ object Commands {
             "A Command that is useful for monitoring/debugging existing features. §cIntended for developers only!"
         ),
         INTERNAL("§8", "Internal Command", "A Command that should §cnever §7be called manually!"),
-
+        SHORTENED_COMMANDS("§b", "Shortened Commands", "Commands that shorten or improve existing Hypixel commands!")
     }
 
     class CommandInfo(val name: String, val description: String, val category: CommandCategory)
@@ -108,6 +109,9 @@ object Commands {
 
         currentCategory = CommandCategory.INTERNAL
         internalCommands()
+
+        currentCategory = CommandCategory.SHORTENED_COMMANDS
+        shortenedCommands()
     }
 
     private fun usersMain() {
@@ -292,6 +296,14 @@ object Commands {
 //            "shsendtranslation",
 //            "Respond with a translation of the message that the user clicks"
 //        ) { Translator.toEnglish(it) }
+    }
+
+    private fun shortenedCommands() {
+        registerCommand("pko", "Kicks offline party members") { PartyCommands.kickOffline() }
+        registerCommand("pw", "Warps your party") { PartyCommands.warp() }
+        registerCommand("pk", "Kick a specific party member") { PartyCommands.kick(it) }
+        registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
+        registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
     }
 
     private fun commandHelp(args: Array<String>) {
