@@ -281,8 +281,8 @@ object Commands {
             "List persons into the chat SkyHanni thinks are in your party."
         ) { PartyAPI.listMembers() }
         registerCommand(
-                "shplaysound",
-                "Play the specified sound effect at the given pitch and volume."
+            "shplaysound",
+            "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
     }
 
