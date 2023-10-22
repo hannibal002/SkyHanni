@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,17 +17,23 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
-class WikiCommand {
+class WikiManager {
 
     private val config get() = SkyHanniMod.feature.commands.fandomWiki
     private val urlPrefix = "https://hypixel-skyblock.fandom.com/wiki/"
     private val urlSearchPrefix = "${urlPrefix}Special:Search?query="
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
-        val packet = event.packet
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "commands.useFandomWiki", "commands.fandomWiki.useFandomWiki")
+    }
 
-        if (!isEnabled() || !LorenzUtils.inSkyBlock) return
+    @SubscribeEvent
+    fun onSendPacket(event: PacketEvent.SendEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
+
+        val packet = event.packet
 
         if (packet is C01PacketChatMessage) {
             val message = packet.message.lowercase()
