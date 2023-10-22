@@ -25,7 +25,7 @@ class WikiManager {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(2, "commands.useFandomWiki", "commands.fandomWiki.useFandomWiki")
+        event.move(6, "commands.useFandomWiki", "commands.fandomWiki.useFandomWiki")
     }
 
     @SubscribeEvent

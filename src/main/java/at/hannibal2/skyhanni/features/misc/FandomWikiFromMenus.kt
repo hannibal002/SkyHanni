@@ -25,7 +25,7 @@ class FandomWikiFromMenus {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(2, "fandomWiki", "commands.fandomWiki")
+        event.move(6, "fandomWiki", "commands.fandomWiki")
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
