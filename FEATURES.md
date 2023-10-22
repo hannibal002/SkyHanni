@@ -754,6 +754,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
++ Added **Dungeon party finder** QOL improvements - Cad
+    + Floor stack size.
+    + Mark Paid Carries red.
+    + Mark Low-Class levels orange.
+    + Mark groups you can't join dark red.
+    + Mark groups without your current classes green.
++ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
+    + /pw -> party warp
+    + /pk -> party kick
+    + /pt -> party transfer
+    + /pp -> party promote
+    + /pko -> party kickoffline
++ Added working **Livid Finder** (should work 100% of the time). - hannibal2
+    + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
+      in some cases).
++ Added AFK time to Discord RPC. - NetheriteMiner
 </details>
 <details open><summary>
 

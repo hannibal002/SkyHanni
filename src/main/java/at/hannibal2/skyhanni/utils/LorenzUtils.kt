@@ -437,7 +437,7 @@ object LorenzUtils {
                 && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
+    fun inIsland(island: IslandType) = inSkyBlock && (skyBlockIsland == island || island == IslandType.CATACOMBS && inDungeons)
 
     fun IslandType.isInIsland() = inIsland(this)
 
