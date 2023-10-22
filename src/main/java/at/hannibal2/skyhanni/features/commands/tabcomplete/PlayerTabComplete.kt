@@ -27,16 +27,12 @@ object PlayerTabComplete {
     }
 
     enum class PlayerCategory {
-        PARTY,
         FRIENDS,
         ISLAND_PLAYERS,
     }
 
     fun handleTabComplete(command: String): List<String>? {
         val commands = mapOf(
-            "p" to listOf(PlayerCategory.PARTY),
-            "party" to listOf(PlayerCategory.PARTY),
-            "pt" to listOf(PlayerCategory.FRIENDS, PlayerCategory.ISLAND_PLAYERS), // /party transfer
             "f" to listOf(PlayerCategory.FRIENDS),
             "friend" to listOf(PlayerCategory.FRIENDS),
 
@@ -69,7 +65,7 @@ object PlayerTabComplete {
                 }
             }
 
-            if (config.party && PlayerCategory.PARTY !in ignored) {
+            if (config.party) {
                 for (member in PartyAPI.partyMembers) {
                     add(member)
                 }
