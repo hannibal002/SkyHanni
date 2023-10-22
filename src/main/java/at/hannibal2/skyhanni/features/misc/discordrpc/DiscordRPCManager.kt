@@ -200,7 +200,6 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-
     // Events that change things in DiscordStatus
     @SubscribeEvent
     fun onKeybind(event: LorenzKeyPressEvent) {

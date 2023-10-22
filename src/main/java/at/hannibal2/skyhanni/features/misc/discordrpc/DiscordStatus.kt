@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -370,7 +371,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     AFK({
-        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince()} minutes"
+        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince().format(maxUnits = 1, longName = true)}"
         else AutoStatus.AFK.placeholderText
     })
     ;
