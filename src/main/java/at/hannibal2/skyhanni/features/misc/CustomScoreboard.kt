@@ -113,17 +113,11 @@ class CustomScoreboard {
         for (index in config.textFormat) {
             lineMap[index]?.let {
 
-                // Multiline for Party Members
-                if (it[0] == "§9Party"){
-                    for (item in it){
-                        newList.add(listOf(item))
-                    }
-                    continue
-                }
-
-                // Multiline for Mayor
-                if (it[0] == MayorElection.currentCandidate?.name){
-                    for (item in it){
+                // Multiline support
+                if (it[0] == "§9Party"
+                    || it[0] == MayorElection.currentCandidate?.name
+                ) {
+                    for (item in it) {
                         newList.add(listOf(item))
                     }
                     continue
@@ -265,16 +259,12 @@ class CustomScoreboard {
         return matchResult?.groupValues?.lastOrNull()
     }
 
-    private fun getProfileTypeAsSymbol() : String{
-        if (HypixelData.ironman){
-            return "§7♲ "
+    private fun getProfileTypeAsSymbol(): String {
+        return when {
+            HypixelData.ironman -> "§7♲ "  // Ironman
+            HypixelData.stranded -> "§a☀ " // Stranded
+            HypixelData.bingo -> "§cⒷ "    // Bingo - TODO: Consider using colors from BingoAPI
+            else -> "§e"                   // Default case
         }
-        if (HypixelData.stranded){
-            return "§a☀ "
-        }
-        if (HypixelData.bingo){
-            return "§cⒷ " //TODO COLORS, maybe bingoAPI? idk
-        }
-        return "§e"
     }
 }
