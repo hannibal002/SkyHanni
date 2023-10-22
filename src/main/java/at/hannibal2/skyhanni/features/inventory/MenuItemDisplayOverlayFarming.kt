@@ -31,7 +31,7 @@ class MenuItemDisplayOverlayFarming {
             var silver = "§f0"
             var bronze = "§c0"
             for (line in item.getLore()) {
-                var noColorLine = line.removeColor()
+                val noColorLine = line.removeColor()
                 if (noColorLine.contains("GOLD")) gold = "§6" + noColorLine.split(" ").last()
                 if (noColorLine.contains("SILVER")) silver = "§f" + noColorLine.split(" ").last()
                 if (noColorLine.contains("BRONZE")) bronze = "§c" + noColorLine.split(" ").last()
@@ -49,7 +49,7 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(2) && (chestName == "Visitor Milestones")) {
             val lore = item.getLore()
-            if (!(lore.isEmpty())) {
+            if (lore.isNotEmpty()) {
                 if ((lore.anyContains("Progress ")) && (lore.anyContains(": ")) && (lore.anyContains("%"))) {
                     for (line in lore) {
                         if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
@@ -62,7 +62,7 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(3) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
-            if (!(lore.isEmpty()) && (lore.anyContains("Times Visited: "))) {
+            if (lore.isNotEmpty() && (lore.anyContains("Times Visited: "))) {
                 return lore.first().take(5).replace("T", "☉")
             }
         }

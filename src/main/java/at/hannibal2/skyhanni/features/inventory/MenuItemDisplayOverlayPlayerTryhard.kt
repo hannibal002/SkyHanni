@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerTryhard {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\.[0-9]*)?(§.)?%".toPattern()
+    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterPattern = ".* (?<odds>§.[A-z ]+).*".toPattern()
@@ -33,10 +33,6 @@ class MenuItemDisplayOverlayPlayerTryhard {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         event.stackTip = getStackTip(event.stack)
-    }
-
-    private fun lazilyGetPercent(original: String, thingToExtract: String = ""): String {
-        return original.removeColor().replace(thingToExtract, "").replace("100%", "a✔").take(2).replace(".", "").replace("a✔", "§a✔").replace("%", "")
     }
 
     private fun getStackTip(item: ItemStack): String {
@@ -58,7 +54,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                             pageNum++
                         }
                         if (pageNum > 999) return "1k+"
-                        else return "${pageNum}"
+                        else return "$pageNum"
                     }
                 }
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
@@ -84,7 +80,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         
         if (stackSizeConfig.contains(2) && (chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
             val lore = item.getLore()
-            if (!(lore.isEmpty())) {
+            if (lore.isNotEmpty()) {
                 if (((chestName.contains("Community Shop")) &&
                 ((lore.first().contains(" Upgrade")) ||
                 (lore.last().contains(" to start!")) ||
@@ -97,7 +93,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         
         if (stackSizeConfig.contains(3) && (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop"))) {
             val lore = item.getLore()
-            if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
+            if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                 if (chestName.contains("Community Shop")) {
                     if (lore.last().contains("§aCurrently selected!")) return "§a⬇"
                 } else if ((chestName.contains("Auction") || (chestName.contains("Bazaar"))) && (lore.first().contains("Category") && lore.last().contains("§aCurrently "))) {
@@ -113,7 +109,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     totalFamePattern.matchMatcher(line) {
                         val totalAsString = group("total").replace(",", "")
                         val usefulPartAsString = group("useful")
-                        var suffix = when (totalAsString.length) {
+                        val suffix = when (totalAsString.length) {
                             in 1..3 -> ""
                             in 4..6 -> "k"
                             in 7..9 -> "M"
@@ -131,7 +127,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     bitsAvailablePattern.matchMatcher(line) {
                         val totalAsString = group("total").replace(",", "")
                         val usefulPartAsString = group("useful")
-                        var suffix = when (totalAsString.length) {
+                        val suffix = when (totalAsString.length) {
                             in 1..3 -> ""
                             in 4..6 -> "k"
                             in 7..9 -> "M"
@@ -172,7 +168,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(5) && (!chestName.isEmpty() && !item.getLore().isEmpty() && !itemName.isEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
+        if (stackSizeConfig.contains(5) && (chestName.isNotEmpty() && item.getLore().isNotEmpty() && itemName.isNotEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
             for (line in item.getLore()) {
                 if (line.contains("Duration:")) {
                     genericDurationPattern.matchMatcher(line) {
@@ -181,11 +177,11 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         val hString = group("hours") ?: ""
                         val mString = group("minutes") ?: ""
                         val sString = group("seconds") ?: ""
-                        if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return yString
-                        if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return dString
-                        if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return hString
-                        if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return mString
-                        if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return sString
+                        if (yString.isNotEmpty() && !(yString.startsWith("0"))) return yString
+                        if (dString.isNotEmpty() && !(dString.startsWith("0"))) return dString
+                        if (hString.isNotEmpty() && !(hString.startsWith("0"))) return hString
+                        if (mString.isNotEmpty() && !(mString.startsWith("0"))) return mString
+                        if (sString.isNotEmpty() && !(sString.startsWith("0"))) return sString
                     }
                 }
             }
@@ -207,7 +203,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         magicalPowerPattern.matchMatcher(line) {
                             val usefulAsString = group("useful")
                             val totalAsString = group("total").replace(",", "")
-                            var suffix = when (totalAsString.length) {
+                            val suffix = when (totalAsString.length) {
                                 in 1..3 -> ""
                                 in 4..6 -> "k"
                                 in 7..9 -> "M"
@@ -228,7 +224,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         }
                     }
                 }
-                return "${totalSlotsResult}"
+                return "$totalSlotsResult"
             }
             if (chestName.contains("Stats Tuning") && itemName == ("Stats Tuning")) {
                 if (lore.anyContains("Tuning Points: ")) {
@@ -237,7 +233,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                             tuningPointsPattern.matchMatcher(line) {
                                 val usefulAsString = group("useful")
                                 val totalAsString = group("total").replace(",", "")
-                                var suffix = when (totalAsString.length) {
+                                val suffix = when (totalAsString.length) {
                                     in 1..3 -> ""
                                     in 4..6 -> "k"
                                     else -> "§b§z:)"
@@ -250,10 +246,10 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
             }
             if (chestName.contains("Power Stones Guide")) {
-                if (!(lore.isEmpty()) && item.getLore().last().contains("Learned: ")) {
+                if (lore.isNotEmpty() && item.getLore().last().contains("Learned: ")) {
                     val symbol = lore.last().split(" ").last()
-                    if (symbol == "✖") return "§c" + symbol
-                    else return "§a" + symbol
+                    if (symbol == "✖") return "§c$symbol"
+                    else return "§a$symbol"
                 }
             }
             if (chestName.contains(" Thaumaturgy") && itemName.contains(" Breakdown")) {
@@ -262,7 +258,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         magicalPowerSecondPattern.matchMatcher(line) {
                             val usefulString = group("useful")
                             val totalString = group("total").replace(",", "")
-                            var suffix = when (totalString.length) {
+                            val suffix = when (totalString.length) {
                                 in 1..3 -> ""
                                 in 4..6 -> "k"
                                 in 7..9 -> "M"
@@ -279,7 +275,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(8)) {
             val lore = item.getLore()
             var theStringToUse = ""
-            if (!(lore.isEmpty()) && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
+            if (lore.isNotEmpty() && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
                 if (lore.anyContains(" in: ")) {
                     for (line in lore) {
                         if (line.contains(" in: ")) {
@@ -288,7 +284,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     }
                 }
             }
-            if (!(lore.isEmpty()) && lore.first().contains(" in: ") && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
+            if (lore.isNotEmpty() && lore.first().contains(" in: ") && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
                 theStringToUse = lore.first()
             }
             genericDurationPattern.matchMatcher(theStringToUse) {
@@ -297,11 +293,11 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 val hString = group("hours") ?: ""
                 val mString = group("minutes") ?: ""
                 val sString = group("seconds") ?: ""
-                if (!(yString.isEmpty()) && !(yString.startsWith("0"))) return "${yString}"
-                if (!(dString.isEmpty()) && !(dString.startsWith("0"))) return "${dString}"
-                if (!(hString.isEmpty()) && !(hString.startsWith("0"))) return "${hString}"
-                if (!(mString.isEmpty()) && !(mString.startsWith("0"))) return "${mString}"
-                if (!(sString.isEmpty()) && !(sString.startsWith("0"))) return "${sString}"
+                if (yString.isNotEmpty() && !(yString.startsWith("0"))) return yString
+                if (dString.isNotEmpty() && !(dString.startsWith("0"))) return dString
+                if (hString.isNotEmpty() && !(hString.startsWith("0"))) return hString
+                if (mString.isNotEmpty() && !(mString.startsWith("0"))) return mString
+                if (sString.isNotEmpty() && !(sString.startsWith("0"))) return sString
             }
         }
 

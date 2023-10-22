@@ -256,7 +256,7 @@ class ItemDisplayOverlayFeatures {
                     if (line.endsWith("kills")) {
                         numberOfLines++
                         xOutOfYNoColorRequiredPattern.matchMatcher(line) {
-                            val mobSpecificKillCount = group("useful").toInt() ?: 0
+                            val mobSpecificKillCount = group("useful").toIntOrNull() ?: 0
                             killCount += mobSpecificKillCount
                         }
                     }

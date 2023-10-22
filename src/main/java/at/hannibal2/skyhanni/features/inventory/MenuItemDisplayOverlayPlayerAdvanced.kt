@@ -98,7 +98,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
                         // ✔ Found: 242/242
                         if (newLine.contains("Found: ")) {
-                            return "§d" + newLine.removeColor().replace(" ✖ Found: ", "").replace(" ✔ Found: ", "").replace(("/" + totalFairySouls), "").replace(totalFairySouls, "§a${totalFairySouls}")
+                            return "§d" + newLine.removeColor().replace(" ✖ Found: ", "").replace(" ✔ Found: ", "").replace(("/$totalFairySouls"), "").replace(totalFairySouls, "§a${totalFairySouls}")
                         }
                     }
                 }
@@ -111,7 +111,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
             }
             if (chestName == "Rift Guide") {
-                if (!(itemName.isEmpty()) && !(lore.isEmpty())) {
+                if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     if (lore.anyContains("Enigma Souls: ")) {
                         for (line in lore) {
                             if (line.contains("Enigma Souls: ")) {
@@ -140,7 +140,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         
         if (stackSizeConfig.contains(4) && chestName.startsWith("Your Stats Breakdown")) {
             val statName = item.name ?: return ""
-            if (!(statName.isEmpty())) {
+            if (statName.isNotEmpty()) {
                 skyblockStatBreakdownPattern.matchMatcher(statName) {
                     val name = group("name")
                     val color = group("color")
@@ -187,8 +187,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.contains("§7Playing on: §a")) {
-                    val profileName = line.replace("§7Playing on: §a", "").removeColor().trim()
-                    return when (profileName) {
+                    return when (val profileName = line.replace("§7Playing on: §a", "").removeColor().trim()) {
                         "Apple" -> "Apl"
                         "Banana" -> "Bna"
                         "Blueberry" -> "Blu"
@@ -244,7 +243,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                                 else -> "§b§z:)"
                             }
                             if (suffix == "§b§z:)") return suffix
-                            else return "§6" + usefulPartAsString + suffix
+                            else return "§6$usefulPartAsString$suffix"
                         }
                     }
                 }
@@ -268,8 +267,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         in 13..15 -> "T"
                         else -> "§b§z:)"
                     }
-                    if (suffix == "§b§z:)") return "§6Balance: " + suffix
-                    else return "§6Balance: " + usefulPartAsString + suffix
+                    if (suffix == "§b§z:)") return "§6Balance: $suffix"
+                    else return "§6Balance: $usefulPartAsString$suffix"
                 }
             }
         }
@@ -280,7 +279,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
                 if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
-                if (!(lore.isEmpty())) {
+                if (lore.isNotEmpty()) {
                     if (lore.anyContains("Candidate")) {
                         val colorCode = nameWithColor.take(2)
                         var numPerks = 0
@@ -290,7 +289,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                                 !(line.contains("Leading in votes!")) &&
                                 !(line.contains("Click to vote for ")) && 
                                 !(line.contains("SPECIAL ")) && 
-                                !(line.startsWith(colorCode + "§"))) {
+                                !(line.startsWith("$colorCode§"))) {
                                     numPerks++
                             }
                         }
@@ -310,7 +309,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                             val colorCode = nameWithColor.take(2)
                             var numPerks = 0
                             for (line in lore) {
-                                if (line.startsWith(colorCode) && !(line.startsWith(colorCode + "§"))) {
+                                if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
                                     numPerks++
                                 }
                             }
@@ -362,12 +361,12 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
             }
             if ((chestName == "Auction View")) {
-                if (!(itemName == "Bid History")) return ""
+                if (itemName != "Bid History") return ""
                 if (!(lore.first().contains("Total "))) return ""
                 return lore.first().removeColor().replace("Total bids: ", "").replace(" bids", "").replace(" bid", "")
             }
             if ((chestName.contains("Auction House"))) {
-                if (!(itemName == "View Bids") && !(itemName == "Manage Auctions")) return ""
+                if (itemName != "View Bids" && itemName != "Manage Auctions") return ""
                 if ((itemName == "View Bids") && (lore.first().removeColor().contains(" top bid ") || lore.first().removeColor().contains("a bid "))) return "1"
                 if ((itemName == "View Bids") && lore.first().contains("You placed ")) "(§.)?You placed (§.)?(?<bids>[0-9]+) bid(.{0,3}) (§.)?on pending".toPattern().matchMatcher(lore.first()) { return group("bids") }
                 if ((itemName == "Manage Auctions")) {
@@ -379,7 +378,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
             }
             if (chestName.contains("Auction")) {
-                if (!(itemName == "Item Tier") && !(itemName == "BIN Filter") && !(itemName == "Sort")) return ""
+                if (itemName != "Item Tier" && itemName != "BIN Filter" && itemName != "Sort") return ""
                 for (line in lore) {
                     if (line.contains("▶ ")) {
                         val betterLine = line.removeColor().replace("▶ ", "")

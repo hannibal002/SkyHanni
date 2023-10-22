@@ -81,7 +81,7 @@ class MenuItemDisplayOverlayMining {
             val nameWithColor = item.name ?: return ""
             if (nameWithColor.contains("§a")) return ""
             val lore = item.getLore()
-            if (lore != null && !(lore.isEmpty())) {
+            if (lore != null && lore.isNotEmpty()) {
                 if ((lore.anyContains("Progress: ")) && (lore.anyContains("%"))) {
                     for (line in lore) {
                         if (line.contains("Progress: ") && line.contains("%")) {
@@ -104,7 +104,7 @@ class MenuItemDisplayOverlayMining {
                 else if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
                 else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
             }
-            var crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
+            val crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
             return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
         }
 

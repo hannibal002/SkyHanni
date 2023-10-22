@@ -153,7 +153,7 @@ class MenuItemDisplayOverlayPlayer {
                 }
             }
             if (chestName.contains("Pets")) {
-                if (itemName.contains("Pet Score Rewards") && !(item.getLore().isEmpty())) {
+                if (itemName.contains("Pet Score Rewards") && item.getLore().isNotEmpty()) {
                     return item.getLore().last().removeColor().split(" ").last()
                 }
             }

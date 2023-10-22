@@ -30,11 +30,11 @@ class MenuItemDisplayOverlayCombat {
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberCombatAsStackSize
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(0) && ((chestName.contains("Bestiary")) && !(itemName.isEmpty()) && (itemName.contains("Bestiary Milestone ")))) {
+        if (stackSizeConfig.contains(0) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty() && (itemName.contains("Bestiary Milestone ")))) {
             return itemName.split(" ").last()
         }
 
-        if (stackSizeConfig.contains(1) && ((chestName.contains("Bestiary")) && !(itemName.isEmpty()))) {
+        if (stackSizeConfig.contains(1) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty())) {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
@@ -44,7 +44,7 @@ class MenuItemDisplayOverlayCombat {
         }
 
         if (stackSizeConfig.contains(2)) {
-            if ((chestName.contains("Slayer")) && !(itemName.isEmpty())) {
+            if ((chestName.contains("Slayer")) && itemName.isNotEmpty()) {
                 val lore = item.getLore()
                 for (line in lore) {
                     if (line.contains(" Slayer: ")) {
