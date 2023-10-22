@@ -85,7 +85,6 @@ class CustomScoreboard {
             }
         }
 
-        //todo add copper etc to this
         for (line in ScoreboardData.sidebarLinesFormatted){
             if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
                 location = line
@@ -99,10 +98,14 @@ class CustomScoreboard {
             if (line.startsWith("Heat: §c♨")){
                 heat = line.removePrefix("Heat: §c♨")
             }
+            if (line.startsWith("Bits: §b")){
+                bits = line.removePrefix("Bits: §b")
+            }
+            if (line.startsWith("Copper: §c")){
+                copper = line.removePrefix("Copper: §c")
+            }
         }
-        bits = getBits()
         purse = LorenzUtils.formatInteger(PurseAPI.currentPurse.toInt())
-        copper = getCopper()
     }
 
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
@@ -260,24 +263,6 @@ class CustomScoreboard {
         val regex = Regex("§(\\d{3}/\\d{2}/\\d{2}) §([A-Za-z0-9]+)$")
         val matchResult = regex.find(input)
         return matchResult?.groupValues?.lastOrNull()
-    }
-
-    private fun getBits() : String {
-        val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
-        val scoreboard = ScoreboardData.sidebarLinesFormatted
-        val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
-            bitsRegex.find(it.removeColor())?.groupValues?.get(1)
-        }
-        return bits ?: "0"
-    }
-
-    private fun getCopper() : String {
-        val copperRegex = Regex("""Copper: ([\d|,]+)[\d|.]*""")
-        val scoreboard = ScoreboardData.sidebarLinesFormatted
-        val copper = scoreboard.firstOrNull { copperRegex.matches(it.removeColor()) }?.let {
-            copperRegex.find(it.removeColor())?.groupValues?.get(1)
-        }
-        return copper ?: "0"
     }
 
     private fun getProfileTypeAsSymbol() : String{
