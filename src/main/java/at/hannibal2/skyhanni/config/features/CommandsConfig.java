@@ -72,6 +72,7 @@ public class CommandsConfig {
             "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
     @Expose
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean shortCommands = true;
 
     @Expose
