@@ -25,8 +25,9 @@ class MenuItemDisplayOverlayAbiphone {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberAbiphoneAsStackSize
         val chestName = InventoryUtils.openInventoryName()
+        val isAbiphone = ((chestName.contains("Abiphone") || chestName.contains("AⒷiphone")))
         
-        if ((stackSizeConfig.contains(0)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && (itemName == ("Contacts Directory"))) {
+        if ((stackSizeConfig.contains(0)) && isAbiphone && (itemName == ("Contacts Directory"))) {
             for (line in item.getLore()) {
                 if (line.contains("Your contacts: ")) {
                     return xOutOfYNoColorRequiredPattern.matchMatcher(line) { group("useful") } ?: ""
@@ -34,7 +35,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(1)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone"))) {
+        if ((stackSizeConfig.contains(1)) && isAbiphone) {
             val nameWithColor = item.name ?: return ""
             val lore = item.getLore()
             if ((nameWithColor.startsWith("§f§")) && (lore.anyContains("§cDo Not Disturb")) && lore.anyContains("enabled!")) {
@@ -42,7 +43,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(2)) && ((chestName.contains("Abiphone") || chestName.contains("AⒷiphone"))) && (itemName.contains(" Operator Chip"))) {
+        if ((stackSizeConfig.contains(2)) && isAbiphone && (itemName.contains(" Operator Chip"))) {
             val maxRelays = "9" //edit this line whenever they add more relays
             //§7Upgraded Relays: §e1§7/§59
             //Upgraded Relays: 1/9
@@ -54,7 +55,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(3)) && ((chestName.contains("Abiphone") || chestName.contains("AⒷiphone"))) && (itemName.contains("Ringtones"))) {
+        if ((stackSizeConfig.contains(3)) && isAbiphone && (itemName.contains("Ringtones"))) {
             for (line in item.getLore()) {
                 if (line.contains("Selected Ringtone: ")) {
                     val ringtone = item.getLore().first().removeColor().split(" ").last()
@@ -73,7 +74,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(4)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && (itemName == ("Tic Tac Toe"))) {
+        if ((stackSizeConfig.contains(4)) && isAbiphone && (itemName == ("Tic Tac Toe"))) {
             var finalString = ""
             for (line in item.getLore()) {
                 if (line.contains("Wins: ") || line.contains("Draws: ") || line.contains("Losses: ")) {
@@ -83,7 +84,7 @@ class MenuItemDisplayOverlayAbiphone {
             return finalString
         }
 
-        if ((stackSizeConfig.contains(5)) && (chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && (itemName == ("Snake"))) {
+        if ((stackSizeConfig.contains(5)) && isAbiphone && (itemName == ("Snake"))) {
             for (line in item.getLore()) {
                 if (line.contains(" Score: ")) {
                     return line.removeColor().split(" ").last()
@@ -91,7 +92,7 @@ class MenuItemDisplayOverlayAbiphone {
             }
         }
 
-        if ((stackSizeConfig.contains(6)) && ((chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) || chestName.contains("Contacts Directory")) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
+        if ((stackSizeConfig.contains(6)) && (isAbiphone || chestName.contains("Contacts Directory")) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
             for (line in item.getLore()) {
                 if (line.contains("▶ ")) {
                     val placeholder = line.removeColor().replace("▶ ","").replace(" ","").lowercase() //lowercase() because i dont trust hypixel admins
