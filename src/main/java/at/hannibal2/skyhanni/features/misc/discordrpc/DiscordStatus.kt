@@ -19,9 +19,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -29,6 +31,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
 
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
@@ -91,6 +94,8 @@ private fun getVisitingName(): String {
     }
     return "Someone"
 }
+
+var beenAfkFor = SimpleTimeMark.now()
 
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
 
@@ -363,6 +368,11 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                 "$floor Kills: $amountKills ($time)"
             }
         }
+    }),
+
+    AFK({
+        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince().format(maxUnits = 1, longName = true)}"
+        else AutoStatus.AFK.placeholderText
     })
     ;
 
@@ -372,11 +382,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         return ""
     }
+
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
     CROP_MILESTONES("Not farming!", DiscordStatus.CROP_MILESTONES),
     SLAYER("Planning to do a slayer quest", DiscordStatus.SLAYER),
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
-    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS);
+    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
+    AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
+    ;
 }

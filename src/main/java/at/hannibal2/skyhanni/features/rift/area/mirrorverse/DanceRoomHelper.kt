@@ -12,7 +12,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -160,9 +165,7 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions")?.let {
-            instructions = it.instructions
-        }
+        instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 
     fun start(interval: Long): Job {
