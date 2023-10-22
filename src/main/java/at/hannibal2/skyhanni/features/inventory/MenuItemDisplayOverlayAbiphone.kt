@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -103,7 +104,7 @@ class MenuItemDisplayOverlayAbiphone {
                         "usuallocation" -> "Loc"
                         "notadded" -> "§cQA"
                         "completedquestbutnotadded" -> "§aQ§cA"
-                        else -> placeholder.take(3).capitalize()
+                        else -> placeholder.take(3).firstLetterUppercase()
                     }
                 }
             }
