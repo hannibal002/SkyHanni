@@ -346,7 +346,7 @@ public class InventoryConfig {
                 public int key6 = Keyboard.KEY_6;
                 @Expose
                 @ConfigOption(name = "Key 7", desc = "Key for the seventh Node")
-                @ConfigEditorKeybind(defaultKey = Keyboard.KEY_1)
+                @ConfigEditorKeybind(defaultKey = Keyboard.KEY_7)
                 public int key7 = Keyboard.KEY_7;
             }
         }
