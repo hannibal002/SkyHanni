@@ -3,25 +3,23 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FandomWikiFromMenus {
+
+    private val config get() = SkyHanniMod.feature.commands.fandomWiki
+    private val urlPrefix = "https://hypixel-skyblock.fandom.com/wiki/"
+    private val urlSearchPrefix = "${urlPrefix}Special:Search?query="
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -55,9 +53,14 @@ class FandomWikiFromMenus {
             wikiDisplayName = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
             wikiInternalName = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
         } else return
-        LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!", "wiki $wikiInternalName")
+        if (!config.skipWikiChat) {
+            LorenzUtils.clickableChat("§e[SkyHanni] Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!", "wiki $wikiInternalName")
+        } else {
+            LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$wikiDisplayName")
+            val wikiUrlCustom = "$urlSearchPrefix$wikiInternalName&scope=internal"
+            OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
+        }
         event.isCanceled = true
-
     }
-    private fun isEnabled() = SkyHanniMod.feature.commands.fandomWiki.useFandomWiki
+    private fun isEnabled() = config.useFandomWiki
 }

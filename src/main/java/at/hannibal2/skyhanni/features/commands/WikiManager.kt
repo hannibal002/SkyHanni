@@ -70,7 +70,7 @@ class WikiManager {
 
     private fun wikiTheItem(item: ItemStack) {
         var wikiUrlSearch = ""
-        val itemDisplayName = item.nameWithEnchantment ?: return
+        val itemDisplayName = (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString() ?: return
         LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$itemDisplayName")
         if (internalName != "NONE") wikiUrlSearch = "$urlSearchPrefix$internalName&scope=internal"

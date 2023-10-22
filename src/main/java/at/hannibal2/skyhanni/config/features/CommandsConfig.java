@@ -72,10 +72,16 @@ public class CommandsConfig {
     public static class FandomWikiCommmandConfig {
 
         @Expose
-        @ConfigOption(name = "Use Fandom", desc = "Use Fandom wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7).")
+        @ConfigOption(name = "Replace Chat", desc = "Use Fandom Wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean useFandomWiki = false;
+
+        @Expose
+        @ConfigOption(name = "Skip Chat", desc = "Directly opens the Fandom Wiki instead of sending the §e\"Click to search for this thing on the Fandom Wiki\"§7 message beforehand.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean skipWikiChat = false;
 
         @Expose
         @ConfigOption(name = "Fandom Wiki Key", desc = "Search for an item on Fandom Wiki with this keybind.\n§4For optimal experiences, do §lNOT§r §4bind this to a mouse button.")
