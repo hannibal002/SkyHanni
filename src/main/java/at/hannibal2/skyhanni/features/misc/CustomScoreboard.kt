@@ -38,6 +38,31 @@ class CustomScoreboard {
     private var lobbyCode = "None"
     private var heat = "0"
 
+    // Indexes for the scoreboard
+    private var skyblockIndex = 0
+    private var profileIndex = 1
+    private var purseIndex = 2
+    private var bankIndex = 3
+    private var bitsIndex = 4
+    private var copperIndex = 5
+    private var gemsIndex = 6
+    private var locationIndex = 8
+    private var skyblockTimeIndex = 9
+    private var irlTimeIndex = 10
+    private var lobbyCodeIndex = 11
+    private var powderIndex = 12
+    private var slayerIndex = 14
+    private var nextEventIndex = 15
+    private var currentEventIndex = 16
+    private var mayorIndex = 17
+    private var heatIndex = 19
+    private var partyIndex = 20
+    private var petIndex = 21
+    private var quiverIndex = 22
+    private var maxwellIndex = 23
+    private var websiteIndex = 24
+
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
@@ -121,40 +146,40 @@ class CustomScoreboard {
 
     private fun drawScoreboard() = buildList<List<Any>> {
         val lineMap = HashMap<Int, List<Any>>()
-        lineMap[0] = Collections.singletonList("§6§lSKYBLOCK")
-        lineMap[1] = Collections.singletonList("${getProfileTypeAsSymbol()}${HypixelData.profileName.firstLetterUppercase()}")
-        lineMap[2] = Collections.singletonList("Purse: §6$purse")
-        lineMap[3] = Collections.singletonList("Bank: §6$bank")
-        lineMap[4] = Collections.singletonList("Bits: §b$bits")
-        lineMap[5] = Collections.singletonList("Copper: §c$copper")
-        lineMap[6] = Collections.singletonList("Gems: §a$gems")
+        lineMap[skyblockIndex] = Collections.singletonList("§6§lSKYBLOCK")
+        lineMap[profileIndex] = Collections.singletonList("${getProfileTypeAsSymbol()}${HypixelData.profileName.firstLetterUppercase()}")
+        lineMap[purseIndex] = Collections.singletonList("Purse: §6$purse")
+        lineMap[bankIndex] = Collections.singletonList("Bank: §6$bank")
+        lineMap[bitsIndex] = Collections.singletonList("Bits: §b$bits")
+        lineMap[copperIndex] = Collections.singletonList("Copper: §c$copper")
+        lineMap[gemsIndex] = Collections.singletonList("Gems: §a$gems")
         lineMap[7] = Collections.singletonList("<empty>")
-        lineMap[8] = Collections.singletonList(location)
-        lineMap[9] = Collections.singletonList(SkyBlockTime.now().formatted(false))
-        lineMap[10] = Collections.singletonList((if (config.use24hFormat) timeFormat24h else timeFormat12h).format(System.currentTimeMillis()))
-        lineMap[11] = Collections.singletonList("§8$lobbyCode")
-        lineMap[12] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
+        lineMap[locationIndex] = Collections.singletonList(location)
+        lineMap[skyblockTimeIndex] = Collections.singletonList(SkyBlockTime.now().formatted(false))
+        lineMap[irlTimeIndex] = Collections.singletonList((if (config.use24hFormat) timeFormat24h else timeFormat12h).format(System.currentTimeMillis()))
+        lineMap[lobbyCodeIndex] = Collections.singletonList("§8$lobbyCode")
+        lineMap[powderIndex] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
         lineMap[13] = Collections.singletonList("<empty>")
 
         val slayerList = mutableListOf<Any>()
         slayerList.add("§7Slayer") //todo: get slayer stuff
-        lineMap[14] = slayerList
+        lineMap[slayerIndex] = slayerList
 
-        lineMap[15] = Collections.singletonList("§7Next Event")
+        lineMap[nextEventIndex] = Collections.singletonList("§7Next Event")
 
         val eventList = mutableListOf<Any>()
         eventList.add("§cCurrent Event") //todo: get event stuff
-        lineMap[16] = eventList
+        lineMap[currentEventIndex] = eventList
 
         val mayorList = mutableListOf<Any>()
         mayorList.add(MayorElection.currentCandidate?.name ?: "<hidden>")
         for (perk in MayorElection.currentCandidate?.perks ?: emptyList()){
             mayorList.add(" §7- §e${perk.name}")
         }
-        lineMap[17] = mayorList
+        lineMap[mayorIndex] = mayorList
 
         lineMap[18] = Collections.singletonList("<empty>")
-        lineMap[19] = Collections.singletonList("Heat: §c♨$heat")
+        lineMap[heatIndex] = Collections.singletonList("Heat: §c♨$heat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
@@ -164,59 +189,59 @@ class CustomScoreboard {
             partyList.add(" §7- §7$member")
             partyCount++
         }
-        lineMap[20] = partyList
+        lineMap[partyIndex] = partyList
 
-        lineMap[21] = Collections.singletonList(ProfileStorageData.profileSpecific?.currentPet ?: "<hidden>")
-        lineMap[22] = Collections.singletonList("§7Quiver")
-        lineMap[23] = Collections.singletonList("§7Maxwell Power")
-        lineMap[24] = Collections.singletonList("§ewww.hypixel.net")
+        lineMap[petIndex] = Collections.singletonList(ProfileStorageData.profileSpecific?.currentPet ?: "<hidden>")
+        lineMap[quiverIndex] = Collections.singletonList("§7Quiver")
+        lineMap[maxwellIndex] = Collections.singletonList("§7Maxwell Power")
+        lineMap[websiteIndex] = Collections.singletonList("§ewww.hypixel.net")
 
         // Hide empty lines
         if (config.hideEmptyLines){
-            lineMap[2] = Collections.singletonList(if(purse == "0") "<hidden>" else "Purse: §6$purse")
-            lineMap[3] = Collections.singletonList(if(bank == "0") "<hidden>" else "Bank: §6$bank")
-            lineMap[4] = Collections.singletonList(if(bits == "0") "<hidden>" else "Bits: §b$bits")
-            lineMap[5] = Collections.singletonList(if(copper == "0") "<hidden>" else "Copper: §c$copper")
-            lineMap[6] = Collections.singletonList(if(gems == "0") "<hidden>" else "Gems: §a$gems")
-            lineMap[8] = Collections.singletonList(if(location == "None") "<hidden>" else location)
-            lineMap[11] = Collections.singletonList(if(lobbyCode == "None") "<hidden>" else "§8$lobbyCode")
-            lineMap[19] = Collections.singletonList(if(heat == "0") "<hidden>" else "Heat: §c♨$heat")
+            lineMap[purseIndex] = Collections.singletonList(if(purse == "0") "<hidden>" else "Purse: §6$purse")
+            lineMap[bankIndex] = Collections.singletonList(if(bank == "0") "<hidden>" else "Bank: §6$bank")
+            lineMap[bitsIndex] = Collections.singletonList(if(bits == "0") "<hidden>" else "Bits: §b$bits")
+            lineMap[copperIndex] = Collections.singletonList(if(copper == "0") "<hidden>" else "Copper: §c$copper")
+            lineMap[gemsIndex] = Collections.singletonList(if(gems == "0") "<hidden>" else "Gems: §a$gems")
+            lineMap[locationIndex] = Collections.singletonList(if(location == "None") "<hidden>" else location)
+            lineMap[lobbyCodeIndex] = Collections.singletonList(if(lobbyCode == "None") "<hidden>" else "§8$lobbyCode")
+            lineMap[heatIndex] = Collections.singletonList(if(heat == "0") "<hidden>" else "Heat: §c♨$heat")
 
             if (partyList.size == 1){
-                lineMap[20] = Collections.singletonList("<hidden>")
+                lineMap[partyIndex] = Collections.singletonList("<hidden>")
             }
         }
 
         // Rift
         if(IslandType.THE_RIFT.isInIsland()){
-            lineMap[2] = Collections.singletonList("Motes: §d$motes")
+            lineMap[purseIndex] = Collections.singletonList("Motes: §d$motes")
         }
 
         // Hide irrelevant lines
         if (config.hideIrrelevantLines){
             if (!IslandType.GARDEN.isInIsland()){
-                lineMap[5] = Collections.singletonList("<hidden>") // Copper
+                lineMap[copperIndex] = Collections.singletonList("<hidden>")
             }
             if (IslandType.THE_RIFT.isInIsland()){
-                lineMap[3] = Collections.singletonList("<hidden>") // Bank
-                lineMap[4] = Collections.singletonList("<hidden>") // Bits
-                lineMap[6] = Collections.singletonList("<hidden>") // Gems
-                lineMap[17] = Collections.singletonList("<hidden>") // Mayor
+                lineMap[bankIndex] = Collections.singletonList("<hidden>")
+                lineMap[bitsIndex] = Collections.singletonList("<hidden>")
+                lineMap[gemsIndex] = Collections.singletonList("<hidden>")
+                lineMap[mayorIndex] = Collections.singletonList("<hidden>")
             }
             if (!IslandType.DWARVEN_MINES.isInIsland()
                 && !IslandType.CRYSTAL_HOLLOWS.isInIsland()
             ){
-                lineMap[12] = Collections.singletonList("<hidden>") // Powder
+                lineMap[powderIndex] = Collections.singletonList("<hidden>")
             }
             if (!IslandType.CRYSTAL_HOLLOWS.isInIsland()){
-                lineMap[19] = Collections.singletonList("<hidden>") // Heat
+                lineMap[heatIndex] = Collections.singletonList("<hidden>")
             }
             if (!IslandType.DUNGEON_HUB.isInIsland()
                 && !IslandType.CATACOMBS.isInIsland()
                 && !IslandType.KUUDRA_ARENA.isInIsland()
                 && !IslandType.CRIMSON_ISLE.isInIsland()
             ){
-                lineMap[20] = Collections.singletonList("<hidden>") // Party
+                lineMap[partyIndex] = Collections.singletonList("<hidden>")
             }
             if (!IslandType.HUB.isInIsland()
                 && !IslandType.SPIDER_DEN.isInIsland()
@@ -224,7 +249,7 @@ class CustomScoreboard {
                 && !IslandType.THE_END.isInIsland()
                 && !IslandType.CRIMSON_ISLE.isInIsland()
             ){
-                lineMap[14] = Collections.singletonList("<hidden>") // Slayer
+                lineMap[slayerIndex] = Collections.singletonList("<hidden>")
             }
         }
 

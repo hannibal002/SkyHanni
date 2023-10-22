@@ -609,6 +609,7 @@ class SkyHanniMod {
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
+        loadModule(CustomScoreboard())
 
         init()
 
