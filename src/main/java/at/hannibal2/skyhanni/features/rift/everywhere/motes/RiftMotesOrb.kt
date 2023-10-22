@@ -79,12 +79,15 @@ class RiftMotesOrb {
 
             val location = orb.location
 
+            val sizeOffset = (5 - config.size) * -0.1
             if (orb.pickedUp) {
-                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§7Motes Orb", 1.5, ignoreBlocks = false)
-                event.drawWaypointFilled(location, LorenzColor.GRAY.toColor())
+                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§7Motes Orb", 1.5 + sizeOffset, ignoreBlocks =
+                false)
+                event.drawWaypointFilled(location, LorenzColor.GRAY.toColor(), extraSize = -sizeOffset)
             } else {
-                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§dMotes Orb", 1.5, ignoreBlocks = false)
-                event.drawWaypointFilled(location, LorenzColor.LIGHT_PURPLE.toColor())
+                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§dMotes Orb", 1.5 + sizeOffset, ignoreBlocks =
+                false)
+                event.drawWaypointFilled(location, LorenzColor.LIGHT_PURPLE.toColor(), extraSize = sizeOffset)
             }
         }
     }
