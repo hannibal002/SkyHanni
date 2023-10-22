@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.hitTrigger
+import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.ENTITY_RENDER_RANGE_IN_BLOCKS
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.*
@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object MobHitTrigger {
     // Implement TODOs
     // TODO(Dungeon Ability's)
+    // TODO(Conjuring/Mage Sheep)
     // TODO(Voodoo Doll) Crazy Pain
     // TODO(Firewand)
     // TODO(Wither Implosion)
@@ -113,8 +114,6 @@ object MobHitTrigger {
         handleItemClick(event.itemInHand, ClickType.LEFT_CLICK)
     }
 
-    private const val renderRangeInBlocks = 128.0 //Should be 16*8 because Hypixels max render Range is 8 (or not?)
-
     private val abilityRegex = Regex("Ability:(.*?)\\s(RIGHT|LEFT)\\sCLICK")
 
     private data class Ability(val name: String, val clickType: ClickType)
@@ -150,7 +149,7 @@ object MobHitTrigger {
             when (ability.name) {
                 //Aurora Staff
                 "Arcane Zap" -> rayTraceForSkyblockMob( //TODO fix inaccuracy when moving + correct range
-                    player, renderRangeInBlocks, partialTick
+                    player, ENTITY_RENDER_RANGE_IN_BLOCKS, partialTick
                 )?.let { addToMobHitList(it, hitTrigger.AuroraStaff) }
 
                 else -> return@forEach
@@ -195,7 +194,7 @@ object MobHitTrigger {
             //Mage Left Click TODO(Cooldown)
             classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType.isLeftClick() -> rayTraceForSkyblockMob(
                 player,
-                renderRangeInBlocks,
+                ENTITY_RENDER_RANGE_IN_BLOCKS,
                 partialTick
             )?.let {
                 addToMobHitList(

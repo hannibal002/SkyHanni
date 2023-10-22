@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SkyblockMobKillEvent
-import at.hannibal2.skyhanni.events.hitTrigger
 import at.hannibal2.skyhanni.events.onMobHitEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
@@ -33,7 +33,8 @@ object EntityKill {
 
     val config get() = SkyHanniMod.feature.dev.mobKillDetection
 
-    // TODO(fix mob exiting Renderrange to count as Death/Kill)
+    const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 //Entity Derender after ~5 Chunks
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         previousEntityLiving.clear()
@@ -44,7 +45,9 @@ object EntityKill {
         //Spawned EntityLiving
         (currentEntityLiving - previousEntityLiving).forEach { EntityLivingSpawnEvent(it).postAndCatch() }
         //Despawned EntityLiving
-        (previousEntityLiving - currentEntityLiving).forEach { EntityLivingDeathEvent(it).postAndCatch() }
+        (previousEntityLiving - currentEntityLiving).filter {
+            it.distanceToPlayer() < ENTITY_RENDER_RANGE_IN_BLOCKS
+        }.forEach { EntityLivingDeathEvent(it).postAndCatch() }
 
         if (config.LogMobHitList) {
             if (config.LogMobHitListId) {
@@ -86,7 +89,7 @@ object EntityKill {
 
     @SubscribeEvent
     fun onSkyblockMobKill(event: SkyblockMobKillEvent) {
-        LorenzDebug.chatAndLog("Mob Name: ${event.mob.name}")
+        LorenzDebug.chatAndLog("Mob Name: ${event.mob.name} Distance: ${event.mob.baseEntity.distanceToPlayer()}")
         mobHitList.remove(event.mob)
     }
 
@@ -97,23 +100,23 @@ object EntityKill {
 
     fun addToMobHitList(entity: Entity, trigger: hitTrigger) {
         mobHitList.firstOrNull { it == entity }?.let {
-            if(checkIfBlacklisted(it.name,trigger)) return
+            if (checkIfBlacklisted(it.name, trigger)) return
             onMobHitEvent(it, trigger, false).postAndCatch()
             return
         }
         val mob = SkyblockMobUtils.createSkyblockMob(entity)
-        if(checkIfBlacklisted(mob.name,trigger)) return
+        if (checkIfBlacklisted(mob.name, trigger)) return
         mobHitList.add(mob)
         onMobHitEvent(mob, trigger, true).postAndCatch()
     }
 
     val magicBlacklist = setOf<String>() //Get it from repo
 
-    private fun checkIfBlacklisted(name: String, trigger: hitTrigger) : Boolean{ //TODO complete the Blacklist
-        if(trigger.isMagic()){
+    private fun checkIfBlacklisted(name: String, trigger: hitTrigger): Boolean { //TODO complete the Blacklist
+        if (trigger.isMagic()) {
             return magicBlacklist.contains(name)
         }
-        if(trigger == hitTrigger.Cleave){
+        if (trigger == hitTrigger.Cleave) {
             return name.contains("Star Sentry") // Do not know if more exist
         }
         return false
