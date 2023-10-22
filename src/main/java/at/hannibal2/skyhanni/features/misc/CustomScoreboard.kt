@@ -2,7 +2,8 @@
 // Requested by alpaka8123 (https://discord.com/channels/997079228510117908/1162844830360146080)
 // Done by J10a1n15, with lots of help from hanni, and snippets from item tracker features <3
 //
-
+// I'm also like really sorry for anyone who has to look at this code, it looks kinda bad
+//
 
 package at.hannibal2.skyhanni.features.misc
 
@@ -189,9 +190,42 @@ class CustomScoreboard {
         // Rift
         if(IslandType.THE_RIFT.isInIsland()){
             lineMap[2] = Collections.singletonList("Motes: §d$motes")
-            lineMap[3] = Collections.singletonList("<hidden>")
-            lineMap[4] = Collections.singletonList("<hidden>")
-            lineMap[5] = Collections.singletonList("<hidden>")
+        }
+
+        // Hide irrelevant lines
+        if (config.hideIrrelevantLines){
+            if (!IslandType.GARDEN.isInIsland()){
+                lineMap[5] = Collections.singletonList("<hidden>") // Copper
+            }
+            if (IslandType.THE_RIFT.isInIsland()){
+                lineMap[3] = Collections.singletonList("<hidden>") // Bank
+                lineMap[4] = Collections.singletonList("<hidden>") // Bits
+                lineMap[6] = Collections.singletonList("<hidden>") // Gems
+                lineMap[17] = Collections.singletonList("<hidden>") // Mayor
+            }
+            if (!IslandType.DWARVEN_MINES.isInIsland()
+                && !IslandType.CRYSTAL_HOLLOWS.isInIsland()
+            ){
+                lineMap[12] = Collections.singletonList("<hidden>") // Powder
+            }
+            if (!IslandType.CRYSTAL_HOLLOWS.isInIsland()){
+                lineMap[19] = Collections.singletonList("<hidden>") // Heat
+            }
+            if (!IslandType.DUNGEON_HUB.isInIsland()
+                && !IslandType.CATACOMBS.isInIsland()
+                && !IslandType.KUUDRA_ARENA.isInIsland()
+                && !IslandType.CRIMSON_ISLE.isInIsland()
+            ){
+                lineMap[20] = Collections.singletonList("<hidden>") // Party
+            }
+            if (!IslandType.HUB.isInIsland()
+                && !IslandType.SPIDER_DEN.isInIsland()
+                && !IslandType.THE_PARK.isInIsland()
+                && !IslandType.THE_END.isInIsland()
+                && !IslandType.CRIMSON_ISLE.isInIsland()
+            ){
+                lineMap[14] = Collections.singletonList("<hidden>") // Slayer
+            }
         }
 
         return formatDisplay(lineMap)

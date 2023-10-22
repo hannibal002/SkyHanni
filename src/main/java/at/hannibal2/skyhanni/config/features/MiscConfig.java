@@ -849,6 +849,13 @@ public class MiscConfig {
         public boolean hideEmptyLines = true;
 
         @Expose
+        @ConfigOption(name = "Hide Info not relevant to location", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideIrrelevantLines = true;
+
+
+        @Expose
         @ConfigOption(name = "24h format", desc = "Use 24h format for the IRL time.")
         @ConfigEditorBoolean
         @FeatureToggle
