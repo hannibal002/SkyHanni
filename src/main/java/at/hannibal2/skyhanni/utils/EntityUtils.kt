@@ -144,6 +144,9 @@ object EntityUtils {
 
     fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
 
+    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4 && uniqueID.variant() == 2
+    fun EntityPlayer.isDisplayNPC() = isNPC() && name.any { it in '0'..'9' }
+
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =

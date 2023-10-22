@@ -2,13 +2,18 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill
+import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.passive.EntityVillager
 
 object SkyblockMobUtils {
     val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
@@ -88,18 +93,16 @@ object SkyblockMobUtils {
     fun createSkyblockMob(baseEntity: Entity): SkyblockMob = if (DungeonAPI.inDungeon()) DungeonMob(baseEntity) else
         SkyblockMob(baseEntity)
 
+    fun createSkyblockMobIfValid(baseEntity: Entity): SkyblockMob? = if (testIfSkyBlockMob(baseEntity))
+        createSkyblockMob(baseEntity) else null
+
     fun testIfSkyBlockMob(entity: Entity): Boolean {
         if (entity !is EntityLivingBase) return false
-        if (entity is EntityArmorStand || entity is EntityPlayerSP) return false
-        //Protection that no real Player gets added. Only difference to a custom mob is that every SkyblockItem has a nbtTag
-        if (entity.inventory != null) { //TODO fix this
-            if (entity.inventory.isNotEmpty() && entity.inventory.any { it != null && it.tagCompound == null }) {
-                if (EntityKill.config.LogPlayerCantBeAdded) {
-                    LorenzDebug.log("Entity ${entity.name} is not allowed in HitList")
-                }
-                return false
-            }
-        }
+        if (entity is EntityArmorStand) return false
+        if (entity is EntityOtherPlayerMP && (entity.isRealPlayer() || entity.isDisplayNPC())) return false
+        if (entity is EntityPlayerSP) return false
+        if (entity is EntityWither && (entity.entityId < 0 || entity.name == "Wither")) return false
+        if (entity is EntityVillager) return false //TODO Exclude Jerrys from this Rule
         return true
     }
 

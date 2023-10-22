@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.testIfSkyBlockMob
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -40,7 +40,7 @@ object EntityKill {
         previousEntityLiving.clear()
         previousEntityLiving.addAll(currentEntityLiving)
         currentEntityLiving.clear()
-        currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { testIfSkyBlockMob(it) })
+        currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it.isSkyBlockMob() })
 
         //Spawned EntityLiving
         (currentEntityLiving - previousEntityLiving).forEach { EntityLivingSpawnEvent(it).postAndCatch() }
@@ -79,17 +79,15 @@ object EntityKill {
 
     @SubscribeEvent
     fun onEntityLivingDeath(event: EntityLivingDeathEvent) {
-        //LorenzDebug.log("Entity Death Id=${event.entity.entityId}")
         mobHitList.firstOrNull { it == event.entity }
             ?.let {
-                LorenzDebug.log("Hi i'm not living anymore")
                 SkyblockMobKillEvent(it, false).postAndCatch()
             }
     }
 
     @SubscribeEvent
     fun onSkyblockMobKill(event: SkyblockMobKillEvent) {
-        LorenzDebug.chatAndLog("Mob Name: ${event.mob.name} Distance: ${event.mob.baseEntity.distanceToPlayer()}")
+        if(config.ShowNameOfKilledMob) LorenzDebug.chatAndLog("Mob Name: ${event.mob.name}")
         mobHitList.remove(event.mob)
     }
 

@@ -218,7 +218,6 @@ public class DevConfig {
         }
     }
 
-    //Mob Kill Detection (Only temporarily)
     @Expose
     @ConfigOption(name = "Mob Kill Detection", desc = "")
     @Accordion
@@ -227,33 +226,45 @@ public class DevConfig {
     public static class MobKillDetection {
 
         @Expose
-        @ConfigOption(name = "skyblockMobHighlight", desc = "")
+        @ConfigOption(name = "Mob Highlight", desc = "Highlight each entity that is a valid Skyblock Mob")
         @ConfigEditorBoolean
         public boolean skyblockMobHighlight = false;
 
         @Expose
-        @ConfigOption(name = "skyblockMobHighlightRayHit", desc = "")
+        @ConfigOption(name = "Highlight Ray Hit", desc = "Highlights the SkyblockMob that is directly in front of the camera")
         @ConfigEditorBoolean
         public boolean skyblockMobHighlightRayHit = false;
 
         @Expose
-        @ConfigOption(name = "mobKilldetetctionLogMobHitList", desc = "")
+        @ConfigOption(name = "Kill Message", desc = "Shows a Kill Message in Chat")
+        @ConfigEditorBoolean
+        public boolean ShowNameOfKilledMob = false;
+
+        @Expose
+        @ConfigOption(name = "Log HitList", desc = "Logs the complete HitList each Tick")
         @ConfigEditorBoolean
         public boolean LogMobHitList = false;
 
         @Expose
-        @ConfigOption(name = "mobKilldetetctionLogMobHitListId", desc = "")
+        @ConfigOption(name = "HitList Log as ID", desc = "The HitList will be log only as Mob ID instead of the Mob Name")
         @ConfigEditorBoolean
         public boolean LogMobHitListId = false;
 
         @Expose
-        @ConfigOption(name = "mobKilldetetctionLogPlayerCantBeAdded", desc = "")
-        @ConfigEditorBoolean
-        public boolean LogPlayerCantBeAdded = false;
+        @ConfigOption(name = "Mob Hit Detection", desc = "")
+        @Accordion
+        public MobHitDetecion mobHitDetecion = new MobHitDetecion();
 
-        @Expose
-        @ConfigOption(name = "arrowDebug", desc = "")
-        @ConfigEditorBoolean
-        public boolean arrowDebug = false;
+        public static class MobHitDetecion {
+            @Expose
+            @ConfigOption(name = "Debug Arrow", desc = "Enables all Debug functions for the Arrow Detection")
+            @ConfigEditorBoolean
+            public boolean arrowDebug = false;
+
+            @Expose
+            @ConfigOption(name = "Debug Cleave", desc = "Logs Cleave Hits and shows range")
+            @ConfigEditorBoolean
+            public boolean cleaveDebug = false;
+        }
     }
 }

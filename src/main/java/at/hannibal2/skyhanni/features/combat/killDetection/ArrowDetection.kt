@@ -25,7 +25,7 @@ import kotlin.math.pow
 
 object ArrowDetection {
 
-    private val config get() = SkyHanniMod.feature.dev.mobKillDetection
+    private val config get() = SkyHanniMod.feature.dev.mobKillDetection.mobHitDetecion
 
     class SkyblockArrow(val base: EntityArrow, val pierce: Int, val canHitEnderman: Boolean) {
         var piercedAmount = 0

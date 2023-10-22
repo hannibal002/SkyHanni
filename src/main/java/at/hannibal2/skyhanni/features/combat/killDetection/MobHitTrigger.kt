@@ -1,21 +1,26 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.ENTITY_RENDER_RANGE_IN_BLOCKS
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMob
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.absoluteValue
 
 object MobHitTrigger {
     // Implement TODOs
@@ -67,11 +72,13 @@ object MobHitTrigger {
 
     //Needs Bugfixing
 
+    private val config get() = SkyHanniMod.feature.dev.mobKillDetection.mobHitDetecion
+
 
     @SubscribeEvent
     fun onEntityHit(event: EntityClickEvent) {
         val entity = event.clickedEntity ?: return
-        if (!SkyblockMobUtils.testIfSkyBlockMob(entity)) return
+        if (!entity.isSkyBlockMob()) return
 
         //Base Melee Hit
         if (event.clickType.isLeftClick()) {
@@ -80,7 +87,7 @@ object MobHitTrigger {
             val itemInHand = InventoryUtils.getItemInHand() ?: return
             val enchantmentsOfItemInHand = itemInHand.getEnchantments()
 
-            //Cleave Hit (range isn't 100% correct) //TODO fix Range and add Blacklist for certain mobs (Star Sentry etc.)
+            //Cleave Hit
             if (enchantmentsOfItemInHand != null && enchantmentsOfItemInHand.any { it.key == "cleave" }) {
                 val range: Double = when (enchantmentsOfItemInHand.getValue("cleave")) {
                     1 -> 3.3
@@ -89,17 +96,42 @@ object MobHitTrigger {
                     4 -> 4.2
                     5 -> 4.5
                     6 -> 4.8
-                    else -> 0.0
-                }
+                    else -> -1.4
+                } + 1.4 //Magic Value (determent by Testing)
+                cleaveEntity = entity.getLorenzVec()
+                cleaveRange = range
                 var i = 0
                 EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
-                    .filter { SkyblockMobUtils.testIfSkyBlockMob(it) && it != entity }.forEach {
+                    .filter { it.isSkyBlockMob() && it != entity && (entity.posY - it.posY).absoluteValue < 5.0}
+                    .forEach {
                         addToMobHitList(it, hitTrigger.Cleave)
-                        i++
-                        //LorenzDebug.log("Name: ${it.name}")
+                        if (config.cleaveDebug) {
+                            i++
+                            LorenzDebug.log("Name: ${it.name}")
+                        }
                     }
-                //LorenzDebug.log("Cleave Triggers: $i")
+                if (config.cleaveDebug) {
+                    LorenzDebug.log("Cleave Triggers: $i")
+                }
             }
+        }
+    }
+
+    var cleaveEntity: LorenzVec? = null
+    var cleaveRange = 0.0
+
+    @SubscribeEvent
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
+        if (!config.cleaveDebug) return
+        cleaveEntity?.let {
+            drawCylinderInWorld(
+                LorenzColor.DARK_AQUA.addOpacity(100),
+                it.x,
+                it.y,
+                it.z,
+                cleaveRange.toFloat(),
+                2.0f,
+                event.partialTicks)
         }
     }
 
@@ -126,14 +158,14 @@ object MobHitTrigger {
         val armor = InventoryUtils.getArmor()
         val player = Minecraft.getMinecraft().thePlayer
         val classInDungeon = DungeonAPI.playerClass
-        val partialTick = 0.0f //IDK how to make it correctly but ignoring partialTicks(=0.0) works fine
+        val partialTick = 0.5f //IDK how to make it correctly but ignoring partialTicks(=0.5) works fine
         //LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
 
         //Ability
         val abilityLores = itemInHand.getLore().filter { it.removeColor().contains("Ability:") }
         val abilityList = mutableListOf<Ability>()
 
-        abilityLores.map { it.removeColor()}.forEach {
+        abilityLores.map { it.removeColor() }.forEach {
             val match = abilityRegex.find(it) ?: return@forEach
             abilityList.add(
                 Ability(
