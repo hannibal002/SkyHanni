@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -27,7 +26,7 @@ class DungeonFinderFeatures {
     private val pricePattern = "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?mil)".toRegex(RegexOption.IGNORE_CASE)
     private val carryPattern = "(carry|cary|carries|caries|comp|to cata [0-9]{2})".toRegex(RegexOption.IGNORE_CASE)
     private val memberPattern = "^ §.*?§.: §.([A-Z]+)§. \\(§.([0-9]+)§.\\)".toRegex(RegexOption.IGNORE_CASE)
-    private val ineligiblePattern = "^§c(Requires .*$|You don't meet the requirement!$)".toRegex()
+    private val ineligiblePattern = "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)".toRegex()
     private val classLevelPattern = " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)".toPattern()
     private val notePattern = "^(§7§7Note: |§f[^§])".toRegex()
 
@@ -124,7 +123,7 @@ class DungeonFinderFeatures {
             val memberLevels = members.map { memberPattern.matchEntire(it)?.groupValues?.get(2)?.toInt() ?: 0 }
             val memberClasses = members.map { memberPattern.matchEntire(it)?.groupValues?.get(1) ?: "" }
 
-            if (memberLevels.any { it <= config.markGroupsBelowLevel }) {
+            if (memberLevels.any { it <= config.markBelowClassLevel }) {
                 slot highlight LorenzColor.YELLOW
                 continue
             }
