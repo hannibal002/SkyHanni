@@ -191,6 +191,26 @@ public class DungeonConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Livid Finder", desc = "")
+    @Accordion
+    public LividFinderConfig lividFinder = new LividFinderConfig();
+
+    public static class LividFinderConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Helps find the correct livid in F5 and in M5.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Wrong Livids", desc = "Hide wrong livids entirely.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideWrong = false;
+    }
+
+    @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
             "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
