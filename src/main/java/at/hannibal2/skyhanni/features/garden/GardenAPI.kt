@@ -243,10 +243,10 @@ object GardenAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<GardenJson>("Garden") ?: return
+        val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.garden_exp
     }
 
     private var gardenExperience = listOf<Int>()
-    private const val gardenOverflowExp = 10000 // can be changed I guess
+    private const val gardenOverflowExp = 10000
 }
