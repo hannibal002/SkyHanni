@@ -278,17 +278,17 @@ public class GardenConfig {
                             "§647.2m Coins Spent",
                             "§b23 §9Flowering Bouquet",
                             "§b4 §9Overgrown Grass",
-                            "§b2 §9Green Bandana",
+                            "§b2 §5Green Bandana",
                             "§b1 §9Dedication IV",
-                            "§b6 §9Music Rune",
+                            "§b6 §b◆ Music Rune I",
                             "§b1 §cSpace Helmet",
                             "§b1 §9Cultivating I",
                             "§b1 §9Replenish I",
                             " ", // If they want another empty row
-                            "§212,735 Garden EXP",
-                            "§b11,056 Bits",
-                            "§250,556 Mithril Powder",
-                            "§d50,556 Gemstone Powder",
+                            "§212,600 Garden EXP",
+                            "§b4.2k Bits",
+                            "§220k Mithril Powder",
+                            "§d18k Gemstone Powder",
                     }
             )
             public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
