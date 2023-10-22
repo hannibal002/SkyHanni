@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.events.TabListLineRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -400,18 +399,6 @@ class GardenVisitorFeatures {
                 logger.log("Spaceman!")
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onTabListText(event: TabListLineRenderEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!config.coloredName) return
-        val text = event.text
-        val replace = VisitorAPI.fromHypixelName(text)
-        val visitor = VisitorAPI.getVisitor(replace)
-        visitor?.let {
-            event.text = " " + GardenVisitorColorNames.getColoredName(it.visitorName)
         }
     }
 

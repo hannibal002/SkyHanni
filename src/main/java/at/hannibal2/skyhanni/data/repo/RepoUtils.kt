@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.File
@@ -8,10 +7,10 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
-import java.lang.reflect.Type
 
 object RepoUtils {
 
@@ -84,23 +83,13 @@ object RepoUtils {
         return false
     }
 
-    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T? {
-        if (!repo.exists()) return null
-
-        val jsonFile = File(repo, "constants/$constant.json")
+    fun <T> getConstant(repoLocation: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T {
+        val name = "constants/$constant.json"
+        val jsonFile = File(repoLocation, name)
         if (!jsonFile.isFile) {
-            ErrorManager.logError(
-                Error("File '$jsonFile' not found!"),
-                "File in repo missing! ($jsonFile). Try §e/shupdaterepo"
-            )
-            return null
+            throw RepoError("Repo file '$name' not found.")
         }
-        BufferedReader(
-            InputStreamReader(
-                FileInputStream(jsonFile),
-                StandardCharsets.UTF_8
-            )
-        ).use { reader ->
+        BufferedReader(InputStreamReader(FileInputStream(jsonFile), StandardCharsets.UTF_8)).use { reader ->
             if (type == null) {
                 return gson.fromJson(reader, clazz)
             } else {

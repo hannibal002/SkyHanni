@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemBlink
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
@@ -16,6 +17,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class WildStrawberryDyeNotification {
     var lastCloseTime = 0L
+
+    val item by lazy { "DYE_WILD_STRAWBERRY".asInternalName() }
 
     @SubscribeEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
@@ -33,8 +36,8 @@ class WildStrawberryDyeNotification {
             val diff = System.currentTimeMillis() - lastCloseTime
             if (diff < 1_000) return@execute
 
-            val internalName = event.itemStack.getInternalName_old()
-            if (internalName == "DYE_WILD_STRAWBERRY") {
+            val internalName = event.itemStack.getInternalName()
+            if (internalName == item) {
                 val name = event.itemStack.name!!
                 LorenzUtils.sendTitle(name, 5.seconds)
                 LorenzUtils.chat("§e[SkyHanni] You found a $name§e!")
