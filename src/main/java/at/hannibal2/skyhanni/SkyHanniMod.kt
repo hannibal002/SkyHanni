@@ -581,7 +581,7 @@ class SkyHanniMod {
         loadModule(GriffinPetWarning())
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
-        loadModule(HarpFeatures())
+        loadModule(HarpFeatures)
         loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
