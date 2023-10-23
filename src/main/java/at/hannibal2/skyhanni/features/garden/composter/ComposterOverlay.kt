@@ -55,7 +55,7 @@ import kotlin.time.DurationUnit
 object ComposterOverlay {
     private var organicMatterFactors: Map<NEUInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NEUInternalName, Double> = emptyMap()
-private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
+    private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
 
     private val config get() = SkyHanniMod.feature.garden.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
@@ -176,7 +176,8 @@ private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
                 )
             return
         }
-        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) currentOrganicMatterItem = NONE
+        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) currentOrganicMatterItem =
+            NONE
         if (currentFuelItem.let { it !in fuelFactors.keys && it != NONE }) currentFuelItem = NONE
 
         if (inComposter) {
@@ -561,10 +562,10 @@ private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
 
             var (newId, amount) = NEUItems.getMultiplier(internalName)
             if (amount <= 9) continue
-                if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
-                    //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
-                    amount = 5184
-                }
+            if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
+                //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
+                amount = 5184
+            }
             baseValues[newId.asInternalName()]?.let {
                 map[internalName.asInternalName()] = it * amount
             }
