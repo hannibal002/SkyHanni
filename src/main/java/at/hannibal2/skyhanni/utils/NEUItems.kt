@@ -47,6 +47,7 @@ object NEUItems {
     }
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
     fun getRawInternalName(itemName: String): String {
         return getInternalNameFromItemName(itemName).asString()
     }
@@ -172,6 +173,7 @@ object NEUItems {
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
     fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
         internalName.asInternalName().getItemStack(definite)
 
