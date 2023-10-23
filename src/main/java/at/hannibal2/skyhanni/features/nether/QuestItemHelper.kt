@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -29,6 +31,7 @@ class QuestItemHelper {
                 if (!matches()) continue@items
                 questItem = group("name")
                 questAmount = group("amount").toInt()
+                questAmount -= InventoryUtils.countItemsInLowerInventory { it.name?.contains(questItem) == true }
                 LorenzUtils.clickableChat(
                     "§e[SkyHanni] Click here to grab x$questAmount $questItem from sacks!",
                     "gfs $questItem $questAmount"

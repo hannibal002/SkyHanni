@@ -148,4 +148,10 @@ public class CrimsonIsleConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questItemHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Pablo NPC Helper", desc = "Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean pabloHelper = false;
 }
