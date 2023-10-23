@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -109,29 +109,40 @@ object SkyblockMobUtils {
     fun Entity.isSkyBlockMob() = testIfSkyBlockMob(this)
 
 
-    fun rayTraceForSkyblockMob(entity: Entity, distance: Double, partialTicks: Float): Entity? {
-        val hit = rayTraceForSkyblockMob(entity, partialTicks) ?: return null
+    fun rayTraceForSkyblockMob(
+        entity: Entity,
+        distance: Double,
+        partialTicks: Float,
+        offset: LorenzVec = LorenzVec(0, 0, 0)
+    ): Entity? {
+        val hit = rayTraceForSkyblockMob(entity, partialTicks, offset) ?: return null
         return if (hit.distanceTo(entity.getLorenzVec()) > distance) null else hit
     }
 
-    fun rayTraceForSkyblockMobs(entity: Entity, distance: Double, partialTicks: Float): List<Entity>? {
-        val hits = rayTraceForSkyblockMobs(entity, partialTicks) ?: return null
+    fun rayTraceForSkyblockMobs(
+        entity: Entity,
+        distance: Double,
+        partialTicks: Float,
+        offset: LorenzVec = LorenzVec(0, 0, 0)
+    ): List<Entity>? {
+        val hits = rayTraceForSkyblockMobs(entity, partialTicks, offset) ?: return null
         val inDistance = hits.filter { it.distanceTo(entity.getLorenzVec()) <= distance }
         if (inDistance.isEmpty()) return null
         return inDistance
     }
 
-    fun rayTraceForSkyblockMob(entity: Entity, partialTicks: Float): Entity? {
-        val hits = rayTraceForSkyblockMobs(entity, partialTicks) ?: return null
-        return hits.first()
-    }
+    fun rayTraceForSkyblockMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec(0, 0, 0)) =
+        rayTraceForSkyblockMobs(entity, partialTicks, offset)
+            ?.first()
 
-    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float): List<Entity>? {
-        val pos = entity.getPositionEyes(partialTicks).toLorenzVec()
+    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec(0, 0, 0)):
+        List<Entity>? {
+        val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntitys = EntityKill.currentEntityLiving.filter { it.entityBoundingBox.rayIntersects(pos, look) }
         if (possibleEntitys.isEmpty()) return null
         possibleEntitys.sortedBy { it.distanceTo(pos) }
         return possibleEntitys
     }
+
 }

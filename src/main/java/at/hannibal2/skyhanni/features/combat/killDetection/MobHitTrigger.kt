@@ -9,18 +9,31 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.ENTITY_RENDER_RANGE_IN_BLOCKS
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMob
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
+
+private const val CLEAVE_HIT_LIMIT = 12
+
+private const val CLEAVE_MAX_Y_DIFFERENCE = 5.0
+
+private const val CLEAVE_EXTEND_RANGE = 1.5 //Magic Value (determent by Testing)
 
 object MobHitTrigger {
     // Implement TODOs
@@ -76,7 +89,7 @@ object MobHitTrigger {
 
 
     @SubscribeEvent
-    fun onEntityHit(event: EntityClickEvent) {
+    fun onEntityClicked(event: EntityClickEvent) {
         val entity = event.clickedEntity ?: return
         if (!entity.isSkyBlockMob()) return
 
@@ -96,42 +109,38 @@ object MobHitTrigger {
                     4 -> 4.2
                     5 -> 4.5
                     6 -> 4.8
-                    else -> -1.4
-                } + 1.4 //Magic Value (determent by Testing)
-                cleaveEntity = entity.getLorenzVec()
-                cleaveRange = range
-                var i = 0
-                EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
-                    .filter { it.isSkyBlockMob() && it != entity && (entity.posY - it.posY).absoluteValue < 5.0}
-                    .forEach {
-                        addToMobHitList(it, hitTrigger.Cleave)
-                        if (config.cleaveDebug) {
-                            i++
-                            LorenzDebug.log("Name: ${it.name}")
-                        }
-                    }
+                    else -> -CLEAVE_EXTEND_RANGE
+                } + CLEAVE_EXTEND_RANGE //TODO fix Range (for all Levels)
+                val cleaveHits = EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
+                    .filter { ((entity.posY - it.posY).absoluteValue < CLEAVE_MAX_Y_DIFFERENCE) && (it != entity) && it.isSkyBlockMob() }
+                    .sortedBy { it.distanceTo(entity) }.take(CLEAVE_HIT_LIMIT)
+                cleaveHits.forEach { addToMobHitList(it, hitTrigger.Cleave) }
+
                 if (config.cleaveDebug) {
-                    LorenzDebug.log("Cleave Triggers: $i")
+                    cleaveEntity = entity.getLorenzVec()
+                    cleaveRange = range
+                    LorenzDebug.log("Cleave Triggers: ${cleaveHits.count()} for ${cleaveHits.map { it.name }}")
                 }
             }
         }
     }
 
-    var cleaveEntity: LorenzVec? = null
-    var cleaveRange = 0.0
+    private var cleaveEntity: LorenzVec? = null
+    private var cleaveRange = 0.0
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!config.cleaveDebug) return
         cleaveEntity?.let {
             drawCylinderInWorld(
-                LorenzColor.DARK_AQUA.addOpacity(100),
+                LorenzColor.DARK_AQUA.addOpacity(50),
                 it.x,
                 it.y,
                 it.z,
                 cleaveRange.toFloat(),
                 2.0f,
-                event.partialTicks)
+                event.partialTicks
+            )
         }
     }
 
@@ -181,7 +190,7 @@ object MobHitTrigger {
             when (ability.name) {
                 //Aurora Staff
                 "Arcane Zap" -> rayTraceForSkyblockMob( //TODO fix inaccuracy when moving + correct range
-                    player, ENTITY_RENDER_RANGE_IN_BLOCKS, partialTick
+                    player, ENTITY_RENDER_RANGE_IN_BLOCKS, partialTick, offset = LorenzVec(0.0, -0.6, 0.0)
                 )?.let { addToMobHitList(it, hitTrigger.AuroraStaff) }
 
                 else -> return@forEach
@@ -196,8 +205,8 @@ object MobHitTrigger {
             ))) -> {
                 val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
                     ?: 0) + if (itemName.contains("Juju")) 3 else 0
-                val bowStrength = 4.5  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
-                val direction = player.getLook(partialTick).toLorenzVec().normalize()
+                val bowStrength = 3  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
+                val direction = ArrowDetection.getMotionVector(player)
                 val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0))
                     .add(direction.multiply(0.15))
                 val velocity = direction.multiply(bowStrength)

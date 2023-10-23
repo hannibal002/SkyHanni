@@ -16,10 +16,11 @@ import at.hannibal2.skyhanni.utils.getPrevLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import at.hannibal2.skyhanni.utils.vectorFromPoints
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityArrow
+import net.minecraft.util.MathHelper
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 import kotlin.math.PI
 import kotlin.math.pow
 
@@ -252,4 +253,12 @@ object ArrowDetection {
             event.draw3DLine(it.start, it.end, LorenzColor.YELLOW.toColor(), 10, true)
         }
     }
+
+    private const val ArrowPI = 1415927F
+    fun getMotionVector(player: EntityPlayer): LorenzVec = LorenzVec(
+        (-MathHelper.sin(player.rotationYaw / 180.0F * ArrowPI) * MathHelper.cos(player.rotationPitch / 180.0F * ArrowPI)),
+        (MathHelper.cos(player.rotationYaw / 180.0F * ArrowPI) * MathHelper.cos(player.rotationPitch / 180.0F * ArrowPI)),
+        (-MathHelper.sin(player.rotationPitch / 180.0F * ArrowPI))
+    )
+
 }

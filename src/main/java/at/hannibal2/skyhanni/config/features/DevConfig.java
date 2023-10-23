@@ -231,6 +231,11 @@ public class DevConfig {
         public boolean skyblockMobHighlight = false;
 
         @Expose
+        @ConfigOption(name = "Hit Highlight", desc = "Highlight each entity that is in the HitList")
+        @ConfigEditorBoolean
+        public boolean skyblockMobHitHighlight = false;
+
+        @Expose
         @ConfigOption(name = "Highlight Ray Hit", desc = "Highlights the SkyblockMob that is directly in front of the camera")
         @ConfigEditorBoolean
         public boolean skyblockMobHighlightRayHit = false;

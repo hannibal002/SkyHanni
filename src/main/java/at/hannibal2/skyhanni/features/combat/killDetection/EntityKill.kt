@@ -125,7 +125,15 @@ object EntityKill {
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (config.skyblockMobHighlight) {
             currentEntityLiving.forEach {
-                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.5f)
+                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
+            }
+        }
+        if (config.skyblockMobHitHighlight) {
+            mobHitList.forEach {
+                event.drawFilledBoundingBox_nea(
+                    it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.LIGHT_PURPLE.toColor
+                        (), 0.6f
+                )
             }
         }
         if (config.skyblockMobHighlightRayHit) {
