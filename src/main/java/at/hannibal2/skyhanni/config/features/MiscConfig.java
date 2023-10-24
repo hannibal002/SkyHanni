@@ -258,9 +258,10 @@ public class MiscConfig {
                         "Slayer",
                         "Stacking Enchantment",
                         "Dungeon",
+                        "AFK Indicator"
                 }
         )
-        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
         @Expose
         @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
@@ -624,9 +625,13 @@ public class MiscConfig {
             public boolean markSpecialPersons = false;
 
             @Expose
-            @ConfigOption(name = "Mark SkyHanni Devs", desc = "Adds a §c:O §7behind the tablist name of SkyHanni's creators.")
+            @ConfigOption(
+                    name = "Mark SkyHanni Devs",
+                    desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
+                            "§eThose are the folks that coded the mod for you for free :)"
+            )
             @ConfigEditorBoolean
-            public boolean markSkyHanniDevs = false;
+            public boolean markSkyHanniContributors = false;
         }
     }
 

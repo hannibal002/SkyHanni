@@ -24,5 +24,9 @@ _Frequently Asked Questions_
 > **7: Does the barn fishing timer work on the Crimson Isle?**
 > No, the barn fishing timer is not supported in the Crimson Isle in Hypixel Skyblock because it would disrupt other fishers due to competition for the maximum sea creature cap, potentially leading to conflicts and stealing of sea creatures.
 
-*This FAQ was last updated on September 23rd, 2023.
+> **8: My Jacob Contest Display crops are wrong, how do I fix this?**
+> 1. Run the command `/shconfig reset config.storage.gardenJacobFarmingContestTimes`
+> 2. Restart the game
+
+*This FAQ was last updated on October 17th, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

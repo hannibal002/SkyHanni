@@ -21,6 +21,7 @@ class GardenYawAndPitch {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
+        if (GardenAPI.hideExtraGuis()) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
