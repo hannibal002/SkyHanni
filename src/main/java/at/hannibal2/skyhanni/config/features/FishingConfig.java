@@ -93,6 +93,7 @@ public class FishingConfig {
     @ConfigOption(name = "Thunder Spark", desc = "")
     @Accordion
     public ThunderSparkConfig thunderSpark = new ThunderSparkConfig();
+
     public static class ThunderSparkConfig {
         @Expose
         @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder.")
@@ -110,7 +111,8 @@ public class FishingConfig {
     @ConfigOption(name = "Barn Fishing Timer", desc = "")
     @Accordion
     public BarnTimerConfig barnTimer = new BarnTimerConfig();
-    public static class BarnTimerConfig{
+
+    public static class BarnTimerConfig {
         @Expose
         @ConfigOption(
                 name = "Barn Fishing Timer",

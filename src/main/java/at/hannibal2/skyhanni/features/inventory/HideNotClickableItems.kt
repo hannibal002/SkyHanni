@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -27,7 +27,9 @@ import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.jsonobjects.HideNotClickableItemsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.utils.jsonobjects.MultiFilterJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -54,29 +56,22 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            event.getConstant("TradeNpcs")?.let {
-                tradeNpcFilter.load(it)
-            }
+        val data = event.getConstant<MultiFilterJson>("TradeNpcs")
+        tradeNpcFilter.load(data)
 
-            val hideNotClickableItems = event.getConstant("HideNotClickableItems") ?: return
-            hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
-            hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
-            updateSalvageList(hideNotClickableItems)
-            hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
-            notAuctionableFilter.load(hideNotClickableItems["not_auctionable"].asJsonObject)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("Error in RepositoryReloadEvent for HideNotClickableItems")
-        }
+        val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
+        hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
+        hideInStorageFilter.load(hideNotClickable.hide_in_storage)
+        hidePlayerTradeFilter.load(hideNotClickable.hide_player_trade)
+        notAuctionableFilter.load(hideNotClickable.not_auctionable)
+        updateSalvageList(hideNotClickable.salvage)
     }
 
-    private fun updateSalvageList(hideNotClickableItems: JsonObject) {
+    private fun updateSalvageList(data: SalvageFilter) {
         itemsToSalvage.clear()
-        val salvage = hideNotClickableItems["salvage"].asJsonObject
-        itemsToSalvage.addAll(salvage.asJsonObject["items"].asJsonArray.map { it.asString })
-        for (armor in salvage.asJsonObject["armor"].asJsonArray.map { it.asString }) {
+
+        itemsToSalvage.addAll(data.items)
+        for (armor in data.armor) {
             itemsToSalvage.add("$armor Helmet")
             itemsToSalvage.add("$armor Chestplate")
             itemsToSalvage.add("$armor Leggings")
@@ -136,7 +131,7 @@ class HideNotClickableItems {
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass) {
-                    event.toolTip.add("  §7(Disable with holding the control key)")
+                    event.toolTip.add("  §7(Bypass by holding the control key)")
                 }
             }
         }
@@ -385,7 +380,7 @@ class HideNotClickableItems {
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
         if (!tradeNpcFilter.match(chestName)) return false
-        if (GardenVisitorFeatures.inVisitorInventory) return false
+        if (VisitorAPI.inInventory) return false
         reverseColor = true
 
         var name = stack.cleanName()
