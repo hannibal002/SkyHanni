@@ -35,31 +35,26 @@ class SeaCreatureManager {
         allFishingMobs.clear()
         var counter = 0
 
-        try {
-            val data = event.getConstant<Map<String, SeaCreatureJson.Variant>>("SeaCreatures", SeaCreatureJson.TYPE) ?: return
-            val allFishingMobs = mutableMapOf<String,SeaCreature>()
+        val data = event.getConstant<Map<String, SeaCreatureJson.Variant>>("SeaCreatures", SeaCreatureJson.TYPE)
+        val allFishingMobs = mutableMapOf<String, SeaCreature>()
 
-            for (variant in data.values) {
-                val chatColor = variant.chat_color
-                for ((displayName, seaCreature) in variant.sea_creatures) {
-                    val chatMessage = seaCreature.chat_message
-                    val fishingExperience = seaCreature.fishing_experience
-                    val rarity = seaCreature.rarity
-                    val rare = seaCreature.rare ?: false
+        for (variant in data.values) {
+            val chatColor = variant.chat_color
+            for ((displayName, seaCreature) in variant.sea_creatures) {
+                val chatMessage = seaCreature.chat_message
+                val fishingExperience = seaCreature.fishing_experience
+                val rarity = seaCreature.rarity
+                val rare = seaCreature.rare ?: false
 
-                    val creature = SeaCreature(displayName, fishingExperience, chatColor, rare, rarity)
-                    seaCreatureMap[chatMessage] = creature
-                    allFishingMobs[displayName] = creature
-                    counter++
-                }
+                val creature = SeaCreature(displayName, fishingExperience, chatColor, rare, rarity)
+                seaCreatureMap[chatMessage] = creature
+                allFishingMobs[displayName] = creature
+                counter++
             }
-            SeaCreatureManager.allFishingMobs = allFishingMobs
-            LorenzUtils.debug("Loaded $counter sea creatures from repo")
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
         }
+        SeaCreatureManager.allFishingMobs = allFishingMobs
+        LorenzUtils.debug("Loaded $counter sea creatures from repo")
+
     }
 
     companion object {

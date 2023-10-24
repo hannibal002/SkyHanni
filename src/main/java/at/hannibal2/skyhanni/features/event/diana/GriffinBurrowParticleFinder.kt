@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
@@ -129,8 +129,7 @@ class GriffinBurrowParticleFinder {
         }
     }
 
-    private val ItemStack.isSpade
-        get() = getInternalName_old() == "ANCESTRAL_SPADE"
+    private val ItemStack.isSpade get() = getInternalName() == DianaAPI.spade
 
     class Burrow(
         var location: LorenzVec,

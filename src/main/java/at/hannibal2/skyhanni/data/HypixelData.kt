@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -102,6 +103,7 @@ class HypixelData {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
                 HypixelJoinEvent().postAndCatch()
+                SkyHanniMod.repo.displayRepoStatus(true)
             }
         }
         if (!LorenzUtils.onHypixel) return
