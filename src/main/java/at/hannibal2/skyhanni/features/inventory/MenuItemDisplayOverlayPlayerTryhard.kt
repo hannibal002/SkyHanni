@@ -79,14 +79,22 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
         
         if (stackSizeConfig.contains(2) && (chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
-            val lore = item.getLore()
-            if (lore.isNotEmpty()) {
-                if (((chestName.contains("Community Shop")) &&
-                ((lore.first().contains(" Upgrade")) ||
-                (lore.last().contains(" to start!")) ||
-                (lore.last().contains("Maxed out")) ||
-                (lore.last().contains("upgrad")))) || ((chestName.contains(" Essence Shop")) && (lore.last().lowercase().contains("unlock")))) { //the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
-                    return itemName.split(" ").last().romanToDecimalIfNeeded().toString()
+            also {
+                val lore = item.getLore()
+                if (lore.isNotEmpty()) {
+                    if (((chestName.contains("Community Shop")) &&
+                            ((lore.first().contains(" Upgrade")) ||
+                                (lore.last().contains(" to start!")) ||
+                                (lore.last().contains("Maxed out")) ||
+                                (lore.last().contains("upgrad")))) || ((chestName.contains(" Essence Shop")) && (lore.last().lowercase().contains("unlock")))) { //the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
+                        val lastWord = itemName.split(" ").last()
+                        for (char in lastWord) {
+                            if (!(("IVXLCDM").contains(char))) {
+                                return@also
+                            }
+                        }
+                        return lastWord.romanToDecimalIfNeeded().toString()
+                    }
                 }
             }
         }
