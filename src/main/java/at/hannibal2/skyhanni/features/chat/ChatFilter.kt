@@ -345,7 +345,6 @@ class ChatFilter {
 
         //Useful, maybe in another chat
         message.matchRegex("§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.") -> true
-        message.matchRegex("§aYou received §r§([b6])\\+([12]) (Diamond|Gold) Essence") -> true
         message == "§6You have successfully picked the lock on this chest!" -> true
 
         else -> false
