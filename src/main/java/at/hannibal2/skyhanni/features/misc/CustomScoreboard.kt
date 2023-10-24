@@ -5,6 +5,23 @@
 // I'm also like really sorry for anyone who has to look at this code, it looks kinda bad
 //
 
+//
+// TODO LIST
+// V1 RELEASE
+//  - Add dungeon secrets
+//  - combine date and lobby
+//  - toggle between "<name> <count>" and "<count> <name>"
+//  - Hide default scoreboard
+//  - only show quiver when holding a bow (detect with 9th slot)
+//  - mayor color (from neu)
+//
+// V2 RELEASE
+//  - Soulflow API
+//  - Bank API
+//  - Custom Scoreboard Background
+//  - icons
+//
+
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
