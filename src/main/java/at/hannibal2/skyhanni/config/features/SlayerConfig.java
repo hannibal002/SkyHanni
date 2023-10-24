@@ -17,6 +17,7 @@ public class SlayerConfig {
     @ConfigOption(name = "Enderman Slayer Features", desc = "")
     @Accordion
     public EndermanConfig endermen = new EndermanConfig();
+
     public static class EndermanConfig {
         @Expose
         @ConfigOption(name = "Yang Glyph (beacon)", desc = "")
@@ -84,12 +85,14 @@ public class SlayerConfig {
     @ConfigOption(name = "Blaze", desc = "")
     @Accordion
     public BlazeConfig blazes = new BlazeConfig();
+
     public static class BlazeConfig {
         @Expose
         @ConfigOption(name = "Hellion Shields", desc = "")
         @Accordion
         public BlazeHellionConfig hellion = new BlazeHellionConfig();
-        public static class BlazeHellionConfig{
+
+        public static class BlazeHellionConfig {
             @Expose
             @ConfigOption(name = "Colored Mobs", desc = "Color the Blaze Slayer boss and the demons in the right hellion shield color.")
             @ConfigEditorBoolean
@@ -138,7 +141,6 @@ public class SlayerConfig {
         @FeatureToggle
         public boolean clearView = false;
     }
-
 
 
     @Expose

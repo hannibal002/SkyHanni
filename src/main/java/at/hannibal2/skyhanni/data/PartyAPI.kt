@@ -12,21 +12,24 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
-class PartyAPI {
-    companion object {
-        fun listMembers() {
-            LorenzUtils.chat("§a[SkyHanni] Tracked party members §7(${partyMembers.size}) §f:")
-            for (member in partyMembers) {
-                LorenzUtils.chat(" §a- §7$member")
-            }
+object PartyAPI {
+    val partyMembers = mutableListOf<String>()
 
-            if (Random.nextDouble() < 0.1) {
-                OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
-                LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"))
-            }
+    fun listMembers() {
+        val size = partyMembers.size
+        if (size == 0) {
+            LorenzUtils.chat("§e[SkyHanni] No tracked party members!")
+            return
+        }
+        LorenzUtils.chat("§a[SkyHanni] Tracked party members §7($size) §f:")
+        for (member in partyMembers) {
+            LorenzUtils.chat(" §a- §7$member")
         }
 
-        val partyMembers = mutableListOf<String>()
+        if (Random.nextDouble() < 0.1) {
+            OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
+            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"))
+        }
     }
 
     @SubscribeEvent

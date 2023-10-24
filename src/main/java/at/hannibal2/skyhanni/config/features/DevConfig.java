@@ -20,7 +20,8 @@ public class DevConfig {
     @ConfigOption(name = "Debug", desc = "")
     @Accordion
     public DebugConfig debug = new DebugConfig();
-    public static class DebugConfig{
+
+    public static class DebugConfig {
         @Expose
         @ConfigOption(name = "Enable Debug", desc = "Enable Test logic")
         @ConfigEditorBoolean
@@ -136,7 +137,7 @@ public class DevConfig {
     @Accordion
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
-    public static class MinecraftConsoleConfig{
+    public static class MinecraftConsoleConfig {
         @Expose
         @ConfigOption(name = "Unfiltered Debug", desc = "Print the debug information for unfiltered console messages.")
         @ConfigEditorBoolean
@@ -168,7 +169,7 @@ public class DevConfig {
         @Accordion
         public ConsoleFiltersConfig consoleFilter = new ConsoleFiltersConfig();
 
-        public static class ConsoleFiltersConfig{
+        public static class ConsoleFiltersConfig {
             @Expose
             @ConfigOption(name = "Filter Chat", desc = "Filter chat messages.")
             @ConfigEditorBoolean

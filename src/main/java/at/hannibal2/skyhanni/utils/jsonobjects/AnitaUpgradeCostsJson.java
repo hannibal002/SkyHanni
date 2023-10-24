@@ -6,11 +6,12 @@ import java.util.Map;
 
 public class AnitaUpgradeCostsJson {
     @Expose
-    public Map<String, Price> level_price;
+    public Map<Integer, Price> level_price;
 
     public static class Price {
         @Expose
         public Integer gold_medals;
+
         @Expose
         public Integer jacob_tickets;
     }

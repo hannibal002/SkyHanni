@@ -9,12 +9,13 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -30,7 +31,7 @@ class ShowMotesNpcSellPrice {
     private var display = emptyList<List<Any>>()
     // TODO USE SH-REPO
     private val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
-    private val itemMap = mutableMapOf<String, Pair<MutableList<Int>, Double>>()
+    private val itemMap = mutableMapOf<NEUInternalName, Pair<MutableList<Int>, Double>>()
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 
@@ -109,12 +110,13 @@ class ShowMotesNpcSellPrice {
         itemMap.clear()
         for ((index, stack) in stacks) {
             val itemValue = stack.motesNpcPrice() ?: continue
-            if (itemMap.contains(stack.getInternalName_old())) {
-                val (oldIndex, oldValue) = itemMap[stack.getInternalName_old()] ?: return
+            val internalName = stack.getInternalName()
+            if (itemMap.contains(internalName)) {
+                val (oldIndex, oldValue) = itemMap[internalName] ?: return
                 oldIndex.add(index)
-                itemMap[stack.getInternalName_old()] = Pair(oldIndex, oldValue + itemValue)
+                itemMap[internalName] = Pair(oldIndex, oldValue + itemValue)
             } else {
-                itemMap[stack.getInternalName_old()] = Pair(mutableListOf(index), itemValue)
+                itemMap[internalName] = Pair(mutableListOf(index), itemValue)
             }
         }
         inInventory = true
@@ -143,7 +145,7 @@ class ShowMotesNpcSellPrice {
             newDisplay.add(buildList {
                 val (index, value) = pair
                 add("  §7- ")
-                val stack = NEUItems.getItemStack(internalName)
+                val stack = internalName.getItemStack()
                 add(stack)
                 val price = value.formatPrice()
                 val valuePer = stack.motesNpcPrice() ?: continue
