@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
+import net.minecraft.util.MathHelper
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 
@@ -167,7 +168,7 @@ object MobHitTrigger {
         val armor = InventoryUtils.getArmor()
         val player = Minecraft.getMinecraft().thePlayer
         val classInDungeon = DungeonAPI.playerClass
-        val partialTick = 0.5f //IDK how to make it correctly but ignoring partialTicks(=0.5) works fine
+        val partialTick = 1.0f //IDK how to make it correctly
         //LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
 
         //Ability
@@ -206,9 +207,11 @@ object MobHitTrigger {
                 val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
                     ?: 0) + if (itemName.contains("Juju")) 3 else 0
                 val bowStrength = 3  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
-                val direction = ArrowDetection.getMotionVector(player)
-                val origin = player.getPositionEyes(partialTick).toLorenzVec().subtract(LorenzVec(0.0, 0.1, 0.0))
-                    .add(direction.multiply(0.15))
+                val direction = player.getLook(1.0f).toLorenzVec().normalize()
+                val xOffset = MathHelper.cos(player.rotationYaw / 180.0f * 3.1415927f).toDouble() * 0.16
+                val zOffset = MathHelper.sin(player.rotationYaw / 180.0f * 3.1415927f).toDouble() * 0.16
+                val origin = player.getPositionEyes(1.0f).toLorenzVec()
+                    .subtract(LorenzVec(xOffset, 0.1, zOffset))
                 val velocity = direction.multiply(bowStrength)
                 //TODO(Terror Armor)
                 when {

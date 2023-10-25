@@ -16,9 +16,8 @@ import at.hannibal2.skyhanni.utils.getPrevLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import at.hannibal2.skyhanni.utils.vectorFromPoints
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityArrow
-import net.minecraft.util.MathHelper
+import net.minecraftforge.event.entity.player.ArrowLooseEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.math.PI
@@ -124,7 +123,7 @@ object ArrowDetection {
         if (event.repeatSeconds(3)) {
             val index = upComingArrows.indexOfLast { it.getLivingTime() > 60 }
             for (i in 0..index) {
-                upComingArrows.remove()
+                //upComingArrows.remove()
             }
             //upComingArrows.removeIf { it.getLivingTime() > 50 }
         }
@@ -133,7 +132,7 @@ object ArrowDetection {
     private fun onArrowSpawn(arrow: EntityArrow) {
         val match = upComingArrows.firstOrNull { it.isOnParabola(arrow) } ?: return
         playerArrows.add(SkyblockArrow(arrow, match.pierce, match.canHitEnderman))
-        upComingArrows.remove(match)
+        //upComingArrows.remove(match)
         LorenzDebug.log("Added Arrow, needs to find still: ${upComingArrows.count()}")
     }
 
@@ -254,11 +253,9 @@ object ArrowDetection {
         }
     }
 
-    private const val ArrowPI = 1415927F
-    fun getMotionVector(player: EntityPlayer): LorenzVec = LorenzVec(
-        (-MathHelper.sin(player.rotationYaw / 180.0F * ArrowPI) * MathHelper.cos(player.rotationPitch / 180.0F * ArrowPI)),
-        (MathHelper.cos(player.rotationYaw / 180.0F * ArrowPI) * MathHelper.cos(player.rotationPitch / 180.0F * ArrowPI)),
-        (-MathHelper.sin(player.rotationPitch / 180.0F * ArrowPI))
-    )
+    @SubscribeEvent
+    fun onArrowLooseEvent(event: ArrowLooseEvent) {
+        LorenzDebug.log(event.charge.toString())
+    }
 
 }
