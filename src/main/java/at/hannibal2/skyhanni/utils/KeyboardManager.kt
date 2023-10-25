@@ -17,15 +17,11 @@ object KeyboardManager {
     fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
     fun isShiftKeyDown() = Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()
 
-    fun isPastingKeysDown(): Boolean {
-        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
-        return modifierHeld && Keyboard.KEY_V.isKeyHeld()
-    }
+    fun isPastingKeysDown() = isModifierHeld() && Keyboard.KEY_V.isKeyHeld()
 
-    fun isCopyingKeysDown(): Boolean {
-        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
-        return modifierHeld && Keyboard.KEY_C.isKeyHeld()
-    }
+    fun isCopyingKeysDown() = isModifierHeld() && Keyboard.KEY_C.isKeyHeld()
+
+    private fun isModifierHeld() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
