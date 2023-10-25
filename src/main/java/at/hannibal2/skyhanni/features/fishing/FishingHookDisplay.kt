@@ -19,6 +19,7 @@ class FishingHookDisplay {
     private var bobber: EntityFishHook? = null
     private var armorStand: EntityArmorStand? = null
     private val potentionArmorStands = mutableListOf<EntityArmorStand>()
+    private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -91,11 +92,7 @@ class FishingHookDisplay {
         if (name == "§c§l!!!") {
             return true
         }
-        if (name.startsWith("§e§l") && !name.contains("CLICK")) {
-            return true
-        }
-
-        return false
+        return pattern.matcher(name).matches()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.hasFishingRodInHand()
