@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDateConfig
+    private val monthAndDatePattern = ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st).*".toRegex()
     private var display = ""
 
     @SubscribeEvent
@@ -27,11 +28,11 @@ class InGameDateDisplay {
 
     private fun checkDate() {
         val date = SkyBlockTime.now()
-        var theBaseString = ""
+        var theBaseString: String
         if (config.useScoreboard) {
             val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            val monthAndDate = list.find{ (it.contains("Winter ") || it.contains("Spring ") || it.contains("Summer ") || it.contains("Autumn ")) && (it.contains("st") || it.contains("nd") || it.contains("rd") || it.contains("th")) } ?: "??"
+            val monthAndDate = list.find{ it.matches(monthAndDatePattern) } ?: "??"
             val time = list.find{ it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) theBaseString = theBaseString.replace("☽", "").replace("☀", "")
