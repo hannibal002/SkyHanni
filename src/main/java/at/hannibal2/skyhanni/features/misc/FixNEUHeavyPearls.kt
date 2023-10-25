@@ -17,7 +17,7 @@ class FixNEUHeavyPearls {
 
         for (change in event.sackChanges) {
             if (change.internalName == heavyPearl && change.delta == 3) {
-                LorenzUtils.chat("§e[SkyHanni] Mark NEU Heavy Pearls as done.")
+                LorenzUtils.chat("Mark NEU Heavy Pearls as done.")
                 NotEnoughUpdates.INSTANCE.config.getProfileSpecific().dailyHeavyPearlCompleted =
                     System.currentTimeMillis()
             }

@@ -26,7 +26,7 @@ class JoinCrystalHollows {
             if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) {
                 LorenzUtils.clickableChat("§e[SkyHanni] Click here to warp to Dwarven Mines!", "warp mines")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
+                LorenzUtils.chat("Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
         if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!" && inTime()) {
@@ -39,7 +39,7 @@ class JoinCrystalHollows {
         if (!isEnabled()) return
 
         if (event.newIsland == IslandType.DWARVEN_MINES && inTime()) {
-                LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn§e!")
+                LorenzUtils.chat("Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn§e!")
         }
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
             lastWrongPassTime = 0

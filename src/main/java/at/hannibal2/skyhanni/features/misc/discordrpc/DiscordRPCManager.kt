@@ -58,7 +58,7 @@ object DiscordRPCManager : IPCListener {
 
                 try {
                     client?.connect()
-                    if (fromCommand) LorenzUtils.chat("§a[SkyHanni] Successfully started Rich Presence!") // confirm that /shrpcstart worked
+                    if (fromCommand) LorenzUtils.chat("Successfully started Rich Presence!", prefixColor = "§a") // confirm that /shrpcstart worked
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())
@@ -183,20 +183,20 @@ object DiscordRPCManager : IPCListener {
 
     fun startCommand() {
         if (!config.enabled.get()) {
-            LorenzUtils.chat("§c[SkyHanni] Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
+            LorenzUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
         if (isActive()) {
-            LorenzUtils.chat("§e[SkyHanni] Discord Rich Presence is already active!")
+            LorenzUtils.chat("Discord Rich Presence is already active!")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Attempting to start Discord Rich Presence...")
+        LorenzUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
         } catch (e: Exception) {
-            LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.")
+            LorenzUtils.error("Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.")
         }
     }
 

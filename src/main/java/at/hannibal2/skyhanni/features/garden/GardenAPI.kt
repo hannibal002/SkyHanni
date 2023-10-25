@@ -167,7 +167,7 @@ object GardenAPI {
         config?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
-        LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+        LorenzUtils.chat("Manually reset all crop speed data!")
     }
 
     @SubscribeEvent

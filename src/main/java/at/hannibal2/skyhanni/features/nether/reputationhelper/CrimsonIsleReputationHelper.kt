@@ -145,7 +145,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun reset() {
-        LorenzUtils.chat("§e[SkyHanni] Reset Reputation Helper.")
+        LorenzUtils.chat("Reset Reputation Helper.")
 
         questHelper.reset()
         miniBossHelper.reset()

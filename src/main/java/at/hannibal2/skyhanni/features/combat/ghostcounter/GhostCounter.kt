@@ -478,7 +478,7 @@ object GhostCounter {
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (hidden?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
-            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
+            chat("Your GhostCounter config has been automatically adjusted.")
             hidden?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
     }

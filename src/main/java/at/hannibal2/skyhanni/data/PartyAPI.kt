@@ -21,9 +21,9 @@ object PartyAPI {
             LorenzUtils.chat("§e[SkyHanni] No tracked party members!")
             return
         }
-        LorenzUtils.chat("§a[SkyHanni] Tracked party members §7($size) §f:")
+        LorenzUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
         for (member in partyMembers) {
-            LorenzUtils.chat(" §a- §7$member")
+            LorenzUtils.chat(" §a- §7$member", false)
         }
 
         if (Random.nextDouble() < 0.1) {

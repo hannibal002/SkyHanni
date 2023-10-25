@@ -72,7 +72,7 @@ class CompactBestiaryChatMessage {
 
             } else {
                 milestoneMessage?.let {
-                    LorenzUtils.chat("§6§lBESTIARY MILESTONE $it")
+                    LorenzUtils.chat("§6§lBESTIARY MILESTONE $it", false)
                     milestoneMessage = null
                 }
                 milestonePattern.matchEntire(message)?.let {

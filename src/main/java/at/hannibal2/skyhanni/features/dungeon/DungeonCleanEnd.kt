@@ -73,7 +73,7 @@ class DungeonCleanEnd {
 
         if (event.health <= 0.5) {
             val dungeonFloor = DungeonAPI.dungeonFloor
-            LorenzUtils.chat("§eFloor $dungeonFloor done!")
+            LorenzUtils.chat("§eFloor $dungeonFloor done!", false)
             bossDone = true
         }
     }

@@ -43,7 +43,7 @@ class TrophyFishMessages {
         event.blockedReason = "trophy_fish"
 
         if (config.enabled && config.design == 0 && amount == 1) {
-            LorenzUtils.chat("§6§lTROPHY FISH! §c§lFIRST §r$displayRarity $displayName")
+            LorenzUtils.chat("§6§lTROPHY FISH! §c§lFIRST §r$displayRarity $displayName", false)
             return
         }
 

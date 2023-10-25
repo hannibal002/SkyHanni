@@ -45,7 +45,7 @@ object CropMoneyDisplay {
 
     fun toggleShowCalculation() {
         showCalculation = !showCalculation
-        LorenzUtils.chat("§e[SkyHanni] Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
+        LorenzUtils.chat("Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
         update()
     }
 

@@ -104,7 +104,7 @@ object ProfileStorageData {
         if (System.currentTimeMillis() > noTabListTime + 3_000) {
             noTabListTime = System.currentTimeMillis()
             LorenzUtils.chat(
-                "§c[SkyHanni] Extra Information from Tab list not found! " +
+                "Extra Information from Tab list not found! " +
                         "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
             )
         }

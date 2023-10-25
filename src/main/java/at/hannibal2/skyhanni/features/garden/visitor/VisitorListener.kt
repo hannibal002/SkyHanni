@@ -151,11 +151,11 @@ class VisitorListener {
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
                     if (config.rewardWarning.bypassKey.isKeyHeld()) {
-                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        LorenzUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
-                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    LorenzUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
                                 "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",

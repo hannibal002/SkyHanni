@@ -181,7 +181,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             count = needAmount
         }
         if (quest.haveAmount == count) return
-        LorenzUtils.chat("§e[SkyHanni] ${quest.displayName} progress: $count/$needAmount")
+        LorenzUtils.chat("${quest.displayName} progress: $count/$needAmount")
 
         quest.haveAmount = count
         quest.state = if (count == needAmount) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED

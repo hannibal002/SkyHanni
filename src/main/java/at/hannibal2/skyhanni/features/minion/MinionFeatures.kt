@@ -336,7 +336,7 @@ class MinionFeatures {
 
         fun clearMinionData() {
             minions = mutableMapOf()
-            LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
+            LorenzUtils.chat("Manually reset all private island minion location data!")
         }
     }
 

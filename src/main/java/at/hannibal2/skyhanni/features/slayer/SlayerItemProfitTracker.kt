@@ -184,7 +184,7 @@ object SlayerItemProfitTracker {
         addItemPickup(internalName, amount)
         logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
         if (config.priceInChat && price > config.minimumPrice) {
-            LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
+            LorenzUtils.chat("§a+Slayer Drop§7: §r$itemName")
         }
         if (config.titleWarning && price > config.minimumPriceWarning) {
             LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
@@ -253,7 +253,7 @@ object SlayerItemProfitTracker {
 
                     if (KeyboardManager.isControlKeyDown()) {
                         itemLog.items.remove(internalName)
-                        LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
+                        LorenzUtils.chat("Removed $cleanName §efrom slayer profit display.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         itemProfit.hidden = !hidden
@@ -400,7 +400,7 @@ object SlayerItemProfitTracker {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
             resetData(DisplayMode.TOTAL)
             update()
-            LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
+            LorenzUtils.chat("You reset your $itemLogCategory slayer data!")
             return
         }
 

@@ -145,7 +145,7 @@ class ComposterDisplay {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
-            LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
+            LorenzUtils.chat("§cYour Organic Matter is low!")
             hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
@@ -155,7 +155,7 @@ class ComposterDisplay {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
-            LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
+            LorenzUtils.chat("§cYour Fuel is low!")
             hidden.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
         }
     }
@@ -202,7 +202,7 @@ class ComposterDisplay {
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
-        LorenzUtils.chat("§e[SkyHanni] $warningMessage")
+        LorenzUtils.chat(warningMessage)
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 

@@ -54,8 +54,8 @@ class GardenComposterInventoryFeatures {
                 val (itemName, amount) = pair
                 val internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName == null) {
-                    LorenzUtils.chat(
-                        "§c[SkyHanni] Error reading internal name for item '$itemName§c' " +
+                    LorenzUtils.error(
+                        "Error reading internal name for item '$itemName§c' " +
                                 "(in GardenComposterInventoryFeatures)"
                     )
                     continue

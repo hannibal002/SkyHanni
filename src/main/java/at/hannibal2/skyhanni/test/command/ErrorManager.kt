@@ -29,7 +29,7 @@ object ErrorManager {
 
     fun command(array: Array<String>) {
         if (array.size != 1) {
-            LorenzUtils.chat("§cUse /shcopyerror <error id>")
+            LorenzUtils.chat("§cUse /shcopyerror <error id>", false)
             return
         }
 
@@ -41,10 +41,10 @@ object ErrorManager {
             errorMessages[id]
         }
         val name = if (fullErrorMessage) "Ful error" else "Error"
-        LorenzUtils.chat(errorMessage?.let {
+        LorenzUtils.userError(errorMessage?.let {
             OSUtils.copyToClipboard(it)
-            "§e[SkyHanni] $name copied into the clipboard, please report it on the SkyHanni discord!"
-        } ?: "§c[SkyHanni] Error id not found!")
+            "$name copied into the clipboard, please report it on the SkyHanni discord!"
+        } ?: "Error id not found!")
     }
 
     fun logErrorState(userMessage: String, internalMessage: String) {

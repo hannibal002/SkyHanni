@@ -91,7 +91,7 @@ object ComposterOverlay {
             return
         }
         testOffset = args[0].toInt()
-        LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+        LorenzUtils.chat("Composter test offset set to $testOffset.")
     }
 
     @SubscribeEvent
@@ -382,7 +382,7 @@ object ComposterOverlay {
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            LorenzUtils.chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
+            LorenzUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
@@ -449,7 +449,7 @@ object ComposterOverlay {
         }
         val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName_old() == internalName }
         if (having >= itemsNeeded) {
-            LorenzUtils.chat("§e[SkyHanni] $itemName §8x${itemsNeeded} §ealready found in inventory!")
+            LorenzUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
@@ -470,9 +470,9 @@ object ComposterOverlay {
         } else if (amountInSacks == 0L) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks.")
+                LorenzUtils.chat("No $itemName §efound in sacks.")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
+                LorenzUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             }
             return
@@ -481,7 +481,7 @@ object ComposterOverlay {
         LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("§e[SkyHanni] You're out of $itemName §ein your sacks!")
+                LorenzUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 LorenzUtils.clickableChat(
                     "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",

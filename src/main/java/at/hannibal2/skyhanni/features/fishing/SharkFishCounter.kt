@@ -51,7 +51,7 @@ class SharkFishCounter {
                 counter < 350 -> "Like a pro!"
                 else -> "How???"
             }
-            LorenzUtils.chat("§e[SkyHanni] You caught ${counter.addSeparators()} sharks during this fishing contest. $funnyComment")
+            LorenzUtils.chat("You caught ${counter.addSeparators()} sharks during this fishing contest. $funnyComment")
             counter = 0
         }
     }

@@ -21,10 +21,10 @@ object LockMouseLook {
         if (lockedMouse) {
             oldSensitivity = gameSettings.mouseSensitivity
             gameSettings.mouseSensitivity = -1F / 3F
-            LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
+            LorenzUtils.chat("§bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
         } else {
             gameSettings.mouseSensitivity = oldSensitivity
-            LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now unlocked.")
+            LorenzUtils.chat("§bMouse rotation is now unlocked.")
         }
     }
 }

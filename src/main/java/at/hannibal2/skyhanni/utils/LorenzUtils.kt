@@ -71,7 +71,7 @@ object LorenzUtils {
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
     private val ERROR_PREFIX = "§c[SkyHanni-${SkyHanniMod.version}] "
-    private const val CHAT_PREFIX = "§e[SkyHanni] "
+    private const val CHAT_PREFIX = "[SkyHanni] "
 
     /**
      * Sends a debug message to the chat and the console.
@@ -118,11 +118,12 @@ object LorenzUtils {
      * Sends a message to the user
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
      *
      * @see CHAT_PREFIX
      */
-    fun chat(message: String, prefix: Boolean = true) {
-        if (prefix) internalChat(CHAT_PREFIX + message)
+    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+        if (prefix) internalChat(prefixColor + CHAT_PREFIX + message)
         else internalChat(message)
     }
 

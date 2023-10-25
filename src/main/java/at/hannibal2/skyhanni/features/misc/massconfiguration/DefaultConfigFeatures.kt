@@ -49,12 +49,12 @@ object DefaultConfigFeatures {
         val knownToggles = SkyHanniMod.feature.storage.knownFeatureToggles
         val togglesInNewVersion = knownToggles[new]
         if (new != "null" && togglesInNewVersion == null) {
-            LorenzUtils.chat("§e[SkyHanni] Unknown version $new")
+            LorenzUtils.chat("Unknown version $new")
             return
         }
         val togglesInOldVersion = knownToggles[old]
         if (old != "null" && togglesInOldVersion == null) {
-            LorenzUtils.chat("§e[SkyHanni] Unknown version $old")
+            LorenzUtils.chat("Unknown version $old")
             return
         }
         optionList = optionList

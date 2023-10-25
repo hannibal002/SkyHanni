@@ -20,11 +20,11 @@ class WikiCommand {
             if (message == "/wiki") {
                 event.isCanceled = true
                 OSUtils.openBrowser("https://hypixel-skyblock.fandom.com/wiki/Hypixel_SkyBlock_Wiki")
-                LorenzUtils.chat("§e[SkyHanni] Opening the Fandom Wiki..")
+                LorenzUtils.chat("Opening the Fandom Wiki..")
             } else if (message.startsWith("/wiki ")) {
                 event.isCanceled = true
                 val search = packet.message.substring(6)
-                LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §c$search")
+                LorenzUtils.chat("Searching the Fandom Wiki for §c$search")
 
                 val url = "https://www.google.com/search?q=inurl%3Ahypixel-skyblock.fandom.com $search&hl=en"
                 OSUtils.openBrowser(url.replace(' ', '+'))

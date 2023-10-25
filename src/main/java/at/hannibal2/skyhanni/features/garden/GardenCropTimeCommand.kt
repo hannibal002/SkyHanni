@@ -16,12 +16,12 @@ object GardenCropTimeCommand {
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
-            LorenzUtils.chat("§c[SkyHanni] §cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            LorenzUtils.userError("§cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
         if (args.size < 2) {
-            LorenzUtils.chat("§cUsage: /shcroptime <amount> <item>")
+            LorenzUtils.userError("§cUsage: /shcroptime <amount> <item>")
             return
         }
 
@@ -29,7 +29,7 @@ object GardenCropTimeCommand {
         val amount = try {
             rawAmount.toInt()
         } catch (e: NumberFormatException) {
-            LorenzUtils.chat("§cNot a valid number: '$rawAmount'")
+            LorenzUtils.userError("§cNot a valid number: '$rawAmount'")
             return
         }
 
@@ -64,10 +64,10 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.chat("§c[SkyHanni] §cNo crop item found for '$rawSearchName'")
+            LorenzUtils.chat("§cNo crop item found for '$rawSearchName'", prefixColor = "§c")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+        LorenzUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
     }
 }

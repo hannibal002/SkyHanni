@@ -224,7 +224,7 @@ class FarmingWeightDisplay {
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
                 LorenzUtils.error("Invalid Farming Weight Overtake Goal!")
-                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
+                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!", false)
                 config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
@@ -451,7 +451,7 @@ class FarmingWeightDisplay {
         private fun error() {
             apiError = true
             LorenzUtils.error("Loading the farming weight data from elitebot.dev failed!")
-            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!")
+            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!", false)
         }
 
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
@@ -492,7 +492,7 @@ class FarmingWeightDisplay {
 
         private fun openWebsite(name: String?) {
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
-            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile of player §b$name")
+            LorenzUtils.chat("Opening Farming Profile of player §b$name")
         }
 
         private val factorPerCrop = mutableMapOf<CropType, Double>()

@@ -127,7 +127,7 @@ class ShowMotesNpcSellPrice {
         if (!RiftAPI.inRift()) return
         pattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
-            chat("§6[SkyHanni] Set your McGrubber's burger stacks to ${group("amount")}.")
+            chat("Set your McGrubber's burger stacks to ${group("amount")}.", prefixColor = "§6")
         }
     }
 

@@ -15,7 +15,7 @@ object GardenStartLocation {
 
     fun setLocationCommand() {
         if (!GardenAPI.inGarden()) {
-            LorenzUtils.chat("§c[SkyHanni] This Command only works in the garden!")
+            LorenzUtils.userError("This Command only works in the garden!")
             return
         }
         if (!SkyHanniMod.feature.garden.cropStartLocation.enabled) {
@@ -28,18 +28,18 @@ object GardenStartLocation {
 
         val startLocations = GardenAPI.config?.cropStartLocations
         if (startLocations == null) {
-            LorenzUtils.chat("§c[SkyHanni] The config is not yet loaded, retry in a second.")
+            LorenzUtils.userError("The config is not yet loaded, retry in a second.")
             return
         }
 
         val crop = GardenAPI.getCurrentlyFarmedCrop()
         if (crop == null) {
-            LorenzUtils.chat("§c[SkyHanni] Hold a crop specific farming tool in the hand!")
+            LorenzUtils.userError("Hold a crop specific farming tool in the hand!")
             return
         }
 
         startLocations[crop] = LocationUtils.playerLocation()
-        LorenzUtils.chat("§e[SkyHanni] You changed your Crop Start Location for ${crop.cropName}!")
+        LorenzUtils.chat("You changed your Crop Start Location for ${crop.cropName}!")
     }
 
     @SubscribeEvent
@@ -51,7 +51,7 @@ object GardenStartLocation {
 
         if (!startLocations.contains(crop)) {
             startLocations[crop] = LocationUtils.playerLocation()
-            LorenzUtils.chat("§e[SkyHanni] Auto updated your Crop Start Location for ${crop.cropName}")
+            LorenzUtils.chat("Auto updated your Crop Start Location for ${crop.cropName}")
         }
     }
 

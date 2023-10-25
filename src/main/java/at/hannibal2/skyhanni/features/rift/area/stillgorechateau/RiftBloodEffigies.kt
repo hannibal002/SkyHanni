@@ -74,12 +74,12 @@ class RiftBloodEffigies {
             if (diff < 0L) {
                 if (s == "7") {
                     if (time != 0L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigy #${index + 1} respawned!")
+                        LorenzUtils.chat("Effigy #${index + 1} respawned!")
                         effigiesTimes = effigiesTimes.editCopy { this[index] = 0L }
                     }
                 } else {
                     if (time != -1L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigy #${index + 1} is broken!")
+                        LorenzUtils.chat("Effigy #${index + 1} is broken!")
                         val endTime = System.currentTimeMillis() + 1_000 * 60 * 20
                         effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }

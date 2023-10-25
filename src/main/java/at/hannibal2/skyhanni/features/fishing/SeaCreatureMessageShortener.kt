@@ -22,7 +22,7 @@ class SeaCreatureMessageShortener {
         if (config.compactDoubleHook && event.doubleHook) {
             message = "§e§lDOUBLE HOOK! $message"
         }
-        LorenzUtils.chat(message)
+        LorenzUtils.chat(message, false)
 
         if (seaCreature.fishingExperience == 0) {
             LorenzUtils.debug("no fishing exp set for " + seaCreature.name)

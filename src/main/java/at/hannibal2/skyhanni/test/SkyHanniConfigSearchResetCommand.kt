@@ -22,7 +22,7 @@ object SkyHanniConfigSearchResetCommand {
 
     fun command(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            LorenzUtils.chat(runCommand(args))
+            LorenzUtils.chat(runCommand(args), false)
         }
         lastCommand = args
     }

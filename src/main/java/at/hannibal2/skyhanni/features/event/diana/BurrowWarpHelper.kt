@@ -40,10 +40,8 @@ class BurrowWarpHelper {
             if (lastWarpTime.passedSince() < 1.seconds) {
                 lastWarp?.let {
                     it.unlocked = false
-                    LorenzUtils.chat(
-                        "§e[SkyHanni] Detected not having access to warp point §b${it.displayName}§e!\n" +
-                                "§e[SkyHanni] Use §c/shresetburrowwarps §eonce you have activated this travel scroll."
-                    )
+                    LorenzUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
+                    LorenzUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
                     lastWarp = null
                     currentWarp = null
                 }
@@ -75,7 +73,7 @@ class BurrowWarpHelper {
 
         fun resetDisabledWarps() {
             WarpPoint.entries.forEach { it.unlocked = true }
-            LorenzUtils.chat("§e[SkyHanni] Reset disabled burrow warps.")
+            LorenzUtils.chat("Reset disabled burrow warps.")
         }
     }
 

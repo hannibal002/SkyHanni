@@ -51,7 +51,7 @@ object InquisitorWaypointShare {
 
     fun test() {
         test = !test
-        LorenzUtils.chat("§e[SkyHanni] Inquisitor Test " + if (test) "Enabled" else "Disabled")
+        LorenzUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
     @SubscribeEvent
@@ -186,7 +186,7 @@ object InquisitorWaypointShare {
         lastShareTime = System.currentTimeMillis()
 
         if (inquisitor == -1) {
-            LorenzUtils.chat("§c[SkyHanni] No Inquisitor Found!")
+            LorenzUtils.chat("No Inquisitor Found!", prefixColor = "§c")
             return
         }
 
@@ -197,7 +197,7 @@ object InquisitorWaypointShare {
         }
 
         if (inquisitor.isDead) {
-            LorenzUtils.chat("§cInquisitor is ded")
+            LorenzUtils.chat("§cInquisitor is dead")
             return
         }
         val location = inquisitor.getLorenzVec()
@@ -226,7 +226,7 @@ object InquisitorWaypointShare {
 
             val cleanName = playerName.cleanPlayerName()
             if (!waypoints.containsKey(cleanName)) {
-                LorenzUtils.chat("§e[SkyHanni] $playerName §l§efound an inquisitor at §l§c$x $y $z!")
+                LorenzUtils.chat("$playerName §l§efound an inquisitor at §l§c$x $y $z!")
                 if (cleanName != LorenzUtils.getPlayerName()) {
                     LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5.seconds)
                     SoundUtils.playBeepSound()
@@ -253,7 +253,7 @@ object InquisitorWaypointShare {
     fun maybeRemove(playerName: String) {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(playerName) }
-            LorenzUtils.chat("§e[SkyHanni] Inquisitor from $playerName not found, deleting.")
+            LorenzUtils.chat("Inquisitor from $playerName not found, deleting.")
         }
     }
 }

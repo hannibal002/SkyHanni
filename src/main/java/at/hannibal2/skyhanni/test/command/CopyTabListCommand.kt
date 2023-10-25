@@ -22,6 +22,6 @@ object CopyTabListCommand {
         val tabFooter = tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
         val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
         OSUtils.copyToClipboard(string)
-        LorenzUtils.chat("§e[SkyHanni] Tab list copied into the clipboard!")
+        LorenzUtils.chat("Tab list copied into the clipboard!")
     }
 }

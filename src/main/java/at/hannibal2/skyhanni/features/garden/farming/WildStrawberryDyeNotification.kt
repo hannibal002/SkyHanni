@@ -40,7 +40,7 @@ class WildStrawberryDyeNotification {
             if (internalName == item) {
                 val name = event.itemStack.name!!
                 LorenzUtils.sendTitle(name, 5.seconds)
-                LorenzUtils.chat("§e[SkyHanni] You found a $name§e!")
+                LorenzUtils.chat("You found a $name§e!")
                 SoundUtils.playBeepSound()
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("DYE_WILD_STRAWBERRY"), 5_000)
             }

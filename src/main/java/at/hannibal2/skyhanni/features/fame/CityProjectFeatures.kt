@@ -40,7 +40,7 @@ class CityProjectFeatures {
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
-            LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
+            LorenzUtils.chat("Disabled city project reminder messages!", prefixColor = "§c")
         }
     }
 

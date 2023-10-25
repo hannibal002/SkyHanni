@@ -22,7 +22,7 @@ class MarkedPlayerManager {
 
         fun command(args: Array<String>) {
             if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shmarkplayer <name>")
+                LorenzUtils.chat("§cUsage: /shmarkplayer <name>", false)
                 return
             }
 
@@ -31,18 +31,18 @@ class MarkedPlayerManager {
 
 
             if (name == LorenzUtils.getPlayerName().lowercase()) {
-                LorenzUtils.chat("§c[SkyHanni] You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
+                LorenzUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
                 return
             }
 
             if (name !in playerNamesToMark) {
                 playerNamesToMark.add(name)
                 findPlayers()
-                LorenzUtils.chat("§e[SkyHanni] §aMarked §eplayer §b$displayName§e!")
+                LorenzUtils.chat("§aMarked §eplayer §b$displayName§e!")
             } else {
                 playerNamesToMark.remove(name)
                 markedPlayers.remove(name)
-                LorenzUtils.chat("§e[SkyHanni] §cUnmarked §eplayer §b$displayName§e!")
+                LorenzUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
             }
         }
 

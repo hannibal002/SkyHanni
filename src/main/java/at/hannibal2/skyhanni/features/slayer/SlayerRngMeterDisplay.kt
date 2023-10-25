@@ -86,7 +86,7 @@ class SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                LorenzUtils.chat("§e[SkyHanni] §dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                LorenzUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
                 lastItemDroppedTime = System.currentTimeMillis()
             }
             if (blockChat) {

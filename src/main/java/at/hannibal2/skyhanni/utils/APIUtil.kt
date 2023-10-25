@@ -128,6 +128,6 @@ object APIUtil {
 
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
-        LorenzUtils.chat("§e[SkyHanni] Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+        LorenzUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 }

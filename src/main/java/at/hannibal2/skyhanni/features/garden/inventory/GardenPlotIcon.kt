@@ -106,7 +106,7 @@ object GardenPlotIcon {
                 event.isCanceled = true
                 if (event.slot.stack == null) return
                 copyStack = event.slot.stack
-                chat("§6§lClick an item in the desk menu to replace it with that item!")
+                chat("§6§lClick an item in the desk menu to replace it with that item!", false)
                 return
             }
             if (event.slotId != 53) {

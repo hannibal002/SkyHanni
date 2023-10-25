@@ -345,7 +345,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!")
+            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!", false)
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -355,7 +355,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
+            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!", false)
         } else {
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
@@ -363,7 +363,7 @@ object Commands {
 
     private fun clearFarmingItems() {
         val config = GardenAPI.config?.fortune ?: return
-        LorenzUtils.chat("§e[SkyHanni] clearing farming items")
+        LorenzUtils.chat("clearing farming items")
         config.farmingItems.clear()
         config.outdatedItems.clear()
     }
