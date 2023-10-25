@@ -70,7 +70,7 @@ class SlayerRngMeterDisplay {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
-                LorenzUtils.error("§c[SkyHanni] No Slayer RNG Meter Item selected!")
+                LorenzUtils.userError("No Slayer RNG Meter Item selected!")
                 LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected

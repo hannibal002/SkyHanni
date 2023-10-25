@@ -42,7 +42,7 @@ class GardenNextPlotPrice {
                     val format = NumberUtil.format(price)
                     list[i] = list[i] + " §7(§6$format§7)"
                 } ?: {
-                    LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
+                    LorenzUtils.error("Could not read item '$line'")
                 }
                 break
             }

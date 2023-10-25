@@ -13,11 +13,11 @@ object OSUtils {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
                 e.printStackTrace()
-                LorenzUtils.error("[SkyHanni] Error opening website: $url!")
+                LorenzUtils.error("Error opening website: $url!")
             }
         } else {
             copyToClipboard(url)
-            LorenzUtils.error("[SkyHanni] Web browser is not supported! Copied url to clipboard.")
+            LorenzUtils.error("Web browser is not supported! Copied url to clipboard.")
         }
     }
 

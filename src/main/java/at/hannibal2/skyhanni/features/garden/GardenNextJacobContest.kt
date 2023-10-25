@@ -455,7 +455,7 @@ object GardenNextJacobContest {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            LorenzUtils.error("[SkyHanni] Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+            LorenzUtils.error("Failed to fetch upcoming contests. Please report this error if it continues to occur.")
         }
     }
 
@@ -487,11 +487,11 @@ object GardenNextJacobContest {
         if (result) {
             LorenzUtils.chat("§e[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            LorenzUtils.error("[SkyHanni] Something went wrong submitting upcoming contests!")
+            LorenzUtils.error("Something went wrong submitting upcoming contests!")
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        LorenzUtils.error("[SkyHanni] Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        LorenzUtils.error("Failed to submit upcoming contests. Please report this error if it continues to occur.")
         null
     }
 

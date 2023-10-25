@@ -223,7 +223,7 @@ class FarmingWeightDisplay {
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
+                LorenzUtils.error("Invalid Farming Weight Overtake Goal!")
                 LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
                 config.ETAGoalRank = goal.toString()
             } else {
@@ -450,7 +450,7 @@ class FarmingWeightDisplay {
 
         private fun error() {
             apiError = true
-            LorenzUtils.error("[SkyHanni] Loading the farming weight data from elitebot.dev failed!")
+            LorenzUtils.error("Loading the farming weight data from elitebot.dev failed!")
             LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!")
         }
 

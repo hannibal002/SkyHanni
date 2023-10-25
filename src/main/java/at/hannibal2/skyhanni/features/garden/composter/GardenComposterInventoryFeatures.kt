@@ -48,7 +48,7 @@ class GardenComposterInventoryFeatures {
                 if (line == "") break
                 val pair = ItemUtils.readItemAmount(line)
                 if (pair == null) {
-                    LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
+                    LorenzUtils.error("Could not read item '$line'")
                     continue
                 }
                 val (itemName, amount) = pair

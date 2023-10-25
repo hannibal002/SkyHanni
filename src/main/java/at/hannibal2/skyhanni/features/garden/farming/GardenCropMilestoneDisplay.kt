@@ -108,7 +108,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            LorenzUtils.error("[SkyHanni] Error in OwnInventoryItemUpdateEvent")
+            LorenzUtils.error("Error in OwnInventoryItemUpdateEvent")
             e.printStackTrace()
         }
     }

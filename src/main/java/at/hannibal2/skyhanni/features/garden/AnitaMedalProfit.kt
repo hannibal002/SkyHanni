@@ -99,7 +99,7 @@ class AnitaMedalProfit {
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)
             if (pair == null) {
-                LorenzUtils.error("§c[SkyHanni] Could not read item '$rawItemName'")
+                LorenzUtils.error("Could not read item '$rawItemName'")
                 continue
             }
 
