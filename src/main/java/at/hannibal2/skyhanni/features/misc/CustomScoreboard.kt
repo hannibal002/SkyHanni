@@ -8,12 +8,12 @@
 //
 // TODO LIST
 // V1 RELEASE
-//  - Add dungeon secrets
 //  - combine date and lobby
 //  - toggle between "<name> <count>" and "<count> <name>"
 //  - Hide default scoreboard
 //  - only show quiver when holding a bow (detect with 9th slot)
 //  - mayor color (from neu)
+//  - beacon power
 //
 // V2 RELEASE
 //  - Soulflow API
@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -74,7 +73,7 @@ class CustomScoreboard {
     private var mayorIndex = 17
     private var heatIndex = 19
     private var partyIndex = 20
-    private var petIndex = 21
+    private var sblevelIndex = 21
     private var quiverIndex = 22
     private var maxwellIndex = 23
     private var websiteIndex = 24
@@ -205,7 +204,7 @@ class CustomScoreboard {
         }
         lineMap[partyIndex] = partyList
 
-        lineMap[petIndex] = Collections.singletonList(ProfileStorageData.profileSpecific?.currentPet ?: "<hidden>")
+        lineMap[sblevelIndex] = Collections.singletonList("§7Skyblock Level")
         lineMap[quiverIndex] = Collections.singletonList("§7Quiver")
         lineMap[maxwellIndex] = Collections.singletonList("§7Maxwell Power")
         lineMap[websiteIndex] = Collections.singletonList("§ewww.hypixel.net")

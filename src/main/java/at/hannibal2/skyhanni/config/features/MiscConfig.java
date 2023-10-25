@@ -826,7 +826,7 @@ public class MiscConfig {
                         "",
                         "§cHeat",
                         "§9Party:\n- hannibal2\n- Moulberry\n- Vahvl\n- J10a1n15",
-                        "§7Pet",
+                        "§7Skyblock Level",
                         "§7Quiver (approximation)",
                         "§7Maxwell Power",
                         "§ewww.hypixel.net",
