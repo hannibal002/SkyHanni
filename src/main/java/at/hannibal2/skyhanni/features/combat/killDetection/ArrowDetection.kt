@@ -47,6 +47,8 @@ object ArrowDetection {
 
     private val upComingArrows: Queue<SkyblockArrowSpawn> = LinkedList()
 
+    private val arrowTrail: MutableMap<EntityArrow, MutableList<LorenzVec>> = mutableMapOf()
+
     fun newArrow(origin: LorenzVec, facingDirection: LorenzVec, pierce: Int, canHitEnderman: Boolean) =
         newArrows(origin, facingDirection, 1, 0.0, pierce, canHitEnderman)
 
@@ -111,13 +113,14 @@ object ArrowDetection {
         //    LorenzDebug.log("Arrow Speed: $speed")
         //}
         if (!config.arrowDebug) return
-        currentArrowsInWorld.forEach {
+        currentArrowsInWorld.forEach { entity ->
             renderRealArrowLineList.add(
                 Line(
-                    LorenzVec(it.prevPosX, it.prevPosY, it.prevPosZ),
-                    LorenzVec(it.posX, it.posY, it.posZ)
+                    entity.getPrevLorenzVec(),
+                    entity.getLorenzVec()
                 )
             )
+            arrowTrail.getOrDefault(entity, null)?.add(entity.getLorenzVec()) ?: mutableListOf(entity.getLorenzVec())
         }
 
         if (event.repeatSeconds(3)) {
@@ -125,7 +128,6 @@ object ArrowDetection {
             for (i in 0..index) {
                 //upComingArrows.remove()
             }
-            //upComingArrows.removeIf { it.getLivingTime() > 50 }
         }
     }
 
@@ -196,6 +198,7 @@ object ArrowDetection {
             EntityKill.addToMobHitList(hitEntity, hitTrigger.Bow)
         }
         playerArrows.remove(playerArrow)
+        LorenzDebug.log(arrowTrail[arrow].toString())
     }
 
     @SubscribeEvent
