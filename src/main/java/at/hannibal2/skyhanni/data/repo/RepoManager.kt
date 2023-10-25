@@ -160,8 +160,9 @@ class RepoManager(private val configLocation: File) {
             }
             if (error) {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
-                    "shupdaterepo"
+                    "Error with the repo detected, try /shupdaterepo to fix it!",
+                    "shupdaterepo",
+                    prefixColor = "§c"
                 )
                 if (unsuccessfulConstants.isEmpty()) {
                     unsuccessfulConstants.add("All Constants")

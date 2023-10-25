@@ -30,7 +30,7 @@ class QuestItemHelper {
                 questItem = group("name")
                 questAmount = group("amount").toInt()
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Click here to grab x$questAmount $questItem from sacks!",
+                    "Click here to grab x$questAmount $questItem from sacks!",
                     "gfs $questItem $questAmount"
                 )
                 lastSentMessage = SimpleTimeMark.now()

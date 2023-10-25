@@ -159,7 +159,8 @@ class VisitorListener {
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
                                 "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                                "sh bypass"
+                                "sh bypass",
+                            false
                         )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()

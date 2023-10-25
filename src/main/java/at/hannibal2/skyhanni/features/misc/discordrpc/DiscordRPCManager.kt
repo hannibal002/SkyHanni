@@ -62,7 +62,7 @@ object DiscordRPCManager : IPCListener {
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())
-                    LorenzUtils.clickableChat("§e[SkyHanni] Discord Rich Presence was unable to start! " +
+                    LorenzUtils.clickableChat("Discord Rich Presence was unable to start! " +
                             "This usually happens when you join SkyBlock when Discord is not started. " +
                             "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart")
                 }

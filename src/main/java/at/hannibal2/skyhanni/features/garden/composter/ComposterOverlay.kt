@@ -463,7 +463,7 @@ object ComposterOverlay {
             val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining"
             else "Enchanted Agronomy"
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
             )
             return
@@ -484,7 +484,7 @@ object ComposterOverlay {
                 LorenzUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     "bz ${itemName.removeColor()}"
                 )
             }

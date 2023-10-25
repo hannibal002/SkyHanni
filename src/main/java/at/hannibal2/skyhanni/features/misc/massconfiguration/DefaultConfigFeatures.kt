@@ -26,7 +26,7 @@ object DefaultConfigFeatures {
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
             SkyHanniMod.feature.storage.hasPlayedBefore = true
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Looks like this is the first time you are using SkyHanni. " +
+                "Looks like this is the first time you are using SkyHanni. " +
                         "Click here to configure default options, or run /shdefaultoptions.",
                 "shdefaultoptions"
             )
@@ -35,7 +35,7 @@ object DefaultConfigFeatures {
                 knownToggles.maxByOrNull { if (it.key != SkyHanniMod.version) it.value.size else -1 }
             val command = "/shdefaultoptions ${mostFeatureFulOldVersion?.key} ${SkyHanniMod.version}"
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Looks like you updated SkyHanni. " +
+                "Looks like you updated SkyHanni. " +
                         "Click here to configure the newly introduced options, or run $command.",
                 command
             )

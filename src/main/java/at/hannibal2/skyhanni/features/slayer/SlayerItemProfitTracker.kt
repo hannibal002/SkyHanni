@@ -405,7 +405,7 @@ object SlayerItemProfitTracker {
         }
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Are you sure you want to reset all your $itemLogCategory slayer data? Click here to confirm.",
+            "Are you sure you want to reset all your $itemLogCategory slayer data? Click here to confirm.",
             "shclearslayerprofits confirm"
         )
     }

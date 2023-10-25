@@ -80,7 +80,8 @@ object ErrorManager {
 
         LorenzUtils.clickableChat(
             "§c[SkyHanni ${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            "shcopyerror $randomId"
+            "shcopyerror $randomId",
+            false
         )
     }
 }

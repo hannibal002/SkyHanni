@@ -60,7 +60,7 @@ object APIUtil {
                         } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             if (showApiErrors && apiName == "Hypixel API") {
                                 LorenzUtils.clickableChat(
-                                    "[SkyHanni] Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
+                                    "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
                                     "shtogglehypixelapierrors"
                                 )
                             }

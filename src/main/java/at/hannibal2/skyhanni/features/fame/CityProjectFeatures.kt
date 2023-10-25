@@ -66,7 +66,7 @@ class CityProjectFeatures {
         lastReminderSend = System.currentTimeMillis()
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Daily City Project Reminder! (Click here to disable this reminder)",
+            "Daily City Project Reminder! (Click here to disable this reminder)",
             "shstopcityprojectreminder"
         )
     }

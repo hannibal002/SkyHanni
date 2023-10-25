@@ -282,8 +282,9 @@ object LorenzUtils {
         lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
-    fun clickableChat(message: String, command: String) {
-        val text = ChatComponentText(message)
+    fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
         val fullCommand = "/" + command.removePrefix("/")
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =

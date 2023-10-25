@@ -170,7 +170,7 @@ object GardenNextJacobContest {
                     sendContests()
                 } else {
                     LorenzUtils.clickableChat(
-                        "§e[SkyHanni] §2Click here to submit this years farming contests, thank you for helping everyone out!",
+                        "§2Click here to submit this years farming contests, thank you for helping everyone out!",
                         "shsendcontests"
                     )
                 }
@@ -227,7 +227,7 @@ object GardenNextJacobContest {
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == 0) {
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] §2Click here to automatically share future contests!",
+                "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
             )
         }

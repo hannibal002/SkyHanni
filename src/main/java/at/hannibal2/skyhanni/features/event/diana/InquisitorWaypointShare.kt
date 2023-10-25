@@ -142,7 +142,7 @@ object InquisitorWaypointShare {
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
             val message =
-                "§e[SkyHanni] §l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+                "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
             LorenzUtils.clickableChat(message, "shshareinquis")
         }
     }

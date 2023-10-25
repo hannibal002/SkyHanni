@@ -20,8 +20,9 @@ object GardenStartLocation {
         }
         if (!SkyHanniMod.feature.garden.cropStartLocation.enabled) {
             LorenzUtils.clickableChat(
-                "§c[SkyHanni] This feature is disabled. Enable it in the config: §e/sh crop start location",
-                "sh crop start location"
+                "This feature is disabled. Enable it in the config: §e/sh crop start location",
+                "sh crop start location",
+                prefixColor = "§c"
             )
             return
         }
