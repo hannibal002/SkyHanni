@@ -97,7 +97,7 @@
 + Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election
   API check failed. - CalMWolfs
 + Hiding a bunch of garden GUIs in a bunch of garden inventories. - hannibal2
-+ More shwords support. CalMWolfs
++ More shwords support. - CalMWolfs
     + Added the option to change between case-sensitive and case-insensitive.
     + Allow the use of Ctrl + C to copy the current textbox.
     + The effect of visual words is now visible while editing text.
