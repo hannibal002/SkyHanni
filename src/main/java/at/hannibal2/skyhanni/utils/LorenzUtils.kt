@@ -282,6 +282,15 @@ object LorenzUtils {
         lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param command The command to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
@@ -292,8 +301,19 @@ object LorenzUtils {
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
-    fun hoverableChat(message: String, hover: List<String>, command: String? = null) {
-        val text = ChatComponentText(message)
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param hover The message to be shown when the message is hovered
+     * @param command The command to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun hoverableChat(message: String, hover: List<String>, command: String? = null, prefix: Boolean = true, prefixColor: String = "§e") {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
 

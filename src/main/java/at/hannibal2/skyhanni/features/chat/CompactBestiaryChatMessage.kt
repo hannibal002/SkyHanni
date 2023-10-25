@@ -66,7 +66,7 @@ class CompactBestiaryChatMessage {
                 inBestiary = false
 
                 val title = bestiaryDescription[1]
-                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", bestiaryDescription.dropLast(1), command)
+                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", bestiaryDescription.dropLast(1), command, false)
                 bestiaryDescription.clear()
                 acceptMoreDescription = true
 
