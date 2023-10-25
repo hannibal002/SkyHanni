@@ -135,7 +135,7 @@ class GardenVisitorTimer {
             val factor = diff / 1000.0
             "§7/§$formatColor" + TimeUtils.formatDuration((millis / factor).roundToLong())
         } else ""
-        if (config.pingForVisitorArrivals && millis < 10000){
+        if (config.newVisitorPing && millis < 10000){
             SoundUtils.playBeepSound()
         }
         val formatDuration = TimeUtils.formatDuration(millis)

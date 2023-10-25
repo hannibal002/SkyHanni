@@ -78,9 +78,9 @@ public class GardenConfig {
             public boolean sixthVisitorWarning = true;
 
             @Expose
-            @ConfigOption(name = "Ping when close to new visitor", desc = "Pings you when you are less than 10 seconds away from getting a new visitor.")
+            @ConfigOption(name = "New Visitor Ping", desc = "Pings you when you are less than 10 seconds away from getting a new visitor.")
             @ConfigEditorBoolean
-            public boolean pingForVisitorArrivals = false;
+            public boolean newVisitorPing = false;
 
             @Expose
             public Position pos = new Position(390, 65, false, true);
@@ -323,7 +323,7 @@ public class GardenConfig {
         @Expose
         @ConfigOption(
             name = "Accept Hotkey",
-            desc = "Accept a visitor when you press this keybind while in the visitor GUI"
+            desc = "Accept a visitor when you press this keybind while in the visitor GUI."
         )
         @ConfigEditorKeybind(
             defaultKey = Keyboard.KEY_NONE
