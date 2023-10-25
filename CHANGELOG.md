@@ -70,6 +70,9 @@
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
++ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
+    + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
+    + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 
 ### Changes
 
@@ -94,6 +97,11 @@
 + Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election
   API check failed. - CalMWolfs
 + Hiding a bunch of garden GUIs in a bunch of garden inventories. - hannibal2
++ More shwords support. CalMWolfs
+    + Added the option to change between case-sensitive and case-insensitive.
+    + Allow the use of Ctrl + C to copy the current textbox.
+    + The effect of visual words is now visible while editing text.
++ Added Diamond/Gold essence to chat filter powder mining. - HiZe
 
 ### Bug Fixes
 
@@ -127,6 +135,14 @@
 + Fixed the Blaze Slayer Damage Indicator not working and no longer causing FPS drops. - hannibal2
 + Fixed clean end working in f5/m5. - hannibal2
 + Fixed visitor drop statistics preview. - Obsidian
++ Fixed a bracket at the wrong spot in Discord RPC. - hannibal2
++ Fixed fishing hook display triggering on wrong texts. - hannibal2
++ Fixed crop milestone inventory showing wrong level as stack size when maxed out. - hannibal2
++ Fixed various bugs with the /shwords GUI. - CalMWolfs
++ Bring back the command /shwords - CalMWolfs
++ It got deleted accidentally during code optimisations.
++ Highlight Commission Mobs: The "Golden Goblin Slayer" Commission should not trigger the "Goblin Slayer" Commission
+  anymore. - Thunderblade73
 
 #### Config
 
