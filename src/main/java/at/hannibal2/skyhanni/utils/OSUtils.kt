@@ -17,7 +17,7 @@ object OSUtils {
             }
         } else {
             copyToClipboard(url)
-            LorenzUtils.warning("[SkyHanni] Web browser is not supported! Copied url to clipboard.")
+            LorenzUtils.error("[SkyHanni] Web browser is not supported! Copied url to clipboard.")
         }
     }
 

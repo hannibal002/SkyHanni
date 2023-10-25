@@ -64,28 +64,66 @@ object LorenzUtils {
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-    const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+
     private val log = LorenzLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
+    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
+    private val ERROR_PREFIX = "§c[SkyHanni-${SkyHanniMod.version}] "
+    private const val CHAT_PREFIX = "§e[SkyHanni] "
+
+    /**
+     * Sends a debug message to the chat and the console.
+     * This is only sent if the debug feature is enabled.
+     *
+     * @param message The message to be sent
+     *
+     * @see DEBUG_PREFIX
+     */
     fun debug(message: String) {
         if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
             consoleLog("[Debug] $message")
         }
     }
 
-    // TODO remove ig?
-    fun warning(message: String) {
-        internalChat("§cWarning! $message")
+    /**
+     * Sends a message to the user that they did something incorrectly.
+     * We should tell them what to do instead as well.
+     *
+     * @param message The message to be sent
+     *
+     * @see USER_ERROR_PREFIX
+     */
+    fun userError(message: String) {
+        internalChat(USER_ERROR_PREFIX + message)
     }
 
-    fun error(message: String) {
+    /**
+     * Sends a message to the user that an error occurred caused by something in the code.
+     * This should be used for errors that are not caused by the user.
+     *
+     * @param message The message to be sent
+     * @param prefix Whether to prefix the message with the error prefix, default true
+     *
+     * @see ERROR_PREFIX
+     */
+    fun error(message: String, prefix: Boolean = true) {
         println("error: '$message'")
-        internalChat("§c$message")
+        if (prefix) internalChat(ERROR_PREFIX + message)
+        else internalChat("§c$message")
     }
 
-    fun chat(message: String) {
-        internalChat(message)
+    /**
+     * Sends a message to the user
+     * @param message The message to be sent
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     *
+     * @see CHAT_PREFIX
+     */
+    fun chat(message: String, prefix: Boolean = true) {
+        if (prefix) internalChat(CHAT_PREFIX + message)
+        else internalChat(message)
     }
 
     private fun internalChat(message: String): Boolean {
