@@ -17,8 +17,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftMotesOrb {
     private val config get() = RiftAPI.config.motesOrbsConfig
-    private var motesOrbs = emptyList<MotesOrb>()
+
+    // TODO USE SH-REPO
     private val pattern = "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*".toPattern()
+
+    private var motesOrbs = emptyList<MotesOrb>()
 
     class MotesOrb(
         var location: LorenzVec,
