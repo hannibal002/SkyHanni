@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.features.commands.PartyCommands
+import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 
 object TabComplete {
@@ -26,6 +27,7 @@ object TabComplete {
         PlayerTabComplete.handleTabComplete(command)?.let { return it }
         CollectionTracker.handleTabComplete(command)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
+        ViewRecipeCommand.customTabComplete(command)?.let { return it }
 
         return null
     }

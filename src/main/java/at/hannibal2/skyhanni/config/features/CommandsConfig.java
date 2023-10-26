@@ -60,6 +60,12 @@ public class CommandsConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean partyCommands = true;
+
+        @Expose
+        @ConfigOption(name = "Viewrecipe Items", desc = "Tab complete items with recipe in the the Hypixel command §e/viewrecipe§7.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean viewrecipeItems = true;
     }
 
     @Expose
