@@ -55,7 +55,8 @@ class ShowFishingItemName {
                 if (name.removeColor() == "Stone") continue
 
                 val size = itemStack.stackSize
-                val isBait = name.endsWith(" Bait") && size == 1
+                val isBait = (name.removeColor().startsWith("Obfuscated")
+                    || name.endsWith(" Bait")) && size == 1
                 val prefix = if (!isBait) {
                     "§a§l+"
                 } else {
