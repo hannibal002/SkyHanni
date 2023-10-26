@@ -18,7 +18,7 @@ class SkyblockLevelAPI {
     fun onActionBarUpdate (event: LorenzActionBarEvent){
         val info = extractInfo(event.message)
 
-        if (info.isNotEmpty()) {
+        if (info.isNotEmpty() && info[0].isNotEmpty() && info[1].isNotEmpty() && info[2].isNotEmpty()) {
             currentLevel = info[0].toInt()
             xpSource = info[1]
             currentProgress = info[2]
