@@ -59,16 +59,16 @@ class CustomScoreboard {
     private var bitsIndex = 4
     private var copperIndex = 5
     private var gemsIndex = 6
-
+    private var EMPTY_LINE = 7
     private var locationIndex = 8
     private var skyblockTimeIndex = 9
     private var lobbyCodeIndex = 10
     private var powderIndex = 11
-
+    private var EMPTY_LINE2 = 12
     private var slayerIndex = 13
     private var currentEventIndex = 14
     private var mayorIndex = 15
-
+    private var EMPTY_LINE3 = 16
     private var heatIndex = 17
     private var partyIndex = 18
     private var sblevelIndex = 19
@@ -163,12 +163,12 @@ class CustomScoreboard {
         lineMap[bitsIndex] = Collections.singletonList("Bits: §b$bits")
         lineMap[copperIndex] = Collections.singletonList("Copper: §c$copper")
         lineMap[gemsIndex] = Collections.singletonList("Gems: §a$gems")
-        lineMap[7] = Collections.singletonList("<empty>")
+        lineMap[EMPTY_LINE] = Collections.singletonList("<empty>")
         lineMap[locationIndex] = Collections.singletonList(location)
         lineMap[skyblockTimeIndex] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[lobbyCodeIndex] = Collections.singletonList("§8$lobbyCode")
         lineMap[powderIndex] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
-        lineMap[13] = Collections.singletonList("<empty>")
+        lineMap[EMPTY_LINE2] = Collections.singletonList("<empty>")
 
         val slayerList = mutableListOf<Any>()
         slayerList.add("§7Slayer") //todo: get slayer stuff
@@ -187,7 +187,7 @@ class CustomScoreboard {
         }
         lineMap[mayorIndex] = mayorList
 
-        lineMap[18] = Collections.singletonList("<empty>")
+        lineMap[EMPTY_LINE3] = Collections.singletonList("<empty>")
         lineMap[heatIndex] = Collections.singletonList("Heat: §c♨$heat")
 
         val partyList = mutableListOf<Any>()
