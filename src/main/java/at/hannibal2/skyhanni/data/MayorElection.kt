@@ -15,7 +15,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MayorElection {
     private var lastUpdate = 0L
-    private var dispatcher = Dispatchers.IO
 
     companion object {
         var rawMayorData: MayorJson? = null
@@ -41,7 +40,7 @@ class MayorElection {
             lastUpdate = System.currentTimeMillis()
             SkyHanniMod.coroutineScope.launch {
                 val url = "https://api.hypixel.net/resources/skyblock/election"
-                val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+                val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
                 rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
                 val data = rawMayorData ?: return@launch
                 val map = mutableMapOf<Int, MayorJson.Candidate>()
