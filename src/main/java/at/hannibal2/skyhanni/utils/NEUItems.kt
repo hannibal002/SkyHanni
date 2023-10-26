@@ -112,9 +112,11 @@ object NEUItems {
         return internalName
     }
 
+    // Workaround for duplex
+    private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
+
     private fun fixEnchantmentName(originalName: String): NEUInternalName {
-        // Workaround for duplex
-        "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern().matchMatcher(originalName) {
+        duplexPattern.matchMatcher(originalName) {
             val tier = group("tier")
             return "ULTIMATE_REITERATE;$tier".asInternalName()
         }

@@ -34,8 +34,10 @@ class CityProjectFeatures {
     private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = 0L
-    private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
+
     // TODO USE SH-REPO
+    private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
+
     companion object {
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {

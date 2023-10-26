@@ -23,6 +23,9 @@ import kotlin.random.Random
 object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
+    // TODO USE SH-REPO
+    private val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
+
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
     fun createTabLine(text: String, type: TabStringType) = playerDatas[text]?.let {
@@ -34,8 +37,6 @@ object AdvancedPlayerList {
         if (LorenzUtils.inDungeons) return original
 
         if (ignoreCustomTabList()) return original
-        // TODO USE SH-REPO
-        val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
         val currentData = mutableMapOf<String, PlayerData>()
         newList.add(original.first())

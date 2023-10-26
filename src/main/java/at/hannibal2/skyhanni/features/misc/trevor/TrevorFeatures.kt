@@ -46,6 +46,7 @@ object TrevorFeatures {
     private val talbotPatternBelow =
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
     private val locationPattern = "Zone: (?<zone>.*)".toPattern()
+
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY

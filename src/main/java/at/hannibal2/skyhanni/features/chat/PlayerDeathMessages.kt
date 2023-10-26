@@ -17,9 +17,10 @@ class PlayerDeathMessages {
 
     private val lastTimePlayerSeen = mutableMapOf<String, Long>()
 
+    // TODO USE SH-REPO
     //§c ☠ §r§7§r§bZeroHazel§r§7 was killed by §r§8§lAshfang§r§7§r§7.
     private val deathMessagePattern = "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)".toPattern()
-    // TODO USE SH-REPO
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isHideFarDeathsEnabled()) return

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -34,6 +33,7 @@ class RiftBloodEffigies {
         4 to -1L,
         5 to -1L,
     )
+
     // TODO USE SH-REPO
     private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
 
