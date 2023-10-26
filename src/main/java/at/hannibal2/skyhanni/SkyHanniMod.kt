@@ -71,6 +71,7 @@ import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
@@ -420,6 +421,7 @@ class SkyHanniMod {
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
+        loadModule(ViewRecipeCommand())
         loadModule(PartyCommands)
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
