@@ -14,10 +14,13 @@ object ActionBarStatsData {
     )
 
     var groups = mutableMapOf("health" to "", "riftTime" to "", "defense" to "", "mana" to "")
+    var actionBar = ""
 
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        actionBar = event.message
 
         for ((groupName, pattern) in patterns) {
             pattern.matchMatcher(event.message) {

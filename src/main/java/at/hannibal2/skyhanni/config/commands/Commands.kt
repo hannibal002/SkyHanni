@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.command.CopyActionBar
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -284,6 +285,10 @@ object Commands {
             "shplaysound",
             "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
+        registerCommand(
+            "shcopyactionbar",
+            "Copies the actionbar to the clipboard"
+        ) { CopyActionBar.command(it) }
     }
 
     private fun internalCommands() {
