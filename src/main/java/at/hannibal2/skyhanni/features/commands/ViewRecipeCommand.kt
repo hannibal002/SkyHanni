@@ -11,6 +11,7 @@ class ViewRecipeCommand {
     fun onSendPacket(event: PacketEvent.SendEvent) {
         val packet = event.packet
         if (packet is C01PacketChatMessage) {
+            if (packet.message == packet.message.uppercase()) return
             val message = packet.message.lowercase()
             if (message.startsWith("/viewrecipe ")) {
                 event.isCanceled = true
@@ -18,5 +19,4 @@ class ViewRecipeCommand {
             }
         }
     }
-
 }
