@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -157,8 +156,7 @@ object SackAPI {
                         item.total = group("total")
 
                         if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
-                        val price: Long
-                        if (isTrophySack) {
+                        item.price = if (isTrophySack) {
                             val internal = stack.getInternalName_old()
                             val trophyFishName = internal.substringBeforeLast("_")
                                 .replace("_", "").lowercase()
@@ -166,12 +164,11 @@ object SackAPI {
                             val info = TrophyFishManager.getInfo(trophyFishName)
                             val rarity = TrophyRarity.getByName(trophyRarityName) ?: TrophyRarity.BRONZE
                             val filletValue = (info?.getFilletValue(rarity) ?: 0) * stored.toLong()
-                            price = "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
                             item.magmaFish = filletValue.toString()
+                            "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
                         } else {
-                            price = internalName.sackPrice(stored).coerceAtLeast(0)
+                            internalName.sackPrice(stored).coerceAtLeast(0)
                         }
-                        item.price = price
 
 
                         if (isRuneSack) {

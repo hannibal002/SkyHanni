@@ -5,13 +5,17 @@ import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -22,7 +26,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object SackDisplay {
     private var display = emptyList<List<Any>>()
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
-
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -39,9 +42,8 @@ object SackDisplay {
         if (!SackAPI.inSackInventory) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val stack = slot.stack
-            val lore = stack.getLore()
-            if (lore.any { it.startsWith("§7Stored: §a")}) {
+            val lore = slot.stack.getLore()
+            if (lore.any { it.startsWith("§7Stored: §a") }) {
                 slot highlight LorenzColor.RED
             }
         }
@@ -122,6 +124,8 @@ object SackDisplay {
                 rendered++
             }
 
+            if (SackAPI.isTrophySack) newDisplay.addAsSingletonList("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
+
             val name = SortType.entries[config.sortingType].longName
             newDisplay.addAsSingletonList("§7Sorted By: §c$name")
 
@@ -132,8 +136,6 @@ object SackDisplay {
                     config.sortingType = it.ordinal
                     update(false)
                 })
-
-            if (SackAPI.isTrophySack) newDisplay.addAsSingletonList("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
 
             newDisplay.addButton(
                 prefix = "§7Number format: ",
