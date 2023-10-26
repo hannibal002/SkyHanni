@@ -34,6 +34,7 @@ object PartyAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        // TODO USE SH-REPO
         val message = event.message.trimWhiteSpaceAndResets().removeResets()
 
         // new member joined

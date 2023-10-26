@@ -16,14 +16,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CruxTalismanDisplay {
-
     private val config get() = RiftAPI.config.cruxTalisman
+
+    // TODO USE SH-REPO
+    private val progressPattern =
+        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|(?:§[0-9a-z]\\d+§[0-9a-z]\\/§[0-9a-z]\\d+)).*".toPattern()
+
     private val partialName = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
-    private val progressPattern =
-        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|(?:§[0-9a-z]\\d+§[0-9a-z]\\/§[0-9a-z]\\d+)).*".toPattern()
     private var maxed = false
     private var percentValue = 0.0
 
