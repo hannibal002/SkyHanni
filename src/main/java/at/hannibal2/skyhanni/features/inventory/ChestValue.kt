@@ -29,7 +29,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import kotlin.time.Duration.Companion.hours
 
 class ChestValue {
 
@@ -276,5 +275,4 @@ class ChestValue {
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
 }
