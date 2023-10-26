@@ -239,7 +239,7 @@ public class InventoryConfig {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons")
+        @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enableInDungeons = false;
