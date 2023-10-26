@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.config
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -22,8 +24,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -103,7 +107,7 @@ class VisitorListener {
         }
 
         for (name in visitorsInTab) {
-           VisitorAPI.addVisitor(name)
+            VisitorAPI.addVisitor(name)
         }
     }
 
@@ -112,7 +116,7 @@ class VisitorListener {
         if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[VISITOR_INFO_ITEM_SLOT] ?: return
         val lore = npcItem.getLore()
-        if(!VisitorAPI.isVisitorInfo(lore)) return
+        if (!VisitorAPI.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[VISITOR_ACCEPT_ITEM_SLOT] ?: return
         if (offerItem.name != "§aAccept Offer") return
@@ -138,6 +142,16 @@ class VisitorListener {
         VisitorAPI.inInventory = false
     }
 
+    @SubscribeEvent
+    fun onKeybind(event: KeyboardInputEvent.Post) {
+        if (!VisitorAPI.inInventory) return
+        if (!config.acceptHotkey.isKeyHeld()) return
+        val inventory = event.gui as? AccessorGuiContainer ?: return
+        inventory as GuiContainer
+        val slot = inventory.inventorySlots.getSlot(29)
+        inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
@@ -158,8 +172,8 @@ class VisitorListener {
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
-                                "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                                "sh bypass"
+                            "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
+                            "sh bypass"
                         )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()
@@ -170,7 +184,9 @@ class VisitorListener {
             VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             return
         }
-        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
+        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot.stack?.getLore()
+                ?.any { it == "§eClick to give!" } == true
+        ) {
             VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
             return
         }
