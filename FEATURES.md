@@ -579,6 +579,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
++ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
+    + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
+    + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 </details>
 <details open><summary>
 

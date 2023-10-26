@@ -193,13 +193,13 @@ object CropMoneyDisplay {
 
             try {
                 if (isSeeds(internalName)) {
-                    list.add(getItemStack("BOX_OF_SEEDS", true))
+                    list.add(getItemStack("BOX_OF_SEEDS"))
                 } else {
                     list.add(internalName.getItemStack())
                 }
 
                 if (cropNames[internalName] == CropType.WHEAT && config.mergeSeeds) {
-                    list.add(getItemStack("BOX_OF_SEEDS", true))
+                    list.add(getItemStack("BOX_OF_SEEDS"))
                 }
             } catch (e: NullPointerException) {
                 e.printStackTrace()
