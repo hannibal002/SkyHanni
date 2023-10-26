@@ -79,6 +79,7 @@ object SackDisplay {
             val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
             newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
+
                 val (internalName, colorCode, stored, total, price, magmaFish) = item
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
@@ -102,15 +103,15 @@ object SackDisplay {
                     )
 
                     if (colorCode == "§a") add(" §c§l(Full!)")
-                    if (SackAPI.isTrophySack && magmaFish.toLong() > 0) {
-                        totalMagmaFish += magmaFish.toLong()
+                    if (SackAPI.isTrophySack && magmaFish > 0) {
+                        totalMagmaFish += magmaFish
                         add(
                             Renderable.hoverTips(
-                                " §7(§d${magmaFish.toLong()} ",
+                                " §7(§d${magmaFish} ",
                                 listOf(
-                                    "§6Magmafish: §b${magmaFish.toLong().addSeparators()}",
-                                    "§6Magmafish value: §b${price / magmaFish.toLong()}",
-                                    "§6Magmafish per: §b${magmaFish.toLong() / stored.toLong()}"
+                                    "§6Magmafish: §b${magmaFish.addSeparators()}",
+                                    "§6Magmafish value: §b${price / magmaFish}",
+                                    "§6Magmafish per: §b${magmaFish / stored.toLong()}"
 
                                 )
                             )
