@@ -40,10 +40,28 @@
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
 + Added Quest Item Helper. - NetheriteMiner
-    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items needed from the sacks.
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
+      needed from the sacks.
 + Added alerts when the player catches a Legendary Sea Creature. - Cad
 + Added Soulweaver Skull Hider to the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
++ Added /shmouselock command to lock mouse rotation for farming. - Cad
++ Added **Dungeon party finder** QOL improvements - Cad
+    + Floor stack size.
+    + Mark Paid Carries red.
+    + Mark Low-Class levels orange.
+    + Mark groups you can't join dark red.
+    + Mark groups without your current classes green.
++ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
+    + /pw -> party warp
+    + /pk -> party kick
+    + /pt -> party transfer
+    + /pp -> party promote
+    + /pko -> party kickoffline
++ Added working **Livid Finder** (should work 100% of the time). - hannibal2
+    + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
+      in some cases).
++ Added AFK time to Discord RPC. - NetheriteMiner
 
 #### Events
 
@@ -52,6 +70,9 @@
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
++ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
+    + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
+    + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 
 ### Changes
 
@@ -72,6 +93,15 @@
 + Changed the Yaw/Pitch Display to not show scientific notations at very small numbers. - Obsidian
 + Added an option to the Advanced Player List to hide Crimson Isle faction icons. - hannibal2
 + Added Enrichment to Estimated Item Value. - jani
++ Added Plhlegblast to the Rare Sea Creature Warning and Highlight. - hannibal2
++ Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election
+  API check failed. - CalMWolfs
++ Hiding a bunch of garden GUIs in a bunch of garden inventories. - hannibal2
++ More shwords support. - CalMWolfs
+    + Added the option to change between case-sensitive and case-insensitive.
+    + Allow the use of Ctrl + C to copy the current textbox.
+    + The effect of visual words is now visible while editing text.
++ Added Diamond/Gold essence to chat filter powder mining. - HiZe
 
 ### Bug Fixes
 
@@ -100,6 +130,19 @@
 + Fixed Abiphone ring message not getting filtered correctly. - hannibal2
 + Fixed the bug that faction icons in Crimson Isle are always hidden in the tab list. - hannibal2
 + Fixed SkyHanni GUI Edit Button not working inside storage even if neu storage is not disabled. - hannibal2
++ Hide "click" texts with the Fishing Hook Display. - hannibal2
++ Fixed Highlight Showcase Items not working in some areas. - Obsidian
++ Fixed the Blaze Slayer Damage Indicator not working and no longer causing FPS drops. - hannibal2
++ Fixed clean end working in f5/m5. - hannibal2
++ Fixed visitor drop statistics preview. - Obsidian
++ Fixed a bracket at the wrong spot in Discord RPC. - hannibal2
++ Fixed fishing hook display triggering on wrong texts. - hannibal2
++ Fixed crop milestone inventory showing wrong level as stack size when maxed out. - hannibal2
++ Fixed various bugs with the /shwords GUI. - CalMWolfs
++ Bring back the command /shwords - CalMWolfs
++ It got deleted accidentally during code optimisations.
++ Highlight Commission Mobs: The "Golden Goblin Slayer" Commission should not trigger the "Goblin Slayer" Commission
+  anymore. - Thunderblade73
 
 #### Config
 

@@ -18,7 +18,7 @@ class RiftUpsideDownParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: return
+        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
         parkourHelper = ParkourHelper(
             data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
             data.shortCuts,

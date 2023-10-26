@@ -96,6 +96,7 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
+        if (!DianaAPI.featuresEnabled()) return
         if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
             teleportedLocation = event.newLocation
         }
@@ -103,6 +104,7 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!DianaAPI.featuresEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
@@ -142,6 +144,7 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!DianaAPI.featuresEnabled()) return
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()

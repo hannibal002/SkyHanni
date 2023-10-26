@@ -67,8 +67,7 @@ object SlayerItemProfitTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val items = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems") ?: return
-        allowedItems = items.slayers
+        allowedItems = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems").slayers
     }
 
     @SubscribeEvent

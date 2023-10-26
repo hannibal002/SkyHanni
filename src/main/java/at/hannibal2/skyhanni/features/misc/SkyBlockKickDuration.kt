@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -82,6 +83,7 @@ class SkyBlockKickDuration {
 
     private fun warn() {
         LorenzUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        SoundUtils.playBeepSound()
     }
 
     fun isEnabled() = config.enabled

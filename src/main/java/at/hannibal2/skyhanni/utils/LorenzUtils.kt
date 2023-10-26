@@ -108,22 +108,6 @@ object LorenzUtils {
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
-    fun SkyBlockTime.formatted(): String {
-        val date = SkyBlockTime.now()
-        val hour = if (date.hour > 12) date.hour - 12 else date.hour
-        val timeOfDay = if (date.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        var minute = date.minute.toString()
-        if (minute.length != 2) {
-            minute = minute.padStart(2, '0')
-        }
-
-        val month = SkyBlockTime.monthName(date.month)
-        val day = date.day
-        val daySuffix = SkyBlockTime.daySuffix(day)
-        val year = date.year
-        return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
-    }
-
     fun stripVanillaMessage(originalMessage: String): String {
         var message = originalMessage
 
@@ -446,7 +430,7 @@ object LorenzUtils {
                 && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
+    fun inIsland(island: IslandType) = inSkyBlock && (skyBlockIsland == island || island == IslandType.CATACOMBS && inDungeons)
 
     fun IslandType.isInIsland() = inIsland(this)
 
