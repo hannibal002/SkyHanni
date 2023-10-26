@@ -80,4 +80,10 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;
+
+    @Expose
+    @ConfigOption(name = "/viewrecipe Lower Case", desc = "Adds support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean viewRecipeLowerCase = true;
 }
