@@ -138,7 +138,7 @@ public class RiftConfig {
             public static class OdonataConfig {
 
                 @Expose
-                @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding a " +
+                @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding an " +
                         "§eEmpty Odonata Bottle §7in the hand.")
                 @ConfigEditorBoolean
                 @FeatureToggle

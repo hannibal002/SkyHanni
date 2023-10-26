@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.events.VisitorArrivalEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -135,7 +135,9 @@ class GardenVisitorTimer {
             val factor = diff / 1000.0
             "§7/§$formatColor" + TimeUtils.formatDuration((millis / factor).roundToLong())
         } else ""
-
+        if (config.newVisitorPing && millis < 10000){
+            SoundUtils.playBeepSound()
+        }
         val formatDuration = TimeUtils.formatDuration(millis)
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis < 0)) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"

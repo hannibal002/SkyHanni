@@ -29,6 +29,7 @@ class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
+        if (GardenAPI.hideExtraGuis()) return
         val shouldShow = apiError || (config.ignoreLow || weight >= 200)
         if (isEnabled() && shouldShow) {
             config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
@@ -76,7 +77,11 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
         event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
         event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
-        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage", "garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(
+            3,
+            "garden.eliteFarmingWeightOffScreenDropMessage",
+            "garden.eliteFarmingWeights.offScreenDropMessage"
+        )
         event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")

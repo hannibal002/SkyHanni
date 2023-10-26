@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -172,16 +172,12 @@ object NEUItems {
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
     // TODO remove
-    fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
-        internalName.asInternalName().getItemStack(definite)
+    fun getItemStack(internalName: String): ItemStack =
+        internalName.asInternalName().getItemStack()
 
-    fun NEUInternalName.getItemStack(definite: Boolean = false): ItemStack =
+    fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
             if (getPriceOrNull() == null) return@run fallbackItem
-
-            if (definite) {
-                Utils.showOutdatedRepoNotification()
-            }
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
@@ -191,7 +187,7 @@ object NEUItems {
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName_old())
+    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
