@@ -20,6 +20,7 @@
 //  - quiver
 //  - icons
 //  - beacon power
+//  - skyblock level
 //
 
 package at.hannibal2.skyhanni.features.misc
@@ -71,9 +72,8 @@ class CustomScoreboard {
     private var EMPTY_LINE3 = 16
     private var heatIndex = 17
     private var partyIndex = 18
-    private var sblevelIndex = 19
-    private var maxwellIndex = 20
-    private var websiteIndex = 21
+    private var maxwellIndex = 19
+    private var websiteIndex = 20
 
 
     @SubscribeEvent
@@ -129,7 +129,6 @@ class CustomScoreboard {
                 // Multiline support
                 if (it[0] == "§9Party"
                     || it[0].toString().contains(MayorElection.currentCandidate?.name ?: "")
-                    || it[0].toString().contains("Level:")
                 ) {
                     for (item in it) {
                         newList.add(listOf(item))
@@ -200,13 +199,6 @@ class CustomScoreboard {
             partyCount++
         }
         lineMap[partyIndex] = partyList
-
-        val sblevelList = mutableListOf<Any>()
-        sblevelList.add("Level: " + SkyblockLevelAPI.currentLevel)
-        if (config.showSblvlProgess){
-            sblevelList.add("§7Progress: §e${SkyblockLevelAPI.currentProgress}")
-        }
-        lineMap[sblevelIndex] = sblevelList
 
         lineMap[maxwellIndex] = Collections.singletonList("§7Maxwell Power")
         lineMap[websiteIndex] = Collections.singletonList("§ewww.hypixel.net")
