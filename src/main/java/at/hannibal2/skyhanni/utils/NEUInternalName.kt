@@ -36,6 +36,9 @@ class NEUInternalName private constructor(private val internalName: String) {
     fun startsWith(other: String) = internalName.startsWith(other)
 
     fun endsWith(other: String) = internalName.endsWith(other)
+    fun substringBeforeLast(delimiter: String) = internalName.substringBeforeLast(delimiter)
+
+    fun substringAfterLast(delimiter: String) = internalName.substringAfterLast(delimiter)
 
     fun replace(oldValue: String, newValue: String) =
         internalName.replace(oldValue.uppercase(), newValue.uppercase()).asInternalName()

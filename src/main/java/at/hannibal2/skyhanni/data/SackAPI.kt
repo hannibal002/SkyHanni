@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -158,7 +157,7 @@ object SackAPI {
 
                         if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
                         item.price = if (isTrophySack) {
-                            val internal = stack.getInternalName_old()
+                            val internal = stack.getInternalName()
                             val trophyFishName = internal.substringBeforeLast("_")
                                 .replace("_", "").lowercase()
                             val trophyRarityName = internal.substringAfterLast("_")

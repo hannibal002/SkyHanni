@@ -25,6 +25,7 @@ object TrophyFishManager {
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
 
+    // TODO MIGRATE TO NeuInternalName
     fun getInfo(internalName: String) = trophyFishInfo[internalName]
 
     fun getInfoByName(name: String) = trophyFishInfo.values.find { it.displayName == name }

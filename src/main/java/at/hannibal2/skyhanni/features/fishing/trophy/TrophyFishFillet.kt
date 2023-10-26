@@ -18,7 +18,7 @@ class TrophyFishFillet {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (event.slot.inventory.name.contains("Sack")) return
-        val internalName = event.itemStack.getInternalName().asString()
+        val internalName = event.itemStack.getInternalName()
         val trophyFishName = internalName.substringBeforeLast("_")
             .replace("_", "").lowercase()
         val trophyRarityName = internalName.substringAfterLast("_")
