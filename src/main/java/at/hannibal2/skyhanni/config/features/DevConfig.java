@@ -12,7 +12,7 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" +
-            "§cOnly disable this if you know what you are doing!")
+        "§cOnly disable this if you know what you are doing!")
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
 
@@ -34,9 +34,9 @@ public class DevConfig {
 
         @Expose
         @ConfigOption(
-                name = "Mod Menu Log",
-                desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
-                        "Useful for adding more mods to quick mod menu switch."
+            name = "Mod Menu Log",
+            desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
+                "Useful for adding more mods to quick mod menu switch."
         )
         @ConfigEditorBoolean
         public boolean modMenuLog = false;
@@ -150,16 +150,16 @@ public class DevConfig {
 
         @Expose
         @ConfigOption(
-                name = "Outside SkyBlock",
-                desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
+            name = "Outside SkyBlock",
+            desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
         )
         @ConfigEditorBoolean
         public boolean printUnfilteredDebugsOutsideSkyBlock = false;
 
         @Expose
         @ConfigOption(
-                name = "Log Filtered",
-                desc = "Log the filtered messages into the console."
+            name = "Log Filtered",
+            desc = "Log the filtered messages into the console."
         )
         @ConfigEditorBoolean
         public boolean printFilteredReason = false;
@@ -187,7 +187,7 @@ public class DevConfig {
 
             @Expose
             @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " +
-                    "removeObjective and 'scoreboard team already exists'.")
+                "removeObjective and 'scoreboard team already exists'.")
             @ConfigEditorBoolean
             public boolean filterScoreboardErrors = true;
 

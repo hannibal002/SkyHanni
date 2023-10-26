@@ -83,7 +83,10 @@ class DungeonMilestonesDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + display, posLabel = "Dungeon Milestone")
+        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(
+            color + display,
+            posLabel = "Dungeon Milestone"
+        )
     }
 
     private fun isEnabled(): Boolean {

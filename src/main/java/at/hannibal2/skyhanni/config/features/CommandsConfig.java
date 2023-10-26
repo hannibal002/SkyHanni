@@ -69,7 +69,7 @@ public class CommandsConfig {
     public boolean useFandomWiki = false;
 
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
-            "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
+        "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle

@@ -36,21 +36,21 @@ public class MinionsConfig {
 
         @Expose
         @ConfigOption(
-                name = "Last Minion Color",
-                desc = "The color in which the last minion should be displayed."
+            name = "Last Minion Color",
+            desc = "The color in which the last minion should be displayed."
         )
         @ConfigEditorColour
         public String color = "0:245:85:255:85";
 
         @Expose
         @ConfigOption(
-                name = "Last Minion Time",
-                desc = "Time in seconds how long the last minion should be displayed."
+            name = "Last Minion Time",
+            desc = "Time in seconds how long the last minion should be displayed."
         )
         @ConfigEditorSlider(
-                minValue = 3,
-                maxValue = 120,
-                minStep = 1
+            minValue = 3,
+            maxValue = 120,
+            minStep = 1
         )
         public int time = 20;
     }
@@ -69,13 +69,13 @@ public class MinionsConfig {
 
         @Expose
         @ConfigOption(
-                name = "Distance",
-                desc = "Maximum distance to display minion data."
+            name = "Distance",
+            desc = "Maximum distance to display minion data."
         )
         @ConfigEditorSlider(
-                minValue = 3,
-                maxValue = 30,
-                minStep = 1
+            minValue = 3,
+            maxValue = 30,
+            minStep = 1
         )
         public int distance = 10;
     }

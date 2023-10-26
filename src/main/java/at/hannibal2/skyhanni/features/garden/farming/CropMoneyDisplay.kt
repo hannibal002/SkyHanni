@@ -276,8 +276,8 @@ object CropMoneyDisplay {
 
         val onlyNpcPrice =
             (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
-                    (config.useCustomFormat && config.customFormat.size == 1 &&
-                            config.customFormat[0] == 2)
+                (config.useCustomFormat && config.customFormat.size == 1 &&
+                    config.customFormat[0] == 2)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!

@@ -31,8 +31,8 @@ public class FishingConfig {
 
             @Expose
             @ConfigOption(
-                    name = "Trophy Counter",
-                    desc = "Counts Trophy messages from chat and tells you how many you have found."
+                name = "Trophy Counter",
+                desc = "Counts Trophy messages from chat and tells you how many you have found."
             )
             @ConfigEditorBoolean
             @FeatureToggle
@@ -40,10 +40,10 @@ public class FishingConfig {
 
             @Expose
             @ConfigOption(
-                    name = "Trophy Counter Design",
-                    desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
-                            "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
-                            "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
+                name = "Trophy Counter Design",
+                desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
+                    "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
+                    "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
             )
             @ConfigEditorDropdown(values = {"Style 1", "Style 2", "Style 3"})
             public int design = 0;
@@ -115,8 +115,8 @@ public class FishingConfig {
     public static class BarnTimerConfig {
         @Expose
         @ConfigOption(
-                name = "Barn Fishing Timer",
-                desc = "Show the time and amount of sea creatures while fishing on the barn via hub."
+            name = "Barn Fishing Timer",
+            desc = "Show the time and amount of sea creatures while fishing on the barn via hub."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -124,24 +124,24 @@ public class FishingConfig {
 
         @Expose
         @ConfigOption(
-                name = "Worm Fishing",
-                desc = "Show the Barn Fishing Timer even for worms or other sea creatures in the Crystal Hollows."
+            name = "Worm Fishing",
+            desc = "Show the Barn Fishing Timer even for worms or other sea creatures in the Crystal Hollows."
         )
         @ConfigEditorBoolean
         public boolean crystalHollows = true;
 
         @Expose
         @ConfigOption(
-                name = "Stranded Fishing",
-                desc = "Show the Barn Fishing Timer even on all the different islands Stranded players can visit."
+            name = "Stranded Fishing",
+            desc = "Show the Barn Fishing Timer even on all the different islands Stranded players can visit."
         )
         @ConfigEditorBoolean
         public boolean forStranded = true;
 
         @Expose
         @ConfigOption(
-                name = "Worm Cap Alert",
-                desc = "Alerts you with sound if you hit the Worm Sea Creature limit of 60."
+            name = "Worm Cap Alert",
+            desc = "Alerts you with sound if you hit the Worm Sea Creature limit of 60."
         )
         @ConfigEditorBoolean
         public boolean wormLimitAlert = true;
@@ -154,9 +154,9 @@ public class FishingConfig {
         @Expose
         @ConfigOption(name = "Fishing Timer Alert", desc = "Change the amount of time in seconds until the timer dings.")
         @ConfigEditorSlider(
-                minValue = 240,
-                maxValue = 360,
-                minStep = 10
+            minValue = 240,
+            maxValue = 360,
+            minStep = 10
         )
         public int alertTime = 330;
 
@@ -223,8 +223,8 @@ public class FishingConfig {
 
         @Expose
         @ConfigOption(
-                name = "Hide Armor Stand",
-                desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
+            name = "Hide Armor Stand",
+            desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
         )
         @ConfigEditorBoolean
         public boolean hideArmorStand = true;
@@ -266,8 +266,8 @@ public class FishingConfig {
 
     @Expose
     @ConfigOption(
-            name = "Shark Fish Counter",
-            desc = "Counts how many Sharks have been caught."
+        name = "Shark Fish Counter",
+        desc = "Counts how many Sharks have been caught."
     )
     @ConfigEditorBoolean
     @FeatureToggle

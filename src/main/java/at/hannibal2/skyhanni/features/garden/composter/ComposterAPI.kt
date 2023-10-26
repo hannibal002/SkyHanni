@@ -11,13 +11,15 @@ object ComposterAPI {
     var tabListData = mapOf<ComposterDisplay.DataType, String>()
     val composterUpgrades: MutableMap<ComposterUpgrade, Int>? get() = GardenAPI.config?.composterUpgrades
 
-    fun ComposterUpgrade.getLevel(addOne: ComposterUpgrade?) = (composterUpgrades?.get(this) ?: 0) + if (addOne == this) 1 else 0
+    fun ComposterUpgrade.getLevel(addOne: ComposterUpgrade?) =
+        (composterUpgrades?.get(this) ?: 0) + if (addOne == this) 1 else 0
 
     fun getFuel() = tabListData[ComposterDisplay.DataType.FUEL]?.removeColor()?.formatNumber() ?: 0
 
     fun getOrganicMatter() = tabListData[ComposterDisplay.DataType.ORGANIC_MATTER]?.removeColor()?.formatNumber() ?: 0
 
-    fun maxOrganicMatter(addOne: ComposterUpgrade?) = 40_000 + ComposterUpgrade.ORGANIC_MATTER_CAP.getLevel(addOne) * 20_000
+    fun maxOrganicMatter(addOne: ComposterUpgrade?) =
+        40_000 + ComposterUpgrade.ORGANIC_MATTER_CAP.getLevel(addOne) * 20_000
 
     fun multiDropChance(addOne: ComposterUpgrade?) = ComposterUpgrade.MULTI_DROP.getLevel(addOne) * 0.03
 

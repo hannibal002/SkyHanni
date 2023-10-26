@@ -214,7 +214,7 @@ class EnderNodeTracker {
         addAsSingletonList(" ")
         addAsSingletonList(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                    "§7(§6${format(totalEnderArmor * 10_000)}§7)"
+                "§7(§6${format(totalEnderArmor * 10_000)}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (storage.lootCount[item] ?: 0).addSeparators()

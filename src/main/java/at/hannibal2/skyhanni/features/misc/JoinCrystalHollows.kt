@@ -39,7 +39,7 @@ class JoinCrystalHollows {
         if (!isEnabled()) return
 
         if (event.newIsland == IslandType.DWARVEN_MINES && inTime()) {
-                LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn§e!")
+            LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn§e!")
         }
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
             lastWrongPassTime = 0

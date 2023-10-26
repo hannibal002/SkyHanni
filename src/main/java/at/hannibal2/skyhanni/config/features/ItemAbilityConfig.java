@@ -35,8 +35,8 @@ public class ItemAbilityConfig {
 
         @Expose
         @ConfigOption(
-                name = "Line Color",
-                desc = "Changes the color of the Fire Veil Wand line."
+            name = "Line Color",
+            desc = "Changes the color of the Fire Veil Wand line."
         )
         @ConfigEditorColour
         public String displayColor = "0:245:255:85:85";
@@ -67,7 +67,7 @@ public class ItemAbilityConfig {
 
     @Expose
     @ConfigOption(name = "Depleted Bonzo's Masks",
-            desc = "Highlights used Bonzo's Masks and Spirit Masks with a background.")
+        desc = "Highlights used Bonzo's Masks and Spirit Masks with a background.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean depletedBonzosMasks = false;

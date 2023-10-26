@@ -140,9 +140,7 @@ class ChatFilter {
     }
 
     private fun party(message: String): Boolean {
-        if (message == "§9§m-----------------------------------------------------") return true
-
-        return false
+        return message == "§9§m-----------------------------------------------------"
     }
 
     private fun slayerDrop(message: String): Boolean {

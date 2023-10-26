@@ -439,7 +439,8 @@ class GardenVisitorFeatures {
             if (!visitor.inSacks) {
                 val status = visitor.status
                 if (status == VisitorAPI.VisitorStatus.WAITING || status == VisitorAPI.VisitorStatus.READY) {
-                    val newStatus = if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
+                    val newStatus =
+                        if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
                     VisitorAPI.changeStatus(visitor, newStatus, "hasItemsInInventory")
                 }
             }

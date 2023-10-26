@@ -88,7 +88,7 @@ class SummoningMobManager {
                     healthPattern.matchMatcher(name) {
                         val playerName = LorenzUtils.getPlayerName()
                         if (name.contains(playerName)) {
-                            summoningMobNametags.add(it as EntityArmorStand)
+                            summoningMobNametags.add(it)
                             if (summoningMobNametags.size == summoningsSpawned) {
                                 searchArmorStands = false
                             }

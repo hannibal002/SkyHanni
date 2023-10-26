@@ -19,12 +19,12 @@ object NEUVersionCheck {
         } catch (e: Throwable) {
             neuWarning(
                 "NotEnoughUpdates is missing!\n" +
-                        "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                        "You currently need NEU version 2.1.1-Alpha-19 or later.\n" +
-                        "NEU 2.1 is NOT the latest version.\n" +
-                        "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
-                        "Or in the #neu-updates channel in the SkyHanni discord\n" +
-                        "Use these links to download the latest version:"
+                    "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
+                    "You currently need NEU version 2.1.1-Alpha-19 or later.\n" +
+                    "NEU 2.1 is NOT the latest version.\n" +
+                    "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
+                    "Or in the #neu-updates channel in the SkyHanni discord\n" +
+                    "Use these links to download the latest version:"
             )
             return
         }
@@ -39,12 +39,12 @@ object NEUVersionCheck {
         }
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
-                    "You currently need NEU version 2.1.1-Alpha-19 or later.\n\n" +
-                    "NEU 2.1 is NOT the latest version.\n\n" +
-                    "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
-                    "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
-                    "Or in the #neu-updates channel in the SkyHanni discord\n" +
-                    "Use these links to download the latest version:"
+                "You currently need NEU version 2.1.1-Alpha-19 or later.\n\n" +
+                "NEU 2.1 is NOT the latest version.\n\n" +
+                "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
+                "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
+                "Or in the #neu-updates channel in the SkyHanni discord\n" +
+                "Use these links to download the latest version:"
         )
     }
 

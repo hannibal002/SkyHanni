@@ -183,8 +183,8 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
@@ -308,8 +308,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU

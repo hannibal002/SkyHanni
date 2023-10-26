@@ -23,15 +23,63 @@ class DicerRngDropCounter {
 
     init {
         initDrops()
-        itemDrops.add(ItemDrop(CropType.MELON, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!".toRegex()))
-        itemDrops.add(ItemDrop(CropType.MELON, DropRarity.RARE, "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!".toRegex()))
-        itemDrops.add(ItemDrop(CropType.MELON, DropRarity.CRAZY_RARE, "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§[a|9]Enchanted Melon(?: Block)?§r§e!".toRegex()))
-        itemDrops.add(ItemDrop(CropType.MELON, DropRarity.PRAY_TO_RNGESUS, "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9(\\d+)x §r§9Enchanted Melon Block§r§e!".toRegex()))
+        itemDrops.add(
+            ItemDrop(
+                CropType.MELON,
+                DropRarity.UNCOMMON,
+                "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!".toRegex()
+            )
+        )
+        itemDrops.add(
+            ItemDrop(
+                CropType.MELON,
+                DropRarity.RARE,
+                "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!".toRegex()
+            )
+        )
+        itemDrops.add(
+            ItemDrop(
+                CropType.MELON,
+                DropRarity.CRAZY_RARE,
+                "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§[a|9]Enchanted Melon(?: Block)?§r§e!".toRegex()
+            )
+        )
+        itemDrops.add(
+            ItemDrop(
+                CropType.MELON,
+                DropRarity.PRAY_TO_RNGESUS,
+                "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9(\\d+)x §r§9Enchanted Melon Block§r§e!".toRegex()
+            )
+        )
 
-        itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!".toRegex()))
-        itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.RARE, "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!".toRegex()))
-        itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.CRAZY_RARE, "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!".toRegex()))
-        itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.PRAY_TO_RNGESUS, "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§(aEnchanted|9Polished) Pumpkin§r§e!".toRegex()))
+        itemDrops.add(
+            ItemDrop(
+                CropType.PUMPKIN,
+                DropRarity.UNCOMMON,
+                "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!".toRegex()
+            )
+        )
+        itemDrops.add(
+            ItemDrop(
+                CropType.PUMPKIN,
+                DropRarity.RARE,
+                "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!".toRegex()
+            )
+        )
+        itemDrops.add(
+            ItemDrop(
+                CropType.PUMPKIN,
+                DropRarity.CRAZY_RARE,
+                "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!".toRegex()
+            )
+        )
+        itemDrops.add(
+            ItemDrop(
+                CropType.PUMPKIN,
+                DropRarity.PRAY_TO_RNGESUS,
+                "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§(aEnchanted|9Polished) Pumpkin§r§e!".toRegex()
+            )
+        )
     }
 
     private fun initDrops() {

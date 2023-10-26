@@ -238,7 +238,7 @@ class ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
-                LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+            LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
         return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 

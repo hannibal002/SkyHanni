@@ -181,7 +181,15 @@ object GuiRenderUtils {
         )
     }
 
-    fun renderItemAndTip(list: MutableList<String>, item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
+    fun renderItemAndTip(
+        list: MutableList<String>,
+        item: ItemStack?,
+        x: Int,
+        y: Int,
+        mouseX: Int,
+        mouseY: Int,
+        color: Int = 0xFF43464B.toInt()
+    ) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
         if (item != null) {
             renderItemStack(item, x, y)
@@ -277,8 +285,10 @@ object GuiRenderUtils {
     }
 
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, colour: Int, inverseScale: Float) {
-        GuiScreen.drawRect((left * inverseScale).toInt(), (top * inverseScale).toInt(),
-            (right * inverseScale).toInt(), (bottom * inverseScale).toInt(), colour)
+        GuiScreen.drawRect(
+            (left * inverseScale).toInt(), (top * inverseScale).toInt(),
+            (right * inverseScale).toInt(), (bottom * inverseScale).toInt(), colour
+        )
     }
 
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {

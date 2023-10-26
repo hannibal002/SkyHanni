@@ -32,6 +32,7 @@ object SackAPI {
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
+
     // TODO USE SH-REPO
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val numPattern =

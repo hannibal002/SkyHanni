@@ -25,8 +25,10 @@ class SpawnTimers {
 
     private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)
     private var arachneSpawnTime = SimpleTimeMark.farPast()
-    private val arachneFragmentMessage = "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$".toRegex()
-    private val arachneCrystalMessage = "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$".toRegex()
+    private val arachneFragmentMessage =
+        "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$".toRegex()
+    private val arachneCrystalMessage =
+        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$".toRegex()
     private var saveNextTickParticles = false
     private var particleCounter = 0
     private var tickTime: Long = 0
@@ -75,7 +77,7 @@ class SpawnTimers {
         if (particleCounter == 0 && tickTime == 0L) tickTime = System.currentTimeMillis()
 
         if (System.currentTimeMillis() > tickTime + 60) {
-            arachneSpawnTime = if (particleCounter <= 20)  {
+            arachneSpawnTime = if (particleCounter <= 20) {
                 SimpleTimeMark.now() + 21.seconds
             } else {
                 SimpleTimeMark.now() + 37.seconds
@@ -94,5 +96,6 @@ class SpawnTimers {
         }
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && LorenzUtils.skyBlockArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+    fun isEnabled() =
+        IslandType.SPIDER_DEN.isInIsland() && LorenzUtils.skyBlockArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
 }

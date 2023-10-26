@@ -163,5 +163,6 @@ class FrozenTreasureTracker {
 
     private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)
 
-    private fun inGlacialCave() = onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
+    private fun inGlacialCave() =
+        onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 }

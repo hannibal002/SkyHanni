@@ -38,17 +38,18 @@ public class DungeonConfig {
     @ConfigOption(name = "Clean End", desc = "")
     @Accordion
     public CleanEndConfig cleanEnd = new CleanEndConfig();
+
     public static class CleanEndConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "After the last Dungeon boss has died, all entities and " +
-                "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
+            "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
 
         @Expose
         @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 Guardians from the clean end feature when " +
-                "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
+            "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
         @ConfigEditorBoolean
         public boolean F3IgnoreGuardians = false;
     }
@@ -76,6 +77,7 @@ public class DungeonConfig {
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
     @Accordion
     public ObjectHiderConfig objectHider = new ObjectHiderConfig();
+
     public static class ObjectHiderConfig {
         @Expose
         @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in Dungeons.")
@@ -127,8 +129,8 @@ public class DungeonConfig {
 
         @Expose
         @ConfigOption(
-                name = "Hide Soulweaver Skulls",
-                desc = "Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.")
+            name = "Hide Soulweaver Skulls",
+            desc = "Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideSoulweaverSkulls = false;
@@ -140,7 +142,7 @@ public class DungeonConfig {
     @Accordion
     public MessageFilterConfig messageFilter = new MessageFilterConfig();
 
-    public static class MessageFilterConfig{
+    public static class MessageFilterConfig {
         @Expose
         @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in Dungeons.")
         @ConfigEditorBoolean
@@ -153,7 +155,7 @@ public class DungeonConfig {
     @Accordion
     public DungeonCopilotConfig dungeonCopilot = new DungeonCopilotConfig();
 
-    public static class DungeonCopilotConfig{
+    public static class DungeonCopilotConfig {
         @Expose
         @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in Dungeons.")
         @ConfigEditorBoolean
@@ -242,14 +244,14 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
-            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
+        "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightSkeletonSkull = true;
 
     @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
-            "shows unopened chests.")
+        "shows unopened chests.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;

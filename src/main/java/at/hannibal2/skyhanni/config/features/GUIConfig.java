@@ -71,8 +71,8 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
-                "§eUse '&' as the colour code character.\n" +
-                "§eUse '\\n' as the line break character.")
+            "§eUse '&' as the colour code character.\n" +
+            "§eUse '\\n' as the line break character.")
         @ConfigEditorText
         public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
@@ -104,9 +104,9 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(
-                name = "Enabled",
-                desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n" +
-                        "(Though this one includes the SkyBlock year!)"
+            name = "Enabled",
+            desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n" +
+                "(Though this one includes the SkyBlock year!)"
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -117,13 +117,13 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(
-                name = "Refresh Rate",
-                desc = "Change the time in seconds you would like to refresh the In-Game Date Display."
+            name = "Refresh Rate",
+            desc = "Change the time in seconds you would like to refresh the In-Game Date Display."
         )
         @ConfigEditorSlider(
-                minValue = 1,
-                maxValue = 60,
-                minStep = 1
+            minValue = 1,
+            maxValue = 60,
+            minStep = 1
         )
         public int RefreshSeconds = 10;
     }

@@ -62,9 +62,7 @@ class SharkFishCounter {
         if (!isRod) return false
 
         val isLavaRod = heldItem.getLore().any { it.contains("Lava Rod") }
-        if (isLavaRod) return false
-
-        return true
+        return !isLavaRod
     }
 
     @SubscribeEvent

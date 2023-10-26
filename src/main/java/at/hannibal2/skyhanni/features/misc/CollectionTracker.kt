@@ -170,7 +170,7 @@ class CollectionTracker {
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
         if (diff != 0 && diff > 0) {
-                gainItems(diff)
+            gainItems(diff)
         }
 
         lastAmountInInventory = currentlyInInventory

@@ -131,9 +131,9 @@ object GardenVisitorDropStatistics {
         if (visitorRarities.isNotEmpty()) {
             addAsSingletonList(
                 "§a${visitorRarities[0].addSeparators()}§f-" +
-                        "§9${visitorRarities[1].addSeparators()}§f-" +
-                        "§6${visitorRarities[2].addSeparators()}§f-" +
-                        "§c${visitorRarities[3].addSeparators()}"
+                    "§9${visitorRarities[1].addSeparators()}§f-" +
+                    "§6${visitorRarities[2].addSeparators()}§f-" +
+                    "§c${visitorRarities[3].addSeparators()}"
             )
         } else {
             addAsSingletonList("§c?")
@@ -234,7 +234,11 @@ object GardenVisitorDropStatistics {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorDropsStatistics.enabled", "garden.visitors.dropsStatistics.enabled")
         event.move(3, "garden.visitorDropsStatistics.textFormat", "garden.visitors.dropsStatistics.textFormat")
-        event.move(3, "garden.visitorDropsStatistics.displayNumbersFirst", "garden.visitors.dropsStatistics.displayNumbersFirst")
+        event.move(
+            3,
+            "garden.visitorDropsStatistics.displayNumbersFirst",
+            "garden.visitors.dropsStatistics.displayNumbersFirst"
+        )
         event.move(3, "garden.visitorDropsStatistics.displayIcons", "garden.visitors.dropsStatistics.displayIcons")
         event.move(3, "garden.visitorDropsStatistics.onlyOnBarn", "garden.visitors.dropsStatistics.onlyOnBarn")
         event.move(3, "garden.visitorDropsStatistics.visitorDropPos", "garden.visitors.dropsStatistics.pos")

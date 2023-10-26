@@ -792,8 +792,8 @@ object EstimatedItemValue {
 
             // eg. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
-                    // If the slot index is 0, we don't need to specify
-                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+                // If the slot index is 0, we don't need to specify
+                if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
 
             priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
         }
@@ -810,6 +810,6 @@ object EstimatedItemValue {
         event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")
         event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
         event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
-        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
+        event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
     }
 }

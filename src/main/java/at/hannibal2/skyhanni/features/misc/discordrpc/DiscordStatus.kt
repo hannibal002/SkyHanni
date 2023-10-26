@@ -371,7 +371,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     AFK({
-        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince().format(maxUnits = 1, longName = true)}"
+        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${
+            beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+        }"
         else AutoStatus.AFK.placeholderText
     })
     ;

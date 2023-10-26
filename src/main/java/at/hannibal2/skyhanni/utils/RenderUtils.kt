@@ -927,7 +927,12 @@ object RenderUtils {
         GlStateManager.disableBlend()
     }
 
-    fun LorenzRenderWorldEvent.outlineTopFace(boundingBox: AxisAlignedBB, lineWidth: Int, colour: Color, depth: Boolean) {
+    fun LorenzRenderWorldEvent.outlineTopFace(
+        boundingBox: AxisAlignedBB,
+        lineWidth: Int,
+        colour: Color,
+        depth: Boolean
+    ) {
         val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
         val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
         val cornerThree = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)

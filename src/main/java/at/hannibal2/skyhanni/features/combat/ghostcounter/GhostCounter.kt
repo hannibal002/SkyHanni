@@ -127,7 +127,11 @@ object GhostCounter {
         }
         val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> "${
+                ((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(
+                    2
+                )
+            }"
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting

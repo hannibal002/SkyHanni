@@ -105,7 +105,7 @@ public class RiftConfig {
 
             @Expose
             @ConfigOption(name = "Shy Crux Warning", desc = "Shows a warning when a Shy Crux is going to steal your time. " +
-                    "Useful if you play without volume.")
+                "Useful if you play without volume.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean shyWarning = true;
@@ -139,7 +139,7 @@ public class RiftConfig {
 
                 @Expose
                 @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding an " +
-                        "§eEmpty Odonata Bottle §7in the hand.")
+                    "§eEmpty Odonata Bottle §7in the hand.")
                 @ConfigEditorBoolean
                 @FeatureToggle
                 public boolean highlight = true;
@@ -194,7 +194,7 @@ public class RiftConfig {
         public static class DreadfarmConfig {
             @Expose
             @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) " +
-                    "§7changes color from brown to red and is breakable.")
+                "§7changes color from brown to red and is breakable.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean agaricusCap = true;
@@ -614,9 +614,9 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Respawning Time", desc = "Time before effigies respawn to show.")
                 @ConfigEditorSlider(
-                        minValue = 1,
-                        maxValue = 15,
-                        minStep = 1
+                    minValue = 1,
+                    maxValue = 15,
+                    minStep = 1
                 )
                 public int respwningSoonTime = 3;
 
@@ -671,7 +671,7 @@ public class RiftConfig {
 
             @Expose
             @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
-                    "Long: 1,200,000")
+                "Long: 1,200,000")
             @ConfigEditorDropdown(values = {"Short", "Long"})
             public int formatType = 0;
 

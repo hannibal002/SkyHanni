@@ -107,6 +107,7 @@ class StatsTuning {
             }
         }
     }
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.statsTuningSelectedStats", "inventory.statsTuning.selectedStats")

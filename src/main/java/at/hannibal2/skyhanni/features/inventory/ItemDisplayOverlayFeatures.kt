@@ -43,7 +43,10 @@ class ItemDisplayOverlayFeatures {
             return itemName.substring(itemName.length - 1)
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains(
+                "Diamond "
+            ))
+        ) {
             when {
                 itemName.contains("Bonzo") -> return "1"
                 itemName.contains("Scarf") -> return "2"
@@ -71,7 +74,9 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5) && itemName.contains(" Minion ") && item.getLore().any { it.contains("Place this minion") }) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5) && itemName.contains(" Minion ") && item.getLore()
+                .any { it.contains("Place this minion") }
+        ) {
             val array = itemName.split(" ")
             val last = array[array.size - 1]
             return last.romanToDecimal().toString()
@@ -93,7 +98,9 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9) && InventoryUtils.openInventoryName() == "Your Skills" && item.getLore().any { it.contains("Click to view!") }) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9) && InventoryUtils.openInventoryName() == "Your Skills" && item.getLore()
+                .any { it.contains("Click to view!") }
+        ) {
             if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
             val split = itemName.split(" ")
             if (split.size < 2) return "0"
@@ -103,17 +110,19 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10) && InventoryUtils.openInventoryName().endsWith(" Collections")) {
-                val lore = item.getLore()
-                if (lore.any { it.contains("Click to view!") }) {
-                    if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                    item.name?.let {
-                        if (it.startsWith("§e")) {
-                            val text = it.split(" ").last()
-                            return "" + text.romanToDecimalIfNeeded()
-                        }
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10) && InventoryUtils.openInventoryName()
+                .endsWith(" Collections")
+        ) {
+            val lore = item.getLore()
+            if (lore.any { it.contains("Click to view!") }) {
+                if (CollectionAPI.isCollectionTier0(lore)) return "0"
+                item.name?.let {
+                    if (it.startsWith("§e")) {
+                        val text = it.split(" ").last()
+                        return "" + text.romanToDecimalIfNeeded()
                     }
                 }
+            }
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11) && itemName.contains("Rancher's Boots")) {
@@ -137,7 +146,10 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13) && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13) && itemName.startsWith("Dungeon ") && itemName.contains(
+                " Potion"
+            )
+        ) {
             item.name?.let {
                 "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {

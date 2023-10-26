@@ -162,8 +162,8 @@ class DamageIndicatorManager {
             var healthText = data.healthText
             val delayedStart = data.delayedStart
             if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
-                    val delay = delayedStart - System.currentTimeMillis()
-                    healthText = formatDelay(delay)
+                val delay = delayedStart - System.currentTimeMillis()
+                healthText = formatDelay(delay)
             }
 
             val location = if (data.dead && data.deathLocation != null) {

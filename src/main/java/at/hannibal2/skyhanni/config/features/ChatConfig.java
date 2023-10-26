@@ -125,15 +125,15 @@ public class ChatConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Adds extra symbols to the chat such as those from ironman, " +
-                "stranded, bingo or nether factions and places them next to your regular player emblems. " +
-                "§cDoes not work with hide rank hider!")
+            "stranded, bingo or nether factions and places them next to your regular player emblems. " +
+            "§cDoes not work with hide rank hider!")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
 
         @Expose
         @ConfigOption(name = "Chat Symbol Location", desc = "Determines where the symbols should go in chat in relation to the " +
-                "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
+            "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
         @ConfigEditorDropdown(values = {"Left", "Right", "Hidden"})
         public int symbolLocation = 0;
     }
@@ -152,7 +152,7 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Hide Far Deaths", desc = "Hide other players' death messages, " +
-            "except for players who are nearby or during Dungeons/a Kuudra fight.")
+        "except for players who are nearby or during Dungeons/a Kuudra fight.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideFarDeathMessages = false;
@@ -178,9 +178,9 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(
-            name = "Sacks Hider",
-            desc = "Hide the chat's sack change message with this, " +
-                    "not in Hypixel settings, for mods to access sack data in new features."
+        name = "Sacks Hider",
+        desc = "Hide the chat's sack change message with this, " +
+            "not in Hypixel settings, for mods to access sack data in new features."
     )
     @ConfigEditorBoolean
     @FeatureToggle

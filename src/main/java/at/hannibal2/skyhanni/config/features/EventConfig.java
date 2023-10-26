@@ -42,7 +42,7 @@ public class EventConfig {
 
             @Expose
             @ConfigOption(name = "Bingo Steps", desc = "Show help with the next step in Bingo instead of the Bingo Card. " +
-                    "§cThis feature is in early development. Expect bugs and missing goals.")
+                "§cThis feature is in early development. Expect bugs and missing goals.")
             @ConfigEditorBoolean
             public boolean stepHelper = false;
 
@@ -53,10 +53,10 @@ public class EventConfig {
 
             @Expose
             @ConfigOption(
-                    name = "Show Guide",
-                    desc = "Show tips and difficulty for bingo goals inside the Bingo Card inventory.\n" +
-                            "These tips are made from inspirations and guides from the community,\n"+
-                            "aiming to help you to complete the bingo card."
+                name = "Show Guide",
+                desc = "Show tips and difficulty for bingo goals inside the Bingo Card inventory.\n" +
+                    "These tips are made from inspirations and guides from the community,\n" +
+                    "aiming to help you to complete the bingo card."
             )
             @ConfigEditorBoolean
             @FeatureToggle
@@ -75,7 +75,7 @@ public class EventConfig {
 
             @Expose
             @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
-                    "new area discoveries and SkyBlock level up messages while on Bingo.")
+                "new area discoveries and SkyBlock level up messages while on Bingo.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean enabled = true;
@@ -218,9 +218,9 @@ public class EventConfig {
 
             @Expose
             @ConfigOption(
-                    name = "Enabled",
-                    desc = "Tracks all of your drops from Frozen Treasure in the Glacial Caves.\n" +
-                            "§eIce calculations are an estimate but are relatively accurate."
+                name = "Enabled",
+                desc = "Tracks all of your drops from Frozen Treasure in the Glacial Caves.\n" +
+                    "§eIce calculations are an estimate but are relatively accurate."
             )
             @ConfigEditorBoolean
             @FeatureToggle
@@ -228,29 +228,29 @@ public class EventConfig {
 
             @Expose
             @ConfigOption(
-                    name = "Text Format",
-                    desc = "Drag text to change the appearance of the overlay."
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
             )
             @ConfigEditorDraggableList(
-                    exampleText = {
-                            "§1§lFrozen Treasure Tracker",
-                            "§61,636 Treasures Mined",
-                            "§33.2m Total Ice",
-                            "§3342,192 Ice/hr",
-                            "§81,002 Compact Procs",
-                            " ",
-                            "§b182 §fWhite Gift",
-                            "§b94 §aGreen Gift",
-                            "§b17 §9§cRed Gift",
-                            "§b328 §fPacked Ice",
-                            "§b80 §aEnchanted Ice",
-                            "§b4 §9Enchanted Packed Ice",
-                            "§b182 §aIce Bait",
-                            "§b3 §aGlowy Chum Bait",
-                            "§b36 §5Glacial Fragment",
-                            "§b6 §fGlacial Talisman",
-                            " ",
-                    }
+                exampleText = {
+                    "§1§lFrozen Treasure Tracker",
+                    "§61,636 Treasures Mined",
+                    "§33.2m Total Ice",
+                    "§3342,192 Ice/hr",
+                    "§81,002 Compact Procs",
+                    " ",
+                    "§b182 §fWhite Gift",
+                    "§b94 §aGreen Gift",
+                    "§b17 §9§cRed Gift",
+                    "§b328 §fPacked Ice",
+                    "§b80 §aEnchanted Ice",
+                    "§b4 §9Enchanted Packed Ice",
+                    "§b182 §aIce Bait",
+                    "§b3 §aGlowy Chum Bait",
+                    "§b36 §5Glacial Fragment",
+                    "§b6 §fGlacial Talisman",
+                    " ",
+                }
             )
             public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 14, 15));
 
@@ -261,7 +261,7 @@ public class EventConfig {
 
             @Expose
             @ConfigOption(name = "Show as Drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
-                    "E.g. 3 Ice Bait -> 48 Ice Bait")
+                "E.g. 3 Ice Bait -> 48 Ice Bait")
             @ConfigEditorBoolean
             public boolean showAsDrops = false;
 

@@ -54,10 +54,10 @@ data class LorenzVec(
 
     override fun toString(): String {
         return "LorenzVec{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}'
+            "x=" + x +
+            ", y=" + y +
+            ", z=" + z +
+            '}'
     }
 
     fun multiply(d: Double): LorenzVec = LorenzVec(x multiplyZeroSave d, y multiplyZeroSave d, z multiplyZeroSave d)

@@ -151,7 +151,11 @@ class MobFinder {
                 )
             }
 
-            if (DungeonAPI.isOneOf("F5", "M5") && entity is EntityOtherPlayerMP && entity == DungeonLividFinder.lividEntity) {
+            if (DungeonAPI.isOneOf(
+                    "F5",
+                    "M5"
+                ) && entity is EntityOtherPlayerMP && entity == DungeonLividFinder.lividEntity
+            ) {
                 return EntityResult(
                     bossType = BossType.DUNGEON_F5,
                     ignoreBlocks = true,

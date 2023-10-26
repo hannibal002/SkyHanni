@@ -392,7 +392,7 @@ object SlayerItemProfitTracker {
         if (itemLogCategory == "") {
             LorenzUtils.chat(
                 "§c[SkyHanni] No current slayer data found. " +
-                        "Go to a slayer area and start the specific slayer type you want to reset the data of."
+                    "Go to a slayer area and start the specific slayer type you want to reset the data of."
             )
             return
         }
