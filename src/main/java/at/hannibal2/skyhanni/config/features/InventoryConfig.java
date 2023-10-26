@@ -233,7 +233,7 @@ public class InventoryConfig {
 
     public static class ChestValueConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enable estimated value of chest")
+        @ConfigOption(name = "Enabled", desc = "Enable estimated value of chest.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
