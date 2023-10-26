@@ -21,13 +21,13 @@ class HarpFeatures {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val keys = listOf(
-        Keyboard.KEY_1,
-        Keyboard.KEY_2,
-        Keyboard.KEY_3,
-        Keyboard.KEY_4,
-        Keyboard.KEY_5,
-        Keyboard.KEY_6,
-        Keyboard.KEY_7
+        Keyboard.KEY_A,
+        Keyboard.KEY_S,
+        Keyboard.KEY_D,
+        Keyboard.KEY_SPACE,
+        Keyboard.KEY_J,
+        Keyboard.KEY_K,
+        Keyboard.KEY_L
     )
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
