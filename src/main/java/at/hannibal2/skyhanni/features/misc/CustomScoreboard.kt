@@ -128,7 +128,8 @@ class CustomScoreboard {
 
                 // Multiline support
                 if (it[0] == "§9Party"
-                    || it[0] == translateMayorNameToColor(MayorElection.currentCandidate?.name ?: "")
+                    || it[0].toString().contains(MayorElection.currentCandidate?.name ?: "")
+                    || it[0].toString().contains("Level:")
                 ) {
                     for (item in it) {
                         newList.add(listOf(item))
