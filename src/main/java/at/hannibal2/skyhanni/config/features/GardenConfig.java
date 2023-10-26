@@ -73,9 +73,15 @@ public class GardenConfig {
 
             @Expose
             @ConfigOption(name = "Sixth Visitor Warning", desc = "Notifies when it is believed that the sixth visitor has arrived. " +
-                    "May be inaccurate with co-op members farming simultaneously.")
+                "May be inaccurate with co-op members farming simultaneously.")
             @ConfigEditorBoolean
             public boolean sixthVisitorWarning = true;
+
+            @Expose
+            @ConfigOption(name = "New Visitor Ping", desc = "Pings you when you are less than 10 seconds away from getting a new visitor. " +
+                "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event.")
+            @ConfigEditorBoolean
+            public boolean newVisitorPing = false;
 
             @Expose
             public Position pos = new Position(390, 65, false, true);
@@ -278,17 +284,17 @@ public class GardenConfig {
                             "§647.2m Coins Spent",
                             "§b23 §9Flowering Bouquet",
                             "§b4 §9Overgrown Grass",
-                            "§b2 §9Green Bandana",
+                            "§b2 §5Green Bandana",
                             "§b1 §9Dedication IV",
-                            "§b6 §9Music Rune",
+                            "§b6 §b◆ Music Rune I",
                             "§b1 §cSpace Helmet",
                             "§b1 §9Cultivating I",
                             "§b1 §9Replenish I",
                             " ", // If they want another empty row
-                            "§212,735 Garden EXP",
-                            "§b11,056 Bits",
-                            "§250,556 Mithril Powder",
-                            "§d50,556 Gemstone Powder",
+                            "§212,600 Garden EXP",
+                            "§b4.2k Bits",
+                            "§220k Mithril Powder",
+                            "§d18k Gemstone Powder",
                     }
             )
             public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
@@ -314,6 +320,17 @@ public class GardenConfig {
             @Expose
             public Position pos = new Position(5, 20, false, true);
         }
+
+        @Expose
+        @ConfigOption(
+            name = "Accept Hotkey",
+            desc = "Accept a visitor when you press this keybind while in the visitor GUI. " +
+                "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
+        )
+        @ConfigEditorKeybind(
+            defaultKey = Keyboard.KEY_NONE
+        )
+        public int acceptHotkey = Keyboard.KEY_NONE;
     }
 
     @Expose

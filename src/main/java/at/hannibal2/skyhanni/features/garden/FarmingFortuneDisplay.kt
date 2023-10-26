@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -257,9 +256,9 @@ class FarmingFortuneDisplay {
                     displayedFortune = match[1]!!.value.toDouble()
                     reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
 
-                    itemBaseFortune = if (tool.getInternalName_old().contains("LOTUS")) 5.0
+                    itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
                     else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount() ?: 0 ) * 1.0
-                    greenThumbFortune = if (tool.getInternalName_old().contains("LOTUS")) {
+                    greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                         displayedFortune - reforgeFortune - itemBaseFortune
                     } else 0.0
                 }

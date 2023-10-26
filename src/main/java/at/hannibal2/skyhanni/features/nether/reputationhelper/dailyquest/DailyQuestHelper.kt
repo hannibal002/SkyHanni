@@ -312,9 +312,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         reset()
-
         questLoader.loadConfig(storage)
-
     }
 
     fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {

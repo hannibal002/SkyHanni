@@ -33,7 +33,7 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         for ((index, upgrade) in upgradeList.withIndex()) {
             if (adjustedY + 25 * index < FFGuideGUI.guiTop + 20) continue
             if (adjustedY + 25 * index > FFGuideGUI.guiTop + 160) continue
-            val upgradeItem = upgrade.requiredItem.let { NEUItems.getItemStack(it, true) }
+            val upgradeItem = upgrade.requiredItem.let { NEUItems.getItemStack(it) }
             var formattedUpgrade = upgradeItem.nameWithEnchantment ?: return
             if (adjustedY + 25 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 25 * index + 10) {
                 FFGuideGUI.lastClickedHeight = 0

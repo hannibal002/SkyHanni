@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -84,7 +84,7 @@ object CruxTalismanDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
-        if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName_old().startsWith(partialName) }) return
+        if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }) return
 
         displayLine.clear()
         bonusesLine.clear()

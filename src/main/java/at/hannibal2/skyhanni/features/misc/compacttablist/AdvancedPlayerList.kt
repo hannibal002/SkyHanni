@@ -138,9 +138,7 @@ object AdvancedPlayerList {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<ContributorListJson>("ContributorList")?.usernames?.let {
-            contributors = it
-        }
+        contributors = event.getConstant<ContributorListJson>("ContributorList").usernames
     }
 
     private fun createCustomName(data: PlayerData): String {
