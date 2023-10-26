@@ -180,7 +180,7 @@ class CustomScoreboard {
         lineMap[currentEventIndex] = eventList
 
         val mayorList = mutableListOf<Any>()
-        mayorList.add(MayorElection.currentCandidate?.name ?: "<hidden>")
+        mayorList.add(MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>")
         for (perk in MayorElection.currentCandidate?.perks ?: emptyList()){
             mayorList.add(" §7- §e${perk.name}")
         }
@@ -261,6 +261,20 @@ class CustomScoreboard {
         }
 
         return formatDisplay(lineMap)
+    }
+
+    private fun translateMayorNameToColor(input: String) : String {
+        return when (input) {
+            "Aatrox"    ->  "§3$input"
+            "Cole"      ->  "§e$input"
+            "Diana"     ->  "§2$input"
+            "Diaz"      ->  "§6$input"
+            "Finnegan"  ->  "§c$input"
+            "Foxy"      ->  "§d$input"
+            "Marina"    ->  "§b$input"
+            "Paul"      ->  "§c$input"
+            else        ->  "§7$input"
+        }
     }
 
     private fun extractLobbyCode(input: String): String? {
