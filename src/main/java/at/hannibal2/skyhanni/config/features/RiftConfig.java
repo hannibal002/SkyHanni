@@ -696,7 +696,7 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Highlight Size", desc = "Set render size for highlighted Motes Orbs.")
         @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 5)
-        public int size = 5;
+        public int size = 3;
 
         @Expose
         @ConfigOption(name = "Hide Particles", desc = "Hide normal Motes Orbs particles.")
