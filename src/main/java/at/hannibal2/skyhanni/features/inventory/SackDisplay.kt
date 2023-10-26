@@ -2,17 +2,19 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,6 +34,19 @@ object SackDisplay {
         }
     }
 
+    @SubscribeEvent
+    fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!SackAPI.inSackInventory) return
+        if (!config.highlightFull) return
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val stack = slot.stack
+            val lore = stack.getLore()
+            if (lore.any { it.startsWith("§7Stored: §a")}) {
+                slot highlight LorenzColor.RED
+            }
+        }
+    }
+
     fun update(savingSacks: Boolean) {
         display = drawDisplay(savingSacks)
     }
@@ -40,6 +55,7 @@ object SackDisplay {
         val newDisplay = mutableListOf<List<Any>>()
         var totalPrice = 0L
         var rendered = 0
+        var totalMagmaFish = 0L
         SackAPI.getSacksData(savingSacks)
 
         val sackItems = SackAPI.sackItem.toList()
@@ -61,7 +77,7 @@ object SackDisplay {
             val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
             newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
-                val (internalName, colorCode, stored, total, price) = item
+                val (internalName, colorCode, stored, total, price, magmaFish) = item
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
                 if (stored == "0" && !config.showEmpty) continue
@@ -84,6 +100,23 @@ object SackDisplay {
                     )
 
                     if (colorCode == "§a") add(" §c§l(Full!)")
+                    if (SackAPI.isTrophySack && magmaFish.toLong() > 0) {
+                        totalMagmaFish += magmaFish.toLong()
+                        add(
+                            Renderable.hoverTips(
+                                " §7(§d${magmaFish.toLong()} ",
+                                listOf(
+                                    "§6Magmafish: §b${magmaFish.toLong().addSeparators()}",
+                                    "§6Magmafish value: §b${price / magmaFish.toLong()}",
+                                    "§6Magmafish per: §b${magmaFish.toLong() / stored.toLong()}"
+
+                                )
+                            )
+                        )
+                        add("MAGMA_FISH".asInternalName().getItemStack())
+                        add("§7)")
+
+                    }
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
                 rendered++
@@ -99,6 +132,9 @@ object SackDisplay {
                     config.sortingType = it.ordinal
                     update(false)
                 })
+
+            if (SackAPI.isTrophySack) newDisplay.addAsSingletonList("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
+
             newDisplay.addButton(
                 prefix = "§7Number format: ",
                 getName = NumberFormat.entries[config.numberFormat].DisplayName,
@@ -107,6 +143,7 @@ object SackDisplay {
                     update(false)
                 }
             )
+
             if (config.showPrice) {
                 newDisplay.addSelector<PriceFrom>(" ",
                     getName = { type -> type.displayName },
