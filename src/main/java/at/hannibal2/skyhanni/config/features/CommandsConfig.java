@@ -62,7 +62,7 @@ public class CommandsConfig {
         public boolean partyCommands = true;
 
         @Expose
-        @ConfigOption(name = "Viewrecipe Items", desc = "Tab complete items with recipe in the the Hypixel command §e/viewrecipe§7.")
+        @ConfigOption(name = "View Recipe", desc = "Tab complete item IDs in the the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean viewrecipeItems = true;
