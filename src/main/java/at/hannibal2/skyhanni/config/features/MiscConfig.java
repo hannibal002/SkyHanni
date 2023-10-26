@@ -815,24 +815,21 @@ public class MiscConfig {
                         "",
                         "§7Location",
                         "§7Ingame Time",
-                        "§Real Time",
                         "§7Current Server",
                         "§2Mithril §r/ §dGemstone §7Powder",
                         "",
                         "§cSlayer",
-                        "§7Next Event",
                         "§7Current Event",
                         "§7Current Mayor",
                         "",
                         "§cHeat",
                         "§9Party:\n- hannibal2\n- Moulberry\n- Vahvl\n- J10a1n15",
                         "§7Skyblock Level",
-                        "§7Quiver (approximation)",
                         "§7Maxwell Power",
                         "§ewww.hypixel.net",
                 }
         )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24));
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21));
 
         @Expose
         @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")

@@ -8,18 +8,18 @@
 //
 // TODO LIST
 // V1 RELEASE
-//  - combine date and lobby
+//  - enums prob (why)
 //  - toggle between "<name> <count>" and "<count> <name>"
 //  - Hide default scoreboard
-//  - only show quiver when holding a bow (detect with 9th slot)
 //  - mayor color (from neu)
-//  - beacon power
 //
 // V2 RELEASE
 //  - Soulflow API
 //  - Bank API
 //  - Custom Scoreboard Background
+//  - quiver
 //  - icons
+//  - beacon power
 //
 
 package at.hannibal2.skyhanni.features.misc
@@ -42,8 +42,6 @@ import java.util.*
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.misc.customScoreboard
     private var display = emptyList<List<Any>>()
-    private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
-    private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
     private var purse = "0"
     private var motes = "0"
     private var bank = "0"
@@ -62,21 +60,21 @@ class CustomScoreboard {
     private var bitsIndex = 4
     private var copperIndex = 5
     private var gemsIndex = 6
+
     private var locationIndex = 8
     private var skyblockTimeIndex = 9
-    private var irlTimeIndex = 10
-    private var lobbyCodeIndex = 11
-    private var powderIndex = 12
-    private var slayerIndex = 14
-    private var nextEventIndex = 15
-    private var currentEventIndex = 16
-    private var mayorIndex = 17
-    private var heatIndex = 19
-    private var partyIndex = 20
-    private var sblevelIndex = 21
-    private var quiverIndex = 22
-    private var maxwellIndex = 23
-    private var websiteIndex = 24
+    private var lobbyCodeIndex = 10
+    private var powderIndex = 11
+
+    private var slayerIndex = 13
+    private var currentEventIndex = 14
+    private var mayorIndex = 15
+
+    private var heatIndex = 17
+    private var partyIndex = 18
+    private var sblevelIndex = 19
+    private var maxwellIndex = 20
+    private var websiteIndex = 21
 
 
     @SubscribeEvent
@@ -169,7 +167,6 @@ class CustomScoreboard {
         lineMap[7] = Collections.singletonList("<empty>")
         lineMap[locationIndex] = Collections.singletonList(location)
         lineMap[skyblockTimeIndex] = Collections.singletonList(SkyBlockTime.now().formatted(false))
-        lineMap[irlTimeIndex] = Collections.singletonList((if (config.use24hFormat) timeFormat24h else timeFormat12h).format(System.currentTimeMillis()))
         lineMap[lobbyCodeIndex] = Collections.singletonList("§8$lobbyCode")
         lineMap[powderIndex] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
         lineMap[13] = Collections.singletonList("<empty>")
@@ -177,8 +174,6 @@ class CustomScoreboard {
         val slayerList = mutableListOf<Any>()
         slayerList.add("§7Slayer") //todo: get slayer stuff
         lineMap[slayerIndex] = slayerList
-
-        lineMap[nextEventIndex] = Collections.singletonList("§7Next Event")
 
         val eventList = mutableListOf<Any>()
         eventList.add("§cCurrent Event") //todo: get event stuff
@@ -205,7 +200,6 @@ class CustomScoreboard {
         lineMap[partyIndex] = partyList
 
         lineMap[sblevelIndex] = Collections.singletonList("§7Skyblock Level")
-        lineMap[quiverIndex] = Collections.singletonList("§7Quiver")
         lineMap[maxwellIndex] = Collections.singletonList("§7Maxwell Power")
         lineMap[websiteIndex] = Collections.singletonList("§ewww.hypixel.net")
 
