@@ -174,16 +174,12 @@ object NEUItems {
 
     // TODO remove
     @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
-    fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
-        internalName.asInternalName().getItemStack(definite)
+    fun getItemStack(internalName: String): ItemStack =
+        internalName.asInternalName().getItemStack()
 
-    fun NEUInternalName.getItemStack(definite: Boolean = false): ItemStack =
+    fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
             if (getPriceOrNull() == null) return@run fallbackItem
-
-            if (definite) {
-                Utils.showOutdatedRepoNotification()
-            }
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
