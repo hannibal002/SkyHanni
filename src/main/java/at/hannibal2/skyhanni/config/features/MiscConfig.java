@@ -852,18 +852,17 @@ public class MiscConfig {
         @FeatureToggle
         public boolean hideIrrelevantLines = true;
 
-
-        @Expose
-        @ConfigOption(name = "24h format", desc = "Use 24h format for the IRL time.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean use24hFormat = false;
-
         @Expose
         @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean showMayorPerks = true;
+
+        @Expose
+        @ConfigOption(name = "Show SkyBlock Level Progress", desc = "Show the progress to the next SkyBlock level.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showSblvlProgess = false;
 
         @Expose
         public Position position = new Position(10, 80, false, true);

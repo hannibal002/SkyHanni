@@ -181,8 +181,10 @@ class CustomScoreboard {
 
         val mayorList = mutableListOf<Any>()
         mayorList.add(MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>")
-        for (perk in MayorElection.currentCandidate?.perks ?: emptyList()){
-            mayorList.add(" §7- §e${perk.name}")
+        if (config.showMayorPerks) {
+            for (perk in MayorElection.currentCandidate?.perks ?: emptyList()) {
+                mayorList.add(" §7- §e${perk.name}")
+            }
         }
         lineMap[mayorIndex] = mayorList
 
@@ -199,7 +201,13 @@ class CustomScoreboard {
         }
         lineMap[partyIndex] = partyList
 
-        lineMap[sblevelIndex] = Collections.singletonList("§7Skyblock Level")
+        val sblevelList = mutableListOf<Any>()
+        sblevelList.add("Level: " + SkyblockLevelAPI.currentLevel)
+        if (config.showSblvlProgess){
+            sblevelList.add("§7Progress: §e${SkyblockLevelAPI.currentProgress}")
+        }
+        lineMap[sblevelIndex] = sblevelList
+
         lineMap[maxwellIndex] = Collections.singletonList("§7Maxwell Power")
         lineMap[websiteIndex] = Collections.singletonList("§ewww.hypixel.net")
 
