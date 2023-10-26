@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.item.ItemStack
 
 object RiftAPI {
@@ -15,6 +16,8 @@ object RiftAPI {
 
     // internal name -> motes
     var motesPrice = emptyMap<NEUInternalName, Double>()
+
+    val farmingTool by lazy { "FARMING_WAND".asInternalName() }
 
     fun ItemStack.motesNpcPrice(): Double? {
         val baseMotes = motesPrice[getInternalName()] ?: return null

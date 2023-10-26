@@ -17,6 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
 
+    // TODO USE SH-REPO
+    private val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         val message = event.message
@@ -46,8 +49,6 @@ class CurrentPetDisplay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-
-        val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
@@ -59,7 +60,6 @@ class CurrentPetDisplay {
             }
         }
     }
-
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

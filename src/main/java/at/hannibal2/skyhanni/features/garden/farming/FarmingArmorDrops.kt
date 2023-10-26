@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson.DropInfo
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -100,24 +100,19 @@ class FarmingArmorDrops {
 
     private fun checkArmor() {
         val armorPieces = InventoryUtils.getArmor()
-            .mapNotNull { it?.getInternalName_old() }
+            .mapNotNull { it?.getInternalName()?.asString() }
             .count { armorPattern.matcher(it).matches() }
         hasArmor = armorPieces > 1
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val data = event.getConstant<ArmorDropsJson>("ArmorDrops") ?: error("ArmorDrops not found in repo")
-            armorDropInfo = data.special_crops
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
-        }
+        val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
+        armorDropInfo = data.special_crops
     }
 
     companion object {
-        var armorDropInfo = mapOf<String, ArmorDropsJson.DropInfo>()
+        var armorDropInfo = mapOf<String, DropInfo>()
         private var currentArmorDropChance = 0.0
         private var lastCalculationTime = SimpleTimeMark.farPast()
 
@@ -130,7 +125,7 @@ class FarmingArmorDrops {
                 val armorDropName = crop.specialDropType
                 val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
                 val pieceCount = InventoryUtils.getArmor()
-                    .mapNotNull { it?.getInternalName_old() }
+                    .mapNotNull { it?.getInternalName()?.asString() }
                     .count { it.contains(armorName) || it.contains("FERMENTO") }
 
                 val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0

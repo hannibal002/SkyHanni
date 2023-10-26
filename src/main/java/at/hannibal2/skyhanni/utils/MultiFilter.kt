@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.jsonobjects.MultiFilterJson
 
 class MultiFilter {
 
@@ -10,25 +11,23 @@ class MultiFilter {
     private val contains = mutableListOf<String>()
     private val containsWord = mutableListOf<String>()
 
-    fun load(hideNpcSell: JsonObject) {
+    fun load(data: MultiFilterJson) {
         equals.clear()
         startsWith.clear()
         endsWith.clear()
         contains.clear()
         containsWord.clear()
 
-        fill(hideNpcSell, "equals", equals)
-        fill(hideNpcSell, "exact", equals)
-        fill(hideNpcSell, "startsWith", startsWith)
-        fill(hideNpcSell, "endsWith", endsWith)
-        fill(hideNpcSell, "contains", contains)
-        fill(hideNpcSell, "containsWord", containsWord)
+        fill(equals, data.equals)
+        fill(startsWith, data.startsWith)
+        fill(endsWith, data.endsWith)
+        fill(contains, data.contains)
+        fill(containsWord, data.containsWord)
     }
 
-    private fun fill(jsonObject: JsonObject, key: String, list: MutableList<String>) {
-        if (jsonObject.has(key)) {
-            list.addAll(jsonObject[key].asJsonArray.map { it.asString })
-        }
+    private fun fill(list: MutableList<String>, data: List<String>?) {
+        if (data == null) return
+        list.addAll(data)
     }
 
     fun match(string: String): Boolean {
@@ -50,8 +49,9 @@ class MultiFilter {
         return null
     }
 
-    private fun containsWord(message: String, word: String): Boolean =
-        message.startsWith("$word ") || message.endsWith(" $word") || message.contains(" $word ")
+    private fun containsWord(message: String, word: String): Boolean {
+        return message.split(" ").any { it.trimWhiteSpace() == word }
+    }
 
     fun count(): Int {
         return equals.size + startsWith.size + endsWith.size + contains.size + containsWord.size

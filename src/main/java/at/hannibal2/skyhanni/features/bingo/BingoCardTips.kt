@@ -20,9 +20,7 @@ class BingoCardTips {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<BingoJson>("Bingo")?.let {
-            tips = it.bingo_tips
-        }
+        tips = event.getConstant<BingoJson>("Bingo").bingo_tips
     }
 
     @SubscribeEvent

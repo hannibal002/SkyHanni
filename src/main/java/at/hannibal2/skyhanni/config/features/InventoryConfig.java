@@ -62,6 +62,7 @@ public class InventoryConfig {
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
+
     public static class RngMeterConfig {
         @Expose
         @ConfigOption(name = "Floor Names", desc = "Show the Floor names in the Catacombs RNG Meter inventory.")
@@ -86,6 +87,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Stats Tuning", desc = "")
     @Accordion
     public StatsTuningConfig statsTuning = new StatsTuningConfig();
+
     public static class StatsTuningConfig {
         @Expose
         @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
@@ -116,6 +118,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Jacob Farming Contest", desc = "")
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
+
     public static class JacobFarmingContestConfig {
         @Expose
         @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the Jacob inventory.")
@@ -143,7 +146,6 @@ public class InventoryConfig {
     }
 
 
-
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
@@ -158,10 +160,20 @@ public class InventoryConfig {
         public boolean enabled = true;
 
         @Expose
+        @ConfigOption(
+            name = "Highlight Full",
+            desc = "Highlight items that are full in red.\n" +
+                "§eDoes not need the option above to be enabled."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightFull = true;
+
+        @Expose
         @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers.\n" +
-                "§eDefault: §72,240/2.2k\n" +
-                "§eFormatted: §72.2k/2.2k\n" +
-                "§eUnformatted: §72,240/2,200")
+            "§eDefault: §72,240/2.2k\n" +
+            "§eFormatted: §72.2k/2.2k\n" +
+            "§eUnformatted: §72,240/2,200")
         @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
         public int numberFormat = 1;
 

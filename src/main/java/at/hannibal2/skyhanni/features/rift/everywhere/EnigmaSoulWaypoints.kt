@@ -36,7 +36,7 @@ object EnigmaSoulWaypoints {
     private var adding = true
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL", true)
+        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL")
         Utils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
@@ -144,7 +144,7 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls") ?: return
+        val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
         soulLocations = buildMap {
             for ((area, locations) in areas) {

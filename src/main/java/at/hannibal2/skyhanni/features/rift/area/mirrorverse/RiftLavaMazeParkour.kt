@@ -18,7 +18,7 @@ class RiftLavaMazeParkour {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour") ?: return
+        val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
         parkourHelper = ParkourHelper(
             data.locations,
             data.shortCuts,
