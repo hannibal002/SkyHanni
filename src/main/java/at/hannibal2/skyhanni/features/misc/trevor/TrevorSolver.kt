@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -58,10 +59,7 @@ object TrevorSolver {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
                     if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
                         println("This is unfortunate")
-                    } else canSee = LocationUtils.canSee(
-                        LocationUtils.playerEyeLocation(),
-                        entity.position.toLorenzVec().add(0.0, 0.5, 0.0)
-                    ) && dist < currentMob!!.renderDistance
+                    } else canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
 
                     if (!canSee) {
                         val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
@@ -95,3 +93,4 @@ object TrevorSolver {
         mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
     }
 }
+
