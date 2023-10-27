@@ -359,7 +359,7 @@ class DamageIndicatorManager {
             entityData.timeLastTick = System.currentTimeMillis()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
-            e.printStackTrace()
+            ErrorManager.logError(e, "Error checking damage indicator entity $entity")
             return null
         }
     }
