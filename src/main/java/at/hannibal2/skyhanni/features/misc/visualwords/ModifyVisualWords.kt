@@ -37,7 +37,11 @@ object ModifyVisualWords {
 
                 if (phrase.isEmpty()) continue
 
-                modifiedText = modifiedText.replace(phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive())
+                modifiedText = modifiedText.replace(
+                    phrase,
+                    modifiedWord.replacement.convertToFormatted(),
+                    modifiedWord.isCaseSensitive()
+                )
             }
         }
 

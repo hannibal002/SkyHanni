@@ -78,7 +78,8 @@ public class GardenConfig {
             public boolean sixthVisitorWarning = true;
 
             @Expose
-            @ConfigOption(name = "New Visitor Ping", desc = "Pings you when you are less than 10 seconds away from getting a new visitor.")
+            @ConfigOption(name = "New Visitor Ping", desc = "Pings you when you are less than 10 seconds away from getting a new visitor. " +
+                "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event.")
             @ConfigEditorBoolean
             public boolean newVisitorPing = false;
 
@@ -323,7 +324,8 @@ public class GardenConfig {
         @Expose
         @ConfigOption(
             name = "Accept Hotkey",
-            desc = "Accept a visitor when you press this keybind while in the visitor GUI."
+            desc = "Accept a visitor when you press this keybind while in the visitor GUI. " +
+                "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
         )
         @ConfigEditorKeybind(
             defaultKey = Keyboard.KEY_NONE

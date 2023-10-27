@@ -9,6 +9,7 @@ enum class TabStringType {
     PLAYER;
 
     companion object {
+        // TODO USE SH-REPO
         private val usernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
 
         fun fromLine(line: String): TabStringType {
