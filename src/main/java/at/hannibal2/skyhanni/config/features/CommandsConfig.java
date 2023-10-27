@@ -62,6 +62,12 @@ public class CommandsConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean partyCommands = true;
+
+        @Expose
+        @ConfigOption(name = "View Recipe", desc = "Tab complete item IDs in the the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean viewrecipeItems = true;
     }
 
     @ConfigOption(name = "Fandom Wiki for §e/wiki", desc = "")
@@ -90,7 +96,7 @@ public class CommandsConfig {
     }
 
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
-            "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
+        "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle
@@ -101,4 +107,10 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;
+
+    @Expose
+    @ConfigOption(name = "/viewrecipe Lower Case", desc = "Adds support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean viewRecipeLowerCase = true;
 }
