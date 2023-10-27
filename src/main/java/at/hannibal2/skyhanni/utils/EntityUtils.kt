@@ -154,5 +154,5 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence() ?: emptySequence()
 
-    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(0.0, 0.5, 0.0).canBeSeen(radius)
+    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 }
