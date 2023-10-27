@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ActionBarStatsData {
+    // TODO USE SH-REPO
     private val patterns = mapOf(
         "health" to "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*".toPattern(),
         "defense" to ".*§a(?<defense>[\\d,]+)§a❈.*".toPattern(),

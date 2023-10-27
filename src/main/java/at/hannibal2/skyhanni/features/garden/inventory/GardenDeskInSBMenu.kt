@@ -19,7 +19,7 @@ class GardenDeskInSBMenu {
     private var showItem = false
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("DOUBLE_PLANT", true)
+        val neuItem = NEUItems.getItemStack("DOUBLE_PLANT")
         Utils.createItemStack(neuItem.item, "§bDesk", "§7Click here to", "§7run §e/desk")
     }
 

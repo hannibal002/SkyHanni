@@ -296,6 +296,7 @@ object Commands {
         registerCommand("shcopyerror", "") { ErrorManager.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
 //        registerCommand(
 //            "shsendtranslation",

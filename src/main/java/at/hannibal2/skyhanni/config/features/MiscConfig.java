@@ -644,9 +644,9 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Enabled",
-                desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
-                        "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
+            name = "Enabled",
+            desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
+                "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -655,9 +655,9 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
         @ConfigEditorSlider(
-                minValue = 5,
-                maxValue = 300,
-                minStep = 1
+            minValue = 5,
+            maxValue = 300,
+            minStep = 1
         )
         public Property<Integer> warnTime = Property.of(60);
 

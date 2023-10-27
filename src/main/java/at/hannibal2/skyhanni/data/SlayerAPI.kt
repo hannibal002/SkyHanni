@@ -146,6 +146,7 @@ object SlayerAPI {
         }
     }
 
+    // TODO USE SH-REPO
     fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
         "Graveyard",
         "Coal Mine",

@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ScoreboardData {
 
     companion object {
+        // TODO USE SH-REPO
         private val splitIcons = listOf(
             "\uD83C\uDF6B",
             "\uD83D\uDCA3",
