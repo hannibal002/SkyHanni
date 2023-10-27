@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
+    // TODO USE SH-REPO
     private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
     private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
 
