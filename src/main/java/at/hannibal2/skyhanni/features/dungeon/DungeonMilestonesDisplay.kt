@@ -7,26 +7,29 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class DungeonMilestonesDisplay {
 
     companion object {
+
+        // TODO USE SH-REPO
+        private val milestonePatternList = listOf(
+            "§e§l(.*) Milestone §r§e.§r§7: You have dealt §r§c(.*)§r§7 Total Damage so far! §r§a(.*)".toPattern(),
+            "§e§lArcher Milestone §r§e.§r§7: You have dealt §r§c(.*)§r§7 Ranged Damage so far! §r§a(.*)".toPattern(),
+            "§e§lHealer Milestone §r§e.§r§7: You have healed §r§a(.*)§r§7 Damage so far! §r§a(.*)".toPattern(),
+            "§e§lTank Milestone §r§e.§r§7: You have tanked and dealt §r§c(.*)§r§7 Total Damage so far! §r§a(.*)s".toPattern()
+        )
+
         private var display = ""
         var color = ""
         var currentMilestone = 0
         var timeReached = 0L
 
-        fun isMilestoneMessage(message: String): Boolean = when {
-            message.matchRegex("§e§l(.*) Milestone §r§e.§r§7: You have dealt §r§c(.*)§r§7 Total Damage so far! §r§a(.*)") -> true
-            message.matchRegex("§e§lArcher Milestone §r§e.§r§7: You have dealt §r§c(.*)§r§7 Ranged Damage so far! §r§a(.*)") -> true
-            message.matchRegex("§e§lHealer Milestone §r§e.§r§7: You have healed §r§a(.*)§r§7 Damage so far! §r§a(.*)") -> true
-            message.matchRegex("§e§lTank Milestone §r§e.§r§7: You have tanked and dealt §r§c(.*)§r§7 Total Damage so far! §r§a(.*)s") -> true
-
-            else -> false
-        }
+        fun isMilestoneMessage(message: String): Boolean =
+            milestonePatternList.any { it.matchMatcher(message) { } != null }
     }
 
     init {
@@ -83,7 +86,10 @@ class DungeonMilestonesDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + display, posLabel = "Dungeon Milestone")
+        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(
+            color + display,
+            posLabel = "Dungeon Milestone"
+        )
     }
 
     private fun isEnabled(): Boolean {
