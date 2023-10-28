@@ -21,8 +21,8 @@ class MenuItemDisplayOverlayMining {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberMiningAsStackSize.isEmpty()) return ""
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberMiningAsStackSize
+        if (SkyHanniMod.feature.inventory.stackSize.menu.mining.isEmpty()) return ""
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.mining
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(0) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -36,9 +37,9 @@ class ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.itemNumber.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.itemNumberAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.itemNumber
         val chestName = InventoryUtils.openInventoryName()
         val internalName = item.getInternalName().asString()
 
@@ -341,5 +342,10 @@ class ItemDisplayOverlayFeatures {
             if (text == line) return grabSackName(name.substring(text.length + 1))
         }
         return text
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumber")
     }
 }

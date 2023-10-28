@@ -66,9 +66,9 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberPlayerAdvancedAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerAdvancedAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(0)) {

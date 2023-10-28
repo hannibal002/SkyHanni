@@ -36,9 +36,9 @@ class MenuItemDisplayOverlayPlayerTryhard {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberPlayerTryhardAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.playerTryhard.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerTryhardAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerTryhard
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(0)) {
