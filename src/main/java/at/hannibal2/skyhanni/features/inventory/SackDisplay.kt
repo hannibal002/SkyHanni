@@ -112,7 +112,6 @@ object SackDisplay {
                                     "§6Magmafish: §b${magmaFish.addSeparators()}",
                                     "§6Magmafish value: §b${price / magmaFish}",
                                     "§6Magmafish per: §b${magmaFish / stored.formatNumber()}"
-
                                 )
                             )
                         )
