@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -355,18 +354,18 @@ class ChatFilter {
      * @return The reason why the message was blocked, empty if not blocked
      */
     private fun block(message: String): String = when {
-        config.hypixelHub && isMessagePresent(message, "lobby") -> "lobby"
+        config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && isEmpty(message) -> "empty"
-        config.warping && isMessagePresent(message, "warping") -> "warping"
-        config.welcome && isMessagePresent(message, "welcome") -> "welcome"
-        config.guildExp && isMessagePresent(message, "guild_exp") -> "guild_exp"
-        config.killCombo && isMessagePresent(message, "kill_combo") -> "kill_combo"
-        config.profileJoin && isMessagePresent(message, "profile_join") -> "profile_join"
+        config.warping && message.isPresent("warping") -> "warping"
+        config.welcome && message.isPresent("welcome") -> "welcome"
+        config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
+        config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
+        config.profileJoin && message.isPresent("profile_join") -> "profile_join"
 
         config.others && isOthers(message) -> othersMsg
 
-        config.winterGift && isMessagePresent(message, "winter_gift") -> "winter_gift"
-        config.powderMining && isMessagePresent(message, "powder_mining") -> "powder_mining"
+        config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
+        config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         else -> ""
     }
 
@@ -390,16 +389,16 @@ class ChatFilter {
      */
     private fun isOthers(message: String): Boolean {
         othersMsg = when {
-            isMessagePresent(message, "bz_ah_minis") -> "bz_ah_minis"
-            isMessagePresent(message, "slayer") -> "slayer"
-            isMessagePresent(message, "slayer_drop") -> "slayer_drop"
-            isMessagePresent(message, "useless_drop") -> "useless_drop"
-            isMessagePresent(message, "useless_notification") -> "useless_notification"
-            isMessagePresent(message, "party") -> "party"
-            isMessagePresent(message, "money") -> "money"
-            isMessagePresent(message, "winter_island") -> "winter_island"
-            isMessagePresent(message, "useless_warning") -> "useless_warning"
-            isMessagePresent(message, "annoying_spam") -> "annoying_spam"
+            message.isPresent("bz_ah_minis") -> "bz_ah_minis"
+            message.isPresent("slayer") -> "slayer"
+            message.isPresent("slayer_drop") -> "slayer_drop"
+            message.isPresent("useless_drop") -> "useless_drop"
+            message.isPresent("useless_notification") -> "useless_notification"
+            message.isPresent("party") -> "party"
+            message.isPresent("money") -> "money"
+            message.isPresent("winter_island") -> "winter_island"
+            message.isPresent("useless_warning") -> "useless_warning"
+            message.isPresent("annoying_spam") -> "annoying_spam"
             else -> ""
         }
         return othersMsg != ""
@@ -408,7 +407,7 @@ class ChatFilter {
     /**
      * Checks if the message is present in the list of messages or patterns
      * Checks against four maps that compare in different ways.
-     * @param message The message to check
+     * @receiver message The message to check
      * @param key The key of the list to check
      * @return True if the message is present in any of the maps
      * @see messagesMap
@@ -416,11 +415,11 @@ class ChatFilter {
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
-    private fun isMessagePresent(message: String, key: String): Boolean {
-        return message in (messagesMap[key] ?: emptyList()) ||
-            (patternsMap[key] ?: emptyList()).any { it.matchMatcher(message) { } != null } ||
-            (messagesContainsMap[key] ?: emptyList()).any { message.contains(it) } ||
-            (messagesStartsWithMap[key] ?: emptyList()).any { message.startsWith(it) }
+    private fun String.isPresent(key: String): Boolean {
+        return this in (messagesMap[key] ?: emptyList()) ||
+            (patternsMap[key] ?: emptyList()).any { it.matchMatcher(this) { } != null } ||
+            (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
+            (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
     }
 
     @SubscribeEvent
