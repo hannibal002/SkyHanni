@@ -274,7 +274,7 @@ class PowderTracker {
         addAsSingletonList("§b$mithrilCount ${reward.displayName} §7($mithrilPerHour/h)")
     }
 
-    private fun format(e: Double): String? = if (e < 0) "0" else e.toInt().addSeparators()
+    private fun format(e: Double): String = if (e < 0) "0" else e.toInt().addSeparators()
 
     private fun calculateResourceHour(resourceInfo: ResourceInfo) {
         val difference = resourceInfo.estimated - resourceInfo.lastEstimated
