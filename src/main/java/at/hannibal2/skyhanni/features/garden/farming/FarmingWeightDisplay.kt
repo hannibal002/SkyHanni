@@ -90,6 +90,7 @@ class FarmingWeightDisplay {
     companion object {
         private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
+        private var dispatcher = Dispatchers.IO
 
         private var display = emptyList<Renderable>()
         private var profileId = ""
@@ -401,7 +402,7 @@ class FarmingWeightDisplay {
             val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
             val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
                 nextPlayers.clear()
@@ -426,20 +427,32 @@ class FarmingWeightDisplay {
             val url = "https://api.elitebot.dev/weight/$uuid"
 
             try {
-                val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
-                for (profileEntry in result["profiles"].asJsonArray) {
-                    val profile = profileEntry.asJsonObject
-                    val profileName = profile["profileName"].asString.lowercase()
-                    if (profileName == localProfile) {
-                        profileId = profile["profileId"].asString
-                        weight = profile["totalWeight"].asDouble
+                val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
+                val selectedProfileId = result["selectedProfileId"].asString
+                val profileEntries = result["profiles"].asJsonArray
 
-                        localCounter.clear()
-                        dirtyCropWeight = true
+                var selectedProfileEntry = profileEntries.find {
+                    it.asJsonObject["profileId"].asString == selectedProfileId
+                }?.asJsonObject
 
-                        return
-                    }
+                // If the selected profile is not found or if the cute name doesn't match look for a different profile
+                // While it's not optimal to loop twice, this shouldn't happen often
+                if (selectedProfileEntry == null || selectedProfileEntry["profileName"].asString.lowercase() != localProfile) {
+                    selectedProfileEntry = profileEntries.find {
+                        it.asJsonObject["profileName"].asString.lowercase() == localProfile
+                    }?.asJsonObject
                 }
+
+                if (selectedProfileEntry != null) {
+                    profileId = selectedProfileEntry["profileId"].asString
+                    weight = selectedProfileEntry["totalWeight"].asDouble
+
+                    localCounter.clear()
+                    dirtyCropWeight = true
+
+                    return
+                }
+
                 println("localProfile: '$localProfile'")
                 println("url: '$url'")
                 println("result: '$result'")
@@ -506,7 +519,7 @@ class FarmingWeightDisplay {
             attemptingCropWeightFetch = true
 
             val url = "https://api.elitebot.dev/weights"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             for (crop in result.entrySet()) {
                 val cropType = CropType.getByName(crop.key)

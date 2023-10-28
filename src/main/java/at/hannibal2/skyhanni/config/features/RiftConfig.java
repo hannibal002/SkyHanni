@@ -138,7 +138,7 @@ public class RiftConfig {
             public static class OdonataConfig {
 
                 @Expose
-                @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding a " +
+                @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding an " +
                         "§eEmpty Odonata Bottle §7in the hand.")
                 @ConfigEditorBoolean
                 @FeatureToggle
@@ -692,6 +692,11 @@ public class RiftConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight Size", desc = "Set render size for highlighted Motes Orbs.")
+        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 5)
+        public int size = 3;
 
         @Expose
         @ConfigOption(name = "Hide Particles", desc = "Hide normal Motes Orbs particles.")

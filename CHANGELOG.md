@@ -40,11 +40,29 @@
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
 + Added Quest Item Helper. - NetheriteMiner
-    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items needed from the sacks.
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
+      needed from the sacks.
 + Added alerts when the player catches a Legendary Sea Creature. - Cad
 + Added Soulweaver Skull Hider to the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 + Added /shmouselock command to lock mouse rotation for farming. - Cad
++ Added **Dungeon party finder** QOL improvements - Cad
+    + Floor stack size.
+    + Mark Paid Carries red.
+    + Mark Low-Class levels orange.
+    + Mark groups you can't join dark red.
+    + Mark groups without your current classes green.
++ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
+    + /pw -> party warp
+    + /pk -> party kick
+    + /pt -> party transfer
+    + /pp -> party promote
+    + /pko -> party kickoffline
++ Added working **Livid Finder** (should work 100% of the time). - hannibal2
+    + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
+      in some cases).
++ Added AFK time to Discord RPC. - NetheriteMiner
++ Option to highlight items that are full in the sack inventory.
 
 #### Events
 
@@ -53,6 +71,9 @@
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
++ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
+    + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
+    + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 
 ### Changes
 
@@ -74,8 +95,22 @@
 + Added an option to the Advanced Player List to hide Crimson Isle faction icons. - hannibal2
 + Added Enrichment to Estimated Item Value. - jani
 + Added Plhlegblast to the Rare Sea Creature Warning and Highlight. - hannibal2
-+ Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election API check failed. - CalMWolfs
++ Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election
+  API check failed. - CalMWolfs
 + Hiding a bunch of garden GUIs in a bunch of garden inventories. - hannibal2
++ More shwords support. - CalMWolfs
+    + Added the option to change between case-sensitive and case-insensitive.
+    + Allow the use of Ctrl + C to copy the current textbox.
+    + The effect of visual words is now visible while editing text.
++ Added Diamond/Gold essence to chat filter powder mining. - HiZe
++ Added fillet count and coins to Bronze/Silver Trophy Sack. - HiZe
++ Chest value is now default disabled in the dungeon, and added an option to enable it. - HiZe
++ Added support for lower case item IDs to the Hypixel command /viewrecipe. - walker
++ Added support for tab complete item IDs in the Hypixel command /viewrecipe. - hannibal2
+    + Only items with recipes are tab completed.
++ Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
++ Disabled clicks on SkyHanni GUIs while inside NEU's or Skytils profile viewer. - hannibal2
++ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks sometimes. - hannibal2
 
 ### Bug Fixes
 
@@ -107,6 +142,24 @@
 + Hide "click" texts with the Fishing Hook Display. - hannibal2
 + Fixed Highlight Showcase Items not working in some areas. - Obsidian
 + Fixed the Blaze Slayer Damage Indicator not working and no longer causing FPS drops. - hannibal2
++ Fixed clean end working in f5/m5. - hannibal2
++ Fixed visitor drop statistics preview. - Obsidian
++ Fixed a bracket at the wrong spot in Discord RPC. - hannibal2
++ Fixed fishing hook display triggering on wrong texts. - hannibal2
++ Fixed crop milestone inventory showing wrong level as stack size when maxed out. - hannibal2
++ Fixed various bugs with the /shwords GUI. - CalMWolfs
++ Bring back the command /shwords - CalMWolfs
++ It got deleted accidentally during code optimisations.
++ Highlight Commission Mobs: The "Golden Goblin Slayer" Commission should not trigger the "Goblin Slayer" Commission
+  anymore. - Thunderblade73
++ Fixed potential crash with future neu version. - CalMWolfs
++ Added missing beep sound to rejoin SkyBlock after kick warning. - hannibal2
++ Fixed Fire Veil particle hider not working. - cimbraien
++ Fixed a bug with the Trophy Sack Display reading number. - HiZe
++ Fixed Ghost Counter item stack detection. - HiZe
++ Fixed Farming Weight Display shows 0 weight wrongly sometimes. - Kaeso
++ Fixed damage indicator errors during Enderman Slayer. - hannibal2
++ Fixed weird error messages in the Damage Indicator. - hannibal2
 
 #### Config
 
@@ -117,6 +170,13 @@
 
 + Removed **Duplicate Hider**.
     + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
+
+#### Internal Changes
+
++ Add Repo TODOs to regex patterns. - walker
++ Moved many patterns from function scope to members. - hannibal2
++ Avoid hardcoded dispatcher. - walker
++ Created and used Entity.canBeSeen and LorenzVec.canBeSeen. - hannibal2
 
 ## Version 0.20
 

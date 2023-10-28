@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -28,7 +28,7 @@ class RiftAgaricusCap {
     }
 
     private fun updateLocation(): LorenzVec? {
-        if (InventoryUtils.getItemInHand()?.getInternalName_old() != "FARMING_WAND") return null
+        if (InventoryUtils.getItemInHand()?.getInternalName() != RiftAPI.farmingTool) return null
         val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
 
         when (currentLocation.getBlockStateAt().toString()) {

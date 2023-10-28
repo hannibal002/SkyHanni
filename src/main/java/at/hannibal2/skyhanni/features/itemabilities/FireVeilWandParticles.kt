@@ -6,9 +6,10 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
@@ -19,13 +20,14 @@ class FireVeilWandParticles {
 
     var lastClick = 0L
 
+    val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
+
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (config.display == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
-
-        if (event.type == EnumParticleTypes.FLAME && event.count == 1 && event.speed == 0f && event.offset.isZero()) {
+        if (event.type == EnumParticleTypes.FLAME && event.speed == 0.55f) {
             event.isCanceled = true
         }
     }
@@ -35,9 +37,9 @@ class FireVeilWandParticles {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.clickType == ClickType.RIGHT_CLICK) {
-            val internalName = event.itemInHand?.getInternalName_old() ?: return
+            val internalName = event.itemInHand?.getInternalName() ?: return
 
-            if (internalName == "FIRE_VEIL_WAND") {
+            if (internalName == item) {
                 lastClick = System.currentTimeMillis()
             }
         }

@@ -17,6 +17,10 @@ object ErrorManager {
     private var cache =
         CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build<Pair<String, Int>, Unit>()
 
+    fun resetCache() {
+        cache.asMap().clear()
+    }
+
     fun skyHanniError(message: String): Nothing {
         val exception = IllegalStateException(message)
         logError(exception, message)
@@ -47,19 +51,26 @@ object ErrorManager {
         logError(IllegalStateException(internalMessage), userMessage)
     }
 
+    // we love java
     fun logError(throwable: Throwable, message: String) {
+        logError(throwable, message, false)
+    }
+
+    fun logError(throwable: Throwable, message: String, ignoreErrorCache: Boolean) {
         val error = Error(message, throwable)
-        Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
-        val pair = if (throwable.stackTrace.isNotEmpty()) {
-            throwable.stackTrace[0].let { it.fileName to it.lineNumber }
-        } else message to 0
-        if (cache.getIfPresent(pair) != null) return
-        cache.put(pair, Unit)
+        if (!ignoreErrorCache) {
+            val pair = if (throwable.stackTrace.isNotEmpty()) {
+                throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+            } else message to 0
+            if (cache.getIfPresent(pair) != null) return
+            cache.put(pair, Unit)
+        }
 
-        val fullStackTrace = throwable.getExactStackTrace(true).joinToString("\n")
-        val stackTrace = throwable.getExactStackTrace(false).joinToString("\n").removeSpam()
+        val fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
+        val stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
         val randomId = UUID.randomUUID().toString()
 
         val rawMessage = message.removeColor()
@@ -74,7 +85,7 @@ object ErrorManager {
     }
 }
 
-private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
+private fun Throwable.getCustomStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
     add("Caused by " + javaClass.name + ": $message")
 
     val breakAfter = listOf(
@@ -83,6 +94,8 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
     val replace = mapOf(
         "io.mouberry,notenoughupdates" to "NEU",
         "at.hannibal2.skyhanni" to "SH",
+        "net.minecraft." to "MC.",
+        "net.minecraftforge.fml." to "FML.",
     )
 
     for (traceElement in stackTrace) {
@@ -103,8 +116,13 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
         }
     }
 
+    if (this === cause) {
+        add("Infinite recurring causes")
+        return@buildList
+    }
+
     cause?.let {
-        addAll(it.getExactStackTrace(full, this))
+        addAll(it.getCustomStackTrace(full, this))
     }
 }
 
@@ -126,6 +144,9 @@ private fun String.removeSpam(): String {
         "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
         "at net.minecraft.launchwrapper.",
         "at net.fabricmc.devlaunchinjector.",
+        "at SH.events.LorenzEvent.postAndCatchAndBlock(LorenzEvent.kt:28)",
+        "at SH.events.LorenzEvent.postAndCatchAndBlock\$default(LorenzEvent.kt:18)",
+        "at SH.events.LorenzEvent.postAndCatch(LorenzEvent.kt:16)",
     )
     return split("\n").filter { line -> !ignored.any { line.contains(it) } }.joinToString("\n")
 }

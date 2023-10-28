@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -30,6 +32,7 @@ object SackAPI {
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
+    // TODO USE SH-REPO
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val numPattern =
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)".toPattern()
@@ -152,15 +155,22 @@ object SackAPI {
                         item.colorCode = group("color")
                         item.stored = stored
                         item.total = group("total")
+
                         if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
                         item.price = if (isTrophySack) {
-                            val trophyName =
-                                internalName.asString().lowercase().substringBeforeLast("_").replace("_", "")
-                            val filletValue =
-                                TrophyFishManager.getInfoByName(trophyName)?.getFilletValue(sackRarity!!) ?: 0
-                            val storedNumber = stored.formatNumber()
-                            "MAGMA_FISH".asInternalName().sackPrice((filletValue * storedNumber).toString())
-                        } else internalName.sackPrice(stored).coerceAtLeast(0)
+                            val internal = stack.getInternalName_old()
+                            val trophyFishName = internal.substringBeforeLast("_")
+                                .replace("_", "").lowercase()
+                            val trophyRarityName = internal.substringAfterLast("_")
+                            val info = TrophyFishManager.getInfo(trophyFishName)
+                            val rarity = TrophyRarity.getByName(trophyRarityName) ?: TrophyRarity.BRONZE
+                            val filletValue = (info?.getFilletValue(rarity) ?: 0) * stored.formatNumber()
+                            item.magmaFish = filletValue
+                            "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
+                        } else {
+                            internalName.sackPrice(stored).coerceAtLeast(0)
+                        }
+
 
                         if (isRuneSack) {
                             val level = group("level")
@@ -319,6 +329,7 @@ object SackAPI {
         var stored: String = "0",
         var total: String = "0",
         var price: Long = 0,
+        var magmaFish: Long = 0,
     )
 }
 
@@ -329,6 +340,7 @@ data class SackItem(
 ) {
     fun getStatus() = status ?: SackStatus.MISSING
 }
+
 
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
