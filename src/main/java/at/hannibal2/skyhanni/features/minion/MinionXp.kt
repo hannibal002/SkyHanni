@@ -43,10 +43,7 @@ class MinionXp {
         Alchemy
     }
 
-    private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
-
     private var collectItem: Item? = null
-    private val collectItemXpList: MutableList<String> = mutableListOf()
 
     private val minionStorages = mutableListOf<MinionStorage>()
 
@@ -76,7 +73,7 @@ class MinionXp {
     ): Boolean {
         if (!getHasStorage(minionPosition)) return false
         val storage = minionStorages.firstOrNull {
-            it.position.distanceSq(minionPosition) <= 1.0 && it.timestamp.passedSince().inWholeMinutes < 20
+            it.position.distanceSq(minionPosition) <= 2.5 && it.timestamp.passedSince().inWholeMinutes < 20
         }
 
         return if (storage != null) {
@@ -136,13 +133,6 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onIslandChangeEvent(event: IslandChangeEvent) {
-        minionStorages.clear()
-        xpItemMap.clear()
-        collectItemXpList.clear()
-    }
-
-    @SubscribeEvent
     fun onItemTooltipEvent(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.xpDisplay) return
@@ -168,19 +158,36 @@ class MinionXp {
         }
     }
 
+    @SubscribeEvent
+    fun onIslandChangeEvent(event: IslandChangeEvent) {
+        minionStorages.clear()
+        xpItemMap.clear()
+        collectItemXpList.clear()
+    }
+
+    companion object {
+        private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
+        private val collectItemXpList: MutableList<String> = mutableListOf()
+        fun onMinionClose() {
+            xpItemMap.clear()
+            collectItemXpList.clear()
+        }
+    }
+
     private val xpInfoMap: HashMap<NEUInternalName, XpInfo> = hashMapOf(
+        //TODO Flowers
         "ABSOLUTE_ENDER_PEARL".asInternalName() to XpInfo(XpType.Combat, 7680.0),
         "LOG-2".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "ALLIUM".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "AZURE_BLUET".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "LOG-2".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "BLAZE_ROD".asInternalName() to XpInfo(XpType.Combat, 0.3),
-        "BLOCK_OF_COAL".asInternalName() to XpInfo(XpType.Mining, 2.7),
-        "BLOCK_OF_DIAMOND".asInternalName() to XpInfo(XpType.Mining, 3.6),
-        "BLOCK_OF_EMERALD".asInternalName() to XpInfo(XpType.Mining, 3.6),
-        "BLOCK_OF_GOLD".asInternalName() to XpInfo(XpType.Mining, 3.6),
-        "BLOCK_OF_IRON".asInternalName() to XpInfo(XpType.Mining, 2.7),
-        "BLOCK_OF_QUARTZ".asInternalName() to XpInfo(XpType.Mining, 1.2),
+        "COAL_BLOCK".asInternalName() to XpInfo(XpType.Mining, 2.7),
+        "DIAMOND_BLOCK".asInternalName() to XpInfo(XpType.Mining, 3.6),
+        "EMERALD_BLOCK".asInternalName() to XpInfo(XpType.Mining, 3.6),
+        "GOLD_BLOCK".asInternalName() to XpInfo(XpType.Mining, 3.6),
+        "IRON_BLOCK".asInternalName() to XpInfo(XpType.Mining, 2.7),
+        "QUARTZ_BLOCK".asInternalName() to XpInfo(XpType.Mining, 1.2),
         "BLOCK_OF_REDSTONE".asInternalName() to XpInfo(XpType.Mining, 1.8),
         "BLUE_ORCHID".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "BONE".asInternalName() to XpInfo(XpType.Combat, 0.2),
