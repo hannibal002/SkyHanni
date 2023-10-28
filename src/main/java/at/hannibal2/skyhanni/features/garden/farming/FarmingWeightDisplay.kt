@@ -426,19 +426,31 @@ class FarmingWeightDisplay {
 
             try {
                 val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
-                for (profileEntry in result["profiles"].asJsonArray) {
-                    val profile = profileEntry.asJsonObject
-                    val profileName = profile["profileName"].asString.lowercase()
-                    if (profileName == localProfile) {
-                        profileId = profile["profileId"].asString
-                        weight = profile["totalWeight"].asDouble
+                val selectedProfileId = result["selectedProfileId"].asString
+                val profileEntries = result["profiles"].asJsonArray
 
-                        localCounter.clear()
-                        dirtyCropWeight = true
+                var selectedProfileEntry = profileEntries.find {
+                    it.asJsonObject["profileId"].asString == selectedProfileId
+                }?.asJsonObject
 
-                        return
-                    }
+                // If the selected profile is not found or if the cute name doesn't match look for a different profile
+                // While it's not optimal to loop twice, this shouldn't happen often
+                if (selectedProfileEntry == null || selectedProfileEntry["profileName"].asString.lowercase() != localProfile) {
+                    selectedProfileEntry = profileEntries.find {
+                        it.asJsonObject["profileName"].asString.lowercase() == localProfile
+                    }?.asJsonObject
                 }
+
+                if (selectedProfileEntry != null) {
+                    profileId = selectedProfileEntry["profileId"].asString
+                    weight = selectedProfileEntry["totalWeight"].asDouble
+
+                    localCounter.clear()
+                    dirtyCropWeight = true
+
+                    return
+                }
+
                 println("localProfile: '$localProfile'")
                 println("url: '$url'")
                 println("result: '$result'")

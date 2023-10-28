@@ -80,7 +80,7 @@ class RiftMotesOrb {
                 orb.pickedUp = true
             }
 
-            val location = orb.location.add(0.0, 0.5, 0.0)
+            val location = orb.location.add(y = 0.5)
             val sizeOffset = (5 - config.size) * -0.1
             val color = if (orb.pickedUp) LorenzColor.GRAY else LorenzColor.LIGHT_PURPLE
             val text = color.getChatColor() + "Motes Orb"
