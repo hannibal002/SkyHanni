@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class TimeFeatures {
-    private val config get() = SkyHanniMod.feature.gui.realTime
+    private val realTimeConfig get() = SkyHanniMod.feature.gui.realTime
     private val winterConfig get() = SkyHanniMod.feature.event.winter
 
     private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
@@ -29,11 +29,12 @@ class TimeFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !realTimeConfig.showOutsideSB) return
 
-        if (config.enabled) {
-            val currentTime = (if (config.formatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
-            config.position.renderString(currentTime, posLabel = "Real Time")
+        if (realTimeConfig.enabled) {
+            val simpleDateFormat = if (realTimeConfig.formatToggle) timeFormat12h else timeFormat24h
+            val currentTime = simpleDateFormat.format(System.currentTimeMillis())
+            realTimeConfig.position.renderString(currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
@@ -56,8 +57,8 @@ class TimeFeatures {
         event.move(2, "misc.timeConfigs.realTime", "gui.realTime")
         event.move(2, "misc.timeConfigs.realTimePos", "gui.realTimePosition")
 
-        event.move(5,"gui.realTime","gui.realTime.enabled")
-        event.move(5,"gui.realTimeFormatToggle","gui.realTime.formatToggle")
-        event.move(5,"gui.realTimePos","gui.realTime.position")
+        event.move(7, "gui.realTime", "gui.realTime.enabled")
+        event.move(7, "gui.realTimeFormatToggle", "gui.realTime.formatToggle")
+        event.move(7, "gui.realTimePos", "gui.realTime.position")
     }
 }

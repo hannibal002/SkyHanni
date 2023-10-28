@@ -587,8 +587,8 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Outline Color",
-                desc = "The color to outline party members in."
+            name = "Outline Color",
+            desc = "The color to outline party members in."
         )
         @ConfigEditorColour
         public String outlineColor = "0:245:85:255:85";
@@ -607,8 +607,11 @@ public class MiscConfig {
 
     public static class CompactTabListConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
-                "doesn't break god-pot detection and shortens some other lines.")
+        @ConfigOption(
+            name = "Enabled",
+            desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
+                "doesn't break god-pot detection and shortens some other lines."
+        )
         //made tablist one word here so both searches will pick it up
         @ConfigEditorBoolean
         @FeatureToggle

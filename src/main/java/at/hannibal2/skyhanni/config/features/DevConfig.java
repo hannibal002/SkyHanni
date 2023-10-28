@@ -127,7 +127,7 @@ public class DevConfig {
         @Expose
         @ConfigOption(name = "Show Outside SB", desc = "Make parkour waypoints outside of SkyBlock too.")
         @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
+        public boolean parkourOutsideSB = false;
     }
 
     @Expose

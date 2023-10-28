@@ -801,12 +801,12 @@ public class GardenConfig {
         public boolean ignoreLow = false;
 
         @Expose
-        @ConfigOption(name = "Show outside garden", desc = "Show the farming weight outside of the garden.")
+        @ConfigOption(name = "Show Outside Garden", desc = "Show the farming weight outside of the garden.")
         @ConfigEditorBoolean
         public boolean showOutsideGarden = false;
 
         @Expose
-        @ConfigOption(name = "Show outside SB", desc = "Show the farming weight outside of SkyBlock.")
+        @ConfigOption(name = "Show Outside SB", desc = "Show the farming weight outside of SkyBlock.")
         @ConfigEditorBoolean
         public boolean showOutsideSB = false;
     }

@@ -137,7 +137,7 @@ class FarmingWeightDisplay {
         }
 
         private fun update() {
-            if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+//             if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
             if (!GardenAPI.inGarden() && !config.showOutsideGarden) return
             if (apiError) {
                 display = errorMessage

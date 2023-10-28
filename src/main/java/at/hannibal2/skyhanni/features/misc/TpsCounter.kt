@@ -99,8 +99,8 @@ class TpsCounter {
         event.move(2, "misc.tpsDisplayEnabled", "gui.tpsDisplay")
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
 
-        event.move(5,"gui.tpsDisplay","gui.tpsDisplay.enabled")
-        event.move(5,"gui.tpsDisplayPosition","gui.tpsDisplay.position")
+        event.move(7, "gui.tpsDisplay", "gui.tpsDisplay.enabled")
+        event.move(7, "gui.tpsDisplayPosition", "gui.tpsDisplay.position")
     }
 
     private fun getColor(tps: Double) = when {

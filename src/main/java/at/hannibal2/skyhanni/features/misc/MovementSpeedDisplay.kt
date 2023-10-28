@@ -49,7 +49,7 @@ class MovementSpeedDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(5,"misc.playerMovementSpeed","misc.movementSpeed.enabled")
-        event.move(5,"misc.playerMovementSpeedPos","misc.movementSpeed.position")
+        event.move(7, "misc.playerMovementSpeed", "misc.movementSpeed.enabled")
+        event.move(7, "misc.playerMovementSpeedPos", "misc.movementSpeed.position")
     }
 }

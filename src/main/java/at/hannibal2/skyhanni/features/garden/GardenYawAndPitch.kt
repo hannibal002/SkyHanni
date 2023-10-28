@@ -61,6 +61,6 @@ class GardenYawAndPitch {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(5,"garden.yawPitchDisplay.everywhere","garden.yawPitchDisplay.showOutsideGarden")
+        event.move(7, "garden.yawPitchDisplay.everywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }
 }

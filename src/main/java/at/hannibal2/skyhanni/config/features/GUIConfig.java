@@ -71,8 +71,8 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
-                "§eUse '&' as the colour code character.\n" +
-                "§eUse '\\n' as the line break character.")
+            "§eUse '&' as the colour code character.\n" +
+            "§eUse '\\n' as the line break character.")
         @ConfigEditorText
         public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
@@ -93,7 +93,7 @@ public class GUIConfig {
     public static class RealTimeConfig {
 
         @Expose
-        @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
+        @ConfigOption(name = "Enabled", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
@@ -154,7 +154,7 @@ public class GUIConfig {
     public static class TpsDisplayConfig {
 
         @Expose
-        @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")
+        @ConfigOption(name = "Enabled", desc = "Show the TPS of the current server, like in Soopy.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;

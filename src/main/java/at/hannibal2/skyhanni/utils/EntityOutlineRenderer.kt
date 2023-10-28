@@ -221,14 +221,10 @@ object EntityOutlineRenderer {
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
         // SkyBlock Conditions
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.highlightPartyMembers.showOutsideSB) {
-            return false
-        }
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.highlightPartyMembers.showOutsideSB) return false
 
         // Main toggle for outlines features
-        if (!isEnabled()) {
-            return false
-        }
+        if (!isEnabled()) return false
 
         // Vanilla Conditions
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
