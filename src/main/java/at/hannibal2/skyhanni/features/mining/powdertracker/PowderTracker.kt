@@ -207,34 +207,18 @@ class PowderTracker {
 
         val both = currentLog() ?: return@buildList
         val display = both.get(currentDisplayMode)
-        val rewards = display.rewards
 
-        val chestPerHour = if (chestInfo.perHour < 0) "0" else chestInfo.perHour.toInt().addSeparators()
+        val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
         addAsSingletonList("§bDouble Powder: ${if (doublePowder) "§aActive! §7($powderTimer)" else "§cInactive!"}")
 
-        val mithril = PowderChestReward.entries[0]
-        val mithrilCount = rewards.getOrDefault(mithril, 0).addSeparators()
-        val mithrilPerHour = if (mithrilInfo.perHour < 0) "0" else mithrilInfo.perHour.toInt().addSeparators()
-        addAsSingletonList("§b$mithrilCount ${mithril.displayName} §7($mithrilPerHour/h)")
-
-        val gemstone = PowderChestReward.entries[1]
-        val gemstoneCount = rewards.getOrDefault(gemstone, 0).addSeparators()
-        val gemstonePerHour = if (gemstoneInfo.perHour < 0) "0" else gemstoneInfo.perHour.toInt().addSeparators()
-        addAsSingletonList("§b$gemstoneCount ${gemstone.displayName} §7($gemstonePerHour/h)")
-
+        val entries = PowderChestReward.entries
+        val rewards = display.rewards
+        addPerHour(rewards, entries[0], mithrilInfo)
+        addPerHour(rewards, entries[1], gemstoneInfo)
         addAsSingletonList("")
-
-        val diamondEssence = PowderChestReward.entries[46]
-        val diamondEssenceCount = rewards.getOrDefault(diamondEssence, 0).addSeparators()
-        val diamondEssencePerHour =
-            if (diamondEssenceInfo.perHour < 0) "0" else diamondEssenceInfo.perHour.toInt().addSeparators()
-        addAsSingletonList("§b$diamondEssenceCount ${diamondEssence.displayName} §7($diamondEssencePerHour/h)")
-
-        val goldEssence = PowderChestReward.entries[47]
-        val goldEssenceCount = rewards.getOrDefault(goldEssence, 0).addSeparators()
-        val goldEssencePerHour = if (goldEssenceInfo.perHour < 0) "0" else goldEssenceInfo.perHour.toInt().addSeparators()
-        addAsSingletonList("§b$goldEssenceCount ${goldEssence.displayName} §7($goldEssencePerHour/h)")
+        addPerHour(rewards, entries[46], diamondEssenceInfo)
+        addPerHour(rewards, entries[47], goldEssenceInfo)
 
 
         addAsSingletonList("")
@@ -260,7 +244,7 @@ class PowderTracker {
         }
 
         var totalParts = 0L
-        for (reward in PowderChestReward.entries.subList(26, 32)) { // robots part
+        for (reward in entries.subList(26, 32)) { // robots part
             val count = rewards.getOrDefault(reward, 0)
             totalParts += count
             addAsSingletonList("§b${count.addSeparators()} ${reward.displayName}")
@@ -274,12 +258,23 @@ class PowderTracker {
         val blueEgg = rewards.getOrDefault(PowderChestReward.BLUE_GOBLIN_EGG, 0)
         addAsSingletonList("§9$goblinEgg§7-§a$greenEgg§7-§c$redEgg§f-§e$yellowEgg§f-§3$blueEgg §fGoblin Egg")
 
-        for (reward in PowderChestReward.entries.subList(37, 46)) {
+        for (reward in entries.subList(37, 46)) {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
 
     }
+
+    private fun MutableList<List<Any>>.addPerHour(
+        map: MutableMap<PowderChestReward, Long>,
+        reward: PowderChestReward,
+        info: ResourceInfo) {
+        val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
+        val mithrilPerHour = format(info.perHour)
+        addAsSingletonList("§b$mithrilCount ${reward.displayName} §7($mithrilPerHour/h)")
+    }
+
+    private fun format(e: Double): String? = if (e < 0) "0" else e.toInt().addSeparators()
 
     private fun calculateResourceHour(resourceInfo: ResourceInfo) {
         val difference = resourceInfo.estimated - resourceInfo.lastEstimated
