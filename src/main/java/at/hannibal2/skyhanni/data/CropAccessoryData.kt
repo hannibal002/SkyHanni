@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompressedStreamTools
@@ -20,7 +21,7 @@ import java.util.Base64
 
 class CropAccessoryData {
     // TODO USE SH-REPO
-    private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toRegex()
+    private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toPattern()
     private var loadedAccessoryThisProfile = false
     private var ticks = 0
     private var accessoryInBag: CropAccessory? = null
@@ -48,10 +49,11 @@ class CropAccessoryData {
             return
         }
 
-        val groups = accessoryBagNamePattern.matchEntire(event.inventoryName)?.groups ?: return
-        isLoadingAccessories = true
-        accessoryBagPageCount = groups[2]!!.value.toInt()
-        accessoryBagPageNumber = groups[1]!!.value.toInt()
+        accessoryBagNamePattern.matchMatcher(event.inventoryName) {
+            isLoadingAccessories = true
+            accessoryBagPageCount = group(0).toInt()
+            accessoryBagPageNumber = group(1).toInt()
+        } ?: return
     }
 
     @SubscribeEvent
