@@ -70,7 +70,7 @@ object LorenzUtils {
 
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private val ERROR_PREFIX = "§c[SkyHanni-${SkyHanniMod.version}] "
+    private val ERROR_PREFIX by lazy { "§c[SkyHanni-${SkyHanniMod.version}] " }
     private const val CHAT_PREFIX = "[SkyHanni] "
 
     /**
