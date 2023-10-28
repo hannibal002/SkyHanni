@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -267,11 +267,7 @@ object VampireSlayerFeatures {
     fun pre(event: RenderLivingEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
-        if (entityList.contains(event.entity) && LocationUtils.canSee(
-                LocationUtils.playerEyeLocation(),
-                event.entity.getLorenzVec()
-            )
-        ) {
+        if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
             GlStateManager.disableDepth()
         }
     }
@@ -280,11 +276,7 @@ object VampireSlayerFeatures {
     fun pre(event: RenderLivingEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
-        if (entityList.contains(event.entity) && LocationUtils.canSee(
-                LocationUtils.playerEyeLocation(),
-                event.entity.getLorenzVec()
-            )
-        ) {
+        if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
             GlStateManager.enableDepth()
         }
     }
@@ -364,14 +356,12 @@ object VampireSlayerFeatures {
         }
     }
 
-
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         entityList.clear()
         taggedEntityList.clear()
         standList = mutableMapOf()
     }
-
 
     @SubscribeEvent
     fun onParticle(event: ReceiveParticleEvent) {

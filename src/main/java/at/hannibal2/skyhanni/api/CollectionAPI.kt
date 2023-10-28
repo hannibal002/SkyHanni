@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CollectionAPI {
+    // TODO USE SH-REPO
     private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
     private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
 
@@ -66,6 +67,7 @@ class CollectionAPI {
     }
 
     companion object {
+        // TODO USE SH-REPO
         val collectionValue = mutableMapOf<NEUInternalName, Long>()
         private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
 

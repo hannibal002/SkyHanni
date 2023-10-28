@@ -14,6 +14,7 @@ import java.awt.datatransfer.UnsupportedFlavorException
 import kotlin.time.Duration.Companion.milliseconds
 
 object ClipboardUtils {
+    private var dispatcher = Dispatchers.IO
     private var lastClipboardAccessTime = SimpleTimeMark.farPast()
 
     private fun canAccessClipboard(): Boolean {
@@ -55,7 +56,7 @@ object ClipboardUtils {
     suspend fun readFromClipboard(step: Int = 0): String? {
         try {
             return try {
-                withContext(Dispatchers.IO) {
+                withContext(dispatcher) {
                     getClipboard()?.getData(DataFlavor.stringFlavor)?.toString()
                 }
             } catch (e: UnsupportedFlavorException) {
