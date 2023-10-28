@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
@@ -23,6 +24,9 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
+
+    private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
+    private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
 
     private var clientSideClicked = false
     private var textTopLeft = ""
@@ -37,12 +41,14 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.hideDaggerWarning) return
+        if (!config.hideDaggerWarning) return
 
         val message = event.message
-        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
-            message == "§cYour hit was reduced by Hellion Shield!"
-        ) {
+        attunementPattern.matchMatcher(message) {
+            event.blockedReason = "blaze_slayer_dagger"
+        }
+
+        if (message == "§cYour hit was reduced by Hellion Shield!") {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }
@@ -68,7 +74,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazes.hellion.firstDagger]
+        val first = Dagger.entries[config.firstDagger]
         val second = first.other()
 
         textTopLeft = format(holding, true, first)
@@ -78,7 +84,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun findNearest(): HellionShield? {
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.markRightHellionShield) return null
+        if (!config.markRightHellionShield) return null
 
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()
@@ -194,7 +200,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.daggers
+        return LorenzUtils.inSkyBlock && config.daggers
     }
 
     @SubscribeEvent
