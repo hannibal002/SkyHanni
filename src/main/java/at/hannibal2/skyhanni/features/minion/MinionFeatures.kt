@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -50,11 +51,9 @@ import java.awt.Color
 class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
-    private var lastMinion: LorenzVec? = null
     private var newMinion: LorenzVec? = null
     private var newMinionName: String? = null
     private var lastMinionOpened = 0L
-    private var minionInventoryOpen = false
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
@@ -90,6 +89,10 @@ class MinionFeatures {
         val entity = minecraft.pointedEntity
         if (entity != null) {
             lastClickedEntity = entity.getLorenzVec()
+            return
+        }
+        minecraft.thePlayer.rayTrace(16.0, 1.0f)?.let {
+            lastStorage = it.blockPos.toLorenzVec()
         }
     }
 
@@ -122,13 +125,17 @@ class MinionFeatures {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!event.inventoryName.contains(" Minion ")) return
+        if (!event.inventoryName.contains("Minion ")) return
 
         event.inventoryItems[48]?.let {
             if ("§aCollect All" == it.name) {
                 MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+                return
             }
         }
+
+        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()//TODO
+        minionStorageInventoryOpen = true
     }
 
     @SubscribeEvent
@@ -158,6 +165,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        minionStorageInventoryOpen = false
         if (!minionInventoryOpen) return
         val minions = minions ?: return
 
@@ -223,6 +231,7 @@ class MinionFeatures {
         lastMinion = null
         lastMinionOpened = 0L
         minionInventoryOpen = false
+        minionStorageInventoryOpen = false
     }
 
     @SubscribeEvent
@@ -232,7 +241,7 @@ class MinionFeatures {
 
         val message = event.message
         if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-                minions?.get(lastMinion)?.let {
+            minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
 
@@ -244,14 +253,14 @@ class MinionFeatures {
             lastMinionOpened = 0L
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
-                minions = minions?.editCopy {
-                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
-                        displayName = newMinionName
-                        lastClicked = 0
-                    }
+            minions = minions?.editCopy {
+                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = newMinionName
+                    lastClicked = 0
                 }
-                newMinion = null
-                newMinionName = null
+            }
+            newMinion = null
+            newMinionName = null
         }
 
         minionUpgradePattern.matchMatcher(message) {
@@ -326,6 +335,12 @@ class MinionFeatures {
     }
 
     companion object {
+
+        var lastMinion: LorenzVec? = null
+        var lastStorage: LorenzVec? = null
+        var minionInventoryOpen = false
+        var minionStorageInventoryOpen = false
+
         private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
             get() {
                 return ProfileStorageData.profileSpecific?.minions

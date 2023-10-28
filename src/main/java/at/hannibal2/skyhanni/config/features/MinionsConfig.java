@@ -93,4 +93,10 @@ public class MinionsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideMobsNametagNearby = false;
+
+    @Expose
+    @ConfigOption(name = "Show Xp", desc = "Shows how many Exp you will get")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpDisplay = false;
 }
