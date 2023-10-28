@@ -56,7 +56,7 @@ class DamageIndicatorManager {
     private val maxHealth = mutableMapOf<UUID, Long>()
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
-    private val enderSlayerHitsNumberPattern = "§c☠ §bVoidgloom Seraph \\w+ §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
+    private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
     companion object {
         private var data = mapOf<UUID, EntityData>()
