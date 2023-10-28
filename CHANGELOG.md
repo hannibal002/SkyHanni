@@ -62,6 +62,7 @@
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
 + Added AFK time to Discord RPC. - NetheriteMiner
++ Option to highlight items that are full in the sack inventory.
 
 #### Events
 
@@ -102,6 +103,12 @@
     + Allow the use of Ctrl + C to copy the current textbox.
     + The effect of visual words is now visible while editing text.
 + Added Diamond/Gold essence to chat filter powder mining. - HiZe
++ Added fillet count and coins to Bronze/Silver Trophy Sack. - HiZe
++ Chest value is now default disabled in the dungeon, and added an option to enable it. - HiZe
++ Added support for lower case item IDs to the Hypixel command /viewrecipe. - walker
++ Added support for tab complete item IDs in the Hypixel command /viewrecipe. - hannibal2
+    + Only items with recipes are tab completed.
++ Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
 
 ### Bug Fixes
 
@@ -143,6 +150,8 @@
 + It got deleted accidentally during code optimisations.
 + Highlight Commission Mobs: The "Golden Goblin Slayer" Commission should not trigger the "Goblin Slayer" Commission
   anymore. - Thunderblade73
++ Fixed potential crash with future neu version. - CalMWolfs
++ Added missing beep sound to rejoin SkyBlock after kick warning. - hannibal2
 
 #### Config
 
@@ -153,6 +162,12 @@
 
 + Removed **Duplicate Hider**.
     + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
+
+#### Internal Changes
+
++ Add Repo TODOs to regex patterns. - walker
++ Moved many patterns from function scope to members. - hannibal2
++ Avoid hardcoded dispatcher. - walker
 
 ## Version 0.20
 
