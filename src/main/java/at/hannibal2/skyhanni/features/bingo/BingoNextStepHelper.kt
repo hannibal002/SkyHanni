@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BingoNextStepHelper {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
-
+    // TODO USE SH-REPO
     private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemPreconditions = mutableMapOf<String, NextStep>()
