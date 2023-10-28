@@ -671,6 +671,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can be disabled
     + Sortable by price or items stored (both desc/asc)
     + Option to show prices from Bazaar or NPC
++ Option to highlight items that are full in the sack inventory.
 + **Ghost Counter** (Contributed by HiZe)
     + Shows number of ghosts killed in the Mist in Dwarven Mines
     + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
