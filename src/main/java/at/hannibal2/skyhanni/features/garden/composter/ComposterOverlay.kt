@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,7 +15,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -45,11 +47,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 
-class ComposterOverlay {
+object ComposterOverlay {
     private var organicMatterFactors: Map<String, Double> = emptyMap()
     private var fuelFactors: Map<String, Double> = emptyMap()
+    private var organicMatter: Map<String, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 
@@ -66,34 +69,30 @@ class ComposterOverlay {
     private var lastHovered = 0L
     private var lastAttemptTime = SimpleTimeMark.farPast()
 
-    companion object {
-        var currentOrganicMatterItem: String?
-            get() = GardenAPI.config?.composterCurrentOrganicMatterItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentOrganicMatterItem = value
-            }
+    var inInventory = false
 
-        var currentFuelItem: String?
-            get() = GardenAPI.config?.composterCurrentFuelItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentFuelItem = value
-            }
+    private var testOffset = 0
 
-        var testOffset = 0
-
-        fun onCommand(args: Array<String>) {
-            if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
-                return
-            }
-            testOffset = args[0].toInt()
-            LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+    var currentOrganicMatterItem: String?
+        get() = GardenAPI.config?.composterCurrentOrganicMatterItem
+        private set(value) {
+            GardenAPI.config?.composterCurrentOrganicMatterItem = value
         }
 
-        var inInventory = false
-    }
+    var currentFuelItem: String?
+        get() = GardenAPI.config?.composterCurrentFuelItem
+        private set(value) {
+            GardenAPI.config?.composterCurrentFuelItem = value
+        }
 
-    var garden: GardenJson? = null
+    fun onCommand(args: Array<String>) {
+        if (args.size != 1) {
+            LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+            return
+        }
+        testOffset = args[0].toInt()
+        LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+    }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -119,7 +118,7 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.composterOverlay) return
+        if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
         inComposterUpgrades = event.inventoryName == "Composter Upgrades"
         if (!inComposter && !inComposterUpgrades) return
@@ -399,7 +398,7 @@ class ComposterOverlay {
             val item = NEUItems.getItemStack(internalName)
             val itemName = item.name!!
             val price = getPrice(internalName)
-            val itemsNeeded = if (config.composterRoundDown) {
+            val itemsNeeded = if (config.roundDown) {
                 val amount = missing / factor
                 if (amount > .75 && amount < 1.0) {
                     1.0
@@ -444,21 +443,25 @@ class ComposterOverlay {
 
     private fun retrieveMaterials(internalName: String, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0 || internalName == "BIOFUEL") return
-        if (config.composterOverlayRetrieveFrom == 0 && !LorenzUtils.noTradeMode) {
+        if (config.retrieveFrom == 0 && !LorenzUtils.noTradeMode) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
-        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName.asInternalName() }
+        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName_old() == internalName }
         if (having >= itemsNeeded) {
             LorenzUtils.chat("§e[SkyHanni] $itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
-        val (amountInSacks, _, sacksLoaded) = SackAPI.fetchSackItem(internalName.asInternalName())
+        val sackItem = SackAPI.fetchSackItem(internalName.asInternalName())
+        val amountInSacks = sackItem.amount
+        val sackStatus = sackItem.getStatus()
 
-        if (sacksLoaded == -1 || sacksLoaded == 2) {
-            if (sacksLoaded == 2) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
-            val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining" else "Enchanted Agronomy" // TODO Add sack type repo data
+        if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
+            if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
+            // TODO Add sack type repo data
+            val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining"
+            else "Enchanted Agronomy"
             LorenzUtils.clickableChat(
                 "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
@@ -489,7 +492,7 @@ class ComposterOverlay {
     }
 
     private fun getPrice(internalName: String): Double {
-        val useSellPrice = config.composterOverlayPriceType == 1
+        val useSellPrice = config.overlayPriceType == 1
         val price = NEUItems.getPrice(internalName, useSellPrice)
         if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
 
@@ -503,16 +506,15 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant<GardenJson>("Garden")
+        val data = event.getConstant<GardenJson>("Garden")
+        organicMatter = data.organic_matter
+        fuelFactors = data.fuel
         updateOrganicMatterFactors()
     }
 
     private fun updateOrganicMatterFactors() {
         try {
-            val garden = this.garden ?: return
-            organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
-            fuelFactors = garden.fuel
-
+            organicMatterFactors = updateOrganicMatterFactors(organicMatter)
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -549,11 +551,11 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.composterOverlayOrganicMatterPos.renderStringsAndItems(
+            config.overlayOrganicMatterPos.renderStringsAndItems(
                 organicMatterDisplay,
                 posLabel = "Composter Overlay Organic Matter"
             )
-            config.composterOverlayFuelExtrasPos.renderStringsAndItems(
+            config.overlayFuelExtrasPos.renderStringsAndItems(
                 fuelExtraDisplay,
                 posLabel = "Composter Overlay Fuel Extras"
             )
@@ -564,5 +566,15 @@ class ComposterOverlay {
         COMPOST("Compost", 1),
         HOUR("Hour", 60 * 60),
         DAY("Day", 60 * 60 * 24),
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.composterOverlay", "garden.composters.overlay")
+        event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
+        event.move(3, "garden.composterOverlayRetrieveFrom", "garden.composters.retrieveFrom")
+        event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
+        event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
+        event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
     }
 }

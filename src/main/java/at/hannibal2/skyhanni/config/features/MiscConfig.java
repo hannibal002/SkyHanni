@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
@@ -25,40 +23,39 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Pet", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean pet = false;
-
-    @Expose
-    @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean petDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Pet Experience Tooltip", desc = "")
-    @ConfigAccordionId(id = 0)
     @Accordion
-    public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
-
-    public static class PetExperienceToolTipConfig {
-
+    public PetConfig pets = new PetConfig();
+    public static class PetConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
+        @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean petDisplay = true;
+        public boolean display = false;
 
         @Expose
-        @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
-        @ConfigEditorBoolean
-        public boolean showAlways = false;
+        @ConfigOption(name = "Pet Experience Tooltip", desc = "")
+        @Accordion
+        public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
 
-        @Expose
-        @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
-        @ConfigEditorBoolean
-        public boolean showGoldenDragonEgg = true;
+        public static class PetExperienceToolTipConfig {
 
+            @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean petDisplay = true;
+
+            @Expose
+            @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
+            @ConfigEditorBoolean
+            public boolean showAlways = false;
+
+            @Expose
+            @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
+            @ConfigEditorBoolean
+            public boolean showGoldenDragonEgg = true;
+
+        }
     }
 
     @Expose
@@ -74,143 +71,128 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
         @ConfigEditorDropdown(values = {"All", "Own Armor", "Other's Armor", "Off"})
-        @ConfigAccordionId(id = 1)
         public int mode = 3;
 
         @Expose
         @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
         @ConfigEditorBoolean()
-        @ConfigAccordionId(id = 3)
         public Boolean onlyHelmet = false;
 
     }
 
     @Expose
     @ConfigOption(name = "Potion Effects", desc = "")
-    @ConfigEditorAccordion(id = 5)
-    public boolean potionEffects = false;
+    @Accordion
+    public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
+    public static class PotionEffectsConfig {
+        @Expose
+        @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean nonGodPotEffectDisplay = false;
 
-    @Expose
-    @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 5)
-    @FeatureToggle
-    public boolean nonGodPotEffectDisplay = false;
+        @Expose
+        @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean nonGodPotEffectShowMixins = false;
 
-    @Expose
-    @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 5)
-    @FeatureToggle
-    public boolean nonGodPotEffectShowMixins = false;
-
-    @Expose
-    public Position nonGodPotEffectPos = new Position(10, 10, false, true);
+        @Expose
+        public Position nonGodPotEffectPos = new Position(10, 10, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Particle Hider", desc = "")
-    @ConfigEditorAccordion(id = 9)
-    public boolean particleHider = false;
+    @Accordion
+    public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
+    public static class ParticleHiderConfig {
+        @Expose
+        @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideBlazeParticles = false;
 
-    @Expose
-    @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideBlazeParticles = false;
+        @Expose
+        @ConfigOption(name = "Enderman Particles", desc = "Hide Enderman particles.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideEndermanParticles = false;
 
-    @Expose
-    @ConfigOption(name = "Enderman Particles", desc = "Hide Enderman particles.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideEndermanParticles = false;
+        @Expose
+        @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideFireballParticles = true;
 
-    @Expose
-    @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideFireballParticles = true;
+        @Expose
+        @ConfigOption(name = "Fire Particles", desc = "Hide particles from the fire block.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideFireBlockParticles = true;
 
-    @Expose
-    @ConfigOption(name = "Fire Particles", desc = "Hide particles from the fire block.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideFireBlockParticles = true;
+        @Expose
+        @ConfigOption(name = "Smoke Particles", desc = "Hide smoke particles.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideSmokeParticles = false;
 
-    @Expose
-    @ConfigOption(name = "Smoke Particles", desc = "Hide smoke particles.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideSmokeParticles = false;
+        @Expose
+        @ConfigOption(name = "Far Particles", desc = "Hide particles that are more than 40 blocks away.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideFarParticles = true;
 
-    @Expose
-    @ConfigOption(name = "Far Particles", desc = "Hide particles that are more than 40 blocks away.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideFarParticles = true;
-
-    @Expose
-    @ConfigOption(name = "Close Redstone Particles", desc = "Hide Redstone particles around the player (appear for some potion effects).")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 9)
-    @FeatureToggle
-    public boolean hideCloseRedstoneparticles = true;
+        @Expose
+        @ConfigOption(name = "Close Redstone Particles", desc = "Hide Redstone particles around the player (appear for some potion effects).")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideCloseRedstoneParticles = true;
+    }
 
     @Expose
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
-    @ConfigEditorAccordion(id = 11)
-    public boolean estimatedItemValue = false;
+    @Accordion
+    public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
+    public static class EstimatedItemValueConfig {
+        @Expose
+        @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
 
-    @Expose
-    @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    @FeatureToggle
-    public boolean estimatedIemValueEnabled = false;
+        @Expose
+        @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int hotkey = Keyboard.KEY_NONE;
 
-    @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    @ConfigAccordionId(id = 11)
-    public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
+        @Expose
+        @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
+        @ConfigEditorBoolean
+        public boolean alwaysEnabled = true;
 
-    @Expose
-    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean estimatedIemValueAlwaysEnabled = true;
+        @Expose
+        @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 30,
+                minStep = 1
+        )
+        public Property<Integer> enchantmentsCap = Property.of(7);
 
-    @Expose
-    @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 30,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 11)
-    public Property<Integer> estimatedIemValueEnchantmentsCap = Property.of(7);
+        @Expose
+        @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
+        @ConfigEditorBoolean
+        public boolean exactPrice = false;
 
+        @Expose
+        @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean armor = true;
 
-    @Expose
-    @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    public boolean estimatedIemValueExactPrice = false;
-
-    @Expose
-    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 11)
-    @FeatureToggle
-    public boolean estimatedIemValueArmor = true;
-
-    @Expose
-    public Position itemPriceDataPos = new Position(140, 90, false, true);
+        @Expose
+        public Position itemPriceDataPos = new Position(140, 90, false, true);
+    }
 
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
@@ -276,9 +258,10 @@ public class MiscConfig {
                         "Slayer",
                         "Stacking Enchantment",
                         "Dungeon",
+                        "AFK Indicator"
                 }
         )
-        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
         @Expose
         @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
@@ -634,7 +617,6 @@ public class MiscConfig {
             @Expose
             @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
             @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
-            @ConfigAccordionId(id = 1)
             public int playerSortOrder = 0;
 
             @Expose
@@ -678,14 +660,23 @@ public class MiscConfig {
             public boolean showBingoRankNumber = false;
 
             @Expose
+            @ConfigOption(name = "Hide Factions", desc = "Hide the icon of the Crimson Isle Faction in the tab list.")
+            @ConfigEditorBoolean
+            public boolean hideFactions = false;
+
+            @Expose
             @ConfigOption(name = "Mark Special Persons", desc = "Show speical icons behind the name of guild members, party members, friends, and marked players.")
             @ConfigEditorBoolean
             public boolean markSpecialPersons = false;
 
             @Expose
-            @ConfigOption(name = "Mark SkyHanni Devs", desc = "Adds a §c:O §7behind the tablist name of SkyHanni's creators.")
+            @ConfigOption(
+                    name = "Mark SkyHanni Devs",
+                    desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
+                            "§eThose are the folks that coded the mod for you for free :)"
+            )
             @ConfigEditorBoolean
-            public boolean markSkyHanniDevs = false;
+            public boolean markSkyHanniContributors = false;
         }
     }
 
@@ -698,9 +689,9 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Enabled",
-                desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
-                        "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
+            name = "Enabled",
+            desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
+                "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -709,36 +700,14 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
         @ConfigEditorSlider(
-                minValue = 5,
-                maxValue = 300,
-                minStep = 1
+            minValue = 5,
+            maxValue = 300,
+            minStep = 1
         )
         public Property<Integer> warnTime = Property.of(60);
 
         @Expose
         public Position position = new Position(400, 200, 1.3f);
-    }
-
-    @Expose
-    @ConfigOption(name = "Player Chat Symbols", desc = "")
-    @Accordion
-    public ChatSymbols chatSymbols = new ChatSymbols();
-
-    public static class ChatSymbols {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Adds extra symbols to the chat such as those from ironman, " +
-                "stranded, bingo or nether factions and places them next to your regular player emblems. " +
-                "Also allows emblems without sb level in chat.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = true;
-
-        @Expose
-        @ConfigOption(name = "Chat Symbol Location", desc = "Determines where the symbols should go in chat in relation to the " +
-                "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
-        @ConfigEditorDropdown(values = {"Left", "Right", "Hidden"})
-        public int symbolLocation = 0;
     }
 
     @Expose

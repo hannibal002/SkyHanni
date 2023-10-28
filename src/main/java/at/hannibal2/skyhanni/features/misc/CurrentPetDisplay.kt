@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -15,6 +16,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+
+    // TODO USE SH-REPO
+    private val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -37,7 +41,7 @@ class CurrentPetDisplay {
             blocked = true
         }
 
-        if (blocked && SkyHanniMod.feature.misc.petDisplay) {
+        if (blocked && SkyHanniMod.feature.misc.pets.display) {
             event.blockedReason = "pets"
         }
     }
@@ -45,8 +49,6 @@ class CurrentPetDisplay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-
-        val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
@@ -59,15 +61,19 @@ class CurrentPetDisplay {
         }
     }
 
-
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
 
-        if (!SkyHanniMod.feature.misc.petDisplay) return
+        if (!SkyHanniMod.feature.misc.pets.display) return
         val config = ProfileStorageData.profileSpecific ?: return
 
         SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "misc.petDisplay", "misc.pets.display")
     }
 }

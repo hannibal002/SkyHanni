@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
@@ -19,144 +17,141 @@ import java.util.List;
 
 public class InventoryConfig {
 
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean hideNotClickable = false;
+    @Accordion
+    public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
+
+    public static class HideNotClickableConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean items = false;
+
+        @Expose
+        @ConfigOption(name = "Block Clicks", desc = "Block the clicks on these items.")
+        @ConfigEditorBoolean
+        public boolean itemsBlockClicks = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Opacity",
+                desc = "How strong should the items be grayed out?"
+        )
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 255,
+                minStep = 5
+        )
+        public int opacity = 180;
+
+        @Expose
+        @ConfigOption(name = "Bypass With Control", desc = "Adds the ability to bypass not clickable items when holding the control key.")
+        @ConfigEditorBoolean
+        public boolean itemsBypass = true;
+
+        @Expose
+        @ConfigOption(name = "Green Line", desc = "Adds green line around items that are clickable.")
+        @ConfigEditorBoolean
+        public boolean itemsGreenLine = true;
+
+    }
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    @FeatureToggle
-    public boolean hideNotClickableItems = false;
-
-    @Expose
-    @ConfigOption(name = "Block Clicks", desc = "Block the clicks on these items.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean hideNotClickableItemsBlockClicks = true;
-
-    @Expose
-    @ConfigOption(
-            name = "Opacity",
-            desc = "How strong should the items be grayed out?"
-    )
-    @ConfigEditorSlider(
-            minValue = 0,
-            maxValue = 255,
-            minStep = 5
-    )
-    @ConfigAccordionId(id = 0)
-    public int hideNotClickableOpacity = 180;
-
-    @Expose
-    @ConfigOption(name = "Bypass With Control", desc = "Adds the ability to bypass not clickable items when holding the control key.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean notClickableItemsBypass = true;
-
-    @Expose
-    @ConfigOption(name = "Green Line", desc = "Adds green line around items that are clickable.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean hideNotClickableItemsGreenLine = true;
-
     @ConfigOption(name = "RNG Meter", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean rngMeter = false;
+    @Accordion
+    public RngMeterConfig rngMeter = new RngMeterConfig();
+
+    public static class RngMeterConfig {
+        @Expose
+        @ConfigOption(name = "Floor Names", desc = "Show the Floor names in the Catacombs RNG Meter inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean floorName = false;
+
+        @Expose
+        @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the Catacombs RNG Meter inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean noDrop = false;
+
+        @Expose
+        @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the Catacombs or Slayer RNG Meter inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean selectedDrop = false;
+    }
 
     @Expose
-    @ConfigOption(name = "Floor Names", desc = "Show the Floor names in the Catacombs RNG Meter inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean rngMeterFloorName = false;
-
-    @Expose
-    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the Catacombs RNG Meter inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean rngMeterNoDrop = false;
-
-    @Expose
-    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the Catacombs or Slayer RNG Meter inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    @FeatureToggle
-    public boolean rngMeterSelectedDrop = false;
-
     @ConfigOption(name = "Stats Tuning", desc = "")
-    @ConfigEditorAccordion(id = 2)
-    public boolean statsTuning = false;
+    @Accordion
+    public StatsTuningConfig statsTuning = new StatsTuningConfig();
 
-    @Expose
-    @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean statsTuningSelectedStats = true;
+    public static class StatsTuningConfig {
+        @Expose
+        @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean selectedStats = true;
 
-    @Expose
-    @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected Tuning Points in the Stats Tuning inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean statsTuningPoints = true;
+        @Expose
+        @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected Tuning Points in the Stats Tuning inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean points = true;
 
-    @Expose
-    @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the Stats Tuning inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean statsTuningSelectedTemplate = true;
+        @Expose
+        @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the Stats Tuning inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean selectedTemplate = true;
 
-    @Expose
-    @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the Tuning Point templates.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    @FeatureToggle
-    public boolean statsTuningTemplateStats = true;
+        @Expose
+        @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the Tuning Point templates.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean templateStats = true;
+    }
 
     @Expose
     @ConfigOption(name = "Jacob Farming Contest", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    public boolean jacobFarmingContest = false;
+    @Accordion
+    public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
 
-    @Expose
-    @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the Jacob inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestHighlightRewards = true;
+    public static class JacobFarmingContestConfig {
+        @Expose
+        @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the Jacob inventory.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightRewards = true;
 
-    @Expose
-    @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestRealTime = true;
+        @Expose
+        @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the Contest description.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean realTime = true;
 
-    @Expose
-    @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this Contest. " +
-            "§eIf you use a texture pack this may cause conflicting icons.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    @FeatureToggle
-    public boolean jacobFarmingContestMedalIcon = true;
+        @Expose
+        @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this Contest. " +
+                "§eIf you use a texture pack this may cause conflicting icons.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean medalIcon = true;
 
-    @Expose
-    @ConfigOption(name = "Finnegan Icon", desc = "Uses a different indicator for when the Contest happened during Mayor Finnegan.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean jacobFarmingContestFinneganIcon = true;
+        @Expose
+        @ConfigOption(name = "Finnegan Icon", desc = "Uses a different indicator for when the Contest happened during Mayor Finnegan.")
+        @ConfigEditorBoolean
+        public boolean finneganIcon = true;
+    }
+
 
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
-    public SackDisplay sackDisplay = new SackDisplay();
+    public SackDisplayConfig sackDisplay = new SackDisplayConfig();
 
-    public static class SackDisplay {
+    public static class SackDisplayConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show contained items inside a sack inventory.")
@@ -165,10 +160,20 @@ public class InventoryConfig {
         public boolean enabled = true;
 
         @Expose
+        @ConfigOption(
+            name = "Highlight Full",
+            desc = "Highlight items that are full in red.\n" +
+                "§eDoes not need the option above to be enabled."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean highlightFull = true;
+
+        @Expose
         @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers.\n" +
-                "§eDefault: §72,240/2.2k\n" +
-                "§eFormatted: §72.2k/2.2k\n" +
-                "§eUnformatted: §72,240/2,200")
+            "§eDefault: §72,240/2.2k\n" +
+            "§eFormatted: §72.2k/2.2k\n" +
+            "§eUnformatted: §72,240/2,200")
         @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
         public int numberFormat = 1;
 
@@ -228,10 +233,16 @@ public class InventoryConfig {
 
     public static class ChestValueConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enabled estimated value of chest")
+        @ConfigOption(name = "Enabled", desc = "Enable estimated value of chest.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enableInDungeons = false;
 
         @Expose
         @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")

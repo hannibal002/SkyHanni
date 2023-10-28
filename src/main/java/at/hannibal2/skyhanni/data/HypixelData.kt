@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 class HypixelData {
+    // TODO USE SH-REPO
     private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
     private val westVillageFarmArea = AxisAlignedBB(-54.0, 69.0, -115.0, -40.0, 75.0, -127.0)
     private val howlingCaveArea = AxisAlignedBB(-401.0, 50.0, -104.0, -337.0, 90.0, 36.0)
@@ -102,6 +104,7 @@ class HypixelData {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
                 HypixelJoinEvent().postAndCatch()
+                SkyHanniMod.repo.displayRepoStatus(true)
             }
         }
         if (!LorenzUtils.onHypixel) return

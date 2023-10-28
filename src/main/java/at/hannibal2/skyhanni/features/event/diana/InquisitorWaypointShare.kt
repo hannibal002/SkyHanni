@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.diana
 
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
@@ -30,10 +29,11 @@ import kotlin.time.Duration.Companion.seconds
 
 object InquisitorWaypointShare {
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
+
+    // TODO USE SH-REPO
     private val partyPattern =
         "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
     private val diedPattern = "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!".toPattern()
-
     private var time = 0L
     private var testTime = 0L
     private var lastInquisitorMessage = ""
@@ -249,7 +249,7 @@ object InquisitorWaypointShare {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && config.enabled
+    fun isEnabled() = DianaAPI.featuresEnabled() && config.enabled
 
     fun maybeRemove(playerName: String) {
         if (inquisitorsNearby.isEmpty()) {

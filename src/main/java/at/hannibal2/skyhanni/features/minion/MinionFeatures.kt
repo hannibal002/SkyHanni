@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
@@ -96,14 +98,14 @@ class MinionFeatures {
     fun onRenderLastClickedMinion(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!config.lastClickedMinionDisplay) return
+        if (!config.lastClickedMinion.display) return
 
-        val special = config.lastOpenedMinionColor
+        val special = config.lastClickedMinion.color
         val color = Color(SpecialColour.specialToChromaRGB(special), true)
 
         val loc = lastMinion
         if (loc != null) {
-            val time = config.lastOpenedMinionTime * 1_000
+            val time = config.lastClickedMinion.time * 1_000
             if (lastMinionOpened + time > System.currentTimeMillis()) {
                 event.drawWaypointFilled(
                     loc.add(-0.5, 0.0, -0.5),
@@ -231,7 +233,7 @@ class MinionFeatures {
 
         val message = event.message
         if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-                minions?.get(lastMinion)?.let {
+            minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
 
@@ -243,14 +245,14 @@ class MinionFeatures {
             lastMinionOpened = 0L
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
-                minions = minions?.editCopy {
-                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
-                        displayName = newMinionName
-                        lastClicked = 0
-                    }
+            minions = minions?.editCopy {
+                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = newMinionName
+                    lastClicked = 0
                 }
-                newMinion = null
-                newMinionName = null
+            }
+            newMinion = null
+            newMinionName = null
         }
 
         minionUpgradePattern.matchMatcher(message) {
@@ -268,14 +270,13 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val playerLocation = LocationUtils.playerLocation()
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
         val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.add(0.0, 1.0, 0.0)
-            if (!LocationUtils.canSee(playerEyeLocation, location)) continue
+            if (!location.canBeSeen()) continue
 
             val lastEmptied = minion.value.lastClicked
-            if (playerLocation.distance(location) >= config.distance) continue
+            if (playerLocation.distance(location) >= config.emptiedTime.distance) continue
 
             if (config.nameDisplay) {
                 val displayName = minion.value.displayName
@@ -285,7 +286,7 @@ class MinionFeatures {
                 event.drawString(location.add(0.0, 0.65, 0.0), name, true)
             }
 
-            if (config.emptiedTimeDisplay && lastEmptied != 0L) {
+            if (config.emptiedTime.display && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
                 val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
@@ -337,5 +338,14 @@ class MinionFeatures {
             minions = mutableMapOf()
             LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "minions.lastClickedMinionDisplay", "minions.lastClickedMinion.display")
+        event.move(3, "minions.lastOpenedMinionColor", "minions.lastClickedMinion.color")
+        event.move(3, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
+        event.move(3, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
+        event.move(3, "minions.distance", "minions.emptiedTime.distance")
     }
 }

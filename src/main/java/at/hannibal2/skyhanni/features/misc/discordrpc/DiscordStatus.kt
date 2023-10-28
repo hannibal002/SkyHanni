@@ -19,15 +19,19 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
 
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
@@ -90,6 +94,8 @@ private fun getVisitingName(): String {
     }
     return "Someone"
 }
+
+var beenAfkFor = SimpleTimeMark.now()
 
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
 
@@ -179,23 +185,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     TIME({
-        fun formatNum(num: Int): Int {
-            val rem = num % 10
-            var returnNum = num - rem // floor()
-            if (returnNum == 0) {
-                returnNum = "0$num".toInt()
-                /**
-                 * and this is so that if the minute value is ever
-                 * a single digit (0 after being floored), it displays as 00 because 12:0pm looks bad
-                 */
-            }
-            return returnNum
-        }
-
-        val date: SkyBlockTime = SkyBlockTime.now()
-        val hour = if (date.hour > 12) date.hour - 12 else date.hour
-        val timeOfDay = if (date.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        "${SkyBlockTime.monthName(date.month)} ${date.day}${SkyBlockTime.daySuffix(date.day)}, $hour:${formatNum(date.minute)}$timeOfDay" // Early Winter 1st, 12:00pm
+        SkyBlockTime.now().formatted()
     }),
 
     PROFILE({
@@ -294,7 +284,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         } ?: 100 // percentage to next milestone
 
         if (tier != null) {
-            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected"})"
+            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
         } else AutoStatus.CROP_MILESTONES.placeholderText
     }),
 
@@ -378,6 +368,11 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                 "$floor Kills: $amountKills ($time)"
             }
         }
+    }),
+
+    AFK({
+        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince().format(maxUnits = 1, longName = true)}"
+        else AutoStatus.AFK.placeholderText
     })
     ;
 
@@ -387,11 +382,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         return ""
     }
+
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
     CROP_MILESTONES("Not farming!", DiscordStatus.CROP_MILESTONES),
     SLAYER("Planning to do a slayer quest", DiscordStatus.SLAYER),
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
-    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS);
+    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
+    AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
+    ;
 }

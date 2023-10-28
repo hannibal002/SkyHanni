@@ -4,19 +4,27 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.jsonobjects.ContributorListJson
 import com.google.common.cache.CacheBuilder
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
+
+    // TODO USE SH-REPO
+    private val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
@@ -29,8 +37,6 @@ object AdvancedPlayerList {
         if (LorenzUtils.inDungeons) return original
 
         if (ignoreCustomTabList()) return original
-
-        val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
         val currentData = mutableMapOf<String, PlayerData>()
         newList.add(original.first())
@@ -66,6 +72,15 @@ object AdvancedPlayerList {
                             playerData.ironman = true
                         } else {
                             playerData.bingoLevel = BingoAPI.getRank(line)
+                        }
+                        if (IslandType.CRIMSON_ISLE.isInIsland()) {
+                            playerData.faction = if (line.contains("§c⚒")) {
+                                CrimsonIsleFaction.BARBARIAN
+                            } else if (line.contains("§5ቾ")) {
+                                CrimsonIsleFaction.MAGE
+                            } else {
+                                CrimsonIsleFaction.NONE
+                            }
                         }
                     } else {
                         playerData.nameSuffix = ""
@@ -116,17 +131,16 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debugEnabled && KeyboardManager.isControlKeyDown()
+        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isControlKeyDown()
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
     }
 
-    private val listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding = listOf(
-        "hannibal2",
-        "CalMWolfs",
-        "HiZe_",
-        "lrg89",
-        "Eisengolem",
-    )
+    private var contributors: List<String> = emptyList()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        contributors = event.getConstant<ContributorListJson>("ContributorList").usernames
+    }
 
     private fun createCustomName(data: PlayerData): String {
         val playerName = if (config.useLevelColorForName) {
@@ -146,8 +160,12 @@ object AdvancedPlayerList {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
-        if (config.markSkyHanniDevs && data.name in listOfSkyHanniDevsOrPeopeWhoKnowALotAboutModdingSeceneButAreBadInCoding) {
+        if (config.markSkyHanniContributors && data.name in contributors) {
             suffix += " §c:O"
+        }
+
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
+            suffix += data.faction.icon
         }
 
         return "$level $playerName ${suffix.trim()}"
@@ -203,5 +221,12 @@ object AdvancedPlayerList {
         var levelText: String = "?"
         var ironman: Boolean = false
         var bingoLevel: Int? = null
+        var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
+    }
+
+    enum class CrimsonIsleFaction(val icon: String) {
+        BARBARIAN(" §c⚒"),
+        MAGE(" §5ቾ"),
+        NONE("")
     }
 }

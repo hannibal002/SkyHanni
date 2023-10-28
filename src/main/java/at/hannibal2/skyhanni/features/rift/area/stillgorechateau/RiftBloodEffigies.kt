@@ -34,6 +34,7 @@ class RiftBloodEffigies {
         5 to -1L,
     )
 
+    // TODO USE SH-REPO
     private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
 
     @SubscribeEvent
@@ -50,12 +51,11 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.locations?.let {
-            if (it.size != 6) {
-                error("Invalid rift effigies size: ${it.size} (expeced 6)")
-            }
-            locations = it
+        val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
+        if (newLocations.size != 6) {
+            error("Invalid rift effigies size: ${newLocations.size} (expeced 6)")
         }
+        locations = newLocations
     }
 
     @SubscribeEvent
@@ -95,7 +95,7 @@ class RiftBloodEffigies {
 
         for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 6.0)) {
             effigiesTimerPattern.matchMatcher(entity.name) {
-                val nearest = locations.sortedBy { it.distanceSq(entity.getLorenzVec()) }.firstOrNull() ?: return
+                val nearest = locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) } ?: return
                 val index = locations.indexOf(nearest)
 
                 val string = group("time")
