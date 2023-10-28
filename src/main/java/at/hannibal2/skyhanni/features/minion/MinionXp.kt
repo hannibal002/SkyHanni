@@ -65,6 +65,7 @@ class MinionXp {
             collectItemXpList.add("§4No Minion Storage Data")
             collectItemXpList.add("§6Open Storage to get Correct Value")
         }
+        collectItemXpList.add("")
     }
 
     private fun getStorageXpAndUpdateTotal(
@@ -175,11 +176,10 @@ class MinionXp {
     }
 
     private val xpInfoMap: HashMap<NEUInternalName, XpInfo> = hashMapOf(
-        //TODO Flowers
         "ABSOLUTE_ENDER_PEARL".asInternalName() to XpInfo(XpType.Combat, 7680.0),
         "LOG-2".asInternalName() to XpInfo(XpType.Foraging, 0.1),
-        "ALLIUM".asInternalName() to XpInfo(XpType.Foraging, 0.1),
-        "AZURE_BLUET".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE-2".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE-3".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "LOG-2".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "BLAZE_ROD".asInternalName() to XpInfo(XpType.Combat, 0.3),
         "COAL_BLOCK".asInternalName() to XpInfo(XpType.Mining, 2.7),
@@ -189,7 +189,7 @@ class MinionXp {
         "IRON_BLOCK".asInternalName() to XpInfo(XpType.Mining, 2.7),
         "QUARTZ_BLOCK".asInternalName() to XpInfo(XpType.Mining, 1.2),
         "BLOCK_OF_REDSTONE".asInternalName() to XpInfo(XpType.Mining, 1.8),
-        "BLUE_ORCHID".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE-1".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "BONE".asInternalName() to XpInfo(XpType.Combat, 0.2),
         "BOX_OF_SEEDS".asInternalName() to XpInfo(XpType.Farming, 2560.0),
         "BROWN_MUSHROOM".asInternalName() to XpInfo(XpType.Farming, 0.3),
@@ -206,7 +206,7 @@ class MinionXp {
         "COCOA_BEANS".asInternalName() to XpInfo(XpType.Farming, 0.2),
         "CONCENTRATED_STONE".asInternalName() to XpInfo(XpType.Mining, 33177.6),
         "CRUDE_GABAGOOL".asInternalName() to XpInfo(XpType.Combat, 0.0),
-        "DANDELION".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "YELLOW_FLOWER".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "LOG_2-1".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "DIAMOND".asInternalName() to XpInfo(XpType.Mining, 0.4),
         "EGG".asInternalName() to XpInfo(XpType.Farming, 0.2),
@@ -337,7 +337,7 @@ class MinionXp {
         "INK_SACK-4".asInternalName() to XpInfo(XpType.Mining, 0.1),
         "LAPIS_LAZULI_BLOCK".asInternalName() to XpInfo(XpType.Mining, 0.9),
         "LEATHER".asInternalName() to XpInfo(XpType.Farming, 0.2),
-        "LILAC".asInternalName() to XpInfo(XpType.Foraging, 0.2),
+        "DOUBLE_PLANT-1".asInternalName() to XpInfo(XpType.Foraging, 0.2),
         "MAGMA_CREAM".asInternalName() to XpInfo(XpType.Combat, 0.2),
         "MELON".asInternalName() to XpInfo(XpType.Farming, 0.1),
         "MELON_BLOCK".asInternalName() to XpInfo(XpType.Farming, 0.9),
@@ -350,14 +350,14 @@ class MinionXp {
         "OBSIDIAN".asInternalName() to XpInfo(XpType.Combat, 0.4),
         "OBSIDIAN".asInternalName() to XpInfo(XpType.Mining, 0.4),
         "OMEGA_ENCHANTED_EGG".asInternalName() to XpInfo(XpType.Farming, 149040.0),
-        "ORANGE_TULIP".asInternalName() to XpInfo(XpType.Foraging, 0.1),
-        "OXEYE_DAISY".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE-5".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE-8".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "PACKED_ICE".asInternalName() to XpInfo(XpType.Mining, 4.5),
-        "PEONY".asInternalName() to XpInfo(XpType.Foraging, 0.2),
-        "PINK_TULIP".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "DOUBLE_PLANT-5".asInternalName() to XpInfo(XpType.Foraging, 0.2),
+        "RED_ROSE-7".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "POISONOUS_POTATO".asInternalName() to XpInfo(XpType.Combat, 0.0),
         "POLISHED_PUMPKIN".asInternalName() to XpInfo(XpType.Farming, 7680.0),
-        "POPPY".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "POTATO".asInternalName() to XpInfo(XpType.Farming, 0.1),
         "PRISMARINE_CRYSTALS".asInternalName() to XpInfo(XpType.Fishing, 0.5),
         "PRISMARINE_SHARD".asInternalName() to XpInfo(XpType.Fishing, 0.5),
@@ -377,8 +377,8 @@ class MinionXp {
         "RED_MUSHROOM".asInternalName() to XpInfo(XpType.Farming, 0.3),
         "RED_MUSHROOM_BLOCK".asInternalName() to XpInfo(XpType.Farming, 0.3),
         "RED_SAND".asInternalName() to XpInfo(XpType.Mining, 0.2),
-        "RED_TULIP".asInternalName() to XpInfo(XpType.Foraging, 0.1),
-        "ROSE_BUSH".asInternalName() to XpInfo(XpType.Foraging, 0.2),
+        "RED_ROSE-4".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "DOUBLE_PLANT-4".asInternalName() to XpInfo(XpType.Foraging, 0.2),
         "ROTTEN_FLESH".asInternalName() to XpInfo(XpType.Combat, 0.3),
         "SAND".asInternalName() to XpInfo(XpType.Mining, 0.2),
         "SEEDS".asInternalName() to XpInfo(XpType.Farming, 0.1),
@@ -392,13 +392,13 @@ class MinionXp {
         "STONE".asInternalName() to XpInfo(XpType.Mining, 0.1),
         "STRING".asInternalName() to XpInfo(XpType.Combat, 0.2),
         "SUGAR_CANE".asInternalName() to XpInfo(XpType.Farming, 0.1),
-        "SUNFLOWER".asInternalName() to XpInfo(XpType.Foraging, 0.2),
+        "DOUBLE_PLANT".asInternalName() to XpInfo(XpType.Foraging, 0.2),
         "SUPER_EGG".asInternalName() to XpInfo(XpType.Farming, 16560.0),
         "TIGHTLY_TIED_HAY_BALE".asInternalName() to XpInfo(XpType.Farming, 41472.0),
         "WHEAT".asInternalName() to XpInfo(XpType.Farming, 0.2),
-        "WHITE_TULIP".asInternalName() to XpInfo(XpType.Foraging, 0.1),
+        "RED_ROSE-6".asInternalName() to XpInfo(XpType.Foraging, 0.1),
         "WOOL".asInternalName() to XpInfo(XpType.Farming, 0.1),
-        "LUSH_BERBERIS".asInternalName() to XpInfo(XpType.Farming, 0.1), //TODO
-        "ENCHANTED_LUSH_BERBERIS".asInternalName() to XpInfo(XpType.Farming, 0.1), //TODO
+        "LUSH_BERBERIS".asInternalName() to XpInfo(XpType.Farming, 10.0),
+        "ENCHANTED_LUSH_BERBERIS".asInternalName() to XpInfo(XpType.Farming, 1600.0),
     )
 }
