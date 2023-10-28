@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -54,6 +55,8 @@ class DamageIndicatorManager {
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
+
+    private val enderSlayerHitsNumberPattern = "§c☠ §bVoidgloom Seraph \\w+ §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
     companion object {
         private var data = mapOf<UUID, EntityData>()
@@ -162,8 +165,8 @@ class DamageIndicatorManager {
             var healthText = data.healthText
             val delayedStart = data.delayedStart
             if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
-                    val delay = delayedStart - System.currentTimeMillis()
-                    healthText = formatDelay(delay)
+                val delay = delayedStart - System.currentTimeMillis()
+                healthText = formatDelay(delay)
             }
 
             val location = if (data.dead && data.deathLocation != null) {
@@ -356,7 +359,7 @@ class DamageIndicatorManager {
             entityData.timeLastTick = System.currentTimeMillis()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
-            e.printStackTrace()
+            ErrorManager.logError(e, "Error checking damage indicator entity $entity")
             return null
         }
     }
@@ -615,7 +618,6 @@ class DamageIndicatorManager {
             entityData.namePrefix = ""
         }
 
-
         //Hit phase
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
@@ -626,15 +628,9 @@ class DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_4 -> 100
                 else -> 100
             }
-            val name = armorStandHits.name.removeColor()
-
-            // TODO replace this super ugly workaround with regex
-            val text = name.between("Seraph ", " Hit")
-            val hits = try {
-                text.toInt()
-            } catch (e: NumberFormatException) {
-                text.substring(2).toInt()
-            }
+            val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name) {
+                group("hits").toInt()
+            } ?: error("No hits number found in ender slayer name '${armorStandHits.name}'")
 
             return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
@@ -778,7 +774,6 @@ class DamageIndicatorManager {
 
     private fun grabData(entity: EntityLivingBase): EntityData? {
         if (data.contains(entity.uniqueID)) return data[entity.uniqueID]
-
 
         val entityResult = mobFinder?.tryAdd(entity) ?: return null
 
