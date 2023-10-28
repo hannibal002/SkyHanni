@@ -71,6 +71,10 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
+    @Deprecated(
+        "Create a Pattern object instead and use matchMatcher()",
+        ReplaceWith("String.toPattern().matchMatcher()")
+    )
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     private fun String.removeAtBeginning(text: String): String =
