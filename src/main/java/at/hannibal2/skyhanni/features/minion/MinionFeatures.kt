@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
@@ -269,11 +270,10 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val playerLocation = LocationUtils.playerLocation()
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
         val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.add(0.0, 1.0, 0.0)
-            if (!LocationUtils.canSee(playerEyeLocation, location)) continue
+            if (!location.canBeSeen()) continue
 
             val lastEmptied = minion.value.lastClicked
             if (playerLocation.distance(location) >= config.emptiedTime.distance) continue

@@ -459,7 +459,7 @@ object GhostCounter {
         val inventoryName = event.inventoryName
         if (inventoryName != "Bestiary ➜ Dwarven Mines") return
         val stacks = event.inventoryItems
-        val ghostStack = stacks[10] ?: return
+        val ghostStack = stacks.values.find { it.displayName.contains("Ghost") } ?: return
         val bestiaryNextLevel =
             if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8)
                 .romanToDecimal() + 1

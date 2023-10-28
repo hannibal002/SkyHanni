@@ -11,10 +11,11 @@ import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -54,11 +55,7 @@ class EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && canSee(
-                LocationUtils.playerEyeLocation(),
-                entity.getLorenzVec()
-            )
-        ) {
+        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(15.0)) {
             endermenWithBeacons.add(entity)
             logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
@@ -66,7 +63,7 @@ class EndermanSlayerFeatures {
         if (entity is EntityArmorStand) {
             if (showBeacon()) {
                 val stack = entity.inventory[4] ?: return
-                if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                if (stack.name == "Beacon" && entity.canBeSeen(15.0)) {
                     flyingBeacons = flyingBeacons.editCopy {
                         add(entity)
                     }
@@ -86,7 +83,7 @@ class EndermanSlayerFeatures {
 
     private fun hasBeaconInHand(enderman: EntityEnderman) = enderman.getBlockInHand()?.block == Blocks.beacon
 
-    private fun canSee(a: LorenzVec, b: LorenzVec) = LocationUtils.canSee(a, b) || a.distance(b) < 15
+    private fun canSee(b: LorenzVec) = b.canBeSeen(15.0)
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
@@ -223,11 +220,7 @@ class EndermanSlayerFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(
-            3,
-            "slayer.endermanBeaconConfig.highlightBeacon",
-            "slayer.endermen.endermanBeaconConfig.highlightBeacon"
-        )
+        event.move(3, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.endermen.endermanBeaconConfig.highlightBeacon")
         event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.endermen.endermanBeaconConfig.beaconColor")
         event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.endermen.endermanBeaconConfig.showWarning")
         event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.endermen.endermanBeaconConfig.showLine")
