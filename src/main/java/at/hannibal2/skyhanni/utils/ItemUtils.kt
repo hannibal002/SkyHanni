@@ -117,6 +117,7 @@ object ItemUtils {
     }
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalName()"))
     fun ItemStack.getInternalName_old() = getInternalName().asString()
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE

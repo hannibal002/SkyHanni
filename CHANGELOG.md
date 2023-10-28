@@ -109,6 +109,8 @@
 + Added support for tab complete item IDs in the Hypixel command /viewrecipe. - hannibal2
     + Only items with recipes are tab completed.
 + Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
++ Disabled clicks on SkyHanni GUIs while inside NEU's or Skytils profile viewer. - hannibal2
++ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks sometimes. - hannibal2
 
 ### Bug Fixes
 
@@ -152,6 +154,12 @@
   anymore. - Thunderblade73
 + Fixed potential crash with future neu version. - CalMWolfs
 + Added missing beep sound to rejoin SkyBlock after kick warning. - hannibal2
++ Fixed Fire Veil particle hider not working. - cimbraien
++ Fixed a bug with the Trophy Sack Display reading number. - HiZe
++ Fixed Ghost Counter item stack detection. - HiZe
++ Fixed Farming Weight Display shows 0 weight wrongly sometimes. - Kaeso
++ Fixed damage indicator errors during Enderman Slayer. - hannibal2
++ Fixed weird error messages in the Damage Indicator. - hannibal2
 
 #### Config
 
@@ -168,6 +176,7 @@
 + Add Repo TODOs to regex patterns. - walker
 + Moved many patterns from function scope to members. - hannibal2
 + Avoid hardcoded dispatcher. - walker
++ Created and used Entity.canBeSeen and LorenzVec.canBeSeen. - hannibal2
 
 ## Version 0.20
 

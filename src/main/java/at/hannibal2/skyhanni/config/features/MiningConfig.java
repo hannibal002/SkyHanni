@@ -52,6 +52,11 @@ public class MiningConfig {
                 "§b250,420 §aMithril Powder §7(350,000/h)",
                 "§b250,420 §dGemstone Powder §7(350,000/h)",
                 "",
+
+                "§b129 §bDiamond Essence §7(600/h)",
+                "§b234 §6Gold Essence §7(700/h)",
+                "",
+              
                 "§50§7-§90§7-§a0§f-0 §cRuby Gemstone",
                 "§50§7-§90§7-§a0§f-0 §bSapphire Gemstone",
                 "§50§7-§90§7-§a0§f-0 §6Amber Gemstone",
