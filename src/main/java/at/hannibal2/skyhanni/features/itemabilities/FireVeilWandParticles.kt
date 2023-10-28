@@ -27,8 +27,7 @@ class FireVeilWandParticles {
         if (!LorenzUtils.inSkyBlock) return
         if (config.display == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
-
-        if (event.type == EnumParticleTypes.FLAME && event.count == 1 && event.speed == 0f && event.offset.isZero()) {
+        if (event.type == EnumParticleTypes.FLAME && event.speed == 0.55f) {
             event.isCanceled = true
         }
     }

@@ -12,6 +12,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
     private val config get() = RiftAPI.config.timer
+
+    // TODO USE SH-REPO
+    val pattern = "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern()
+
     private var display = emptyList<String>()
     private var maxTime = 0L
     private var latestTime = 0L
@@ -28,9 +32,8 @@ class RiftTimer {
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
 
-        val message = event.message
-        for (entry in message.split("     ")) {
-            "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern().matchMatcher(entry) {
+        for (entry in event.message.split("     ")) {
+            pattern.matchMatcher(entry) {
                 val color = group("color")
                 if (color == "7") {
                     val currentTime = getTime(group("time"))

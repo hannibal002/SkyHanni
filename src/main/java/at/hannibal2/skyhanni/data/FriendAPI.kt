@@ -17,6 +17,8 @@ import java.util.UUID
 
 class FriendAPI {
     private val file = File("config/skyhanni/friends.json")
+
+    // TODO USE SH-REPO
     private val removedFriendPattern =
         ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*".toPattern()
     private val addedFriendPattern = "§aYou are now friends with (?<name>.*)".toPattern()
