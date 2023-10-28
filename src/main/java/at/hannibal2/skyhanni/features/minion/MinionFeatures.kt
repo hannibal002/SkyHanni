@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -60,6 +59,7 @@ class MinionFeatures {
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+    private val minionCoinPattern = "§aYou received §r§6(.*) coins§r§a!".toPattern()
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
@@ -232,11 +232,12 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-            minions?.get(lastMinion)?.let {
-                it.lastClicked = System.currentTimeMillis()
+        minionCoinPattern.matchMatcher(message) {
+            if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+                minions?.get(lastMinion)?.let {
+                    it.lastClicked = System.currentTimeMillis()
+                }
             }
-
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
             minions = minions?.editCopy { remove(lastMinion) }
