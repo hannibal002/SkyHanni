@@ -40,6 +40,7 @@ class ChestValue {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (LorenzUtils.inDungeons && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
         if (inInventory) {
             config.position.renderStringsAndItems(
