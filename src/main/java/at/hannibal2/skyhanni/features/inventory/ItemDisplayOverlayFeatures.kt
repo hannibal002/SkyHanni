@@ -18,8 +18,10 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
+    // TODO USE SH-REPO
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
+    private val masterSkullPattern = "(.*)Master Skull - Tier .".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -39,8 +41,10 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(1) && itemName.matchRegex("(.*)Master Skull - Tier .")) {
-            return itemName.substring(itemName.length - 1)
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(1)) {
+            masterSkullPattern.matchMatcher(itemName) {
+                return itemName.substring(itemName.length - 1)
+            }
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
