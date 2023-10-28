@@ -71,11 +71,12 @@ import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
-import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
+import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash
@@ -190,6 +191,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
+import at.hannibal2.skyhanni.features.misc.FandomWikiFromMenus
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
@@ -317,7 +319,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.12",
+    version = "0.21.Beta.13",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -391,6 +393,7 @@ class SkyHanniMod {
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
+        loadModule(FandomWikiFromMenus())
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
@@ -418,7 +421,7 @@ class SkyHanniMod {
         loadModule(MinionFeatures())
         loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
-        loadModule(WikiCommand())
+        loadModule(WikiManager())
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
         loadModule(ViewRecipeCommand)
@@ -607,6 +610,7 @@ class SkyHanniMod {
         loadModule(SkyBlockKickDuration())
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
+        loadModule(ArrowTrail())
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
