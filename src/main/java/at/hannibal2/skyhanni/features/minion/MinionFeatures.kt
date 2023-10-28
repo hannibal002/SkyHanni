@@ -232,11 +232,9 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val message = event.message
-        minionCoinPattern.matchMatcher(message) {
-            if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-                minions?.get(lastMinion)?.let {
-                    it.lastClicked = System.currentTimeMillis()
-                }
+        if (minionCoinPattern.matchMatcher(message) { } != null && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+            minions?.get(lastMinion)?.let {
+                it.lastClicked = System.currentTimeMillis()
             }
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {

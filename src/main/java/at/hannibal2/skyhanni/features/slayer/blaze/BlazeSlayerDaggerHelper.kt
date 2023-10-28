@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
@@ -44,11 +43,7 @@ class BlazeSlayerDaggerHelper {
         if (!config.hideDaggerWarning) return
 
         val message = event.message
-        attunementPattern.matchMatcher(message) {
-            event.blockedReason = "blaze_slayer_dagger"
-        }
-
-        if (message == "§cYour hit was reduced by Hellion Shield!") {
+        if (attunementPattern.matchMatcher(message) {} != null || message == "§cYour hit was reduced by Hellion Shield!") {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }

@@ -30,18 +30,11 @@ class CurrentPetDisplay {
         val message = event.message
         var blocked = false
 
-        autoPetEquippedPattern.matchMatcher(message) {
-            config.currentPet = message.between("] ", "§e!")
-            blocked = true
-        }
-
-        petSummonedPattern.matchMatcher(message) {
-            config.currentPet = message.between("your §r", "§r§a")
-            blocked = true
-        }
-
-        petDespawnedPattern.matchMatcher(message) {
-            config.currentPet = ""
+        if (autoPetEquippedPattern.matchMatcher(message) {
+                config.currentPet = message.between("] ", "§e!")
+            } != null || petSummonedPattern.matchMatcher(message) {
+                config.currentPet = message.between("your §r", "§r§a")
+            } != null || petDespawnedPattern.matchMatcher(message) { config.currentPet = "" } != null) {
             blocked = true
         }
 
