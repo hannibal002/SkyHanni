@@ -12,7 +12,6 @@ import java.util.regex.Pattern
 
 class ChatFilter {
     private val config get() = SkyHanniMod.feature.chat.filterType
-    private val devConfig get() = SkyHanniMod.feature.dev.debug.debugMessages
 
     // Regex Patterns & Messages
     // Lobby Messages
@@ -350,11 +349,6 @@ class ChatFilter {
         if (blockReason == "") return
 
         event.blockedReason = blockReason
-
-        if (devConfig.blockedMessages) {
-            LorenzUtils.debug("Blocked next message with reason \"$blockReason\":")
-            LorenzUtils.debug(event.message)
-        }
     }
 
     /**
