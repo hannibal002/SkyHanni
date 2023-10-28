@@ -30,7 +30,6 @@ class BazaarApi {
         val holder = BazaarDataHolder()
         var inBazaarInventory = false
         private var currentSearchedItem = ""
-        private val bazaarOrderPattern = "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
 
         var currentlyOpenedProduct: NEUInternalName? = null
 
@@ -113,7 +112,9 @@ class BazaarApi {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!inBazaarInventory) return
-        bazaarOrderPattern.matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
+        // TODO USE SH-REPO
+        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
+            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
