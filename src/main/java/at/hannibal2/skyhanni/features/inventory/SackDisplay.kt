@@ -97,7 +97,7 @@ object SackDisplay {
                         when (config.numberFormat) {
                             0 -> "$colorCode${stored}§7/§b${total}"
                             1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                            2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
+                            2 -> "$colorCode${stored}§7/§b${total.formatNumber().addSeparators()}"
                             else -> "$colorCode${stored}§7/§b${total}"
                         }
                     )
@@ -111,7 +111,7 @@ object SackDisplay {
                                 listOf(
                                     "§6Magmafish: §b${magmaFish.addSeparators()}",
                                     "§6Magmafish value: §b${price / magmaFish}",
-                                    "§6Magmafish per: §b${magmaFish / stored.toLong()}"
+                                    "§6Magmafish per: §b${magmaFish / stored.formatNumber()}"
 
                                 )
                             )
