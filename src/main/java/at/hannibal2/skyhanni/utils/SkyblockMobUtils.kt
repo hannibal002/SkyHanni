@@ -102,7 +102,7 @@ object SkyblockMobUtils {
         if (entity is EntityOtherPlayerMP && (entity.isRealPlayer() || entity.isDisplayNPC())) return false
         if (entity is EntityPlayerSP) return false
         if (entity is EntityWither && (entity.entityId < 0 || entity.name == "Wither")) return false
-        if (entity is EntityVillager) return false //TODO Exclude Jerrys from this Rule
+        if (entity is EntityVillager && entity.maxHealth > 7) return false
         return true
     }
 
