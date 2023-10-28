@@ -93,6 +93,10 @@ dependencies {
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
 //    testImplementation(kotlin("test"))
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha22:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
 }
