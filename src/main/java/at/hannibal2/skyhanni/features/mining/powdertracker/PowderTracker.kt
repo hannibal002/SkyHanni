@@ -37,6 +37,8 @@ class PowderTracker {
     private var isGrinding = false
     private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val mithrilInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
+    private val diamondEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
+    private val goldEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var powderTimer = ""
@@ -57,6 +59,8 @@ class PowderTracker {
             if (!isEnabled()) return@fixedRateTimer
             calculateResourceHour(gemstoneInfo)
             calculateResourceHour(mithrilInfo)
+            calculateResourceHour(diamondEssenceInfo)
+            calculateResourceHour(goldEssenceInfo)
             calculateResourceHour(chestInfo)
         }
     }
@@ -151,6 +155,12 @@ class PowderTracker {
         mithrilInfo.perHour = 0.0
         mithrilInfo.stoppedChecks = 0
         mithrilInfo.perMin.clear()
+        diamondEssenceInfo.perHour = 0.0
+        diamondEssenceInfo.stoppedChecks = 0
+        diamondEssenceInfo.perMin.clear()
+        goldEssenceInfo.perHour = 0.0
+        goldEssenceInfo.stoppedChecks = 0
+        goldEssenceInfo.perMin.clear()
         chestInfo.perHour = 0.0
         chestInfo.stoppedChecks = 0
         chestInfo.perMin.clear()
@@ -166,6 +176,8 @@ class PowderTracker {
     private fun saveAndUpdate() {
         calculateGemstone()
         calculateMithril()
+        calculateDiamondEssence()
+        calculateGoldEssence()
         calculateChest()
         display = formatDisplay(drawDisplay())
     }
@@ -212,6 +224,20 @@ class PowderTracker {
         addAsSingletonList("§b$gemstoneCount ${gemstone.displayName} §7($gemstonePerHour/h)")
 
         addAsSingletonList("")
+
+        val diamondEssence = PowderChestReward.entries[46]
+        val diamondEssenceCount = rewards.getOrDefault(diamondEssence, 0).addSeparators()
+        val diamondEssencePerHour = if (diamondEssenceInfo.perHour < 0) 0 else diamondEssenceInfo.perHour.toInt().addSeparators()
+        addAsSingletonList("§b$diamondEssenceCount ${diamondEssence.displayName} §7($diamondEssencePerHour/h)")
+
+        val goldEssence = PowderChestReward.entries[47]
+        val goldEssenceCount = rewards.getOrDefault(goldEssence, 0).addSeparators()
+        val goldEssencePerHour = if (goldEssenceInfo.perHour < 0) 0 else goldEssenceInfo.perHour.toInt().addSeparators()
+        addAsSingletonList("§b$goldEssenceCount ${goldEssence.displayName} §7($goldEssencePerHour/h)")
+
+
+        addAsSingletonList("")
+
 
         for ((gem, color) in gemstones) {
             var totalGemstone = 0L
@@ -293,6 +319,22 @@ class PowderTracker {
         val rewards = display.rewards
         mithrilInfo.estimated = 0
         mithrilInfo.estimated += rewards.getOrDefault(PowderChestReward.MITHRIL_POWDER, 0)
+    }
+
+    private fun calculateDiamondEssence(){
+        val both = currentLog() ?: return
+        val display = both.get(currentDisplayMode)
+        val rewards = display.rewards
+        diamondEssenceInfo.estimated = 0
+        diamondEssenceInfo.estimated += rewards.getOrDefault(PowderChestReward.DIAMOND_ESSENCE, 0)
+    }
+
+    private fun calculateGoldEssence(){
+        val both = currentLog() ?: return
+        val display = both.get(currentDisplayMode)
+        val rewards = display.rewards
+        goldEssenceInfo.estimated = 0
+        goldEssenceInfo.estimated += rewards.getOrDefault(PowderChestReward.GOLD_ESSENCE, 0)
     }
 
     private fun calculateChest() {
