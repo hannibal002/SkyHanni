@@ -666,6 +666,85 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Custom Scoreboard", desc = "")
+    @Accordion
+    public MiscConfig.CustomScoreboard customScoreboard = new MiscConfig.CustomScoreboard();
+
+    public static class CustomScoreboard {
+
+        @Expose
+        @ConfigOption(
+            name = "Enabled",
+            desc = "Show a custom scoreboard instead of the default one." //TODO: MAKE COOLER
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(
+            name = "Text Format",
+            desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+            exampleText = {
+                "§6§lSKYBLOCK",
+                "§7Profile",
+                "§ePurse",
+                "§eBank",
+                "§bBits",
+                "§cCopper",
+                "§aGems",
+                "",
+                "§7Location",
+                "§7Ingame Time",
+                "§7Current Server",
+                "§7Powder\n §fMithril: §254,646\n §fGemstone: §d51,234",
+                "",
+                "§cSlayer",
+                "§7Current Event",
+                "§7Current Mayor",
+                "",
+                "§cHeat",
+                "§9Party:\n- hannibal2\n- Moulberry\n- Vahvl\n- J10a1n15",
+                "§7Maxwell Power",
+                "§ewww.hypixel.net",
+            }
+        )
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20));
+
+        @Expose
+        @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
+        @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 25, // why do I even set it so high
+            minStep = 1
+        )
+        public Property<Integer> maxPartyList = Property.of(4);
+
+        @Expose
+        @ConfigOption(name = "Hide lines with no info", desc = "Hide lines that have no info to display, like hiding the party when not being in one.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideEmptyLines = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Info not relevant to location", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideIrrelevantLines = true;
+
+        @Expose
+        @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showMayorPerks = true;
+
+        @Expose
+        public Position position = new Position(10, 80, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -781,83 +860,4 @@ public class MiscConfig {
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Custom Scoreboard", desc = "")
-    @Accordion
-    public MiscConfig.CustomScoreboard customScoreboard = new MiscConfig.CustomScoreboard();
-
-    public static class CustomScoreboard {
-
-        @Expose
-        @ConfigOption(
-                name = "Enabled",
-                desc = "Show a custom scoreboard instead of the default one." //TODO: MAKE COOLER
-        )
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(
-                name = "Text Format",
-                desc = "Drag text to change the appearance of the overlay."
-        )
-        @ConfigEditorDraggableList(
-                exampleText = {
-                        "§6§lSKYBLOCK",
-                        "§7Profile",
-                        "§ePurse",
-                        "§eBank",
-                        "§bBits",
-                        "§cCopper",
-                        "§aGems",
-                        "",
-                        "§7Location",
-                        "§7Ingame Time",
-                        "§7Current Server",
-                        "§7Powder\n §fMithril: §254,646\n §fGemstone: §d51,234",
-                        "",
-                        "§cSlayer",
-                        "§7Current Event",
-                        "§7Current Mayor",
-                        "",
-                        "§cHeat",
-                        "§9Party:\n- hannibal2\n- Moulberry\n- Vahvl\n- J10a1n15",
-                        "§7Maxwell Power",
-                        "§ewww.hypixel.net",
-                }
-        )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20));
-
-        @Expose
-        @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
-        @ConfigEditorSlider(
-                minValue = 1,
-                maxValue = 25, // why do I even set it so high
-                minStep = 1
-        )
-        public Property<Integer> maxPartyList = Property.of(4);
-
-        @Expose
-        @ConfigOption(name = "Hide lines with no info", desc = "Hide lines that have no info to display, like hiding the party when not being in one.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideEmptyLines = true;
-
-        @Expose
-        @ConfigOption(name = "Hide Info not relevant to location", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideIrrelevantLines = true;
-
-        @Expose
-        @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean showMayorPerks = true;
-
-        @Expose
-        public Position position = new Position(10, 80, false, true);
-    }
 }
