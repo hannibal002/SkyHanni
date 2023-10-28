@@ -31,6 +31,7 @@ object ProfileStorageData {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onChat(event: LorenzChatEvent) {
+        // TODO USE SH-REPO
         "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern().matchMatcher(event.message) {
             nextProfile = group("name").lowercase()
             loaded = false

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
@@ -232,7 +233,7 @@ class MinionFeatures {
 
         val message = event.message
         if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-                minions?.get(lastMinion)?.let {
+            minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
 
@@ -244,14 +245,14 @@ class MinionFeatures {
             lastMinionOpened = 0L
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
-                minions = minions?.editCopy {
-                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
-                        displayName = newMinionName
-                        lastClicked = 0
-                    }
+            minions = minions?.editCopy {
+                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = newMinionName
+                    lastClicked = 0
                 }
-                newMinion = null
-                newMinionName = null
+            }
+            newMinion = null
+            newMinionName = null
         }
 
         minionUpgradePattern.matchMatcher(message) {
@@ -269,11 +270,10 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val playerLocation = LocationUtils.playerLocation()
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
         val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.add(0.0, 1.0, 0.0)
-            if (!LocationUtils.canSee(playerEyeLocation, location)) continue
+            if (!location.canBeSeen()) continue
 
             val lastEmptied = minion.value.lastClicked
             if (playerLocation.distance(location) >= config.emptiedTime.distance) continue

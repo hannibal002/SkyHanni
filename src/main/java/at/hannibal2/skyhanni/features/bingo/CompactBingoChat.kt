@@ -18,6 +18,7 @@ class CompactBingoChat {
     private val healthPattern = "   §r§7§8\\+§a.* §c❤ Health".toPattern()
     private val strengthPattern = "   §r§7§8\\+§a. §c❁ Strength".toPattern()
 
+    // TODO USE SH-REPO
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!config.enabled) return
