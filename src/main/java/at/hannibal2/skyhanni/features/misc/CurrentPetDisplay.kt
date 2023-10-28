@@ -12,31 +12,35 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
 
     // TODO USE SH-REPO
     private val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
+    private val autoPetEquippedPattern = "§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE".toPattern()
+    private val petSummonedPattern = "§aYou summoned your §r(.*)§r§a!".toPattern()
+    private val petDespawnedPattern = "§aYou despawned your §r(.*)§r§a!".toPattern()
+    private val selectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        val message = event.message
+        if (!LorenzUtils.inSkyBlock) return
         val config = ProfileStorageData.profileSpecific ?: return
+        val message = event.message
         var blocked = false
-        if (message.matchRegex("§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE")) {
+
+        autoPetEquippedPattern.matchMatcher(message) {
             config.currentPet = message.between("] ", "§e!")
             blocked = true
         }
 
-        if (!LorenzUtils.inSkyBlock) return
-
-        if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
+        petSummonedPattern.matchMatcher(message) {
             config.currentPet = message.between("your §r", "§r§a")
             blocked = true
         }
-        if (message.matchRegex("§aYou despawned your §r(.*)§r§a!")) {
+
+        petDespawnedPattern.matchMatcher(message) {
             config.currentPet = ""
             blocked = true
         }
@@ -52,7 +56,6 @@ class CurrentPetDisplay {
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
-        val selectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
         for (line in lore) {
             selectedPetPattern.matchMatcher(line) {
                 val newPet = group("pet")
