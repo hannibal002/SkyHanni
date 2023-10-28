@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -36,6 +35,7 @@ class BingoNextStepHelper {
     private val collectionPattern = "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.".toPattern()
     private val crystalPattern = "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.".toPattern()
     private val skillPattern = "Obtain level (?<level>.*) in the (?<skill>.*) Skill.".toPattern()
+    private val crystalFoundPattern = " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)".toPattern()
     private val rhysTaskName = "30x Enchanted Redstone (for Rhys)"
 
     companion object {
@@ -134,7 +134,7 @@ class BingoNextStepHelper {
 
         for (currentStep in currentSteps) {
             if (currentStep is ObtainCrystalStep) {
-                if (event.message.matchRegex(" *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)")) {
+                crystalFoundPattern.matchMatcher(event.message) {
                     nextMessageIsCrystal = true
                     return
                 }
