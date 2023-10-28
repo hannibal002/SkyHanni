@@ -116,6 +116,11 @@ private fun Throwable.getCustomStackTrace(full: Boolean, parent: List<String> = 
         }
     }
 
+    if (this === cause) {
+        add("Infinite recurring causes")
+        return@buildList
+    }
+
     cause?.let {
         addAll(it.getCustomStackTrace(full, this))
     }
