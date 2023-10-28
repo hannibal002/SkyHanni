@@ -143,7 +143,7 @@ class CustomScoreboard {
                 // Multiline support
                 if (it[0] == "§9Party"
                     || it[0].toString().contains(MayorElection.currentCandidate?.name ?: "")
-                    || it[0] == "§fPowder"
+                    || it[0].toString().contains("Powder")
                 ) {
                     for (item in it) {
                         newList.add(listOf(item))
@@ -184,7 +184,7 @@ class CustomScoreboard {
         lineMap[lobbyCodeIndex] = Collections.singletonList("§8$lobbyCode")
 
         val powderList = mutableListOf<Any>()
-        powderList.add("§fPowder")
+        powderList.add("§9§lPowder")
         powderList.add(" §7- §fMithril: §2$mithrilPowder")
         powderList.add(" §7- §fGemstone: §d$gemstonePowder")
         lineMap[powderIndex] = powderList
