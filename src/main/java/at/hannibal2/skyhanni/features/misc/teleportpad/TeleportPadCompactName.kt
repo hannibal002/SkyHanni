@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TeleportPadCompactName {
+    // TODO USE SH-REPO
     private val patternName = "§.✦ §aWarp To (?<name>.*)".toPattern()
     private val patternNoName = "§.✦ §cNo Destination".toPattern()
 

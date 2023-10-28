@@ -168,7 +168,13 @@ interface Renderable {
                 ToolTipData.lastSlot == null
             } else true
             val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
-            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen
+
+            val openGui = Minecraft.getMinecraft().currentScreen?.javaClass?.name ?: "none"
+            val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
+            val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+
+            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen &&
+                !isInNeuPv && !isInSkyTilsPv
 
             if (debug) {
                 if (!result) {
@@ -178,6 +184,8 @@ interface Renderable {
                     if (!isGuiPositionEditor) logger.log("isGuiPositionEditor")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
                     if (!isConfigScreen) logger.log("isConfigScreen")
+                    if (isInNeuPv) logger.log("isInNeuPv")
+                    if (isInSkyTilsPv) logger.log("isInSkyTilsPv")
                     logger.log("")
                 } else {
                     logger.log("allowed click")

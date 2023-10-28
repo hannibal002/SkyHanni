@@ -16,6 +16,8 @@ import java.util.Locale
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
+
+    // TODO USE SH-REPO
     private val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
