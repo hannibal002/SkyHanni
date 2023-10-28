@@ -39,7 +39,6 @@ class ChatFilter {
         // other
         "§aYou are still radiating with §bGenerosity§r§a!"
     )
-    private val lobbyMessagesStartsWith = emptyList<String>()
 
     // Warping
     private val warpingPatterns = listOf(
@@ -338,7 +337,6 @@ class ChatFilter {
         "lobby" to lobbyMessagesContains,
     )
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
-        "lobby" to lobbyMessagesStartsWith,
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith
     )
