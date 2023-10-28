@@ -152,7 +152,7 @@ object EntityUtils {
 
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence() ?: emptySequence()
+    }?.asSequence()?.filterNotNull() ?: emptySequence()
 
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 }

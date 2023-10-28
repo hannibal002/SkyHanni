@@ -69,8 +69,8 @@ object ErrorManager {
             cache.put(pair, Unit)
         }
 
-        val fullStackTrace = throwable.getExactStackTrace(true).joinToString("\n")
-        val stackTrace = throwable.getExactStackTrace(false).joinToString("\n").removeSpam()
+        val fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
+        val stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
         val randomId = UUID.randomUUID().toString()
 
         val rawMessage = message.removeColor()
@@ -85,7 +85,7 @@ object ErrorManager {
     }
 }
 
-private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
+private fun Throwable.getCustomStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
     add("Caused by " + javaClass.name + ": $message")
 
     val breakAfter = listOf(
@@ -94,6 +94,8 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
     val replace = mapOf(
         "io.mouberry,notenoughupdates" to "NEU",
         "at.hannibal2.skyhanni" to "SH",
+        "net.minecraft." to "MC.",
+        "net.minecraftforge.fml." to "FML.",
     )
 
     for (traceElement in stackTrace) {
@@ -115,7 +117,7 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
     }
 
     cause?.let {
-        addAll(it.getExactStackTrace(full, this))
+        addAll(it.getCustomStackTrace(full, this))
     }
 }
 
@@ -137,6 +139,9 @@ private fun String.removeSpam(): String {
         "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
         "at net.minecraft.launchwrapper.",
         "at net.fabricmc.devlaunchinjector.",
+        "at SH.events.LorenzEvent.postAndCatchAndBlock(LorenzEvent.kt:28)",
+        "at SH.events.LorenzEvent.postAndCatchAndBlock\$default(LorenzEvent.kt:18)",
+        "at SH.events.LorenzEvent.postAndCatch(LorenzEvent.kt:16)",
     )
     return split("\n").filter { line -> !ignored.any { line.contains(it) } }.joinToString("\n")
 }
