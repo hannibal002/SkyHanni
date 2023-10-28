@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
@@ -62,8 +63,9 @@ class MinionXp {
 
         collectItemXpList.addAll(xpTotal.map { (type, amount) -> collectMessage(type, amount) })
         if (missesStorage) {
-            collectItemXpList.add("§4No Minion Storage Data")
-            collectItemXpList.add("§6Open Storage to get Correct Value")
+            collectItemXpList.add("")
+            collectItemXpList.add("§cError: No Minion Storage Data")
+            collectItemXpList.add("§eOpen Storage to get Correct Value")
         }
         collectItemXpList.add("")
     }
@@ -118,7 +120,7 @@ class MinionXp {
     }
 
     private fun collectMessage(type: XpType, amount: Double) =
-        "§7Collect to get: §b${String.format("%.1f", amount)} §e${type.name} Xp"
+        "§7Collect to get: §b${amount.addSeparators()} §e${type.name} XP"
 
     private fun getHasStorage(minionPosition: LorenzVec): Boolean {
         val positionsToCheck = listOf(
@@ -155,7 +157,8 @@ class MinionXp {
 
     private fun addXpInfoToTooltip(event: ItemTooltipEvent) {
         xpItemMap[toPrimitiveItemStack(event.itemStack)]?.let {
-            event.toolTip.add(1, it)
+            event.toolTip.add("")
+            event.toolTip.add(it)
         }
     }
 
@@ -361,7 +364,7 @@ class MinionXp {
         "POTATO".asInternalName() to XpInfo(XpType.Farming, 0.1),
         "PRISMARINE_CRYSTALS".asInternalName() to XpInfo(XpType.Fishing, 0.5),
         "PRISMARINE_SHARD".asInternalName() to XpInfo(XpType.Fishing, 0.5),
-        "PUFFERFISH".asInternalName() to XpInfo(XpType.Fishing, 1.0),
+        "RAW_FISH-3".asInternalName() to XpInfo(XpType.Fishing, 1.0),
         "PUMPKIN".asInternalName() to XpInfo(XpType.Farming, 0.3),
         "RABBIT'S_FOOT".asInternalName() to XpInfo(XpType.Farming, 0.2),
         "RABBIT_HIDE".asInternalName() to XpInfo(XpType.Farming, 0.2),
