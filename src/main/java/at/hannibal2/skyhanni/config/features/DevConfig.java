@@ -28,6 +28,19 @@ public class DevConfig {
         public boolean enabled = false;
 
         @Expose
+        @ConfigOption(name = "Debug Messages", desc = "Configure Debug Messages in Chat")
+        @Accordion
+        public DebugMessagesConfig debugMessages = new DebugMessagesConfig();
+
+        public static class DebugMessagesConfig {
+            @Expose
+            @ConfigOption(name = "Blocked Messages", desc = "Show messages being blocked by the chat filter")
+            @ConfigEditorBoolean
+            public boolean blockedMessages = false;
+        }
+
+
+        @Expose
         @ConfigOption(name = "Command Logging", desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)")
         @ConfigEditorBoolean
         public boolean commandLogs = false;
