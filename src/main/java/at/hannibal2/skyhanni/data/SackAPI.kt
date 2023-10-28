@@ -163,7 +163,7 @@ object SackAPI {
                             val trophyRarityName = internal.substringAfterLast("_")
                             val info = TrophyFishManager.getInfo(trophyFishName)
                             val rarity = TrophyRarity.getByName(trophyRarityName) ?: TrophyRarity.BRONZE
-                            val filletValue = (info?.getFilletValue(rarity) ?: 0) * stored.toLong()
+                            val filletValue = (info?.getFilletValue(rarity) ?: 0) * stored.formatNumber()
                             item.magmaFish = filletValue
                             "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
                         } else {
