@@ -816,7 +816,7 @@ public class MiscConfig {
                         "§7Location",
                         "§7Ingame Time",
                         "§7Current Server",
-                        "§2Mithril §r/ §dGemstone §7Powder",
+                        "§7Powder\n §fMithril: §254,646\n §fGemstone: §d51,234",
                         "",
                         "§cSlayer",
                         "§7Current Event",

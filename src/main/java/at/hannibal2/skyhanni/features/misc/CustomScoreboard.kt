@@ -11,7 +11,7 @@
 //  - enums prob (why)
 //  - toggle between "<name> <count>" and "<count> <name>"
 //  - Hide default scoreboard
-//  - mayor color (from neu)
+//  - the things that arent done yet
 //
 // V2 RELEASE
 //  - Soulflow API
@@ -21,12 +21,18 @@
 //  - icons
 //  - beacon power
 //  - skyblock level
+//  - commissions
 //
 
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.*
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -51,6 +57,8 @@ class CustomScoreboard {
     private var location = "None"
     private var lobbyCode = "None"
     private var heat = "0"
+    private var mithrilPowder = "0"
+    private var gemstonePowder = "0"
 
     // Indexes for the scoreboard
     private var skyblockIndex = 0
@@ -96,6 +104,12 @@ class CustomScoreboard {
             if (line.startsWith(" Bank: §r§6")){
                 bank = line.removePrefix(" Bank: §r§6")
             }
+            if (line.startsWith(" §r§fMithril Powder: §r§2")){
+                mithrilPowder = line.removePrefix(" §r§fMithril Powder: §r§2")
+            }
+            if (line.startsWith(" §r§fGemstone Powder: §r§d")){
+                gemstonePowder = line.removePrefix(" §r§fGemstone Powder: §r§d")
+            }
         }
 
         for (line in ScoreboardData.sidebarLinesFormatted){
@@ -108,8 +122,8 @@ class CustomScoreboard {
             if (extractLobbyCode(line) is String ){
                 lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
             }
-            if (line.startsWith("Heat: §c♨")){
-                heat = line.removePrefix("Heat: §c♨")
+            if (line.startsWith("Heat: ")){
+                heat = line.removePrefix("Heat: ")
             }
             if (line.startsWith("Bits: §b")){
                 bits = line.removePrefix("Bits: §b")
@@ -129,6 +143,7 @@ class CustomScoreboard {
                 // Multiline support
                 if (it[0] == "§9Party"
                     || it[0].toString().contains(MayorElection.currentCandidate?.name ?: "")
+                    || it[0] == "§fPowder"
                 ) {
                     for (item in it) {
                         newList.add(listOf(item))
@@ -167,7 +182,13 @@ class CustomScoreboard {
         lineMap[locationIndex] = Collections.singletonList(location)
         lineMap[skyblockTimeIndex] = Collections.singletonList(SkyBlockTime.now().formatted(false))
         lineMap[lobbyCodeIndex] = Collections.singletonList("§8$lobbyCode")
-        lineMap[powderIndex] = Collections.singletonList("§2Mithril §r/§2Gemstone §7Powder") //todo: could be multiline, need to decide
+
+        val powderList = mutableListOf<Any>()
+        powderList.add("§fPowder")
+        powderList.add(" §7- §fMithril: §2$mithrilPowder")
+        powderList.add(" §7- §fGemstone: §d$gemstonePowder")
+        lineMap[powderIndex] = powderList
+
         lineMap[EMPTY_LINE2] = Collections.singletonList("<empty>")
 
         val slayerList = mutableListOf<Any>()
@@ -188,7 +209,7 @@ class CustomScoreboard {
         lineMap[mayorIndex] = mayorList
 
         lineMap[EMPTY_LINE3] = Collections.singletonList("<empty>")
-        lineMap[heatIndex] = Collections.singletonList("Heat: §c♨$heat")
+        lineMap[heatIndex] = Collections.singletonList(if(heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
 
         val partyList = mutableListOf<Any>()
         var partyCount = 0
