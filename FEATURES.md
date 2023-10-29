@@ -1,19 +1,10 @@
 # SkyHanni - List of all Features
 
 Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
-
-## Chat Filter
-
-- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message,
-  radiating generosity, Hypixel tournaments)
-- Hiding Empty messages.
-- Warping messages (Sending requests and switching servers)
-- Welcome Message when entering SkyBlock.
-- Powder Mining messages hider
-- Winter gift messages hider
-- Many other messages (Not separated into own categories yet)
+<details open><summary>
 
 ## Chat
+</summary>
 
 + Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
   player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
@@ -33,8 +24,26 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
++ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
+    + Will not break with emblems.
+    + Optional if left or right side of name.
+    + Should not break with other mods.
+
+#### Chat Filter
+
+- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message,
+  radiating generosity, Hypixel tournaments)
+- Hiding Empty messages.
+- Warping messages (Sending requests and switching servers)
+- Welcome Message when entering SkyBlock.
+- Powder Mining messages hider
+- Winter gift messages hider
+- Many other messages (Not separated into own categories yet)
+</details>
+<details open><summary>
 
 ## Dungeon
+</summary>
 
 + Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, Wither Essence or a lever)
 + Current milestone display.
@@ -61,29 +70,33 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Outline Dungeon Teammates. - Cad
 + Dungeon Colored Class Level. - hannibal2
     + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
++ Soulweaver Skull Hider in the Dungeon Object Hider. - nea
+    + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
+</details>
+<details open><summary>
 
 ## Inventory
+</summary>
 
-- Not Clickable Items
-    - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
++ Not Clickable Items
+    + Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines
       around items that meet that requirement.
-    - Works in:
-        - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
-        - bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
-        - chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
-    - Option to allow/block clicks
-- Option to change the gray-out opacity for 'Not Clickable Items'.
-- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and
+    + Works in:
+        + In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
+        + bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
+        + chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
+    + Option to allow/block clicks
++ Option to change the gray-out opacity for 'Not Clickable Items'.
++ Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and
   diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and
   collection level)
-- Sack name (show short name of sacks)
-- Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same
++ Sack name (show short name of sacks)
++ Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same
   enchantment are highlighted in the inventory)
-- compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors,
++ compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors,
   cloaks and fishing rods)
-- RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a
++ RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a
   drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
-
 + Show the tuning stats in the Thaumaturgy inventory.
 + Show the amount of selected tuning points in the stats tuning inventory.
 + Highlight the selected template in the stats tuning inventory.
@@ -92,7 +105,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight stuff that is missing in the SkyBlock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
-+ **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + **Contest Time** - Show the real time format to the farming contest description.
 + **Pet Candies Used number**
     + Works even after Hypixel removed the `10 pet candies applied` line
@@ -106,16 +118,27 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ **Quick Craft Confirmation**. - Cad
+    + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
+    + Sack items can be crafted normally.
++ **Shift Click Equipment**. - Thunderblade73
+    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
+</details>
+<details open><summary>
 
 ## Item Abilities
+</summary>
 
 + Show the **cooldown of items** in the inventory. - hannibal2
     + Option to change the item background according to the cooldown.
     + Supports dungeon mage cooldown reduction. - Cad
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
+</details>
+<details open><summary>
 
 ## Summoning Mobs
+</summary>
 
 - Summoning Soul Display (Show the name of dropped soul lying on the ground, not working in dungeon when Skytils' "Hide
   Non-Starred Mobs Nametags" is enabled)
@@ -123,8 +146,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to mark the own summoning mobs in green.
 - Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the
   corresponding spawning/despawning chat messages)
+</details>
+<details open><summary>
 
 ## Ashfang
+</summary>
 
 - Show a cooldown when the player gets an ability block effect during the ashfang fight.
 - Display a timer until Ashfang brings his underlings back to him.
@@ -134,8 +160,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to hide all the particles around the ashfang boss.
 - Option to hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)
 - Option to hide damage splashes around ashfang.
+</details>
+<details open><summary>
 
 ## Minion
+</summary>
 
 - A display that show the last time the hopper inside a minion has been emptied.
 - A marker to the last opened minion for a couple of seconds (seen through walls)
@@ -145,17 +174,23 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
+</details>
+<details open><summary>
 
 ## Bazaar
+</summary>
 
 + Showing colors in the order inventory for outbid or fully bought/sold items.
 + Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
 + Saves missing items from canceled buy orders to clipboard for faster re-entry.
 + Update Timer showing when the next api data update happens.
-+ Added Price Website button. - hannibal2
++ Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
+</details>
+<details open><summary>
 
 ## Fishing
+</summary>
 
 + **Trophy Counter**
     + After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total.
@@ -185,11 +220,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Chum/Chumcap Bucket.
     + Hides your own Chum/Chumcap Bucket.
 + Highlight and outline feature for rare sea creatures. - Cad
-+ Added Fishing Hook Display. - hannibal2
++ Fishing Hook Display. - hannibal2
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
++ Alerts when the player catches a Legendary Sea Creature. - Cad
+</details>
+<details open><summary>
 
 ## Damage Indicator
+</summary>
 
 - Show the remaining health of selected bosses in the game in a bigger GUI.
 - Send a chat message when the boss is healing himself.
@@ -209,8 +248,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show the amount of HP missing until the steak can be used on the vampire slayer on top of the boss.
     + Show a timer until the boss leaves the invincible Mania Circles state.
     + Show the percentage of HP next to the HP.
+</details>
+<details open><summary>
 
 ## Slayer
+</summary>
 
 + Hide poor slayer drop chat messages.
 + Slayer **Mini Boss:**
@@ -275,20 +317,29 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Inquisitor Sharing**
     + Share aypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
+</details>
+<details open><summary>
 
 ## Marked Players
+</summary>
 
 + Adding or removing players as marked with command /shmarkplayer
 + Highlight marked players in the world.
 + Highlight marked player names in chat.
 + Mark the own player name.
+</details>
+<details open><summary>
 
 ## Bingo
+</summary>
 
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
+</details>
+<details open><summary>
 
 ## Mobs
+</summary>
 
 + Arachne keeper highlighter.
 + Area boss highlighter.
@@ -298,10 +349,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ Added a countdown for Arachne spawn. - Cad
++ Countdown for Arachne spawn. - Cad
+    + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
+</details>
+<details open><summary>
 
 ## Garden Features
+</summary>
 
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + **Visitor Display** - Show all items needed for the visitors.
@@ -424,8 +479,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
++ /shmouselock command to lock mouse rotation for farming. - Cad
+</details>
+<details open><summary>
 
 ## The Rift
+</summary>
 
 + **Rift Timer**
     + Show the remaining rift time, max time, percentage, and extra time changes.
@@ -438,7 +497,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
     + Customize the color
 + **Odonatas Highlighter**
-    + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+    + Highlight the small Odonatas flying around the trees while holding an Empty Odonata Bottle in the hand.
     + Customize the color
 + **Agaricus Cap** countdown
     + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
@@ -493,8 +552,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide the wilted berberis particles
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
+</details>
+<details open><summary>
 
 ## Mining
+</summary>
 
 + **Highlight Commission Mobs** - hannibal2
     + Highlight Mobs that are part of active commissions
@@ -506,8 +568,25 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
+</details>
+<details open><summary>
+
+## Events
+</summary>
+
++ Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
+    + Thanks Tobbbb for the coordinates!
+    + Support for hiding basket waypoints once you have clicked on them. - hannibal2
+    + Option to show only the closest basket. - hannibal2
++ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
+    + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
+    + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
+</details>
+<details open><summary>
 
 ## Commands
+</summary>
 
 + **/shcommands**
     + Show all commands in SkyHanni
@@ -522,8 +601,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
+</details>
+<details open><summary>
 
 ## Misc
+</summary>
 
 + Allow to paste text from clipboard in signs
 + Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with
@@ -539,6 +621,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Wishing compass uses amount display.
 + Brewing Stand Overlay.
 + Crimson Isle Reputation Helper.
++ Quest Item Helper. (Crimson Isle) - NetheriteMiner
+    + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
+      needed from the sacks.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -586,6 +671,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can be disabled
     + Sortable by price or items stored (both desc/asc)
     + Option to show prices from Bazaar or NPC
++ Option to highlight items that are full in the sack inventory.
 + **Ghost Counter** (Contributed by HiZe)
     + Shows number of ghosts killed in the Mist in Dwarven Mines
     + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
@@ -615,7 +701,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Only on Private island.
 + Account upgrade complete reminder. - appable0
 + Pet Experience Tooltip
-    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
       shift key.
     + Highlight the level 100 text in gold for pets below legendary. - hannibal2
       (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)
@@ -646,9 +732,61 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
     + Change the scale with plus and minus keys. - CalMWolfs
++ **Compact Tab List**.
+    + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
+    + Option to hide Hypixel advertisment banners. - CalMWolfs
+    + **Advanced Player List**. - hannibal2
+        + Customize the player list (inside the tab list) in various ways.
+        + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
+          party/friends/guild
+        + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
+          level
++ Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send a warning and sound after a custom amount of seconds.
++ Time In Limbo. - hannibal2
+    + Show the time since you entered limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
++ Highlight Party Members. - Cad
+    + Marking party members with a bright outline to better find them in the world.
++ Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
+    + Options to change speed, size, saturation and direction.
++ Added Modify Visual Words (command /shwords). - CalMWolfs
+    + Allows you to replace text on your screen with different text (like the SBE one, just less costly).
+    + Supports all color codes, even chroma (use &&Z)
++ Added In-Game Date display. - Erymanthus
+    + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
+    + Includes the SkyBlock year.
++ Added **Dungeon party finder** QOL improvements - Cad
+    + Floor stack size.
+    + Mark Paid Carries red.
+    + Mark Low-Class levels orange.
+    + Mark groups you can't join dark red.
+    + Mark groups without your current classes green.
++ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
+    + /pw -> party warp
+    + /pk -> party kick
+    + /pt -> party transfer
+    + /pp -> party promote
+    + /pko -> party kickoffline
++ Added working **Livid Finder** (should work 100% of the time). - hannibal2
+    + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
+      in some cases).
++ Added AFK time to Discord RPC. - NetheriteMiner
++ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
+    + E.g. inside the SkyBlock leveling guide.
+</details>
+<details open><summary>
 
 ## Cosmetics
+</summary>
 
 + **Following Line** - hannibal2
     + Draws a colored line behind the player.
     + Change the color, width, and duration of the line.
++ **Arrow Trail cosmetic** - Thunderblade73
+    + Draw a colored line behind the arrows in the air.
+    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
+      color, to change the time alive, and the line width.
+</details>

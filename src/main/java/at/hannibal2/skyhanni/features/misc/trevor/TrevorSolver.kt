@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
@@ -58,18 +58,10 @@ object TrevorSolver {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
                     if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
                         println("This is unfortunate")
-                    } else canSee = LocationUtils.canSee(
-                        LocationUtils.playerEyeLocation(),
-                        entity.position.toLorenzVec().add(0.0, 0.5, 0.0)
-                    ) && dist < currentMob!!.renderDistance
-
-                    if (!canSee) {
-                        val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
-                        if (nameTagEntity is EntityArmorStand) canSee = true
-                    }
+                    } else canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
                     if (canSee) {
                         if (mobLocation != CurrentMobArea.FOUND) {
-                            TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
+                            LorenzUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
                         }
                         mobLocation = CurrentMobArea.FOUND
                         mobCoordinates = entity.position.toLorenzVec()
@@ -95,3 +87,4 @@ object TrevorSolver {
         mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
     }
 }
+

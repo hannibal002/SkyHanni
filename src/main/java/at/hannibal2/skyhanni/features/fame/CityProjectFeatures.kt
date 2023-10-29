@@ -34,6 +34,8 @@ class CityProjectFeatures {
     private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = 0L
+
+    // TODO USE SH-REPO
     private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
 
     companion object {
@@ -167,7 +169,7 @@ class CityProjectFeatures {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showMaterials) return
         if (!inInventory) return

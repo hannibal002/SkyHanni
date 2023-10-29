@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -17,6 +17,8 @@ import java.util.UUID
 
 class FriendAPI {
     private val file = File("config/skyhanni/friends.json")
+
+    // TODO USE SH-REPO
     private val removedFriendPattern =
         ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*".toPattern()
     private val addedFriendPattern = "§aYou are now friends with (?<name>.*)".toPattern()
@@ -67,23 +69,19 @@ class FriendAPI {
 
         removedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("removed friend: '$name'")
             removedFriend(name)
         }
         addedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("added friend: '$name'")
             addFriend(name)
         }
 
         noBestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("no best friend: '$name'")
             setBestFriend(name, false)
         }
         bestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
-            println("best friend: '$name'")
             setBestFriend(name, true)
         }
     }
@@ -118,7 +116,7 @@ class FriendAPI {
                     try {
                         UUID.fromString(it)
                     } catch (e: IllegalArgumentException) {
-                        CopyErrorCommand.logError(e, "Error reading friend list.")
+                        ErrorManager.logError(e, "Error reading friend list.")
                         return
                     }
                 }

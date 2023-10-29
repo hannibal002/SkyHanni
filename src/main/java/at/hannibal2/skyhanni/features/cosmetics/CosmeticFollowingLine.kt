@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
@@ -32,7 +32,7 @@ class CosmeticFollowingLine {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
@@ -46,7 +46,7 @@ class CosmeticFollowingLine {
     }
 
     private fun renderFar(
-        event: RenderWorldLastEvent,
+        event: LorenzRenderWorldEvent,
         firstPerson: Boolean,
         color: Color
     ) {
@@ -67,7 +67,7 @@ class CosmeticFollowingLine {
         }
     }
 
-    private fun updateClose(event: RenderWorldLastEvent) {
+    private fun updateClose(event: LorenzRenderWorldEvent) {
         val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(0.0, 0.3, 0.0)
 
         latestLocations = latestLocations.editCopy {
@@ -77,7 +77,7 @@ class CosmeticFollowingLine {
         }
     }
 
-    private fun renderClose(event: RenderWorldLastEvent, firstPerson: Boolean, color: Color) {
+    private fun renderClose(event: LorenzRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
         for ((a, b) in latestLocations.keys.zipWithNext()) {

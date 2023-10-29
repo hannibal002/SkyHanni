@@ -13,6 +13,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
+import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
@@ -105,7 +106,11 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
-                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
+                            true,
+                            bypassChecks
+                        )
+                    ) {
                         onClick()
                     }
                     wasDown = isDown
@@ -163,7 +168,13 @@ interface Renderable {
                 ToolTipData.lastSlot == null
             } else true
             val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
-            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen
+
+            val openGui = Minecraft.getMinecraft().currentScreen?.javaClass?.name ?: "none"
+            val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
+            val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+
+            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen &&
+                !isInNeuPv && !isInSkyTilsPv
 
             if (debug) {
                 if (!result) {
@@ -173,6 +184,8 @@ interface Renderable {
                     if (!isGuiPositionEditor) logger.log("isGuiPositionEditor")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
                     if (!isConfigScreen) logger.log("isConfigScreen")
+                    if (isInNeuPv) logger.log("isInNeuPv")
+                    if (isInSkyTilsPv) logger.log("isInSkyTilsPv")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
@@ -225,6 +238,10 @@ interface Renderable {
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
                 GlStateManager.popMatrix()
             }
+        }
+
+        fun singeltonString(string: String): List<Renderable> {
+            return Collections.singletonList(string(string))
         }
 
         fun string(string: String) = object : Renderable {

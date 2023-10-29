@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -15,6 +16,8 @@ import java.util.Locale
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
+
+    // TODO USE SH-REPO
     private val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
@@ -31,7 +34,7 @@ object SkyBlockItemModifierUtils {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
-    private fun ItemStack.getBaseSilexCount() = when (getInternalName_old()) {
+    private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
         "PROMISING_SPADE" -> 5
 
@@ -108,6 +111,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.asInternalName()
 
+    fun ItemStack.getEnrichment() = getAttributeString("talisman_enrichment")
+
     fun ItemStack.getHelmetSkin() = getAttributeString("skin")?.asInternalName()
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
@@ -145,7 +150,12 @@ object SkyBlockItemModifierUtils {
         }
 
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
-        if (it == "pitchin") "pitchin_koi" else it
+        when {
+            it == "pitchin" -> "pitchin_koi"
+            it == "warped" && name!!.removeColor().startsWith("Hyper ") -> "endstone_geode"
+
+            else -> it
+        }
     }
 
     fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")

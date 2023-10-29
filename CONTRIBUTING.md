@@ -35,7 +35,9 @@ follow [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/m
 
 ## Creating a Pull Request
 
-_An explanation how to use intellij and branches will follow here soon_
+If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
+
+_An explanation how to use intellij and branches will follow here soon.
 
 Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
 
@@ -123,8 +125,8 @@ SkyHanni uses a repo system to easily change static variables without the need f
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
 A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
-When working with the repo, it is recommended to disable the manual repo update to prevent overriding your local changes
-accidentally.
+If you add stuff to the repo make sure it gets serialised. See the [jsonobjects](src/main/java/at/hannibal2/skyhanni/utils/jsonobjects)
+folder for how to properly do this. You also may have to disable repo auto update in game.
 
 ### Discord IPC
 

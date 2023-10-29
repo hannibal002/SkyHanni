@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 class CropAccessoryData {
+    // TODO USE SH-REPO
     private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toRegex()
     private var loadedAccessoryThisProfile = false
     private var ticks = 0

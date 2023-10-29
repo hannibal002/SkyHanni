@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -12,9 +15,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenInventoryNumbers {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.number
 
-    private var patternTierProgress = "§7Progress to Tier (?<tier>.*): §e(?:.*)".toPattern()
     private var patternUpgradeTier = "§7Current Tier: §[ea](?<tier>.*)§7/§a.*".toPattern()
 
     @SubscribeEvent
@@ -22,17 +24,16 @@ class GardenInventoryNumbers {
         if (!GardenAPI.inGarden()) return
 
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
-            if (!config.numberCropMilestone) return
+            if (!config.cropMilestone) return
 
-            event.stack.getLore()
-                .map { patternTierProgress.matcher(it) }
-                .filter { it.matches() }
-                .map { it.group("tier").romanToDecimalIfNeeded() - 1 }
-                .forEach { event.stackTip = "" + it }
+            val crop = GardenCropMilestones.getCropTypeByLore(event.stack) ?: return
+            val counter = crop.getCounter()
+            val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
+            event.stackTip = "" + currentTier
         }
 
         if (InventoryUtils.openInventoryName() == "Crop Upgrades") {
-            if (!config.numberCropUpgrades) return
+            if (!config.cropUpgrades) return
 
             event.stack.getLore()
                 .map { patternUpgradeTier.matcher(it) }
@@ -42,7 +43,7 @@ class GardenInventoryNumbers {
         }
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
-            if (!config.numberComposterUpgrades) return
+            if (!config.composterUpgrades) return
 
             event.stack.name?.let {
                 ComposterUpgrade.regex.matchMatcher(it) {
@@ -52,4 +53,12 @@ class GardenInventoryNumbers {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.numberCropMilestone", "garden.number.cropMilestone")
+        event.move(3, "garden.numberCropUpgrades", "garden.number.cropUpgrades")
+        event.move(3, "garden.numberComposterUpgrades", "garden.number.composterUpgrades")
+    }
+
 }

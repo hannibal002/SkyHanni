@@ -43,7 +43,7 @@ class ItemDisplayOverlayFeatures {
             return itemName.substring(itemName.length - 1)
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && itemName.contains("Golden ") || itemName.contains("Diamond ")) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
             when {
                 itemName.contains("Bonzo") -> return "1"
                 itemName.contains("Scarf") -> return "2"
@@ -63,7 +63,9 @@ class ItemDisplayOverlayFeatures {
             val chestName = InventoryUtils.openInventoryName()
             if (!chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)) {
                 petLevelPattern.matchMatcher(itemName) {
-                    val level = group("level").toInt()
+                    val rawLevel = group("level")
+                    val level = rawLevel.toIntOrNull()
+                        ?: throw IllegalStateException("pet level not found for item name '$itemName'")
                     if (level != ItemUtils.maxPetLevel(itemName)) {
                         return "$level"
                     }

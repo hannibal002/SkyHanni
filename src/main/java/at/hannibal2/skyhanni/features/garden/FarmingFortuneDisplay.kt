@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -78,13 +78,14 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.farmingFortunePos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
+        if (GardenAPI.hideExtraGuis()) return
+        config.pos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!CropAccessoryData.isLoadingAccessories) return
         SkyHanniMod.feature.misc.inventoryLoadPos.renderString(
@@ -137,18 +138,18 @@ class FarmingFortuneDisplay {
             toolCounterFortune + getTurboCropFortune(tool, currentCrop) + getDedicationFortune(tool, currentCrop)
     }
 
-    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.farmingFortuneDisplay
+    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden
+        private val config get() = SkyHanniMod.feature.garden.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestTrueFarmingFortune
 
         private val currentCrop get() = GardenAPI.getCurrentlyFarmedCrop()
 
         private var tabFortune: Double = 0.0
         private var toolFortune: Double = 0.0
-        private val baseFortune: Double get() = if (config.farmingFortuneDropMultiplier) 100.0 else 0.0
+        private val baseFortune: Double get() = if (config.dropMultiplier) 100.0 else 0.0
         private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
         private val accessoryFortune: Double?
             get() = currentCrop?.let {
@@ -255,9 +256,9 @@ class FarmingFortuneDisplay {
                     displayedFortune = match[1]!!.value.toDouble()
                     reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
 
-                    itemBaseFortune = if (tool.getInternalName_old().contains("LOTUS")) 5.0
+                    itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
                     else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount() ?: 0 ) * 1.0
-                    greenThumbFortune = if (tool.getInternalName_old().contains("LOTUS")) {
+                    greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                         displayedFortune - reforgeFortune - itemBaseFortune
                     } else 0.0
                 }
@@ -280,5 +281,12 @@ class FarmingFortuneDisplay {
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
+        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
+        event.move(3,"garden.farmingFortunePos", "garden.farmingFortunes.pos")
     }
 }

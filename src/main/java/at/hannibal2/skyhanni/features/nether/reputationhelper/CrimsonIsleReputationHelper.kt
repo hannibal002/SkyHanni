@@ -10,14 +10,15 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -28,7 +29,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
-    var repoData: JsonObject? = null
     var factionType = FactionType.NONE
 
     private var display = emptyList<List<Any>>()
@@ -42,21 +42,24 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        repoData = event.getConstant("CrimsonIsleReputation") ?: return
+        val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
+        miniBossHelper.onRepoReload(data.MINIBOSS)
+        kuudraBossHelper.onRepoReload(data.KUUDRA)
 
-        tryLoadConfig()
+        QuestLoader.quests.clear()
+        QuestLoader.loadQuests(data.FISHING, "FISHING")
+        QuestLoader.loadQuests(data.RESCUE, "RESCUE")
+        QuestLoader.loadQuests(data.FETCH, "FETCH")
+        QuestLoader.loadQuests(data.DOJO, "DOJO")
+
         update()
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        tryLoadConfig()
-    }
-
-    private fun tryLoadConfig() {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
-            miniBossHelper.load(it)
-            kuudraBossHelper.load(it)
+            miniBossHelper.loadData(it)
+            kuudraBossHelper.loadData(it)
             questHelper.load(it)
         }
     }
@@ -106,13 +109,13 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun renderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
 
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        if (config.useHotkey && !OSUtils.isKeyHeld(config.hotkey)) {
+        if (config.useHotkey && !config.hotkey.isKeyHeld()) {
             return
         }
 
@@ -150,19 +153,15 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         update()
     }
 
-    fun readLocationData(data: JsonObject): LorenzVec? {
-        val locationData = data["location"]?.asJsonArray ?: return null
-        if (locationData.size() == 0) return null
-
-        val x = locationData[0].asDouble - 1
-        val y = locationData[1].asDouble
-        val z = locationData[2].asDouble - 1
-        return LorenzVec(x, y, z)
+    fun readLocationData(locations: List<Double>): LorenzVec? {
+        if (locations.isEmpty()) return null
+        val (x, y, z) = locations
+        return LorenzVec(x, y, z).add(-1, 0, -1)
     }
 
     fun showLocations() = when (config.showLocation) {
         0 -> true
-        1 -> OSUtils.isKeyHeld(config.hotkey)
+        1 -> config.hotkey.isKeyHeld()
         else -> false
     }
 }

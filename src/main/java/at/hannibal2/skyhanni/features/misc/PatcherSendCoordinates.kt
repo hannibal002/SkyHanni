@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -21,8 +21,9 @@ class PatcherSendCoordinates {
 
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
-    private val pattern = "(?<playerName>.*): x: (?<x>.*), y: (?<y>.*), z: (?<z>.*)".toPattern()
 
+    // TODO USE SH-REPO
+    private val pattern = "(?<playerName>.*): x: (?<x>.*), y: (?<y>.*), z: (?<z>.*)".toPattern()
 
     @SubscribeEvent
     fun onPatcherCoordinates(event: LorenzChatEvent) {
@@ -48,7 +49,7 @@ class PatcherSendCoordinates {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!SkyHanniMod.feature.misc.patcherSendCoordWaypoint) return
 
         for (beacon in patcherBeacon) {

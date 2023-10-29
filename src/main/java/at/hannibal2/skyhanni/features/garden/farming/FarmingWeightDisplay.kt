@@ -16,21 +16,23 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.Collections
 
 class FarmingWeightDisplay {
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (isEnabled() && config.eliteFarmingWeightIgnoreLow || weight >= 200) {
-            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (GardenAPI.hideExtraGuis()) return
+        val shouldShow = apiError || (config.ignoreLow || weight >= 200)
+        if (isEnabled() && shouldShow) {
+            config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
         }
     }
 
@@ -43,19 +45,7 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         // We want to try to connect to the api again after a world switch.
-        apiError = false
-        // We ask both api endpoints after every world switch
-        weight = -1.0
-        weightPerSecond = -1.0
-
-        leaderboardPosition = -1
-        dirtyCropWeight = true
-        lastLeaderboardUpdate = 0
-
-        nextPlayers.clear()
-        rankGoal = -1
-
-        localCounter.clear()
+        resetData()
     }
 
     @SubscribeEvent
@@ -83,13 +73,26 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
+        event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
+        event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
+        event.move(
+            3,
+            "garden.eliteFarmingWeightOffScreenDropMessage",
+            "garden.eliteFarmingWeights.offScreenDropMessage"
+        )
+        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
+        event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
+        event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden
+        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
+        private var dispatcher = Dispatchers.IO
 
-        private var display = emptyList<String>()
+        private var display = emptyList<Renderable>()
         private var profileId = ""
         private var lastLeaderboardUpdate = 0L
         private var apiError = false
@@ -105,18 +108,42 @@ class FarmingWeightDisplay {
         private var nextPlayers = mutableListOf<UpcomingPlayer>()
         private val nextPlayer get() = nextPlayers.firstOrNull()
 
+        private val recalculate by lazy {
+            ({
+                resetData()
+            })
+        }
+
+        private val errorMessage by lazy {
+            listOf(
+                Renderable.clickAndHover(
+                    "§cFarming Weight error: Cannot load",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                ), Renderable.clickAndHover(
+                    "§cdata from Elite Farmers!",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                ), Renderable.clickAndHover(
+                    "§eRejoin the garden or",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                ), Renderable.clickAndHover(
+                    "§eclick here to fix it.",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                )
+            )
+        }
+
         private fun update() {
             if (!GardenAPI.inGarden()) return
             if (apiError) {
-                display = listOf(
-                    "§6Farming Weight§7: §cError!",
-                    "§cCannot load data from Elite Farmers!",
-                    "§eRejoin garden to try again."
-                )
+                display = errorMessage
                 return
             }
             if (weight == -2.0) {
-                display = Collections.singletonList("§6Farming Weight§7: §eLoading..")
+                display = Renderable.singeltonString("§6Farming Weight§7: §eLoading..")
                 return
             }
 
@@ -124,13 +151,13 @@ class FarmingWeightDisplay {
                 if (!isLoadingWeight) {
                     val localProfile = HypixelData.profileName
                     if (localProfile == "") {
-                        display = Collections.singletonList("§cError: profileName is empty!")
+                        display = Renderable.singeltonString("§cError: profileName is empty!")
                         return
                     }
 
                     isLoadingWeight = true
                     if (display.isEmpty()) {
-                        display = Collections.singletonList("§cLoading..")
+                        display = Renderable.singeltonString("§6Farming Weight§7: §eLoading..")
                     }
                     SkyHanniMod.coroutineScope.launch {
                         loadWeight(localProfile)
@@ -145,17 +172,24 @@ class FarmingWeightDisplay {
             if (rankGoal == -1) rankGoal = getRankGoal()
             val leaderboard = getLeaderboard()
 
-            val list = mutableListOf<String>()
-            list.add("§6Farming Weight§7: $weight$leaderboard")
+            val list = mutableListOf<Renderable>()
+            list.add(Renderable.clickAndHover(
+                "§6Farming Weight§7: $weight$leaderboard",
+                listOf("§eClick to open the Farming Profile of you.")
+            ) {
+                openWebsite(LorenzUtils.getPlayerName())
+            })
 
-            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.eliteFarmingWeightOvertakeETAAlways)) {
-                list.add(getETA())
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
+                getETA()?.let {
+                    list.add(it)
+                }
             }
             display = list
         }
 
         private fun getLeaderboard(): String {
-            if (!config.eliteFarmingWeightLeaderboard) return ""
+            if (!config.leaderboard) return ""
 
             // Fetching new leaderboard position every 10.5 minutes
             if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
@@ -184,7 +218,7 @@ class FarmingWeightDisplay {
         }
 
         private fun getRankGoal(): Int {
-            val value = config.eliteFarmingWeightETAGoalRank
+            val value = config.ETAGoalRank
             var goal = 10000
 
             // Check that the provided string is valid
@@ -192,7 +226,7 @@ class FarmingWeightDisplay {
             if (parsed < 1 || parsed > goal) {
                 LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
                 LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
-                config.eliteFarmingWeightETAGoalRank = goal.toString()
+                config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
             }
@@ -205,10 +239,14 @@ class FarmingWeightDisplay {
             return goal
         }
 
-        private fun getETA(): String {
-            if (weight < 0) return ""
+        private fun getETA(): Renderable? {
+            if (weight < 0) return null
 
-            var nextPlayer = nextPlayer ?: return ""
+            val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
+                "§cWaiting for leaderboard update...",
+                listOf("§eClick here to load new data right now!"),
+                onClick = recalculate
+            )
             var nextName =
                 if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
 
@@ -233,14 +271,17 @@ class FarmingWeightDisplay {
                 nextPlayers.removeFirst()
 
                 // Display waiting message if nextPlayers list is empty
-                nextPlayer = this.nextPlayer ?: return "§cWaiting for leaderboard update..."
                 // Update values to next player
                 nextName = nextPlayer.name
                 weightUntilOvertake = nextPlayer.weight - totalWeight
             }
 
             if (nextPlayer.weight == 0.0) {
-                return "§cRejoin the garden to show ETA!"
+                return Renderable.clickAndHover(
+                    "§cRejoin the garden to show ETA!",
+                    listOf("Click here to calculate the data right now!"),
+                    onClick = recalculate
+                )
             }
 
             val timeFormat = if (weightPerSecond != -1.0) {
@@ -250,7 +291,28 @@ class FarmingWeightDisplay {
             } else ""
 
             val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
-            return "§e$weightFormat$timeFormat §7behind §b$nextName"
+            return Renderable.clickAndHover(
+                "§e$weightFormat$timeFormat §7behind §b$nextName",
+                listOf("§eClick to open the Farming Profile of §b$nextName.")
+            ) {
+                openWebsite(nextName)
+            }
+        }
+
+        private fun resetData() {
+            apiError = false
+            // We ask both api endpoints after every world switch
+            weight = -1.0
+            weightPerSecond = -1.0
+
+            leaderboardPosition = -1
+            dirtyCropWeight = true
+            lastLeaderboardUpdate = 0
+
+            nextPlayers.clear()
+            rankGoal = -1
+
+            localCounter.clear()
         }
 
         private fun farmingChatMessage(message: String) {
@@ -264,8 +326,8 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
-        private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
+        private fun isEnabled() = GardenAPI.inGarden() && config.display
+        private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
             val before = getExactWeight()
@@ -297,7 +359,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded && config.eliteFarmingWeightOffScreenDropMessage) {
+                if (wasNotLoaded && config.offScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
@@ -338,7 +400,7 @@ class FarmingWeightDisplay {
             val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
             val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
                 nextPlayers.clear()
@@ -363,20 +425,32 @@ class FarmingWeightDisplay {
             val url = "https://api.elitebot.dev/weight/$uuid"
 
             try {
-                val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
-                for (profileEntry in result["profiles"].asJsonArray) {
-                    val profile = profileEntry.asJsonObject
-                    val profileName = profile["profileName"].asString.lowercase()
-                    if (profileName == localProfile) {
-                        profileId = profile["profileId"].asString
-                        weight = profile["totalWeight"].asDouble
+                val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
+                val selectedProfileId = result["selectedProfileId"].asString
+                val profileEntries = result["profiles"].asJsonArray
 
-                        localCounter.clear()
-                        dirtyCropWeight = true
+                var selectedProfileEntry = profileEntries.find {
+                    it.asJsonObject["profileId"].asString == selectedProfileId
+                }?.asJsonObject
 
-                        return
-                    }
+                // If the selected profile is not found or if the cute name doesn't match look for a different profile
+                // While it's not optimal to loop twice, this shouldn't happen often
+                if (selectedProfileEntry == null || selectedProfileEntry["profileName"].asString.lowercase() != localProfile) {
+                    selectedProfileEntry = profileEntries.find {
+                        it.asJsonObject["profileName"].asString.lowercase() == localProfile
+                    }?.asJsonObject
                 }
+
+                if (selectedProfileEntry != null) {
+                    profileId = selectedProfileEntry["profileId"].asString
+                    weight = selectedProfileEntry["totalWeight"].asDouble
+
+                    localCounter.clear()
+                    dirtyCropWeight = true
+
+                    return
+                }
+
                 println("localProfile: '$localProfile'")
                 println("url: '$url'")
                 println("result: '$result'")
@@ -426,6 +500,10 @@ class FarmingWeightDisplay {
 
         fun lookUpCommand(it: Array<String>) {
             val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
+            openWebsite(name)
+        }
+
+        private fun openWebsite(name: String?) {
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
             LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile of player §b$name")
         }
@@ -439,7 +517,7 @@ class FarmingWeightDisplay {
             attemptingCropWeightFetch = true
 
             val url = "https://api.elitebot.dev/weights"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             for (crop in result.entrySet()) {
                 val cropType = CropType.getByName(crop.key)

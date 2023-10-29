@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
@@ -26,7 +25,6 @@ object FFStats {
 
     var cakeExpireTime = 0L
 
-    // todo maybe these could be maps
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
     val beltFF = mutableMapOf<FFTypes, Double>()
@@ -75,7 +73,7 @@ object FFStats {
                 { it.second }).map { (key, values) -> key to values.sum() }
                 .toMap() as MutableMap<FFTypes, Double>
 
-        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName_old() in farmingBoots
+        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         getPetFFData(FarmingItems.ELEPHANT.getItem(), elephantFF)
         getPetFFData(FarmingItems.MOOSHROOM_COW.getItem(), mooshroomFF)
@@ -245,17 +243,17 @@ object FFStats {
         val strength = (GardenAPI.config?.fortune?.farmingStrength)
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
-            return if (rawInternalName.contains("ELEPHANT;4")) {
-                1.5 * petLevel
-            } else if (rawInternalName.contains("MOOSHROOM_COW;4")) {
-                (10 + petLevel).toDouble() + floor(floor(strength / (40 - petLevel * .2)) * .7)
-            } else if (rawInternalName.contains("MOOSHROOM")) {
-                (10 + petLevel).toDouble()
-            } else if (rawInternalName.contains("BEE;2")) {
-                0.2 * petLevel
-            } else if (rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4")) {
-                0.3 * petLevel
-            } else 0.0
+            return when {
+                rawInternalName.contains("ELEPHANT;4") -> 1.5 * petLevel
+                rawInternalName.contains("MOOSHROOM_COW;4") -> {
+                    (10 + petLevel).toDouble() + floor(floor(strength / (40 - petLevel * .2)) * .7)
+                }
+
+                rawInternalName.contains("MOOSHROOM") -> (10 + petLevel).toDouble()
+                rawInternalName.contains("BEE;2") -> 0.2 * petLevel
+                rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
+                else -> 0.0
+            }
         }
         return 0.0
     }

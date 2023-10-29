@@ -14,6 +14,8 @@ object LocationUtils {
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
+    fun LorenzVec.distanceSqToPlayer() = distanceSq(playerLocation())
+
     fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
 
     fun Entity.distanceToPlayer() = getLorenzVec().distance(playerLocation())
@@ -29,4 +31,13 @@ object LocationUtils {
     fun AxisAlignedBB.isVecInside(vec: LorenzVec) = isVecInside(vec.toVec3())
 
     fun AxisAlignedBB.isPlayerInside() = isVecInside(playerLocation())
+
+    fun LorenzVec.canBeSeen(radius: Double = 150.0): Boolean {
+        val a = playerEyeLocation()
+        val b = this
+        val noBlocks = canSee(a, b)
+        val notTooFar = a.distance(b) < radius
+        val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
+        return noBlocks && notTooFar && inFov
+    }
 }

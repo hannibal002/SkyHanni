@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.misc.EnderNode;
-import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
-import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -37,6 +38,9 @@ public class Storage {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
+    public List<VisualWord> modifiedWords = new ArrayList<>();
+
+    @Expose
     public Boolean contestSendingAsked = false;
 
     @Expose
@@ -58,6 +62,9 @@ public class Storage {
 
         @Expose
         public long nextAccountUpgradeCompletionTime = -1L;
+
+        @Expose
+        public List<String> guildMembers = new ArrayList<>();
     }
 
     public static class ProfileSpecific {
@@ -188,6 +195,15 @@ public class Storage {
                 public long coinsSpent = 0;
 
                 @Expose
+                public long bits = 0;
+
+                @Expose
+                public long mithrilPowder = 0;
+
+                @Expose
+                public long gemstonePowder = 0;
+
+                @Expose
                 public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
             }
 
@@ -196,7 +212,7 @@ public class Storage {
 
             public static class PlotIcon {
                 @Expose
-                public Map<Integer, String> plotList = new HashMap<>();
+                public Map<Integer, NEUInternalName> plotList = new HashMap<>();
             }
 
             @Expose

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
@@ -9,8 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
@@ -28,9 +26,8 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val packet = event.packet
 
         if (packet is S2APacketParticles) {
@@ -100,8 +97,8 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
@@ -121,9 +118,8 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!DianaAPI.featuresEnabled()) return
         if (!config.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
 
         val pos = event.position
         if (event.itemInHand?.isSpade != true || pos.getBlockAt() !== Blocks.grass) return
@@ -133,8 +129,7 @@ class GriffinBurrowParticleFinder {
         }
     }
 
-    private val ItemStack.isSpade
-        get() = getInternalName_old() == "ANCESTRAL_SPADE"
+    private val ItemStack.isSpade get() = getInternalName() == DianaAPI.spade
 
     class Burrow(
         var location: LorenzVec,

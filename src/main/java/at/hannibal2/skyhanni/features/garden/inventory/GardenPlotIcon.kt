@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -47,7 +47,7 @@ object GardenPlotIcon {
         val plotList = plotList ?: return
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
-            val new = NEUItems.getItemStack(internalName)
+            val new = internalName.getItemStack()
             cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
         }
     }
@@ -118,7 +118,7 @@ object GardenPlotIcon {
                     return
                 }
                 val copyStack = copyStack ?: return
-                plotList[event.slotId] = copyStack.getInternalName_old()
+                plotList[event.slotId] = copyStack.getInternalName()
                 cachedStack[event.slotId] = copyStack
             }
         }

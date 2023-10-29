@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -16,8 +15,8 @@ import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
@@ -50,17 +49,22 @@ object DanceRoomHelper {
         val size = instructions.size
         val format = line.format()
 
-        if (index < size && index == lineIndex) {
-            val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
-            "${now.formatColor()} $format $countdown"
+        when {
+            index < size && index == lineIndex -> {
+                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+                "${now.formatColor()} $format $countdown"
+            }
 
-        } else if (index + 1 < size && index + 1 == lineIndex) {
-            "${next.formatColor()} $format"
+            index + 1 < size && index + 1 == lineIndex -> {
+                "${next.formatColor()} $format"
+            }
 
-        } else if (index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex)) {
-            "${later.formatColor()} $format"
+            index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex) -> {
+                "${later.formatColor()} $format"
+            }
 
-        } else null
+            else -> null
+        }
     }
 
     private fun String.formatColor() = replace("&", "§")
@@ -68,17 +72,19 @@ object DanceRoomHelper {
     private fun String.format() =
         split(" ").joinToString(" ") { it.firstLetterUppercase().addColor().replace("&", "§") }
 
-    private fun String.addColor() = when (this) {
-        "Move" -> config.danceRoomFormatting.color.move
-        "Stand" -> config.danceRoomFormatting.color.stand
-        "Sneak" -> config.danceRoomFormatting.color.sneak
-        "Jump" -> config.danceRoomFormatting.color.jump
-        "Punch" -> config.danceRoomFormatting.color.punch
-        else -> config.danceRoomFormatting.color.fallback
-    } + this
+    private fun String.addColor() = with(config.danceRoomFormatting.color) {
+        when (this@addColor) {
+            "Move" -> move
+            "Stand" -> stand
+            "Sneak" -> sneak
+            "Jump" -> jump
+            "Punch" -> punch
+            else -> fallback
+        } + this@addColor
+    }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRoom) return
         config.position.renderStrings(
@@ -159,14 +165,12 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions")?.let {
-            instructions = it.instructions
-        }
+        instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 
     fun start(interval: Long): Job {
         return CoroutineScope(Dispatchers.Default).launch {
-            while (NonCancellable.isActive && found) {
+            while (isActive && found) {
                 index++
                 startCountdown(0, 500)
                 delay(interval)
