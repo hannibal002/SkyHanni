@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.jsonobjects.MinionXpJson
+import at.hannibal2.skyhanni.utils.jsonobjects.MinionXPJson
 import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
 import net.minecraft.item.Item
@@ -182,11 +182,13 @@ class MinionXp {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        xpInfoMap = event.getConstant<MinionXpJson>("MinionXp").minion_xp.mapNotNull {
-            it.key.asInternalName() to
-                XpInfo(XpType.valueOf(it.value.type), it.value.value)
-        }.toMap()
+        xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minion_xp.mapNotNull { xpType ->
+            xpType.value.mapNotNull { it.key.asInternalName() to XpInfo(XpType.valueOf(xpType.key), it.value) }
+        }.flatten().toMap()
     }
 
     private var xpInfoMap: Map<NEUInternalName, XpInfo> = hashMapOf()
 }
+
+/* it.key.asInternalName() to
+                XpInfo(XpType.valueOf(it.value.type), it.value.value) */
