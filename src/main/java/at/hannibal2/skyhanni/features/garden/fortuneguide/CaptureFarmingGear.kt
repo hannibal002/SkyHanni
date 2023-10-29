@@ -33,6 +33,8 @@ class CaptureFarmingGear {
     private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
     private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
 
+    private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
+
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
         private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
@@ -234,7 +236,7 @@ class CaptureFarmingGear {
                 }
             }
         }
-        if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
+        cakePattern.matchMatcher(msg) {
             hidden.cakeExpiring = System.currentTimeMillis() + 172800000
         }
         if (msg == "CARROTS EXPORTATION COMPLETE!") {
