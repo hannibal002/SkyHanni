@@ -691,6 +691,7 @@ public class MiscConfig {
                 "§6§lSKYBLOCK",
                 "§7Profile",
                 "§ePurse",
+                "§dMotes",
                 "§eBank",
                 "§bBits",
                 "§cCopper",
@@ -711,7 +712,7 @@ public class MiscConfig {
                 "§ewww.hypixel.net",
             }
         )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20));
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21));
 
         @Expose
         @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
@@ -733,6 +734,13 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideIrrelevantLines = true;
+
+        @Expose
+        @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first. " +
+            "§eNote: Will not update the preview above!")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean displayNumbersFirst = false;
 
         @Expose
         @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")

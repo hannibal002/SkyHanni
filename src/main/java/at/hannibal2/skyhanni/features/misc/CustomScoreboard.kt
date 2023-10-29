@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
@@ -45,45 +44,219 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
+private val config get() = SkyHanniMod.feature.misc.customScoreboard
+private var display = emptyList<List<Any>>()
+private var partyCount = 0
+
+// Stats / Numbers
+private var purse = "0"
+private var motes = "0"
+private var bank = "0"
+private var bits = "0"
+private var copper = "0"
+private var gems = "0"
+private var location = "None"
+private var lobbyCode = "None"
+private var heat = "0"
+private var mithrilPowder = "0"
+private var gemstonePowder = "0"
+
+
+enum class CustomScoreboardElements (
+    // displayLine: The line that is displayed on the scoreboard
+    val displayLine: List<String>,
+
+    // alternativeLine: The line that is displayed on the scoreboard when "displayNumbersFirst" is enabled
+    val alternativeLine: List<String>,
+
+    // islands: The islands that this line is displayed on
+    val islands: List<IslandType>,
+
+    // visibilityOption: The option that is used to hide this line - use 0 to only display on the listed islands, 1 to hide on the listed islands
+    val visibilityOption : Int,
+
+    // index: The index of the line
+    val index: Int,
+
+    // data: The data that is used for this line
+    val data: String = ""
+){
+    SKYBLOCK(
+        listOf("§6§lSKYBLOCK"),
+        listOf(),
+        listOf(),
+        0,
+        0
+    ),
+    PROFILE(
+        listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase()),
+        listOf(),
+        listOf(),
+        0,
+        1
+    ),
+    PURSE(
+        listOf("Purse: §6$purse"),
+        listOf("§6$purse Purse"),
+        listOf(IslandType.THE_RIFT),
+        1,
+        2,
+        purse
+    ),
+    MOTES(
+        listOf("Motes: §d$motes"),
+        listOf("§d$motes Motes"),
+        listOf(IslandType.THE_RIFT),
+        0,
+        3,
+        motes
+    ),
+    BANK(
+        listOf("Bank: §6$bank"),
+        listOf("§6$bank Bank"),
+        listOf(IslandType.THE_RIFT),
+        1,
+        4,
+        bank
+    ),
+    BITS(
+        listOf("Bits: §b$bits"),
+        listOf("§b$bits Bits"),
+        listOf(IslandType.THE_RIFT),
+        1,
+        5,
+        bits
+    ),
+    COPPER(
+        listOf("Copper: §c$copper"),
+        listOf("§c$copper Copper"),
+        listOf(IslandType.GARDEN),
+        0,
+        6,
+        copper
+    ),
+    GEMS(
+        listOf("Gems: §a$gems"),
+        listOf("§a$gems Gems"),
+        listOf(IslandType.THE_RIFT),
+        1,
+        7,
+        gems
+    ),
+    EMPTY_LINE(
+        listOf("<empty>"),
+        listOf(),
+        listOf(),
+        0,
+        8
+    ),
+    LOCATION(
+        listOf(location),
+        listOf(),
+        listOf(),
+        0,
+        9
+    ),
+    SKYBLOCK_TIME(
+        listOf(SkyBlockTime.now().formatted(false)),
+        listOf(),
+        listOf(),
+        0,
+        10
+    ),
+    LOBBY_CODE(
+        listOf("§8$lobbyCode"),
+        listOf(),
+        listOf(),
+        0,
+        11
+    ),
+    POWDER(
+        listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder"),
+        listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone"),
+        listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES),
+        0,
+        12
+    ),
+    EMPTY_LINE2(
+        listOf("<empty>"),
+        listOf(),
+        listOf(),
+        0,
+        13
+    ),
+    SLAYER(
+        listOf("§7Slayer"),
+        listOf(""),
+        listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE),
+        0,
+        14
+    ),
+    CURRENT_EVENT(
+        listOf("§cCurrent Event"),
+        listOf(""),
+        listOf(),
+        0,
+        15
+    ),
+    MAYOR(
+        listOf(
+            MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>"
+        ) + (if (config.showMayorPerks) {
+            MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" } ?: emptyList()
+        } else {
+            emptyList()
+        }),
+        listOf(),
+        listOf(IslandType.THE_RIFT),
+        1,
+        16
+    ),
+    EMPTY_LINE3(
+        listOf("<empty>"),
+        listOf(),
+        listOf(),
+        0,
+        17
+    ),
+    HEAT(
+        listOf(if(heat == "0") "Heat: §c♨ 0" else "Heat: $heat"),
+        listOf(if(heat == "0") "§c♨ 0 Heat" else "$heat Heat"),
+        listOf(IslandType.CRYSTAL_HOLLOWS),
+        0,
+        18,
+        heat
+    ),
+    PARTY(
+        listOf(
+            "§9Party",
+            *PartyAPI.partyMembers.takeWhile { partyCount < config.maxPartyList.get() }
+                .map { " §7- §7$it" }
+                .toTypedArray()
+        ),
+        listOf(),
+        listOf(IslandType.CATACOMBS, IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
+        0,
+        19,
+        partyCount.toString()
+    ),
+    MAXWELL(
+        listOf("§7Maxwell Power"),
+        listOf(),
+        listOf(IslandType.THE_RIFT),
+        1,
+        20
+    ),
+    WEBSITE(
+        listOf("§ewww.hypixel.net"),
+        listOf(),
+        listOf(),
+        0,
+        21
+    );
+}
+
 class CustomScoreboard {
-    private val config get() = SkyHanniMod.feature.misc.customScoreboard
-    private var display = emptyList<List<Any>>()
-    private var purse = "0"
-    private var motes = "0"
-    private var bank = "0"
-    private var bits = "0"
-    private var copper = "0"
-    private var gems = "0"
-    private var location = "None"
-    private var lobbyCode = "None"
-    private var heat = "0"
-    private var mithrilPowder = "0"
-    private var gemstonePowder = "0"
-
-    // Indexes for the scoreboard
-    private var skyblockIndex = 0
-    private var profileIndex = 1
-    private var purseIndex = 2
-    private var bankIndex = 3
-    private var bitsIndex = 4
-    private var copperIndex = 5
-    private var gemsIndex = 6
-    private var EMPTY_LINE = 7
-    private var locationIndex = 8
-    private var skyblockTimeIndex = 9
-    private var lobbyCodeIndex = 10
-    private var powderIndex = 11
-    private var EMPTY_LINE2 = 12
-    private var slayerIndex = 13
-    private var currentEventIndex = 14
-    private var mayorIndex = 15
-    private var EMPTY_LINE3 = 16
-    private var heatIndex = 17
-    private var partyIndex = 18
-    private var maxwellIndex = 19
-    private var websiteIndex = 20
-
-
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
@@ -95,6 +268,9 @@ class CustomScoreboard {
     fun onTick(event: TickEvent) {
         // Draws the custom scoreboard
         display = drawScoreboard()
+
+        // Resets Party count
+        partyCount = 0
 
         // Gets some values for the scoreboard
         for (line in TabListData.getTabList()){
@@ -135,6 +311,25 @@ class CustomScoreboard {
         purse = LorenzUtils.formatInteger(PurseAPI.currentPurse.toInt())
     }
 
+    private fun drawScoreboard() = buildList<List<Any>> {
+        val lineMap = HashMap<Int, List<Any>>()
+        for (element in CustomScoreboardElements.entries) {
+            if (element.data == "0" && config.hideEmptyLines){ // Hide empty lines
+                lineMap[element.index] = listOf("<hidden>")
+                continue
+            }
+
+            lineMap[element.index] = formatLine(element)
+        }
+
+        return formatDisplay(lineMap)
+    }
+
+    private fun formatLine(element: CustomScoreboardElements) : List<Any>{
+        if (element.alternativeLine.isEmpty()) return element.displayLine
+        return if (config.displayNumbersFirst) element.alternativeLine else element.displayLine
+    }
+
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
@@ -169,147 +364,36 @@ class CustomScoreboard {
         return newList
     }
 
-    private fun drawScoreboard() = buildList<List<Any>> {
-        val lineMap = HashMap<Int, List<Any>>()
-        lineMap[skyblockIndex] = Collections.singletonList("§6§lSKYBLOCK")
-        lineMap[profileIndex] = Collections.singletonList("${getProfileTypeAsSymbol()}${HypixelData.profileName.firstLetterUppercase()}")
-        lineMap[purseIndex] = Collections.singletonList("Purse: §6$purse")
-        lineMap[bankIndex] = Collections.singletonList("Bank: §6$bank")
-        lineMap[bitsIndex] = Collections.singletonList("Bits: §b$bits")
-        lineMap[copperIndex] = Collections.singletonList("Copper: §c$copper")
-        lineMap[gemsIndex] = Collections.singletonList("Gems: §a$gems")
-        lineMap[EMPTY_LINE] = Collections.singletonList("<empty>")
-        lineMap[locationIndex] = Collections.singletonList(location)
-        lineMap[skyblockTimeIndex] = Collections.singletonList(SkyBlockTime.now().formatted(false))
-        lineMap[lobbyCodeIndex] = Collections.singletonList("§8$lobbyCode")
-
-        val powderList = mutableListOf<Any>()
-        powderList.add("§9§lPowder")
-        powderList.add(" §7- §fMithril: §2$mithrilPowder")
-        powderList.add(" §7- §fGemstone: §d$gemstonePowder")
-        lineMap[powderIndex] = powderList
-
-        lineMap[EMPTY_LINE2] = Collections.singletonList("<empty>")
-
-        val slayerList = mutableListOf<Any>()
-        slayerList.add("§7Slayer") //todo: get slayer stuff
-        lineMap[slayerIndex] = slayerList
-
-        val eventList = mutableListOf<Any>()
-        eventList.add("§cCurrent Event") //todo: get event stuff
-        lineMap[currentEventIndex] = eventList
-
-        val mayorList = mutableListOf<Any>()
-        mayorList.add(MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>")
-        if (config.showMayorPerks) {
-            for (perk in MayorElection.currentCandidate?.perks ?: emptyList()) {
-                mayorList.add(" §7- §e${perk.name}")
-            }
-        }
-        lineMap[mayorIndex] = mayorList
-
-        lineMap[EMPTY_LINE3] = Collections.singletonList("<empty>")
-        lineMap[heatIndex] = Collections.singletonList(if(heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
-
-        val partyList = mutableListOf<Any>()
-        var partyCount = 0
-        partyList.add("§9Party")
-        for (member in PartyAPI.partyMembers){
-            if (partyCount >= config.maxPartyList.get()) break
-            partyList.add(" §7- §7$member")
-            partyCount++
-        }
-        lineMap[partyIndex] = partyList
-
-        lineMap[maxwellIndex] = Collections.singletonList("§7Maxwell Power")
-        lineMap[websiteIndex] = Collections.singletonList("§ewww.hypixel.net")
-
-        // Hide empty lines
-        if (config.hideEmptyLines){
-            lineMap[purseIndex] = Collections.singletonList(if(purse == "0") "<hidden>" else "Purse: §6$purse")
-            lineMap[bankIndex] = Collections.singletonList(if(bank == "0") "<hidden>" else "Bank: §6$bank")
-            lineMap[bitsIndex] = Collections.singletonList(if(bits == "0") "<hidden>" else "Bits: §b$bits")
-            lineMap[copperIndex] = Collections.singletonList(if(copper == "0") "<hidden>" else "Copper: §c$copper")
-            lineMap[gemsIndex] = Collections.singletonList(if(gems == "0") "<hidden>" else "Gems: §a$gems")
-            lineMap[locationIndex] = Collections.singletonList(if(location == "None") "<hidden>" else location)
-            lineMap[lobbyCodeIndex] = Collections.singletonList(if(lobbyCode == "None") "<hidden>" else "§8$lobbyCode")
-            lineMap[heatIndex] = Collections.singletonList(if(heat == "0") "<hidden>" else "Heat: §c♨$heat")
-
-            if (partyList.size == 1){
-                lineMap[partyIndex] = Collections.singletonList("<hidden>")
-            }
-        }
-
-        // Rift
-        if(IslandType.THE_RIFT.isInIsland()){
-            lineMap[purseIndex] = Collections.singletonList("Motes: §d$motes")
-        }
-
-        // Hide irrelevant lines
-        if (config.hideIrrelevantLines){
-            if (!IslandType.GARDEN.isInIsland()){
-                lineMap[copperIndex] = Collections.singletonList("<hidden>")
-            }
-            if (IslandType.THE_RIFT.isInIsland()){
-                lineMap[bankIndex] = Collections.singletonList("<hidden>")
-                lineMap[bitsIndex] = Collections.singletonList("<hidden>")
-                lineMap[gemsIndex] = Collections.singletonList("<hidden>")
-                lineMap[mayorIndex] = Collections.singletonList("<hidden>")
-            }
-            if (!IslandType.DWARVEN_MINES.isInIsland()
-                && !IslandType.CRYSTAL_HOLLOWS.isInIsland()
-            ){
-                lineMap[powderIndex] = Collections.singletonList("<hidden>")
-            }
-            if (!IslandType.CRYSTAL_HOLLOWS.isInIsland()){
-                lineMap[heatIndex] = Collections.singletonList("<hidden>")
-            }
-            if (!IslandType.DUNGEON_HUB.isInIsland()
-                && !IslandType.CATACOMBS.isInIsland()
-                && !IslandType.KUUDRA_ARENA.isInIsland()
-                && !IslandType.CRIMSON_ISLE.isInIsland()
-            ){
-                lineMap[partyIndex] = Collections.singletonList("<hidden>")
-            }
-            if (!IslandType.HUB.isInIsland()
-                && !IslandType.SPIDER_DEN.isInIsland()
-                && !IslandType.THE_PARK.isInIsland()
-                && !IslandType.THE_END.isInIsland()
-                && !IslandType.CRIMSON_ISLE.isInIsland()
-            ){
-                lineMap[slayerIndex] = Collections.singletonList("<hidden>")
-            }
-        }
-
-        return formatDisplay(lineMap)
+    private fun isEnabled() : Boolean{
+        return config.enabled && LorenzUtils.inSkyBlock
     }
+}
 
-    private fun translateMayorNameToColor(input: String) : String {
-        return when (input) {
-            "Aatrox"    ->  "§3$input"
-            "Cole"      ->  "§e$input"
-            "Diana"     ->  "§2$input"
-            "Diaz"      ->  "§6$input"
-            "Finnegan"  ->  "§c$input"
-            "Foxy"      ->  "§d$input"
-            "Marina"    ->  "§b$input"
-            "Paul"      ->  "§c$input"
-            else        ->  "§7$input"
-        }
+private fun translateMayorNameToColor(input: String) : String {
+    return when (input) {
+        "Aatrox"    ->  "§3$input"
+        "Cole"      ->  "§e$input"
+        "Diana"     ->  "§2$input"
+        "Diaz"      ->  "§6$input"
+        "Finnegan"  ->  "§c$input"
+        "Foxy"      ->  "§d$input"
+        "Marina"    ->  "§b$input"
+        "Paul"      ->  "§c$input"
+        else        ->  "§7$input"
     }
+}
 
-    private fun extractLobbyCode(input: String): String? {
-        val regex = Regex("§(\\d{3}/\\d{2}/\\d{2}) §([A-Za-z0-9]+)$")
-        val matchResult = regex.find(input)
-        return matchResult?.groupValues?.lastOrNull()
-    }
+private fun extractLobbyCode(input: String): String? {
+    val regex = Regex("§(\\d{3}/\\d{2}/\\d{2}) §([A-Za-z0-9]+)$")
+    val matchResult = regex.find(input)
+    return matchResult?.groupValues?.lastOrNull()
+}
 
-    private fun getProfileTypeAsSymbol(): String {
-        return when {
-            HypixelData.ironman -> "§7♲ "  // Ironman
-            HypixelData.stranded -> "§a☀ " // Stranded
-            HypixelData.bingo -> "§cⒷ "    // Bingo - TODO: Consider using colors from BingoAPI
-            else -> "§e"                   // Default case
-        }
+private fun getProfileTypeAsSymbol(): String {
+    return when {
+        HypixelData.ironman -> "§7♲ "  // Ironman
+        HypixelData.stranded -> "§a☀ " // Stranded
+        HypixelData.bingo -> "§cⒷ "    // Bingo - TODO: Consider using colors from BingoAPI
+        else -> "§e"                   // Default case
     }
 }
