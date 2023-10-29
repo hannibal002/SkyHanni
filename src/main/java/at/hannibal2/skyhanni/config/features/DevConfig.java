@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -265,6 +266,19 @@ public class DevConfig {
             @ConfigOption(name = "Debug Arrow", desc = "Enables all Debug functions for the Arrow Detection")
             @ConfigEditorBoolean
             public boolean arrowDebug = false;
+
+            @Expose
+            @ConfigOption(name = "Bow Strength", desc = "Adjust default strength of Bows")
+            @ConfigEditorSlider(minValue = 1.0f, maxValue = 10.0f, minStep = 0.1f)
+            public double bowStrength = 3.0;
+            @Expose
+            @ConfigOption(name = "Arrow Gravity", desc = "Adjust default Gravity of Arrows")
+            @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.0001f)
+            public double arrowGravity = 0.025;
+            @Expose
+            @ConfigOption(name = "Arrow Drag", desc = "Adjust default Drag of Arrows")
+            @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.001f)
+            public double arrowDrag = 0.99;
 
             @Expose
             @ConfigOption(name = "Debug Cleave", desc = "Logs Cleave Hits and shows range")

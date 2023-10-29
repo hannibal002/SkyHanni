@@ -163,7 +163,7 @@ object MobHitTrigger {
     private fun handleItemClick(itemInHand: ItemStack?, clickType: ClickType) {
         if (itemInHand == null) return
 
-        val lastLore = itemInHand.getLore().last().removeColor()
+        val lastLore = "BOW"//itemInHand.getLore().last().removeColor()
         val itemName = itemInHand.displayName ?: "How"
         val armor = InventoryUtils.getArmor()
         val player = Minecraft.getMinecraft().thePlayer
@@ -206,13 +206,14 @@ object MobHitTrigger {
             ))) -> {
                 val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
                     ?: 0) + if (itemName.contains("Juju")) 3 else 0
-                val bowStrength = 3  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
+                val bowStrength = config.bowStrength  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
                 val direction = player.getLook(1.0f).toLorenzVec().normalize()
                 val xOffset = MathHelper.cos(player.rotationYaw / 180.0f * 3.1415927f).toDouble() * 0.16
                 val zOffset = MathHelper.sin(player.rotationYaw / 180.0f * 3.1415927f).toDouble() * 0.16
                 val origin = player.getPositionEyes(1.0f).toLorenzVec()
                     .subtract(LorenzVec(xOffset, 0.1, zOffset))
                 val velocity = direction.multiply(bowStrength)
+                LorenzDebug.log(velocity.toString())
                 //TODO(Terror Armor)
                 when {
                     itemName.contains("Runaan") -> ArrowDetection.newArrows(

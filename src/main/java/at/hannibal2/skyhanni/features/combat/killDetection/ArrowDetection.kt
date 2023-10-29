@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -121,6 +122,8 @@ object ArrowDetection {
                 )
             )
             arrowTrail.getOrDefault(entity, null)?.add(entity.getLorenzVec()) ?: mutableListOf(entity.getLorenzVec())
+            LorenzDebug.log(MinecraftData.totalTicks.toString())
+            LorenzDebug.log(LorenzVec(entity.motionX, entity.motionY, entity.motionZ).toString())
         }
 
         if (event.repeatSeconds(3)) {
@@ -171,17 +174,27 @@ object ArrowDetection {
         return angleDiffer < ANGLE_TOLERANCE
     }
 
-    private const val GRAVITY = 0.05
-    private const val DRAG = 0.99
+    private val GRAVITY = 0.024 // get()= config.arrowGravity
+    private val DRAG = 0.995 //get()= config.arrowDrag
 
     /**parabola(origin, direction, time) = origin + [time * direction - (0, GRAVITY * time^2, 0)] * DRAG^time
      * Time is in Ticks*/
-    private fun parabola(origin: LorenzVec, direction: LorenzVec, time: Int): LorenzVec {
+    private fun old_parabola(origin: LorenzVec, direction: LorenzVec, time: Int): LorenzVec {
         val gravityEffect = LorenzVec(0.0, GRAVITY * time * time, 0.0)
         val change = direction.multiply(time)
         val changeWithGravity = change.subtract(gravityEffect)
         val dampening = DRAG.pow(time)
         val travel = changeWithGravity.multiply(dampening)
+        return origin.add(travel)
+    }
+
+    private fun parabola(origin: LorenzVec, direction: LorenzVec, time: Int): LorenzVec {
+        val mt = DRAG.pow(time - 1)
+        val x = direction.x * mt * time
+        val z = direction.z * mt * time
+        val y = (direction.y * mt - (GRAVITY * (mt - 1) / (DRAG - 1))) * time
+
+        val travel = LorenzVec(x, y, z)
         return origin.add(travel)
     }
 
@@ -241,6 +254,7 @@ object ArrowDetection {
                     5,
                     true
                 )
+                event.drawWaypointFilled(it.parabola(i), LorenzColor.DARK_RED.toColor())
             }
         }
         val player = Minecraft.getMinecraft().thePlayer
@@ -250,6 +264,7 @@ object ArrowDetection {
 
         renderRealArrowLineList.forEach {
             event.draw3DLine(it.start, it.end, LorenzColor.GREEN.toColor(), 5, true)
+            event.drawWaypointFilled(it.start, LorenzColor.DARK_GREEN.toColor())
         }
         renderArrowDetectLineList.forEach {
             event.draw3DLine(it.start, it.end, LorenzColor.YELLOW.toColor(), 10, true)
