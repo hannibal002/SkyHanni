@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.getMotionLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import at.hannibal2.skyhanni.utils.vectorFromPoints
@@ -122,8 +122,6 @@ object ArrowDetection {
                 )
             )
             arrowTrail.getOrDefault(entity, null)?.add(entity.getLorenzVec()) ?: mutableListOf(entity.getLorenzVec())
-            LorenzDebug.log(MinecraftData.totalTicks.toString())
-            LorenzDebug.log(LorenzVec(entity.motionX, entity.motionY, entity.motionZ).toString())
         }
 
         if (event.repeatSeconds(3)) {
@@ -137,56 +135,34 @@ object ArrowDetection {
     private fun onArrowSpawn(arrow: EntityArrow) {
         val match = upComingArrows.firstOrNull { it.isOnParabola(arrow) } ?: return
         playerArrows.add(SkyblockArrow(arrow, match.pierce, match.canHitEnderman))
-        //upComingArrows.remove(match)
+        upComingArrows.remove(match)
         LorenzDebug.log("Added Arrow, needs to find still: ${upComingArrows.count()}")
     }
 
-    private const val ANGLE_TOLERANCE = PI * (2.0 / 3.0)
+    private const val ANGLE_TOLERANCE = PI * (4.0 / 3.0)
     private const val DISTANCE_TOLERANCE = 4.0
-    private const val TICK_ADJUST = 4
+    private const val TICK_TO_CATCH = 1
+
     private fun isOnParabola(origin: LorenzVec, direction: LorenzVec, tick: Int, arrow: EntityArrow): Boolean {
-        val p = tick - TICK_ADJUST
-        val pointOnParabola = parabola(origin, direction, p)    //TODO Check if the parabola is correct
-        if (pointOnParabola.distance(arrow.getLorenzVec()) < DISTANCE_TOLERANCE) {
-            if (config.arrowDebug) {
-                LorenzDebug.log("Caught Arrow at $p Tick")
-                renderArrowDetectLineList.add(
-                    Line(
-                        pointOnParabola,
-                        arrow.getLorenzVec()
-                    )
-                )
-            }
-        } else {
-            LorenzDebug.log("Caught Arrow not at $p Tick")
-            renderArrowDetectLineList.add(
-                Line(
-                    pointOnParabola,
-                    arrow.getLorenzVec()
+        val p = TICK_TO_CATCH
+
+        if (!(parabola(origin, direction, p).distance(arrow.getLorenzVec()) < DISTANCE_TOLERANCE)) return false
+
+        //TODO Debug Angle
+        val angleDiffer = arrow.getMotionLorenzVec() //TODO fix that Multiarrow has 0 MotionVector
+            .angleInRad(
+                vectorFromPoints(
+                    parabola(origin, direction, p),
+                    parabola(origin, direction, p + 1)
                 )
             )
-            return false
-        }
-        //TODO Debug Angle
-        val angleDiffer = arrow.getLook(0.0f).toLorenzVec()
-            .angleInRad(vectorFromPoints(parabola(origin, direction, p - 1), parabola(origin, direction, p)))
         LorenzDebug.log("Soll: $ANGLE_TOLERANCE, Ist: $angleDiffer")
         return angleDiffer < ANGLE_TOLERANCE
     }
 
-    private val GRAVITY = 0.024 // get()= config.arrowGravity
-    private val DRAG = 0.995 //get()= config.arrowDrag
-
-    /**parabola(origin, direction, time) = origin + [time * direction - (0, GRAVITY * time^2, 0)] * DRAG^time
-     * Time is in Ticks*/
-    private fun old_parabola(origin: LorenzVec, direction: LorenzVec, time: Int): LorenzVec {
-        val gravityEffect = LorenzVec(0.0, GRAVITY * time * time, 0.0)
-        val change = direction.multiply(time)
-        val changeWithGravity = change.subtract(gravityEffect)
-        val dampening = DRAG.pow(time)
-        val travel = changeWithGravity.multiply(dampening)
-        return origin.add(travel)
-    }
+    //Adjusted values from Minecraft uses because EntityArrow.Update is only called every second tick
+    private val GRAVITY = 0.024 //Minecraft Default = 0.05
+    private val DRAG = 0.995 //Minecraft Default = 0.99
 
     private fun parabola(origin: LorenzVec, direction: LorenzVec, time: Int): LorenzVec {
         val mt = DRAG.pow(time - 1)
@@ -223,15 +199,7 @@ object ArrowDetection {
     fun onTickForHighlight(event: LorenzRenderWorldEvent) {
         if (!config.arrowDebug) return
         playerArrows.forEach {
-            RenderUtils.drawCylinderInWorld(
-                LorenzColor.GOLD.toColor(),
-                it.base.position.x.toDouble(),
-                it.base.position.y.toDouble(),
-                it.base.position.z.toDouble(),
-                1.0.toFloat(),
-                1.0.toFloat(),
-                event.partialTicks
-            )
+            event.drawWaypointFilled(it.base.getLorenzVec(), LorenzColor.GOLD.toColor())
         }
     }
 
@@ -254,7 +222,8 @@ object ArrowDetection {
                     5,
                     true
                 )
-                event.drawWaypointFilled(it.parabola(i), LorenzColor.DARK_RED.toColor())
+                val color = if (i != TICK_TO_CATCH) LorenzColor.DARK_RED else LorenzColor.YELLOW
+                event.drawWaypointFilled(it.parabola(i), color.toColor())
             }
         }
         val player = Minecraft.getMinecraft().thePlayer
@@ -264,7 +233,7 @@ object ArrowDetection {
 
         renderRealArrowLineList.forEach {
             event.draw3DLine(it.start, it.end, LorenzColor.GREEN.toColor(), 5, true)
-            event.drawWaypointFilled(it.start, LorenzColor.DARK_GREEN.toColor())
+            event.drawWaypointFilled(it.end, LorenzColor.DARK_GREEN.toColor())
         }
         renderArrowDetectLineList.forEach {
             event.draw3DLine(it.start, it.end, LorenzColor.YELLOW.toColor(), 10, true)

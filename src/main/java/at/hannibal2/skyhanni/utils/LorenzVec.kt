@@ -73,7 +73,7 @@ data class LorenzVec(
     fun dotProduct(other: LorenzVec): Double =
         x multiplyZeroSave other.x + y multiplyZeroSave other.y + z multiplyZeroSave other.z
 
-    fun angleAsCos(other: LorenzVec) = this.dotProduct(other) / (this.length() * other.length())
+    fun angleAsCos(other: LorenzVec) = this.normalize().dotProduct(other.normalize())
 
     fun angleInRad(other: LorenzVec) = acos(this.angleAsCos(other))
 
@@ -192,6 +192,7 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 
