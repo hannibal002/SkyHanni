@@ -614,7 +614,6 @@ class SkyHanniMod {
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
-        // bulling contributors <3
 
         init()
 
