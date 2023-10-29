@@ -71,10 +71,11 @@ import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
-import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
+import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -164,15 +165,15 @@ import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.HarpFeatures
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
-import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayAbiphone
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayer
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayerAdvanced
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayPlayerTryhard
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayCombat
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayFarming
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlayMining
-import at.hannibal2.skyhanni.features.inventory.MenuItemDisplayOverlaySBLeveling
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayAbiphone
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayer
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayerAdvanced
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayerTryhard
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayCombat
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayFarming
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayMining
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlaySBLeveling
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
@@ -198,6 +199,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
+import at.hannibal2.skyhanni.features.misc.FandomWikiFromMenus
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
@@ -325,7 +327,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.12",
+    version = "0.21.Beta.14",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -407,6 +409,7 @@ class SkyHanniMod {
         loadModule(MenuItemDisplayOverlaySBLeveling())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
+        loadModule(FandomWikiFromMenus())
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
@@ -434,7 +437,7 @@ class SkyHanniMod {
         loadModule(MinionFeatures())
         loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
-        loadModule(WikiCommand())
+        loadModule(WikiManager())
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
         loadModule(ViewRecipeCommand)
@@ -623,6 +626,7 @@ class SkyHanniMod {
         loadModule(SkyBlockKickDuration())
         loadModule(LimboTimeTracker())
         loadModule(PartyMemberOutlines())
+        loadModule(ArrowTrail())
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())

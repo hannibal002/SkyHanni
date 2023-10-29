@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -22,9 +22,9 @@ class MenuItemDisplayOverlayAbiphone {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberAbiphoneAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.abiphone.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberAbiphoneAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.abiphone
         val chestName = InventoryUtils.openInventoryName()
         val isAbiphone = ((chestName.contains("Abiphone") || chestName.contains("AⒷiphone")))
         

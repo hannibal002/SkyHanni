@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -25,9 +25,9 @@ class MenuItemDisplayOverlayCombat {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberCombatAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.combat.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberCombatAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.combat
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(0) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty() && (itemName.contains("Bestiary Milestone ")))) {

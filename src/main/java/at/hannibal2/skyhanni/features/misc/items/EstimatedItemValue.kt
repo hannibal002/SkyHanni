@@ -249,7 +249,7 @@ object EstimatedItemValue {
             if (price != null) {
                 list.add(
                     "§7Attribute §9${
-                        attributes[0].first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                        attributes[0].first.fixMending().split("_").joinToString(" ") { it.firstLetterUppercase() }
                     } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
                 )
                 return price
@@ -272,8 +272,7 @@ object EstimatedItemValue {
             if (price != null) {
                 subTotal += price
             }
-            var displayName = attr.first
-            if (displayName == ("MENDING")) displayName = "VITALITY"
+            val displayName = attr.first.fixMending()
             list.add(
                 "  §9${
                     displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
@@ -282,6 +281,8 @@ object EstimatedItemValue {
         }
         return subTotal
     }
+
+    private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
         return (1..10).mapNotNull { lowerLevel ->

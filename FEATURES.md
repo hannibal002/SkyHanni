@@ -774,6 +774,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
 + Added AFK time to Discord RPC. - NetheriteMiner
++ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
+    + E.g. inside the SkyBlock leveling guide.
 </details>
 <details open><summary>
 
@@ -783,4 +785,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Following Line** - hannibal2
     + Draws a colored line behind the player.
     + Change the color, width, and duration of the line.
++ **Arrow Trail cosmetic** - Thunderblade73
+    + Draw a colored line behind the arrows in the air.
+    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
+      color, to change the time alive, and the line width.
 </details>

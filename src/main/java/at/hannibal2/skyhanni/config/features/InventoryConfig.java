@@ -362,12 +362,19 @@ public class InventoryConfig {
     }
 
     @Expose
-    @ConfigOption(
+    @ConfigOption(name = "Stack Size Features", desc = "")
+    @Accordion
+    public StackSizeConfig stackSize = new StackSizeConfig();
+
+    public static class StackSizeConfig {
+
+        @Expose
+        @ConfigOption(
             name = "Item Number",
             desc = "Showing the item number as a stack size for these items." // Some values may be truncated percentages or §a✔§r§7s.
-    )
-    @ConfigEditorDraggableList(
-        exampleText = {
+        )
+        @ConfigEditorDraggableList(
+            exampleText = {
                 "§bMaster Star Tier",
                 "§bMaster Skull Tier",
                 "§bGolden/Diamond Dungeon Head Floor Number",
@@ -394,17 +401,24 @@ public class InventoryConfig {
                 "§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)",
                 "§bAbiphone Tier",
                 "§bItem Edition/Auction Number (if less than 1000)",
-        }
-    )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
+            }
+        )
+        public List<Integer> itemNumber = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (General)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+        @Expose
+        @Accordion
+        @ConfigOption(name = "Stack Size in Menus", desc = "")
+        public MenuConfig menu = new MenuConfig();
+
+        public static class MenuConfig {
+
+            @Expose
+            @ConfigOption(
+                name = "General",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bSkyblock Level (#, won't work in Rift)",
                     "§bSkill + Garden + Dungeoneering Levels (#)",
                     "§bSkill Average (#)",
@@ -415,17 +429,17 @@ public class InventoryConfig {
                     "§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)",
                     "§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)",
                     "§bQuick Upgrade Missing Count (#)",
-            }
-    )
-    public List<Integer> menuItemNumberPlayerAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9));
+                }
+            )
+            public List<Integer> player = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (Advanced)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "Advanced",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bUnlocked Recipes (%)",
                     "§bCollected Fairy/Enigma Souls + Completed Quests (#)",
                     "§bTrades Unlocked (%)",
@@ -436,17 +450,17 @@ public class InventoryConfig {
                     "§bDojo Progress (Abbv)",
                     "§bBank Utilities (Abbvs)",
                     "§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)",
-            }
-    )
-    public List<Integer> menuItemNumberPlayerAdvancedAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 9));
+                }
+            )
+            public List<Integer> playerAdvanced = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 9));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (Tryhard)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "Tryhard",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)",
                     "§bRNG Meter Drop Odds (Abbvs)",
                     "§bCommunity Shop + Essence Shop Upgrade Tiers (#)",
@@ -457,81 +471,81 @@ public class InventoryConfig {
                     "§bAccessory Bag Utilities (Various)",
                     "§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]",
                     "§bSkyBlock Achievements Points (%)",
-            }
-    )
-    public List<Integer> menuItemNumberPlayerTryhardAsStackSize = new ArrayList<>(Arrays.asList(2, 4, 5, 8));
+                }
+            )
+            public List<Integer> playerTryhard = new ArrayList<>(Arrays.asList(2, 4, 5, 8));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (§aFarming§7)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "§aFarming§7",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)",
                     "§bVisitor's Logbook Countdown (#, highest unit of time only)",
                     "§bVisitor Milestones Progress (%)",
                     "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
                     "§bComposter \"Insert from \" Counts (Abbv)"
-            }
-    )
-    public List<Integer> menuItemNumberFarmingAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2));
+                }
+            )
+            public List<Integer> farming = new ArrayList<>(Arrays.asList(0, 1, 2));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (§aMining§7)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "§aMining§7",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bCurrent Sky Mall Perk (Abbv)", //do not move this PLEASE otherwise one of the other stack size features will break
                     "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
                     "§bHOTM Tiers Progress (%)",
                     "§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)",
-            }
-    )
-    public List<Integer> menuItemNumberMiningAsStackSize = new ArrayList<>(Arrays.asList(1, 2));
+                }
+            )
+            public List<Integer> mining = new ArrayList<>(Arrays.asList(1, 2));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (§aCombat§7)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "§aCombat§7",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bBestiary Level (#)",
                     "§bBestiary Progress (%, Overall + per Family)",
                     "§bCurrent Slayer Levels (#)",
                     "§bSlayer Combat Wisdom Buff (#)",
                     "§bSlayer/Catacombs RNG Meter Progress (%)",
                     "§bUnlocked Slayer Recipes (#)",
-            }
-    )
-    public List<Integer> menuItemNumberCombatAsStackSize = new ArrayList<>(Arrays.asList(0, 2));
+                }
+            )
+            public List<Integer> combat = new ArrayList<>(Arrays.asList(0, 2));
 
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (§aSB Levels§7)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "§aSB Levels§7",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bSkyblock Guide Progress (%)",
                     "§bSkyblock Ways To Level Up Tasks (%)",
                     "§bSkyblock Leveling Rewards Progress (%)",
                     "§bEmblems Unlocked (#)",
-            }
-    )
-    public List<Integer> menuItemNumberSBLevelingAsStackSize = new ArrayList<>(Arrays.asList(0));
+                }
+            )
+            public List<Integer> sbLeveling = new ArrayList<>(Arrays.asList(0));
 
-    @Expose
-    @ConfigOption(
-            name = "Menu stack size (§aAb§9ip§5ho§6ne§ds§7)",
-            desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
+            @Expose
+            @ConfigOption(
+                name = "§aAb§9ip§5ho§6ne§ds§7",
+                desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+            )
+            @ConfigEditorDraggableList(
+                exampleText = {
                     "§bContacts Directory (#)",
                     "§bDND Indicator (§c§l✖§b)",
                     "§bRelays Finished (#)",
@@ -539,10 +553,11 @@ public class InventoryConfig {
                     "§bTic Tac Toe Stats (§aW§eT§cL§b)",
                     "§bSnake Highest Score (#)",
                     "§bSorting/Filtering Abbreviations",
-            }
-    )
-    public List<Integer> menuItemNumberAbiphoneAsStackSize = new ArrayList<>(Arrays.asList(0, 1, 2));
-
+                }
+            )
+            public List<Integer> abiphone = new ArrayList<>(Arrays.asList(0, 1, 2));
+        }
+    }
 
     @Expose
     @ConfigOption(

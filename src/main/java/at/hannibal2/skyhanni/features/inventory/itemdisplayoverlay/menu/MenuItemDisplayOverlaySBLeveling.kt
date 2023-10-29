@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -20,9 +20,9 @@ class MenuItemDisplayOverlaySBLeveling {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberSBLevelingAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.sbLeveling.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberSBLevelingAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.sbLeveling
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(0)) {

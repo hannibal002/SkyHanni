@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -21,9 +21,9 @@ class MenuItemDisplayOverlayFarming {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberFarmingAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.farming.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberFarmingAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.farming
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(0) && ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!"))) {

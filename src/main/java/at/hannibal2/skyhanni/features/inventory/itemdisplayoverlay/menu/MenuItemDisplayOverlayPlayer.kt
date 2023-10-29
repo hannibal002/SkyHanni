@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
@@ -34,9 +34,9 @@ class MenuItemDisplayOverlayPlayer {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.menuItemNumberPlayerAsStackSize.isEmpty()) return ""
+        if (SkyHanniMod.feature.inventory.stackSize.menu.player.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.menuItemNumberPlayerAsStackSize
+        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.player
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(0) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
