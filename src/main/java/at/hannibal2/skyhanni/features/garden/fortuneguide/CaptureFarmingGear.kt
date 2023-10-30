@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
+import kotlin.time.Duration.Companion.days
 
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
@@ -33,6 +34,8 @@ class CaptureFarmingGear {
 
     private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
     private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
+
+    private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
@@ -107,8 +110,8 @@ class CaptureFarmingGear {
                     FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
                     val enchantments = slot.getEnchantments() ?: emptyMap()
                     val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
-                    GardenAPI.config?.uniqueVisitors =
-                        round(FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
+                    val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
+                    GardenAPI.config?.uniqueVisitors = round(visitors).toInt()
                 }
             }
         }
@@ -238,8 +241,8 @@ class CaptureFarmingGear {
                 }
             }
         }
-        if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
-            hidden.cakeExpiring = System.currentTimeMillis() + 172800000
+        cakePattern.matchMatcher(msg) {
+            hidden.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
         }
         if (msg == "CARROTS EXPORTATION COMPLETE!") {
             hidden.carrotFortune = true
