@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntityByID
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -190,7 +190,7 @@ object InquisitorWaypointShare {
             return
         }
 
-        val inquisitor = Minecraft.getMinecraft().theWorld.getEntityByID(inquisitor)
+        val inquisitor = getEntityByID(inquisitor)
         if (inquisitor == null) {
             LorenzUtils.chat("§cInquisitor out of range!")
             return

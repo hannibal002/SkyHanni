@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntityByID
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -64,7 +65,7 @@ object TrevorSolver {
                     ) && dist < currentMob!!.renderDistance
 
                     if (!canSee) {
-                        val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
+                        val nameTagEntity = getEntityByID(foundID + 1)
                         if (nameTagEntity is EntityArmorStand) canSee = true
                     }
                     if (canSee) {
