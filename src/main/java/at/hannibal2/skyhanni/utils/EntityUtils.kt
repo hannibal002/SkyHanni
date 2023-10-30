@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -158,12 +159,9 @@ object EntityUtils {
 
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence() ?: emptySequence()
+    }?.asSequence()?.filterNotNull() ?: emptySequence()
 
-    fun getEntityById(id: Int): Entity? {
-        val minecraft = Minecraft.getMinecraft() ?: return null
-        val world = minecraft.theWorld ?: return null
-        if (minecraft.thePlayer == null) return null
-        return world.getEntityByID(id)
-    }
+    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
+
+    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 }

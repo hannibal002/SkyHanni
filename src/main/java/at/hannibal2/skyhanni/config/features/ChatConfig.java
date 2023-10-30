@@ -66,7 +66,7 @@ public class ChatConfig {
 
         @Expose
         @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
-                "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
+            "(Except powder numbers over 1k, essence numbers over 2, Prehistoric Eggs, and Automaton Parts)")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean powderMining = true;
@@ -186,14 +186,14 @@ public class ChatConfig {
     @FeatureToggle
     public boolean hideSacksChange = false;
 
-//    @Expose
-//    @ConfigOption(
-//            name = "Translator",
-//            desc = "Click on a message to translate it into English. " +
-//                    "Use §e/shcopytranslation§7 to get the translation from English. " +
-//                    "§cTranslation is not guaranteed to be 100% accurate."
-//    )
-//    @ConfigEditorBoolean
-//    @FeatureToggle
-//    public boolean translator = false;
+    @Expose
+    @ConfigOption(
+            name = "Translator",
+            desc = "Click on a message to translate it into English. " +
+                    "Use §e/shcopytranslation§7 to get the translation from English. " +
+                    "§cTranslation is not guaranteed to be 100% accurate."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean translator = false;
 }

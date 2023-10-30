@@ -284,7 +284,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         } ?: 100 // percentage to next milestone
 
         if (tier != null) {
-            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected"})"
+            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
         } else AutoStatus.CROP_MILESTONES.placeholderText
     }),
 

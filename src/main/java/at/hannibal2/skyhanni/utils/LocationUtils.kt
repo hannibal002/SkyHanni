@@ -37,6 +37,15 @@ object LocationUtils {
 
     fun AxisAlignedBB.isPlayerInside() = isVecInside(playerLocation())
 
+    fun LorenzVec.canBeSeen(radius: Double = 150.0): Boolean {
+        val a = playerEyeLocation()
+        val b = this
+        val noBlocks = canSee(a, b)
+        val notTooFar = a.distance(b) < radius
+        val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
+        return noBlocks && notTooFar && inFov
+    }
+
     fun AxisAlignedBB.minBox() = LorenzVec(minX,minY,minZ)
 
     fun AxisAlignedBB.maxBox() = LorenzVec(maxX,maxY,maxZ)
