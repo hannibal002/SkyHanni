@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntityByID
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -211,9 +212,9 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!onFarmingIsland()) return
-        var entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(trapperID)
+        var entityTrapper = getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper =
-            Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
+            getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
             RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
             { config.trapperTalkCooldown }
