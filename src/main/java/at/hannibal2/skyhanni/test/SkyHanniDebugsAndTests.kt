@@ -124,7 +124,7 @@ class SkyHanniDebugsAndTests {
                 Thread.sleep(500)
                 SkyHanniMod.configManager.disableSaving()
 
-                // inizialising a new config manager, calling firstLoad, and setting it as the config manager in use.
+                // initializing a new config manager, calling firstLoad, and setting it as the config manager in use.
                 val configManager = ConfigManager()
                 configManager.firstLoad()
                 SkyHanniMod.Companion::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
@@ -132,7 +132,7 @@ class SkyHanniDebugsAndTests {
 
                 // resetting the MoulConfigProcessor in use
                 ConfigGuiManager.editor = null
-                LorenzUtils.chat("Reseted the config manager!")
+                LorenzUtils.chat("Reset the config manager!")
             }.start()
         }
 

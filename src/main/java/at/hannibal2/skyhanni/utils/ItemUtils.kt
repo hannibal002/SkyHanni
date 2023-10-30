@@ -212,7 +212,9 @@ object ItemUtils {
 
 
         if (isPet(cleanName())) {
-            return getPetRarity(this)
+            val petRarity = getPetRarity(this)
+            data.itemRarity = petRarity
+            return petRarity
         }
 
         val rarity = LorenzRarity.readItemRarity(this)
