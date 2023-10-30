@@ -156,10 +156,5 @@ object EntityUtils {
 
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 
-    fun getEntityByID(id: Int): Entity? {
-        val minecraft = Minecraft.getMinecraft() ?: return null
-        val world = minecraft.theWorld ?: return null
-        if (minecraft.thePlayer == null) return null
-        return world.getEntityByID(id)
-    }
+    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 }

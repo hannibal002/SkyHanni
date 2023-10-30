@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntityByID
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -50,7 +49,7 @@ class EntityData {
         val watchableObjects = packet.func_149376_c() ?: return
         val entityId = packet.entityId
 
-        val entity = getEntityByID(entityId) ?: return
+        val entity = EntityUtils.getEntityByID(entityId) ?: return
         if (entity is EntityArmorStand) return
         if (entity is EntityXPOrb) return
         if (entity is EntityItem) return

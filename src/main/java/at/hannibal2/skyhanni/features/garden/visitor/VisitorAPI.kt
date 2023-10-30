@@ -7,13 +7,12 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntityByID
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
@@ -116,8 +115,8 @@ object VisitorAPI {
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
 
-        fun getEntity(): Entity? = getEntityByID(entityId)
-        fun getNameTagEntity(): Entity? = getEntityByID(nameTagEntityId)
+        fun getEntity() = EntityUtils.getEntityByID(entityId)
+        fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
 
         fun hasReward(): VisitorReward? {
             for (internalName in allRewards) {

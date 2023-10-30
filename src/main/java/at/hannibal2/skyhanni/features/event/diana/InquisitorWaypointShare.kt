@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntityByID
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -191,7 +191,7 @@ object InquisitorWaypointShare {
             return
         }
 
-        val inquisitor = getEntityByID(inquisitor)
+        val inquisitor = EntityUtils.getEntityByID(inquisitor)
         if (inquisitor == null) {
             LorenzUtils.chat("§cInquisitor out of range!")
             return
