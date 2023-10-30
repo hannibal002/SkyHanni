@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class CommandsConfig {
 
@@ -60,16 +62,40 @@ public class CommandsConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean partyCommands = true;
+
+        @Expose
+        @ConfigOption(name = "View Recipe", desc = "Tab complete item IDs in the the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean viewrecipeItems = true;
     }
 
+    @ConfigOption(name = "Fandom Wiki for §e/wiki", desc = "")
+    @Accordion
     @Expose
-    @ConfigOption(name = "Fandom Wiki", desc = "Use Fandom wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7).")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean useFandomWiki = false;
+    public FandomWikiCommmandConfig fandomWiki = new FandomWikiCommmandConfig();
+
+    public static class FandomWikiCommmandConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Use Fandom Wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Skip Chat", desc = "Directly opens the Fandom Wiki instead of sending the §e\"Click to search for this thing on the Fandom Wiki\"§7 message beforehand.")
+        @ConfigEditorBoolean
+        public boolean skipWikiChat = false;
+
+        @Expose
+        @ConfigOption(name = "Fandom Wiki Key", desc = "Search for an item on Fandom Wiki with this keybind.\n§4For optimal experiences, do §lNOT§r §4bind this to a mouse button.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int fandomWikiKeybind = Keyboard.KEY_NONE;
+    }
 
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
-            "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
+        "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle
@@ -80,4 +106,10 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;
+
+    @Expose
+    @ConfigOption(name = "/viewrecipe Lower Case", desc = "Adds support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean viewRecipeLowerCase = true;
 }

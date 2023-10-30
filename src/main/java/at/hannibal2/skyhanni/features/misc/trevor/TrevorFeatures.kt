@@ -39,6 +39,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorFeatures {
+    // TODO USE SH-REPO
     private val trapperPattern =
         "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
     private val talbotPatternAbove =
@@ -46,6 +47,7 @@ object TrevorFeatures {
     private val talbotPatternBelow =
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
     private val locationPattern = "Zone: (?<zone>.*)".toPattern()
+
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY
