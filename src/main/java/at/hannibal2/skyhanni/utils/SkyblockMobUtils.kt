@@ -23,7 +23,7 @@ object SkyblockMobUtils {
 
     open class SkyblockMob(val baseEntity: Entity) {
         //Fun Fact the corresponding ArmorStand for a mob has always the ID + 1
-        val armorStand = EntityUtils.getEntityById(baseEntity.entityId + 1)
+        val armorStand = EntityUtils.getEntityByID(baseEntity.entityId + 1)
 
         open val name: String = armorStand?.name?.let { mobNameFilter.find(it.removeColor())?.groupValues?.get(1) }
             ?: "Skyblock Name of Mob ${baseEntity.name} found"
