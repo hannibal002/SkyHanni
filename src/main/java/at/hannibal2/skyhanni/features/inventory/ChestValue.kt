@@ -42,6 +42,11 @@ class ChestValue {
         if (!isEnabled()) return
         if (LorenzUtils.inDungeons && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
+
+        if (!config.showDuringEstimatedItemValue) {
+            if (EstimatedItemValue.currentlyShowing) return
+        }
+
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
@@ -239,7 +244,7 @@ class ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
-                LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+            LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
         return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 

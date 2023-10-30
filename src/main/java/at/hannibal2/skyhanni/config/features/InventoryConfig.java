@@ -245,6 +245,12 @@ public class InventoryConfig {
         public boolean enableInDungeons = false;
 
         @Expose
+        @ConfigOption(name = "Enable during Item Value", desc = "Show this display even if the Estimated Item Value is visible.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean showDuringEstimatedItemValue = false;
+
+        @Expose
         @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")
         @ConfigEditorBoolean
         public boolean showStacks = true;

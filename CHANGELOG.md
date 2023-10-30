@@ -62,7 +62,13 @@
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
 + Added AFK time to Discord RPC. - NetheriteMiner
-+ Option to highlight items that are full in the sack inventory.
++ Added option to highlight items that are full in the sack inventory.
++ Added **Arrow Trail cosmetic** - Thunderblade73
+    + Draw a colored line behind the arrows in the air.
+    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
+      color, to change the time alive, and the line width.
++ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
+    + E.g. inside the SkyBlock leveling guide.
 
 #### Events
 
@@ -74,6 +80,7 @@
 + Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
+
 
 ### Changes
 
@@ -111,6 +118,8 @@
 + Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
 + Disabled clicks on SkyHanni GUIs while inside NEU's or Skytils profile viewer. - hannibal2
 + Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks sometimes. - hannibal2
++ Added diamond and gold essence support to PowderTracker. - walker
++ Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search engine - Erymanthus
 
 ### Bug Fixes
 
@@ -160,6 +169,9 @@
 + Fixed Farming Weight Display shows 0 weight wrongly sometimes. - Kaeso
 + Fixed damage indicator errors during Enderman Slayer. - hannibal2
 + Fixed weird error messages in the Damage Indicator. - hannibal2
++ Fixed Enderman Slayer errors again. - hannibal2
++ Fixed the Sack Display error again. - HiZe
++ Fixed the attribute Vitality getting wrongly labeled as Mending on attribute shards. - hannibal2
 
 #### Config
 
@@ -177,6 +189,9 @@
 + Moved many patterns from function scope to members. - hannibal2
 + Avoid hardcoded dispatcher. - walker
 + Created and used Entity.canBeSeen and LorenzVec.canBeSeen. - hannibal2
++ Reducing cognitive complexity in StatsTuning.kt - walker
++ Reducing indentations and line counts in StatsTuning.kt - hannibal2
++ Mark functions around item utils and neu items as deprecated. - walker
 
 ## Version 0.20
 
