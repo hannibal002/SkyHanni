@@ -369,7 +369,6 @@ object Commands {
         commands.add(CommandInfo(name, description, currentCategory))
     }
 
-
     private fun registerCommand0(
         name: String,
         description: String,
