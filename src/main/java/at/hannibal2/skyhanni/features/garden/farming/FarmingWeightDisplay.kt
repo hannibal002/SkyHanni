@@ -255,7 +255,7 @@ class FarmingWeightDisplay {
 
             if (weightUntilOvertake < 0) {
                 if (weightPerSecond > 0) {
-                    farmingChatMessage("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                    farmingChatMessage("You passed §b$nextName §ein the Farming Weight Leaderboard!")
                 }
 
                 // Lower leaderboard position

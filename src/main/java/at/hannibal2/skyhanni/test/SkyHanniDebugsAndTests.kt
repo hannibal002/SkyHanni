@@ -109,7 +109,8 @@ class SkyHanniDebugsAndTests {
 
             LorenzUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm"
+                "shconfigmanagerreset confirm",
+                false
             )
         }
 
@@ -131,7 +132,7 @@ class SkyHanniDebugsAndTests {
 
                 // resetting the MoulConfigProcessor in use
                 ConfigGuiManager.editor = null
-                LorenzUtils.chat("§e[SkyHanni] Reseted the config manager!")
+                LorenzUtils.chat("Reseted the config manager!")
             }.start()
         }
 

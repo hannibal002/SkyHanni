@@ -43,7 +43,7 @@ class FandomWikiFromMenus {
         val inWikiInventory = // TODO better name for this inventory
             event.slotId == 11 && itemClickedName.contains("Wiki Command") && chestName.contains("Wiki")
         if ((itemInHandName == "") || inWikiInventory) {
-            LorenzUtils.clickableChat("§e[SkyHanni] Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
+            LorenzUtils.clickableChat("Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
             return
         }
 
@@ -66,11 +66,11 @@ class FandomWikiFromMenus {
 
         if (!config.skipWikiChat) {
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
+                "Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
                 "wiki $wikiInternalName"
             )
         } else {
-            LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$wikiDisplayName")
+            LorenzUtils.chat("Searching the Fandom Wiki for §a$wikiDisplayName")
             val wikiUrlCustom = "${WikiManager.urlSearchPrefix}$wikiInternalName&scope=internal"
             OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
         }
