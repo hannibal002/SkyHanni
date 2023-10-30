@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 class ChatFilter {
     private val config get() = SkyHanniMod.feature.chat.filterType
 
-    // Regex Patterns & Messages
+    /// <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
     private val lobbyPatterns = listOf(
         // player join
@@ -339,6 +339,7 @@ class ChatFilter {
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith
     )
+    /// </editor-fold>
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
