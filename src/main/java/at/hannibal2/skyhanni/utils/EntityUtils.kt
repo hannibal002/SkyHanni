@@ -160,5 +160,10 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence() ?: emptySequence()
 
-    fun getEntityById(id : Int) : Entity? = Minecraft.getMinecraft()?.theWorld?.getEntityByID(id)
+    fun getEntityById(id: Int): Entity? {
+        val minecraft = Minecraft.getMinecraft() ?: return null
+        val world = minecraft.theWorld ?: return null
+        if (minecraft.thePlayer == null) return null
+        return world.getEntityByID(id)
+    }
 }

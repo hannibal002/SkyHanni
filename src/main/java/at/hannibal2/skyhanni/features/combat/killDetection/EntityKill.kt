@@ -24,8 +24,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityKill {
 
-    var playerName = " " //Just Debug
-
     private var mobHitList = mutableSetOf<SkyblockMobUtils.SkyblockMob>()
 
     val currentEntityLiving = mutableSetOf<EntityLivingBase>()
@@ -61,20 +59,7 @@ object EntityKill {
 
     @SubscribeEvent
     fun onEntityLivingSpawn(event: EntityLivingSpawnEvent) {
-        //Only Debug
-        val entity = event.entity
-        if (entity.name == playerName) {
-            val properties = entity.javaClass.declaredFields
 
-            for (property in properties) {
-                property.isAccessible = true
-                val propertyName = property.name
-                val propertyValue = property.get(entity)
-
-                // Log the property name and value
-                LorenzDebug.log("$propertyName: $propertyValue")
-            }
-        }
     }
 
     @SubscribeEvent
