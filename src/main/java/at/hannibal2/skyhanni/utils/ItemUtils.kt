@@ -124,6 +124,7 @@ object ItemUtils {
     }
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalName()"))
     fun ItemStack.getInternalName_old() = getInternalName().asString()
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
@@ -218,7 +219,9 @@ object ItemUtils {
 
 
         if (isPet(cleanName())) {
-            return getPetRarity(this)
+            val petRarity = getPetRarity(this)
+            data.itemRarity = petRarity
+            return petRarity
         }
 
         val rarity = LorenzRarity.readItemRarity(this)
