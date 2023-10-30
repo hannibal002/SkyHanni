@@ -416,12 +416,10 @@ class ChatFilter {
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
-    private fun String.isPresent(key: String): Boolean {
-        return this in (messagesMap[key] ?: emptyList()) ||
+    private fun String.isPresent(key: String) = this in (messagesMap[key] ?: emptyList()) ||
             (patternsMap[key] ?: emptyList()).any { it.matchMatcher(this) { } != null } ||
             (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
             (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
-    }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
