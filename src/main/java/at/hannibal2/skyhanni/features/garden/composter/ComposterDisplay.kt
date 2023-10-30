@@ -33,7 +33,7 @@ class ComposterDisplay {
         STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
 
         val displayItem by lazy {
-            NEUItems.getItemStack(icon, true)
+            NEUItems.getItemStack(icon)
         }
 
         val pattern by lazy { rawPattern.toPattern() }
@@ -102,7 +102,7 @@ class ComposterDisplay {
             val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
             GardenAPI.config?.composterEmptyTime = System.currentTimeMillis() + millis
             val format = TimeUtils.formatDuration(millis, maxUnits = 2)
-            listOf(NEUItems.getItemStack("BUCKET", true), "§b$format")
+            listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")
         }
@@ -188,7 +188,7 @@ class ComposterDisplay {
         } else "?"
 
         if (!GardenAPI.inGarden() && config.displayOutsideGarden) {
-            val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET", true), "§b$format"))
+            val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }
     }

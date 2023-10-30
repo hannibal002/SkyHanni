@@ -258,9 +258,10 @@ public class MiscConfig {
                         "Slayer",
                         "Stacking Enchantment",
                         "Dungeon",
+                        "AFK Indicator"
                 }
         )
-        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
         @Expose
         @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
@@ -489,6 +490,49 @@ public class MiscConfig {
             @ConfigEditorBoolean
             public boolean behindBlocks = false;
         }
+
+        @Expose
+        @ConfigOption(name = "Arrow Trail", desc = "")
+        @Accordion
+        public ArrowTrailConfig arrowTrailConfig = new ArrowTrailConfig();
+
+        public static class ArrowTrailConfig {
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Draw a colored line behind arrows in the air.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Nonplayer Arrows", desc = "Only shows for arrows the player has shot.")
+            @ConfigEditorBoolean
+            public boolean hideOtherArrows = true;
+
+            @Expose
+            @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
+            @ConfigEditorColour
+            public String arrowColor = "0:200:85:255:85";
+
+            @Expose
+            @ConfigOption(name = "Player Arrows", desc = "Different color for the line of arrows that you have shot.")
+            @ConfigEditorBoolean
+            public boolean handlePlayerArrowsDifferently = false;
+
+            @Expose
+            @ConfigOption(name = "Player Arrow Color", desc = "Color of the line of your own arrows.")
+            @ConfigEditorColour
+            public String playerArrowColor = "0:200:85:255:255";
+
+            @Expose
+            @ConfigOption(name = "Time Alive", desc = "Time in seconds until the trail fades out.")
+            @ConfigEditorSlider(minStep = 0.1f, minValue = 0.1f, maxValue = 10)
+            public float secondsAlive = 0.5f;
+
+            @Expose
+            @ConfigOption(name = "Line Width", desc = "Width of the line.")
+            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+            public int lineWidth = 4;
+        }
     }
 
 
@@ -643,9 +687,9 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Enabled",
-                desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
-                        "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
+            name = "Enabled",
+            desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
+                "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -654,9 +698,9 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
         @ConfigEditorSlider(
-                minValue = 5,
-                maxValue = 300,
-                minStep = 1
+            minValue = 5,
+            maxValue = 300,
+            minStep = 1
         )
         public Property<Integer> warnTime = Property.of(60);
 
