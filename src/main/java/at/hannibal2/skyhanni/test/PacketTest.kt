@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -189,7 +190,7 @@ class PacketTest {
             return packet.getEntity(world)
         }
         if (id != null) {
-            return world.getEntityByID(id)
+            return EntityUtils.getEntityByID(id)
         }
 
         return null

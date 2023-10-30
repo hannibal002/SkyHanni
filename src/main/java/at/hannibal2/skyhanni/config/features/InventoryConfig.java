@@ -241,8 +241,12 @@ public class InventoryConfig {
         @Expose
         @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
         @ConfigEditorBoolean
-        @FeatureToggle
         public boolean enableInDungeons = false;
+
+        @Expose
+        @ConfigOption(name = "Enable during Item Value", desc = "Show this display even if the Estimated Item Value is visible.")
+        @ConfigEditorBoolean
+        public boolean showDuringEstimatedItemValue = false;
 
         @Expose
         @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")
