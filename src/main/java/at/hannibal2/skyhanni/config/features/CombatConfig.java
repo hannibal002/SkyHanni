@@ -63,7 +63,6 @@ public class CombatConfig {
                 "§bTarantula Broodfather",
                 "§bSven Packmaster",
                 "§bVoidgloom Seraph",
-                "§bInferno Demonlord (only tier 1 yet)",
                 "§bHeadless Horseman (bugged)",
                 "§bDungeon Floor 1",
                 "§bDungeon Floor 2",

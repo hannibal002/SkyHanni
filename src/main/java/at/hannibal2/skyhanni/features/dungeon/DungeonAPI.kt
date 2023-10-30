@@ -49,22 +49,20 @@ class DungeonAPI {
 
         fun inDungeon() = dungeonFloor != null
 
-        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(floors) == true
+        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
 
         fun handleBossMessage(rawMessage: String) {
             if (!inDungeon()) return
             val message = rawMessage.removeColor()
             val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
-            if (bossName != "The Watcher" && dungeonFloor != null && checkBossName(dungeonFloor!!, bossName) &&
-                !inBossRoom
-            ) {
+            if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
                 DungeonBossRoomEnterEvent().postAndCatch()
                 inBossRoom = true
             }
         }
 
-        private fun checkBossName(floor: String, bossName: String): Boolean {
-            val correctBoss = when (floor) {
+        private fun checkBossName(bossName: String): Boolean {
+            val correctBoss = when (dungeonFloor!!) {
                 "E" -> "The Watcher"
                 "F1", "M1" -> "Bonzo"
                 "F2", "M2" -> "Scarf"

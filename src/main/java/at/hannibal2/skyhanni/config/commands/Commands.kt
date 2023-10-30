@@ -284,6 +284,10 @@ object Commands {
             "shplaysound",
             "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
+        registerCommand(
+            "shconfigmanagerreset",
+            "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
+        ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
     }
 
     private fun internalCommands() {
