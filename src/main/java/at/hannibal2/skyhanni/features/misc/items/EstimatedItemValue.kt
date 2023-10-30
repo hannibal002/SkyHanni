@@ -78,6 +78,7 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     private var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var currentlyShowing = false
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -96,12 +97,21 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
-        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return
-        if (System.currentTimeMillis() > lastToolTipTime + 200) return
+        currentlyShowing = checkCurrentlyVisible()
+        if (!currentlyShowing) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+    }
+
+    private fun checkCurrentlyVisible(): Boolean {
+        if (!LorenzUtils.inSkyBlock) return false
+        if (!config.enabled) return false
+        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
+        if (System.currentTimeMillis() > lastToolTipTime + 200) return false
+
+        if (display.isEmpty()) return false
+
+        return true
     }
 
     @SubscribeEvent
