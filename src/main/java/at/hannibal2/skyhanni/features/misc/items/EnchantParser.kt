@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.*
+import java.util.TreeSet
 import java.util.regex.Pattern
 
 /**
