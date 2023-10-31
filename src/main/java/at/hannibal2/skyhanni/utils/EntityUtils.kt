@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
@@ -146,7 +147,8 @@ object EntityUtils {
     fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
 
     fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4 && uniqueID.variant() == 2
-    fun EntityPlayer.isDisplayNPC() = isNPC() && name.any { it in '0'..'9' }
+    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && name.any { it in '0'..'9' }) || (this
+        is EntityVillager && this.maxHealth == 20.0f)
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 

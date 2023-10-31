@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.EntityData.Companion.ENTITY_RENDER_RANGE_IN_BLOCKS
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.ENTITY_RENDER_RANGE_IN_BLOCKS
 import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill.addToMobHitList
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils

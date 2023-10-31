@@ -1,52 +1,31 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.EntityLivingDeathEvent
-import at.hannibal2.skyhanni.events.EntityLivingSpawnEvent
+import at.hannibal2.skyhanni.data.EntityData.Companion.currentSkyblockMobs
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyblockMobDeathEvent
 import at.hannibal2.skyhanni.events.SkyblockMobKillEvent
 import at.hannibal2.skyhanni.events.onMobHitEvent
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityKill {
 
     private var mobHitList = mutableSetOf<SkyblockMobUtils.SkyblockMob>()
-
-    val currentEntityLiving = mutableSetOf<EntityLivingBase>()
-    private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
-
     val config get() = SkyHanniMod.feature.dev.mobKillDetection
 
-    const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 //Entity Derender after ~5 Chunks
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        previousEntityLiving.clear()
-        previousEntityLiving.addAll(currentEntityLiving)
-        currentEntityLiving.clear()
-        currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it.isSkyBlockMob() })
-
-        //Spawned EntityLiving
-        (currentEntityLiving - previousEntityLiving).forEach { EntityLivingSpawnEvent(it).postAndCatch() }
-        //Despawned EntityLiving
-        (previousEntityLiving - currentEntityLiving).filter {
-            it.distanceToPlayer() < ENTITY_RENDER_RANGE_IN_BLOCKS
-        }.forEach { EntityLivingDeathEvent(it).postAndCatch() }
-
+    fun onTick2(event: LorenzTickEvent) {
         if (config.LogMobHitList) {
             if (config.LogMobHitListId) {
                 val id = mobHitList.map { it.baseEntity.entityId }
@@ -58,12 +37,7 @@ object EntityKill {
     }
 
     @SubscribeEvent
-    fun onEntityLivingSpawn(event: EntityLivingSpawnEvent) {
-
-    }
-
-    @SubscribeEvent
-    fun onEntityLivingDeath(event: EntityLivingDeathEvent) {
+    fun onEntityLivingDeath(event: SkyblockMobDeathEvent) {
         mobHitList.firstOrNull { it == event.entity }
             ?.let {
                 SkyblockMobKillEvent(it, false).postAndCatch()
@@ -72,7 +46,7 @@ object EntityKill {
 
     @SubscribeEvent
     fun onSkyblockMobKill(event: SkyblockMobKillEvent) {
-        if(config.ShowNameOfKilledMob) LorenzDebug.chatAndLog("Mob Name: ${event.mob.name}")
+        if (config.ShowNameOfKilledMob) LorenzDebug.chatAndLog("Mob Name: ${event.mob.name}")
         mobHitList.remove(event.mob)
     }
 
@@ -109,7 +83,7 @@ object EntityKill {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (config.skyblockMobHighlight) {
-            currentEntityLiving.forEach {
+            currentSkyblockMobs.forEach {
                 event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
             }
         }
