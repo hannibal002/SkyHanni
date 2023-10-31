@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -176,7 +177,7 @@ object ArrowDetection {
 
     private fun onArrowDeSpawn(arrow: EntityArrow) {
         val playerArrow = playerArrows.firstOrNull { it.base == arrow } ?: return
-        val hitEntity = EntityKill.currentEntityLiving.firstOrNull {
+        val hitEntity = EntityData.currentSkyblockMobs.firstOrNull {
             it.getPrevLorenzVec().distance(arrow.getLorenzVec()) < 4.0
         }
         if (hitEntity == null) {

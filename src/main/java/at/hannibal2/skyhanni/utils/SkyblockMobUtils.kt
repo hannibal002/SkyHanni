@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.combat.killDetection.EntityKill
+import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
@@ -19,14 +19,11 @@ object SkyblockMobUtils {
     val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
 
-    //TODO find exceptions to the Rule and Analyse it
-
-    open class SkyblockMob(val baseEntity: Entity) {
+    abstract class SkyblockEntity(val baseEntity: Entity) {
         //Fun Fact the corresponding ArmorStand for a mob has always the ID + 1
         val armorStand = EntityUtils.getEntityByID(baseEntity.entityId + 1)
 
-        open val name: String = armorStand?.name?.let { mobNameFilter.find(it.removeColor())?.groupValues?.get(1) }
-            ?: "Skyblock Name of Mob ${baseEntity.name} found"
+        abstract val name: String
 
         override fun toString(): String = name
 
@@ -37,18 +34,30 @@ object SkyblockMobUtils {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
 
-            // If the other object is an instance of SkyblockMob, compare their baseEntity properties.
-            if (other is SkyblockMob) {
+            if (other is SkyblockEntity) {
                 return baseEntity == other.baseEntity
             }
 
-            // If the other object is an instance of Entity, compare it with this SkyblockMob's baseEntity.
             if (other is Entity) {
                 return baseEntity == other
             }
 
             return false
         }
+    }
+
+    class DisplayNPC(baseEntity: Entity) : SkyblockEntity(baseEntity) {
+
+        override val name: String = armorStand?.name ?: "null"
+    }
+
+    open class SkyblockMob(baseEntity: Entity) : SkyblockEntity(baseEntity) {
+
+        override val name: String = armorStand?.name?.let {
+            mobNameFilter.find(it.removeColor())?.groupValues?.get(1)
+                ?: it
+        }
+            ?: "Skyblock Name of Mob ${baseEntity.name} not found"
     }
 
     class DungeonMob(baseEntity: Entity) : SkyblockMob(baseEntity) {
@@ -89,11 +98,11 @@ object SkyblockMobUtils {
         }
     }
 
-    /** baseEntity must pass the testIfSkyBlockMob function */
+    /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockMob(baseEntity: Entity): SkyblockMob = if (DungeonAPI.inDungeon()) DungeonMob(baseEntity) else
         SkyblockMob(baseEntity)
 
-    fun createSkyblockMobIfValid(baseEntity: Entity): SkyblockMob? = if (testIfSkyBlockMob(baseEntity))
+    fun createSkyblockMobIfValid(baseEntity: Entity): SkyblockMob? = if (baseEntity.isSkyBlockMob())
         createSkyblockMob(baseEntity) else null
 
     fun testIfSkyBlockMob(entity: Entity): Boolean {
@@ -106,7 +115,15 @@ object SkyblockMobUtils {
         return true
     }
 
-    fun Entity.isSkyBlockMob() = testIfSkyBlockMob(this)
+    fun Entity.isSkyBlockMob(): Boolean {
+        if (this !is EntityLivingBase) return false
+        if (this is EntityArmorStand) return false
+        if (this is EntityOtherPlayerMP && this.isRealPlayer()) return false
+        if (this.isDisplayNPC()) return false
+        if (this is EntityWither && (this.entityId < 0 || this.name == "Wither")) return false
+        if (this is EntityPlayerSP) return false
+        return true
+    }
 
 
     fun rayTraceForSkyblockMob(
@@ -139,7 +156,7 @@ object SkyblockMobUtils {
         List<Entity>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        val possibleEntitys = EntityKill.currentEntityLiving.filter { it.entityBoundingBox.rayIntersects(pos, look) }
+        val possibleEntitys = EntityData.currentSkyblockMobs.filter { it.entityBoundingBox.rayIntersects(pos, look) }
         if (possibleEntitys.isEmpty()) return null
         possibleEntitys.sortedBy { it.distanceTo(pos) }
         return possibleEntitys
