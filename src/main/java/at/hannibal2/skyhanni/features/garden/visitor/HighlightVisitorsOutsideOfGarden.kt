@@ -93,7 +93,7 @@ class HighlightVisitorsOutsideOfGarden {
         ) {
             event.isCanceled = true
             LorenzUtils.clickableChat(
-                "§e[SkyHanniBal] Blocked you from interacting with a Visitor. Sneak to bypass or click here to change settings.",
+                "§e[SkyHanniBal] Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                 "/sh block interacting with visitors"
             )
         }
