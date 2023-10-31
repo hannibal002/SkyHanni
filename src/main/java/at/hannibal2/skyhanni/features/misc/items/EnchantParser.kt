@@ -33,6 +33,7 @@ object EnchantParser {
     private val GRAY_ENCHANT_PATTERN = Pattern.compile("^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
 
     private var indexOfLastGrayEnchant = -1
+    private var loreLines: MutableList<String> = mutableListOf()
 
     private val gson = Gson()
     private val loreCache: Cache = Cache()
@@ -111,6 +112,7 @@ object EnchantParser {
         var shouldBeSingleColumn = false
         val orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
         var lastEnchant: FormattedEnchant? = null
+        loreLines = mutableListOf()
 
         // Order all enchants
         for (i in startEnchant..endEnchant) {
@@ -144,8 +146,18 @@ object EnchantParser {
 
             if (!containsEnchant && lastEnchant != null) {
                 lastEnchant.addLore(loreList[i])
+                loreLines.add(loreList[i])
                 hasLore = true
             }
+        }
+
+        // If we have color parsing off and hide enchant descriptions, remove them and return from method
+        if (!SkyHanniMod.feature.enchantParsing.colorEnchants.colorParsing) {
+            if (SkyHanniMod.feature.enchantParsing.hideEnchantDescriptions) {
+                loreList.removeAll(loreLines)
+                return
+            }
+            return
         }
 
         if (orderedEnchants.isEmpty()) {
@@ -160,7 +172,7 @@ object EnchantParser {
 
         // Check we don't have any enchants with description lore
         if (!hasLore && !shouldBeSingleColumn) {
-            val commaFormat = SkyHanniMod.feature.enchantParsing.commaFormat
+            val commaFormat = SkyHanniMod.feature.enchantParsing.colorEnchants.commaFormat
 
             var builder = StringBuilder()
 
@@ -286,7 +298,7 @@ object EnchantParser {
         open fun getFormattedName(level: Int) = getFormat(level) + loreName
 
         open fun getFormat(level: Int) : String {
-            val config = SkyHanniMod.feature.enchantParsing
+            val config = SkyHanniMod.feature.enchantParsing.colorEnchants
 
             if (level >= maxLevel) return "§" + COLOR_CODES[config.perfectEnchantColor]
             if (level > goodLevel) return "§" + COLOR_CODES[config.greatEnchantColor]
