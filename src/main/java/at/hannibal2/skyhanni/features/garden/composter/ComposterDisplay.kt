@@ -162,7 +162,7 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.displayOutsideSB) return
 
         if (GardenAPI.inGarden() && config.displayEnabled) {
             config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")
@@ -178,7 +178,7 @@ class ComposterDisplay {
             val duration = storage.composterEmptyTime - System.currentTimeMillis()
             if (duration > 0) {
                 if (duration < 1000 * 60 * 20) {
-                    warn("Your composter in the garden is soon empty!")
+                    warn("Your composter almost empty!")
                 }
                 TimeUtils.formatDuration(duration, maxUnits = 3)
             } else {
@@ -187,7 +187,7 @@ class ComposterDisplay {
             }
         } else "?"
 
-        if (!GardenAPI.inGarden() && config.displayOutsideGarden) {
+        if (!GardenAPI.inGarden() && ((LorenzUtils.inSkyBlock && config.displayOutsideGarden) || (!LorenzUtils.inSkyBlock && config.displayOutsideSB))) {
             val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }

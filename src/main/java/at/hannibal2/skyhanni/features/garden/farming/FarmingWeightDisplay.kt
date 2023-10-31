@@ -137,8 +137,7 @@ class FarmingWeightDisplay {
         }
 
         private fun update() {
-//             if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
-            if (!GardenAPI.inGarden() && !config.showOutsideGarden) return
+            if (!isEnabled()) return
             if (apiError) {
                 display = errorMessage
                 return
@@ -151,10 +150,6 @@ class FarmingWeightDisplay {
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
                     val localProfile = HypixelData.profileName
-                    if (localProfile == "") {
-                        display = Renderable.singeltonString("§cError: profileName is empty!")
-                        return
-                    }
 
                     isLoadingWeight = true
                     if (display.isEmpty()) {
@@ -327,8 +322,7 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = (LorenzUtils.inSkyBlock || config.showOutsideSB) && (GardenAPI.inGarden() || config.showOutsideGarden) && config.display
-
+        private fun isEnabled() = ((config.showOutsideSB && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
         private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
@@ -437,7 +431,7 @@ class FarmingWeightDisplay {
 
                 // If the selected profile is not found or if the cute name doesn't match look for a different profile
                 // While it's not optimal to loop twice, this shouldn't happen often
-                if (selectedProfileEntry == null || selectedProfileEntry["profileName"].asString.lowercase() != localProfile) {
+                if (selectedProfileEntry == null || (selectedProfileEntry["profileName"].asString.lowercase() != localProfile && localProfile != "")) {
                     selectedProfileEntry = profileEntries.find {
                         it.asJsonObject["profileName"].asString.lowercase() == localProfile
                     }?.asJsonObject

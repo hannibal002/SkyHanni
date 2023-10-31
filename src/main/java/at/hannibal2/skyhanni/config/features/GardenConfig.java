@@ -1105,11 +1105,20 @@ public class GardenConfig {
         @Expose
         @ConfigOption(
                 name = "Outside Garden",
-                desc = "Show Time till Composter is empty outside Garden"
+                desc = "Show time until Composter is empty outside of the Garden."
         )
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean displayOutsideGarden = false;
+
+        @Expose
+        @ConfigOption(
+            name = "Outside SB",
+            desc = "Show time until Composter is empty outside of SkyBlock."
+        )
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean displayOutsideSB = false;
 
         @Expose
         @ConfigOption(
