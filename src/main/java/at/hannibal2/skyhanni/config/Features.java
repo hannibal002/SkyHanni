@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.features.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.CrimsonIsleConfig;
 import at.hannibal2.skyhanni.config.features.DevConfig;
 import at.hannibal2.skyhanni.config.features.DungeonConfig;
+import at.hannibal2.skyhanni.config.features.EnchantParsingConfig;
 import at.hannibal2.skyhanni.config.features.EventConfig;
 import at.hannibal2.skyhanni.config.features.FishingConfig;
 import at.hannibal2.skyhanni.config.features.GUIConfig;
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.config.features.MiscConfig;
 import at.hannibal2.skyhanni.config.features.OldHidden;
 import at.hannibal2.skyhanni.config.features.RiftConfig;
 import at.hannibal2.skyhanni.config.features.SlayerConfig;
+import at.hannibal2.skyhanni.features.misc.items.EnchantParser;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -53,6 +55,8 @@ public class Features extends Config {
     @Override
     public void saveNow() {
         SkyHanniMod.configManager.saveConfig("close-gui");
+        // Mark cache dirty so cached items get forcefully updated
+        EnchantParser.INSTANCE.markCacheDirty();
     }
 
     @Override
@@ -75,6 +79,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
     public ChatConfig chat = new ChatConfig();
+
+    @Expose
+    @Category(name = "Enchant Parsing", desc = "Change how enchants are parsed / look.")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
     @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
