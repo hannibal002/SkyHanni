@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.PriceSource
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -161,7 +162,7 @@ object SlayerItemProfitTracker {
         if (packet !is S0DPacketCollectItem) return
 
         val entityID = packet.collectedItemEntityID
-        val item = Minecraft.getMinecraft().theWorld.getEntityByID(entityID) ?: return
+        val item = EntityUtils.getEntityByID(entityID) ?: return
         if (item !is EntityItem) return
 
         if (collectedCache.getIfPresent(entityID) != null) return

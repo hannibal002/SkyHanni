@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
@@ -75,8 +76,8 @@ import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
-import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
+import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash
@@ -319,7 +320,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.13",
+    version = "0.21.Beta.15",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -592,7 +593,7 @@ class SkyHanniMod {
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
-//        loadModule(Translator())
+        loadModule(Translator())
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())

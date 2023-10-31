@@ -109,6 +109,7 @@ class ConfigManager {
     private var configFile: File? = null
     private var sackFile: File? = null
     lateinit var processor: MoulConfigProcessor<Features>
+    private var disableSaving = false
 
     fun firstLoad() {
         if (::features.isInitialized) {
@@ -217,6 +218,7 @@ class ConfigManager {
     }
 
     fun saveConfig(reason: String) {
+        if (disableSaving) return
         logger.log("saveConfig: $reason")
         val file = configFile ?: throw Error("Can not save config, configFile is null!")
         try {
@@ -242,6 +244,7 @@ class ConfigManager {
     }
 
     fun saveSackData(reason: String) {
+        if (disableSaving) return
         logger.log("saveSackData: $reason")
         val file = sackFile ?: throw Error("Can not save sacks, sackFile is null!")
         try {
@@ -255,5 +258,9 @@ class ConfigManager {
             logger.log("Could not save sacks file to $file")
             e.printStackTrace()
         }
+    }
+
+    fun disableSaving() {
+        disableSaving = true
     }
 }
