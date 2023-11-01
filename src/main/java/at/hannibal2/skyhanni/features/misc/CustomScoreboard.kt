@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -202,7 +203,13 @@ enum class CustomScoreboardElements (
     ),
     SLAYER(
         {
-            listOf("§7Slayer")
+            listOf(
+                (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>")
+            ) + (
+                " §7- §e${SlayerAPI.latestSlayerCategory.trim()}"
+            ) + (
+                " §7- §e${SlayerAPI.latestSlayerProgress.trim()}"
+            )
         },
         listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE),
         0,
@@ -366,10 +373,7 @@ class CustomScoreboard {
             lineMap[index]?.let {
 
                 // Multiline support
-                if (it[0] == "§9Party"
-                    || it[0].toString().contains(MayorElection.currentCandidate?.name ?: "")
-                    || it[0].toString().contains("Powder")
-                ) {
+                if (it.size > 1) {
                     for (item in it) {
                         newList.add(listOf(item))
                     }
@@ -394,10 +398,13 @@ class CustomScoreboard {
         return newList
     }
 
+    // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post){
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET && config.hideVanillaScoreboard && LorenzUtils.inSkyBlock){
             GuiIngameForge.renderObjective = false
+        } else if (event.type == RenderGameOverlayEvent.ElementType.HELMET && !config.hideVanillaScoreboard && LorenzUtils.inSkyBlock){
+            GuiIngameForge.renderObjective = true
         }
     }
 
