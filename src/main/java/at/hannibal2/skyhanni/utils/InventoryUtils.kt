@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.OtherMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -12,6 +11,8 @@ import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
 object InventoryUtils {
+    val neuConfigPath = "config/notenoughupdates/configNew.json"
+
     var itemInHandId = NEUInternalName.NONE
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
@@ -55,16 +56,15 @@ object InventoryUtils {
 
     val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
         try {
-            val configPath = OtherMod.NEU.configPath
-            if (File(configPath).exists()) {
+            if (File(neuConfigPath).exists()) {
                 val json = ConfigManager.gson.fromJson(
-                    APIUtil.readFile(File(configPath)),
+                    APIUtil.readFile(File(neuConfigPath)),
                     com.google.gson.JsonObject::class.java
                 )
                 json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
             } else false
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false
         }
     }
