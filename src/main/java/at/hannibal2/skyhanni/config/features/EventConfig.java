@@ -340,19 +340,19 @@ public class EventConfig {
         @ConfigOption(name = "Primal Fear Timer", desc = "Shows cooldown timer for next primal fear.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean primalFearTimer = true;
+        public boolean primalFearTimer = false;
 
         @Expose
         @ConfigOption(name = "Fear Stat Display", desc = "Shows your current Fear stat value.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean fearStatDisplay = true;
+        public boolean fearStatDisplay = false;
 
         @Expose
         @ConfigOption(name = "IRL Time Left", desc = "Shows the IRL time left before The Great Spook ends.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean greatSpookTimeLeft = true;
+        public boolean greatSpookTimeLeft = false;
 
         @Expose
         public Position positionTimer = new Position(10, 10, false, true);
