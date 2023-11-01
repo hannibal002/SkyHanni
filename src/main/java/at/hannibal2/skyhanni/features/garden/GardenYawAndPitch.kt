@@ -21,7 +21,7 @@ class GardenYawAndPitch {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
-        if(!((config.showOutsideSB && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))) return
+        if(!((SkyHanniMod.feature.misc.showOutsideSB.contains(8) && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))) return
         if (GardenAPI.hideExtraGuis()) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 

@@ -45,12 +45,6 @@ public class GUIConfig {
         @FeatureToggle
         public boolean enabled = true;
 
-        @Expose
-        @ConfigOption(name = "Work Outside SkyBlock", desc = "Allows modifying visual words anywhere on Hypixel.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean workOutside = false;
-
         @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /shwords")
         @ConfigEditorButton(buttonText = "Open")
         public Runnable open = Commands::openVisualWords;
@@ -77,11 +71,6 @@ public class GUIConfig {
         public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
         @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show textbox outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
-
-        @Expose
         public Position position = new Position(10, 80, false, true);
     }
 
@@ -102,11 +91,6 @@ public class GUIConfig {
         @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
         @ConfigEditorBoolean
         public boolean formatToggle = false;
-
-        @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show the time outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
 
         @Expose
         public Position position = new Position(10, 10, false, true);
@@ -147,26 +131,13 @@ public class GUIConfig {
     }
 
     @Expose
-    @ConfigOption(name = "TPS Display", desc = "")
-    @Accordion
-    public TpsDisplayConfig tpsDisplay = new TpsDisplayConfig();
+    @ConfigOption(name = "Enabled", desc = "Show the TPS of the current server, like in Soopy.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = false;
 
-    public static class TpsDisplayConfig {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the TPS of the current server, like in Soopy.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Shows the TPS outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
-
-        @Expose
-        public Position position = new Position(10, 10, false, true);
-    }
+    @Expose
+    public Position position = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

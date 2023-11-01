@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class TpsCounter {
-    private val config get() = SkyHanniMod.feature.gui.tpsDisplay
+    private val config get() = SkyHanniMod.feature.gui
 
     companion object {
         private const val minDataAmount = 5
@@ -30,7 +30,7 @@ class TpsCounter {
     init {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
             if (!LorenzUtils.onHypixel) return@fixedRateTimer
-            if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return@fixedRateTimer
             if (!config.enabled) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
@@ -61,7 +61,7 @@ class TpsCounter {
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
             if (!LorenzUtils.onHypixel) return@fixedRateTimer
-            if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return@fixedRateTimer
             if (!config.enabled) return@fixedRateTimer
 
             if (hasPacketReceived) {
@@ -88,7 +88,7 @@ class TpsCounter {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
-        if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return
         if (!config.enabled) return
 
         config.position.renderString(display, posLabel = "Tps Display")
@@ -98,9 +98,6 @@ class TpsCounter {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tpsDisplayEnabled", "gui.tpsDisplay")
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
-
-        event.move(7, "gui.tpsDisplay", "gui.tpsDisplay.enabled")
-        event.move(7, "gui.tpsDisplayPosition", "gui.tpsDisplay.position")
     }
 
     private fun getColor(tps: Double) = when {

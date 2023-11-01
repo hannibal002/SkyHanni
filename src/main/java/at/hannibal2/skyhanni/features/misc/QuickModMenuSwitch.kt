@@ -190,7 +190,7 @@ object QuickModMenuSwitch {
         GlStateManager.popMatrix()
     }
 
-    fun isEnabled() = (LorenzUtils.inSkyBlock || config.showOutsideSB) && config.enabled
+    fun isEnabled() = (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(9)) && config.enabled
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

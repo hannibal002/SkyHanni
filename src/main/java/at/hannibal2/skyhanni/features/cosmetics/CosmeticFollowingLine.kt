@@ -33,7 +33,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(10)) return
         if (!config.enabled) return
 
         updateClose(event)
@@ -96,7 +96,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.showOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(10)) return
         if (!config.enabled) return
 
         if (event.isMod(5)) {

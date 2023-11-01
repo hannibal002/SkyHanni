@@ -447,11 +447,6 @@ public class MiscConfig {
         public boolean insidePlayerInventory = false;
 
         @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show the mod list outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
-
-        @Expose
         public Position pos = new Position(-178, 143, false, true);
     }
 
@@ -494,11 +489,6 @@ public class MiscConfig {
             @ConfigOption(name = "Behind Blocks", desc = "Show behind blocks.")
             @ConfigEditorBoolean
             public boolean behindBlocks = false;
-
-            @Expose
-            @ConfigOption(name = "Show Outside SB", desc = "Show the line outside of SkyBlock.")
-            @ConfigEditorBoolean
-            public boolean showOutsideSB = false;
         }
 
         @Expose
@@ -592,11 +582,6 @@ public class MiscConfig {
         )
         @ConfigEditorColour
         public String outlineColor = "0:245:85:255:85";
-
-        @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Highlight party members outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
     }
 
 
@@ -726,25 +711,35 @@ public class MiscConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Movement Speed", desc = "")
-    @Accordion
-    public MovementSpeedConfig movementSpeed = new MovementSpeedConfig();
+    @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
+    @ConfigEditorDraggableList(
+        exampleText = {
+            "Modify Visual Words", // 0
+            "Custom Text Box", // 1
+            "Real Time", // 2
+            "TPS Display", // 3
+            "Marked Players", // 4
+            "Farming Weight", // 5
+            "Next Jacobs's Context", // 6
+            "Composter Time", // 7
+            "Yaw and Pitch", // 8
+            "Quick Mod Menu Switch", // 9
+            "Following Line", // 10
+            "Arrow Trail", // 11
+            "Highlight Party Members", // 12
+            "Movement Speed" // 13
+        }
+    )
+    public List<Integer> showOutsideSB = new ArrayList<>(Arrays.asList());
 
-    public static class MovementSpeedConfig {
-        @Expose
-        @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
+    @Expose
+    @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = false;
 
-        @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show the player movement speed outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
-
-        @Expose
-        public Position position = new Position(394, 124, false, true);
-    }
+    @Expose
+    public Position position = new Position(394, 124, false, true);
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")

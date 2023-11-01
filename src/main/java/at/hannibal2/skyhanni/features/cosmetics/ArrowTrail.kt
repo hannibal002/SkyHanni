@@ -30,7 +30,7 @@ class ArrowTrail {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(11)) return
         if (!config.enabled) return
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
@@ -51,7 +51,7 @@ class ArrowTrail {
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(11)) return
         if (!config.enabled) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
         val playerArrowColor = color.toChromaColor()

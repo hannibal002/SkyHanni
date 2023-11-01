@@ -804,11 +804,6 @@ public class GardenConfig {
         @ConfigOption(name = "Show Outside Garden", desc = "Show the farming weight outside of the garden.")
         @ConfigEditorBoolean
         public boolean showOutsideGarden = false;
-
-        @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show the farming weight outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
     }
 
     @Expose
@@ -969,11 +964,6 @@ public class GardenConfig {
         public boolean showOutsideGarden = false;
 
         @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show the timer outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
-
-        @Expose
         @ConfigOption(name = "In Other Guis", desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.")
         @ConfigEditorBoolean
         public boolean otherGuis = false;
@@ -1110,15 +1100,6 @@ public class GardenConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean displayOutsideGarden = false;
-
-        @Expose
-        @ConfigOption(
-            name = "Outside SB",
-            desc = "Show time until Composter is empty outside of SkyBlock."
-        )
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean displayOutsideSB = false;
 
         @Expose
         @ConfigOption(
@@ -1330,11 +1311,6 @@ public class GardenConfig {
         @ConfigOption(name = "Show Outside Garden", desc = "Show the overlay outside of the Garden.")
         @ConfigEditorBoolean
         public boolean showOutsideGarden = false;
-
-        @Expose
-        @ConfigOption(name = "Show Outside SB", desc = "Show the overlay outside of SkyBlock.")
-        @ConfigEditorBoolean
-        public boolean showOutsideSB = false;
 
         @Expose
         @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")

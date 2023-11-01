@@ -322,7 +322,7 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = ((config.showOutsideSB && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
+        private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(5) && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
         private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {

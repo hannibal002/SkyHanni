@@ -17,7 +17,7 @@ object ModifyVisualWords {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
-        if (!LorenzUtils.inSkyBlock && !config.workOutside) return originalText
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(0)) return originalText
 
         if (modifiedWords.isEmpty()) {
             modifiedWords = SkyHanniMod.feature.storage.modifiedWords

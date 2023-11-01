@@ -162,7 +162,7 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.displayOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(7)) return
 
         if (GardenAPI.inGarden() && config.displayEnabled) {
             config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")
@@ -187,7 +187,7 @@ class ComposterDisplay {
             }
         } else "?"
 
-        if (!GardenAPI.inGarden() && ((LorenzUtils.inSkyBlock && config.displayOutsideGarden) || (!LorenzUtils.inSkyBlock && config.displayOutsideSB))) {
+        if (!GardenAPI.inGarden() && ((LorenzUtils.inSkyBlock && config.displayOutsideGarden) || (!LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.showOutsideSB.contains(7)))) {
             val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }

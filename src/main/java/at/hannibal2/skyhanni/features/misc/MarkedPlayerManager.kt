@@ -79,7 +79,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.markOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(4)) return
 
         if (event.repeatSeconds(1)) {
             findPlayers()
@@ -88,7 +88,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.markOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(4)) return
         if (!config.highlightInWorld) return
 
         val entity = event.entity
@@ -99,7 +99,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inSkyBlock && !config.markOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(4)) return
         if (!config.highlightInWorld) return
 
         val entity = event.entity

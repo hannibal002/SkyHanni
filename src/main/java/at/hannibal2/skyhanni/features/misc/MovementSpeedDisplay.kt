@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class MovementSpeedDisplay {
-    private val config get() = SkyHanniMod.feature.misc.movementSpeed
+    private val config get() = SkyHanniMod.feature.misc
     private var lastLocation: LorenzVec? = null
     private var display = ""
 
@@ -45,11 +44,5 @@ class MovementSpeedDisplay {
         config.position.renderString(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = LorenzUtils.onHypixel && (LorenzUtils.inSkyBlock || config.showOutsideSB) && config.enabled
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(7, "misc.playerMovementSpeed", "misc.movementSpeed.enabled")
-        event.move(7, "misc.playerMovementSpeedPos", "misc.movementSpeed.position")
-    }
+    fun isEnabled() = LorenzUtils.onHypixel && (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(13)) && config.enabled
 }

@@ -29,7 +29,7 @@ class TimeFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock && !realTimeConfig.showOutsideSB) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(2)) return
 
         if (realTimeConfig.enabled) {
             val simpleDateFormat = if (realTimeConfig.formatToggle) timeFormat12h else timeFormat24h
