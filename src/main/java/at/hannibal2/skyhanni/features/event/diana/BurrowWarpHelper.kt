@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,6 +23,7 @@ class BurrowWarpHelper {
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
 
         currentWarp?.let {
             if (lastWarpTime.passedSince() > 5.seconds) {
