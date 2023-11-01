@@ -26,11 +26,11 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -38,9 +38,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import net.minecraftforge.client.GuiIngameForge
+import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.*
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.misc.customScoreboard
@@ -200,7 +201,9 @@ enum class CustomScoreboardElements (
         13
     ),
     SLAYER(
-        { listOf("§7Slayer") },
+        {
+            listOf("§7Slayer")
+        },
         listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE),
         0,
         14
@@ -389,6 +392,13 @@ class CustomScoreboard {
         }
 
         return newList
+    }
+
+    @SubscribeEvent
+    fun onRenderScoreboard(event: RenderGameOverlayEvent.Post){
+        if (event.type == RenderGameOverlayEvent.ElementType.HELMET && config.hideVanillaScoreboard && LorenzUtils.inSkyBlock){
+            GuiIngameForge.renderObjective = false
+        }
     }
 
     private fun isEnabled() : Boolean{

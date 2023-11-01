@@ -758,6 +758,12 @@ public class MiscConfig {
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21));
 
         @Expose
+        @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideVanillaScoreboard = false;
+
+        @Expose
         @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
         @ConfigEditorSlider(
             minValue = 1,
