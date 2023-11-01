@@ -290,6 +290,7 @@ object Commands {
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
         ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
+        registerCommand(
             "shcopyactionbar",
             "Copies the actionbar to the clipboard"
         ) { CopyActionBar.command(it) }
