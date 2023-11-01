@@ -74,7 +74,7 @@ object TimeUtils {
     }
 
     // TODO: use kotlin Duration
-    fun getMillis(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " "))
+    fun getMillis(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
     private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L

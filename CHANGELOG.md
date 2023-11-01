@@ -69,6 +69,8 @@
       color, to change the time alive, and the line width.
 + Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
++ Added Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
 
 #### Events
 
@@ -120,6 +122,13 @@
 + Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks sometimes. - hannibal2
 + Added diamond and gold essence support to PowderTracker. - walker
 + Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search engine - Erymanthus
++ Added option to hide Chest Value while the Estimated Item Value display is showing. - hannibal2
++ No longer merging same items with different prices in Chest Value together. - hannibal2
++ Adding Great Spook support for Non God Pot Effect display. - hannibal2
++ Added a title warning to the Worm Cap Alert ping sound. - Vahvl
++ Added support for detecting refreshed farming fortune century cake effect. - alexia
++ Show key to press below burrow warp. - hannibal2
++ Makes the Compact Potion message open the Potion effects menu on click. - jani
 
 ### Bug Fixes
 
@@ -172,6 +181,16 @@
 + Fixed Enderman Slayer errors again. - hannibal2
 + Fixed the Sack Display error again. - HiZe
 + Fixed the attribute Vitality getting wrongly labeled as Mending on attribute shards. - hannibal2
++ Made Livid Solver great again. - hannibal2
++ Fixed Damage Indicator in Dungeons for some floors. - hannibal2
++ Fixed Damage Indicator "hide nametag" feature works even for disabled mobs. - hannibal2
++ Fixed item rarity detection for pets. - hannibal2
++ Fixed rare error message while disconnecting. - Thunderblade73
++ Disabled the Daily Quest part of the Reputation Helper during the great spook. - hannibal2
++ Fixed Diana warp key not working. - hannibal2
++ SkyHanni Keybinds no longer work inside SkyHanni config. - hannibal2
++ Fixed Great Spook potion not working in Non God Pot Effect feature. - jani
++ Fixed wrong Rhys (Deep Caverns NPC) items needed for Dwarven Mines unlock in Bingo Step Helper. - ReyMaratov
 
 #### Config
 
@@ -192,6 +211,11 @@
 + Reducing cognitive complexity in StatsTuning.kt - walker
 + Reducing indentations and line counts in StatsTuning.kt - hannibal2
 + Mark functions around item utils and neu items as deprecated. - walker
++ Added debug command /shconfigmanagerreset. - hannibal2
++ Reloads the config manager and rendering processors of MoulConfig. This WILL RESET your config, but also update the
+  java config files (names, description, orderings and stuff).
++ Adding 100 lines to MobFinder.kt and making it better readable in the process. - walker
++ Making ChatFiler.kt way better, storing regex objects for reuse and preparing future repo support. - walker
 
 ## Version 0.20
 
@@ -237,8 +261,6 @@
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + Added SkyHanni **Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
-+ Added Chat **Translator** - NetheriteMiner
-    + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
 + Added **Default Option Settings:** - nea
