@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.internal.KeybindHelper
+import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
@@ -25,6 +27,10 @@ object KeyboardManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        val isConfigScreen = Minecraft.getMinecraft().currentScreen is GuiScreenElementWrapper
+        if (isConfigScreen) return
+
+
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
             val key = Mouse.getEventButton() - 100
             LorenzKeyPressEvent(key).postAndCatch()
