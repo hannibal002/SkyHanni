@@ -63,13 +63,13 @@ private var gemstonePowder = "0"
 
 enum class CustomScoreboardElements (
     // displayLine: The line that is displayed on the scoreboard
-    val displayLine: Supplier<List<String>>?,
+    private val displayLine: Supplier<List<String>>?,
 
     // islands: The islands that this line is displayed on
-    val islands: List<IslandType>,
+    private val islands: List<IslandType>,
 
     // visibilityOption: The option that is used to hide this line - use 0 to only display on the listed islands, 1 to hide on the listed islands
-    val visibilityOption : Int,
+    private val visibilityOption : Int,
 
     // index: The index of the line
     val index: Int
