@@ -343,10 +343,16 @@ public class EventConfig {
         public boolean primalFearTimer = false;
 
         @Expose
+        public Position positionTimer = new Position(20, 20, false, true);
+
+        @Expose
         @ConfigOption(name = "Fear Stat Display", desc = "Shows your current Fear stat value.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean fearStatDisplay = false;
+
+        @Expose
+        public Position positionFear = new Position(30, 30, false, true);
 
         @Expose
         @ConfigOption(name = "IRL Time Left", desc = "Shows the IRL time left before The Great Spook ends.")
@@ -355,13 +361,7 @@ public class EventConfig {
         public boolean greatSpookTimeLeft = false;
 
         @Expose
-        public Position positionTimer = new Position(10, 10, false, true);
-
-        @Expose
-        public Position positionFear = new Position(10, 10, false, true);
-
-        @Expose
-        public Position positionTimeLeft = new Position(10, 10, false, true);
+        public Position positionTimeLeft = new Position(40, 40, false, true);
 
     }
 
