@@ -31,9 +31,7 @@ class ChromaFontRenderer(private val baseColor: Int) {
     }
 
     fun restoreChromaEnv() {
-        if (ShaderHelper.areShadersSupported()) {
-            if (!chromaOn) ChromaShaderManager.end()
-        }
+        if (ShaderHelper.areShadersSupported() && !chromaOn) ChromaShaderManager.end()
     }
 
     fun newChromaEnv() : ChromaFontRenderer {
