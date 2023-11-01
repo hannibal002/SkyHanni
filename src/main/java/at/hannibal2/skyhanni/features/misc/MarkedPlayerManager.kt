@@ -16,6 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MarkedPlayerManager {
 
+    private val config get() = SkyHanniMod.feature.markedPlayers
+
     companion object {
         val playerNamesToMark = mutableListOf<String>()
         private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
@@ -64,7 +66,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        SkyHanniMod.feature.markedPlayers.markOwnName.whenChanged { _, new ->
+        config.markOwnName.whenChanged { _, new ->
             val name = LorenzUtils.getPlayerName()
             if (new) {
                 if (!playerNamesToMark.contains(name)) {
@@ -88,7 +90,7 @@ class MarkedPlayerManager {
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.markedPlayers.highlightInWorld) return
+        if (!config.highlightInWorld) return
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
@@ -99,7 +101,7 @@ class MarkedPlayerManager {
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.markedPlayers.highlightInWorld) return
+        if (!config.highlightInWorld) return
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
@@ -112,7 +114,7 @@ class MarkedPlayerManager {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
         markedPlayers.clear()
-        if (SkyHanniMod.feature.markedPlayers.markOwnName.get()) {
+        if (config.markOwnName.get()) {
             val name = LorenzUtils.getPlayerName()
             if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)
