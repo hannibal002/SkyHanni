@@ -165,6 +165,12 @@ public class ChatConfig {
     public boolean compactPotionMessage = true;
 
     @Expose
+    @ConfigOption(name = "Clickable Potion Messages", desc = "Makes the Compact Potion message open the Potion effects menu on click.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactPotionClickableMessage = true;
+
+    @Expose
     @ConfigOption(name = "Compact Bestiary Message", desc = "Shorten the Bestiary level up message, showing additional information when hovering.")
     @ConfigEditorBoolean
     @FeatureToggle
