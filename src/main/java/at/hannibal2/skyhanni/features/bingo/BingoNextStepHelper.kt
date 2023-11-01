@@ -315,6 +315,33 @@ class BingoNextStepHelper {
         IslandType.DEEP_CAVERNS.getStep() requires IslandType.GOLD_MINES.getStep()
         IslandType.DEEP_CAVERNS.getStep() requires SkillLevelStep("Mining", 5)
 
+        rhys()
+        IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep(
+            "Mining",
+            12
+        ).also { it requires IslandType.THE_FARMING_ISLANDS.getStep() }
+
+        IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
+
+        // TODO add SkyBlock level requirement
+//        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
+        IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
+
+        val farmingContest = ChatMessageStep("Farming Contest")
+        farmingContest requires SkillLevelStep("Farming", 10)
+        itemPreconditions["Jacob's Ticket"] = farmingContest
+
+        IslandType.DWARVEN_MINES.getStep().makeFinalStep()
+        ChatMessageStep("Get Ender Armor").makeFinalStep() requires IslandType.THE_END.getStep()
+        IslandType.THE_END.getStep() requires SkillLevelStep(
+            "Combat",
+            12
+        ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
+//        enchantedCharcoal(7)
+//        compactor(7)
+    }
+
+    private fun rhys() {
         val redstoneForRhys = PartialProgressItemsStep(
             rhysTaskName,
             "Redstone",
@@ -339,32 +366,10 @@ class BingoNextStepHelper {
         )
         coalForRhys requires IslandType.DEEP_CAVERNS.getStep()
 
-        IslandType.DWARVEN_MINES.getStep() requires redstoneForRhys
-        IslandType.DWARVEN_MINES.getStep() requires lapisForRhys
-        IslandType.DWARVEN_MINES.getStep() requires coalForRhys
-        IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep(
-            "Mining",
-            12
-        ).also { it requires IslandType.THE_FARMING_ISLANDS.getStep() }
-
-        IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
-
-        // TODO add SkyBlock level requirement
-//        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
-        IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
-
-        val farmingContest = ChatMessageStep("Farming Contest")
-        farmingContest requires SkillLevelStep("Farming", 10)
-        itemPreconditions["Jacob's Ticket"] = farmingContest
-
-        IslandType.DWARVEN_MINES.getStep().makeFinalStep()
-        ChatMessageStep("Get Ender Armor").makeFinalStep() requires IslandType.THE_END.getStep()
-        IslandType.THE_END.getStep() requires SkillLevelStep(
-            "Combat",
-            12
-        ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
-//        enchantedCharcoal(7)
-//        compactor(7)
+        val mines = IslandType.DWARVEN_MINES.getStep()
+        mines requires redstoneForRhys
+        mines requires lapisForRhys
+        mines requires coalForRhys
     }
 
     private fun compactor(amount: Long) {
