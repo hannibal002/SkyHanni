@@ -119,7 +119,7 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Player Chat Symbols", desc = "")
     @Accordion
-    public ChatSymbols chatSymbols = new ChatSymbols();
+    public CompactPotionConfig chatSymbols = new CompactPotionConfig();
 
     public static class ChatSymbols {
 
@@ -159,16 +159,23 @@ public class ChatConfig {
     //TODO jawbus + thunder
 
     @Expose
-    @ConfigOption(name = "Compact Potion Message", desc = "Shorten chat messages about player potion effects.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean compactPotionMessage = true;
+    @ConfigOption(name = "Compact Potion Messages", desc = "")
+    @Accordion
+    public CompactPotionConfig compactPotionMessages = new CompactPotionConfig();
 
-    @Expose
-    @ConfigOption(name = "Clickable Potion Messages", desc = "Makes the Compact Potion message open the Potion effects menu on click.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean compactPotionClickableMessage = true;
+    public static class CompactPotionConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Shorten chat messages about player potion effects.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Clickable Chat Message", desc = "Makes the Compact Potion message open the Potion effects menu on click.")
+        @ConfigEditorBoolean
+        public boolean clickableChatMessage = true;
+    }
 
     @Expose
     @ConfigOption(name = "Compact Bestiary Message", desc = "Shorten the Bestiary level up message, showing additional information when hovering.")
