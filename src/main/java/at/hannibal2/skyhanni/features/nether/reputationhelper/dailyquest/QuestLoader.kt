@@ -158,12 +158,14 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         if (dailyQuestHelper.greatSpook) return
         for (text in storage.quests.toList()) {
-            val split = text.split(":")
-            val name = split[0]
-            if (name.contains("The Great Spook")) {
+            if (text.contains("The Great Spook")) {
                 dailyQuestHelper.greatSpook = true
                 return
             }
+        }
+        for (text in storage.quests.toList()) {
+            val split = text.split(":")
+            val name = split[0]
             val state = QuestState.valueOf(split[1])
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
