@@ -792,6 +792,16 @@ public class MiscConfig {
         public boolean showMayorPerks = true;
 
         @Expose
+        @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard.\nUse & for colors")
+        @ConfigEditorText
+        public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
+
+        @Expose
+        @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard.\nUse & for colors")
+        @ConfigEditorText
+        public Property<String> customFooter = Property.of("&ewww.hypixel.net");
+
+        @Expose
         public Position position = new Position(10, 80, false, true);
     }
 

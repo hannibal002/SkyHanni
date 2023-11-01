@@ -75,33 +75,24 @@ enum class CustomScoreboardElements (
     val index: Int
 ){
     SKYBLOCK(
-        { listOf("§bSkyBlock") },
+        { listOf(config.customTitle.get().toString().replace("&", "§")) },
         listOf(),
         0,
         0
     ),
     PROFILE(
-        {
-            when (config.displayNumbersFirst){
-                true -> listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
-                false -> listOf(HypixelData.profileName.firstLetterUppercase() + getProfileTypeAsSymbol())
-            }
-        },
+        { listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase()) },
         listOf(),
         0,
         1
     ),
     PURSE(
         {
-            when (purse){
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst){
-                        true -> listOf("§6$purse Purse")
-                        false -> listOf("Purse: §6$purse")
-                    }
+            when {
+                config.hideEmptyLines && purse == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf("§6$purse Purse")
+                else -> listOf("Purse: §6$purse")
             }
-
         },
         listOf(IslandType.THE_RIFT),
         1,
@@ -109,13 +100,10 @@ enum class CustomScoreboardElements (
     ),
     MOTES(
         {
-            when (motes){
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst){
-                        true -> listOf("§d$motes Motes")
-                        false -> listOf("Motes: §d$motes")
-                    }
+            when {
+                motes == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf("§d$motes Motes")
+                else -> listOf("Motes: §d$motes")
             }
         },
         listOf(IslandType.THE_RIFT),
@@ -124,13 +112,10 @@ enum class CustomScoreboardElements (
     ),
     BANK(
         {
-            when (bank){
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst){
-                        true -> listOf("§6$bank Bank")
-                        false -> listOf("Bank: §6$bank")
-                    }
+            when {
+                bank == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf("§6$bank Bank")
+                else -> listOf("Bank: §6$bank")
             }
         },
         listOf(IslandType.THE_RIFT),
@@ -139,13 +124,10 @@ enum class CustomScoreboardElements (
     ),
     BITS(
         {
-            when(bits) {
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst) {
-                        true -> listOf("§b$bits Bits")
-                        false -> listOf("Bits: §b$bits")
-                    }
+            when {
+                bits == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf("§b$bits Bits")
+                else -> listOf("Bits: §b$bits")
             }
         },
         listOf(IslandType.THE_RIFT),
@@ -154,13 +136,10 @@ enum class CustomScoreboardElements (
     ),
     COPPER(
         {
-            when(copper) {
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst) {
-                        true -> listOf("§c$copper Copper")
-                        false -> listOf("Copper: §c$copper")
-                    }
+            when {
+                copper == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf("§c$copper Copper")
+                else -> listOf("Copper: §c$copper")
             }
         },
         listOf(IslandType.GARDEN),
@@ -169,13 +148,10 @@ enum class CustomScoreboardElements (
     ),
     GEMS(
         {
-            when (gems) {
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst) {
-                        true -> listOf("§a$gems Gems")
-                        false -> listOf("Gems: §a$gems")
-                    }
+            when {
+                gems == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf("§a$gems Gems")
+                else -> listOf("Gems: §a$gems")
             }
         },
         listOf(IslandType.THE_RIFT),
@@ -257,13 +233,10 @@ enum class CustomScoreboardElements (
     ),
     HEAT(
         {
-            when (heat) {
-                "0" -> listOf("<hidden>")
-                else ->
-                    when (config.displayNumbersFirst) {
-                        true -> listOf(if(heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
-                        false -> listOf(if(heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
-                    }
+            when {
+                heat == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
+                else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
             }
         },
         listOf(IslandType.CRYSTAL_HOLLOWS),
@@ -294,7 +267,7 @@ enum class CustomScoreboardElements (
         20
     ),
     WEBSITE(
-        { listOf("§ewww.hypixel.net") },
+        { listOf(config.customFooter.get().toString().replace("&", "§")) },
         listOf(),
         0,
         21
