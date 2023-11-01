@@ -24,7 +24,7 @@ class BurrowWarpHelper {
         if (event.keyCode != config.keyBindWarp) return
 
         currentWarp?.let {
-            if (lastWarpTime.passedSince() < 5.seconds) {
+            if (lastWarpTime.passedSince() > 5.seconds) {
                 lastWarpTime = SimpleTimeMark.now()
                 LorenzUtils.sendCommandToServer("warp " + currentWarp?.name)
                 lastWarp = currentWarp
