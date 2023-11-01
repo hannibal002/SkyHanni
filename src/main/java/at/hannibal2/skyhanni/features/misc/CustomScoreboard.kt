@@ -245,16 +245,21 @@ enum class CustomScoreboardElements (
     ),
     PARTY(
         {
-            listOf(
-                "§9§lParty",
-                *PartyAPI.partyMembers
+            val partyTitle : List<String> = if (PartyAPI.partyMembers.isEmpty() && config.hideEmptyLines) {
+                listOf("<hidden>")
+            } else {
+                val title = if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
+                val partyList = PartyAPI.partyMembers
                     .takeWhile { partyCount < config.maxPartyList.get() }
                     .map {
                         partyCount++
                         " §7- §7$it"
                     }
                     .toTypedArray()
-            )
+                listOf(title, *partyList)
+            }
+
+            partyTitle
         },
         listOf(IslandType.CATACOMBS, IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
         0,

@@ -750,7 +750,7 @@ public class MiscConfig {
                 "§2Diana:\n§7- §eLucky!\n§7- §eMythological Ritual\n§7- §ePet XP Buff",
                 "",
                 "Heat: §c♨ 0",
-                "§9§lParty:\n §7- §fhannibal2\n §7- §f Moulberry\n §7- §f Vahvl\n §7- §f J10a1n15",
+                "§9§lParty (4):\n §7- §fhannibal2\n §7- §f Moulberry\n §7- §f Vahvl\n §7- §f J10a1n15",
                 "§7Maxwell Power",
                 "§ewww.hypixel.net",
             }
