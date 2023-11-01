@@ -8,11 +8,10 @@ object ConfigGuiManager {
 
     var editor: MoulConfigEditor<Features>? = null
 
+    fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also { editor = it }
+
     fun openConfigGui(search: String? = null) {
-        if (editor == null) {
-            editor = MoulConfigEditor(SkyHanniMod.configManager.processor)
-        }
-        val editor = editor ?: return
+        val editor = getEditorInstance()
 
         if (search != null) {
             editor.search(search)
