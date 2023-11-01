@@ -119,7 +119,7 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Player Chat Symbols", desc = "")
     @Accordion
-    public CompactPotionConfig chatSymbols = new CompactPotionConfig();
+    public ChatSymbols chatSymbols = new ChatSymbols();
 
     public static class ChatSymbols {
 
