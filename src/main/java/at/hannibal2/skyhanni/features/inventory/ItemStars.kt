@@ -12,6 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemStars {
 
+    private val config get() = SkyHanniMod.feature.inventory
+
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
     private val STAR_FIND_PATCHER = "(.*)§.✪(.*)".toPattern()
@@ -23,7 +25,7 @@ class ItemStars {
 
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
-        if (!SkyHanniMod.feature.inventory.itemStars) return
+        if (!config.itemStars) return
 
         val itemName = stack.name ?: return
         val stars = getStars(itemName)
@@ -51,7 +53,7 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(6)) return
+        if (!config.itemNumberAsStackSize.contains(6)) return
         val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
         if (number != -1) {
