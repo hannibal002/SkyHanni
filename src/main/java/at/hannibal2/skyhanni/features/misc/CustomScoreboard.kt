@@ -276,6 +276,16 @@ enum class CustomScoreboardElements (
     fun getLine(): List<String> {
         return displayLine?.get() ?: emptyList()
     }
+
+    fun isVisible(): Boolean {
+        if (!config.hideIrrelevantLines) return true
+        if (islands.isEmpty()) return true
+        return when (visibilityOption) {
+            0 -> islands.contains(HypixelData.skyBlockIsland)
+            1 -> !islands.contains(HypixelData.skyBlockIsland)
+            else -> true
+        }
+    }
 }
 
 class CustomScoreboard {
@@ -336,7 +346,7 @@ class CustomScoreboard {
     private fun drawScoreboard() = buildList<List<Any>> {
         val lineMap = HashMap<Int, List<Any>>()
         for (element in CustomScoreboardElements.entries) {
-            lineMap[element.index] = element.getLine()
+            lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
         }
 
         return formatDisplay(lineMap)
