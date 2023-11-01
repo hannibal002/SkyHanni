@@ -8,8 +8,6 @@
 //
 // TODO LIST
 // V1 RELEASE
-//  - enums prob (why)
-//  - toggle between "<name> <count>" and "<count> <name>"
 //  - Hide default scoreboard
 //  - the things that arent done yet
 //
@@ -43,6 +41,7 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
+import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.misc.customScoreboard
 private var display = emptyList<List<Any>>()
@@ -64,10 +63,7 @@ private var gemstonePowder = "0"
 
 enum class CustomScoreboardElements (
     // displayLine: The line that is displayed on the scoreboard
-    val displayLine: List<String>,
-
-    // alternativeLine: The line that is displayed on the scoreboard when "displayNumbersFirst" is enabled
-    val alternativeLine: List<String>,
+    val displayLine: Supplier<List<String>>?,
 
     // islands: The islands that this line is displayed on
     val islands: List<IslandType>,
@@ -76,191 +72,243 @@ enum class CustomScoreboardElements (
     val visibilityOption : Int,
 
     // index: The index of the line
-    val index: Int,
-
-    // data: The data that is used for this line
-    val data: String = ""
+    val index: Int
 ){
     SKYBLOCK(
-        listOf("§6§lSKYBLOCK"),
-        listOf(),
+        { listOf("§bSkyBlock") },
         listOf(),
         0,
         0
     ),
     PROFILE(
-        listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase()),
-        listOf(),
+        {
+            when (config.displayNumbersFirst){
+                true -> listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
+                false -> listOf(HypixelData.profileName.firstLetterUppercase() + getProfileTypeAsSymbol())
+            }
+        },
         listOf(),
         0,
         1
     ),
     PURSE(
-        listOf("Purse: §6$purse"),
-        listOf("§6$purse Purse"),
+        {
+            when (purse){
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst){
+                        true -> listOf("§6$purse Purse")
+                        false -> listOf("Purse: §6$purse")
+                    }
+            }
+
+        },
         listOf(IslandType.THE_RIFT),
         1,
-        2,
-        purse
+        2
     ),
     MOTES(
-        listOf("Motes: §d$motes"),
-        listOf("§d$motes Motes"),
+        {
+            when (motes){
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst){
+                        true -> listOf("§d$motes Motes")
+                        false -> listOf("Motes: §d$motes")
+                    }
+            }
+        },
         listOf(IslandType.THE_RIFT),
         0,
-        3,
-        motes
+        3
     ),
     BANK(
-        listOf("Bank: §6$bank"),
-        listOf("§6$bank Bank"),
+        {
+            when (bank){
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst){
+                        true -> listOf("§6$bank Bank")
+                        false -> listOf("Bank: §6$bank")
+                    }
+            }
+        },
         listOf(IslandType.THE_RIFT),
         1,
-        4,
-        bank
+        4
     ),
     BITS(
-        listOf("Bits: §b$bits"),
-        listOf("§b$bits Bits"),
+        {
+            when(bits) {
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst) {
+                        true -> listOf("§b$bits Bits")
+                        false -> listOf("Bits: §b$bits")
+                    }
+            }
+        },
         listOf(IslandType.THE_RIFT),
         1,
-        5,
-        bits
+        5
     ),
     COPPER(
-        listOf("Copper: §c$copper"),
-        listOf("§c$copper Copper"),
+        {
+            when(copper) {
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst) {
+                        true -> listOf("§c$copper Copper")
+                        false -> listOf("Copper: §c$copper")
+                    }
+            }
+        },
         listOf(IslandType.GARDEN),
         0,
-        6,
-        copper
+        6
     ),
     GEMS(
-        listOf("Gems: §a$gems"),
-        listOf("§a$gems Gems"),
+        {
+            when (gems) {
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst) {
+                        true -> listOf("§a$gems Gems")
+                        false -> listOf("Gems: §a$gems")
+                    }
+            }
+        },
         listOf(IslandType.THE_RIFT),
         1,
-        7,
-        gems
+        7
     ),
     EMPTY_LINE(
-        listOf("<empty>"),
-        listOf(),
+        { listOf("<empty>") },
         listOf(),
         0,
         8
     ),
     LOCATION(
-        listOf(location),
-        listOf(),
+        { listOf(location) },
         listOf(),
         0,
         9
     ),
     SKYBLOCK_TIME(
-        listOf(SkyBlockTime.now().formatted(false)),
-        listOf(),
+        { listOf(SkyBlockTime.now().formatted(false)) },
         listOf(),
         0,
         10
     ),
     LOBBY_CODE(
-        listOf("§8$lobbyCode"),
-        listOf(),
+        { listOf("§8$lobbyCode") },
         listOf(),
         0,
         11
     ),
     POWDER(
-        listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder"),
-        listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone"),
+        {
+            when (config.displayNumbersFirst){
+                true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
+                false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
+            }
+        },
         listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES),
         0,
         12
     ),
     EMPTY_LINE2(
-        listOf("<empty>"),
-        listOf(),
+        { listOf("<empty>") },
         listOf(),
         0,
         13
     ),
     SLAYER(
-        listOf("§7Slayer"),
-        listOf(""),
+        { listOf("§7Slayer") },
         listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE),
         0,
         14
     ),
     CURRENT_EVENT(
-        listOf("§cCurrent Event"),
-        listOf(""),
+        { listOf("§cCurrent Event") },
         listOf(),
         0,
         15
     ),
     MAYOR(
-        listOf(
-            MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>"
-        ) + (if (config.showMayorPerks) {
-            MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" } ?: emptyList()
-        } else {
-            emptyList()
-        }),
-        listOf(),
+        {
+            listOf(
+                MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>"
+            ) + (if (config.showMayorPerks) {
+                MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" } ?: emptyList()
+            } else {
+                emptyList()
+            })
+        },
         listOf(IslandType.THE_RIFT),
         1,
         16
     ),
     EMPTY_LINE3(
-        listOf("<empty>"),
-        listOf(),
+        { listOf("<empty>") },
         listOf(),
         0,
         17
     ),
     HEAT(
-        listOf(if(heat == "0") "Heat: §c♨ 0" else "Heat: $heat"),
-        listOf(if(heat == "0") "§c♨ 0 Heat" else "$heat Heat"),
+        {
+            when (heat) {
+                "0" -> listOf("<hidden>")
+                else ->
+                    when (config.displayNumbersFirst) {
+                        true -> listOf(if(heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
+                        false -> listOf(if(heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
+                    }
+            }
+        },
         listOf(IslandType.CRYSTAL_HOLLOWS),
         0,
-        18,
-        heat
+        18
     ),
     PARTY(
-        listOf(
-            "§9Party",
-            *PartyAPI.partyMembers.takeWhile { partyCount < config.maxPartyList.get() }
-                .map { " §7- §7$it" }
-                .toTypedArray()
-        ),
-        listOf(),
+        {
+            listOf(
+                "§9Party",
+                *PartyAPI.partyMembers
+                    .takeWhile { partyCount < config.maxPartyList.get() }
+                    .map { it ->
+                        partyCount++
+                        " §7- §7$it"
+                    }
+                    .toTypedArray()
+            )
+        },
         listOf(IslandType.CATACOMBS, IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
         0,
-        19,
-        partyCount.toString()
+        19
     ),
     MAXWELL(
-        listOf("§7Maxwell Power"),
-        listOf(),
+        { listOf("§7Maxwell Power") },
         listOf(IslandType.THE_RIFT),
         1,
         20
     ),
     WEBSITE(
-        listOf("§ewww.hypixel.net"),
-        listOf(),
+        { listOf("§ewww.hypixel.net") },
         listOf(),
         0,
         21
     );
+
+    fun getLine(): List<String> {
+        return displayLine?.get() ?: emptyList()
+    }
 }
 
 class CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         config.position.renderStringsAndItems(display, posLabel = "Custom Scoreboard")
     }
 
@@ -272,7 +320,7 @@ class CustomScoreboard {
         // Resets Party count
         partyCount = 0
 
-        // Gets some values for the scoreboard
+        // Gets some values for the tablist
         for (line in TabListData.getTabList()){
             if (line.startsWith(" Gems: §r§a")){
                 gems = line.removePrefix(" Gems: §r§a")
@@ -288,6 +336,7 @@ class CustomScoreboard {
             }
         }
 
+        // Gets some values for the scoreboard
         for (line in ScoreboardData.sidebarLinesFormatted){
             if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
                 location = line
@@ -314,20 +363,10 @@ class CustomScoreboard {
     private fun drawScoreboard() = buildList<List<Any>> {
         val lineMap = HashMap<Int, List<Any>>()
         for (element in CustomScoreboardElements.entries) {
-            if (element.data == "0" && config.hideEmptyLines){ // Hide empty lines
-                lineMap[element.index] = listOf("<hidden>")
-                continue
-            }
-
-            lineMap[element.index] = formatLine(element)
+            lineMap[element.index] = element.getLine()
         }
 
         return formatDisplay(lineMap)
-    }
-
-    private fun formatLine(element: CustomScoreboardElements) : List<Any>{
-        if (element.alternativeLine.isEmpty()) return element.displayLine
-        return if (config.displayNumbersFirst) element.alternativeLine else element.displayLine
     }
 
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
