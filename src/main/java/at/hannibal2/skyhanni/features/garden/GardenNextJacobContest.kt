@@ -294,17 +294,17 @@ object GardenNextJacobContest {
         list: MutableList<Any>,
     ): MutableList<Any> {
         var duration = nextContest.endTime - System.currentTimeMillis()
+        for (crop in nextContest.crops) {
+            list.add(" ")
+            list.addCropIcon(crop)
+            nextContestCrops.add(crop)
+        }
         if (duration < contestDuration) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
             warn(duration, nextContest.crops)
-        }
-        for (crop in nextContest.crops) {
-            list.add(" ")
-            list.addCropIcon(crop)
-            nextContestCrops.add(crop)
         }
         val format = TimeUtils.formatDuration(duration)
         list.add("§7(§b$format§7)")
@@ -315,6 +315,7 @@ object GardenNextJacobContest {
     private fun warn(timeInMillis: Long, crops: List<CropType>) {
         if (!config.warn) return
         if (config.warnTime <= timeInMillis / 1000) return
+        if (!warnForCrop()) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
@@ -370,6 +371,13 @@ object GardenNextJacobContest {
             allOptions,
             allOptions[0]
         )
+    }
+
+    private fun warnForCrop(): Boolean {
+        for(crop in nextContestCrops) {
+            if (config.warnFor.contains(crop.ordinal)) return true
+        }
+        return false
     }
 
     @SubscribeEvent

@@ -993,6 +993,27 @@ public class GardenConfig {
         public boolean warnPopup = false;
 
         @Expose
+        @ConfigOption(
+            name = "Warn For",
+            desc = "Only Warn for these crops"
+        )
+        @ConfigEditorDraggableList(
+            exampleText = {
+                "Wheat",
+                "Carrot",
+                "Potato",
+                "Nether Wart",
+                "Pumpkin",
+                "Melon",
+                "Cocoa Beans",
+                "Sugar Cane",
+                "Cactus",
+                "Mushroom"
+            }
+        )
+        public List<Integer> warnFor = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+
+        @Expose
         public Position pos = new Position(-200, 10, false, true);
     }
 
