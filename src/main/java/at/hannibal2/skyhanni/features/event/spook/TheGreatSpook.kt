@@ -31,8 +31,8 @@ class TheGreatSpook {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isTimerEnabled()) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")
-        if (isFearStatEnabled()) config.positionTimer.renderString(displayFearStat, posLabel = "Fear Stat Display")
-        if (isTimeLeftEnabled()) config.positionTimer.renderString(displayTimeLeft, posLabel = "Time Left Display")
+        if (isFearStatEnabled()) config.positionFear.renderString(displayFearStat, posLabel = "Fear Stat Display")
+        if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
     }
 
     private fun isTimerEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearTimer

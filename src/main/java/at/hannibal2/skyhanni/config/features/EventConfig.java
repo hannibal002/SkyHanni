@@ -357,6 +357,12 @@ public class EventConfig {
         @Expose
         public Position positionTimer = new Position(10, 10, false, true);
 
+        @Expose
+        public Position positionFear = new Position(10, 10, false, true);
+
+        @Expose
+        public Position positionTimeLeft = new Position(10, 10, false, true);
+
     }
 
     // comment in if the event is needed again
