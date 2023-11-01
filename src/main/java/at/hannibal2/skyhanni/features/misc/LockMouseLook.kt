@@ -8,10 +8,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object LockMouseLook {
     private var lockedMouse = false
     private var oldSensitivity = 0F
+    private val lockedPosition = -1F / 3F
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (lockedMouse) toggleLock()
+        val gameSettings = Minecraft.getMinecraft().gameSettings
+        if (gameSettings.mouseSensitivity == lockedPosition) {
+            gameSettings.mouseSensitivity = 0.5f
+            LorenzUtils.chat("§e[SkyHanni] §bReset your mouse sensitivity to 100%.")
+        }
     }
 
     fun toggleLock() {
@@ -20,7 +26,7 @@ object LockMouseLook {
         val gameSettings = Minecraft.getMinecraft().gameSettings
         if (lockedMouse) {
             oldSensitivity = gameSettings.mouseSensitivity
-            gameSettings.mouseSensitivity = -1F / 3F
+            gameSettings.mouseSensitivity = lockedPosition
             LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
         } else {
             gameSettings.mouseSensitivity = oldSensitivity
