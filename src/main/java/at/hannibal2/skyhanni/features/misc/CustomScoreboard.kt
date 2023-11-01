@@ -249,7 +249,7 @@ enum class CustomScoreboardElements (
                 "§9Party",
                 *PartyAPI.partyMembers
                     .takeWhile { partyCount < config.maxPartyList.get() }
-                    .map { it ->
+                    .map {
                         partyCount++
                         " §7- §7$it"
                     }
