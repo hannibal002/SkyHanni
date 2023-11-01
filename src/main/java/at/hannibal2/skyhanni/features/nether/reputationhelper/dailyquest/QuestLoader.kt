@@ -30,6 +30,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     fun loadFromTabList() {
         var i = -1
+        dailyQuestHelper.greatSpook = false
         for (line in TabListData.getTabList()) {
             if (line.contains("Faction Quests:")) {
                 i = 0
@@ -39,6 +40,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
             i++
             readQuest(line)
+            if (dailyQuestHelper.greatSpook) return
             if (i == 5) {
                 break
             }
@@ -46,6 +48,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (line.contains("The Great Spook")) {
+            dailyQuestHelper.greatSpook = true
+            dailyQuestHelper.update()
+            return
+        }
         var text = line.substring(3)
         val green = text.startsWith("§a")
         text = text.substring(2)
@@ -149,9 +156,14 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (dailyQuestHelper.greatSpook) return
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
+            if (name.contains("The Great Spook")) {
+                dailyQuestHelper.greatSpook = true
+                return
+            }
             val state = QuestState.valueOf(split[1])
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
