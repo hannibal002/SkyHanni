@@ -371,15 +371,6 @@ class CustomScoreboard {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
             lineMap[index]?.let {
-
-                // Multiline support
-                if (it.size > 1) {
-                    for (item in it) {
-                        newList.add(listOf(item))
-                    }
-                    continue
-                }
-
                 // Adds empty lines
                 if(it[0] == "<empty>"){
                     newList.add(listOf(""))
@@ -388,6 +379,14 @@ class CustomScoreboard {
 
                 // Does not display this line
                 if(it[0] == "<hidden>"){
+                    continue
+                }
+
+                // Multiline support
+                if (it.size > 1) {
+                    for (item in it) {
+                        newList.add(listOf(item))
+                    }
                     continue
                 }
 
