@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items
+package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ChatHoverEvent
@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.Gson
@@ -28,8 +27,7 @@ import java.util.regex.Pattern
  */
 object EnchantParser {
 
-    private const val COLOR_CODES = "0123456789abcdefZ"
-    private val ENCHANTMENT_PATTERN = Pattern.compile("(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
+    val ENCHANTMENT_PATTERN: Pattern = Pattern.compile("(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
     private val GRAY_ENCHANT_PATTERN = Pattern.compile("^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
 
     private var indexOfLastGrayEnchant = -1
@@ -151,17 +149,19 @@ object EnchantParser {
             }
         }
 
+        if (orderedEnchants.isEmpty()) {
+            loreCache.updateAfter(loreList)
+            return
+        }
+
         // If we have color parsing off and hide enchant descriptions, remove them and return from method
         if (!SkyHanniMod.feature.enchantParsing.colorEnchants.colorParsing) {
             if (SkyHanniMod.feature.enchantParsing.hideEnchantDescriptions) {
                 loreList.removeAll(loreLines)
+                loreCache.updateAfter(loreList)
+                if (chatComponent != null) editChatComponent(chatComponent, loreList)
                 return
             }
-            return
-        }
-
-        if (orderedEnchants.isEmpty()) {
-            loreCache.updateAfter(loreList)
             return
         }
 
@@ -216,16 +216,20 @@ object EnchantParser {
 
         // Alter the chat component value if one was passed
         if (chatComponent != null) {
-            // Drop 1st 2 and last 2 characters since when being rendered, the chat tooltip
-            // adds formatting in front of, and at the end of the text, so we get rid of them
-            // here and let Minecraft add them back, otherwise the text grows infinitely
-            (chatComponent as ChatComponentText).text = loreList.joinToString("\n").drop(2).dropLast(2)
+            editChatComponent(chatComponent, loreList)
+        }
+    }
 
-            val iterator = chatComponent.siblings.iterator()
-            while (iterator.hasNext()) {
-                iterator.next()
-                iterator.remove()
-            }
+    private fun editChatComponent(chatComponent: IChatComponent, loreList: MutableList<String>) {
+        // Drop 1st 2 and last 2 characters since when being rendered, the chat tooltip
+        // adds formatting in front of, and at the end of the text, so we get rid of them
+        // here and let Minecraft add them back, otherwise the text grows infinitely
+        (chatComponent as ChatComponentText).text = loreList.joinToString("\n").drop(2).dropLast(2)
+
+        val iterator = chatComponent.siblings.iterator()
+        while (iterator.hasNext()) {
+            iterator.next()
+            iterator.remove()
         }
     }
 
@@ -252,122 +256,6 @@ object EnchantParser {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.enchantParsing.enabled
-
-    class Enchants {
-        var NORMAL: HashMap<String, Enchant.Normal> = hashMapOf()
-        var ULTIMATE: HashMap<String, Enchant.Ultimate> = hashMapOf()
-        var STACKING: HashMap<String, Enchant.Stacking> = hashMapOf()
-
-        fun getFromLore(passedLoreName: String) : Enchant {
-            val loreName = passedLoreName.lowercase()
-            var enchant: Enchant? = NORMAL[loreName]
-            if (enchant == null) enchant = ULTIMATE[loreName]
-            if (enchant == null) enchant = STACKING[loreName]
-            if (enchant == null) enchant = Enchant.Dummy(passedLoreName)
-            return enchant
-        }
-
-        fun containsEnchantment(enchants: Map<String, Int>, line: String) : Boolean {
-            val matcher = ENCHANTMENT_PATTERN.matcher(line)
-            while (matcher.find()) {
-                val enchant = this.getFromLore(matcher.group("enchant"))
-                if (enchants.isNotEmpty()) {
-                    if (enchants.containsKey(enchant.nbtName)) return true
-                } else {
-                    if (NORMAL.containsKey(enchant.loreName.lowercase())) return true
-                    if (ULTIMATE.containsKey(enchant.loreName.lowercase())) return true
-                    if (STACKING.containsKey(enchant.loreName.lowercase())) return true
-                }
-            }
-            return false
-        }
-
-        fun hasEnchantData() = NORMAL.isNotEmpty() && ULTIMATE.isNotEmpty() && STACKING.isNotEmpty()
-    }
-
-    open class Enchant : Comparable<Enchant> {
-        var nbtName = ""
-        var loreName = ""
-        private var goodLevel = 0
-        private var maxLevel = 0
-
-        private fun isNormal() = this is Normal
-        private fun isUltimate() = this is Ultimate
-        private fun isStacking() = this is Stacking
-
-        open fun getFormattedName(level: Int) = getFormat(level) + loreName
-
-        open fun getFormat(level: Int) : String {
-            val config = SkyHanniMod.feature.enchantParsing.colorEnchants
-
-            if (level >= maxLevel) return "§" + COLOR_CODES[config.perfectEnchantColor]
-            if (level > goodLevel) return "§" + COLOR_CODES[config.greatEnchantColor]
-            if (level == goodLevel) return "§" + COLOR_CODES[config.goodEnchantColor]
-            return "§" + COLOR_CODES[config.poorEnchantColor]
-        }
-
-        override fun toString() = "$nbtName $goodLevel $maxLevel\n"
-
-        override fun compareTo(other: Enchant): Int {
-            if (this.isUltimate() == other.isUltimate()) {
-                if (this.isStacking() == other.isStacking()) {
-                    return this.loreName.compareTo(other.loreName)
-                }
-                return if (this.isStacking()) -1 else 1
-            }
-            return if (this.isUltimate()) -1 else 1
-        }
-
-        class Normal : Enchant() {
-        }
-
-        class Ultimate : Enchant() {
-            override fun getFormat(level: Int) = "§d§l"
-        }
-
-        class Stacking : Enchant() {
-            private var nbtNum: String? = null
-            private var statLabel: String? = null
-            private var stackLevel: TreeSet<Int>? = null
-
-            override fun toString() = "$nbtNum ${stackLevel.toString()} ${super.toString()}"
-        }
-
-        class Dummy(name: String) : Enchant() {
-            init {
-                loreName = name
-                nbtName = name
-            }
-
-            // Ensures enchants not yet in repo stay as vanilla formatting
-            // (instead of that stupid dark red lowercase formatting *cough* sba *cough*)
-            override fun getFormattedName(level: Int) = "§9$loreName"
-        }
-
-    }
-
-    class FormattedEnchant(
-        private val enchant: Enchant,
-        private val level: Int,
-        stacking: String
-    ) : Comparable<FormattedEnchant> {
-        private val stacking: String = stacking
-            get() = "§8$field"
-        private val loreDescription: MutableList<String> = mutableListOf()
-
-        fun addLore(lineOfLore: String) = loreDescription.add(lineOfLore)
-
-        fun getLore() = loreDescription
-
-        override fun compareTo(other: FormattedEnchant) = this.enchant.compareTo(other.enchant)
-
-        fun getFormattedString() : String {
-            val builder = StringBuilder()
-            builder.append(enchant.getFormattedName(level)).append(" ").append(level.toRoman())
-
-            return if (!stacking.contains("empty")) builder.append(stacking).toString() else builder.toString()
-        }
-    }
 
     fun markCacheDirty() {
         loreCache.configChanged = true

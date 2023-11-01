@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.config.features.MiscConfig;
 import at.hannibal2.skyhanni.config.features.OldHidden;
 import at.hannibal2.skyhanni.config.features.RiftConfig;
 import at.hannibal2.skyhanni.config.features.SlayerConfig;
-import at.hannibal2.skyhanni.features.misc.items.EnchantParser;
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
