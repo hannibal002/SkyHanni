@@ -239,4 +239,6 @@ object StringUtils {
     fun String.convertToFormatted(): String {
         return this.replace("&&", "§")
     }
+    
+    fun Pattern.matches(string: String) = matcher(string).matches()
 }

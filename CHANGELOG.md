@@ -127,6 +127,8 @@
 + Adding Great Spook support for Non God Pot Effect display. - hannibal2
 + Added a title warning to the Worm Cap Alert ping sound. - Vahvl
 + Added support for detecting refreshed farming fortune century cake effect. - alexia
++ Show key to press below burrow warp. - hannibal2
++ Makes the Compact Potion message open the Potion effects menu on click. - jani
 
 ### Bug Fixes
 
@@ -184,6 +186,11 @@
 + Fixed Damage Indicator "hide nametag" feature works even for disabled mobs. - hannibal2
 + Fixed item rarity detection for pets. - hannibal2
 + Fixed rare error message while disconnecting. - Thunderblade73
++ Disabled the Daily Quest part of the Reputation Helper during the great spook. - hannibal2
++ Fixed Diana warp key not working. - hannibal2
++ SkyHanni Keybinds no longer work inside SkyHanni config. - hannibal2
++ Fixed Great Spook potion not working in Non God Pot Effect feature. - jani
++ Fixed wrong Rhys (Deep Caverns NPC) items needed for Dwarven Mines unlock in Bingo Step Helper. - ReyMaratov
 
 #### Config
 
