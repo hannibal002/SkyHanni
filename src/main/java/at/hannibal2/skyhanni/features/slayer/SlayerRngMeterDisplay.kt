@@ -28,7 +28,7 @@ class SlayerRngMeterDisplay {
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
     private var display = ""
     private val inventoryNamePattern = "(?<name>.*) RNG Meter".toPattern()
-    private val updatePattern = "   §dRNG Meter §f- §d(?<exp>.*) Stored XP".toPattern()
+    private val updatePattern = " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP".toPattern()
     private val changedItemPattern = "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!".toPattern()
     private var lastItemDroppedTime = 0L
 

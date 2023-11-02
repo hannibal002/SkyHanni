@@ -15,8 +15,8 @@ class CompactBingoChat {
     private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
-    private val healthPattern = "   §r§7§8\\+§a.* §c❤ Health".toPattern()
-    private val strengthPattern = "   §r§7§8\\+§a. §c❁ Strength".toPattern()
+    private val healthPattern = " {3}§r§7§8\\+§a.* §c❤ Health".toPattern()
+    private val strengthPattern = " {3}§r§7§8\\+§a. §c❁ Strength".toPattern()
 
     // TODO USE SH-REPO
     @SubscribeEvent
