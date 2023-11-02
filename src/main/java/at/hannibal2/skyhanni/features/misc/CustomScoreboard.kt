@@ -16,15 +16,16 @@
 //  - Bank API
 //  - Custom Scoreboard Background
 //  - quiver
-//  - icons
 //  - beacon power
 //  - skyblock level
 //  - commissions
+//  - island date
 //
 
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
@@ -33,6 +34,7 @@ import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -434,9 +436,9 @@ private fun extractLobbyCode(input: String): String? {
 
 private fun getProfileTypeAsSymbol(): String {
     return when {
-        HypixelData.ironman -> "§7♲ "  // Ironman
+        HypixelData.ironman -> "§7♲ " // Ironman
         HypixelData.stranded -> "§a☀ " // Stranded
-        HypixelData.bingo -> "§cⒷ "    // Bingo - TODO: Consider using colors from BingoAPI
-        else -> "§e"                   // Default case
+        HypixelData.bingo -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(0, 3) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
+        else -> "§e " // Default case
     }
 }
