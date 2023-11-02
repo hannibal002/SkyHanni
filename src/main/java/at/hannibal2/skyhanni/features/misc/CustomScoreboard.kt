@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
@@ -278,7 +279,17 @@ enum class CustomScoreboardElements (
         19
     ),
     MAXWELL(
-        { listOf("§7Maxwell Power") },
+        {
+            when (MaxwellAPI.currentPower == null) {
+                true -> listOf("§c§lPlease visit Maxwell!")
+                false ->
+                    when (config.displayNumbersFirst)
+                    {
+                        true -> listOf("§e${MaxwellAPI.currentPower?.power} Power")
+                        false -> listOf("Power: §e${MaxwellAPI.currentPower?.power}")
+                    }
+            }
+        },
         listOf(IslandType.THE_RIFT),
         1,
         20
