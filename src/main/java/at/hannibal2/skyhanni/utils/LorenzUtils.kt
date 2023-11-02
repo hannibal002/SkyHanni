@@ -46,7 +46,7 @@ object LorenzUtils {
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
-    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
+    val inSkyBlock get() = true//onHypixel && HypixelData.skyBlock
 
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
