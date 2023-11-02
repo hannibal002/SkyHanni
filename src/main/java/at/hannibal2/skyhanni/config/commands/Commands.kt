@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -218,6 +219,10 @@ object Commands {
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
+        registerCommand(
+            "shkingfix",
+            "Reseting the local King Talisman Helper offset."
+        ) { KingTalismanHelper.kingFix() }
     }
 
     private fun developersDebugFeatures() {
