@@ -40,7 +40,7 @@ public class MiscConfig {
         public static class PetExperienceToolTipConfig {
 
             @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
+            @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean petDisplay = true;
@@ -821,6 +821,9 @@ public class MiscConfig {
 
     @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
+    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
