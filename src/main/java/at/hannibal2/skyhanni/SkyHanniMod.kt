@@ -103,6 +103,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
+import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
@@ -161,6 +162,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
+import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfGarden
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
@@ -322,7 +324,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.16",
+    version = "0.21.Beta.17",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -356,6 +358,7 @@ class SkyHanniMod {
         loadModule(VisitorListener())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
+        loadModule(HighlightVisitorsOutsideOfGarden())
         loadModule(GuiEditManager())
         loadModule(UpdateManager)
         loadModule(CropAccessoryData())
@@ -458,6 +461,7 @@ class SkyHanniMod {
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
         loadModule(HighlightJerries())
+        loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
