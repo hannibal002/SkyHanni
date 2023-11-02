@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDateConfig
-    private val monthAndDatePattern = ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st).*".toRegex()
+    private val monthAndDatePattern = ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st).*".toPattern()
     private var display = ""
 
     @SubscribeEvent
@@ -32,7 +33,13 @@ class InGameDateDisplay {
         if (config.useScoreboard) {
             val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            val monthAndDate = list.find{ it.matches(monthAndDatePattern) } ?: "??"
+            var monthAndDate = ""
+            for (line in list) {
+                monthAndDatePattern.matchMatcher(line) {
+                    monthAndDate = line
+                }
+            }
+            if (monthAndDate.isEmpty()) monthAndDate = "??"
             val time = list.find{ it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) theBaseString = theBaseString.replace("☽", "").replace("☀", "")
