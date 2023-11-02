@@ -33,13 +33,8 @@ class InGameDateDisplay {
         if (config.useScoreboard) {
             val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            var monthAndDate = ""
-            for (line in list) {
-                monthAndDatePattern.matchMatcher(line) {
-                    monthAndDate = line
-                }
-            }
-            if (monthAndDate.isEmpty()) monthAndDate = "??"
+            var monthAndDate = "??" //initalize as "??" as fallback value in case none of the scoreboard lines match
+            for (line in list) { monthAndDatePattern.matchMatcher(line) { monthAndDate = line } }
             val time = list.find{ it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) theBaseString = theBaseString.replace("☽", "").replace("☀", "")
