@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 class SlayerBossSpawnSoon {
 
     private val config get() = SkyHanniMod.feature.slayer.slayerBossWarning
-    private val pattern = " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*".toPattern()
+    private val pattern = " \\(?(?<progress>[0-9.,k]+)\\/(?<total>[0-9.,k]+)\\)?.*".toPattern()
     private var lastCompletion = 0f
     private var warned = false
 
