@@ -37,7 +37,7 @@ class InGameDateDisplay {
             for (line in list) { monthAndDatePattern.matchMatcher(line) { monthAndDate = line } }
             val time = list.find{ it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
-            if (!config.includeSunMoon) theBaseString = theBaseString.replace("☽", "").replace("☀", "")
+            if (!config.includeSunMoon) theBaseString = theBaseString.replace("☽", "").replace("☀", "").replace("࿇", "")
         } else {
             theBaseString = date.formatted()
             if (config.includeSunMoon) {
