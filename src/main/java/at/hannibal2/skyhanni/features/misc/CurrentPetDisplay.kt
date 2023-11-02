@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+    private val config get() = SkyHanniMod.feature.misc.pets
 
     // TODO USE SH-REPO
     private val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
@@ -23,25 +24,26 @@ class CurrentPetDisplay {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         val message = event.message
-        val config = ProfileStorageData.profileSpecific ?: return
+        val hidden = ProfileStorageData.profileSpecific ?: return
+
         var blocked = false
         if (message.matchRegex("§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE")) {
-            config.currentPet = message.between("] ", "§e!")
+            hidden.currentPet = message.between("] ", "§e!")
             blocked = true
         }
 
         if (!LorenzUtils.inSkyBlock) return
 
         if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
-            config.currentPet = message.between("your §r", "§r§a")
+            hidden.currentPet = message.between("your §r", "§r§a")
             blocked = true
         }
         if (message.matchRegex("§aYou despawned your §r(.*)§r§a!")) {
-            config.currentPet = ""
+            hidden.currentPet = ""
             blocked = true
         }
 
-        if (blocked && SkyHanniMod.feature.misc.pets.display) {
+        if (blocked && config.display && config.hideAutopet) {
             event.blockedReason = "pets"
         }
     }
@@ -66,14 +68,15 @@ class CurrentPetDisplay {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
 
-        if (!SkyHanniMod.feature.misc.pets.display) return
-        val config = ProfileStorageData.profileSpecific ?: return
+        if (!config.display) return
+        val hidden = ProfileStorageData.profileSpecific ?: return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
+        config.petDisplayPos.renderString(hidden.currentPet, posLabel = "Current Pet")
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
+        event.move(7, "misc.petDisplayPos", "misc.pets.petDisplayPos")
     }
 }
