@@ -65,23 +65,14 @@ class KingTalismanHelper {
     }
 
     private fun checkOffset() {
-        val currentKing = getCurrentKing()
-
-        val king =
-            EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
-                .filter { it.name.startsWith("§6§lKing ") }.first()
+        val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
+            .filter { it.name.startsWith("§6§lKing ") }.first()
         val foundKing = "§6§lKing (?<name>.*)".toPattern().matchMatcher(king.name) {
             group("name")
         } ?: return
 
-        println(" ")
-
-        val currentId = kingCircles.indexOf(currentKing)
-        println("currentKing: $currentKing $currentId")
-
+        val currentId = kingCircles.indexOf(getCurrentKing())
         val foundId = kingCircles.indexOf(foundKing)
-        println("currentKing: $foundKing $foundId")
-
         currentOffset = currentId - foundId
     }
 
