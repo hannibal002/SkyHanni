@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -24,10 +25,9 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightVisitorsOutsideOfGarden {
-    var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
+    private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
 
     val config get() = SkyHanniMod.feature.garden.visitors
-
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -36,22 +36,27 @@ class HighlightVisitorsOutsideOfGarden {
         ).visitors.values.groupBy {
             it.mode
         }
+        for (list in visitorJson.values) {
+            for (visitor in list) {
+                visitor.skinOrType = visitor.skinOrType?.replace("\\n", "")?.replace("\n", "")
+            }
+        }
     }
 
-    fun getSkinOrTypeFor(entity: Entity): String {
+    private fun getSkinOrTypeFor(entity: Entity): String {
         if (entity is EntityPlayer) {
             return entity.getSkinTexture() ?: "no skin"
         }
         return entity.javaClass.simpleName
     }
 
-    fun isVisitor(entity: Entity): Boolean {
+    private fun isVisitor(entity: Entity): Boolean {
         val mode = SBInfo.getInstance().getLocation()
         val possibleJsons = visitorJson[mode] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            ((it.position == null) || it.position!!.distance(entity.position.toLorenzVec()) < 1)
-                && it.skinOrType?.replace("\\n", "")?.replace("\n", "") == skinOrType
+            (it.position == null || it.position!!.distance(entity.position.toLorenzVec()) < 1)
+                && it.skinOrType == skinOrType
         }
     }
 
@@ -69,13 +74,16 @@ class HighlightVisitorsOutsideOfGarden {
             }
     }
 
-    val shouldBlock
+    private val shouldBlock
         get() = when (config.blockInteracting) {
             VisitorBlockBehaviour.DONT -> false
             VisitorBlockBehaviour.ALWAYS -> true
-            VisitorBlockBehaviour.ONLY_ON_BINGO -> SBInfo.getInstance().bingo
+            VisitorBlockBehaviour.ONLY_ON_BINGO -> LorenzUtils.isBingoProfile
             null -> false
         }
+
+    private fun isVisitorNearby(location: LorenzVec) =
+        EntityUtils.getEntitiesNearby<EntityLivingBase>(location, 2.0).any { isVisitor(it) }
 
     @SubscribeEvent
     fun onClickEntity(event: PacketEvent.SendEvent) {
@@ -85,17 +93,14 @@ class HighlightVisitorsOutsideOfGarden {
         if (player.isSneaking) return
         val packet = event.packet as? C02PacketUseEntity ?: return
         val entity = packet.getEntityFromWorld(world) ?: return
-        if (isVisitor(entity)
-            || (entity is EntityArmorStand && EntityUtils.getEntitiesNearby<EntityLivingBase>(
-                entity.getLorenzVec(),
-                2.0
-            ).any { isVisitor(it) })
-        ) {
+        if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             event.isCanceled = true
-            LorenzUtils.clickableChat(
-                "§e[SkyHanniBal] Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                "/sh block interacting with visitors"
-            )
+            if (packet.action == C02PacketUseEntity.Action.INTERACT) {
+                LorenzUtils.clickableChat(
+                    "§e[SkyHanni] Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                    "/sh block interacting with visitors"
+                )
+            }
         }
     }
 }
