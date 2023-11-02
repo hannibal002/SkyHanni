@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -174,10 +173,10 @@ class FarmingFortuneDisplay {
                 return 0.0
             }
             return if (internalName.startsWith("THEORETICAL_HOE")) {
-                listOf(10.0, 25.0, 50.0)[internalName.toString().last().digitToInt() - 1]
-            } else when (internalName) {
-                "FUNGI_CUTTER".asInternalName() -> 30.0
-                "COCO_CHOPPER".asInternalName() -> 20.0
+                listOf(10.0, 25.0, 50.0)[internalName.asString().last().digitToInt() - 1]
+            } else when (internalName.asString()) {
+                "FUNGI_CUTTER" -> 30.0
+                "COCO_CHOPPER" -> 20.0
                 else -> 0.0
             }
         }
