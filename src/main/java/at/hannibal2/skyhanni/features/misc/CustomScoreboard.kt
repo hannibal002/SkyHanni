@@ -439,6 +439,6 @@ private fun getProfileTypeAsSymbol(): String {
         HypixelData.ironman -> "§7♲ " // Ironman
         HypixelData.stranded -> "§a☀ " // Stranded
         HypixelData.bingo -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(0, 3) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
-        else -> "§e " // Default case
+        else -> "§e" // Default case
     }
 }
