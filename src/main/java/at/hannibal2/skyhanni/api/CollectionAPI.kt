@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CollectionAPI {
     // TODO USE SH-REPO
-    private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
+    private val counterPattern = ".* §e(?<amount>.*)§6/.*".toPattern()
     private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
 
     @SubscribeEvent
