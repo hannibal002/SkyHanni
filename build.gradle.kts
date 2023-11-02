@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.21.Beta.12"
+version = "0.21.Beta.16"
 
 // Toolchains:
 java {
@@ -93,6 +93,10 @@ dependencies {
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
 //    testImplementation(kotlin("test"))
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha22:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
 }
