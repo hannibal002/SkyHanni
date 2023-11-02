@@ -57,7 +57,7 @@ object ConfigUpdaterMigrator {
         }
     }
 
-    fun merge(a: JsonObject, b: JsonObject): Int {
+    private fun merge(a: JsonObject, b: JsonObject): Int {
         var c = 0
         b.entrySet().forEach {
             val e = a.get(it.key)
