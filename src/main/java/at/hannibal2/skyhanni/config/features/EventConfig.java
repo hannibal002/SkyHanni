@@ -343,6 +343,12 @@ public class EventConfig {
         public boolean primalFearTimer = false;
 
         @Expose
+        @ConfigOption(name = "Primal Fear Notify", desc = "Plays a notification sound when the next primal fear can spawn.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean primalFearNotification = false;
+
+        @Expose
         public Position positionTimer = new Position(20, 20, false, true);
 
         @Expose
