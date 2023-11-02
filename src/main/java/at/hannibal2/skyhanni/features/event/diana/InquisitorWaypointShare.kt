@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -165,6 +166,7 @@ object InquisitorWaypointShare {
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
         if (event.keyCode == config.keyBindShare) sendInquisitor()
     }
 
