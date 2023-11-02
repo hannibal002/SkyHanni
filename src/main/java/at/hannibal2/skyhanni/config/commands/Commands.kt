@@ -215,6 +215,10 @@ object Commands {
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
         registerCommand(
+            "shpumpkin",
+            "Toggles receiving the 12 fortune from pumpkins"
+        ) { CaptureFarmingGear.reversePumpkinFortune() }
+        registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
