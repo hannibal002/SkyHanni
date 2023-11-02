@@ -8,8 +8,7 @@
 //
 // TODO LIST
 // V1 RELEASE
-//  - Hide default scoreboard
-//  - the things that arent done yet
+//  - the things that arent done yet (EVENTS SOON)
 //
 // V2 RELEASE
 //  - Soulflow API
@@ -18,8 +17,6 @@
 //  - quiver
 //  - beacon power
 //  - skyblock level
-//  - commissions
-//  - island date
 //
 
 package at.hannibal2.skyhanni.features.misc
