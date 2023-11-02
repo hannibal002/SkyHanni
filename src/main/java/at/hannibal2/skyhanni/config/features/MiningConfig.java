@@ -94,19 +94,33 @@ public class MiningConfig {
     }
 
     @Expose
+    @ConfigOption(name = "King Talisman", desc = "")
+    @Accordion
+    public KingTalismanConfig kingTalisman = new KingTalismanConfig();
+
+    public static class KingTalismanConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show kings you have not talked to yet, and when the next missing king will appear.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Outside Mines", desc = "Show the display even while outside the Dwarven Mines.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean outsideMines = false;
+
+        @Expose
+        public Position position = new Position(-400, 220, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightCommissionMobs = false;
-
-    @Expose
-    @ConfigOption(name = "King Talisman Helper", desc = "Show kings you have not talked to yet, and when the next missing king will appear.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean kingTalismanHelper = false;
-
-    @Expose
-    public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
 
     @Expose
     @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.")
