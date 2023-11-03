@@ -167,9 +167,9 @@ object Commands {
         registerCommand(
             "shcopytranslation",
             "<language code (2 letters)> <messsage to translate>\n" +
-                    "Requires the Chat > Translator feature to be enabled.\n" +
-                    "Copies the translation for a given message to your clipboard. " +
-                    "Language codes are at the end of the translation when you click on a message."
+                "Requires the Chat > Translator feature to be enabled.\n" +
+                "Copies the translation for a given message to your clipboard. " +
+                "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shmouselock",
@@ -368,6 +368,7 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
+            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
@@ -388,7 +389,7 @@ object Commands {
         name: String,
         description: String,
         function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
     ) {
         val command = SimpleCommand(
             name,

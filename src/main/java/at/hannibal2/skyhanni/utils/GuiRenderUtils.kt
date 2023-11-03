@@ -164,9 +164,8 @@ object GuiRenderUtils {
         drawTooltip(textLines, mouseX, mouseY, screenHeight, Minecraft.getMinecraft().fontRendererObj)
     }
 
-    fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int): Boolean {
-        return left <= x && x < left + width && top <= y && y < top + height
-    }
+    fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
+        left <= x && x < left + width && top <= y && y < top + height
 
     fun drawProgressBar(x: Int, y: Int, barWidth: Int, progress: Float) {
         GuiScreen.drawRect(x, y, x + barWidth, y + 6, 0xFF43464B.toInt())
