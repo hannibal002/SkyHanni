@@ -63,6 +63,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
+import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
@@ -118,7 +119,6 @@ object EstimatedItemValue {
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }
-
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -584,7 +584,6 @@ object EstimatedItemValue {
         val enrichmentName = stack.getEnrichment() ?: return 0.0
         val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".asInternalName()
 
-
         val price = internalName.getPrice()
         val name = internalName.getItemName()
         list.add("§7Enrichment: $name §7(§6" + NumberUtil.format(price) + "§7)")
@@ -695,7 +694,6 @@ object EstimatedItemValue {
             val itemStack = enchantmentName.getItemStackOrNull() ?: continue
             val singlePrice = enchantmentName.getPriceOrNull() ?: continue
 
-
             var name = itemStack.getLore()[0]
             if (multiplier > 1) {
                 name = "§8${multiplier}x $name"
@@ -803,8 +801,8 @@ object EstimatedItemValue {
 
             // eg. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
-                    // If the slot index is 0, we don't need to specify
-                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+                // If the slot index is 0, we don't need to specify
+                if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
 
             priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
         }
@@ -821,6 +819,6 @@ object EstimatedItemValue {
         event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")
         event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
         event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
-        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
+        event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
     }
 }
