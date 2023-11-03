@@ -19,31 +19,24 @@ object HarpFeatures {
     val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
-    private object keys :
-        Iterable<Int> {
-        override fun iterator(): Iterator<Int> {
-            return object : Iterator<Int> {
-                private var currentIndex = 0
+    private object KeyIterable : Iterable<Int> {
+        override fun iterator() = object : Iterator<Int> {
+            private var currentIndex = 0
 
-                override fun hasNext(): Boolean {
-                    return currentIndex < 7
-                }
+            override fun hasNext() = currentIndex < 7
 
-                override fun next(): Int {
-                    return when (currentIndex++) {
-                        0 -> HarpFeatures.config.harpKeybinds.key1
-                        1 -> HarpFeatures.config.harpKeybinds.key2
-                        2 -> HarpFeatures.config.harpKeybinds.key3
-                        3 -> HarpFeatures.config.harpKeybinds.key4
-                        4 -> HarpFeatures.config.harpKeybinds.key5
-                        5 -> HarpFeatures.config.harpKeybinds.key6
-                        6 -> HarpFeatures.config.harpKeybinds.key7
-                        else -> throw NoSuchElementException()
-                    }
-                }
+            override fun next() = when (currentIndex++) {
+                0 -> config.harpKeybinds.key1
+                1 -> config.harpKeybinds.key2
+                2 -> config.harpKeybinds.key3
+                3 -> config.harpKeybinds.key4
+                4 -> config.harpKeybinds.key5
+                5 -> config.harpKeybinds.key6
+                6 -> config.harpKeybinds.key7
+
+                else -> throw NoSuchElementException("currentIndex: $currentIndex")
             }
         }
-
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
@@ -55,20 +48,19 @@ object HarpFeatures {
         if (!openInventoryName().startsWith("Harp")) return
         val chest = event.gui as? GuiChest ?: return
 
-        for ((index, key) in keys.withIndex()) {
-            if (key.isKeyHeld()) {
-                if (lastClick.passedSince() > 200.milliseconds) {
-                    Minecraft.getMinecraft().playerController.windowClick(
-                        chest.inventorySlots.windowId,
-                        37 + index,
-                        2,
-                        3,
-                        Minecraft.getMinecraft().thePlayer
-                    ) // middle clicks > left clicks
-                    lastClick = SimpleTimeMark.now()
-                }
-                break
-            }
+        for ((index, key) in KeyIterable.withIndex()) {
+            if (!key.isKeyHeld()) continue
+            if (lastClick.passedSince() < 200.milliseconds) break
+
+            Minecraft.getMinecraft().playerController.windowClick(
+                chest.inventorySlots.windowId,
+                37 + index,
+                2,
+                3,
+                Minecraft.getMinecraft().thePlayer
+            ) // middle clicks > left clicks
+            lastClick = SimpleTimeMark.now()
+            break
         }
     }
 
