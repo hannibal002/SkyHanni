@@ -16,23 +16,22 @@ class ItemStars {
 
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
-    private val STAR_FIND_PATCHER = "(.*)§.✪(.*)".toPattern()
+    private val starFindPattern = "(.*)§.✪(.*)".toPattern()
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+        if (!isEnabled()) return
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
-        if (!config.itemStars) return
+
 
         val itemName = stack.name ?: return
         val stars = getStars(itemName)
 
         if (stars > 0) {
             var name = itemName
-            while (STAR_FIND_PATCHER.matcher(name).matches()) {
+            while (starFindPattern.matcher(name).matches()) {
                 name = name.replaceFirst("§.✪".toRegex(), "")
             }
             name = name.trim()
@@ -122,4 +121,6 @@ class ItemStars {
 
         return -1
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars
 }

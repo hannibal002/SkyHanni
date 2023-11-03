@@ -89,8 +89,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.highlightInWorld) return
+        if (!isEnabled()) return
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
@@ -100,8 +99,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.highlightInWorld) return
+        if (!isEnabled()) return
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
@@ -121,4 +119,6 @@ class MarkedPlayerManager {
             }
         }
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.highlightInWorld
 }
