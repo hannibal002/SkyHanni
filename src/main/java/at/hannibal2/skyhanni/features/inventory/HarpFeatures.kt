@@ -12,23 +12,39 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.Item
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
-class HarpFeatures {
-    private val config get() = SkyHanniMod.feature.inventory.helper.harp
+object HarpFeatures {
+    val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
-    private val keys = listOf(
-        Keyboard.KEY_1,
-        Keyboard.KEY_2,
-        Keyboard.KEY_3,
-        Keyboard.KEY_4,
-        Keyboard.KEY_5,
-        Keyboard.KEY_6,
-        Keyboard.KEY_7
-    )
+    private object keys :
+        Iterable<Int> {
+        override fun iterator(): Iterator<Int> {
+            return object : Iterator<Int> {
+                private var currentIndex = 0
+
+                override fun hasNext(): Boolean {
+                    return currentIndex < 7
+                }
+
+                override fun next(): Int {
+                    return when (currentIndex++) {
+                        0 -> HarpFeatures.config.harpKeybinds.key1
+                        1 -> HarpFeatures.config.harpKeybinds.key2
+                        2 -> HarpFeatures.config.harpKeybinds.key3
+                        3 -> HarpFeatures.config.harpKeybinds.key4
+                        4 -> HarpFeatures.config.harpKeybinds.key5
+                        5 -> HarpFeatures.config.harpKeybinds.key6
+                        6 -> HarpFeatures.config.harpKeybinds.key7
+                        else -> throw NoSuchElementException()
+                    }
+                }
+            }
+        }
+
+    }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
@@ -39,12 +55,12 @@ class HarpFeatures {
         if (!openInventoryName().startsWith("Harp")) return
         val chest = event.gui as? GuiChest ?: return
 
-        for (key in keys) {
+        for ((index, key) in keys.withIndex()) {
             if (key.isKeyHeld()) {
                 if (lastClick.passedSince() > 200.milliseconds) {
                     Minecraft.getMinecraft().playerController.windowClick(
                         chest.inventorySlots.windowId,
-                        35 + key,
+                        37 + index,
                         2,
                         3,
                         Minecraft.getMinecraft().thePlayer
