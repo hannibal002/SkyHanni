@@ -56,8 +56,10 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
-        if (inBazaarInventory) {
-            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+        if (!inBazaarInventory) return
+
+        val openedProduct = getOpenedProduct(event.inventoryItems);
+        if (openedProduct != null) {
             currentlyOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
         }
@@ -117,14 +119,13 @@ class BazaarApi {
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
-        val returnItem = event.inventorySize - 5
-        for ((slot, item) in event.inventoryItems) {
-            if (slot == returnItem && item.name?.removeColor().let { it == "Go Back" }) {
-                val lore = item.getLore()
-                if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
-                    return true
-                }
-            }
+        val returnItemSlot = intArrayOf(event.inventorySize - 5, event.inventorySize - 6)
+        for (slot in returnItemSlot) {
+            var item = event.inventoryItems.get(slot)
+            if (item == null || !item.name?.removeColor().let { it == "Go Back" }
+                || !item.getLore().get(0)?.removeColor().let { it == "To Bazaar" })
+                continue
+            return true
         }
 
         if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
@@ -146,4 +147,3 @@ class BazaarApi {
         inBazaarInventory = false
         currentlyOpenedProduct = null
     }
-}
