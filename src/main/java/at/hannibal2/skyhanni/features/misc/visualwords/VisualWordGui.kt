@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
@@ -85,7 +86,7 @@ open class VisualWordGui : GuiScreen() {
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
-            if (shouldDrawImport){
+            if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
@@ -365,12 +366,12 @@ open class VisualWordGui : GuiScreen() {
             }
             currentlyEditing = !currentlyEditing
         }
-        if (shouldDrawImport){
+        if (shouldDrawImport) {
             val importX = guiLeft + sizeX - 45
             val importY = guiTop + sizeY - 10
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) {
                 SoundUtils.playClickSound()
-                tryImport()
+                tryImportFromSBE()
             }
         }
     }
@@ -479,19 +480,18 @@ open class VisualWordGui : GuiScreen() {
         SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 
-    private fun tryImport() {
-        if (drawImport) {
-            val json = ConfigManager.gson.fromJson(
-                FileReader(sbeConfigPath),
-                JsonObject::class.java
-            )
+    private fun tryImportFromSBE() {
+        if (!drawImport) return
+        try {
+            val json = ConfigManager.gson.fromJson(FileReader(sbeConfigPath), JsonObject::class.java)
             var importedWords = 0
             var skippedWords = 0
             val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
+            val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
             loop@ for (line in lists) {
-                "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern().matchMatcher(line.asString) {
-                    val from = group("from")
-                    val to = group("to")
+                pattern.matchMatcher(line.asString) {
+                    val from = group("from").replace("&", "&&")
+                    val to = group("to").replace("&", "&&")
                     val state = group("state").toBoolean()
 
                     if (modifiedWords.any { it.phrase == from }) {
@@ -499,7 +499,7 @@ open class VisualWordGui : GuiScreen() {
                         continue@loop
                     }
 
-                    modifiedWords.add(VisualWord(from.replace("&", "&&"), to.replace("&", "&&"), state, false))
+                    modifiedWords.add(VisualWord(from, to, state, false))
                     importedWords++
                 }
             }
@@ -508,8 +508,11 @@ open class VisualWordGui : GuiScreen() {
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false
             }
+        } catch (t: Throwable) {
+            ErrorManager.logError(t, "Failed to load visual words from SBE")
         }
     }
+
     private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
         GuiRenderUtils.drawString("§§$str", x, y)
     }
