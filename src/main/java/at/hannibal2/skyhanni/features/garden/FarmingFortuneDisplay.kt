@@ -173,8 +173,8 @@ class FarmingFortuneDisplay {
                 return 0.0
             }
             return if (internalName.startsWith("THEORETICAL_HOE")) {
-                listOf(10.0, 25.0, 50.0)[internalName.toString().last().digitToInt() - 1]
-            } else when (internalName.toString()) {
+                listOf(10.0, 25.0, 50.0)[internalName.asString().last().digitToInt() - 1]
+            } else when (internalName.asString()) {
                 "FUNGI_CUTTER" -> 30.0
                 "COCO_CHOPPER" -> 20.0
                 else -> 0.0
