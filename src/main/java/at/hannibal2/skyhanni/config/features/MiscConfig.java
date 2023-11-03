@@ -823,5 +823,8 @@ public class MiscConfig {
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose
+    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
+
+    @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 }
