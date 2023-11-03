@@ -57,7 +57,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:f91ed4b") {
+    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
