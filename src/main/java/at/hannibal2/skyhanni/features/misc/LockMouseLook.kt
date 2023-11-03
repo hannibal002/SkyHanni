@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -32,5 +34,11 @@ object LockMouseLook {
             gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseSensitivity
             LorenzUtils.chat("§bMouse rotation is now unlocked.")
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!lockedMouse) return
+        SkyHanniMod.feature.misc.lockedMouseDisplay.renderString("§eMouse Locked", posLabel = "Mouse Locked")
     }
 }
