@@ -66,8 +66,10 @@ import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.util.Locale
@@ -97,11 +99,26 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onTooltip(event: ItemTooltipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+
+        if (Minecraft.getMinecraft().currentScreen is GuiProfileViewer) {
+            updateItem(event.itemStack)
+            tryRendering()
+        }
+    }
+
+    private fun tryRendering() {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        tryRendering()
     }
 
     private fun checkCurrentlyVisible(): Boolean {
@@ -132,7 +149,10 @@ object EstimatedItemValue {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
-        val item = event.stack
+        updateItem(event.stack)
+    }
+
+    private fun updateItem(item: ItemStack) {
         val oldData = cache[item]
         if (oldData != null) {
             display = oldData
