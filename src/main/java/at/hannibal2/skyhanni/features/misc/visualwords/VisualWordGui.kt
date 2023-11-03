@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -12,6 +16,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
+import java.io.File
+import java.io.FileReader
 import java.io.IOException
 
 open class VisualWordGui : GuiScreen() {
@@ -44,8 +50,12 @@ open class VisualWordGui : GuiScreen() {
 
     private var modifiedWords = mutableListOf<VisualWord>()
 
+    private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
+
     companion object {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
+        var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
+        var drawImport = false
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -74,6 +84,15 @@ open class VisualWordGui : GuiScreen() {
             val colour =
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+
+            if (shouldDrawImport){
+                val importX = guiLeft + sizeX - 45
+                val importY = guiTop + sizeY - 10
+                GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
+                val importColor =
+                    if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) 0x50828282 else 0x50303030
+                drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
+            }
 
             GlStateManager.scale(scale, scale, 1f)
 
@@ -346,6 +365,14 @@ open class VisualWordGui : GuiScreen() {
             }
             currentlyEditing = !currentlyEditing
         }
+        if (shouldDrawImport){
+            val importX = guiLeft + sizeX - 45
+            val importY = guiTop + sizeY - 10
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) {
+                SoundUtils.playClickSound()
+                tryImport()
+            }
+        }
     }
 
     @Throws(IOException::class)
@@ -452,6 +479,37 @@ open class VisualWordGui : GuiScreen() {
         SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 
+    private fun tryImport() {
+        if (drawImport) {
+            val json = ConfigManager.gson.fromJson(
+                FileReader(sbeConfigPath),
+                JsonObject::class.java
+            )
+            var importedWords = 0
+            var skippedWords = 0
+            val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
+            loop@ for (line in lists) {
+                "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern().matchMatcher(line.asString) {
+                    val from = group("from")
+                    val to = group("to")
+                    val state = group("state").toBoolean()
+
+                    if (modifiedWords.any { it.phrase == from }) {
+                        skippedWords++
+                        continue@loop
+                    }
+
+                    modifiedWords.add(VisualWord(from.replace("&", "&&"), to.replace("&", "&&"), state, false))
+                    importedWords++
+                }
+            }
+            if (importedWords > 0 || skippedWords > 0) {
+                chat("§e[SkyHanni] §aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !")
+                SkyHanniMod.feature.storage.visualWordsImported = true
+                drawImport = false
+            }
+        }
+    }
     private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
         GuiRenderUtils.drawString("§§$str", x, y)
     }

@@ -368,6 +368,7 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
+            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
@@ -388,7 +389,7 @@ object Commands {
         name: String,
         description: String,
         function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
     ) {
         val command = SimpleCommand(
             name,
