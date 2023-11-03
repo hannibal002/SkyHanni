@@ -36,13 +36,13 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(
-                name = "Opacity",
-                desc = "How strong should the items be grayed out?"
+            name = "Opacity",
+            desc = "How strong should the items be grayed out?"
         )
         @ConfigEditorSlider(
-                minValue = 0,
-                maxValue = 255,
-                minStep = 5
+            minValue = 0,
+            maxValue = 255,
+            minStep = 5
         )
         public int opacity = 180;
 
@@ -134,7 +134,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this Contest. " +
-                "§eIf you use a texture pack this may cause conflicting icons.")
+            "§eIf you use a texture pack this may cause conflicting icons.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean medalIcon = true;
@@ -180,9 +180,9 @@ public class InventoryConfig {
         @Expose
         @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
         @ConfigEditorSlider(
-                minValue = 0,
-                maxValue = 10,
-                minStep = 1)
+            minValue = 0,
+            maxValue = 10,
+            minStep = 1)
         public int extraSpace = 1;
 
         @Expose
@@ -192,11 +192,11 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +
-                "in larger GUI scales, like the nether sack.)")
+            "in larger GUI scales, like the nether sack.)")
         @ConfigEditorSlider(
-                minValue = 0,
-                maxValue = 45,
-                minStep = 1
+            minValue = 0,
+            maxValue = 45,
+            minStep = 1
         )
         public int itemToShow = 15;
 
@@ -212,8 +212,8 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(name = "Price Format", desc = "Format of the price displayed.\n" +
-                "§eFormatted: §7(12k)\n" +
-                "§eUnformatted: §7(12,421)")
+            "§eFormatted: §7(12k)\n" +
+            "§eUnformatted: §7(12,421)")
         @ConfigEditorDropdown(values = {"Formatted", "Unformatted"})
         public int priceFormat = 0;
 
@@ -286,21 +286,21 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +
-                "All items in the chest are still counted for the total value.")
+            "All items in the chest are still counted for the total value.")
         @ConfigEditorSlider(
-                minValue = 0,
-                maxValue = 54,
-                minStep = 1
+            minValue = 0,
+            maxValue = 54,
+            minStep = 1
         )
         public int itemToShow = 15;
 
         @Expose
         @ConfigOption(name = "Hide below", desc = "Item item value below configured amount.\n" +
-                "Items are still counted for the total value.")
+            "Items are still counted for the total value.")
         @ConfigEditorSlider(
-                minValue = 50_000,
-                maxValue = 10_000_000,
-                minStep = 50_000
+            minValue = 50_000,
+            maxValue = 10_000_000,
+            minStep = 50_000
         )
         public int hideBelow = 100_000;
 
@@ -367,34 +367,34 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-            name = "Item Number",
-            desc = "Showing the item number as a stack size for these items."
+        name = "Item Number",
+        desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
-            exampleText = {
-                    "§bMaster Star Tier",
-                    "§bMaster Skull Tier",
-                    "§bDungeon Head Floor Number",
-                    "§bNew Year Cake",
-                    "§bPet Level",
-                    "§bMinion Tier",
-                    "§bCrimson Armor",
-                    "§7(Removed)",
-                    "§bKuudra Key",
-                    "§bSkill Level",
-                    "§bCollection Level",
-                    "§bRancher's Boots speed",
-                    "§bLarva Hook",
-                    "§bDungeon Potion Level"
-            }
+        exampleText = {
+            "§bMaster Star Tier",
+            "§bMaster Skull Tier",
+            "§bDungeon Head Floor Number",
+            "§bNew Year Cake",
+            "§bPet Level",
+            "§bMinion Tier",
+            "§bCrimson Armor",
+            "§7(Removed)",
+            "§bKuudra Key",
+            "§bSkill Level",
+            "§bCollection Level",
+            "§bRancher's Boots speed",
+            "§bLarva Hook",
+            "§bDungeon Potion Level"
+        }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
 
     @Expose
     @ConfigOption(
-            name = "Quick Craft Confirmation",
-            desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-                    "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+        name = "Quick Craft Confirmation",
+        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -414,21 +414,21 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Item Stars",
-            desc = "Show a compact star count in the item name for all items.")
+        desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
 
     @Expose
     @ConfigOption(name = "Missing Tasks",
-            desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
+        desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
     @ConfigOption(name = "Highlight Auctions",
-            desc = "Highlight own items that are sold in green and that are expired in red.")
+        desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightAuctions = true;
