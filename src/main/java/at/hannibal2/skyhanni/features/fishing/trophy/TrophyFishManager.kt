@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.jsonobjects.TrophyFishJson
-import at.hannibal2.skyhanni.utils.jsonobjects.TrophyFishJson.TrophyFishInfo
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle

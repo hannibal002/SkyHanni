@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson.Price
+import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson.Price
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 

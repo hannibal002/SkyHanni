@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson.DropInfo
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 

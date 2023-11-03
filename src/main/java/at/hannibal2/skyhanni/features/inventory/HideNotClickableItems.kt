@@ -27,9 +27,9 @@ import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.HideNotClickableItemsJson.SalvageFilter
-import at.hannibal2.skyhanni.utils.jsonobjects.MultiFilterJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
