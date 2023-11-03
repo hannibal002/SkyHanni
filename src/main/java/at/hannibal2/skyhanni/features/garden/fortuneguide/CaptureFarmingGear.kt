@@ -253,5 +253,8 @@ class CaptureFarmingGear {
         if (msg == "CARROTS EXPORTATION COMPLETE!") {
             hidden.carrotFortune = true
         }
+        if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
+            hidden.pumpkinFortune = true
+        }
     }
 }
