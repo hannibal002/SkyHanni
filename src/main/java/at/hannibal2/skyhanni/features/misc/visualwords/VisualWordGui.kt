@@ -139,19 +139,20 @@ open class VisualWordGui : GuiScreen() {
 
                 drawUnmodifiedString("${index + 1}.", (guiLeft + 5) * inverseScale, (adjustedY + 10 + 30 * index) * inverseScale)
 
-                if (isPointInLastClicked(guiLeft + 335, adjustedY + 30 * index + 7, 16, 16)) {
+                val top = adjustedY + 30 * index + 7
+                if (isPointInLastClicked(guiLeft + 335, top, 16, 16)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     phrase.enabled = !phrase.enabled
                     saveChanges()
                     SoundUtils.playClickSound()
-                } else if (isPointInLastClicked(guiLeft + 295, adjustedY + 30 * index + 7, 16, 16) && index != 0) {
+                } else if (isPointInLastClicked(guiLeft + 295, top, 16, 16) && index != 0) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = ActionType.UP
-                } else if (isPointInLastClicked(guiLeft + 315, adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1) {
+                } else if (isPointInLastClicked(guiLeft + 315, top, 16, 16) && index != modifiedWords.size - 1) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
@@ -166,8 +167,7 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 if (inBox) {
-                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30,
-                        colorB, inverseScale)
+                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, colorB, inverseScale)
                 }
 
                 val statusBlock = if (phrase.enabled) {
@@ -179,13 +179,13 @@ open class VisualWordGui : GuiScreen() {
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
-                    GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, adjustedY + 30 * index + 7, colorA)
+                    GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
                 }
                 if (index != modifiedWords.size - 1) {
-                    GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, adjustedY + 30 * index + 7, colorA)
+                    GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, top, colorA)
                 }
 
-                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, adjustedY + 30 * index + 7, colorA)
+                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
 
                 GlStateManager.scale(scale, scale, 1f)
 
