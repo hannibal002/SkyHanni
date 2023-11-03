@@ -167,9 +167,9 @@ object Commands {
         registerCommand(
             "shcopytranslation",
             "<language code (2 letters)> <messsage to translate>\n" +
-                    "Requires the Chat > Translator feature to be enabled.\n" +
-                    "Copies the translation for a given message to your clipboard. " +
-                    "Language codes are at the end of the translation when you click on a message."
+                "Requires the Chat > Translator feature to be enabled.\n" +
+                "Copies the translation for a given message to your clipboard. " +
+                "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shmouselock",

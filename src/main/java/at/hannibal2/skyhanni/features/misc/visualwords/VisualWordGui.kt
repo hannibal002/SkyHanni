@@ -82,16 +82,14 @@ open class VisualWordGui : GuiScreen() {
             val y = guiTop + 170
 
             drawUnmodifiedStringCentered("§aAdd New", x, y)
-            val colour =
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            val colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
-                val importColor =
-                    if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) 0x50828282 else 0x50303030
+                val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) 0x50828282 else 0x50303030
                 drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
@@ -114,31 +112,31 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 var inBox = false
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, adjustedY + 30 * index, sizeX, 30)) inBox = true
+                if (isPointInMousePos(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
+                    inBox = true
+                }
 
                 drawUnmodifiedString("${index + 1}.", (guiLeft + 5) * inverseScale, (adjustedY + 10 + 30 * index) * inverseScale)
 
-                if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 335, adjustedY + 30 * index + 7, 16, 16)) {
+                if (isPointInLastClicked(guiLeft + 335, adjustedY + 30 * index + 7, 16, 16)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     phrase.enabled = !phrase.enabled
                     saveChanges()
                     SoundUtils.playClickSound()
-                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 295,
-                        adjustedY + 30 * index + 7, 16, 16) && index != 0) {
+                } else if (isPointInLastClicked(guiLeft + 295, adjustedY + 30 * index + 7, 16, 16) && index != 0) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = ActionType.UP
-                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft + 315,
-                        adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1) {
+                } else if (isPointInLastClicked(guiLeft + 315, adjustedY + 30 * index + 7, 16, 16) && index != modifiedWords.size - 1) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
                     changedIndex = index
                     changedAction = ActionType.DOWN
-                } else if (GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, guiLeft, adjustedY + 30 * index, sizeX, 30)) {
+                } else if (isPointInLastClicked(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
                     lastClickedWidth = 0
                     lastClickedHeight = 0
                     SoundUtils.playClickSound()
@@ -192,16 +190,15 @@ open class VisualWordGui : GuiScreen() {
             GlStateManager.scale(inverseScale, inverseScale, 1f)
 
             scrollScreen()
-        }
-        else {
+        } else {
             var x = guiLeft + 180
             var y = guiTop + 140
             drawUnmodifiedStringCentered("§cDelete", x, y)
-            var colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            var colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
             y += 30
             drawUnmodifiedStringCentered("§eBack", x, y)
-            colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
@@ -211,26 +208,26 @@ open class VisualWordGui : GuiScreen() {
                 drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 drawUnmodifiedStringCentered(status, x, y)
-                colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
                 x += 200
                 drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
-                colour = if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
                 drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
+                if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
                     drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50303030)
                 }
                 if (currentTextBox == SelectedTextBox.PHRASE) {
                     drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50828282)
                 }
 
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
+                if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
                     drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50303030)
                 }
                 if (currentTextBox == SelectedTextBox.REPLACEMENT) {
@@ -262,8 +259,7 @@ open class VisualWordGui : GuiScreen() {
                     modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
                     modifiedWords[changedIndex - 1] = temp
                 }
-            }
-            else if (changedAction == ActionType.DOWN) {
+            } else if (changedAction == ActionType.DOWN) {
                 if (changedIndex < modifiedWords.size - 1) {
                     val temp = modifiedWords[changedIndex]
                     modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
@@ -278,6 +274,12 @@ open class VisualWordGui : GuiScreen() {
 
         GlStateManager.popMatrix()
     }
+
+    private fun isPointInMousePos(left: Int, top: Int, width: Int, height: Int) =
+        GuiRenderUtils.isPointInRect(mouseX, mouseY, left, top, width, height)
+
+    private fun isPointInLastClicked(left: Int, top: Int, width: Int, height: Int) =
+        GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, left, top, width, height)
 
     override fun handleMouseInput() {
         super.handleMouseInput()
@@ -296,7 +298,7 @@ open class VisualWordGui : GuiScreen() {
     @Throws(IOException::class)
     fun mouseClickEvent() {
         if (!currentlyEditing) {
-            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop, sizeX, sizeY - 25)) {
+            if (isPointInMousePos(guiLeft, guiTop, sizeX, sizeY - 25)) {
                 lastClickedWidth = mouseX
                 lastClickedHeight = mouseY
             }
@@ -304,7 +306,7 @@ open class VisualWordGui : GuiScreen() {
         var x = guiLeft + 180
         var y = guiTop + 140
         if (currentlyEditing) {
-            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+            if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
                 SoundUtils.playClickSound()
                 currentlyEditing = false
                 modifiedWords.removeAt(currentIndex)
@@ -315,21 +317,21 @@ open class VisualWordGui : GuiScreen() {
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 x -= 100
                 y += 30
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+                if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
                     SoundUtils.playClickSound()
                     modifiedWords[currentIndex].enabled = !modifiedWords[currentIndex].enabled
                     saveChanges()
                 }
                 x += 200
-                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+                if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
                     SoundUtils.playClickSound()
                     modifiedWords[currentIndex].setCaseSensitive(!modifiedWords[currentIndex].isCaseSensitive())
                     saveChanges()
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 35, sizeX, 30)) {
+                } else if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
                     SoundUtils.playClickSound()
                     currentTextBox = SelectedTextBox.PHRASE
                     currentText = modifiedWords[currentIndex].phrase
-                } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop + 90, sizeX, 30)) {
+                } else if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
                     SoundUtils.playClickSound()
                     currentTextBox = SelectedTextBox.REPLACEMENT
                     currentText = modifiedWords[currentIndex].replacement
@@ -343,7 +345,7 @@ open class VisualWordGui : GuiScreen() {
         }
         y = guiTop + 170
         x = guiLeft + 180
-        if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - 30, y - 10, 60, 20)) {
+        if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
             SoundUtils.playClickSound()
             if (currentlyEditing) {
                 val currentVisualWord = modifiedWords.elementAt(currentIndex)
@@ -356,7 +358,7 @@ open class VisualWordGui : GuiScreen() {
                 currentIndex = -1
                 currentTextBox = SelectedTextBox.NONE
             } else {
-                modifiedWords.add(VisualWord("", "", true, false))
+                modifiedWords.add(VisualWord("", "", true, caseSensitive = false))
                 currentTextBox = SelectedTextBox.PHRASE
                 currentText = ""
                 currentIndex = modifiedWords.size - 1
@@ -369,7 +371,7 @@ open class VisualWordGui : GuiScreen() {
         if (shouldDrawImport) {
             val importX = guiLeft + sizeX - 45
             val importY = guiTop + sizeY - 10
-            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, importX - 45, importY - 10, 90, 20)) {
+            if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) {
                 SoundUtils.playClickSound()
                 tryImportFromSBE()
             }
