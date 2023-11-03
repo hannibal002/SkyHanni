@@ -57,6 +57,25 @@ open class VisualWordGui : GuiScreen() {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
+
+        val itemUp by lazy {
+            ItemUtils.createSkull(
+                "§§Up",
+                "7f68dd73-1ff6-4193-b246-820975d6fab1",
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmY" +
+                    "WI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0="
+            )
+        }
+
+        val itemDown by lazy {
+            ItemUtils.createSkull(
+                "§§Down",
+                "e4ace6de-0629-4719-aea3-3e113314dd3f",
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMz" +
+                    "RmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
+            )
+        }
+
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -74,6 +93,8 @@ open class VisualWordGui : GuiScreen() {
         val scale = 0.75f
         val inverseScale = 1 / scale
 
+        val colorA = 0x50828282
+        val colorB = 0x50303030
         if (!currentlyEditing) {
             val adjustedY = guiTop + 30 + pageScroll
             var toRemove: VisualWord? = null
@@ -82,14 +103,14 @@ open class VisualWordGui : GuiScreen() {
             val y = guiTop + 170
 
             drawUnmodifiedStringCentered("§aAdd New", x, y)
-            val colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            val colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
-                val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) 0x50828282 else 0x50303030
+                val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
                 drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
@@ -145,7 +166,8 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 if (inBox) {
-                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, 0x50303030, inverseScale)
+                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30,
+                        colorB, inverseScale)
                 }
 
                 val statusBlock = if (phrase.enabled) {
@@ -157,15 +179,13 @@ open class VisualWordGui : GuiScreen() {
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
-                    val skullItem = ItemUtils.createSkull("§§Up", "7f68dd73-1ff6-4193-b246-820975d6fab1", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0=")
-                    GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 295, adjustedY + 30 * index + 7, 0x50828282)
+                    GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, adjustedY + 30 * index + 7, colorA)
                 }
                 if (index != modifiedWords.size - 1) {
-                    val skullItem = ItemUtils.createSkull("§§Down", "e4ace6de-0629-4719-aea3-3e113314dd3f", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMzRmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0=")
-                    GuiRenderUtils.renderItemAndBackground(skullItem, guiLeft + 315, adjustedY + 30 * index + 7, 0x50828282)
+                    GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, adjustedY + 30 * index + 7, colorA)
                 }
 
-                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, adjustedY + 30 * index + 7, 0x50828282)
+                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, adjustedY + 30 * index + 7, colorA)
 
                 GlStateManager.scale(scale, scale, 1f)
 
@@ -194,11 +214,11 @@ open class VisualWordGui : GuiScreen() {
             var x = guiLeft + 180
             var y = guiTop + 140
             drawUnmodifiedStringCentered("§cDelete", x, y)
-            var colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            var colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
             y += 30
             drawUnmodifiedStringCentered("§eBack", x, y)
-            colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+            colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
             drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
@@ -208,30 +228,30 @@ open class VisualWordGui : GuiScreen() {
                 drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 drawUnmodifiedStringCentered(status, x, y)
-                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
                 x += 200
                 drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
-                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) 0x50828282 else 0x50303030
+                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
                 drawRect(x - 30, y - 10, x + 30, y + 10, colour)
 
                 drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50303030)
+                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.PHRASE) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, 0x50828282)
+                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
                 }
 
                 if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50303030)
+                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, 0x50828282)
+                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
                 }
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
