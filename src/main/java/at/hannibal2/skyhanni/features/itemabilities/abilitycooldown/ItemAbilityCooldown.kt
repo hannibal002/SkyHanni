@@ -35,6 +35,7 @@ class ItemAbilityCooldown {
     private var items = mapOf<ItemStack, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
+    private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
@@ -326,7 +327,7 @@ class ItemAbilityCooldown {
         if (message == "§cRagnarock was cancelled due to being hit!") {
             ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
         }
-        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern().matchMatcher(message) {
+        youBuffedYourselfPattern.matchMatcher(message) {
             ItemAbility.SWORD_OF_BAD_HEALTH.activate()
         }
     }
