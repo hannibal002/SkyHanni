@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.SlayerAPI
@@ -20,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
@@ -96,6 +99,40 @@ class SkyHanniDebugsAndTests {
 //            for (line in TabListUtils.getTabList()) {
 //                println("tablist: '$line'")
 //            }
+        }
+
+        fun configManagerResetCommand(args: Array<String>) {
+            if (args.size == 1 && args[0] == "confirm") {
+                configManagerReset()
+                return
+            }
+
+            LorenzUtils.clickableChat(
+                "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
+                "shconfigmanagerreset confirm"
+            )
+        }
+
+        private fun configManagerReset() {
+            // TODO make it so that it does not reset the config
+
+            // saving old config state
+            SkyHanniMod.configManager.saveConfig("reload config manager")
+            SkyHanniMod.configManager.saveSackData("reload config manager")
+            Thread {
+                Thread.sleep(500)
+                SkyHanniMod.configManager.disableSaving()
+
+                // initializing a new config manager, calling firstLoad, and setting it as the config manager in use.
+                val configManager = ConfigManager()
+                configManager.firstLoad()
+                SkyHanniMod.Companion::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
+                    .set(SkyHanniMod, configManager)
+
+                // resetting the MoulConfigProcessor in use
+                ConfigGuiManager.editor = null
+                LorenzUtils.chat("§e[SkyHanni] Reset the config manager!")
+            }.start()
         }
 
         fun testGardenVisitors() {

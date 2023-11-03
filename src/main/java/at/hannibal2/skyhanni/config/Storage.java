@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
-import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
@@ -30,6 +30,9 @@ public class Storage {
 
     @Expose
     public boolean hasPlayedBefore = false;
+
+    @Expose
+    public Float savedMouseSensitivity = .5f;
 
     @Expose
     public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
