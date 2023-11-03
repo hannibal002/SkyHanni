@@ -62,6 +62,19 @@
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
 + Added AFK time to Discord RPC. - NetheriteMiner
++ Added option to highlight items that are full in the sack inventory.
++ Added **Arrow Trail cosmetic** - Thunderblade73
+    + Draw a colored line behind the arrows in the air.
+    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
+      color, to change the time alive, and the line width.
++ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
+    + E.g. inside the SkyBlock leveling guide.
++ Added Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
++ Added Highlight Visitors in SkyBlock. - nea
+    + Highlights Visitors outside the Garden.
++ Block Interacting with Visitors. - nea
+    + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
 
 #### Events
 
@@ -70,6 +83,11 @@
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
++ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
+    + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
+    + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
++ Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
++ Play warning sound when the next Primal Fear can spawn. - thunderblade73
 
 ### Changes
 
@@ -94,6 +112,32 @@
 + Disabling all Diana features if no Diana mayor is active, allowing to overwrite the Diana mayor check if the election
   API check failed. - CalMWolfs
 + Hiding a bunch of garden GUIs in a bunch of garden inventories. - hannibal2
++ More shwords support. - CalMWolfs
+    + Added the option to change between case-sensitive and case-insensitive.
+    + Allow the use of Ctrl + C to copy the current textbox.
+    + The effect of visual words is now visible while editing text.
++ Added Diamond/Gold essence to chat filter powder mining. - HiZe
++ Added fillet count and coins to Bronze/Silver Trophy Sack. - HiZe
++ Chest value is now default disabled in the dungeon, and added an option to enable it. - HiZe
++ Added support for lower case item IDs to the Hypixel command /viewrecipe. - walker
++ Added support for tab complete item IDs in the Hypixel command /viewrecipe. - hannibal2
+    + Only items with recipes are tab completed.
++ Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
++ Disabled clicks on SkyHanni GUIs while inside NEU's or Skytils profile viewer. - hannibal2
++ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks
+  sometimes. - hannibal2
++ Added diamond and gold essence support to PowderTracker. - walker
++ Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search
+  engine - Erymanthus
++ Added option to hide Chest Value while the Estimated Item Value display is showing. - hannibal2
++ No longer merging same items with different prices in Chest Value together. - hannibal2
++ Adding Great Spook support for Non God Pot Effect display. - hannibal2
++ Added a title warning to the Worm Cap Alert ping sound. - Vahvl
++ Added support for detecting refreshed farming fortune century cake effect. - alexia
++ Show key to press below burrow warp. - hannibal2
++ Makes the Compact Potion message open the Potion effects menu on click. - jani
++ Added option to show King Talisman Helper outside Dwarven Mines. - hannibal2
++ In-Game Date: Adds support for reading the in-game scoreboard, and also allow sun/moon symbol customization. - Erymanthus
 
 ### Bug Fixes
 
@@ -127,6 +171,42 @@
 + Fixed the Blaze Slayer Damage Indicator not working and no longer causing FPS drops. - hannibal2
 + Fixed clean end working in f5/m5. - hannibal2
 + Fixed visitor drop statistics preview. - Obsidian
++ Fixed a bracket at the wrong spot in Discord RPC. - hannibal2
++ Fixed fishing hook display triggering on wrong texts. - hannibal2
++ Fixed crop milestone inventory showing wrong level as stack size when maxed out. - hannibal2
++ Fixed various bugs with the /shwords GUI. - CalMWolfs
++ Bring back the command /shwords - CalMWolfs
++ It got deleted accidentally during code optimisations.
++ Highlight Commission Mobs: The "Golden Goblin Slayer" Commission should not trigger the "Goblin Slayer" Commission
+  anymore. - Thunderblade73
++ Fixed potential crash with future neu version. - CalMWolfs
++ Added missing beep sound to rejoin SkyBlock after kick warning. - hannibal2
++ Fixed Fire Veil particle hider not working. - cimbraien
++ Fixed a bug with the Trophy Sack Display reading number. - HiZe
++ Fixed Ghost Counter item stack detection. - HiZe
++ Fixed Farming Weight Display shows 0 weight wrongly sometimes. - Kaeso
++ Fixed damage indicator errors during Enderman Slayer. - hannibal2
++ Fixed weird error messages in the Damage Indicator. - hannibal2
++ Fixed Enderman Slayer errors again. - hannibal2
++ Fixed the Sack Display error again. - HiZe
++ Fixed the attribute Vitality getting wrongly labeled as Mending on attribute shards. - hannibal2
++ Made Livid Solver great again. - hannibal2
++ Fixed Damage Indicator in Dungeons for some floors. - hannibal2
++ Fixed Damage Indicator "hide nametag" feature works even for disabled mobs. - hannibal2
++ Fixed item rarity detection for pets. - hannibal2
++ Fixed rare error message while disconnecting. - Thunderblade73
++ Disabled the Daily Quest part of the Reputation Helper during the great spook. - hannibal2
++ Fixed Diana warp key not working. - hannibal2
++ SkyHanni Keybinds no longer work inside SkyHanni config. - hannibal2
++ Fixed Great Spook potion not working in Non God Pot Effect feature. - jani
++ Fixed wrong Rhys (Deep Caverns NPC) items needed for Dwarven Mines unlock in Bingo Step Helper. - ReyMaratov
++ Fixed King Talisman Helper once again. - hannibal2
++ Made the ESC -> Mod Options -> SkyHanni -> Config button not crash you. - hannibal2
++ Disabled Diana Warp key and Inquis Share key while inside any GUI. - hannibal2
++ Removed Diana warp data on world switch. - hannibal2
++ Reset mouse sensitivity back to 100% if you log off with lock mouse look enabled. - hannibal2
++ Fixed mouse sensitivity stuck after restarting by storing old sensitivity. - CalMWolfs
++ Fixed tool fortune. - CalMWolfs
 
 #### Config
 
@@ -137,6 +217,22 @@
 
 + Removed **Duplicate Hider**.
     + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
+
+#### Internal Changes
+
++ Add Repo TODOs to regex patterns. - walker
++ Moved many patterns from function scope to members. - hannibal2
++ Avoid hardcoded dispatcher. - walker
++ Created and used Entity.canBeSeen and LorenzVec.canBeSeen. - hannibal2
++ Reducing cognitive complexity in StatsTuning.kt - walker
++ Reducing indentations and line counts in StatsTuning.kt - hannibal2
++ Mark functions around item utils and neu items as deprecated. - walker
++ Added debug command /shconfigmanagerreset. - hannibal2
++ Reloads the config manager and rendering processors of MoulConfig. This WILL RESET your config, but also update the
+  java config files (names, description, orderings and stuff).
++ Adding 100 lines to MobFinder.kt and making it better readable in the process. - walker
++ Making ChatFiler.kt way better, storing regex objects for reuse and preparing future repo support. - walker
++ Added command /shkingfix to reset the internal King Talisman Helper offset. - hannibal2
 
 ## Version 0.20
 
@@ -182,8 +278,6 @@
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + Added SkyHanni **Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
-+ Added Chat **Translator** - NetheriteMiner
-    + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
 + Added **Default Option Settings:** - nea

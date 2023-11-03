@@ -20,11 +20,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
+import kotlin.time.Duration.Companion.days
 
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.config?.fortune?.outdatedItems
 
+    // TODO USE SH-REPO
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
@@ -33,10 +35,14 @@ class CaptureFarmingGear {
     private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
     private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
 
+    private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
+
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
-        private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
-            "RANCHERS", "FARMER", "RABBIT")
+        private val farmingSets = arrayListOf(
+            "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
+            "RANCHERS", "FARMER", "RABBIT"
+        )
         private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
         fun captureFarmingGear() {
@@ -104,7 +110,8 @@ class CaptureFarmingGear {
                     FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
                     val enchantments = slot.getEnchantments() ?: emptyMap()
                     val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
-                    GardenAPI.config?.uniqueVisitors = round(FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
+                    val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
+                    GardenAPI.config?.uniqueVisitors = round(visitors).toInt()
                 }
             }
         }
@@ -147,9 +154,9 @@ class CaptureFarmingGear {
                     highestRabbitRarity = split.last().toInt()
                 }
                 if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
-                        farmingItems[FarmingItems.BEE] = item
-                        outdatedItems[FarmingItems.BEE] = false
-                        highestBeeRarity = split.last().toInt()
+                    farmingItems[FarmingItems.BEE] = item
+                    outdatedItems[FarmingItems.BEE] = false
+                    highestBeeRarity = split.last().toInt()
                 }
             }
         }
@@ -234,8 +241,8 @@ class CaptureFarmingGear {
                 }
             }
         }
-        if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
-            hidden.cakeExpiring = System.currentTimeMillis() + 172800000
+        cakePattern.matchMatcher(msg) {
+            hidden.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
         }
         if (msg == "CARROTS EXPORTATION COMPLETE!") {
             hidden.carrotFortune = true

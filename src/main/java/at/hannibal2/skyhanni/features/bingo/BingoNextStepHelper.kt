@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BingoNextStepHelper {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
-
+    // TODO USE SH-REPO
     private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemPreconditions = mutableMapOf<String, NextStep>()
@@ -36,7 +36,7 @@ class BingoNextStepHelper {
     private val collectionPattern = "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.".toPattern()
     private val crystalPattern = "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.".toPattern()
     private val skillPattern = "Obtain level (?<level>.*) in the (?<skill>.*) Skill.".toPattern()
-    private val rhysTaskName = "30x Enchanted Redstone (for Rhys)"
+    private val rhysTaskName = "30x Enchanted Minerals (Redstone, Lapis Lazuli, Coal) (for Rhys)"
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
@@ -303,6 +303,8 @@ class BingoNextStepHelper {
 
         itemIslandRequired["Acacia Wood"] = IslandType.THE_PARK.getStep()
         itemIslandRequired["Redstone"] = IslandType.DEEP_CAVERNS.getStep()
+        itemIslandRequired["Lapis Lazuli"] = IslandType.DEEP_CAVERNS.getStep()
+        itemIslandRequired["Coal"] = IslandType.DEEP_CAVERNS.getStep()
         itemIslandRequired["Slimeball"] = IslandType.DEEP_CAVERNS.getStep()
         itemIslandRequired["Emerald"] = IslandType.DEEP_CAVERNS.getStep()
         itemIslandRequired["Mithril"] = IslandType.DEEP_CAVERNS.getStep()
@@ -313,15 +315,7 @@ class BingoNextStepHelper {
         IslandType.DEEP_CAVERNS.getStep() requires IslandType.GOLD_MINES.getStep()
         IslandType.DEEP_CAVERNS.getStep() requires SkillLevelStep("Mining", 5)
 
-        val redstoneForThys = PartialProgressItemsStep(
-            rhysTaskName,
-            "Redstone",
-            160 * 10 * 3,
-            mapOf("Redstone" to 1, "Enchanted Redstone" to 160)
-        )
-        redstoneForThys requires IslandType.DEEP_CAVERNS.getStep()
-
-        IslandType.DWARVEN_MINES.getStep() requires redstoneForThys
+        rhys()
         IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep(
             "Mining",
             12
@@ -345,6 +339,37 @@ class BingoNextStepHelper {
         ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
 //        enchantedCharcoal(7)
 //        compactor(7)
+    }
+
+    private fun rhys() {
+        val redstoneForRhys = PartialProgressItemsStep(
+            rhysTaskName,
+            "Redstone",
+            160 * 10,
+            mapOf("Redstone" to 1, "Enchanted Redstone" to 160)
+        )
+        redstoneForRhys requires IslandType.DEEP_CAVERNS.getStep()
+
+        val lapisForRhys = PartialProgressItemsStep(
+            rhysTaskName,
+            "Lapis Lazuli",
+            160 * 10,
+            mapOf("Lapis Lazuli" to 1, "Enchanted Lapis Lazuli" to 160)
+        )
+        lapisForRhys requires IslandType.DEEP_CAVERNS.getStep()
+
+        val coalForRhys = PartialProgressItemsStep(
+            rhysTaskName,
+            "Coal",
+            160 * 10,
+            mapOf("Coal" to 1, "Enchanted Coal" to 160)
+        )
+        coalForRhys requires IslandType.DEEP_CAVERNS.getStep()
+
+        val mines = IslandType.DWARVEN_MINES.getStep()
+        mines requires redstoneForRhys
+        mines requires lapisForRhys
+        mines requires coalForRhys
     }
 
     private fun compactor(amount: Long) {

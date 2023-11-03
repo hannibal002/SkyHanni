@@ -5,14 +5,18 @@ import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 
 object ConfigGuiManager {
-    val editor by lazy { MoulConfigEditor(SkyHanniMod.configManager.processor) }
+
+    var editor: MoulConfigEditor<Features>? = null
+
+    fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also { editor = it }
 
     fun openConfigGui(search: String? = null) {
+        val editor = getEditorInstance()
+
         if (search != null) {
             editor.search(search)
         }
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
     }
-
 
 }

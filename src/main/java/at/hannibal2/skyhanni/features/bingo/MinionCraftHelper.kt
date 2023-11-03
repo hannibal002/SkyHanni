@@ -23,6 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
     private val config get() = SkyHanniMod.feature.event.bingo
+    // TODO USE SH-REPO
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var display = emptyList<String>()
     private var hasMinionInInventory = false

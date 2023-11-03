@@ -18,7 +18,7 @@ class BazaarOpenPriceWebsite {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("PAPER", true)
+        val neuItem = NEUItems.getItemStack("PAPER")
         Utils.createItemStack(
             neuItem.item,
             "§bPrice History",

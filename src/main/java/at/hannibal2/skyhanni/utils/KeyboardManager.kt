@@ -2,7 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.internal.KeybindHelper
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
@@ -17,13 +20,20 @@ object KeyboardManager {
     fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
     fun isShiftKeyDown() = Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()
 
-    fun isPastingKeysDown(): Boolean {
-        val modifierHeld = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
-        return modifierHeld && Keyboard.KEY_V.isKeyHeld()
-    }
+    fun isPastingKeysDown() = isModifierHeld() && Keyboard.KEY_V.isKeyHeld()
+
+    fun isCopyingKeysDown() = isModifierHeld() && Keyboard.KEY_C.isKeyHeld()
+
+    private fun isModifierHeld() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+        val isConfigScreen = currentScreen is GuiScreenElementWrapper
+        if (isConfigScreen) return
+        if (currentScreen is GuiChat) return
+
+
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
             val key = Mouse.getEventButton() - 100
             LorenzKeyPressEvent(key).postAndCatch()
