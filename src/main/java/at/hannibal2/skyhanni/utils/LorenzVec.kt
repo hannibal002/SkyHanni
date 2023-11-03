@@ -21,6 +21,7 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
+    constructor() : this(0.0, 0.0, 0.0)
 
     constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
@@ -51,7 +52,8 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
-    fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
+    fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec =
+        LorenzVec(this.x + x, this.y + y, this.z + z)
 
     fun add(x: Int, y: Int, z: Int): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 

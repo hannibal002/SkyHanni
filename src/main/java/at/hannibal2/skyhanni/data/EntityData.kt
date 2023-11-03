@@ -51,6 +51,11 @@ class EntityData {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         maxHealthMap.clear()
+
+        // Only Backup normally this should do nothing
+        _currentSkyblockMobs.clear()
+        _currentDisplayNPCs.clear()
+        _currentRealPlayers.clear()
     }
 
     @SubscribeEvent
@@ -90,11 +95,17 @@ class EntityData {
     }
 
     companion object {
-        val currentSkyblockMobs = mutableSetOf<EntityLivingBase>()
+        val currentSkyblockMobs get() = _currentSkyblockMobs as Set<EntityLivingBase>
+        val currentDisplayNPCs get() = _currentDisplayNPCs as Set<EntityLivingBase>
+        val currentRealPlayers get() = _currentRealPlayers as Set<EntityLivingBase>
+
+        private val _currentSkyblockMobs = mutableSetOf<EntityLivingBase>()
+        private val _currentDisplayNPCs = mutableSetOf<EntityLivingBase>()
+        private val _currentRealPlayers = mutableSetOf<EntityLivingBase>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
-        const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 //Entity Derender after ~5 Chunks
+        const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
     }
 
     @SubscribeEvent
@@ -145,12 +156,32 @@ class EntityData {
     }
 
     @SubscribeEvent
-    fun onEntityLivingSpawn(event: SkyblockMobSpawnEvent) {
-        currentSkyblockMobs.add(event.entity)
+    fun onSkyblockMobSpawnEvent(event: SkyblockMobSpawnEvent) {
+        _currentSkyblockMobs.add(event.entity)
     }
 
     @SubscribeEvent
-    fun onEntityLivingDeSpawn(event: SkyblockMobDeSpawnEvent) {
-        currentSkyblockMobs.remove(event.entity)
+    fun onSkyblockMobDeSpawnEvent(event: SkyblockMobDeSpawnEvent) {
+        _currentSkyblockMobs.remove(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntityDisplayNPCSpawnEvent(event: EntityDisplayNPCSpawnEvent) {
+        _currentDisplayNPCs.add(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntityDisplayNPCSpawnDeEvent(event: EntityDisplayNPCDeSpawnEvent) {
+        _currentDisplayNPCs.remove(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntityRealPlayerSpawnEvent(event: EntityRealPlayerSpawnEvent) {
+        _currentRealPlayers.add(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntityRealPlayerDeSpawnEvent(event: EntityRealPlayerDeSpawnEvent) {
+        _currentRealPlayers.remove(event.entity)
     }
 }
