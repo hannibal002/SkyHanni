@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -25,17 +26,7 @@ object HarpFeatures {
 
             override fun hasNext() = currentIndex < 7
 
-            override fun next() = when (currentIndex++) {
-                0 -> config.harpKeybinds.key1
-                1 -> config.harpKeybinds.key2
-                2 -> config.harpKeybinds.key3
-                3 -> config.harpKeybinds.key4
-                4 -> config.harpKeybinds.key5
-                5 -> config.harpKeybinds.key6
-                6 -> config.harpKeybinds.key7
-
-                else -> throw NoSuchElementException("currentIndex: $currentIndex")
-            }
+            override fun next() = getKey(currentIndex++) ?: throw NoSuchElementException("currentIndex: $currentIndex")
         }
     }
 
@@ -64,6 +55,18 @@ object HarpFeatures {
         }
     }
 
+    fun getKey(index: Int) = when (index) {
+        0 -> config.harpKeybinds.key1
+        1 -> config.harpKeybinds.key2
+        2 -> config.harpKeybinds.key3
+        3 -> config.harpKeybinds.key4
+        4 -> config.harpKeybinds.key5
+        5 -> config.harpKeybinds.key6
+        6 -> config.harpKeybinds.key7
+
+        else -> null
+    }
+
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -75,7 +78,8 @@ object HarpFeatures {
         val index = buttonColors.indexOfFirst { it == event.stack.displayName[1] }
         if (index == -1) return // this should never happen unless there's an update
 
-        event.stackTip = (index + 1).toString()
+        val keyCode = getKey(index) ?: return
+        event.stackTip = KeyboardManager.getKeyName(keyCode)
     }
 
     @SubscribeEvent
