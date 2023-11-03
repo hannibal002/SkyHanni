@@ -19,5 +19,6 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     CULTIVATING("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n§2You get 2☘ per level"),
     TURBO("§2Turbo-Crop Enchantment", "§7§2Fortune for each enchantment level\n§2You get 5☘ per level"),
     DEDICATION("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n§2and crop milestone"),
-    EXPORTED_CARROT("§2Exported Carrot", "§7§2Gain 12☘ from exporting Carrots in the Rift!\n§eRun /shcarrot to toggle the stat")
+    EXPORTED_CARROT("§2Exported Carrot", "§7§2Gain 12☘ from exporting Carrots in the Rift!\n§eRun /shcarrot to toggle the stat"),
+    EXPIRED_PUMPKIN("§2Expired Pumpkin", "§7§2Gain 12☘ from letting Pumpkins expire!\n§eRun /shpumpkin to toggle the stat")
 }

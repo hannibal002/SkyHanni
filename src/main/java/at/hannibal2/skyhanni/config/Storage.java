@@ -251,6 +251,9 @@ public class Storage {
                 public boolean carrotFortune = false;
 
                 @Expose
+                public boolean pumpkinFortune = false;
+
+                @Expose
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
 

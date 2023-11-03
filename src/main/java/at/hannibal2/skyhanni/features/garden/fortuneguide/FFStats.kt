@@ -155,6 +155,11 @@ object FFStats {
             val carrotFortune = if (hidden.carrotFortune) 12.0 else 0.0
             cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
         }
+        if (crop == CropType.PUMPKIN) {
+            val hidden = GardenAPI.config?.fortune ?: return
+            val pumpkinFortune = if (hidden.pumpkinFortune) 12.0 else 0.0
+            cropPage[FortuneStats.EXPIRED_PUMPKIN] = Pair(pumpkinFortune, 12.0)
+        }
 
         cropPage[FortuneStats.CROP_TOTAL] = Pair(
             cropPage.toList().sumOf { it.second.first },

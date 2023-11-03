@@ -270,14 +270,19 @@ class FarmingFortuneDisplay {
             val accessoryFortune = accessoryFortune ?: 0.0
 
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            var carrotFortune = 0.0
+            var otherFortune = 0.0
 
             if (currentCrop == CropType.CARROT) {
                 GardenAPI.config?.fortune?.let {
-                    if (it.carrotFortune) carrotFortune = 12.0
+                    if (it.carrotFortune) otherFortune = 12.0
                 }
             }
-            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + carrotFortune
+            if (currentCrop == CropType.PUMPKIN) {
+                GardenAPI.config?.fortune?.let {
+                    if (it.pumpkinFortune) otherFortune = 12.0
+                }
+            }
+            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + otherFortune
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)

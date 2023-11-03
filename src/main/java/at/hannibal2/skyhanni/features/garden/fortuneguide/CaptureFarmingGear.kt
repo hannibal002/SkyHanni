@@ -84,6 +84,11 @@ class CaptureFarmingGear {
             hidden.carrotFortune = !hidden.carrotFortune
             LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${hidden.carrotFortune}")
         }
+        fun reversePumpkinFortune() {
+            val hidden = GardenAPI.config?.fortune ?: return
+            hidden.pumpkinFortune = !hidden.pumpkinFortune
+            LorenzUtils.chat("§2Toggled expired pumpkin fortune to: ${hidden.pumpkinFortune}")
+        }
     }
 
     @SubscribeEvent
