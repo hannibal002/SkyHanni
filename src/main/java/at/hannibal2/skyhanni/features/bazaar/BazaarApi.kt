@@ -147,3 +147,4 @@ class BazaarApi {
         inBazaarInventory = false
         currentlyOpenedProduct = null
     }
+}
