@@ -80,9 +80,15 @@ class CaptureFarmingGear {
         }
 
         fun reverseCarrotFortune() {
-            val hidden = GardenAPI.config?.fortune ?: return
-            hidden.carrotFortune = !hidden.carrotFortune
-            LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${hidden.carrotFortune}", false)
+            val storage = GardenAPI.config?.fortune ?: return
+            storage.carrotFortune = !storage.carrotFortune
+            LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${storage.carrotFortune}", false)
+        }
+
+        fun reversePumpkinFortune() {
+            val storage = GardenAPI.config?.fortune ?: return
+            storage.pumpkinFortune = !storage.pumpkinFortune
+            LorenzUtils.chat("§2Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}", false)
         }
     }
 
