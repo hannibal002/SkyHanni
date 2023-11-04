@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.EntityData.Companion.currentSkyblockMobs
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -22,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object EntityKill {
 
     private var mobHitList = mutableSetOf<SkyblockMob>()
-    val config get() = SkyHanniMod.feature.dev.mobKillDetection
+    val config get() = SkyHanniMod.feature.dev.mobDetection.mobHitDetecion
 
 
     @SubscribeEvent
@@ -86,11 +85,6 @@ object EntityKill {
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (config.skyblockMobHighlight) {
-            currentSkyblockMobs.forEach {
-                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
-            }
-        }
         if (config.skyblockMobHitHighlight) {
             mobHitList.forEach {
                 event.drawFilledBoundingBox_nea(

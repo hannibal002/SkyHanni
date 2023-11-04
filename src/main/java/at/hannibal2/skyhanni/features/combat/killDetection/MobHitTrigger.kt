@@ -34,7 +34,7 @@ private const val CLEAVE_HIT_LIMIT = 12
 
 private const val CLEAVE_MAX_Y_DIFFERENCE = 5.0
 
-private const val CLEAVE_EXTEND_RANGE = 1.5 //Magic Value (determent by Testing)
+private const val CLEAVE_EXTEND_RANGE = 1.5 // Magic Value (determent by Testing)
 
 object MobHitTrigger {
     // Implement TODOs
@@ -78,15 +78,15 @@ object MobHitTrigger {
     // TODO(Summons) IDK
 
 
-    //Working on it
+    // Working on it
     // TODO(Bow) Priority, separate System
 
-    //Needs Testing
+    // Needs Testing
     // TODO(Left Click Mage, Aurora Staff)
 
-    //Needs Bugfixing
+    // Needs Bugfixing
 
-    private val config get() = SkyHanniMod.feature.dev.mobKillDetection.mobHitDetecion
+    private val config get() = SkyHanniMod.feature.dev.mobDetection.mobHitDetecion
 
 
     @SubscribeEvent
@@ -94,14 +94,14 @@ object MobHitTrigger {
         val entity = event.clickedEntity ?: return
         if (!entity.isSkyBlockMob()) return
 
-        //Base Melee Hit
+        // Base Melee Hit
         if (event.clickType.isLeftClick()) {
             addToMobHitList(entity, hitTrigger.Melee)
 
             val itemInHand = InventoryUtils.getItemInHand() ?: return
             val enchantmentsOfItemInHand = itemInHand.getEnchantments()
 
-            //Cleave Hit
+            // Cleave Hit
             if (enchantmentsOfItemInHand != null && enchantmentsOfItemInHand.any { it.key == "cleave" }) {
                 val range: Double = when (enchantmentsOfItemInHand.getValue("cleave")) {
                     1 -> 3.3
@@ -111,7 +111,7 @@ object MobHitTrigger {
                     5 -> 4.5
                     6 -> 4.8
                     else -> -CLEAVE_EXTEND_RANGE
-                } + CLEAVE_EXTEND_RANGE //TODO fix Range (for all Levels)
+                } + CLEAVE_EXTEND_RANGE // TODO fix Range (for all Levels)
                 val cleaveHits = EntityUtils.getEntitiesNearbyIgnoreY<EntityLivingBase>(entity.getLorenzVec(), range)
                     .filter { ((entity.posY - it.posY).absoluteValue < CLEAVE_MAX_Y_DIFFERENCE) && (it != entity) && it.isSkyBlockMob() }
                     .sortedBy { it.distanceTo(entity) }.take(CLEAVE_HIT_LIMIT)
@@ -134,13 +134,7 @@ object MobHitTrigger {
         if (!config.cleaveDebug) return
         cleaveEntity?.let {
             drawCylinderInWorld(
-                LorenzColor.DARK_AQUA.addOpacity(50),
-                it.x,
-                it.y,
-                it.z,
-                cleaveRange.toFloat(),
-                2.0f,
-                event.partialTicks
+                LorenzColor.DARK_AQUA.addOpacity(50), it.x, it.y, it.z, cleaveRange.toFloat(), 2.0f, event.partialTicks
             )
         }
     }
@@ -152,7 +146,7 @@ object MobHitTrigger {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        //LorenzDebug.log("Mouse Button" + Mouse.getEventButton().toString())
+        // LorenzDebug.log("Mouse Button" + Mouse.getEventButton().toString())
         handleItemClick(event.itemInHand, ClickType.LEFT_CLICK)
     }
 
@@ -168,10 +162,10 @@ object MobHitTrigger {
         val armor = InventoryUtils.getArmor()
         val player = Minecraft.getMinecraft().thePlayer
         val classInDungeon = DungeonAPI.playerClass
-        val partialTick = 1.0f //IDK how to make it correctly
-        //LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
+        val partialTick = 1.0f // IDK how to make it correctly
+        // LorenzDebug.log("Item Press: ${itemInHand.displayName.removeColor()} ItemTag: $lastLore")
 
-        //Ability
+        // Ability
         val abilityLores = itemInHand.getLore().filter { it.removeColor().contains("Ability:") }
         val abilityList = mutableListOf<Ability>()
 
@@ -179,18 +173,17 @@ object MobHitTrigger {
             val match = abilityRegex.find(it) ?: return@forEach
             abilityList.add(
                 Ability(
-                    match.groupValues[1].trim(), if (match.groupValues[2] == "RIGHT") ClickType.RIGHT_CLICK else
-                        ClickType.LEFT_CLICK
+                    match.groupValues[1].trim(), if (match.groupValues[2] == "RIGHT") ClickType.RIGHT_CLICK else ClickType.LEFT_CLICK
                 )
             )
         }
 
-        //TODO(Cooldowns)
+        // TODO(Cooldowns)
         abilityList.forEach { ability ->
             if (ability.clickType != clickType) return@forEach
             when (ability.name) {
-                //Aurora Staff
-                "Arcane Zap" -> rayTraceForSkyblockMob( //TODO fix inaccuracy when moving + correct range
+                // Aurora Staff
+                "Arcane Zap" -> rayTraceForSkyblockMob( // TODO fix inaccuracy when moving + correct range
                     player, ENTITY_RENDER_RANGE_IN_BLOCKS, partialTick, offset = LorenzVec(0.0, -0.6, 0.0)
                 )?.let { addToMobHitList(it, hitTrigger.AuroraStaff) }
 
@@ -198,52 +191,38 @@ object MobHitTrigger {
             }
         }
 
-        //Special Cases
+        // Special Cases
         when {
-            //Bow TODO(Cooldown)
+            // Bow TODO(Cooldown)
             lastLore.endsWith("BOW") && (clickType.isRightClick() || (clickType.isLeftClick() && itemName.contains(
                 "Shortbow"
             ))) -> {
-                val piercingDepth = (itemInHand.getEnchantments()?.getValue("piercing")
-                    ?: 0) + if (itemName.contains("Juju")) 3 else 0
-                val bowStrength = config.bowStrength  //TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
+                val piercingDepth =
+                    (itemInHand.getEnchantments()?.getValue("piercing") ?: 0) + if (itemName.contains("Juju")) 3 else 0
+                val bowStrength = config.bowStrength  // TODO (Correct BowStrength) ~60 Blocks/s at Full Draw
                 val direction = player.getLook(1.0f).toLorenzVec().normalize()
                 val xOffset = MathHelper.cos(player.rotationYaw / 180.0f * 3.1415927f).toDouble() * 0.16
                 val zOffset = MathHelper.sin(player.rotationYaw / 180.0f * 3.1415927f).toDouble() * 0.16
-                val origin = player.getPositionEyes(1.0f).toLorenzVec()
-                    .subtract(LorenzVec(xOffset, 0.1, zOffset))
+                val origin = player.getPositionEyes(1.0f).toLorenzVec().subtract(LorenzVec(xOffset, 0.1, zOffset))
                 val velocity = direction.multiply(bowStrength)
-                //TODO(Terror Armor)
+                // TODO(Terror Armor)
                 when {
                     itemName.contains("Runaan") -> ArrowDetection.newArrows(
-                        origin,
-                        velocity,
-                        3,
-                        12.5,
-                        piercingDepth,
-                        false
+                        origin, velocity, 3, 12.5, piercingDepth, false
                     ) //{val arrowCount = 3; val spread = 12.5}
                     itemName.contains("Terminator") -> ArrowDetection.newArrows(
-                        origin,
-                        velocity,
-                        3,
-                        5.0,
-                        piercingDepth,
-                        false
+                        origin, velocity, 3, 5.0, piercingDepth, false
                     )//{val arrowCount = 3; val spread = 5.0}
                     else -> ArrowDetection.newArrow(origin, velocity, piercingDepth, itemName.contains("Juju"))
                 }
 
             }
-            //Mage Left Click TODO(Cooldown)
+            // Mage Left Click TODO(Cooldown)
             classInDungeon == DungeonAPI.DungeonClass.MAGE && clickType.isLeftClick() -> rayTraceForSkyblockMob(
-                player,
-                ENTITY_RENDER_RANGE_IN_BLOCKS,
-                partialTick
+                player, ENTITY_RENDER_RANGE_IN_BLOCKS, partialTick
             )?.let {
                 addToMobHitList(
-                    it,
-                    hitTrigger.LMage
+                    it, hitTrigger.LMage
                 )
             }
         }

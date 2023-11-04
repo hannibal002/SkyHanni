@@ -12,8 +12,7 @@ import org.lwjgl.input.Keyboard;
 public class DevConfig {
 
     @Expose
-    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" +
-        "§cOnly disable this if you know what you are doing!")
+    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" + "§cOnly disable this if you know what you are doing!")
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
 
@@ -34,11 +33,7 @@ public class DevConfig {
         public boolean commandLogs = false;
 
         @Expose
-        @ConfigOption(
-            name = "Mod Menu Log",
-            desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
-                "Useful for adding more mods to quick mod menu switch."
-        )
+        @ConfigOption(name = "Mod Menu Log", desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " + "Useful for adding more mods to quick mod menu switch.")
         @ConfigEditorBoolean
         public boolean modMenuLog = false;
 
@@ -150,18 +145,12 @@ public class DevConfig {
         public boolean logUnfilteredFile = false;
 
         @Expose
-        @ConfigOption(
-            name = "Outside SkyBlock",
-            desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
-        )
+        @ConfigOption(name = "Outside SkyBlock", desc = "Print the debug information for unfiltered console messages outside SkyBlock too.")
         @ConfigEditorBoolean
         public boolean printUnfilteredDebugsOutsideSkyBlock = false;
 
         @Expose
-        @ConfigOption(
-            name = "Log Filtered",
-            desc = "Log the filtered messages into the console."
-        )
+        @ConfigOption(name = "Log Filtered", desc = "Log the filtered messages into the console.")
         @ConfigEditorBoolean
         public boolean printFilteredReason = false;
 
@@ -187,8 +176,7 @@ public class DevConfig {
             public boolean filterUnknownSound = true;
 
             @Expose
-            @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " +
-                "removeObjective and 'scoreboard team already exists'.")
+            @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " + "removeObjective and 'scoreboard team already exists'.")
             @ConfigEditorBoolean
             public boolean filterScoreboardErrors = true;
 
@@ -220,41 +208,31 @@ public class DevConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Mob Kill Detection", desc = "")
+    @ConfigOption(name = "Mob Detection", desc = "")
     @Accordion
-    public MobKillDetection mobKillDetection = new MobKillDetection();
+    public MobDetection mobDetection = new MobDetection();
 
-    public static class MobKillDetection {
+    public static class MobDetection {
 
         @Expose
-        @ConfigOption(name = "Mob Highlight", desc = "Highlight each entity that is a valid Skyblock Mob")
+        @ConfigOption(name = "SkyblockMob Highlight", desc = "Highlight each entity that is a valid SkyblockMob in Green")
         @ConfigEditorBoolean
         public boolean skyblockMobHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Hit Highlight", desc = "Highlight each entity that is in the HitList")
+        @ConfigOption(name = "DisplayNPC Highlight", desc = "Highlight each entity that is a valid DisplayNPC in Red")
         @ConfigEditorBoolean
-        public boolean skyblockMobHitHighlight = false;
+        public boolean displayNPCHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Highlight Ray Hit", desc = "Highlights the SkyblockMob that is directly in front of the camera")
+        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in Blue")
         @ConfigEditorBoolean
-        public boolean skyblockMobHighlightRayHit = false;
+        public boolean realPlayerHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Kill Message", desc = "Shows a Kill Message in Chat")
+        @ConfigOption(name = "Summon Highlight", desc = "Highlight each entity that is a valid Summon in Yellow")
         @ConfigEditorBoolean
-        public boolean ShowNameOfKilledMob = false;
-
-        @Expose
-        @ConfigOption(name = "Log HitList", desc = "Logs the complete HitList each Tick")
-        @ConfigEditorBoolean
-        public boolean LogMobHitList = false;
-
-        @Expose
-        @ConfigOption(name = "HitList Log as ID", desc = "The HitList will be log only as Mob ID instead of the Mob Name")
-        @ConfigEditorBoolean
-        public boolean LogMobHitListId = false;
+        public boolean summonHighlight = false;
 
         @Expose
         @ConfigOption(name = "Mob Hit Detection", desc = "")
@@ -262,6 +240,32 @@ public class DevConfig {
         public MobHitDetecion mobHitDetecion = new MobHitDetecion();
 
         public static class MobHitDetecion {
+
+            @Expose
+            @ConfigOption(name = "Hit Highlight", desc = "Highlight each entity that is in the HitList")
+            @ConfigEditorBoolean
+            public boolean skyblockMobHitHighlight = false;
+
+            @Expose
+            @ConfigOption(name = "Highlight Ray Hit", desc = "Highlights the SkyblockMob that is directly in front of the camera")
+            @ConfigEditorBoolean
+            public boolean skyblockMobHighlightRayHit = false;
+
+            @Expose
+            @ConfigOption(name = "Kill Message", desc = "Shows a Kill Message in Chat")
+            @ConfigEditorBoolean
+            public boolean ShowNameOfKilledMob = false;
+
+            @Expose
+            @ConfigOption(name = "Log HitList", desc = "Logs the complete HitList each Tick")
+            @ConfigEditorBoolean
+            public boolean LogMobHitList = false;
+
+            @Expose
+            @ConfigOption(name = "HitList Log as ID", desc = "The HitList will be log only as Mob ID instead of the Mob Name")
+            @ConfigEditorBoolean
+            public boolean LogMobHitListId = false;
+
             @Expose
             @ConfigOption(name = "Debug Arrow", desc = "Enables all Debug functions for the Arrow Detection")
             @ConfigEditorBoolean

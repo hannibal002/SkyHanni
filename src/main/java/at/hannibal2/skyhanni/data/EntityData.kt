@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.EntityRealPlayerDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityRealPlayerSpawnEvent
 import at.hannibal2.skyhanni.events.EntitySummoningDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntitySummoningSpawnEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -21,8 +23,11 @@ import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -99,14 +104,18 @@ class EntityData {
         }
     }
 
+    val mobConfig get() = SkyHanniMod.feature.dev.mobDetection
+
     companion object {
         val currentSkyblockMobs get() = _currentSkyblockMobs as Set<SkyblockMob>
         val currentDisplayNPCs get() = _currentDisplayNPCs as Set<DisplayNPC>
         val currentRealPlayers get() = _currentRealPlayers as Set<EntityPlayer>
+        val currentSummoningMobs get() = _currentSummoningMobs as Set<SummoningMob>
 
         private val _currentSkyblockMobs = mutableSetOf<SkyblockMob>()
         private val _currentDisplayNPCs = mutableSetOf<DisplayNPC>()
         private val _currentRealPlayers = mutableSetOf<EntityPlayer>()
+        private val _currentSummoningMobs = mutableSetOf<SummoningMob>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
@@ -197,5 +206,39 @@ class EntityData {
     @SubscribeEvent
     fun onEntityRealPlayerDeSpawnEvent(event: EntityRealPlayerDeSpawnEvent) {
         _currentRealPlayers.remove(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntitySummonSpawnEvent(event: EntitySummoningSpawnEvent) {
+        _currentSummoningMobs.add(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntitySummonDeSpawnEvent(event: EntitySummoningDeSpawnEvent) {
+        _currentSummoningMobs.remove(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
+        if (mobConfig.skyblockMobHighlight) {
+            currentSkyblockMobs.forEach {
+                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
+            }
+        }
+        if (mobConfig.displayNPCHighlight) {
+            currentDisplayNPCs.forEach {
+                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.RED.toColor(), 0.3f)
+            }
+        }
+        if (mobConfig.realPlayerHighlight) {
+            currentRealPlayers.forEach {
+                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.BLUE.toColor(), 0.3f)
+            }
+        }
+        if (mobConfig.summonHighlight) {
+            currentSummoningMobs.forEach {
+                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.3f)
+            }
+        }
     }
 }
