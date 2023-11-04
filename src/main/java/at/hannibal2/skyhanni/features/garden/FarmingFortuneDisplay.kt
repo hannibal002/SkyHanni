@@ -140,7 +140,6 @@ class FarmingFortuneDisplay {
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
-
     companion object {
         private val config get() = SkyHanniMod.feature.garden.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestTrueFarmingFortune
@@ -251,17 +250,20 @@ class FarmingFortuneDisplay {
             itemBaseFortune = 0.0
             greenThumbFortune = 0.0
             for (line in tool?.getLore()!!) {
-                val match = tooltipFortunePattern.matchEntire(line)?.groups
-                if (match != null) {
-                    displayedFortune = match[1]!!.value.toDouble()
-                    reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
+                val match = tooltipFortunePattern.matchEntire(line)?.groups ?: continue
 
-                    itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
-                    else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount() ?: 0 ) * 1.0
-                    greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
-                        displayedFortune - reforgeFortune - itemBaseFortune
-                    } else 0.0
+                displayedFortune = match[1]!!.value.toDouble()
+                reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
+
+                itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
+                    5.0
+                } else {
+                    val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
+                    displayedFortune - reforgeFortune - enchantmentFortune - dummiesFF
                 }
+                greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
+                    displayedFortune - reforgeFortune - itemBaseFortune
+                } else 0.0
             }
         }
 
@@ -270,14 +272,19 @@ class FarmingFortuneDisplay {
             val accessoryFortune = accessoryFortune ?: 0.0
 
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            var carrotFortune = 0.0
+            var otherFortune = 0.0
 
             if (currentCrop == CropType.CARROT) {
                 GardenAPI.config?.fortune?.let {
-                    if (it.carrotFortune) carrotFortune = 12.0
+                    if (it.carrotFortune) otherFortune = 12.0
                 }
             }
-            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + carrotFortune
+            if (currentCrop == CropType.PUMPKIN) {
+                GardenAPI.config?.fortune?.let {
+                    if (it.pumpkinFortune) otherFortune = 12.0
+                }
+            }
+            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + otherFortune
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
@@ -285,8 +292,8 @@ class FarmingFortuneDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3,"garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
-        event.move(3,"garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
-        event.move(3,"garden.farmingFortunePos", "garden.farmingFortunes.pos")
+        event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
+        event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
+        event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
     }
 }
