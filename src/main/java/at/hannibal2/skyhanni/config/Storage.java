@@ -44,6 +44,9 @@ public class Storage {
     public List<VisualWord> modifiedWords = new ArrayList<>();
 
     @Expose
+    public boolean visualWordsImported = false;
+
+    @Expose
     public Boolean contestSendingAsked = false;
 
     @Expose
@@ -89,9 +92,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -248,6 +251,9 @@ public class Storage {
                 public boolean carrotFortune = false;
 
                 @Expose
+                public boolean pumpkinFortune = false;
+
+                @Expose
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
 
@@ -374,22 +380,22 @@ public class Storage {
                 @Override
                 public String toString() {
                     return "SlayerItemProfit{" +
-                            "internalName='" + internalName + '\'' +
-                            ", timesDropped=" + timesDropped +
-                            ", totalAmount=" + totalAmount +
-                            ", hidden=" + hidden +
-                            '}';
+                        "internalName='" + internalName + '\'' +
+                        ", timesDropped=" + timesDropped +
+                        ", totalAmount=" + totalAmount +
+                        ", hidden=" + hidden +
+                        '}';
                 }
             }
 
             @Override
             public String toString() {
                 return "SlayerProfitList{" +
-                        "items=" + items +
-                        ", mobKillCoins=" + mobKillCoins +
-                        ", slayerSpawnCost=" + slayerSpawnCost +
-                        ", slayerCompletedCount=" + slayerCompletedCount +
-                        '}';
+                    "items=" + items +
+                    ", mobKillCoins=" + mobKillCoins +
+                    ", slayerSpawnCost=" + slayerSpawnCost +
+                    ", slayerCompletedCount=" + slayerCompletedCount +
+                    '}';
             }
         }
 
@@ -413,11 +419,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
@@ -448,7 +454,7 @@ public class Storage {
             public int selfKillingAnimals;
 
             @Expose
-            public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities= new HashMap<>();
+            public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities = new HashMap<>();
         }
 
         @Expose
