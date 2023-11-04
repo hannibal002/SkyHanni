@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.EntityData.EntityActionState.DeSpawn
+import at.hannibal2.skyhanni.data.EntityData.EntityActionState.Spawn
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
@@ -41,6 +43,8 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+private const val MAX_RETRIES = 100
 
 class EntityData {
 
@@ -119,47 +123,53 @@ class EntityData {
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
+        private val retries = mutableListOf<RetryEntityInstancing>()
+
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
     }
 
     @SubscribeEvent
     fun onTickForEntityDetection(event: LorenzTickEvent) {
+        handleReTries()
+
         previousEntityLiving.clear()
         previousEntityLiving.addAll(currentEntityLiving)
         currentEntityLiving.clear()
         currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
 
-        (currentEntityLiving - previousEntityLiving).forEach { handelEntityInstancing(it, EntityActionState.Spawn) }
-        (previousEntityLiving - currentEntityLiving).forEach { handelEntityInstancing(it, EntityActionState.DeSpawn) }
+        (currentEntityLiving - previousEntityLiving).forEach { if (!handelEntityInstancing(it, Spawn)) retry(it, Spawn) }
+        (previousEntityLiving - currentEntityLiving).forEach { if (!handelEntityInstancing(it, DeSpawn)) retry(it, DeSpawn) }
     }
 
     private enum class EntityActionState {
         Spawn, DeSpawn
     }
 
-    private fun handelEntityInstancing(entity: EntityLivingBase, state: EntityActionState) {
+    private fun handelEntityInstancing(entity: EntityLivingBase, state: EntityActionState): Boolean {
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> {
                 when (state) {
-                    EntityActionState.Spawn -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
-                    EntityActionState.DeSpawn -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
+                    Spawn -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
+                    DeSpawn -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
                 }
+                return true
             }
 
             entity.isDisplayNPC() -> {
-                val e = DisplayNPC(entity)
+                val e = DisplayNPC(entity) ?: return false
                 when (state) {
-                    EntityActionState.Spawn -> EntityDisplayNPCSpawnEvent(e).postAndCatch()
-                    EntityActionState.DeSpawn -> EntityDisplayNPCDeSpawnEvent(e).postAndCatch()
+                    Spawn -> EntityDisplayNPCSpawnEvent(e).postAndCatch()
+                    DeSpawn -> EntityDisplayNPCDeSpawnEvent(e).postAndCatch()
                 }
+                return true
             }
 
             entity.isSkyBlockMob() -> {
-                val e = SkyblockMobUtils.createSkyblockEntity(entity) ?: return
+                val e = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
                 if (e is SkyblockMob) {
                     when (state) {
-                        EntityActionState.Spawn -> SkyblockMobSpawnEvent(e).postAndCatch()
-                        EntityActionState.DeSpawn -> {
+                        Spawn -> SkyblockMobSpawnEvent(e).postAndCatch()
+                        DeSpawn -> {
                             if (e.isInRender()) {
                                 SkyblockMobDeathEvent(e).postAndCatch()
                             } else {
@@ -170,13 +180,38 @@ class EntityData {
                     }
                 } else if (e is SummoningMob) {
                     when (state) {
-                        EntityActionState.Spawn -> EntitySummoningSpawnEvent(e)
-                        EntityActionState.DeSpawn -> EntitySummoningDeSpawnEvent(e)
+                        Spawn -> EntitySummoningSpawnEvent(e)
+                        DeSpawn -> EntitySummoningDeSpawnEvent(e)
                     }
                 }
+                return true
             }
+
+            else -> return true
         }
     }
+
+    private fun retry(entity: EntityLivingBase, state: EntityActionState) =
+        retries.add(RetryEntityInstancing(entity, state, 0))
+
+    private data class RetryEntityInstancing(val entity: EntityLivingBase, val state: EntityActionState, var times: Int)
+
+    private fun handleReTries() {
+        val iterator = retries.iterator()
+        while (iterator.hasNext()) {
+            val retry = iterator.next()
+            if (retry.times > MAX_RETRIES) {
+                iterator.remove()
+                continue
+            }
+            if (!handelEntityInstancing(retry.entity, retry.state)) {
+                retry.times++
+                continue
+            }
+            iterator.remove()
+        }
+    }
+
 
     @SubscribeEvent
     fun onSkyblockMobSpawnEvent(event: SkyblockMobSpawnEvent) {

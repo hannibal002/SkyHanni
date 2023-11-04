@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
@@ -21,6 +22,7 @@ object SkyblockMobUtils {
     val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
     private val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
+    private const val defaultArmorStandName = "Armor Stand"
 
     fun errorNameFinding(name: String): String {
         LorenzDebug.chatAndLog("Skyblock Name of Mob $name not found")
@@ -46,7 +48,10 @@ object SkyblockMobUtils {
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: Entity): SkyblockEntity? {
         val armorStand = getArmorStand(baseEntity) ?: return null
-        val sumReg = summoningRegex.find(armorStand.name) ?: return createSkyblockMob(baseEntity, armorStand)
+        LorenzDebug.log(armorStand.name)
+        if (armorStand.name == defaultArmorStandName) return null
+        val sumReg =
+            summoningRegex.find(armorStand.name.removeColor()) ?: return createSkyblockMob(baseEntity, armorStand)
         return SummoningMob(baseEntity, armorStand, sumReg)
     }
 
