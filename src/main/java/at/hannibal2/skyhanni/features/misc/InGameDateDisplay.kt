@@ -45,17 +45,7 @@ class InGameDateDisplay {
             val year = "Year ${date.year}"
             var monthAndDate = (list.find { monthAndDatePattern.matches(it) } ?: "??").trim()
             if (monthAndDate.last().isDigit()) {
-                //code adapted from ThatGravyBoat's getDateSuffix code in SkyblockHUD.
-                val theDate = monthAndDate.takeLast(2).trim().toInt()
-                if (theDate in 10..14) monthAndDate += "th"
-                else {
-                    when (theDate % 10) {
-                        1 -> "${monthAndDate}st"
-                        2 -> "${monthAndDate}nd"
-                        3 -> "${monthAndDate}rd"
-                        else -> "${monthAndDate}th"
-                    }
-                }
+                monthAndDate = "${monthAndDate}${SkyBlockTime.daySuffix(monthAndDate.takeLast(2).trim().toInt())}"
             }
             val time = list.find { it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
