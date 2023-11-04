@@ -59,7 +59,7 @@ class InGameDateDisplay {
                 else "$theBaseString ☽"
             }
         }
-        if (!config.includeOrdinal) theBaseString.replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
+        if (!config.includeOrdinal) theBaseString = theBaseString.replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
         display = theBaseString
     }
 
