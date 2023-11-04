@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDate
     private val monthAndDatePattern =
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st).*".toPattern()
+        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}((nd|rd|th|st)?).*".toPattern()
     private var display = ""
 
     // sun, moon, spooky
@@ -43,7 +43,20 @@ class InGameDateDisplay {
         if (config.useScoreboard) {
             val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            val monthAndDate = list.find { monthAndDatePattern.matches(it) } ?: "??"
+            var monthAndDate = (list.find { monthAndDatePattern.matches(it) } ?: "??").trim()
+            if (monthAndDate.last().isDigit()) {
+                //code adapted from ThatGravyBoat's getDateSuffix code in SkyblockHUD.
+                val theDate = monthAndDate.takeLast(2).trim().toInt()
+                if (theDate in 10..14) monthAndDate += "th"
+                else {
+                    when (theDate % 10) {
+                        1 -> "${monthAndDate}st"
+                        2 -> "${monthAndDate}nd"
+                        3 -> "${monthAndDate}rd"
+                        else -> "${monthAndDate}th"
+                    }
+                }
+            }
             val time = list.find { it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) {
@@ -56,6 +69,7 @@ class InGameDateDisplay {
                 else "$theBaseString ☽"
             }
         }
+        if (!config.includeOrdinal) theBaseString.replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
         display = theBaseString
     }
 
