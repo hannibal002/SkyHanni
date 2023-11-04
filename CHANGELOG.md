@@ -75,8 +75,6 @@
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
-+ Added command /shpumpkin to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff display. - CalMWolfs
-+ Added auto-detection of Expired Pumpkin farming fortune. - CalMWolfs
 
 #### Events
 
@@ -140,11 +138,6 @@
 + Makes the Compact Potion message open the Potion effects menu on click. - jani
 + Added option to show King Talisman Helper outside Dwarven Mines. - hannibal2
 + In-Game Date: Adds support for reading the in-game scoreboard, and also allow sun/moon symbol customization. - Erymanthus
-+ Added Estimated Item Value support to NEU Profile Viewer - hannibal2
-+ Added support to import SBE Visual Words into SkyHanni. - HiZe
-+ Add custom keybinds for Harp Helper. - Thunderblade73
-+ Show the custom hotkey name in the Harp inventory. - hannibal2
-+ Added a GUI element to remind you while /shmouselock is enabled. - CalMWolfs
 
 ### Bug Fixes
 
@@ -214,8 +207,6 @@
 + Reset mouse sensitivity back to 100% if you log off with lock mouse look enabled. - hannibal2
 + Fixed mouse sensitivity stuck after restarting by storing old sensitivity. - CalMWolfs
 + Fixed tool fortune. - CalMWolfs
-+ Fixed Item Ability Cooldown display not activating for Sword of Bad Health. - hannibal2
-+ Fixed the crop name gets replaced to internal name in /shwords. - hannibal2
 
 #### Config
 
@@ -242,7 +233,6 @@
 + Adding 100 lines to MobFinder.kt and making it better readable in the process. - walker
 + Making ChatFiler.kt way better, storing regex objects for reuse and preparing future repo support. - walker
 + Added command /shkingfix to reset the internal King Talisman Helper offset. - hannibal2
-+ Updated dependency version of junixsocket in DiscordIPC so that antivirus websites no longer show false positives. - NetheriteMiner
 
 ## Version 0.20
 

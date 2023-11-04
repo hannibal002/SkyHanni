@@ -151,14 +151,9 @@ object FFStats {
             else -> {}
         }
         if (crop == CropType.CARROT) {
-            val storage = GardenAPI.config?.fortune ?: return
-            val carrotFortune = if (storage.carrotFortune) 12.0 else 0.0
+            val hidden = GardenAPI.config?.fortune ?: return
+            val carrotFortune = if (hidden.carrotFortune) 12.0 else 0.0
             cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
-        }
-        if (crop == CropType.PUMPKIN) {
-            val storage = GardenAPI.config?.fortune ?: return
-            val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
-            cropPage[FortuneStats.EXPIRED_PUMPKIN] = Pair(pumpkinFortune, 12.0)
         }
 
         cropPage[FortuneStats.CROP_TOTAL] = Pair(
