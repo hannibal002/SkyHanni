@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
+import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 
-class EntityDisplayNPCSpawnEvent(val entity: SkyblockMobUtils.DisplayNPC) : LorenzEvent()
+class EntityDisplayNPCSpawnEvent(val entity: DisplayNPC) : LorenzEvent()

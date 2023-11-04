@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 
-class SkyblockMobLeavingRenderEvent(val entity: SkyblockMobUtils.SkyblockMob) : LorenzEvent()
+class SkyblockMobLeavingRenderEvent(val entity: SkyblockMob) : LorenzEvent()

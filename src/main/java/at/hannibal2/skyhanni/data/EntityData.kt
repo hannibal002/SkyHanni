@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
+import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.events.EntityDisplayNPCDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityDisplayNPCSpawnEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
@@ -97,12 +100,12 @@ class EntityData {
     }
 
     companion object {
-        val currentSkyblockMobs get() = _currentSkyblockMobs as Set<SkyblockMobUtils.SkyblockMob>
-        val currentDisplayNPCs get() = _currentDisplayNPCs as Set<SkyblockMobUtils.DisplayNPC>
+        val currentSkyblockMobs get() = _currentSkyblockMobs as Set<SkyblockMob>
+        val currentDisplayNPCs get() = _currentDisplayNPCs as Set<DisplayNPC>
         val currentRealPlayers get() = _currentRealPlayers as Set<EntityPlayer>
 
-        private val _currentSkyblockMobs = mutableSetOf<SkyblockMobUtils.SkyblockMob>()
-        private val _currentDisplayNPCs = mutableSetOf<SkyblockMobUtils.DisplayNPC>()
+        private val _currentSkyblockMobs = mutableSetOf<SkyblockMob>()
+        private val _currentDisplayNPCs = mutableSetOf<DisplayNPC>()
         private val _currentRealPlayers = mutableSetOf<EntityPlayer>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
@@ -111,7 +114,7 @@ class EntityData {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTickForEntityDetection(event: LorenzTickEvent) {
         previousEntityLiving.clear()
         previousEntityLiving.addAll(currentEntityLiving)
         currentEntityLiving.clear()
@@ -135,7 +138,7 @@ class EntityData {
             }
 
             entity.isDisplayNPC() -> {
-                val e = SkyblockMobUtils.DisplayNPC(entity)
+                val e = DisplayNPC(entity)
                 when (state) {
                     EntityActionState.Spawn -> EntityDisplayNPCSpawnEvent(e).postAndCatch()
                     EntityActionState.DeSpawn -> EntityDisplayNPCDeSpawnEvent(e).postAndCatch()
@@ -144,7 +147,7 @@ class EntityData {
 
             entity.isSkyBlockMob() -> {
                 val e = SkyblockMobUtils.createSkyblockEntity(entity) ?: return
-                if (e is SkyblockMobUtils.SkyblockMob) {
+                if (e is SkyblockMob) {
                     when (state) {
                         EntityActionState.Spawn -> SkyblockMobSpawnEvent(e).postAndCatch()
                         EntityActionState.DeSpawn -> {
@@ -156,7 +159,7 @@ class EntityData {
                             SkyblockMobDeSpawnEvent(e).postAndCatch()
                         }
                     }
-                } else if (e is SkyblockMobUtils.SummoningMob) {
+                } else if (e is SummoningMob) {
                     when (state) {
                         EntityActionState.Spawn -> EntitySummoningSpawnEvent(e)
                         EntityActionState.DeSpawn -> EntitySummoningDeSpawnEvent(e)

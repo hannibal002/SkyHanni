@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityData.Companion.currentSkyblockMobs
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.createSkyblockMobIfValid
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
 import net.minecraft.client.Minecraft
@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityKill {
 
-    private var mobHitList = mutableSetOf<SkyblockMobUtils.SkyblockMob>()
+    private var mobHitList = mutableSetOf<SkyblockMob>()
     val config get() = SkyHanniMod.feature.dev.mobKillDetection
 
 
@@ -65,7 +65,7 @@ object EntityKill {
         onMobHitEvent(mob, trigger, true).postAndCatch()
     }
 
-    fun addToMobHitList(mob: SkyblockMobUtils.SkyblockMob, trigger: hitTrigger) {
+    fun addToMobHitList(mob: SkyblockMob, trigger: hitTrigger) {
         if (checkIfBlacklisted(mob.name, trigger)) return
         if (!mobHitList.contains(mob)) mobHitList.add(mob)
         onMobHitEvent(mob, trigger, false).postAndCatch()
