@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
@@ -14,6 +17,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
@@ -46,8 +50,7 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("name: '" + entity.name + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
-                resultList.add("entityUUID: ${entity.uniqueID}")
-                resultList.add("IsSkyblockMob: ${entity.isSkyBlockMob()}")
+                resultList.add("Type of Mob: ${getType(entity)}")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")
@@ -152,6 +155,19 @@ object CopyNearbyEntitiesCommand {
             LorenzUtils.chat("§e[SkyHanni] $counter entities copied into the clipboard!")
         } else {
             LorenzUtils.chat("§e[SkyHanni] No entities found in a search radius of $searchRadius!")
+        }
+    }
+
+    private fun getType(entity: Entity) = buildString {
+        if (entity.isSkyBlockMob()) append("SkyblockMob, ")
+        if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
+        if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
+        if (EntityData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
+
+        if (isNotEmpty()) {
+            delete(length - 2, length) // Remove the last ", "
+        } else {
+            append("NONE")
         }
     }
 

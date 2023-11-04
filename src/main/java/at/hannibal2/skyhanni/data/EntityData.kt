@@ -104,7 +104,7 @@ class EntityData {
         }
     }
 
-    val mobConfig get() = SkyHanniMod.feature.dev.mobDetection
+    private val mobConfig get() = SkyHanniMod.feature.dev.mobDetection
 
     companion object {
         val currentSkyblockMobs get() = _currentSkyblockMobs as Set<SkyblockMob>
@@ -231,7 +231,7 @@ class EntityData {
             }
         }
         if (mobConfig.realPlayerHighlight) {
-            currentRealPlayers.forEach {
+            currentRealPlayers.filterNot { it is EntityPlayerSP }.forEach {
                 event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.BLUE.toColor(), 0.3f)
             }
         }

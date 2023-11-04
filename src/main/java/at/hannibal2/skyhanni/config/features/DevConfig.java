@@ -215,22 +215,22 @@ public class DevConfig {
     public static class MobDetection {
 
         @Expose
-        @ConfigOption(name = "SkyblockMob Highlight", desc = "Highlight each entity that is a valid SkyblockMob in Green")
+        @ConfigOption(name = "SkyblockMob Highlight", desc = "Highlight each entity that is a valid SkyblockMob in green")
         @ConfigEditorBoolean
         public boolean skyblockMobHighlight = false;
 
         @Expose
-        @ConfigOption(name = "DisplayNPC Highlight", desc = "Highlight each entity that is a valid DisplayNPC in Red")
+        @ConfigOption(name = "DisplayNPC Highlight", desc = "Highlight each entity that is a valid DisplayNPC in red")
         @ConfigEditorBoolean
         public boolean displayNPCHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in Blue")
+        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue. (Yourself is also include in the list but won't be Highlighted for obvious reason)")
         @ConfigEditorBoolean
         public boolean realPlayerHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Summon Highlight", desc = "Highlight each entity that is a valid Summon in Yellow")
+        @ConfigOption(name = "Summon Highlight", desc = "Highlight each entity that is a valid Summon in yellow")
         @ConfigEditorBoolean
         public boolean summonHighlight = false;
 
