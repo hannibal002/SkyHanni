@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityRealPlayerDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityRealPlayerSpawnEvent
+import at.hannibal2.skyhanni.events.EntitySummoningDeSpawnEvent
+import at.hannibal2.skyhanni.events.EntitySummoningSpawnEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -16,9 +18,9 @@ import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -95,13 +97,13 @@ class EntityData {
     }
 
     companion object {
-        val currentSkyblockMobs get() = _currentSkyblockMobs as Set<EntityLivingBase>
-        val currentDisplayNPCs get() = _currentDisplayNPCs as Set<EntityLivingBase>
-        val currentRealPlayers get() = _currentRealPlayers as Set<EntityLivingBase>
+        val currentSkyblockMobs get() = _currentSkyblockMobs as Set<SkyblockMobUtils.SkyblockMob>
+        val currentDisplayNPCs get() = _currentDisplayNPCs as Set<SkyblockMobUtils.DisplayNPC>
+        val currentRealPlayers get() = _currentRealPlayers as Set<EntityPlayer>
 
-        private val _currentSkyblockMobs = mutableSetOf<EntityLivingBase>()
-        private val _currentDisplayNPCs = mutableSetOf<EntityLivingBase>()
-        private val _currentRealPlayers = mutableSetOf<EntityLivingBase>()
+        private val _currentSkyblockMobs = mutableSetOf<SkyblockMobUtils.SkyblockMob>()
+        private val _currentDisplayNPCs = mutableSetOf<SkyblockMobUtils.DisplayNPC>()
+        private val _currentRealPlayers = mutableSetOf<EntityPlayer>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
@@ -133,22 +135,31 @@ class EntityData {
             }
 
             entity.isDisplayNPC() -> {
+                val e = SkyblockMobUtils.DisplayNPC(entity)
                 when (state) {
-                    EntityActionState.Spawn -> EntityDisplayNPCSpawnEvent(entity).postAndCatch()
-                    EntityActionState.DeSpawn -> EntityDisplayNPCDeSpawnEvent(entity).postAndCatch()
+                    EntityActionState.Spawn -> EntityDisplayNPCSpawnEvent(e).postAndCatch()
+                    EntityActionState.DeSpawn -> EntityDisplayNPCDeSpawnEvent(e).postAndCatch()
                 }
             }
 
             entity.isSkyBlockMob() -> {
-                when (state) {
-                    EntityActionState.Spawn -> SkyblockMobSpawnEvent(entity).postAndCatch()
-                    EntityActionState.DeSpawn -> {
-                        if (entity.distanceToPlayer() < ENTITY_RENDER_RANGE_IN_BLOCKS) {
-                            SkyblockMobDeathEvent(entity).postAndCatch()
-                        } else {
-                            SkyblockMobLeavingRenderEvent(entity).postAndCatch()
+                val e = SkyblockMobUtils.createSkyblockEntity(entity) ?: return
+                if (e is SkyblockMobUtils.SkyblockMob) {
+                    when (state) {
+                        EntityActionState.Spawn -> SkyblockMobSpawnEvent(e).postAndCatch()
+                        EntityActionState.DeSpawn -> {
+                            if (e.isInRender()) {
+                                SkyblockMobDeathEvent(e).postAndCatch()
+                            } else {
+                                SkyblockMobLeavingRenderEvent(e).postAndCatch()
+                            }
+                            SkyblockMobDeSpawnEvent(e).postAndCatch()
                         }
-                        SkyblockMobDeSpawnEvent(entity).postAndCatch()
+                    }
+                } else if (e is SkyblockMobUtils.SummoningMob) {
+                    when (state) {
+                        EntityActionState.Spawn -> EntitySummoningSpawnEvent(e)
+                        EntityActionState.DeSpawn -> EntitySummoningDeSpawnEvent(e)
                     }
                 }
             }

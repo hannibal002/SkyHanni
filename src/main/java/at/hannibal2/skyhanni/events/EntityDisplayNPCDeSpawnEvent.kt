@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import net.minecraft.entity.EntityLivingBase
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 
-class EntityDisplayNPCDeSpawnEvent(val entity: EntityLivingBase) : LorenzEvent()
+class EntityDisplayNPCDeSpawnEvent(val entity: SkyblockMobUtils.DisplayNPC) : LorenzEvent()

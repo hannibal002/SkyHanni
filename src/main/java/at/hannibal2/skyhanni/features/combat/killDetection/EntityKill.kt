@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils.createSkyblockMobIfValid
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
@@ -38,10 +39,9 @@ object EntityKill {
 
     @SubscribeEvent
     fun onEntityLivingDeath(event: SkyblockMobDeathEvent) {
-        mobHitList.firstOrNull { it == event.entity }
-            ?.let {
-                SkyblockMobKillEvent(it, false).postAndCatch()
-            }
+        mobHitList.firstOrNull { it == event.entity }?.let {
+            SkyblockMobKillEvent(it, false).postAndCatch()
+        }
     }
 
     @SubscribeEvent
@@ -52,24 +52,28 @@ object EntityKill {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        mobHitList.clear() //TODO Clear before the Kill trigger is activated
+        mobHitList.clear() // TODO Clear before the Kill trigger is activated
     }
 
     fun addToMobHitList(entity: Entity, trigger: hitTrigger) {
-        mobHitList.firstOrNull { it == entity }?.let {
-            if (checkIfBlacklisted(it.name, trigger)) return
-            onMobHitEvent(it, trigger, false).postAndCatch()
-            return
+        val mob = mobHitList.firstOrNull { it == entity } ?: run {
+            val it = createSkyblockMobIfValid(entity) ?: return
+            mobHitList.add(it)
+            return@run it
         }
-        val mob = SkyblockMobUtils.createSkyblockMob(entity)
         if (checkIfBlacklisted(mob.name, trigger)) return
-        mobHitList.add(mob)
         onMobHitEvent(mob, trigger, true).postAndCatch()
     }
 
-    val magicBlacklist = setOf<String>() //Get it from repo
+    fun addToMobHitList(mob: SkyblockMobUtils.SkyblockMob, trigger: hitTrigger) {
+        if (checkIfBlacklisted(mob.name, trigger)) return
+        if (!mobHitList.contains(mob)) mobHitList.add(mob)
+        onMobHitEvent(mob, trigger, false).postAndCatch()
+    }
 
-    private fun checkIfBlacklisted(name: String, trigger: hitTrigger): Boolean { //TODO complete the Blacklist
+    val magicBlacklist = setOf<String>() // Get it from repo
+
+    private fun checkIfBlacklisted(name: String, trigger: hitTrigger): Boolean { // TODO complete the Blacklist
         if (trigger.isMagic()) {
             return magicBlacklist.contains(name)
         }
@@ -84,20 +88,19 @@ object EntityKill {
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (config.skyblockMobHighlight) {
             currentSkyblockMobs.forEach {
-                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
+                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
             }
         }
         if (config.skyblockMobHitHighlight) {
             mobHitList.forEach {
                 event.drawFilledBoundingBox_nea(
-                    it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.LIGHT_PURPLE.toColor
-                        (), 0.6f
+                    it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.LIGHT_PURPLE.toColor(), 0.6f
                 )
             }
         }
         if (config.skyblockMobHighlightRayHit) {
             rayTraceForSkyblockMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.forEach {
-                event.drawFilledBoundingBox_nea(it.entityBoundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.5f)
+                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.5f)
             }
         }
     }

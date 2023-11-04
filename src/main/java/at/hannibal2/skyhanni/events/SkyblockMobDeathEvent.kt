@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import net.minecraft.entity.EntityLivingBase
+import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 
-class SkyblockMobDeathEvent(val entity: EntityLivingBase) : LorenzEvent()
+class SkyblockMobDeathEvent(val entity: SkyblockMobUtils.SkyblockMob) : LorenzEvent()

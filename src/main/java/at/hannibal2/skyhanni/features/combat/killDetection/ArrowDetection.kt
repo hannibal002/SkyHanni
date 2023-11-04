@@ -39,7 +39,7 @@ object ArrowDetection {
         val direction: LorenzVec,
         val pierce: Int,
         val canHitEnderman: Boolean,
-        val spawnTick: Int = MinecraftData.totalTicks
+        val spawnTick: Int = MinecraftData.totalTicks,
     ) {
         fun parabola(time: Int) = parabola(origin, direction, time)
         fun isOnParabola(arrow: EntityArrow) = isOnParabola(origin, direction, getLivingTime(), arrow)
@@ -70,18 +70,12 @@ object ArrowDetection {
         for (i in 1..amount / 2) {
             upComingArrows.add(
                 SkyblockArrowSpawn(
-                    origin,
-                    facingDirection.rotateXZ(spreadInRad * i),
-                    pierce,
-                    canHitEnderman
+                    origin, facingDirection.rotateXZ(spreadInRad * i), pierce, canHitEnderman
                 )
             )
             upComingArrows.add(
                 SkyblockArrowSpawn(
-                    origin,
-                    facingDirection.rotateXZ(-spreadInRad * i),
-                    pierce,
-                    canHitEnderman
+                    origin, facingDirection.rotateXZ(-spreadInRad * i), pierce, canHitEnderman
                 )
             )
         }
@@ -105,12 +99,12 @@ object ArrowDetection {
         currentArrowsInWorld.clear()
         currentArrowsInWorld.addAll(EntityUtils.getEntities<EntityArrow>())
 
-        //New Arrow
+        // New Arrow
         (currentArrowsInWorld - previousArrowsInWorld).forEach { onArrowSpawn(it) }
-        //Arrow Disappeared
+        // Arrow Disappeared
         (previousArrowsInWorld - currentArrowsInWorld).forEach { onArrowDeSpawn(it) }
 
-        //currentArrowsInWorld.forEach{arrow ->
+        // currentArrowsInWorld.forEach{arrow ->
         //    val speed = LorenzVec(arrow.posX-arrow.lastTickPosX,arrow.posY-arrow.lastTickPosY,arrow.posZ-arrow.lastTickPosZ).multiply(20).length()
         //    LorenzDebug.log("Arrow Speed: $speed")
         //}
@@ -118,8 +112,7 @@ object ArrowDetection {
         currentArrowsInWorld.forEach { entity ->
             renderRealArrowLineList.add(
                 Line(
-                    entity.getPrevLorenzVec(),
-                    entity.getLorenzVec()
+                    entity.getPrevLorenzVec(), entity.getLorenzVec()
                 )
             )
             arrowTrail.getOrDefault(entity, null)?.add(entity.getLorenzVec()) ?: mutableListOf(entity.getLorenzVec())
@@ -128,7 +121,7 @@ object ArrowDetection {
         if (event.repeatSeconds(3)) {
             val index = upComingArrows.indexOfLast { it.getLivingTime() > 60 }
             for (i in 0..index) {
-                //upComingArrows.remove()
+                // upComingArrows.remove()
             }
         }
     }
@@ -149,21 +142,20 @@ object ArrowDetection {
 
         if (!(parabola(origin, direction, p).distance(arrow.getLorenzVec()) < DISTANCE_TOLERANCE)) return false
 
-        //TODO Debug Angle
-        val angleDiffer = arrow.getMotionLorenzVec() //TODO fix that Multiarrow has 0 MotionVector
+        // TODO Debug Angle
+        val angleDiffer = arrow.getMotionLorenzVec() // TODO fix that Multiarrow has 0 MotionVector
             .angleInRad(
                 vectorFromPoints(
-                    parabola(origin, direction, p),
-                    parabola(origin, direction, p + 1)
+                    parabola(origin, direction, p), parabola(origin, direction, p + 1)
                 )
             )
         LorenzDebug.log("Soll: $ANGLE_TOLERANCE, Ist: $angleDiffer")
         return angleDiffer < ANGLE_TOLERANCE
     }
 
-    //Adjusted values from Minecraft uses because EntityArrow.Update is only called every second tick
-    private val GRAVITY = 0.024 //Minecraft Default = 0.05
-    private val DRAG = 0.995 //Minecraft Default = 0.99
+    // Adjusted values from Minecraft uses because EntityArrow.Update is only called every second tick
+    private val GRAVITY = 0.024 // Minecraft Default = 0.05
+    private val DRAG = 0.995 // Minecraft Default = 0.99
 
     private fun parabola(origin: LorenzVec, direction: LorenzVec, time: Int): LorenzVec {
         val mt = DRAG.pow(time - 1)
@@ -178,7 +170,7 @@ object ArrowDetection {
     private fun onArrowDeSpawn(arrow: EntityArrow) {
         val playerArrow = playerArrows.firstOrNull { it.base == arrow } ?: return
         val hitEntity = EntityData.currentSkyblockMobs.firstOrNull {
-            it.getPrevLorenzVec().distance(arrow.getLorenzVec()) < 4.0
+            it.baseEntity.getPrevLorenzVec().distance(arrow.getLorenzVec()) < 4.0
         }
         if (hitEntity == null) {
             if (config.arrowDebug) {
@@ -209,19 +201,12 @@ object ArrowDetection {
         if (!config.arrowDebug) return
         upComingArrows.forEach {
             event.draw3DLine(
-                it.origin,
-                it.direction.normalize().multiply(50).add(it.origin),
-                LorenzColor.LIGHT_PURPLE.toColor(),
-                5,
-                true
+                it.origin, it.direction.normalize().multiply(50)
+                    .add(it.origin), LorenzColor.LIGHT_PURPLE.toColor(), 5, true
             )
             for (i in 0..50) {
                 event.draw3DLine(
-                    it.parabola(i),
-                    it.parabola(i + 1),
-                    LorenzColor.RED.toColor(),
-                    5,
-                    true
+                    it.parabola(i), it.parabola(i + 1), LorenzColor.RED.toColor(), 5, true
                 )
                 val color = if (i != TICK_TO_CATCH) LorenzColor.DARK_RED else LorenzColor.YELLOW
                 event.drawWaypointFilled(it.parabola(i), color.toColor())
