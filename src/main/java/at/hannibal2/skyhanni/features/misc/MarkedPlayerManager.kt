@@ -63,7 +63,6 @@ class MarkedPlayerManager {
 
     }
 
-
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.markOwnName.whenChanged { _, new ->
@@ -80,7 +79,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.MARKED_PLAYERS.isSelected()) return
+        if (!isEnabled()) return
 
         if (event.repeatSeconds(1)) {
             findPlayers()
@@ -89,8 +88,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.MARKED_PLAYERS.isSelected()) return
-        if (!config.highlightInWorld) return
+        if (!isEnabled()) return
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
@@ -100,14 +98,16 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.MARKED_PLAYERS.isSelected()) return
-        if (!config.highlightInWorld) return
+        if (!isEnabled()) return
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
             event.shouldReset = true
         }
     }
+
+    private fun isEnabled() = config.highlightInWorld &&
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

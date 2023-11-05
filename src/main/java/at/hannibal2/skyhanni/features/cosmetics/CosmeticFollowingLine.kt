@@ -34,8 +34,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.FOLLOWING_LINE.isSelected()) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         updateClose(event)
 
@@ -97,8 +96,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.FOLLOWING_LINE.isSelected()) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         if (event.isMod(5)) {
             locations = locations.editCopy { values.removeIf { it.time.passedSince() > config.secondsAlive.seconds } }
@@ -121,4 +119,6 @@ class CosmeticFollowingLine {
             }
         }
     }
+
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.FOLLOWING_LINE.isSelected()) && config.enabled
 }

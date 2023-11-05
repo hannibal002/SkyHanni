@@ -30,9 +30,7 @@ class TpsCounter {
 
     init {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
-            if (!LorenzUtils.onHypixel) return@fixedRateTimer
-            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.TPS_DISPLAY.isSelected()) return@fixedRateTimer
-            if (!config.tpsDisplay) return@fixedRateTimer
+            if (!isEnabled()) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
@@ -61,9 +59,7 @@ class TpsCounter {
             }
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
-            if (!LorenzUtils.onHypixel) return@fixedRateTimer
-            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.TPS_DISPLAY.isSelected()) return@fixedRateTimer
-            if (!config.tpsDisplay) return@fixedRateTimer
+            if (!isEnabled()) return@fixedRateTimer
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
@@ -88,12 +84,13 @@ class TpsCounter {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.onHypixel) return
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.TPS_DISPLAY.isSelected()) return
-        if (!config.tpsDisplay) return
+        if (!isEnabled()) return
 
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
     }
+
+    private fun isEnabled() = config.tpsDisplay && LorenzUtils.onHypixel &&
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
