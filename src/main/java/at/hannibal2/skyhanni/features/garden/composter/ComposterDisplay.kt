@@ -197,7 +197,9 @@ class ComposterDisplay {
             }
         } else "?"
 
-        if (!GardenAPI.inGarden() && ((LorenzUtils.inSkyBlock && config.displayOutsideGarden) || (!LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.showOutsideSB.contains(7)))) {
+        val inSb = LorenzUtils.inSkyBlock && config.displayOutsideGarden
+        val outsideSb = !LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.showOutsideSB.contains(7)
+        if (!GardenAPI.inGarden() && (inSb || outsideSb)) {
             val list = Collections.singletonList(listOf(bucket, "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }

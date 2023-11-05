@@ -396,7 +396,10 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(6) && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
+    private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(6) && !LorenzUtils.inSkyBlock) ||
+        (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
+        && config.display
+
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != 2 // 2 = Disabled
     private fun askToSendContests() =
