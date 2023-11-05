@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.config.features.MarkedPlayerConfig;
 import at.hannibal2.skyhanni.config.features.MiningConfig;
 import at.hannibal2.skyhanni.config.features.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.MiscConfig;
-import at.hannibal2.skyhanni.config.features.OldHidden;
 import at.hannibal2.skyhanni.config.features.RiftConfig;
 import at.hannibal2.skyhanni.config.features.SlayerConfig;
 import com.google.gson.annotations.Expose;
@@ -45,8 +44,8 @@ public class Features extends Config {
     @Override
     public List<Social> getSocials() {
         return Arrays.asList(
-                Social.forLink("Join our Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
-                Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
+            Social.forLink("Join our Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
+            Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
         );
     }
 
@@ -143,9 +142,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     public DevConfig dev = new DevConfig();
-
-    @Expose
-    public OldHidden hidden = new OldHidden();
 
     @Expose
     public Storage storage = new Storage();

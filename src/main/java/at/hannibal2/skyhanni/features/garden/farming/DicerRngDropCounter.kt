@@ -117,7 +117,7 @@ class DicerRngDropCounter {
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Regex)
 
     private fun saveConfig() {
-        val map = GardenAPI.config?.dicerRngDrops ?: return
+        val map = GardenAPI.storage?.dicerRngDrops ?: return
         map.clear()
         for (drop in drops) {
             val crop = drop.key
@@ -129,7 +129,7 @@ class DicerRngDropCounter {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val map = GardenAPI.config?.dicerRngDrops ?: return
+        val map = GardenAPI.storage?.dicerRngDrops ?: return
         for ((internalName, amount) in map) {
             val split = internalName.split(".")
             val crop = CropType.getByName(split[0])
