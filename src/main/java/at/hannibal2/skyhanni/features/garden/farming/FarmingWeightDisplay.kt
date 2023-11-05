@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -322,7 +323,7 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(5) && !LorenzUtils.inSkyBlock) ||
+        private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.FARMING_WEIGHT) && !LorenzUtils.inSkyBlock) ||
             (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
 
         private fun isEtaEnabled() = config.overtakeETA

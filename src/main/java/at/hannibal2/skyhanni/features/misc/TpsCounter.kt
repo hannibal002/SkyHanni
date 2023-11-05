@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -30,7 +31,7 @@ class TpsCounter {
     init {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
             if (!LorenzUtils.onHypixel) return@fixedRateTimer
-            if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.TPS_DISPLAY)) return@fixedRateTimer
             if (!config.tpsDisplay) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
@@ -61,7 +62,7 @@ class TpsCounter {
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
             if (!LorenzUtils.onHypixel) return@fixedRateTimer
-            if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.TPS_DISPLAY)) return@fixedRateTimer
             if (!config.tpsDisplay) return@fixedRateTimer
 
             if (hasPacketReceived) {
@@ -88,7 +89,7 @@ class TpsCounter {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.TPS_DISPLAY)) return
         if (!config.tpsDisplay) return
 
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")

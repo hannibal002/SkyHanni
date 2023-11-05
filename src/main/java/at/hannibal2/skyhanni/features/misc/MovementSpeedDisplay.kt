@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -45,6 +46,6 @@ class MovementSpeedDisplay {
     }
 
     fun isEnabled() = LorenzUtils.onHypixel &&
-        (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(13)) &&
+        (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.MOVEMENT_SPEED)) &&
         config.playerMovementSpeed
 }

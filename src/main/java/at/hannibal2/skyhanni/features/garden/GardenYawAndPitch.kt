@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,7 +22,7 @@ class GardenYawAndPitch {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
-        if(!((SkyHanniMod.feature.misc.showOutsideSB.contains(8) && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))) return
+        if(!((SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.YAW_AND_PITCH) && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))) return
         if (GardenAPI.hideExtraGuis()) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 

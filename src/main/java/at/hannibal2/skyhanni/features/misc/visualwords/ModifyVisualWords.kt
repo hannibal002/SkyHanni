@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import com.google.common.cache.Cache
@@ -17,7 +18,7 @@ object ModifyVisualWords {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(0)) return originalText
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.MODIFY_VISUAL_WORDS)) return originalText
 
         if (modifiedWords.isEmpty()) {
             modifiedWords = SkyHanniMod.feature.storage.modifiedWords

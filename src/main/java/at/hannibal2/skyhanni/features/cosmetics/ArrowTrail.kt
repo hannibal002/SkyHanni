@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -30,7 +31,7 @@ class ArrowTrail {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(11)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.ARROW_TRAIL)) return
         if (!config.enabled) return
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
@@ -51,7 +52,7 @@ class ArrowTrail {
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(11)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.ARROW_TRAIL)) return
         if (!config.enabled) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
         val playerArrowColor = color.toChromaColor()

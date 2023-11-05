@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -164,7 +165,7 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(7)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.COMPOSTER_TIME)) return
 
         if (GardenAPI.inGarden() && config.displayEnabled) {
             config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")
@@ -198,7 +199,7 @@ class ComposterDisplay {
         } else "?"
 
         val inSb = LorenzUtils.inSkyBlock && config.displayOutsideGarden
-        val outsideSb = !LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.showOutsideSB.contains(7)
+        val outsideSb = !LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.COMPOSTER_TIME)
         if (!GardenAPI.inGarden() && (inSb || outsideSb)) {
             val list = Collections.singletonList(listOf(bucket, "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")

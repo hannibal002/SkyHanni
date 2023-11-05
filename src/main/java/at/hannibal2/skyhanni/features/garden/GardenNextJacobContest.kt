@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -396,7 +397,7 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(6) && !LorenzUtils.inSkyBlock) ||
+    private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.NEXT_JACOB_CONTEXT) && !LorenzUtils.inSkyBlock) ||
         (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
         && config.display
 

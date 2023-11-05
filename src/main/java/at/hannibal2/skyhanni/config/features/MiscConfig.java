@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -713,25 +714,8 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "Modify Visual Words", // 0
-            "Custom Text Box", // 1
-            "Real Time", // 2
-            "TPS Display", // 3
-            "Marked Players", // 4
-            "Farming Weight", // 5
-            "Next Jacobs's Context", // 6
-            "Composter Time", // 7
-            "Yaw and Pitch", // 8
-            "Quick Mod Menu Switch", // 9
-            "Following Line", // 10
-            "Arrow Trail", // 11
-            "Highlight Party Members", // 12
-            "Movement Speed" // 13
-        }
-    )
-    public List<Integer> showOutsideSB = new ArrayList<>();
+    @ConfigEditorDraggableList
+    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")

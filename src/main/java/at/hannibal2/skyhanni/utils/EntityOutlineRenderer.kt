@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
@@ -221,7 +222,7 @@ object EntityOutlineRenderer {
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
         // SkyBlock Conditions
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(12)) return false
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.HIGHLIGHT_PARTY_MEMBERS)) return false
 
         // Main toggle for outlines features
         if (!isEnabled()) return false

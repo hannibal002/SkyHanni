@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -79,7 +80,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(4)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.MARKED_PLAYERS)) return
 
         if (event.repeatSeconds(1)) {
             findPlayers()
@@ -88,7 +89,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(4)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.MARKED_PLAYERS)) return
         if (!config.highlightInWorld) return
 
         val entity = event.entity
@@ -99,7 +100,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(4)) return
+        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.MARKED_PLAYERS)) return
         if (!config.highlightInWorld) return
 
         val entity = event.entity
