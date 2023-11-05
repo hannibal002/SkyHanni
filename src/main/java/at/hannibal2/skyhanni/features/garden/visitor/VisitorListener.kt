@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -152,41 +155,56 @@ class VisitorListener {
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
     }
 
+    @SubscribeEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!VisitorAPI.inInventory) return
+        if (!config.rewardWarning.preventRefusing && !config.rewardWarning.preventRefusingCopper && !config.rewardWarning.preventAcceptingCopper) return
+        if (config.rewardWarning.bypassKey.isKeyHeld()) return
+
+        val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
+        val refuseOfferStack = event.gui.inventorySlots.getSlot(33).stack ?: return
+        val acceptOfferStack = event.gui.inventorySlots.getSlot(29).stack ?: return
+
+        if (visitor.hasReward() != null && config.rewardWarning.preventRefusing)
+            refuseOfferStack.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
+        if (visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper)
+            refuseOfferStack.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
+        if (visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper)
+            acceptOfferStack.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
-        if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
 
         if (event.slotId == VISITOR_REFUSE_ITEM_SLOT) {
-            if (event.slot.stack?.name != "§cRefuse Offer") return
-
             visitor.hasReward()?.let {
-                if (config.rewardWarning.preventRefusing) {
-                    if (config.rewardWarning.bypassKey.isKeyHeld()) {
-                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                        return
-                    }
+                if (config.rewardWarning.preventRefusing && !config.rewardWarning.bypassKey.isKeyHeld()) {
                     event.isCanceled = true
-                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                    if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        LorenzUtils.clickableChat(
-                            "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                            "sh bypass"
-                        )
-                    }
-                    Minecraft.getMinecraft().thePlayer.closeScreen()
                     return
                 }
             }
 
+            if (visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice &&
+                config.rewardWarning.preventRefusingCopper && !config.rewardWarning.bypassKey.isKeyHeld()) {
+                event.isCanceled = true
+                return
+            }
+
+            if (event.slot.stack?.name != "§cRefuse Offer") return
             VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             return
         }
-        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot.stack?.getLore()
-                ?.any { it == "§eClick to give!" } == true
-        ) {
+        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT) {
+            if (visitor.pricePerCopper > config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper &&
+                !config.rewardWarning.bypassKey.isKeyHeld()) {
+                event.isCanceled = true
+                return
+            }
+
+            if (event.slot.stack?.name != "§eClick to give!") return
             VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
             return
         }
@@ -198,6 +216,30 @@ class VisitorListener {
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
+
+        if (config.rewardWarning.bypassKey.isKeyHeld()) return
+        if (((!(visitor.hasReward() != null && config.rewardWarning.preventRefusing) &&
+            !(visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper)) ||
+            event.itemStack.toString() != "1xtile.clayHardenedStained@14") &&
+            (!(visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper) ||
+            event.itemStack.toString() != "1xtile.clayHardenedStained@13")) return
+
+        val blockReason = when {
+            visitor.hasReward() != null && config.rewardWarning.preventRefusing -> "§aRare visitor reward found"
+            visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper -> "§cCheap copper"
+            visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper -> "§cExpensive copper"
+            else -> "Error"
+        }
+
+        val copiedTooltip = event.toolTip.toList()
+        event.toolTip.clear()
+
+        for (line in copiedTooltip) {
+            if (!line.contains("minecraft:") && !line.contains("NBT:")) event.toolTip.add("§7" + line.removeColor())
+        }
+        event.toolTip.add("")
+        event.toolTip.add(blockReason)
+        event.toolTip.add("  §7(Bypass by holding ${Keyboard.getKeyName(config.rewardWarning.bypassKey)})")
     }
 
     @SubscribeEvent

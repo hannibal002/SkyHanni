@@ -319,6 +319,7 @@ class GardenVisitorFeatures {
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").replace(",", "").toInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
+                visitor.pricePerCopper = (totalPrice / copper).toInt()
                 val timePerCopper = TimeUtils.formatDuration((timeRequired / copper) * 1000)
                 var copperLine = formattedLine
                 if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"

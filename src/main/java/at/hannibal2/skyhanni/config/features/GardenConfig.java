@@ -213,6 +213,23 @@ public class GardenConfig {
                     }
             )
             public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
+
+            @Expose
+            @ConfigOption(name = "Coins Per Copper", desc = "The price to use for the below options.\nRequires one of the below options to be on.")
+            @ConfigEditorSlider(minValue = 1, maxValue = 50_000, minStep = 250)
+            public int coinsPerCopperPrice = 1;
+
+            @Expose
+            @ConfigOption(name = "Prevent Refusing", desc = "Prevent refusing a visitor with a coins per copper lower than the set value.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean preventRefusingCopper = false;
+
+            @Expose
+            @ConfigOption(name = "Prevent Accepting", desc = "Prevent accepting a visitor with a coins per copper higher than the set value.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean preventAcceptingCopper = false;
         }
 
         @Expose

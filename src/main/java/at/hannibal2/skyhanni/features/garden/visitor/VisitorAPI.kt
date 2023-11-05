@@ -111,6 +111,7 @@ object VisitorAPI {
         val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
+        var pricePerCopper: Int = -1
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
