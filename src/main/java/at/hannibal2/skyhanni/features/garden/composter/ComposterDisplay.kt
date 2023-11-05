@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -178,11 +180,19 @@ class ComposterDisplay {
             val duration = storage.composterEmptyTime - System.currentTimeMillis()
             if (duration > 0) {
                 if (duration < 1000 * 60 * 20) {
-                    warn("Your composter almost empty!")
+                    if (IslandType.GARDEN.isInIsland()) {
+                        warn("Your composter is almost empty!")
+                    } else {
+                        warn("Your composter in the garden is almost empty!")
+                    }
                 }
                 TimeUtils.formatDuration(duration, maxUnits = 3)
             } else {
-                warn("Your composter is empty!")
+                if (IslandType.GARDEN.isInIsland()) {
+                    warn("Your composter is empty!")
+                } else {
+                    warn("Your composter in the garden is empty!")
+                }
                 "§cComposter is empty!"
             }
         } else "?"
