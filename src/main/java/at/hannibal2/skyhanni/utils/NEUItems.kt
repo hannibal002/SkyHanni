@@ -310,8 +310,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU

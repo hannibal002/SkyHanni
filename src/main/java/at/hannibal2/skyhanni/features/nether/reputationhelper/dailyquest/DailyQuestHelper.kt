@@ -48,7 +48,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
-
+    var greatSpook = false
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -219,6 +219,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     fun render(display: MutableList<List<Any>>) {
+        if (greatSpook) {
+            display.addAsSingletonList("")
+            display.addAsSingletonList("§7Daily Quests (§cdisabled§7)")
+            display.addAsSingletonList(" §5§lThe Great Spook §7happened :O")
+            return
+        }
         val done = quests.count { it.state == QuestState.COLLECTED }
         display.addAsSingletonList("")
         display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
