@@ -60,17 +60,17 @@ public class Features extends Config {
     }
 
     /*
-    * If you are adding a new category, please insert it alphabetically
-    * The only exceptions to this are About and GUI, which are pinned to the top
-    * and Misc and Dev, which are to be at the bottom. Thanks!
+     * If you are adding a new category, please insert it alphabetically
+     * The only exceptions to this are About and GUI, which are pinned to the top
+     * and Misc and Dev, which are to be at the bottom. Thanks!
      */
 
     @Expose
-    @Category(name = "About", desc = "Information about SkyHanni and updates")
+    @Category(name = "About", desc = "Information about SkyHanni and updates.")
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     public GUIConfig gui = new GUIConfig();
 
     @Expose
@@ -82,7 +82,7 @@ public class Features extends Config {
     public ChatConfig chat = new ChatConfig();
 
     @Expose
-    @Category(name = "Chroma", desc = "Settings for Chroma text. (Credit to SBA)")
+    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
     public ChromaConfig chroma = new ChromaConfig();
 
     @Expose
