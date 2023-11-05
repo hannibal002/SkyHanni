@@ -134,10 +134,10 @@ public class GUIConfig {
     @ConfigOption(name = "Enabled", desc = "Show the TPS of the current server, like in Soopy.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public boolean tpsEnabled = false;
 
     @Expose
-    public Position position = new Position(10, 10, false, true);
+    public Position tpsPosition = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

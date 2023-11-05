@@ -31,7 +31,7 @@ class TpsCounter {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
             if (!LorenzUtils.onHypixel) return@fixedRateTimer
             if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return@fixedRateTimer
-            if (!config.enabled) return@fixedRateTimer
+            if (!config.tpsEnabled) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
@@ -62,7 +62,7 @@ class TpsCounter {
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
             if (!LorenzUtils.onHypixel) return@fixedRateTimer
             if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return@fixedRateTimer
-            if (!config.enabled) return@fixedRateTimer
+            if (!config.tpsEnabled) return@fixedRateTimer
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
@@ -81,7 +81,7 @@ class TpsCounter {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!config.enabled) return
+        if (!config.tpsEnabled) return
         hasPacketReceived = true
     }
 
@@ -89,9 +89,9 @@ class TpsCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
         if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(3)) return
-        if (!config.enabled) return
+        if (!config.tpsEnabled) return
 
-        config.position.renderString(display, posLabel = "Tps Display")
+        config.tpsPosition.renderString(display, posLabel = "Tps Display")
     }
 
     @SubscribeEvent
