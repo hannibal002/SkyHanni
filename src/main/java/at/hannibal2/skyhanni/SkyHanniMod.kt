@@ -106,6 +106,7 @@ import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
@@ -388,6 +389,7 @@ class SkyHanniMod {
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
+        loadModule(FishingAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -622,7 +624,7 @@ class SkyHanniMod {
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
-        loadModule(FishingBaitWarnings());
+        loadModule(FishingBaitWarnings())
 
         init()
 

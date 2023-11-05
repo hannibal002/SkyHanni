@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
@@ -8,15 +9,12 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,18 +22,11 @@ class FishingBaitWarnings {
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
     private var bobber: EntityFishHook? = null
     private var lastBait: String? = null
-    private var timeLastCast = SimpleTimeMark.farPast()
     private var isUsingBait: Boolean = false
 
     @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (!isEnabled()) return
-        val entity = event.entity ?: return
-        if (entity !is EntityFishHook) return
-        if (entity.angler != Minecraft.getMinecraft().thePlayer) return
-
-        bobber = entity
-        timeLastCast = SimpleTimeMark.now()
+    fun onBobberThrow(event: FishingBobberCastEvent) {
+        bobber = event.bobber
         isUsingBait = false
     }
 
@@ -48,10 +39,10 @@ class FishingBaitWarnings {
             return
         }
         if (!event.isMod(5)) return
-        if (timeLastCast.passedSince() < 1.seconds) return
+        if (FishingAPI.lastCastTime.passedSince() < 1.seconds) return
 
         val block = bobber.getLorenzVec().getBlockAt()
-        if (block in FishingAPI.getAllowedBlocks()) return
+        if (block !in FishingAPI.getAllowedBlocks()) return
 
         if (!isUsingBait && config.noBaitWarning) showNoBaitWarning()
         reset()
