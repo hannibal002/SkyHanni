@@ -167,9 +167,9 @@ object Commands {
         registerCommand(
             "shcopytranslation",
             "<language code (2 letters)> <messsage to translate>\n" +
-                    "Requires the Chat > Translator feature to be enabled.\n" +
-                    "Copies the translation for a given message to your clipboard. " +
-                    "Language codes are at the end of the translation when you click on a message."
+                "Requires the Chat > Translator feature to be enabled.\n" +
+                "Copies the translation for a given message to your clipboard. " +
+                "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shmouselock",
@@ -215,6 +215,10 @@ object Commands {
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
+        registerCommand(
+            "shpumpkin",
+            "Toggles receiving the 12 fortune from pumpkins"
+        ) { CaptureFarmingGear.reversePumpkinFortune() }
         registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
@@ -368,15 +372,16 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
+            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
 
     private fun clearFarmingItems() {
-        val config = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         LorenzUtils.chat("§e[SkyHanni] clearing farming items")
-        config.farmingItems.clear()
-        config.outdatedItems.clear()
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
@@ -388,7 +393,7 @@ object Commands {
         name: String,
         description: String,
         function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
     ) {
         val command = SimpleCommand(
             name,

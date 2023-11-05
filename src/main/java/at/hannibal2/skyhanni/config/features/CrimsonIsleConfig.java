@@ -144,8 +144,14 @@ public class CrimsonIsleConfig {
 
     @Expose
     @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
-            "it shows a clickable chat message that will grab the items needed from the sacks.")
+        "it shows a clickable chat message that will grab the items needed from the sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questItemHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Pablo NPC Helper", desc = "Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean pabloHelper = false;
 }

@@ -139,6 +139,7 @@ object LorenzUtils {
     }
 
     // TODO replace all calls with regex
+    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
     // TODO use derpy() on every use case
@@ -426,13 +427,11 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) = inSkyBlock && (skyBlockIsland == island || island == IslandType.CATACOMBS && inDungeons)
-
-    fun IslandType.isInIsland() = inIsland(this)
+    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
         val currentValue = this[key] ?: 0
