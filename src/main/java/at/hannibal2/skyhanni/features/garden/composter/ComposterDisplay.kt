@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -26,6 +27,7 @@ class ComposterDisplay {
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
 
+    private val bucket by lazy { "BUCKET".asInternalName().getItemStack() }
     private var tabListData by ComposterAPI::tabListData
 
     enum class DataType(rawPattern: String, val icon: String) {
@@ -34,9 +36,7 @@ class ComposterDisplay {
         TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
         STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
 
-        val displayItem by lazy {
-            NEUItems.getItemStack(icon)
-        }
+        val displayItem by lazy { icon.asInternalName().getItemStack() }
 
         val pattern by lazy { rawPattern.toPattern() }
 
@@ -104,7 +104,7 @@ class ComposterDisplay {
             val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
             GardenAPI.config?.composterEmptyTime = System.currentTimeMillis() + millis
             val format = TimeUtils.formatDuration(millis, maxUnits = 2)
-            listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
+            listOf(bucket, "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")
         }
@@ -198,7 +198,7 @@ class ComposterDisplay {
         } else "?"
 
         if (!GardenAPI.inGarden() && ((LorenzUtils.inSkyBlock && config.displayOutsideGarden) || (!LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.showOutsideSB.contains(7)))) {
-            val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
+            val list = Collections.singletonList(listOf(bucket, "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }
     }
