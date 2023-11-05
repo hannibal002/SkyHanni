@@ -77,7 +77,7 @@ dependencies {
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    modCompileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
