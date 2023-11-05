@@ -70,31 +70,31 @@ class NonGodPotEffectDisplay {
         }
 
         if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
             update()
         }
 
         if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
             update()
         }
 
         if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
+            update()
+        }
+
+        if (event.message == "§eYou consumed a §r§fGreat Spook Potion§r§e!") {
+            effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
             update()
         }
 
 
         if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
         if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
-            checkFooter = true
             effectDuration.remove(NonGodPotEffect.GOBLIN)
             update()
         }
@@ -199,9 +199,11 @@ class NonGodPotEffectDisplay {
             var effectsCount = 0
             for (line in lines) {
                 for (effect in NonGodPotEffect.entries) {
-                    if (line.startsWith(effect.tabListName)) {
+                    val tabListName = effect.tabListName
+                    if (line.startsWith(tabListName)) {
+                        val string = line.substring(tabListName.length)
                         try {
-                            val duration = TimeUtils.getMillis(line.split("§f")[1])
+                            val duration = TimeUtils.getMillis(string.split("§f")[1])
                             effectDuration[effect] = Timer(duration.milliseconds)
                             update()
                         } catch (e: IndexOutOfBoundsException) {
