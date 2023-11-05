@@ -29,7 +29,6 @@ object GardenVisitorDropStatistics {
     private var acceptedVisitors = 0
     var deniedVisitors = 0
     private var totalVisitors = 0
-    private var visitorRarities = mutableListOf<Long>()
     var coinsSpent = 0L
 
     var lastAccept = 0L
@@ -117,6 +116,7 @@ object GardenVisitorDropStatistics {
     private fun setRarities(rarity: String) {
         acceptedVisitors += 1
         val currentRarity = VisitorRarity.valueOf(rarity)
+        val visitorRarities = GardenAPI.config?.visitorDrops?.visitorRarities ?: return
         val temp = visitorRarities[currentRarity.ordinal] + 1
         visitorRarities[currentRarity.ordinal] = temp
         saveAndUpdate()
@@ -128,6 +128,7 @@ object GardenVisitorDropStatistics {
         //1
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         //2
+        val visitorRarities = hidden.visitorRarities
         if (visitorRarities.isNotEmpty()) {
             addAsSingletonList(
                 "§a${visitorRarities[0].addSeparators()}§f-" +
@@ -197,7 +198,6 @@ object GardenVisitorDropStatistics {
         hidden.acceptedVisitors = acceptedVisitors
         hidden.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
-        hidden.visitorRarities = visitorRarities
         hidden.coinsSpent = coinsSpent
         hidden.rewardsCount = rewardsCount
         display = formatDisplay(drawDisplay(hidden))
@@ -215,7 +215,6 @@ object GardenVisitorDropStatistics {
         acceptedVisitors = hidden.acceptedVisitors
         deniedVisitors = hidden.deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
-        visitorRarities = hidden.visitorRarities
         coinsSpent = hidden.coinsSpent
         rewardsCount = hidden.rewardsCount
         saveAndUpdate()
