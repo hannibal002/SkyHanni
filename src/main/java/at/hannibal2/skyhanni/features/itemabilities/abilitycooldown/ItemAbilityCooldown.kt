@@ -153,6 +153,15 @@ class ItemAbilityCooldown {
             event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
+            // Aspect of the Jerry
+            event.soundName == "mob.villager.idle" && event.pitch == 1f && event.volume == 1.0f -> {
+                ItemAbility.ASPECT_OF_THE_JERRY.sound()
+            }
+            // Jerry's Aspect of the Jerry (reforge)
+            // TODO fix this sharing cooldown with normal aotj and aotj signature
+            event.soundName == "mob.villager.death" && event.pitch == 0.6507937f && event.volume == 1.0f -> {
+                ItemAbility.ASPECT_OF_THE_JERRY.sound()
+            }
         }
     }
 

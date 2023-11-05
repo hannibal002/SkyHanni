@@ -46,6 +46,7 @@ enum class ItemAbility(
     VOODOO_DOLL_WILTED(3),
     FIRE_FURY_STAFF(20),
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
+    ASPECT_OF_THE_JERRY(5,"ASPECT_OF_THE_JERRY_SIGNATURE"),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),
