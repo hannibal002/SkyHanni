@@ -24,24 +24,22 @@ class AbiphoneContactSlots {
         // §7Maximum Contacts: §b7 §c(+15) §5(+1)
         // 7 15 1
         var total = 0
+        val index = (itemLore.indexOfFirst { it.contains("§7Maximum Contacts: ") }) + 1
         val contactsBeforeSplit = itemLore.find { it.contains("§7Maximum Contacts: ") }!!
             .substringAfter("§7Maximum Contacts: ").removeColor()
             .replace("+", "").replace("(", "").replace(")", "")
         val contacts = contactsBeforeSplit.split(" ")
         if (contacts.first() == contactsBeforeSplit) {
             //this is in case hypixel changes their formatting of the maximum contacts lore line and things go terribly wrong
-            event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
-                " §8Could not calculate contact slots. [SkyHanni]")
+            event.toolTip.add(index," §8Could not calculate contact slots. [SkyHanni]")
         }
         else {
             for (eachInt in contacts) if (eachInt.toIntOrNull() != null) total += eachInt.toInt()
             if (total > -1) {
-                event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
-                    " §7Contacts Progress: §b$total§7/§b${allPossibleUpgrades.sum()}")
+                event.toolTip.add(index, " §7Contacts Progress: §b$total§7/§b${allPossibleUpgrades.sum()}")
             }
             else { //this is in case hypixel changes formatting but still keeps spaces somehow
-                event.toolTip.add((event.toolTip.indexOfFirst { it.contains("§7Maximum Contacts: ") } + 1),
-                    " §8Could not calculate contact slots. [SkyHanni]")
+                event.toolTip.add(index, " §8Could not calculate contact slots. [SkyHanni]")
             }
         }
     }

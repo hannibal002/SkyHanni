@@ -190,6 +190,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesI
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+import at.hannibal2.skyhanni.features.misc.AbiphoneContactSlots
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -472,6 +473,7 @@ class SkyHanniMod {
         loadModule(CompactSplashPotionMessage())
         loadModule(CroesusUnopenedChestTracker())
         loadModule(CompactBingoChat())
+        loadModule(AbiphoneContactSlots())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
         loadModule(FishingHookDisplay())
