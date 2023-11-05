@@ -24,7 +24,7 @@ class AbiphoneContactSlots {
         // §7Maximum Contacts: §b7 §c(+15) §5(+1)
         // 7 15 1
         var total = 0
-        val index = (itemLore.indexOfFirst { it.contains("§7Maximum Contacts: ") }) + 1
+        val index = (itemLore.indexOfFirst { it.contains("§7Maximum Contacts: ") }) + 2
         val contactsBeforeSplit = itemLore.find { it.contains("§7Maximum Contacts: ") }!!
             .substringAfter("§7Maximum Contacts: ").removeColor()
             .replace("+", "").replace("(", "").replace(")", "")
