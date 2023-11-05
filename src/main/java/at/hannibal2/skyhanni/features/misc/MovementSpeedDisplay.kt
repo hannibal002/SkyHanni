@@ -46,6 +46,6 @@ class MovementSpeedDisplay {
     }
 
     fun isEnabled() = LorenzUtils.onHypixel &&
-        (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.MOVEMENT_SPEED)) &&
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.MOVEMENT_SPEED.isSelected()) &&
         config.playerMovementSpeed
 }

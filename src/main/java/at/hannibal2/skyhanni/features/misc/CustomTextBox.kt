@@ -28,7 +28,7 @@ class CustomTextBox {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.CUSTOM_TEXT_BOX)) return
+        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_TEXT_BOX.isSelected()) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
     }

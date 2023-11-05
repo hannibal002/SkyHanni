@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.config.enums
 
+import at.hannibal2.skyhanni.SkyHanniMod
+
 enum class OutsideSbFeature(private val displayName: String) {
     MODIFY_VISUAL_WORDS("Modify Visual Words"),
     CUSTOM_TEXT_BOX("Custom Text Box"),
@@ -17,4 +19,6 @@ enum class OutsideSbFeature(private val displayName: String) {
     MOVEMENT_SPEED("Movement Speed");
 
     override fun toString() = displayName
+
+    fun isSelected() = SkyHanniMod.feature.misc.showOutsideSB.contains(this)
 }

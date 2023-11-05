@@ -397,7 +397,7 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = ((SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.NEXT_JACOB_CONTEXT) && !LorenzUtils.inSkyBlock) ||
+    private fun isEnabled() = ((OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock) ||
         (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
         && config.display
 

@@ -20,7 +20,7 @@ class PartyMemberOutlines {
         }
     }
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.HIGHLIGHT_PARTY_MEMBERS)) && !LorenzUtils.inDungeons && config.enabled
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) && !LorenzUtils.inDungeons && config.enabled
 
     private fun getEntityOutlineColor(entity: Entity): Int? {
         if (entity !is EntityOtherPlayerMP || !PartyAPI.partyMembers.contains(entity.name)) return null

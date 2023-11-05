@@ -34,7 +34,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.FOLLOWING_LINE)) return
+        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.FOLLOWING_LINE.isSelected()) return
         if (!config.enabled) return
 
         updateClose(event)
@@ -97,7 +97,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock && !SkyHanniMod.feature.misc.showOutsideSB.contains(OutsideSbFeature.FOLLOWING_LINE)) return
+        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.FOLLOWING_LINE.isSelected()) return
         if (!config.enabled) return
 
         if (event.isMod(5)) {
