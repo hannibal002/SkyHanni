@@ -236,7 +236,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(name = "Bait Warnings", desc = "")
     @Accordion
-    public FishingBaitWarningsConfig fishingBaitWarning = new FishingBaitWarningsConfig();
+    public FishingBaitWarningsConfig fishingBaitWarnings = new FishingBaitWarningsConfig();
 
     public static class FishingBaitWarningsConfig {
         @Expose

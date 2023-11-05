@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.projectile.EntityFishHook
@@ -17,70 +18,65 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class BaitChangeWarning {
-    private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarning
+class FishingBaitWarnings {
+    private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
     private var bobber: EntityFishHook? = null
     private var lastBait: String? = null
-    private var timeLastCast: Long = 0L
+    private var timeLastCast = SimpleTimeMark.farPast()
     private var isUsingBait: Boolean = false
 
     @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent){
-        if(!isEnabled()) return
+    fun onJoinWorld(event: EntityJoinWorldEvent) {
+        if (!isEnabled()) return
         val entity = event.entity ?: return
-        if(entity !is EntityFishHook) return
-        if(entity.angler != Minecraft.getMinecraft().thePlayer) return
+        if (entity !is EntityFishHook) return
+        if (entity.angler != Minecraft.getMinecraft().thePlayer) return
 
-        bobber = entity;
-        timeLastCast = System.currentTimeMillis()
+        bobber = entity
+        timeLastCast = SimpleTimeMark.now()
         isUsingBait = false
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent){
-        if(!isEnabled() || bobber == null) return
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled() || bobber == null) return
         //Is there a way to get event sent time to be more accurate?
-        if(System.currentTimeMillis() - timeLastCast < 1000L) return
+        if (timeLastCast.passedSince() < 1.seconds) return
 
-        if(!isUsingBait && config.noBaitWarning) showNoBaitWarning()
+        if (!isUsingBait && config.noBaitWarning) showNoBaitWarning()
         reset()
     }
 
-    fun reset(){
+    fun reset() {
         bobber = null
         isUsingBait = false
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent){
-        if(!isEnabled() || !config.baitChangeWarning) return
-        if(bobber == null) return
-        for(entityItem in EntityUtils.getEntitiesNearby<EntityItem>(bobber!!.getLorenzVec(), 1.5)){
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled() || !config.baitChangeWarning) return
+        val bobber = bobber ?: return
+        for (entityItem in EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 1.5)) {
             val itemStack = entityItem.entityItem
-            var name = itemStack.name ?: continue
-            name = name.removeColor()
-
-            if((!name.endsWith(" Bait") && !name.startsWith("Obfuscated"))
-                || itemStack.stackSize != 1) continue
+            if (!itemStack.isBait()) continue
+            val name = itemStack.name?.removeColor() ?: continue
 
             isUsingBait = true
-            if(lastBait == null){
-                lastBait = name.removeColor()
-                continue
+            lastBait?.let {
+                if (name == it) continue
+                showBaitChangeWarning(it, name)
             }
-            if(name.removeColor() == lastBait) continue
-            showBaitChangeWarning(lastBait!!, name.removeColor())
-            lastBait = name.removeColor()
+            lastBait = name
         }
     }
 
-    fun showBaitChangeWarning(before: String, after: String){
+    private fun showBaitChangeWarning(before: String, after: String) {
         SoundUtils.playClickSound()
         LorenzUtils.sendTitle("§eBait changed!", 2.seconds)
-        LorenzUtils.chat("§e" + before + " -> " + after)
+        LorenzUtils.chat("§e[SkyHanni] Fishing Bait change detected: $before -> $after")
     }
 
-    fun showNoBaitWarning(){
+    private fun showNoBaitWarning() {
         SoundUtils.playErrorSound()
         LorenzUtils.sendTitle("§cNo bait is used!", 2.seconds)
     }
