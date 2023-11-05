@@ -106,6 +106,8 @@ import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
@@ -243,6 +245,7 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.PabloHelper
 import at.hannibal2.skyhanni.features.nether.QuestItemHelper
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazes
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazingSouls
@@ -394,6 +397,7 @@ class SkyHanniMod {
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
+        loadModule(FishingAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -635,6 +639,8 @@ class SkyHanniMod {
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
+        loadModule(PabloHelper())
+        loadModule(FishingBaitWarnings())
 
         init()
 

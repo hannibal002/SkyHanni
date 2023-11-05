@@ -438,10 +438,7 @@ object LorenzUtils {
             && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) =
-        inSkyBlock && (skyBlockIsland == island || island == IslandType.CATACOMBS && inDungeons)
-
-    fun IslandType.isInIsland() = inIsland(this)
+    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
         val currentValue = this[key] ?: 0
