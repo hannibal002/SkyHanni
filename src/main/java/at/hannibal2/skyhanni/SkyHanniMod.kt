@@ -105,6 +105,7 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureT
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
+import at.hannibal2.skyhanni.features.fishing.BaitChangeWarning
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
@@ -621,6 +622,7 @@ class SkyHanniMod {
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
+        loadModule(BaitChangeWarning());
 
         init()
 

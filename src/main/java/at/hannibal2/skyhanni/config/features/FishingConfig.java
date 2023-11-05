@@ -234,6 +234,25 @@ public class FishingConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Bait Warnings", desc = "")
+    @Accordion
+    public FishingBaitWarningsConfig fishingBaitWarning = new FishingBaitWarningsConfig();
+
+    public static class FishingBaitWarningsConfig {
+        @Expose
+        @ConfigOption(name = "Bait Change Warning", desc = "Show warning when fishing bait is changed")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean baitChangeWarning = false;
+
+        @Expose
+        @ConfigOption(name = "No Bait Warning", desc = "Show warning when no bait is used")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean noBaitWarning = false;
+    }
+
+    @Expose
     @ConfigOption(name = "Rare Sea Creatures", desc = "")
     @Accordion
     public RareCatches rareCatches = new RareCatches();
