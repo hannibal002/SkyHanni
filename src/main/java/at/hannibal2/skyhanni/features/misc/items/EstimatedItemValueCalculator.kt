@@ -55,47 +55,46 @@ import java.util.Locale
 
 object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
-
-    fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
-        var totalPrice = 0.0
-        val basePrice = addBaseItem(stack, list)
-        totalPrice += basePrice
-
-        totalPrice += addAttributeCost(stack, list)
-
-        totalPrice += addReforgeStone(stack, list)
+    private val additionalCostFunctions = listOf(
+        ::addAttributeCost,
+        ::addReforgeStone,
 
         // once
-        totalPrice += addRecomb(stack, list)
-        totalPrice += addArtOfWar(stack, list)
-        totalPrice += addArtOfPiece(stack, list)
-        totalPrice += addEtherwarp(stack, list)
-        totalPrice += addPowerScrolls(stack, list)
-        totalPrice += addWoodSingularity(stack, list)
-        totalPrice += addJalapenoBook(stack, list)
-        totalPrice += addStatsBook(stack, list)
-        totalPrice += addEnrichment(stack, list)
+        ::addRecomb,
+        ::addArtOfWar,
+        ::addArtOfPiece,
+        ::addEtherwarp,
+        ::addPowerScrolls,
+        ::addWoodSingularity,
+        ::addJalapenoBook,
+        ::addStatsBook,
+        ::addEnrichment,
 
         // counted
-        totalPrice += addMasterStars(stack, list)
-        totalPrice += addHotPotatoBooks(stack, list)
-        totalPrice += addFarmingForDummies(stack, list)
-        totalPrice += addSilex(stack, list)
-        totalPrice += addTransmissionTuners(stack, list)
-        totalPrice += addManaDisintegrators(stack, list)
-        totalPrice += addPolarvoidBook(stack, list)
+        ::addMasterStars,
+        ::addHotPotatoBooks,
+        ::addFarmingForDummies,
+        ::addSilex,
+        ::addTransmissionTuners,
+        ::addManaDisintegrators,
+        ::addPolarvoidBook,
 
         // cosmetic
-        totalPrice += addHelmetSkin(stack, list)
-        totalPrice += addArmorDye(stack, list)
-        totalPrice += addRune(stack, list)
+        ::addHelmetSkin,
+        ::addArmorDye,
+        ::addRune,
 
         // dynamic
-        totalPrice += addAbilityScrolls(stack, list)
-        totalPrice += addDrillUpgrades(stack, list)
-        totalPrice += addGemstoneSlotUnlockCost(stack, list)
-        totalPrice += addGemstones(stack, list)
-        totalPrice += addEnchantments(stack, list)
+        ::addAbilityScrolls,
+        ::addDrillUpgrades,
+        ::addGemstoneSlotUnlockCost,
+        ::addGemstones,
+        ::addEnchantments
+    )
+
+    fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
+        val basePrice = addBaseItem(stack, list)
+        val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }
         return Pair(totalPrice, basePrice)
     }
 
