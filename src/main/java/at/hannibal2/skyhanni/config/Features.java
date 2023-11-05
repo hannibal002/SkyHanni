@@ -86,10 +86,6 @@ public class Features extends Config {
     public ChatConfig chat = new ChatConfig();
 
     @Expose
-    @Category(name = "Enchant Parsing", desc = "Change how enchants are parsed / look.")
-    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
-
-    @Expose
     @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
     public ChromaConfig chroma = new ChromaConfig();
 
@@ -108,6 +104,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
+
+    @Expose
+    @Category(name = "Enchant Parsing", desc = "Change how enchants are parsed / look.")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
     @Category(name = "Events", desc = "Stuff that is not always available.")
