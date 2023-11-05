@@ -365,13 +365,14 @@ class HideNotClickableItems {
             return true
         }
 
-        
+        val name = stack.cleanName()
+
         if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be traded!"
             return true
         }
-        
-        val result = hidePlayerTradeFilter.match(stack.cleanName())
+
+        val result = hidePlayerTradeFilter.match(name)
 
         if (result) hideReason = "This item cannot be traded!"
         return result
@@ -418,7 +419,9 @@ class HideNotClickableItems {
             return true
         }
 
-        val result = hideInStorageFilter.match(stack.cleanName())
+        val name = stack.cleanName()
+
+        val result = hideInStorageFilter.match(name)
 
         if (result) hideReason = "Bags cannot be put into the storage!"
         return result
@@ -444,8 +447,9 @@ class HideNotClickableItems {
             return true
         }
 
+        val name = stack.cleanName()
         for (item in itemsToSalvage) {
-            if (stack.cleanName().endsWith(item)) {
+            if (name.endsWith(item)) {
                 return false
             }
         }
@@ -486,12 +490,14 @@ class HideNotClickableItems {
             return true
         }
 
+        val name = stack.cleanName()
+
         if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be auctioned!"
             return true
         }
 
-        val result = notAuctionableFilter.match(stack.cleanName())
+        val result = notAuctionableFilter.match(name)
         if (result) hideReason = "This item cannot be auctioned!"
         return result
     }
