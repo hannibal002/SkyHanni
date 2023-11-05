@@ -75,8 +75,14 @@
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
-+ Added command /shpumpkin to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff display. - CalMWolfs
++ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff
+  display. - CalMWolfs
 + Added auto-detection of Expired Pumpkin farming fortune. - CalMWolfs
++ Added Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
+    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
++ Added **Fishing Bait Warnings.** - cimbraien
+    + Option to warn when no bait is used.
+    + Option to warn when used bait is changed.
 
 #### Events
 
@@ -139,12 +145,15 @@
 + Show key to press below burrow warp. - hannibal2
 + Makes the Compact Potion message open the Potion effects menu on click. - jani
 + Added option to show King Talisman Helper outside Dwarven Mines. - hannibal2
-+ In-Game Date: Adds support for reading the in-game scoreboard, and also allow sun/moon symbol customization. - Erymanthus
++ In-Game Date: Adds support for reading the in-game scoreboard, and also allow sun/moon symbol customization. -
+  Erymanthus
 + Added Estimated Item Value support to NEU Profile Viewer - hannibal2
 + Added support to import SBE Visual Words into SkyHanni. - HiZe
 + Add custom keybinds for Harp Helper. - Thunderblade73
 + Show the custom hotkey name in the Harp inventory. - hannibal2
 + Added a GUI element to remind you while /shmouselock is enabled. - CalMWolfs
++ Make Crimson Isle Quest Item Helper only get amount needed. - NetheriteMiner
++ Change config order to alphabetical. - walker
 
 ### Bug Fixes
 
@@ -216,6 +225,13 @@
 + Fixed tool fortune. - CalMWolfs
 + Fixed Item Ability Cooldown display not activating for Sword of Bad Health. - hannibal2
 + Fixed the crop name gets replaced to internal name in /shwords. - hannibal2
++ Show obfuscated fish as bait instead of caught item. - cimbraien
++ Fixed Estimated Item Value that renders twice inside NEU PV, by not rendering anything when the cursor is exactly in
+  between two items. - hannibal2
++ fixed more error messages with The Great Spook data getting stored in the Reputation Helper quest config
+  accidentally. - hannibal2
++ Hopefully fixed resets of Visitor Drops stats. - hannibal2
++ Fixed typo in The Art Of Peace. - walker
 
 #### Config
 
@@ -242,7 +258,16 @@
 + Adding 100 lines to MobFinder.kt and making it better readable in the process. - walker
 + Making ChatFiler.kt way better, storing regex objects for reuse and preparing future repo support. - walker
 + Added command /shkingfix to reset the internal King Talisman Helper offset. - hannibal2
-+ Updated dependency version of junixsocket in DiscordIPC so that antivirus websites no longer show false positives. - NetheriteMiner
++ Updated dependency version of junixsocket in DiscordIPC so that antivirus websites no longer show false positives. -
+  NetheriteMiner
++ Changed wrong/missing neu version message to show NEU version 2.1.1-Pre-4 instead of beta versions. - CalMWolfs
++ Deleting the old "hidden" part of the config. - hannibal2
++ This will reset parts of the config for users with 7-month-old SkyHanni versions that want to migrate into the
+  present.
++ Added a workaround for the NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering
+  over the border between two items. - hannibal2
++ Using visitorDrops.visitorRarities directly from the config instead of accessing the local field. Hopefully this will
+  prevent partial config resets in the future. - hannibal2
 
 ## Version 0.20
 
