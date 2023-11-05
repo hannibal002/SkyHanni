@@ -734,15 +734,6 @@ public class MiscConfig {
     public List<Integer> showOutsideSB = new ArrayList<>(Arrays.asList());
 
     @Expose
-    @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean playerMovementSpeed = false;
-
-    @Expose
-    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -792,6 +783,15 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean pasteIntoSigns = true;
+
+    @Expose
+    @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean playerMovementSpeed = false;
+
+    @Expose
+    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
     @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
