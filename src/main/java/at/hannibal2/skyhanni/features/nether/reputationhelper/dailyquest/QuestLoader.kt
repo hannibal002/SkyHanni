@@ -157,11 +157,9 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         if (dailyQuestHelper.greatSpook) return
-        for (text in storage.quests.toList()) {
-            if (text.contains("The Great Spook")) {
-                dailyQuestHelper.greatSpook = true
-                return
-            }
+        if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
+            dailyQuestHelper.greatSpook = true
+            return
         }
         for (text in storage.quests.toList()) {
             val split = text.split(":")
@@ -180,6 +178,15 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             }
             addQuest(quest)
         }
+    }
+
+    private fun hasGreatSpookLine(text: String) = when {
+        text.contains("The Great Spook") -> true
+        text.contains(" Days") -> true
+        text.contains("Fear: §r") -> true
+        text.contains("Primal Fears") -> true
+
+        else -> false
     }
 
     private fun addQuest(element: Quest) {
