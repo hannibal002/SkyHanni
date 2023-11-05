@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -115,7 +114,6 @@ object ProfileStorageData {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
-        tryMigrateProfileSpecific()
         loaded = true
         ConfigLoadEvent().postAndCatch()
     }
@@ -125,79 +123,6 @@ object ProfileStorageData {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
-        migratePlayerSpecific()
         ConfigLoadEvent().postAndCatch()
-    }
-
-    private fun migratePlayerSpecific() {
-        val oldHidden = SkyHanniMod.feature.hidden
-        if (oldHidden.isMigrated) return
-
-        SkyHanniMod.feature.storage?.let {
-            it.gardenJacobFarmingContestTimes = oldHidden.gardenJacobFarmingContestTimes
-        }
-    }
-
-    private fun tryMigrateProfileSpecific() {
-        val oldHidden = SkyHanniMod.feature.hidden
-        if (oldHidden.isMigrated) return
-
-        profileSpecific?.let {
-            it.currentPet = oldHidden.currentPet
-
-            for ((rawLocation, minionName) in oldHidden.minionName) {
-                val lastClick = oldHidden.minionLastClick[rawLocation] ?: -1
-                val location = LorenzVec.decodeFromString(rawLocation)
-                val minionConfig = Storage.ProfileSpecific.MinionConfig()
-                minionConfig.displayName = minionName
-                minionConfig.lastClicked = lastClick
-                it.minions[location] = minionConfig
-            }
-        }
-
-        profileSpecific?.crimsonIsle?.let {
-            it.quests = oldHidden.crimsonIsleQuests
-            it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
-            it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
-        }
-
-        profileSpecific?.garden?.let {
-            it.experience = oldHidden.gardenExp.toLong()
-            it.cropCounter = oldHidden.gardenCropCounter
-            it.cropUpgrades = oldHidden.gardenCropUpgrades
-
-            for ((crop, speed) in oldHidden.gardenCropsPerSecond) {
-                if (speed != -1) {
-                    it.cropsPerSecond[crop] = speed
-                }
-            }
-
-            it.latestBlocksPerSecond = oldHidden.gardenLatestBlocksPerSecond
-            it.latestTrueFarmingFortune = oldHidden.gardenLatestTrueFarmingFortune
-            it.savedCropAccessory = oldHidden.savedCropAccessory
-            it.dicerRngDrops = oldHidden.gardenDicerRngDrops
-            it.informedAboutLowMatter = oldHidden.informedAboutLowMatter
-            it.informedAboutLowFuel = oldHidden.informedAboutLowFuel
-            it.visitorInterval = oldHidden.visitorInterval
-            it.nextSixthVisitorArrival = oldHidden.nextSixthVisitorArrival
-            it.farmArmorDrops = oldHidden.gardenFarmingArmorDrops
-            it.composterUpgrades = oldHidden.gardenComposterUpgrades
-            it.toolWithBountiful = oldHidden.gardenToolHasBountiful
-            it.composterCurrentOrganicMatterItem = oldHidden.gardenComposterCurrentOrganicMatterItem
-            it.composterCurrentFuelItem = oldHidden.gardenComposterCurrentFuelItem
-        }
-
-        profileSpecific?.garden?.visitorDrops?.let {
-            val old = oldHidden.visitorDrops
-            it.acceptedVisitors = old.acceptedVisitors
-            it.deniedVisitors = old.deniedVisitors
-            it.visitorRarities = old.visitorRarities
-            it.copper = old.copper
-            it.farmingExp = old.farmingExp
-            it.coinsSpent = old.coinsSpent
-            it.rewardsCount = old.rewardsCount
-        }
-
-        oldHidden.isMigrated = true
     }
 }
