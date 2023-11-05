@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.projectile.EntityFishHook
+import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -39,9 +41,17 @@ class FishingBaitWarnings {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled() || bobber == null) return
-        //Is there a way to get event sent time to be more accurate?
+        if (!isEnabled()) return
+        val bobber = bobber ?: return
+        if (bobber.isDead) {
+            this.bobber = null
+            return
+        }
+        if (!event.isMod(5)) return
         if (timeLastCast.passedSince() < 1.seconds) return
+
+        val block = bobber.getLorenzVec().getBlockAt()
+        if (block in FishingAPI.getAllowedBlocks()) return
 
         if (!isUsingBait && config.noBaitWarning) showNoBaitWarning()
         reset()
@@ -56,29 +66,32 @@ class FishingBaitWarnings {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled() || !config.baitChangeWarning) return
         val bobber = bobber ?: return
-        for (entityItem in EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 1.5)) {
-            val itemStack = entityItem.entityItem
-            if (!itemStack.isBait()) continue
-            val name = itemStack.name?.removeColor() ?: continue
+        EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 1.5)
+            .forEach { onBaitDetection(it.entityItem) }
+    }
 
-            isUsingBait = true
-            lastBait?.let {
-                if (name == it) continue
-                showBaitChangeWarning(it, name)
-            }
-            lastBait = name
+    private fun onBaitDetection(itemStack: ItemStack) {
+        if (!itemStack.isBait()) return
+        val name = itemStack.name?.removeColor() ?: return
+
+        isUsingBait = true
+        lastBait?.let {
+            if (name == it) return
+            showBaitChangeWarning(it, name)
         }
+        lastBait = name
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
         SoundUtils.playClickSound()
         LorenzUtils.sendTitle("§eBait changed!", 2.seconds)
-        LorenzUtils.chat("§e[SkyHanni] Fishing Bait change detected: $before -> $after")
+        LorenzUtils.chat("§e[SkyHanni] Fishing Bait changed: $before -> $after")
     }
 
     private fun showNoBaitWarning() {
         SoundUtils.playErrorSound()
         LorenzUtils.sendTitle("§cNo bait is used!", 2.seconds)
+        LorenzUtils.chat("§e[SkyHanni] You do not use any fishing baits!")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.hasFishingRodInHand()
