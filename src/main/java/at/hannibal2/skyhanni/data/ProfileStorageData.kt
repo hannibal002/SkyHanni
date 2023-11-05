@@ -24,14 +24,15 @@ object ProfileStorageData {
 
     private var nextProfile: String? = null
 
+    // TODO USE SH-REPO
+    private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onChat(event: LorenzChatEvent) {
-        // TODO USE SH-REPO
-        "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern().matchMatcher(event.message) {
+        profileSwitchPattern.matchMatcher(event.message) {
             nextProfile = group("name").lowercase()
             loaded = false
             PreProfileSwitchEvent().postAndCatch()
@@ -53,7 +54,7 @@ object ProfileStorageData {
             LorenzUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
             return
         }
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName, "profile swap (chat message)")
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         ConfigLoadEvent().postAndCatch()
     }
 
@@ -72,7 +73,7 @@ object ProfileStorageData {
 
         if (profileSpecific == null) {
             val profileName = event.name
-            loadProfileSpecific(playerSpecific, sackPlayers, profileName, "first join (chat message)")
+            loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         }
     }
 
@@ -85,7 +86,7 @@ object ProfileStorageData {
             val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
             pattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
-                loadProfileSpecific(playerSpecific, sackPlayers, profileName, "tab list")
+                loadProfileSpecific(playerSpecific, sackPlayers, profileName)
                 nextProfile = null
                 return
             }
@@ -105,12 +106,16 @@ object ProfileStorageData {
             noTabListTime = System.currentTimeMillis()
             LorenzUtils.chat(
                 "§c[SkyHanni] Extra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+                    "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
             )
         }
     }
 
-    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, sackProfile: SackData.PlayerSpecific, profileName: String, reason: String) {
+    private fun loadProfileSpecific(
+        playerSpecific: Storage.PlayerSpecific,
+        sackProfile: SackData.PlayerSpecific,
+        profileName: String
+    ) {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
