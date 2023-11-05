@@ -23,6 +23,11 @@ public class ItemAbilityConfig {
     public boolean itemAbilityCooldownBackground = false;
 
     @Expose
+    @ConfigOption(name = "Show When Ready", desc = "Show the R and background (if enabled) when the ability is ready.")
+    @ConfigEditorBoolean
+    public boolean itemAbilityShowWhenReady = true;
+
+    @Expose
     @ConfigOption(name = "Fire Veil", desc = "")
     @Accordion
     public FireVeilWandConfig fireVeilWands = new FireVeilWandConfig();

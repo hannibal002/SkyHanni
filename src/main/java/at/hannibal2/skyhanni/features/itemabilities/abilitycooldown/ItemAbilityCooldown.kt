@@ -242,11 +242,10 @@ class ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
+        val readyText = if (SkyHanniMod.feature.itemAbilities.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long =
-                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color =
-                specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -254,7 +253,7 @@ class ItemAbilityCooldown {
                 tryHandleNextPhase(ability, specialColor)
                 return createItemText(ability)
             }
-            ItemText(LorenzColor.GREEN, "R", false, ability.alternativePosition)
+            ItemText(LorenzColor.GREEN, readyText, false, ability.alternativePosition)
         }
     }
 
@@ -293,6 +292,7 @@ class ItemAbilityCooldown {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
+                    if (!SkyHanniMod.feature.itemAbilities.itemAbilityShowWhenReady) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }
