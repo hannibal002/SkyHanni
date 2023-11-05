@@ -54,7 +54,7 @@ object CropMoneyDisplay {
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
-    private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
+    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {

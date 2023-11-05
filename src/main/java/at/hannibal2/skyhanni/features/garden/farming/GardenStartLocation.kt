@@ -27,7 +27,7 @@ object GardenStartLocation {
             return
         }
 
-        val startLocations = GardenAPI.config?.cropStartLocations
+        val startLocations = GardenAPI.storage?.cropStartLocations
         if (startLocations == null) {
             LorenzUtils.userError("The config is not yet loaded, retry in a second.")
             return
@@ -46,7 +46,7 @@ object GardenStartLocation {
     @SubscribeEvent
     fun onBlockClick(event: CropClickEvent) {
         if (!isEnabled()) return
-        val startLocations = GardenAPI.config?.cropStartLocations ?: return
+        val startLocations = GardenAPI.storage?.cropStartLocations ?: return
         val crop = GardenAPI.getCurrentlyFarmedCrop() ?: return
         if (crop != GardenCropSpeed.lastBrokenCrop) return
 
@@ -59,7 +59,7 @@ object GardenStartLocation {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        val startLocations = GardenAPI.config?.cropStartLocations ?: return
+        val startLocations = GardenAPI.storage?.cropStartLocations ?: return
         val crop = GardenAPI.cropInHand ?: return
         val location = startLocations[crop]?.add(-0.5, 0.5, -0.5) ?: return
 

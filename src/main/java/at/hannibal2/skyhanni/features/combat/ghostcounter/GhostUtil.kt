@@ -17,7 +17,7 @@ object GhostUtil {
             opt.set(0.0)
             opt.set(0.0, true)
         }
-        GhostCounter.hidden?.totalMF = 0.0
+        GhostCounter.storage?.totalMF = 0.0
         GhostCounter.update()
     }
 
@@ -79,7 +79,7 @@ object GhostUtil {
             GhostData.Option.VOLTACOUNT.add(json["VoltaCount"].asDouble)
             GhostData.Option.GHOSTLYBOOTS.add(json["GhostlyBootsCount"].asDouble)
             GhostData.Option.KILLS.add(json["ghostsKilled"].asDouble)
-            GhostCounter.hidden?.totalMF = GhostCounter.hidden?.totalMF?.plus(json["TotalMF"].asDouble)
+            GhostCounter.storage?.totalMF = GhostCounter.storage?.totalMF?.plus(json["TotalMF"].asDouble)
                 ?: json["TotalMF"].asDouble
             GhostData.Option.TOTALDROPS.add(json["TotalDrops"].asDouble)
             c.ctDataImported = true
@@ -120,7 +120,7 @@ object GhostUtil {
     )
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
-        val bestiaryNextLevel = GhostCounter.hidden?.bestiaryNextLevel
+        val bestiaryNextLevel = GhostCounter.storage?.bestiaryNextLevel
         val currentLevel =
             bestiaryNextLevel?.let { if (it.toInt() < 0) "25" else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
         val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "25" else "${it.toInt()}" }

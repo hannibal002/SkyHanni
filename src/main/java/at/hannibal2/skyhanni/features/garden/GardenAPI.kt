@@ -49,12 +49,12 @@ object GardenAPI {
     var mushroomCowPet = false
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
-    val config get() = ProfileStorageData.profileSpecific?.garden
+    val storage get() = ProfileStorageData.profileSpecific?.garden
     var gardenExp: Long?
-        get() = config?.experience
+        get() = storage?.experience
         set(value) {
             value?.let {
-                config?.experience = it
+                storage?.experience = it
             }
         }
 
@@ -164,7 +164,7 @@ object GardenAPI {
             SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
 
     fun clearCropSpeed() {
-        config?.cropsPerSecond?.clear()
+        storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
         LorenzUtils.chat("Manually reset all crop speed data!")
