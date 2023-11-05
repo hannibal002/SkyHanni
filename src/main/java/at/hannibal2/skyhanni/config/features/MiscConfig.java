@@ -25,6 +25,7 @@ public class MiscConfig {
     @ConfigOption(name = "Pet", desc = "")
     @Accordion
     public PetConfig pets = new PetConfig();
+
     public static class PetConfig {
         @Expose
         @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
@@ -40,7 +41,7 @@ public class MiscConfig {
         public static class PetExperienceToolTipConfig {
 
             @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
+            @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean petDisplay = true;
@@ -84,6 +85,7 @@ public class MiscConfig {
     @ConfigOption(name = "Potion Effects", desc = "")
     @Accordion
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
+
     public static class PotionEffectsConfig {
         @Expose
         @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
@@ -105,6 +107,7 @@ public class MiscConfig {
     @ConfigOption(name = "Particle Hider", desc = "")
     @Accordion
     public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
+
     public static class ParticleHiderConfig {
         @Expose
         @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
@@ -153,6 +156,7 @@ public class MiscConfig {
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
     @Accordion
     public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
+
     public static class EstimatedItemValueConfig {
         @Expose
         @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
@@ -173,9 +177,9 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
         @ConfigEditorSlider(
-                minValue = 1,
-                maxValue = 30,
-                minStep = 1
+            minValue = 1,
+            maxValue = 30,
+            minStep = 1
         )
         public Property<Integer> enchantmentsCap = Property.of(7);
 
@@ -210,38 +214,38 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
         @ConfigEditorDropdown(values = {
-                "Nothing",
-                "Location",
-                "Purse",
-                "Bits",
-                "Stats",
-                "Held Item",
-                "SkyBlock Date",
-                "Profile",
-                "Slayer",
-                "Custom",
-                "Dynamic",
-                "Crop Milestone",
-                "Current Pet"
+            "Nothing",
+            "Location",
+            "Purse",
+            "Bits",
+            "Stats",
+            "Held Item",
+            "SkyBlock Date",
+            "Profile",
+            "Slayer",
+            "Custom",
+            "Dynamic",
+            "Crop Milestone",
+            "Current Pet"
         })
         public Property<Integer> firstLine = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
         @ConfigEditorDropdown(values = {
-                "Nothing",
-                "Location",
-                "Purse",
-                "Bits",
-                "Stats",
-                "Held Item",
-                "SkyBlock Date",
-                "Profile",
-                "Slayer",
-                "Custom",
-                "Dynamic",
-                "Crop Milestone",
-                "Current Pet"
+            "Nothing",
+            "Location",
+            "Purse",
+            "Bits",
+            "Stats",
+            "Held Item",
+            "SkyBlock Date",
+            "Profile",
+            "Slayer",
+            "Custom",
+            "Dynamic",
+            "Crop Milestone",
+            "Current Pet"
         })
         public Property<Integer> secondLine = Property.of(0);
 
@@ -253,31 +257,31 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
         @ConfigEditorDraggableList(
-                exampleText = {
-                        "Crop Milestones",
-                        "Slayer",
-                        "Stacking Enchantment",
-                        "Dungeon",
-                        "AFK Indicator"
-                }
+            exampleText = {
+                "Crop Milestones",
+                "Slayer",
+                "Stacking Enchantment",
+                "Dungeon",
+                "AFK Indicator"
+            }
         )
         public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
         @Expose
         @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
         @ConfigEditorDropdown(values = {
-                "Nothing",
-                "Location",
-                "Purse",
-                "Bits",
-                "Stats",
-                "Held Item",
-                "SkyBlock Date",
-                "Profile",
-                "Slayer",
-                "Custom",
-                "Crop Milestone",
-                "Current Pet"
+            "Nothing",
+            "Location",
+            "Purse",
+            "Bits",
+            "Stats",
+            "Held Item",
+            "SkyBlock Date",
+            "Profile",
+            "Slayer",
+            "Custom",
+            "Crop Milestone",
+            "Current Pet"
         })
         public Property<Integer> auto = Property.of(0);
     }
@@ -291,9 +295,9 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Enable Data Tracker",
-                desc = "Tracks all of your data from doing Trevor Quests.\n" +
-                        "Shows based on the setting below."
+            name = "Enable Data Tracker",
+            desc = "Tracks all of your data from doing Trevor Quests.\n" +
+                "Shows based on the setting below."
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -301,33 +305,33 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Show Between Quests",
-                desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                        "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
+            name = "Show Between Quests",
+            desc = "Shows the tracker during and between quests otherwise it will only show during them." +
+                "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
         )
         @ConfigEditorBoolean
         public boolean displayType = true;
 
         @Expose
         @ConfigOption(
-                name = "Text Format",
-                desc = "Drag text to change the appearance of the overlay."
+            name = "Text Format",
+            desc = "Drag text to change the appearance of the overlay."
         )
         @ConfigEditorDraggableList(
-                exampleText = {
-                        "§b§lTrevor Data Tracker",
-                        "§b1,428 §9Quests Started",
-                        "§b11,281 §5Total Pelts Gained",
-                        "§b2,448 §5Pelts Per Hour",
-                        "",
-                        "§b850 §cKilled Animals",
-                        "§b153 §cSelf Killing Animals",
-                        "§b788 §fTrackable Animals",
-                        "§b239 §aUntrackable Animals",
-                        "§b115 §9Undetected Animals",
-                        "§b73 §5Endangered Animals",
-                        "§b12 §6Elusive Animals"
-                }
+            exampleText = {
+                "§b§lTrevor Data Tracker",
+                "§b1,428 §9Quests Started",
+                "§b11,281 §5Total Pelts Gained",
+                "§b2,448 §5Pelts Per Hour",
+                "",
+                "§b850 §cKilled Animals",
+                "§b153 §cSelf Killing Animals",
+                "§b788 §fTrackable Animals",
+                "§b239 §aUntrackable Animals",
+                "§b115 §9Undetected Animals",
+                "§b73 §5Endangered Animals",
+                "§b12 §6Elusive Animals"
+            }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11));
 
@@ -336,7 +340,7 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
-                "§cWill not help you to find rabbits or sheep in the Oasis!")
+            "§cWill not help you to find rabbits or sheep in the Oasis!")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean trapperSolver = true;
@@ -360,7 +364,7 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
-                "§eRequires the relevant above settings to be toggled")
+            "§eRequires the relevant above settings to be toggled")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int keyBindWarpTrapper = Keyboard.KEY_NONE;
 
@@ -373,8 +377,8 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Trapper Cooldown GUI",
-                desc = "Show the cooldown on screen in an overlay (intended for Abiphone users)."
+            name = "Trapper Cooldown GUI",
+            desc = "Show the cooldown on screen in an overlay (intended for Abiphone users)."
         )
         @ConfigEditorBoolean
         public boolean trapperCooldownGui = false;
@@ -490,6 +494,49 @@ public class MiscConfig {
             @ConfigEditorBoolean
             public boolean behindBlocks = false;
         }
+
+        @Expose
+        @ConfigOption(name = "Arrow Trail", desc = "")
+        @Accordion
+        public ArrowTrailConfig arrowTrailConfig = new ArrowTrailConfig();
+
+        public static class ArrowTrailConfig {
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Draw a colored line behind arrows in the air.")
+            @ConfigEditorBoolean
+            @FeatureToggle
+            public boolean enabled = false;
+
+            @Expose
+            @ConfigOption(name = "Hide Nonplayer Arrows", desc = "Only shows for arrows the player has shot.")
+            @ConfigEditorBoolean
+            public boolean hideOtherArrows = true;
+
+            @Expose
+            @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
+            @ConfigEditorColour
+            public String arrowColor = "0:200:85:255:85";
+
+            @Expose
+            @ConfigOption(name = "Player Arrows", desc = "Different color for the line of arrows that you have shot.")
+            @ConfigEditorBoolean
+            public boolean handlePlayerArrowsDifferently = false;
+
+            @Expose
+            @ConfigOption(name = "Player Arrow Color", desc = "Color of the line of your own arrows.")
+            @ConfigEditorColour
+            public String playerArrowColor = "0:200:85:255:255";
+
+            @Expose
+            @ConfigOption(name = "Time Alive", desc = "Time in seconds until the trail fades out.")
+            @ConfigEditorSlider(minStep = 0.1f, minValue = 0.1f, maxValue = 10)
+            public float secondsAlive = 0.5f;
+
+            @Expose
+            @ConfigOption(name = "Line Width", desc = "Width of the line.")
+            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+            public int lineWidth = 4;
+        }
     }
 
 
@@ -534,8 +581,8 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(
-                name = "Outline Color",
-                desc = "The color to outline party members in."
+            name = "Outline Color",
+            desc = "The color to outline party members in."
         )
         @ConfigEditorColour
         public String outlineColor = "0:245:85:255:85";
@@ -551,7 +598,7 @@ public class MiscConfig {
     public static class CompactTabListConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
-                "doesn't break god-pot detection and shortens some other lines.")
+            "doesn't break god-pot detection and shortens some other lines.")
         //made tablist one word here so both searches will pick it up
         @ConfigEditorBoolean
         @FeatureToggle
@@ -626,9 +673,9 @@ public class MiscConfig {
 
             @Expose
             @ConfigOption(
-                    name = "Mark SkyHanni Devs",
-                    desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
-                            "§eThose are the folks that coded the mod for you for free :)"
+                name = "Mark SkyHanni Devs",
+                desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
+                    "§eThose are the folks that coded the mod for you for free :)"
             )
             @ConfigEditorBoolean
             public boolean markSkyHanniContributors = false;
@@ -770,14 +817,17 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
-            name = "Time In Limbo",
-            desc = "Show the time since you entered the limbo.")
+        name = "Time In Limbo",
+        desc = "Show the time since you entered the limbo.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showTimeInLimbo = true;
 
     @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
+    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);

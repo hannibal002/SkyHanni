@@ -63,10 +63,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
+import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.util.Locale
@@ -78,6 +81,7 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     private var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var currentlyShowing = false
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -95,20 +99,43 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onTooltip(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return
-        if (System.currentTimeMillis() > lastToolTipTime + 200) return
+
+        if (Minecraft.getMinecraft().currentScreen is GuiProfileViewer) {
+            updateItem(event.itemStack)
+            tryRendering()
+        }
+    }
+
+    private fun tryRendering() {
+        currentlyShowing = checkCurrentlyVisible()
+        if (!currentlyShowing) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        tryRendering()
+    }
+
+    private fun checkCurrentlyVisible(): Boolean {
+        if (!LorenzUtils.inSkyBlock) return false
+        if (!config.enabled) return false
+        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
+        if (System.currentTimeMillis() > lastToolTipTime + 200) return false
+
+        if (display.isEmpty()) return false
+
+        return true
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }
-
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -122,7 +149,10 @@ object EstimatedItemValue {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
-        val item = event.stack
+        updateItem(event.stack)
+    }
+
+    private fun updateItem(item: ItemStack) {
         val oldData = cache[item]
         if (oldData != null) {
             display = oldData
@@ -249,7 +279,7 @@ object EstimatedItemValue {
             if (price != null) {
                 list.add(
                     "§7Attribute §9${
-                        attributes[0].first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                        attributes[0].first.fixMending().split("_").joinToString(" ") { it.firstLetterUppercase() }
                     } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
                 )
                 return price
@@ -272,8 +302,7 @@ object EstimatedItemValue {
             if (price != null) {
                 subTotal += price
             }
-            var displayName = attr.first
-            if (displayName == ("MENDING")) displayName = "VITALITY"
+            val displayName = attr.first.fixMending()
             list.add(
                 "  §9${
                     displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
@@ -282,6 +311,8 @@ object EstimatedItemValue {
         }
         return subTotal
     }
+
+    private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
         return (1..10).mapNotNull { lowerLevel ->
@@ -573,7 +604,6 @@ object EstimatedItemValue {
         val enrichmentName = stack.getEnrichment() ?: return 0.0
         val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".asInternalName()
 
-
         val price = internalName.getPrice()
         val name = internalName.getItemName()
         list.add("§7Enrichment: $name §7(§6" + NumberUtil.format(price) + "§7)")
@@ -684,7 +714,6 @@ object EstimatedItemValue {
             val itemStack = enchantmentName.getItemStackOrNull() ?: continue
             val singlePrice = enchantmentName.getPriceOrNull() ?: continue
 
-
             var name = itemStack.getLore()[0]
             if (multiplier > 1) {
                 name = "§8${multiplier}x $name"
@@ -792,8 +821,8 @@ object EstimatedItemValue {
 
             // eg. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
-                    // If the slot index is 0, we don't need to specify
-                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+                // If the slot index is 0, we don't need to specify
+                if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
 
             priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
         }
@@ -810,6 +839,6 @@ object EstimatedItemValue {
         event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")
         event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
         event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
-        event.move(3,"misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
+        event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
     }
 }
