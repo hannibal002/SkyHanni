@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenPlotIcon {
 
     private val config get() = SkyHanniMod.feature.garden.plotIcon
-    private val plotList get() = GardenAPI.config?.plotIcon?.plotList
+    private val plotList get() = GardenAPI.storage?.plotIcon?.plotList
     private var inInventory = false
     private var copyStack: ItemStack? = null
     private var editMode = 0 // 0 = off, 1 = on, 2 = reset

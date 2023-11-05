@@ -33,10 +33,10 @@ class GardenVisitorTimer {
     //TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Long?
-        get() = GardenAPI.config?.visitorInterval
+        get() = GardenAPI.storage?.visitorInterval
         set(value) {
             value?.let {
-                GardenAPI.config?.visitorInterval = it
+                GardenAPI.storage?.visitorInterval = it
             }
         }
 
@@ -99,7 +99,7 @@ class GardenVisitorTimer {
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
                 visitorInterval = ((millis - 1) / 60_000L + 1) * 60_000L
-                GardenAPI.config?.visitorInterval = visitorInterval
+                GardenAPI.storage?.visitorInterval = visitorInterval
             } else {
                 updateSixthVisitorArrivalTime()
             }
@@ -112,7 +112,7 @@ class GardenVisitorTimer {
                 sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime - System.currentTimeMillis()
-            GardenAPI.config?.nextSixthVisitorArrival =
+            GardenAPI.storage?.nextSixthVisitorArrival =
                 System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
             if (isSixthVisitorEnabled() && millis < 0) {
                 visitorsAmount++
@@ -156,7 +156,7 @@ class GardenVisitorTimer {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
-        GardenAPI.config?.nextSixthVisitorArrival?.let {
+        GardenAPI.storage?.nextSixthVisitorArrival?.let {
             sixthVisitorArrivalTime = it
         }
         sixthVisitorReady = false

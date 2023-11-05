@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class FarmingArmorDrops {
     private var display = emptyList<String>()
-    private val storage get() = GardenAPI.config
+    private val storage get() = GardenAPI.storage
 
     private var hasArmor = false
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
