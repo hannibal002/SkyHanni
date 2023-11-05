@@ -737,10 +737,10 @@ public class MiscConfig {
     @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public boolean playerMovementSpeed = false;
 
     @Expose
-    public Position position = new Position(394, 124, false, true);
+    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")

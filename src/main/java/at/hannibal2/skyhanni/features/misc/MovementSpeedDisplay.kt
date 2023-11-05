@@ -41,8 +41,8 @@ class MovementSpeedDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderString(display, posLabel = "Movement Speed")
+        config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = LorenzUtils.onHypixel && (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(13)) && config.enabled
+    fun isEnabled() = LorenzUtils.onHypixel && (LorenzUtils.inSkyBlock || SkyHanniMod.feature.misc.showOutsideSB.contains(13)) && config.playerMovementSpeed
 }
