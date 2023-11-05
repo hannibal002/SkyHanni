@@ -824,6 +824,12 @@ public class MiscConfig {
     public boolean showTimeInLimbo = true;
 
     @Expose
+    @ConfigOption(name = "Abiphone Contacts Progress", desc = "Displays the progress you've been making on upgrading your Abiphone contact slots.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean abiphoneContactsProgress = false;
+
+    @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -14,8 +16,10 @@ class AbiphoneContactSlots {
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyHanniMod.feature.misc.abiphoneContactsProgress) return
         if (Minecraft.getMinecraft().currentScreen == null) return
-        if(Minecraft.getMinecraft().currentScreen is GuiEditSign) return
+        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) return
         val itemStack = event.itemStack
         if (!(itemStack.getInternalName().asString().contains("ABIPHONE_"))) return
         val itemLore = itemStack.getLore()
