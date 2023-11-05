@@ -20,9 +20,8 @@ object NEUVersionCheck {
             neuWarning(
                 "NotEnoughUpdates is missing!\n" +
                     "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                    "You currently need NEU version 2.1.1-Pre-4 or later.\n\n" +
-                    "NEU 2.1 is NOT the latest version.\n\n" +
-                    "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
+                    "You currently need NEU version 2.1.1-Pre-4 or later.\n" +
+                    "NEU 2.1 is NOT the latest version.\n" +
                     "Use these links to download the latest version:"
             )
             return
@@ -38,9 +37,8 @@ object NEUVersionCheck {
         }
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
-                "You currently need NEU version 2.1.1-Pre-4 or later.\n\n" +
-                "NEU 2.1 is NOT the latest version.\n\n" +
-                "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
+                "You currently need NEU version 2.1.1-Pre-4 or later.\n" +
+                "NEU 2.1 is NOT the latest version.\n" +
                 "Use these links to download the latest version:"
         )
     }
