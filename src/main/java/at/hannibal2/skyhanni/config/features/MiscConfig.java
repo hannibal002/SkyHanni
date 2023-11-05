@@ -731,7 +731,7 @@ public class MiscConfig {
             "Movement Speed" // 13
         }
     )
-    public List<Integer> showOutsideSB = new ArrayList<>(Arrays.asList());
+    public List<Integer> showOutsideSB = new ArrayList<>();
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
