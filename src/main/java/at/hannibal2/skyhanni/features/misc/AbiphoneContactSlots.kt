@@ -36,7 +36,7 @@ class AbiphoneContactSlots {
         else {
             for (eachInt in contacts) if (eachInt.toIntOrNull() != null) total += eachInt.toInt()
             if (total > -1) {
-                event.toolTip.add(index, " §7Contacts Progress: §b$total§7/§b${allPossibleUpgrades.sum()}")
+                event.toolTip.add(index, " §7Contacts Progress: §b$total§7/§b${(allPossibleUpgrades.sum() + contacts.first().toInt())}")
             }
             else { //this is in case hypixel changes formatting but still keeps spaces somehow
                 event.toolTip.add(index, " §8Could not calculate contact slots. [SkyHanni]")
