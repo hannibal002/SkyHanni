@@ -31,22 +31,22 @@ object FortuneUpgrades {
     val cropSpecificUpgrades = mutableListOf<FortuneUpgrade>()
 
     fun generateGenericUpgrades() {
-        val hidden = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         genericUpgrades.clear()
 
-        if (hidden.plotsUnlocked != -1 && hidden.plotsUnlocked != 24) {
+        if (storage.plotsUnlocked != -1 && storage.plotsUnlocked != 24) {
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Unlock your ${(hidden.plotsUnlocked + 1).addSuffix()} §7plot",
-                    null, "COMPOST", compostNeeded[hidden.plotsUnlocked], 3.0
+                    "§7Unlock your ${(storage.plotsUnlocked + 1).addSuffix()} §7plot",
+                    null, "COMPOST", compostNeeded[storage.plotsUnlocked], 3.0
                 )
             )
         }
-        if (hidden.anitaUpgrade != -1 && hidden.anitaUpgrade != 15) {
+        if (storage.anitaUpgrade != -1 && storage.anitaUpgrade != 15) {
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
-                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 4.0
+                    "§7Upgrade Anita bonus to level ${storage.anitaUpgrade + 1}",
+                    null, "JACOBS_TICKET", anitaTicketsNeeded[storage.anitaUpgrade], 4.0
                 )
             )
         }
@@ -91,7 +91,7 @@ object FortuneUpgrades {
     }
 
     private fun getEquipmentUpgrades() {
-        val visitors = GardenAPI.config?.uniqueVisitors?.toDouble() ?: 0.0
+        val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in equipment) {
             val item = piece.getItem()
             //todo tell them to buy the missing item
