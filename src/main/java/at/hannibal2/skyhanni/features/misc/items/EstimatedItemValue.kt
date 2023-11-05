@@ -59,8 +59,21 @@ object EstimatedItemValue {
 
         if (Minecraft.getMinecraft().currentScreen is GuiProfileViewer) {
             updateItem(event.itemStack)
-            tryRendering()
+            if (!blockNextFrame && renderedItems < 2) {
+                tryRendering()
+            }
+            renderedItems++
         }
+    }
+
+    // Workaround for NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering over the border between two items.
+    private var renderedItems = 0
+    private var blockNextFrame = false
+
+    @SubscribeEvent
+    fun onRenderOverlayGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        blockNextFrame = renderedItems > 1
+        renderedItems = 0
     }
 
     private fun tryRendering() {
