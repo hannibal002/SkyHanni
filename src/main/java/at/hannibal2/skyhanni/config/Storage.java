@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.tracker.TrackerData;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
@@ -304,7 +305,13 @@ public class Storage {
         @Expose
         public Map<Integer, PowderTracker> powderTracker = new HashMap<>();
 
-        public static class PowderTracker {
+        public static class PowderTracker extends TrackerData {
+
+            public void reset() {
+                rewards.clear();
+                totalChestPicked = 0;
+            }
+
             @Expose
             public int totalChestPicked = 0;
 
@@ -353,7 +360,14 @@ public class Storage {
         @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
 
-        public static class SlayerProfitList {
+        public static class SlayerProfitList extends TrackerData {
+
+            public void reset() {
+                items.clear();
+                mobKillCoins = 0;
+                slayerSpawnCost = 0;
+                slayerCompletedCount = 0;
+            }
 
             @Expose
             public Map<NEUInternalName, SlayerItemProfit> items = new HashMap<>();

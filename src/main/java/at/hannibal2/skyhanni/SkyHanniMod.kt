@@ -605,7 +605,7 @@ class SkyHanniMod {
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
-        loadModule(PowderTracker())
+        loadModule(PowderTracker)
         loadModule(ModifyVisualWords)
         loadModule(TabListReader)
         loadModule(TabListRenderer)
