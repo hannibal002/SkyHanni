@@ -306,6 +306,7 @@ import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
 import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -689,6 +690,7 @@ class SkyHanniMod {
         val sackData: SackData get() = configManager.sackData
         val friendsData: FriendsJson get() = configManager.friendsData
         val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
+        val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
 
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager

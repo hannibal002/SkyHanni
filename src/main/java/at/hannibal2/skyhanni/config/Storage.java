@@ -38,9 +38,6 @@ public class Storage {
     public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
 
     @Expose
-    public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
-
-    @Expose
     public List<VisualWord> modifiedWords = new ArrayList<>();
 
     @Expose

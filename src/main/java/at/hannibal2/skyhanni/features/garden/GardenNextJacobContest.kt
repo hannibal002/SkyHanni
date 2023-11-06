@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -182,7 +183,7 @@ object GardenNextJacobContest {
     }
 
     private fun saveConfig() {
-        val map = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
+        val map = SkyHanniMod.jacobContestsData.contestTimes
         map.clear()
 
         val currentYear = SkyBlockTime.now().year
@@ -193,11 +194,12 @@ object GardenNextJacobContest {
 
             map[contest.endTime] = contest.crops
         }
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.JACOB_CONTESTS, "Save contests")
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val savedContests = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
+        val savedContests = SkyHanniMod.jacobContestsData.contestTimes
         val year = savedContests.firstNotNullOfOrNull {
             val endTime = it.key
 

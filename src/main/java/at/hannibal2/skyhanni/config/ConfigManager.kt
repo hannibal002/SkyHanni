@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
 import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -109,6 +110,8 @@ class ConfigManager {
         private set
     lateinit var knownFeaturesData: KnownFeaturesJson
         private set
+    lateinit var jacobContestData: JacobContestsJson
+        private set
 
     private val logger = LorenzLogger("config_manager")
 
@@ -118,6 +121,7 @@ class ConfigManager {
     private var sackFile: File? = null
     private var friendsFile: File? = null
     private var knowFeaturesFile: File? = null
+    private var jacobContestsFile: File? = null
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
@@ -132,12 +136,13 @@ class ConfigManager {
         sackFile = File(configDirectory, "sacks.json")
         friendsFile = File(configDirectory, "friends.json")
         knowFeaturesFile = File(configDirectory, "known_features.json")
+        jacobContestsFile = File(configDirectory, "jacob_contests.json")
 
         features = firstLoadFile(configFile, ConfigFileType.FEATURES, Features(), true)
         sackData = firstLoadFile(sackFile, ConfigFileType.SACKS, SackData(), false)
         friendsData = firstLoadFile(friendsFile, ConfigFileType.FRIENDS, FriendsJson(), false)
-        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES,
-            KnownFeaturesJson(), false)
+        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES, KnownFeaturesJson(), false)
+        jacobContestData = firstLoadFile(jacobContestsFile, ConfigFileType.JACOB_CONTESTS, JacobContestsJson(), false)
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
@@ -202,6 +207,7 @@ class ConfigManager {
             ConfigFileType.SACKS -> saveFile(sackFile, fileType.fileName, SkyHanniMod.sackData, reason)
             ConfigFileType.FRIENDS -> saveFile(friendsFile, fileType.fileName, SkyHanniMod.friendsData, reason)
             ConfigFileType.KNOWN_FEATURES -> saveFile(knowFeaturesFile, fileType.fileName, SkyHanniMod.knownFeaturesData, reason)
+            ConfigFileType.JACOB_CONTESTS -> saveFile(jacobContestsFile, fileType.fileName, SkyHanniMod.jacobContestsData, reason)
         }
     }
 
@@ -240,5 +246,6 @@ enum class ConfigFileType(val fileName: String) {
     SACKS("sacks"),
     FRIENDS("friends"),
     KNOWN_FEATURES("known_features"),
+    JACOB_CONTESTS("jacob_contests"),
     ;
 }
