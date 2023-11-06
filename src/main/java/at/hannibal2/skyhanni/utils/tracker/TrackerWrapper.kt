@@ -13,4 +13,6 @@ class TrackerWrapper<T : TrackerData>(
         DisplayMode.TOTAL -> total
         DisplayMode.CURRENT -> currentSession
     }
+
+    fun getCurrent() = get(TrackerUtils.currentDisplayMode)
 }

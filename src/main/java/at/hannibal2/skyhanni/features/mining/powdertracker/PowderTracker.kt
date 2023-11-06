@@ -342,7 +342,7 @@ object PowderTracker {
         val perMin: MutableList<Long>
     )
 
-    private fun currentDisplay() = currentLog()?.get(TrackerUtils.currentDisplayMode)
+    private fun currentDisplay() = currentLog()?.getCurrent()
 
     private fun currentLog(): TrackerWrapper<Storage.ProfileSpecific.PowderTracker>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null

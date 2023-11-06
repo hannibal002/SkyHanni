@@ -119,7 +119,7 @@ object SlayerItemProfitTracker {
         update()
     }
 
-    private fun currentDisplay() = currentLog()?.get(TrackerUtils.currentDisplayMode)
+    private fun currentDisplay() = currentLog()?.getCurrent()
 
     private fun currentLog(): TrackerWrapper<SlayerProfitList>? {
         if (itemLogCategory == "") return null
