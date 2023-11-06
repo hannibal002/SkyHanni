@@ -199,7 +199,7 @@ class ConfigManager {
         saveFile(sackFile, "sacks", SkyHanniMod.sackData, reason)
     }
 
-    private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
+    fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
         logger.log("saveConfig: $reason")
         if (file == null) throw Error("Can not save $fileName, ${fileName}File is null!")

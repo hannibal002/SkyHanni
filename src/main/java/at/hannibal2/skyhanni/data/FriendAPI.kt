@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -60,7 +61,8 @@ class FriendAPI {
     }
 
     fun saveConfig() {
-        file.writeText(ConfigManager.gson.toJson(friendsJson))
+        val friendsJsonCopy = friendsJson ?: return
+        SkyHanniMod.configManager.saveFile(file, "friends", friendsJsonCopy, "Save file")
     }
 
     @SubscribeEvent
