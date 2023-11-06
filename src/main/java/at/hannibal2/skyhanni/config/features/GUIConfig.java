@@ -139,7 +139,7 @@ public class GUIConfig {
             desc = "Show the date's ordinal suffix. Ex: (1st <-> 1, 22nd <-> 22, 23rd <-> 3, 24th <-> 24, etc.)"
         )
         @ConfigEditorBoolean
-        @FeatureToggle
+        //@FeatureToggle
         public boolean includeOrdinal = false;
 
         @Expose
