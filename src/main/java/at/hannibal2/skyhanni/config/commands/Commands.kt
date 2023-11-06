@@ -378,10 +378,10 @@ object Commands {
     }
 
     private fun clearFarmingItems() {
-        val config = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         LorenzUtils.chat("§e[SkyHanni] clearing farming items")
-        config.farmingItems.clear()
-        config.outdatedItems.clear()
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
