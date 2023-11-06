@@ -51,7 +51,7 @@ public class Features extends Config {
 
     @Override
     public void saveNow() {
-        SkyHanniMod.configManager.saveConfig("close-gui");
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui");
     }
 
     @Override
