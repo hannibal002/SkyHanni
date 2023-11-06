@@ -24,22 +24,22 @@ class CurrentPetDisplay {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         val message = event.message
-        val hidden = ProfileStorageData.profileSpecific ?: return
+        val storage = ProfileStorageData.profileSpecific ?: return
 
         var blocked = false
         if (message.matchRegex("§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE")) {
-            hidden.currentPet = message.between("] ", "§e!")
+            storage.currentPet = message.between("] ", "§e!")
             blocked = true
         }
 
         if (!LorenzUtils.inSkyBlock) return
 
         if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
-            hidden.currentPet = message.between("your §r", "§r§a")
+            storage.currentPet = message.between("your §r", "§r§a")
             blocked = true
         }
         if (message.matchRegex("§aYou despawned your §r(.*)§r§a!")) {
-            hidden.currentPet = ""
+            storage.currentPet = ""
             blocked = true
         }
 
@@ -50,7 +50,7 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
+        val storage = ProfileStorageData.profileSpecific ?: return
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
@@ -58,7 +58,7 @@ class CurrentPetDisplay {
         for (line in lore) {
             selectedPetPattern.matchMatcher(line) {
                 val newPet = group("pet")
-                config.currentPet = if (newPet != "§cNone") newPet else ""
+                storage.currentPet = if (newPet != "§cNone") newPet else ""
             }
         }
     }
@@ -69,9 +69,9 @@ class CurrentPetDisplay {
         if (RiftAPI.inRift()) return
 
         if (!config.display) return
-        val hidden = ProfileStorageData.profileSpecific ?: return
+        val storage = ProfileStorageData.profileSpecific ?: return
 
-        config.petDisplayPos.renderString(hidden.currentPet, posLabel = "Current Pet")
+        config.petDisplayPos.renderString(storage.currentPet, posLabel = "Current Pet")
     }
 
     @SubscribeEvent

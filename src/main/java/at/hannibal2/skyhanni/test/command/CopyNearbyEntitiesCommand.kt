@@ -45,6 +45,7 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("name: '" + entity.name + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
+                resultList.add("uuid version: ${entity.uniqueID.version()} ${if(entity.uniqueID.version() != 4) "NPC " else ""}(${entity.uniqueID})")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")

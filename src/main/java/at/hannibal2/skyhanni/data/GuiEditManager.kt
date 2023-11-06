@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
+import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -26,7 +27,7 @@ class GuiEditManager {
         if (isInGui()) return
 
         Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
+            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign && it !is GuiProfileViewer) return
             if (it is GuiEditSign && !it.isRancherSign()) return
         }
 

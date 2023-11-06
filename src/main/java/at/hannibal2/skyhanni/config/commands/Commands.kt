@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -166,9 +167,9 @@ object Commands {
         registerCommand(
             "shcopytranslation",
             "<language code (2 letters)> <messsage to translate>\n" +
-                    "Requires the Chat > Translator feature to be enabled.\n" +
-                    "Copies the translation for a given message to your clipboard. " +
-                    "Language codes are at the end of the translation when you click on a message."
+                "Requires the Chat > Translator feature to be enabled.\n" +
+                "Copies the translation for a given message to your clipboard. " +
+                "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shmouselock",
@@ -215,9 +216,17 @@ object Commands {
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
         registerCommand(
+            "shpumpkin",
+            "Toggles receiving the 12 fortune from pumpkins"
+        ) { CaptureFarmingGear.reversePumpkinFortune() }
+        registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
+        registerCommand(
+            "shkingfix",
+            "Reseting the local King Talisman Helper offset."
+        ) { KingTalismanHelper.kingFix() }
     }
 
     private fun developersDebugFeatures() {
@@ -363,15 +372,16 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
+            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
 
     private fun clearFarmingItems() {
-        val config = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         LorenzUtils.chat("§e[SkyHanni] clearing farming items")
-        config.farmingItems.clear()
-        config.outdatedItems.clear()
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
@@ -383,7 +393,7 @@ object Commands {
         name: String,
         description: String,
         function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
     ) {
         val command = SimpleCommand(
             name,
