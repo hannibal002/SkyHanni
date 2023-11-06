@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.misc.massconfiguration.KnownFeaturesJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -106,6 +107,8 @@ class ConfigManager {
         private set
     lateinit var friendsData: FriendsJson
         private set
+    lateinit var knownFeaturesData: KnownFeaturesJson
+        private set
 
     private val logger = LorenzLogger("config_manager")
 
@@ -114,6 +117,7 @@ class ConfigManager {
     private var configFile: File? = null
     private var sackFile: File? = null
     private var friendsFile: File? = null
+    private var knowFeaturesFile: File? = null
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
@@ -127,10 +131,12 @@ class ConfigManager {
         configFile = File(configDirectory, "config.json")
         sackFile = File(configDirectory, "sacks.json")
         friendsFile = File(configDirectory, "friends.json")
+        knowFeaturesFile = File(configDirectory, "known_features.json")
 
         features = firstLoadFile(configFile, ConfigFileType.FEATURES, Features(), true)
         sackData = firstLoadFile(sackFile, ConfigFileType.SACKS, SackData(), false)
         friendsData = firstLoadFile(friendsFile, ConfigFileType.FRIENDS, FriendsJson(), false)
+        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES, KnownFeaturesJson(), false)
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
@@ -194,6 +200,7 @@ class ConfigManager {
             ConfigFileType.FEATURES -> saveFile(configFile, fileType.fileName, SkyHanniMod.feature, reason)
             ConfigFileType.SACKS -> saveFile(sackFile, fileType.fileName, SkyHanniMod.sackData, reason)
             ConfigFileType.FRIENDS -> saveFile(friendsFile, fileType.fileName, SkyHanniMod.friendsData, reason)
+            ConfigFileType.KNOWN_FEATURES -> saveFile(knowFeaturesFile, fileType.fileName, SkyHanniMod.knownFeaturesData, reason)
         }
     }
 
@@ -231,5 +238,6 @@ enum class ConfigFileType(val fileName: String) {
     FEATURES("config"),
     SACKS("sacks"),
     FRIENDS("friends"),
+    KNOWN_FEATURES("known_features"),
     ;
 }

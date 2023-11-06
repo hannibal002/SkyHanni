@@ -231,6 +231,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.massconfiguration.KnownFeaturesJson
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
@@ -687,6 +688,7 @@ class SkyHanniMod {
         val feature: Features get() = configManager.features
         val sackData: SackData get() = configManager.sackData
         val friendsData: FriendsJson get() = configManager.friendsData
+        val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
 
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
