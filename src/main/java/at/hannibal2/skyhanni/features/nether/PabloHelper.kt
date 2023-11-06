@@ -32,7 +32,7 @@ class PabloHelper {
 
         if (InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) == true } > 0) return
 
-        LorenzUtils.clickableChat("§e[SkyHanni] Click here to grab an $itemName from sacks!", "gfs $itemName 1")
+        LorenzUtils.clickableChat("Click here to grab an $itemName from sacks!", "gfs $itemName 1")
         lastSentMessage = SimpleTimeMark.now()
     }
 
