@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
 import at.hannibal2.skyhanni.utils.tracker.TrackerWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -185,23 +185,16 @@ object PowderTracker {
         display = formatDisplay(drawDisplay())
     }
 
-    private fun formatDisplay(map: List<List<Any>>) = buildList<List<Any>> {
+    private fun formatDisplay(map: List<List<Any>>) = buildList {
         if (map.isEmpty()) return@buildList
         for (index in config.textFormat.get()) {
             add(map[index])
         }
 
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            addAsSingletonList(Renderable.clickAndHover(
-                "§cReset session!",
-                listOf("§cThis will reset your", "§ccurrent session for", "§cPowder Tracker"),
-            ) {
-                currentLog()?.get(DisplayMode.CURRENT)?.let {
-                    TrackerUtils.reset(it) {
-                        saveAndUpdate()
-                    }
-                }
-            })
+            addSessionResetButton("Powder Tracker", currentLog()) {
+                saveAndUpdate()
+            }
         }
     }
 

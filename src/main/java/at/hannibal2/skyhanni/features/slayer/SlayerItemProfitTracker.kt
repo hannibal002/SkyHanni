@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
 import at.hannibal2.skyhanni.utils.tracker.TrackerWrapper
 import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
@@ -319,14 +320,9 @@ object SlayerItemProfitTracker {
             )
         }
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            addAsSingletonList(
-                Renderable.clickAndHover(
-                    "§cReset session!",
-                    listOf("§cThis will reset your", "§ccurrent session for", "§c$itemLogCategory"),
-                ) {
-                    resetData(DisplayMode.CURRENT)
-                    update()
-                })
+            addSessionResetButton("$itemLogCategory Slayer", currentLog()) {
+                update()
+            }
         }
     }
 

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 object TrackerUtils {
 
@@ -17,6 +19,24 @@ object TrackerUtils {
                 update()
             }
         )
+    }
+
+    fun MutableList<List<Any>>.addSessionResetButton(name: String, data: TrackerWrapper<*>?, update: () -> Unit) {
+        addAsSingletonList(
+            Renderable.clickAndHover(
+                "§cReset session!",
+                listOf(
+                    "§cThis will reset your",
+                    "§ccurrent session for",
+                    "§c$name"
+                ),
+            ) {
+                data?.get(DisplayMode.CURRENT)?.let {
+                    reset(it) {
+                        update()
+                    }
+                }
+            })
     }
 
     fun resetCommand(name: String, command: String, args: Array<String>, data: TrackerData, update: () -> Unit) {
