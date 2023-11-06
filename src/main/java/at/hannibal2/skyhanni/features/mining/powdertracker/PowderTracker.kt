@@ -46,7 +46,6 @@ object PowderTracker {
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var powderTimer = ""
-    private var currentDisplayMode = DisplayMode.TOTAL
     private var inventoryOpen = false
     private var currentSessionData = mutableMapOf<Int, Storage.ProfileSpecific.PowderTracker>()
     private val gemstones = listOf(
@@ -192,7 +191,6 @@ object PowderTracker {
             add(map[index])
         }
 
-        // TODO this does not work right now. idk why
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
             addAsSingletonList(Renderable.clickAndHover(
                 "§cReset session!",
@@ -218,7 +216,7 @@ object PowderTracker {
         }
 
         val both = currentLog() ?: return@buildList
-        val display = both.get(currentDisplayMode)
+        val display = both.get(TrackerUtils.currentDisplayMode)
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
@@ -314,7 +312,7 @@ object PowderTracker {
 
     private fun calculate(info: ResourceInfo, reward: PowderChestReward) {
         val both = currentLog() ?: return
-        val display = both.get(currentDisplayMode)
+        val display = both.get(TrackerUtils.currentDisplayMode)
         val rewards = display.rewards
         info.estimated = 0
         info.estimated += rewards.getOrDefault(reward, 0)
@@ -322,7 +320,7 @@ object PowderTracker {
 
     private fun calculateChest() {
         val both = currentLog() ?: return
-        val display = both.get(currentDisplayMode)
+        val display = both.get(TrackerUtils.currentDisplayMode)
         chestInfo.estimated = 0
         chestInfo.estimated += display.totalChestPicked
     }
