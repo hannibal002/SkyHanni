@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropCounter;
 import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
@@ -144,7 +145,18 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public Map<String, Integer> dicerRngDrops = new HashMap<>();
+            public DicerRngDropTracker dicerRngDrops = new DicerRngDropTracker();
+
+            public static class DicerRngDropTracker extends TrackerData {
+
+                public void reset() {
+                    drops.clear();
+                }
+
+                @Expose
+                public Map<CropType, Map<DicerRngDropCounter.DropRarity, Integer>> drops = new HashMap<>();
+
+            }
 
             @Expose
             public long informedAboutLowMatter = 0;
