@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-class TrackerWrapper<T : TrackerData>(
+class SharedTracker<T : TrackerData>(
     private val total: T,
     private val currentSession: T,
 ) {

@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.tracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SharedTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
-import at.hannibal2.skyhanni.utils.tracker.TrackerWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.boss.BossStatus
@@ -90,7 +90,7 @@ object PowderTracker {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val msg = event.message
-        val both = currentLog() ?: return
+        val both = getSharedTracker() ?: return
 
         if (config.greatExplorerMaxed) {
             uncovered.matchMatcher(msg) {
@@ -192,7 +192,7 @@ object PowderTracker {
         }
 
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            addSessionResetButton("Powder Tracker", currentLog()) {
+            addSessionResetButton("Powder Tracker", getSharedTracker()) {
                 saveAndUpdate()
             }
         }
@@ -342,12 +342,12 @@ object PowderTracker {
         val perMin: MutableList<Long>
     )
 
-    private fun currentDisplay() = currentLog()?.getCurrent()
+    private fun currentDisplay() = getSharedTracker()?.getCurrent()
 
-    private fun currentLog(): TrackerWrapper<Storage.ProfileSpecific.PowderTracker>? {
+    private fun getSharedTracker(): SharedTracker<Storage.ProfileSpecific.PowderTracker>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
 
-        return TrackerWrapper(
+        return SharedTracker(
             profileSpecific.powderTracker.getOrPut(0) { Storage.ProfileSpecific.PowderTracker() },
             currentSessionData.getOrPut(0) { Storage.ProfileSpecific.PowderTracker() }
         )
@@ -357,7 +357,7 @@ object PowderTracker {
         LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS && config.enabled
 
     fun clearProfitCommand(args: Array<String>) {
-        TrackerUtils.resetCommand("Powder Tracker", "shresetpowdertracker", args, currentLog()) {
+        TrackerUtils.resetCommand("Powder Tracker", "shresetpowdertracker", args, getSharedTracker()) {
             saveAndUpdate()
         }
     }

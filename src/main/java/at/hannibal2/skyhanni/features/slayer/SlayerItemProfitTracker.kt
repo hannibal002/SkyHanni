@@ -34,10 +34,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SharedTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
-import at.hannibal2.skyhanni.utils.tracker.TrackerWrapper
 import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -61,8 +61,7 @@ object SlayerItemProfitTracker {
     private var currentSessionData = mutableMapOf<String, SlayerProfitList>()
 
     private fun addSlayerCosts(price: Int) {
-        val itemLog = currentLog() ?: return
-        itemLog.modify {
+        getSharedTracker()?.modify {
             it.slayerSpawnCost += price
         }
         update()
@@ -98,18 +97,14 @@ object SlayerItemProfitTracker {
     }
 
     private fun addMobKillCoins(coins: Int) {
-        val itemLog = currentLog() ?: return
-
-        itemLog.modify {
+        getSharedTracker()?.modify {
             it.mobKillCoins += coins
         }
         update()
     }
 
     private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
-        val itemLog = currentLog() ?: return
-
-        itemLog.modify {
+        getSharedTracker()?.modify {
             val slayerItemProfit = it.items.getOrPut(internalName) { SlayerProfitList.SlayerItemProfit() }
 
             slayerItemProfit.timesDropped++
@@ -119,13 +114,13 @@ object SlayerItemProfitTracker {
         update()
     }
 
-    private fun currentDisplay() = currentLog()?.getCurrent()
+    private fun currentDisplay() = getSharedTracker()?.getCurrent()
 
-    private fun currentLog(): TrackerWrapper<SlayerProfitList>? {
+    private fun getSharedTracker(): SharedTracker<SlayerProfitList>? {
         if (itemLogCategory == "") return null
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
 
-        return TrackerWrapper(
+        return SharedTracker(
             profileSpecific.slayerProfitData.getOrPut(itemLogCategory) { SlayerProfitList() },
             currentSessionData.getOrPut(itemLogCategory) { SlayerProfitList() }
         )
@@ -133,9 +128,7 @@ object SlayerItemProfitTracker {
 
     @SubscribeEvent
     fun onQuestComplete(event: SlayerQuestCompleteEvent) {
-        val itemLog = currentLog() ?: return
-
-        itemLog.modify {
+        getSharedTracker()?.modify {
             it.slayerCompletedCount++
         }
 
@@ -321,7 +314,7 @@ object SlayerItemProfitTracker {
             )
         }
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            addSessionResetButton("$itemLogCategory Slayer", currentLog()) {
+            addSessionResetButton("$itemLogCategory Slayer", getSharedTracker()) {
                 update()
             }
         }
@@ -359,7 +352,7 @@ object SlayerItemProfitTracker {
             return
         }
 
-        TrackerUtils.resetCommand("$itemLogCategory Slayer", "shclearslayerprofits", args, currentLog()) {
+        TrackerUtils.resetCommand("$itemLogCategory Slayer", "shclearslayerprofits", args, getSharedTracker()) {
             update()
         }
     }

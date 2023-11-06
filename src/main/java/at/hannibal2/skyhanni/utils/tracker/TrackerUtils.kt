@@ -21,7 +21,7 @@ object TrackerUtils {
         )
     }
 
-    fun MutableList<List<Any>>.addSessionResetButton(name: String, data: TrackerWrapper<*>?, update: () -> Unit) {
+    fun MutableList<List<Any>>.addSessionResetButton(name: String, data: SharedTracker<*>?, update: () -> Unit) {
         addAsSingletonList(
             Renderable.clickAndHover(
                 "§cReset session!",
@@ -39,7 +39,7 @@ object TrackerUtils {
             })
     }
 
-    fun resetCommand(name: String, command: String, args: Array<String>, data: TrackerWrapper<*>?, update: () -> Unit) {
+    fun resetCommand(name: String, command: String, args: Array<String>, data: SharedTracker<*>?, update: () -> Unit) {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
             reset(data?.get(DisplayMode.TOTAL)) {
                 update()
