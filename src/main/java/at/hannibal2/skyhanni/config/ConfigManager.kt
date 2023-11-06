@@ -192,17 +192,24 @@ class ConfigManager {
     }
 
     fun saveConfig(reason: String) {
+        saveFile(configFile, "config", SkyHanniMod.feature, reason)
+    }
+
+    fun saveSackData(reason: String) {
+        saveFile(sackFile, "sacks", SkyHanniMod.sackData, reason)
+    }
+
+    private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
         logger.log("saveConfig: $reason")
-        val file = configFile ?: throw Error("Can not save config, configFile is null!")
+        if (file == null) throw Error("Can not save $fileName, ${fileName}File is null!")
         try {
-            logger.log("Saving config file")
+            logger.log("Saving $fileName file")
             file.parentFile.mkdirs()
-            val unit = file.parentFile.resolve("config.json.write")
+            val unit = file.parentFile.resolve("$fileName.json.write")
             unit.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                // TODO remove old "hidden" area
-                writer.write(gson.toJson(SkyHanniMod.feature))
+                writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
             Files.move(
@@ -212,24 +219,7 @@ class ConfigManager {
                 StandardCopyOption.ATOMIC_MOVE
             )
         } catch (e: IOException) {
-            logger.log("Could not save config file to $file")
-            e.printStackTrace()
-        }
-    }
-
-    fun saveSackData(reason: String) {
-        if (disableSaving) return
-        logger.log("saveSackData: $reason")
-        val file = sackFile ?: throw Error("Can not save sacks, sackFile is null!")
-        try {
-            logger.log("Saving sack file")
-            file.parentFile.mkdirs()
-            file.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
-                writer.write(gson.toJson(SkyHanniMod.sackData))
-            }
-        } catch (e: IOException) {
-            logger.log("Could not save sacks file to $file")
+            logger.log("Could not save $fileName file to $file")
             e.printStackTrace()
         }
     }
