@@ -208,8 +208,7 @@ object PowderTracker {
             addAsSingletonList("")
         }
 
-        val both = currentLog() ?: return@buildList
-        val display = both.get(TrackerUtils.currentDisplayMode)
+        val display = currentDisplay() ?: return@buildList
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
@@ -304,16 +303,14 @@ object PowderTracker {
     }
 
     private fun calculate(info: ResourceInfo, reward: PowderChestReward) {
-        val both = currentLog() ?: return
-        val display = both.get(TrackerUtils.currentDisplayMode)
+        val display = currentDisplay() ?: return
         val rewards = display.rewards
         info.estimated = 0
         info.estimated += rewards.getOrDefault(reward, 0)
     }
 
     private fun calculateChest() {
-        val both = currentLog() ?: return
-        val display = both.get(TrackerUtils.currentDisplayMode)
+        val display = currentDisplay() ?: return
         chestInfo.estimated = 0
         chestInfo.estimated += display.totalChestPicked
     }
@@ -344,6 +341,8 @@ object PowderTracker {
         var perHour: Double,
         val perMin: MutableList<Long>
     )
+
+    private fun currentDisplay() = currentLog()?.get(TrackerUtils.currentDisplayMode)
 
     private fun currentLog(): TrackerWrapper<Storage.ProfileSpecific.PowderTracker>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null

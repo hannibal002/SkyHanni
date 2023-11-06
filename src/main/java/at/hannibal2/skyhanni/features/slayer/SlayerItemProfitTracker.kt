@@ -119,6 +119,8 @@ object SlayerItemProfitTracker {
         update()
     }
 
+    private fun currentDisplay() = currentLog()?.get(TrackerUtils.currentDisplayMode)
+
     private fun currentLog(): TrackerWrapper<SlayerProfitList>? {
         if (itemLogCategory == "") return null
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
@@ -205,8 +207,7 @@ object SlayerItemProfitTracker {
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
-        val both = currentLog() ?: return@buildList
-        val itemLog = both.get(TrackerUtils.currentDisplayMode)
+        val itemLog = currentDisplay() ?: return@buildList
 
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
         if (inventoryOpen) {
@@ -324,15 +325,6 @@ object SlayerItemProfitTracker {
                 update()
             }
         }
-    }
-
-    private fun resetData(displayMode: DisplayMode) {
-        val currentLog = currentLog() ?: return
-        val list = currentLog.get(displayMode)
-        list.items.clear()
-        list.mobKillCoins = 0
-        list.slayerSpawnCost = 0
-        list.slayerCompletedCount = 0
     }
 
     private fun getPrice(internalName: NEUInternalName) = when (config.priceFrom) {
