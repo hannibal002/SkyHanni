@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.misc.massconfiguration.KnownFeaturesJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
@@ -136,7 +136,8 @@ class ConfigManager {
         features = firstLoadFile(configFile, ConfigFileType.FEATURES, Features(), true)
         sackData = firstLoadFile(sackFile, ConfigFileType.SACKS, SackData(), false)
         friendsData = firstLoadFile(friendsFile, ConfigFileType.FRIENDS, FriendsJson(), false)
-        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES, KnownFeaturesJson(), false)
+        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES,
+            KnownFeaturesJson(), false)
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.massconfiguration;
+package at.hannibal2.skyhanni.utils.jsonobjects;
 
 import com.google.gson.annotations.Expose;
 
