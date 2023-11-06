@@ -39,10 +39,12 @@ object TrackerUtils {
             })
     }
 
-    fun resetCommand(name: String, command: String, args: Array<String>, data: TrackerData, update: () -> Unit) {
+    fun resetCommand(name: String, command: String, args: Array<String>, data: TrackerWrapper<*>?, update: () -> Unit) {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
-            reset(data, update)
-            LorenzUtils.chat("§e[SkyHanni] You reset your $name data!")
+            reset(data?.get(DisplayMode.TOTAL)) {
+                update()
+                LorenzUtils.chat("§e[SkyHanni] You reset your $name data!")
+            }
             return
         }
 
@@ -52,8 +54,10 @@ object TrackerUtils {
         )
     }
 
-    fun reset(data: TrackerData, update: () -> Unit) {
-        data.reset()
-        update()
+    fun reset(data: TrackerData?, update: () -> Unit) {
+        data?.let {
+            it.reset()
+            update
+        }
     }
 }

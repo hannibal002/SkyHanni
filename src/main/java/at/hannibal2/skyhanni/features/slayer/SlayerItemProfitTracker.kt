@@ -367,8 +367,7 @@ object SlayerItemProfitTracker {
             return
         }
 
-        val data = currentLog()?.get(DisplayMode.TOTAL) ?: return
-        TrackerUtils.resetCommand("$itemLogCategory Slayer", "shclearslayerprofits", args, data) {
+        TrackerUtils.resetCommand("$itemLogCategory Slayer", "shclearslayerprofits", args, currentLog()) {
             update()
         }
     }
