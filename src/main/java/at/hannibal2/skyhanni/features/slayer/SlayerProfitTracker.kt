@@ -42,7 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.seconds
 
-object SlayerItemProfitTracker {
+object SlayerProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
     private var collectedCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.SECONDS).build<Int, Unit>()
 

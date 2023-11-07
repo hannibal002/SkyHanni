@@ -273,9 +273,9 @@ import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
 import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround
 import at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning
 import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterDisplay
 import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
@@ -554,7 +554,7 @@ class SkyHanniMod {
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
         loadModule(GetFromSacksTabComplete)
-        loadModule(SlayerItemProfitTracker)
+        loadModule(SlayerProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)

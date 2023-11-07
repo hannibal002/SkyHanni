@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -151,7 +151,7 @@ object Commands {
         registerCommand(
             "shclearslayerprofits",
             "Clearing the total slayer profit for the current slayer type"
-        ) { SlayerItemProfitTracker.clearProfitCommand(it) }
+        ) { SlayerProfitTracker.clearProfitCommand(it) }
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3"

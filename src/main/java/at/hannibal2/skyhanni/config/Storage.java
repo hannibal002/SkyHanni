@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker;
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
@@ -345,7 +345,7 @@ public class Storage {
         }
 
         @Expose
-        public Map<String, SlayerItemProfitTracker.Data> slayerProfitData = new HashMap<>();
+        public Map<String, SlayerProfitTracker.Data> slayerProfitData = new HashMap<>();
 
         @Expose
         public Map<String, SlayerRngMeterStorage> slayerRngMeter = new HashMap<>();
