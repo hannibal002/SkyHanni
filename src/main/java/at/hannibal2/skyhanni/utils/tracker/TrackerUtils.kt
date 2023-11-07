@@ -57,7 +57,7 @@ object TrackerUtils {
     fun reset(data: TrackerData?, update: () -> Unit) {
         data?.let {
             it.reset()
-            update
+            update()
         }
     }
 }

@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.GardenStorage.DicerRngDropTracker
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -11,15 +12,26 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SharedTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DicerRngDropCounter {
-    private var display = emptyList<String>()
+    private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden.dicerCounters
+    private val currentSessionData = DicerRngDropTracker()
+    private var inventoryOpen = false
 
     init {
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!".toRegex()))
@@ -54,7 +66,6 @@ class DicerRngDropCounter {
         for (drop in itemDrops) {
             if (drop.pattern.matches(message)) {
                 addDrop(drop.crop, drop.rarity)
-                update()
                 if (config.hideChat) {
                     event.blockedReason = "dicer_rng_drop_counter"
                 }
@@ -64,20 +75,30 @@ class DicerRngDropCounter {
     }
 
     private fun update() {
-        val storage = GardenAPI.storage?.dicerRngDrops ?: return
-        display = drawDisplay(storage)
+        currentDisplay()?.let {
+            display = drawDisplay(it)
+        }
     }
 
-    private fun drawDisplay(storage: Storage.ProfileSpecific.GardenStorage.DicerRngDropTracker): List<String> {
-        val help = mutableListOf<String>()
-        val items = storage.drops[cropInHand] ?: return help
-        help.add("§7RNG Drops for $toolName§7:")
+    private fun drawDisplay(storage: DicerRngDropTracker) = buildList<List<Any>> {
+        val cropInHand = cropInHand ?: return@buildList
+        val items = storage.drops.getOrPut(cropInHand) { mutableMapOf() }
+        addAsSingletonList("§7RNG Drops for $toolName§7:")
+        if (inventoryOpen) {
+            addDisplayModeToggle {
+                update()
+            }
+        }
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
-            help.add(" §7- §e${amount.addSeparators()}x $displayName")
+            addAsSingletonList(" §7- §e${amount.addSeparators()}x $displayName")
         }
 
-        return help
+        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
+            addSessionResetButton("Dicer Rng Drop Tracker", getSharedTracker()) {
+                update()
+            }
+        }
     }
 
     private var cropInHand: CropType? = null
@@ -94,17 +115,24 @@ class DicerRngDropCounter {
     }
 
     private fun addDrop(crop: CropType, rarity: DropRarity) {
-        val storage = GardenAPI.storage?.dicerRngDrops ?: return
-        val map = storage.drops.getOrPut(crop) { mutableMapOf() }
-        val old = map[rarity] ?: 0
-        map[rarity] = old + 1
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify {
+            val map = it.drops.getOrPut(crop) { mutableMapOf() }
+            map.addOrPut(rarity, 1)
+        }
+        update()
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (isEnabled()) {
-            config.pos.renderStrings(display, posLabel = "Dicer Counter")
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!isEnabled()) return
+
+        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (inventoryOpen != currentlyOpen) {
+            inventoryOpen = currentlyOpen
+            update()
         }
+        config.pos.renderStringsAndItems(display, posLabel = "Dicer Counter")
     }
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Regex)
@@ -130,5 +158,12 @@ class DicerRngDropCounter {
 
             ConfigManager.gson.toJsonTree(items)
         }
+    }
+
+    private fun currentDisplay() = getSharedTracker()?.getCurrent()
+
+    private fun getSharedTracker(): SharedTracker<DicerRngDropTracker>? {
+        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
+        return SharedTracker(profileSpecific.garden.dicerRngDrops, currentSessionData)
     }
 }
