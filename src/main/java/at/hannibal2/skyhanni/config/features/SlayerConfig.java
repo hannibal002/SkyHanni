@@ -121,6 +121,12 @@ public class SlayerConfig {
             @ConfigEditorBoolean
             @FeatureToggle
             public boolean hideDaggerWarning = false;
+
+            @Expose
+            public Position positionTop = new Position(-475, 173, 4.4f, true);
+
+            @Expose
+            public Position positionBottom = new Position(-475, 230, 3.2f, true);
         }
 
 
