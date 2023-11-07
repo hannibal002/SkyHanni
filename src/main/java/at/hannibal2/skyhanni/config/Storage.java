@@ -1,22 +1,23 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
-import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.tracker.TrackerData;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
@@ -32,6 +33,9 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
+    public Float savedMouseSensitivity = .5f;
+
+    @Expose
     public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
 
     @Expose
@@ -39,6 +43,9 @@ public class Storage {
 
     @Expose
     public List<VisualWord> modifiedWords = new ArrayList<>();
+
+    @Expose
+    public boolean visualWordsImported = false;
 
     @Expose
     public Boolean contestSendingAsked = false;
@@ -86,9 +93,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -137,7 +144,18 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public Map<String, Integer> dicerRngDrops = new HashMap<>();
+            public DicerDropTracker dicerDropTracker = new DicerDropTracker();
+
+            public static class DicerDropTracker extends TrackerData {
+
+                public void reset() {
+                    drops.clear();
+                }
+
+                @Expose
+                public Map<CropType, Map<at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker.DropRarity, Integer>> drops = new HashMap<>();
+
+            }
 
             @Expose
             public long informedAboutLowMatter = 0;
@@ -245,6 +263,9 @@ public class Storage {
                 public boolean carrotFortune = false;
 
                 @Expose
+                public boolean pumpkinFortune = false;
+
+                @Expose
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
 
@@ -295,7 +316,13 @@ public class Storage {
         @Expose
         public Map<Integer, PowderTracker> powderTracker = new HashMap<>();
 
-        public static class PowderTracker {
+        public static class PowderTracker extends TrackerData {
+
+            public void reset() {
+                rewards.clear();
+                totalChestPicked = 0;
+            }
+
             @Expose
             public int totalChestPicked = 0;
 
@@ -344,7 +371,14 @@ public class Storage {
         @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
 
-        public static class SlayerProfitList {
+        public static class SlayerProfitList extends TrackerData {
+
+            public void reset() {
+                items.clear();
+                mobKillCoins = 0;
+                slayerSpawnCost = 0;
+                slayerCompletedCount = 0;
+            }
 
             @Expose
             public Map<NEUInternalName, SlayerItemProfit> items = new HashMap<>();
@@ -371,22 +405,22 @@ public class Storage {
                 @Override
                 public String toString() {
                     return "SlayerItemProfit{" +
-                            "internalName='" + internalName + '\'' +
-                            ", timesDropped=" + timesDropped +
-                            ", totalAmount=" + totalAmount +
-                            ", hidden=" + hidden +
-                            '}';
+                        "internalName='" + internalName + '\'' +
+                        ", timesDropped=" + timesDropped +
+                        ", totalAmount=" + totalAmount +
+                        ", hidden=" + hidden +
+                        '}';
                 }
             }
 
             @Override
             public String toString() {
                 return "SlayerProfitList{" +
-                        "items=" + items +
-                        ", mobKillCoins=" + mobKillCoins +
-                        ", slayerSpawnCost=" + slayerSpawnCost +
-                        ", slayerCompletedCount=" + slayerCompletedCount +
-                        '}';
+                    "items=" + items +
+                    ", mobKillCoins=" + mobKillCoins +
+                    ", slayerSpawnCost=" + slayerSpawnCost +
+                    ", slayerCompletedCount=" + slayerCompletedCount +
+                    '}';
             }
         }
 
@@ -410,11 +444,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
@@ -445,7 +479,7 @@ public class Storage {
             public int selfKillingAnimals;
 
             @Expose
-            public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities= new HashMap<>();
+            public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities = new HashMap<>();
         }
 
         @Expose

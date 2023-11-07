@@ -71,6 +71,18 @@
     + E.g. inside the SkyBlock leveling guide.
 + Added Chat **Translator** - NetheriteMiner
     + After enabling, click on any chat message sent by another player to translate it to English.
++ Added Highlight Visitors in SkyBlock. - nea
+    + Highlights Visitors outside the Garden.
++ Block Interacting with Visitors. - nea
+    + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
++ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff
+  display. - CalMWolfs
++ Added auto-detection of Expired Pumpkin farming fortune. - CalMWolfs
++ Added Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
+    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
++ Added **Fishing Bait Warnings.** - cimbraien
+    + Option to warn when no bait is used.
+    + Option to warn when used bait is changed.
 
 #### Events
 
@@ -82,7 +94,8 @@
 + Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
-
++ Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
++ Play warning sound when the next Primal Fear can spawn. - thunderblade73
 
 ### Changes
 
@@ -119,9 +132,11 @@
     + Only items with recipes are tab completed.
 + Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
 + Disabled clicks on SkyHanni GUIs while inside NEU's or Skytils profile viewer. - hannibal2
-+ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks sometimes. - hannibal2
++ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks
+  sometimes. - hannibal2
 + Added diamond and gold essence support to PowderTracker. - walker
-+ Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search engine - Erymanthus
++ Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search
+  engine - Erymanthus
 + Added option to hide Chest Value while the Estimated Item Value display is showing. - hannibal2
 + No longer merging same items with different prices in Chest Value together. - hannibal2
 + Adding Great Spook support for Non God Pot Effect display. - hannibal2
@@ -129,6 +144,19 @@
 + Added support for detecting refreshed farming fortune century cake effect. - alexia
 + Show key to press below burrow warp. - hannibal2
 + Makes the Compact Potion message open the Potion effects menu on click. - jani
++ Added option to show King Talisman Helper outside Dwarven Mines. - hannibal2
++ In-Game Date: Adds support for reading the in-game scoreboard, and also allow sun/moon symbol customization. -
+  Erymanthus
++ Added Estimated Item Value support to NEU Profile Viewer - hannibal2
++ Added support to import SBE Visual Words into SkyHanni. - HiZe
++ Add custom keybinds for Harp Helper. - Thunderblade73
++ Show the custom hotkey name in the Harp inventory. - hannibal2
++ Added a GUI element to remind you while /shmouselock is enabled. - CalMWolfs
++ Make Crimson Isle Quest Item Helper only get amount needed. - NetheriteMiner
++ Change config order to alphabetical. - walker
++ Added commands /shresetpowdertracker and /shresetdicertracker to reset the Powder Tracker and Dicer Drop Tracker - hannibal2
++ Added current session/total session switch for Dicer Drop Tracker. - hannibal2
++ Added a button to reset the local session for Dicer Drop Tracker and for Powder Tracker. - hannibal2
 
 ### Bug Fixes
 
@@ -191,6 +219,22 @@
 + SkyHanni Keybinds no longer work inside SkyHanni config. - hannibal2
 + Fixed Great Spook potion not working in Non God Pot Effect feature. - jani
 + Fixed wrong Rhys (Deep Caverns NPC) items needed for Dwarven Mines unlock in Bingo Step Helper. - ReyMaratov
++ Fixed King Talisman Helper once again. - hannibal2
++ Made the ESC -> Mod Options -> SkyHanni -> Config button not crash you. - hannibal2
++ Disabled Diana Warp key and Inquis Share key while inside any GUI. - hannibal2
++ Removed Diana warp data on world switch. - hannibal2
++ Reset mouse sensitivity back to 100% if you log off with lock mouse look enabled. - hannibal2
++ Fixed mouse sensitivity stuck after restarting by storing old sensitivity. - CalMWolfs
++ Fixed tool fortune. - CalMWolfs
++ Fixed Item Ability Cooldown display not activating for Sword of Bad Health. - hannibal2
++ Fixed the crop name gets replaced to internal name in /shwords. - hannibal2
++ Show obfuscated fish as bait instead of caught item. - cimbraien
++ Fixed Estimated Item Value that renders twice inside NEU PV, by not rendering anything when the cursor is exactly in
+  between two items. - hannibal2
++ fixed more error messages with The Great Spook data getting stored in the Reputation Helper quest config
+  accidentally. - hannibal2
++ Hopefully fixed resets of Visitor Drops stats. - hannibal2
++ Fixed typo in The Art Of Peace. - walker
 
 #### Config
 
@@ -202,7 +246,7 @@
 + Removed **Duplicate Hider**.
     + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
 
-#### Internal Changes
+#### Technical Details
 
 + Add Repo TODOs to regex patterns. - walker
 + Moved many patterns from function scope to members. - hannibal2
@@ -216,6 +260,21 @@
   java config files (names, description, orderings and stuff).
 + Adding 100 lines to MobFinder.kt and making it better readable in the process. - walker
 + Making ChatFiler.kt way better, storing regex objects for reuse and preparing future repo support. - walker
++ Added command /shkingfix to reset the internal King Talisman Helper offset. - hannibal2
++ Updated dependency version of junixsocket in DiscordIPC so that antivirus websites no longer show false positives. -
+  NetheriteMiner
++ Changed wrong/missing neu version message to show NEU version 2.1.1-Pre-4 instead of beta versions. - CalMWolfs
++ Deleting the old "hidden" part of the config. - hannibal2
++ This will reset parts of the config for users with 7-month-old SkyHanni versions that want to migrate into the
+  present.
++ Added a workaround for the NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering
+  over the border between two items. - hannibal2
++ Using visitorDrops.visitorRarities directly from the config instead of accessing the local field. Hopefully this will
+  prevent partial config resets in the future. - hannibal2
++ Added a tracker API that can be used for all features in SkyHanni that currently track stuff that the user collects. - hannibal2
++ Added the slayer profit tracker logic (command to reset, toggle between total view and session view, and button to delete session) to powder tracker and Dicer Drop Tracker. - hannibal2
++ Added support for migrating parts of the player or session storage. - nea
++ Changed the config format for dicerRngDrops/dicerDropsTracker. - hannibal2
 
 ## Version 0.20
 

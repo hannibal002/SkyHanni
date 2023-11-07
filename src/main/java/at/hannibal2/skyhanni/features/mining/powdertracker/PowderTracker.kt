@@ -12,19 +12,23 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SharedTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
-class PowderTracker {
+object PowderTracker {
 
     private val config get() = SkyHanniMod.feature.mining.powderTracker
     private var display = emptyList<List<Any>>()
@@ -42,7 +46,6 @@ class PowderTracker {
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var powderTimer = ""
-    private var currentDisplayMode = DisplayMode.TOTAL
     private var inventoryOpen = false
     private var currentSessionData = mutableMapOf<Int, Storage.ProfileSpecific.PowderTracker>()
     private val gemstones = listOf(
@@ -87,7 +90,7 @@ class PowderTracker {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val msg = event.message
-        val both = currentLog() ?: return
+        val both = getSharedTracker() ?: return
 
         if (config.greatExplorerMaxed) {
             uncovered.matchMatcher(msg) {
@@ -187,26 +190,25 @@ class PowderTracker {
         for (index in config.textFormat.get()) {
             add(map[index])
         }
+
+        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
+            addSessionResetButton("Powder Tracker", getSharedTracker()) {
+                saveAndUpdate()
+            }
+        }
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§b§lPowder Tracker")
         if (inventoryOpen) {
-            addSelector<DisplayMode>(
-                "§7Display Mode: ",
-                getName = { type -> type.displayName },
-                isCurrent = { it == currentDisplayMode },
-                onChange = {
-                    currentDisplayMode = it
-                    saveAndUpdate()
-                }
-            )
+            addDisplayModeToggle {
+                saveAndUpdate()
+            }
         } else {
             addAsSingletonList("")
         }
 
-        val both = currentLog() ?: return@buildList
-        val display = both.get(currentDisplayMode)
+        val display = currentDisplay() ?: return@buildList
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
@@ -262,13 +264,13 @@ class PowderTracker {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
-
     }
 
     private fun MutableList<List<Any>>.addPerHour(
         map: MutableMap<PowderChestReward, Long>,
         reward: PowderChestReward,
-        info: ResourceInfo) {
+        info: ResourceInfo
+    ) {
         val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
         val mithrilPerHour = format(info.perHour)
         addAsSingletonList("§b$mithrilCount ${reward.displayName} §7($mithrilPerHour/h)")
@@ -301,16 +303,14 @@ class PowderTracker {
     }
 
     private fun calculate(info: ResourceInfo, reward: PowderChestReward) {
-        val both = currentLog() ?: return
-        val display = both.get(currentDisplayMode)
+        val display = currentDisplay() ?: return
         val rewards = display.rewards
         info.estimated = 0
         info.estimated += rewards.getOrDefault(reward, 0)
     }
 
     private fun calculateChest() {
-        val both = currentLog() ?: return
-        val display = both.get(currentDisplayMode)
+        val display = currentDisplay() ?: return
         chestInfo.estimated = 0
         chestInfo.estimated += display.totalChestPicked
     }
@@ -342,37 +342,23 @@ class PowderTracker {
         val perMin: MutableList<Long>
     )
 
-    enum class DisplayMode(val displayName: String) {
-        TOTAL("Total"),
-        CURRENT("This Session"),
-        ;
-    }
+    private fun currentDisplay() = getSharedTracker()?.getCurrent()
 
-    private fun currentLog(): AbstractPowderTracker? {
+    private fun getSharedTracker(): SharedTracker<Storage.ProfileSpecific.PowderTracker>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
 
-        return AbstractPowderTracker(
+        return SharedTracker(
             profileSpecific.powderTracker.getOrPut(0) { Storage.ProfileSpecific.PowderTracker() },
             currentSessionData.getOrPut(0) { Storage.ProfileSpecific.PowderTracker() }
         )
     }
 
-    class AbstractPowderTracker(
-        private val total: Storage.ProfileSpecific.PowderTracker,
-        private val currentSession: Storage.ProfileSpecific.PowderTracker,
-    ) {
-
-        fun modify(modifyFunction: (Storage.ProfileSpecific.PowderTracker) -> Unit) {
-            modifyFunction(total)
-            modifyFunction(currentSession)
-        }
-
-        fun get(displayMode: DisplayMode) = when (displayMode) {
-            DisplayMode.TOTAL -> total
-            DisplayMode.CURRENT -> currentSession
-        }
-    }
-
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS && config.enabled
+
+    fun resetCommand(args: Array<String>) {
+        TrackerUtils.resetCommand("Powder Tracker", "shresetpowdertracker", args, getSharedTracker()) {
+            saveAndUpdate()
+        }
+    }
 }

@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 6
+    const val CONFIG_VERSION = 7
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -26,7 +26,14 @@ object ConfigUpdaterMigrator {
         val new: JsonObject,
         val oldVersion: Int,
         var movesPerformed: Int,
+        val dynamicPrefix: Map<String, List<String>>,
     ) : LorenzEvent() {
+        init {
+            dynamicPrefix.entries.filter { it.value.isEmpty() }.forEach {
+                logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
+            }
+        }
+
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
@@ -41,6 +48,22 @@ object ConfigUpdaterMigrator {
             }
             val op = oldPath.split(".")
             val np = newPath.split(".")
+            if (op.first().startsWith("#")) {
+                require(np.first() == op.first())
+                val realPrefixes = dynamicPrefix[op.first()]
+                if (realPrefixes == null) {
+                    logger.log("Could not resolve dynamic prefix $oldPath")
+                    return
+                }
+                for (realPrefix in realPrefixes) {
+                    move(
+                        since,
+                        "$realPrefix.${oldPath.substringAfter('.')}",
+                        "$realPrefix.${newPath.substringAfter('.')}", transform
+                    )
+                    return
+                }
+            }
             val oldElem = old.at(op, false)
             if (oldElem == null) {
                 logger.log("Skipping move from $oldPath to $newPath ($oldPath not present)")
@@ -83,9 +106,23 @@ object ConfigUpdaterMigrator {
         if (lV == CONFIG_VERSION) return config
         return (lV until CONFIG_VERSION).fold(config) { acc, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
+            val storage = acc.get("storage")?.asJsonObject
+            val dynamicPrefix: Map<String, List<String>> = mapOf(
+                "#profile" to
+                    (storage?.get("players")?.asJsonObject?.entrySet()
+                        ?.flatMap { player ->
+                            player.value.asJsonObject.get("profiles")?.asJsonObject?.entrySet()?.map {
+                                "storage.players.${player.key}.profiles.${it.key}"
+                            } ?: listOf()
+                        }
+                        ?: listOf()),
+                "#player" to
+                    (storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }
+                        ?: listOf()),
+            )
             val migration = ConfigFixEvent(acc, JsonObject().also {
                 it.add("lastVersion", JsonPrimitive(i + 1))
-            }, i, 0).also { it.postAndCatch() }
+            }, i, 0, dynamicPrefix).also { it.postAndCatch() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
             logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")
