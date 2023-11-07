@@ -141,7 +141,7 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropCounter
+import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenBurrowingSporesNotifier
@@ -500,7 +500,7 @@ class SkyHanniMod {
         loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
-        loadModule(DicerRngDropCounter())
+        loadModule(DicerDropTracker)
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
         loadModule(GardenNextJacobContest)
@@ -605,7 +605,7 @@ class SkyHanniMod {
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
-        loadModule(PowderTracker())
+        loadModule(PowderTracker)
         loadModule(ModifyVisualWords)
         loadModule(TabListReader)
         loadModule(TabListRenderer)
