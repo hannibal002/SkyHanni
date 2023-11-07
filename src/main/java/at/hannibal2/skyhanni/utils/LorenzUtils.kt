@@ -243,7 +243,7 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))

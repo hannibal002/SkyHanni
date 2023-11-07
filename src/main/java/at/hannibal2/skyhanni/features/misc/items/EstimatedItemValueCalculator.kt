@@ -68,7 +68,7 @@ object EstimatedItemValueCalculator {
         // once
         totalPrice += addRecomb(stack, list)
         totalPrice += addArtOfWar(stack, list)
-        totalPrice += addArtOfPiece(stack, list)
+        totalPrice += addArtOfPeace(stack, list)
         totalPrice += addEtherwarp(stack, list)
         totalPrice += addPowerScrolls(stack, list)
         totalPrice += addWoodSingularity(stack, list)
@@ -273,11 +273,11 @@ object EstimatedItemValueCalculator {
     }
 
     // TODO untested
-    private fun addArtOfPiece(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addArtOfPeace(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfPeace()) return 0.0
 
         val price = "THE_ART_OF_PEACE".asInternalName().getPrice()
-        list.add("§7The Art Of Piece: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7The Art Of Peace: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 

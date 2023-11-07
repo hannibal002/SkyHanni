@@ -112,7 +112,7 @@ object PartyAPI {
         partyMemberListPattern.matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
-                if (playerName == Minecraft.getMinecraft().thePlayer.name) continue
+                if (playerName == LorenzUtils.getPlayerName()) continue
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
             }
         }

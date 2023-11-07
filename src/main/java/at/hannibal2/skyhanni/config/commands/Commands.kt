@@ -20,11 +20,13 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -158,7 +160,9 @@ object Commands {
             "shclearfarmingitems",
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
-        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
+        registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
+        registerCommand("shresetpowdertracker", "Resets the powder tracker") { PowderTracker.resetCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the dicer counter") { DicerDropTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
