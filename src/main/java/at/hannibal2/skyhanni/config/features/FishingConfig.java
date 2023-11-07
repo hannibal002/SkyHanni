@@ -141,7 +141,7 @@ public class FishingConfig {
         @Expose
         @ConfigOption(
                 name = "Worm Cap Alert",
-                desc = "Alerts you with sound if you hit the Worm Sea Creature limit of 60."
+                desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 60."
         )
         @ConfigEditorBoolean
         public boolean wormLimitAlert = true;
@@ -231,6 +231,25 @@ public class FishingConfig {
 
         @Expose
         public Position position = new Position(460, -240, 3.4f);
+    }
+
+    @Expose
+    @ConfigOption(name = "Bait Warnings", desc = "")
+    @Accordion
+    public FishingBaitWarningsConfig fishingBaitWarnings = new FishingBaitWarningsConfig();
+
+    public static class FishingBaitWarningsConfig {
+        @Expose
+        @ConfigOption(name = "Bait Change Warning", desc = "Show warning when fishing bait is changed")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean baitChangeWarning = false;
+
+        @Expose
+        @ConfigOption(name = "No Bait Warning", desc = "Show warning when no bait is used")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean noBaitWarning = false;
     }
 
     @Expose

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 object GriffinBurrowHelper {
@@ -225,6 +227,10 @@ object GriffinBurrowHelper {
                     event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
                     if (it.distanceToPlayer() < 10) {
                         event.drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
+                        if (config.keyBindWarp != Keyboard.KEY_NONE) {
+                            val keyname = KeyboardManager.getKeyName(config.keyBindWarp)
+                            event.drawString(it.add(0.5, 1.2, 0.5), "§ePress $keyname", true)
+                        }
                     }
                     return
                 }

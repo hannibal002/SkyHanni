@@ -224,6 +224,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
 + Alerts when the player catches a Legendary Sea Creature. - Cad
++ **Fishing Bait Warnings.** - cimbraien
+    + Option to warn when no bait is used.
+    + Option to warn when used bait is changed.
+
 </details>
 <details open><summary>
 
@@ -480,6 +484,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
 + /shmouselock command to lock mouse rotation for farming. - Cad
++ Added Highlight Visitors in SkyBlock. - nea
+    + Highlights Visitors outside the Garden.
++ Block Interacting with Visitors. - nea
+    + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
 </details>
 <details open><summary>
 
@@ -582,6 +590,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
++ Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
++ Play warning sound when the next Primal Fear can spawn. - thunderblade73
 </details>
 <details open><summary>
 
@@ -624,6 +634,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Quest Item Helper. (Crimson Isle) - NetheriteMiner
     + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
       needed from the sacks.
++ Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
+    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
