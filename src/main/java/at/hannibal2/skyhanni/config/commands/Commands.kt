@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.farming.DicerDropsTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -161,6 +162,7 @@ object Commands {
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
         registerCommand("shresetpowdertracker", "Resets the powder tracker") { PowderTracker.clearProfitCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the dicer counter") { DicerDropsTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
