@@ -154,6 +154,9 @@
 + Added a GUI element to remind you while /shmouselock is enabled. - CalMWolfs
 + Make Crimson Isle Quest Item Helper only get amount needed. - NetheriteMiner
 + Change config order to alphabetical. - walker
++ Added commands /shresetpowdertracker and /shresetdicertracker to reset the Powder Tracker and Dicer Drop Tracker - hannibal2
++ Added current session/total session switch for Dicer Drop Tracker. - hannibal2
++ Added a button to reset the local session for Dicer Drop Tracker and for Powder Tracker. - hannibal2
 
 ### Bug Fixes
 
@@ -243,7 +246,7 @@
 + Removed **Duplicate Hider**.
     + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
 
-#### Internal Changes
+#### Technical Details
 
 + Add Repo TODOs to regex patterns. - walker
 + Moved many patterns from function scope to members. - hannibal2
@@ -268,6 +271,10 @@
   over the border between two items. - hannibal2
 + Using visitorDrops.visitorRarities directly from the config instead of accessing the local field. Hopefully this will
   prevent partial config resets in the future. - hannibal2
++ Added a tracker API that can be used for all features in SkyHanni that currently track stuff that the user collects. - hannibal2
++ Added the slayer profit tracker logic (command to reset, toggle between total view and session view, and button to delete session) to powder tracker and Dicer Drop Tracker. - hannibal2
++ Added support for migrating parts of the player or session storage. - nea
++ Changed the config format for dicerRngDrops/dicerDropsTracker. - hannibal2
 
 ## Version 0.20
 
