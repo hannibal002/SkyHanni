@@ -96,4 +96,23 @@ class SkyHanniTracker<Data : TrackerData>(
             update()
         }
     }
+
+    class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data, ) {
+        fun modify(modifyFunction: (Data) -> Unit) {
+            modifyFunction(total)
+            modifyFunction(currentSession)
+        }
+
+        fun get(displayMode: DisplayMode) = when (displayMode) {
+            DisplayMode.TOTAL -> total
+            DisplayMode.SESSION -> currentSession
+        }
+    }
+
+    enum class DisplayMode(val displayName: String) {
+        TOTAL("Total"),
+        SESSION("This Session"),
+        ;
+    }
+
 }
