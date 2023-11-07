@@ -299,14 +299,12 @@ object PowderTracker {
     private fun calculate(info: ResourceInfo, reward: PowderChestReward) {
         val display = tracker.currentDisplay() ?: return
         val rewards = display.rewards
-        info.estimated = 0
-        info.estimated += rewards.getOrDefault(reward, 0)
+        info.estimated = rewards.getOrDefault(reward, 0)
     }
 
     private fun calculateChest() {
         val display = tracker.currentDisplay() ?: return
-        chestInfo.estimated = 0
-        chestInfo.estimated += display.totalChestPicked
+        chestInfo.estimated = display.totalChestPicked.toLong()
     }
 
     private fun convert(roughCount: Long): Gem {
