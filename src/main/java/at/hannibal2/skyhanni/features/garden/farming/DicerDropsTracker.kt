@@ -30,8 +30,7 @@ object DicerDropsTracker {
     private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden.dicerCounters
-    private val currentSessionData =
-        DicerDropTracker()
+    private val currentSessionData = DicerDropTracker()
     private var inventoryOpen = false
 
     init {
