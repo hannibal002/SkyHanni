@@ -14,19 +14,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DicerDropTracker {
     private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden.dicerCounters
-    private var inventoryOpen = false
     private val tracker = SkyHanniTracker("Dicer Drop Tracker", Data(), { it.garden.dicerDropTracker }) { update() }
 
     class Data : TrackerData() {
@@ -89,13 +85,13 @@ object DicerDropTracker {
         val cropInHand = cropInHand ?: return@buildList
         val items = storage.drops.getOrPut(cropInHand) { mutableMapOf() }
         addAsSingletonList("§7Dicer Drop Tracker for $toolName§7:")
-        tracker.addDisplayModeToggle(this, inventoryOpen)
+        tracker.addDisplayModeToggle(this)
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
             addAsSingletonList(" §7- §e${amount.addSeparators()}x $displayName")
         }
 
-        tracker.addSessionResetButton(this, inventoryOpen)
+        tracker.addSessionResetButton(this)
     }
 
     private var cropInHand: CropType? = null
@@ -123,12 +119,7 @@ object DicerDropTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
-        if (inventoryOpen != currentlyOpen) {
-            inventoryOpen = currentlyOpen
-            update()
-        }
-        config.pos.renderStringsAndItems(display, posLabel = "Dicer Drop Tracker")
+        tracker.renderDisplay(config.pos, display)
     }
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Regex)

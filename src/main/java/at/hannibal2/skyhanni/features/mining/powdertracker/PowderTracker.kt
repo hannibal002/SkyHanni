@@ -13,15 +13,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
-import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
@@ -44,7 +39,6 @@ object PowderTracker {
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var powderTimer = ""
-    private var inventoryOpen = false
     private val gemstones = listOf(
         "Ruby" to "§c",
         "Sapphire" to "§b",
@@ -84,18 +78,9 @@ object PowderTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
-        if (inventoryOpen != currentlyOpen) {
-            inventoryOpen = currentlyOpen
-            saveAndUpdate()
-        }
-
         if (config.onlyWhenPowderGrinding && !isGrinding) return
 
-        config.position.renderStringsAndItems(
-            display,
-            posLabel = "Powder Chest Tracker"
-        )
+        tracker.renderDisplay(config.position, display)
     }
 
     @SubscribeEvent
@@ -206,18 +191,12 @@ object PowderTracker {
             add(map[index])
         }
 
-        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            tracker.addSessionResetButton(this, inventoryOpen)
-        }
+        tracker.addSessionResetButton(this)
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§b§lPowder Tracker")
-        if (inventoryOpen) {
-            tracker.addDisplayModeToggle(this, inventoryOpen = true)
-        } else {
-            addAsSingletonList("")
-        }
+        tracker.addDisplayModeToggle(this, closedText = "")
 
         val display = tracker.currentDisplay() ?: return@buildList
 

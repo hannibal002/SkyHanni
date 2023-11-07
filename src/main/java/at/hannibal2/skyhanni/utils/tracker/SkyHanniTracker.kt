@@ -1,23 +1,30 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 
 class SkyHanniTracker<Data : TrackerData>(
-    val name: String,
+    private val name: String,
     private val currentSessionData: Data,
-    val getStorage: (Storage.ProfileSpecific) -> Data,
-    val update: () -> Unit,
+    private val getStorage: (Storage.ProfileSpecific) -> Data,
+    private val update: () -> Unit,
 ) {
+
+    private var inventoryOpen = false
 
     private fun getSharedTracker(): SharedTracker<Data>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
         return SharedTracker(getStorage(profileSpecific), currentSessionData)
     }
 
-    fun addSessionResetButton(list: MutableList<List<Any>>, inventoryOpen: Boolean) {
+    fun addSessionResetButton(list: MutableList<List<Any>>) {
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
             list.addSessionResetButton(name, getSharedTracker()) {
                 update()
@@ -25,10 +32,14 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    fun addDisplayModeToggle(list: MutableList<List<Any>>, inventoryOpen: Boolean) {
+    fun addDisplayModeToggle(list: MutableList<List<Any>>, closedText: String? = null) {
         if (inventoryOpen) {
             list.addDisplayModeToggle {
                 update()
+            }
+        } else {
+            closedText?.let {
+                list.addAsSingletonList(it)
             }
         }
     }
@@ -43,5 +54,15 @@ class SkyHanniTracker<Data : TrackerData>(
 
     fun modify(modifyFunction: (Data) -> Unit) {
         getSharedTracker()?.modify(modifyFunction)
+    }
+
+    fun renderDisplay(position: Position, display: List<List<Any>>) {
+        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (inventoryOpen != currentlyOpen) {
+            inventoryOpen = currentlyOpen
+            update()
+        }
+
+        position.renderStringsAndItems(display, posLabel = name)
     }
 }
