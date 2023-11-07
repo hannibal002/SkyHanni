@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = LorenzLogger("ConfigMigration")
-    val configVersion = 8
+    const val CONFIG_VERSION = 8
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -39,8 +39,8 @@ object ConfigUpdaterMigrator {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return
             }
-            if (since > configVersion) {
-                error("Illegally new version $since > $configVersion")
+            if (since > CONFIG_VERSION) {
+                error("Illegally new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
                 logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
@@ -80,7 +80,7 @@ object ConfigUpdaterMigrator {
         }
     }
 
-    fun merge(a: JsonObject, b: JsonObject): Int {
+    private fun merge(a: JsonObject, b: JsonObject): Int {
         var c = 0
         b.entrySet().forEach {
             val e = a.get(it.key)
@@ -100,11 +100,11 @@ object ConfigUpdaterMigrator {
 
     fun fixConfig(config: JsonObject): JsonObject {
         val lV = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
-        if (lV > configVersion) {
+        if (lV > CONFIG_VERSION) {
             error("Cannot downgrade config")
         }
-        if (lV == configVersion) return config
-        return (lV until configVersion).fold(config) { acc, i ->
+        if (lV == CONFIG_VERSION) return config
+        return (lV until CONFIG_VERSION).fold(config) { acc, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
             val storage = acc.get("storage")?.asJsonObject
             val dynamicPrefix: Map<String, List<String>> = mapOf(
