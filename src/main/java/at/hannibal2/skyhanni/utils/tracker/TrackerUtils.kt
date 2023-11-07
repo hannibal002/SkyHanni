@@ -2,23 +2,9 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 object TrackerUtils {
-    var currentDisplayMode = DisplayMode.TOTAL
-
-    fun MutableList<List<Any>>.addDisplayModeToggle(update: () -> Unit) {
-        addSelector<DisplayMode>(
-            "§7Display Mode: ",
-            getName = { type -> type.displayName },
-            isCurrent = { it == currentDisplayMode },
-            onChange = {
-                currentDisplayMode = it
-                update()
-            }
-        )
-    }
 
     fun MutableList<List<Any>>.addSessionResetButton(name: String, data: SharedTracker<*>?, update: () -> Unit) {
         addAsSingletonList(

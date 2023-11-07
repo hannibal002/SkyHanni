@@ -3,9 +3,8 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -17,6 +16,7 @@ class SkyHanniTracker<Data : TrackerData>(
     private val update: () -> Unit,
 ) {
     private var inventoryOpen = false
+    private var displayMode = DisplayMode.TOTAL
 
     fun isInventoryOpen() = inventoryOpen
 
@@ -26,26 +26,28 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun addSessionResetButton(list: MutableList<List<Any>>) {
-        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.SESSION) {
+        if (inventoryOpen && displayMode == DisplayMode.SESSION) {
             list.addSessionResetButton(name, getSharedTracker()) {
                 update()
             }
         }
     }
 
-    fun addDisplayModeToggle(list: MutableList<List<Any>>, closedText: String? = null) {
-        if (inventoryOpen) {
-            list.addDisplayModeToggle {
+    fun addDisplayModeToggle(list: MutableList<List<Any>>) {
+        if (!inventoryOpen) return
+
+        list.addSelector<DisplayMode>(
+            "§7Display Mode: ",
+            getName = { type -> type.displayName },
+            isCurrent = { it == displayMode },
+            onChange = {
+                displayMode = it
                 update()
             }
-        } else {
-            closedText?.let {
-                list.addAsSingletonList(it)
-            }
-        }
+        )
     }
 
-    fun currentDisplay() = getSharedTracker()?.get(TrackerUtils.currentDisplayMode)
+    fun currentDisplay() = getSharedTracker()?.get(displayMode)
 
     fun resetCommand(args: Array<String>, command: String) {
         TrackerUtils.resetCommand(name, command, args, getSharedTracker()) {

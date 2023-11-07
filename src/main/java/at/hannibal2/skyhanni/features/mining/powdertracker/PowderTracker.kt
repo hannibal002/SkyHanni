@@ -196,7 +196,7 @@ object PowderTracker {
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§b§lPowder Tracker")
-        tracker.addDisplayModeToggle(this, closedText = "")
+        tracker.addDisplayModeToggle(this)
 
         if (!tracker.isInventoryOpen()) {
             addAsSingletonList("")
