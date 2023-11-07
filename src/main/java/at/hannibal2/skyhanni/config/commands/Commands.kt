@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -161,8 +162,12 @@ object Commands {
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
-        registerCommand("shresetpowdertracker", "Resets the powder tracker") { PowderTracker.resetCommand(it) }
-        registerCommand("shresetdicertracker", "Resets the dicer counter") { DicerDropTracker.resetCommand(it) }
+        registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerDropTracker.resetCommand(it) }
+        registerCommand(
+            "shresetendernodetracker",
+            "Resets the Ender Node Tracker"
+        ) { EnderNodeTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",

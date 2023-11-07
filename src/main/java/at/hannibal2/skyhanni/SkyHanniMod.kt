@@ -596,7 +596,7 @@ class SkyHanniMod {
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
         loadModule(HarpFeatures)
-        loadModule(EnderNodeTracker())
+        loadModule(EnderNodeTracker)
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())

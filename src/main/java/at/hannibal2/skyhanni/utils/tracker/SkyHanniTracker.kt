@@ -45,6 +45,7 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
+    // rename
     fun currentDisplay() = getSharedTracker()?.getCurrent()
 
     fun resetCommand(args: Array<String>, command: String) {

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
@@ -321,18 +321,7 @@ public class Storage {
         }
 
         @Expose
-        public EnderNodeTracker enderNodeTracker = new EnderNodeTracker();
-
-        public static class EnderNodeTracker {
-            @Expose
-            public int totalNodesMined = 0;
-
-            @Expose
-            public int totalEndermiteNests = 0;
-
-            @Expose
-            public Map<EnderNode, Integer> lootCount = new HashMap<>();
-        }
+        public EnderNodeTracker.Data enderNodeTracker = new EnderNodeTracker.Data();
 
         @Expose
         public RiftStorage rift = new RiftStorage();
