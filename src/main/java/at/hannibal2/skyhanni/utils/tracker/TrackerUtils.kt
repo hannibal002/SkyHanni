@@ -42,13 +42,13 @@ object TrackerUtils {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
             reset(data?.get(DisplayMode.TOTAL)) {
                 update()
-                LorenzUtils.chat("§e[SkyHanni] You reset your $name data!")
+                LorenzUtils.chat("You reset your $name data!")
             }
             return
         }
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Are you sure you want to reset all your $name data? Click here to confirm.",
+            "Are you sure you want to reset all your $name data? Click here to confirm.",
             "$command confirm"
         )
     }
