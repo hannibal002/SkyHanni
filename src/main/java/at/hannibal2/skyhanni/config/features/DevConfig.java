@@ -19,8 +19,8 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
-    @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
-    public float logExpiryTime = 14f;
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+    public int logExpiryTime = 14;
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")

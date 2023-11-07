@@ -68,7 +68,7 @@ class LorenzLogger(filePath: String) {
                 return logger
             }
             SkyHanniMod.coroutineScope.launch {
-                val timeToDelete = SkyHanniMod.feature.dev.logExpiryTime.toInt().days
+                val timeToDelete = SkyHanniMod.feature.dev.logExpiryTime.days
 
                 for (file in directoryFiles) {
                     val path = file.toPath()
