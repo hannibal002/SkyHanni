@@ -29,7 +29,6 @@ class EnderNodeTracker {
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
     private val storage get() = ProfileStorageData.profileSpecific?.enderNodeTracker
 
-    private var totalEnderArmor = 0
     private var miteGelInInventory = 0
     private var display = emptyList<List<Any>>()
     private var lootProfit = mapOf<EnderNode, Double>()
@@ -61,7 +60,6 @@ class EnderNodeTracker {
 
         when {
             item == null -> return
-            isEnderArmor(item) -> totalEnderArmor++
             item == "§cEndermite Nest" -> {
                 storage.totalEndermiteNests++
             }
@@ -138,11 +136,6 @@ class EnderNodeTracker {
         config.textFormat.afterChange {
             update()
         }
-        val storage = storage ?: return
-
-        totalEnderArmor = storage.lootCount.filter { isEnderArmor(it.key.displayName) }
-            .map { it.value }
-            .sum()
         update()
     }
 
@@ -156,7 +149,7 @@ class EnderNodeTracker {
 
         val newProfit = mutableMapOf<EnderNode, Double>()
         storage.lootCount.forEach { (item, amount) ->
-            val price = if (isEnderArmor(item.displayName)) {
+            val price = if (isEnderArmor(item)) {
                 10_000.0
             } else {
                 (if (!LorenzUtils.noTradeMode) item.internalName.getPriceOrNull() else 0.0)
@@ -177,13 +170,13 @@ class EnderNodeTracker {
 
     private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
 
-    private fun isEnderArmor(displayName: String?) = when (displayName) {
-        EnderNode.END_HELMET.displayName,
-        EnderNode.END_CHESTPLATE.displayName,
-        EnderNode.END_LEGGINGS.displayName,
-        EnderNode.END_BOOTS.displayName,
-        EnderNode.ENDER_NECKLACE.displayName,
-        EnderNode.ENDER_GAUNTLET.displayName -> true
+    private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
+        EnderNode.END_HELMET,
+        EnderNode.END_CHESTPLATE,
+        EnderNode.END_LEGGINGS,
+        EnderNode.END_BOOTS,
+        EnderNode.ENDER_NECKLACE,
+        EnderNode.ENDER_GAUNTLET -> true
 
         else -> false
     }
@@ -212,9 +205,11 @@ class EnderNodeTracker {
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
+
+        val totalEnderArmor = calculateEnderArmor(storage)
         addAsSingletonList(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                    "§7(§6${format(totalEnderArmor * 10_000)}§7)"
+                "§7(§6${format(totalEnderArmor * 10_000)}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (storage.lootCount[item] ?: 0).addSeparators()
@@ -226,6 +221,11 @@ class EnderNodeTracker {
         val profit = format(EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 })
         addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
+
+    private fun calculateEnderArmor(storage: Storage.ProfileSpecific.EnderNodeTracker) =
+        storage.lootCount.filter { isEnderArmor(it.key) }
+            .map { it.value }
+            .sum()
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         if (!ProfileStorageData.loaded) return emptyList()
