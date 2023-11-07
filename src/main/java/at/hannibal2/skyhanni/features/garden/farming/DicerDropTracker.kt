@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.GardenStorage.DicerDropTracker
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -17,11 +15,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.tracker.DisplayMode
-import at.hannibal2.skyhanni.utils.tracker.SharedTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerUtils
-import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addDisplayModeToggle
-import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSessionResetButton
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,8 +26,17 @@ object DicerDropTracker {
     private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden.dicerCounters
-    private val currentSessionData = DicerDropTracker()
     private var inventoryOpen = false
+    private val tracker = SkyHanniTracker("Dicer Drop Tracker", Data(), { it.garden.dicerDropTracker }) { update() }
+
+    class Data : TrackerData() {
+        override fun reset() {
+            drops.clear()
+        }
+
+        @Expose
+        var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
+    }
 
     init {
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!".toRegex()))
@@ -75,30 +80,22 @@ object DicerDropTracker {
     }
 
     private fun update() {
-        currentDisplay()?.let {
+        tracker.currentDisplay()?.let {
             display = drawDisplay(it)
         }
     }
 
-    private fun drawDisplay(storage: DicerDropTracker) = buildList<List<Any>> {
+    private fun drawDisplay(storage: Data) = buildList<List<Any>> {
         val cropInHand = cropInHand ?: return@buildList
         val items = storage.drops.getOrPut(cropInHand) { mutableMapOf() }
         addAsSingletonList("§7Dicer Drop Tracker for $toolName§7:")
-        if (inventoryOpen) {
-            addDisplayModeToggle {
-                update()
-            }
-        }
+        tracker.addDisplayModeToggle(this, inventoryOpen)
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
             addAsSingletonList(" §7- §e${amount.addSeparators()}x $displayName")
         }
 
-        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            addSessionResetButton("Dicer Drop Tracker", getSharedTracker()) {
-                update()
-            }
-        }
+        tracker.addSessionResetButton(this, inventoryOpen)
     }
 
     private var cropInHand: CropType? = null
@@ -115,8 +112,7 @@ object DicerDropTracker {
     }
 
     private fun addDrop(crop: CropType, rarity: DropRarity) {
-        val sharedTracker = getSharedTracker() ?: return
-        sharedTracker.modify {
+        tracker.modify {
             val map = it.drops.getOrPut(crop) { mutableMapOf() }
             map.addOrPut(rarity, 1)
         }
@@ -160,16 +156,7 @@ object DicerDropTracker {
         }
     }
 
-    private fun currentDisplay() = getSharedTracker()?.getCurrent()
-
-    private fun getSharedTracker(): SharedTracker<DicerDropTracker>? {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-        return SharedTracker(profileSpecific.garden.dicerDropTracker, currentSessionData)
-    }
-
     fun resetCommand(args: Array<String>) {
-        TrackerUtils.resetCommand("Dicer Drop Tracker", "shresetdicertracker", args, getSharedTracker()) {
-            update()
-        }
+        tracker.resetCommand(args, "shresetdicertracker")
     }
 }
