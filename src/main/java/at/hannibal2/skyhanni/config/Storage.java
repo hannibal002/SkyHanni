@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
+import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
-import at.hannibal2.skyhanni.utils.tracker.TrackerData;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
@@ -345,60 +345,7 @@ public class Storage {
         }
 
         @Expose
-        public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
-
-        public static class SlayerProfitList extends TrackerData {
-
-            public void reset() {
-                items.clear();
-                mobKillCoins = 0;
-                slayerSpawnCost = 0;
-                slayerCompletedCount = 0;
-            }
-
-            @Expose
-            public Map<NEUInternalName, SlayerItemProfit> items = new HashMap<>();
-
-            @Expose
-            public long mobKillCoins = 0;
-
-            @Expose
-            public long slayerSpawnCost = 0;
-
-            @Expose
-            public int slayerCompletedCount = 0;
-
-            public static class SlayerItemProfit {
-                @Expose
-                public NEUInternalName internalName;
-                @Expose
-                public long timesDropped;
-                @Expose
-                public long totalAmount;
-                @Expose
-                public boolean hidden;
-
-                @Override
-                public String toString() {
-                    return "SlayerItemProfit{" +
-                        "internalName='" + internalName + '\'' +
-                        ", timesDropped=" + timesDropped +
-                        ", totalAmount=" + totalAmount +
-                        ", hidden=" + hidden +
-                        '}';
-                }
-            }
-
-            @Override
-            public String toString() {
-                return "SlayerProfitList{" +
-                    "items=" + items +
-                    ", mobKillCoins=" + mobKillCoins +
-                    ", slayerSpawnCost=" + slayerSpawnCost +
-                    ", slayerCompletedCount=" + slayerCompletedCount +
-                    '}';
-            }
-        }
+        public Map<String, SlayerItemProfitTracker.Data> slayerProfitData = new HashMap<>();
 
         @Expose
         public Map<String, SlayerRngMeterStorage> slayerRngMeter = new HashMap<>();

@@ -16,8 +16,9 @@ class SkyHanniTracker<Data : TrackerData>(
     private val getStorage: (Storage.ProfileSpecific) -> Data,
     private val update: () -> Unit,
 ) {
-
     private var inventoryOpen = false
+
+    fun isInventoryOpen() = inventoryOpen
 
     private fun getSharedTracker(): SharedTracker<Data>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null

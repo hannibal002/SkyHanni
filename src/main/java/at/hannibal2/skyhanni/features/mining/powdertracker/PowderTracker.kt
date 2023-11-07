@@ -198,6 +198,10 @@ object PowderTracker {
         addAsSingletonList("§b§lPowder Tracker")
         tracker.addDisplayModeToggle(this, closedText = "")
 
+        if (!tracker.isInventoryOpen()) {
+            addAsSingletonList("")
+        }
+
         val display = tracker.currentDisplay() ?: return@buildList
 
         val chestPerHour = format(chestInfo.perHour)
