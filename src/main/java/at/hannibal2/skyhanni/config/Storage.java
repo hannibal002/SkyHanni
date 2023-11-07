@@ -8,10 +8,11 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward;
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
@@ -144,18 +145,7 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public DicerDropTracker dicerDropTracker = new DicerDropTracker();
-
-            public static class DicerDropTracker extends TrackerData {
-
-                public void reset() {
-                    drops.clear();
-                }
-
-                @Expose
-                public Map<CropType, Map<at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker.DropRarity, Integer>> drops = new HashMap<>();
-
-            }
+            public DicerDropTracker.Data dicerDropTracker = new DicerDropTracker.Data();
 
             @Expose
             public long informedAboutLowMatter = 0;
@@ -314,21 +304,7 @@ public class Storage {
         }
 
         @Expose
-        public Map<Integer, PowderTracker> powderTracker = new HashMap<>();
-
-        public static class PowderTracker extends TrackerData {
-
-            public void reset() {
-                rewards.clear();
-                totalChestPicked = 0;
-            }
-
-            @Expose
-            public int totalChestPicked = 0;
-
-            @Expose
-            public Map<PowderChestReward, Long> rewards = new HashMap<>();
-        }
+        public PowderTracker.Data powderTracker = new PowderTracker.Data();
 
         @Expose
         public FrozenTreasureTracker frozenTreasureTracker = new FrozenTreasureTracker();
