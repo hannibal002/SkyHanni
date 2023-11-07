@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
-import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -160,7 +160,7 @@ public class Storage {
             public long nextSixthVisitorArrival = 0;
 
             @Expose
-            public Map<FarmingArmorDrops.ArmorDropType, Integer> farmArmorDrops = new HashMap<>();
+            public ArmorDropTracker.Data armorDropTracker = new ArmorDropTracker.Data();
 
             @Expose
             public Map<ComposterUpgrade, Integer> composterUpgrades = new HashMap<>();

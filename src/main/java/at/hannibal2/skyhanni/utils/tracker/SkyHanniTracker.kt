@@ -26,7 +26,7 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun addSessionResetButton(list: MutableList<List<Any>>) {
-        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
+        if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.SESSION) {
             list.addSessionResetButton(name, getSharedTracker()) {
                 update()
             }
@@ -45,8 +45,7 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    // rename
-    fun currentDisplay() = getSharedTracker()?.getCurrent()
+    fun currentDisplay() = getSharedTracker()?.get(TrackerUtils.currentDisplayMode)
 
     fun resetCommand(args: Array<String>, command: String) {
         TrackerUtils.resetCommand(name, command, args, getSharedTracker()) {

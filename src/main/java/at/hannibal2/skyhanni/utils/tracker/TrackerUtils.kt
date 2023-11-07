@@ -30,7 +30,7 @@ object TrackerUtils {
                     "§c$name"
                 ),
             ) {
-                data?.get(DisplayMode.CURRENT)?.let {
+                data?.get(DisplayMode.SESSION)?.let {
                     reset(it) {
                         update()
                     }

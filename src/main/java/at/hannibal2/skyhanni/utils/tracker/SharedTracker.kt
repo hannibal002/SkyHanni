@@ -11,8 +11,6 @@ class SharedTracker<T : TrackerData>(
 
     fun get(displayMode: DisplayMode) = when (displayMode) {
         DisplayMode.TOTAL -> total
-        DisplayMode.CURRENT -> currentSession
+        DisplayMode.SESSION -> currentSession
     }
-
-    fun getCurrent() = get(TrackerUtils.currentDisplayMode)
 }
