@@ -23,7 +23,7 @@ object DicerDropTracker {
     private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden.dicerCounters
-    private val tracker = SkyHanniTracker("Dicer Drop Tracker", Data(), { it.garden.dicerDropTracker }) { update() }
+    private val tracker = SkyHanniTracker("Dicer Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) { update() }
 
     class Data : TrackerData() {
         override fun reset() {

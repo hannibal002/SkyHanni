@@ -59,7 +59,7 @@ object PowderTracker {
         }
     }
 
-    private val tracker = SkyHanniTracker("Powder Tracker", Data(), { it.powderTracker }) { saveAndUpdate() }
+    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { saveAndUpdate() }
 
     class Data : TrackerData() {
         override fun reset() {

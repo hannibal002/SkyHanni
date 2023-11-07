@@ -33,7 +33,7 @@ object ArmorDropTracker {
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = SkyHanniMod.feature.garden.farmingArmorDrop
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", Data(), { it.garden.armorDropTracker }) { update() }
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) { update() }
 
     class Data : TrackerData() {
         override fun reset() {

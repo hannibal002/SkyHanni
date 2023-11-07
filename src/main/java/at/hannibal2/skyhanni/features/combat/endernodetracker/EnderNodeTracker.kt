@@ -36,7 +36,7 @@ object EnderNodeTracker {
     private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker("Ender Node Tracker", Data(), { it.enderNodeTracker }) { update() }
+    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) { update() }
 
     class Data : TrackerData() {
 

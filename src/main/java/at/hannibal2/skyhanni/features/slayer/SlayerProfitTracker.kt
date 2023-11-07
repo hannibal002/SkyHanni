@@ -165,7 +165,7 @@ object SlayerProfitTracker {
                     itemLogCategory
                 ) { Data() }
             }
-            SkyHanniTracker("$itemLogCategory Profit Tracker", Data(), getStorage) { update() }
+            SkyHanniTracker("$itemLogCategory Profit Tracker", { Data() }, getStorage) { update() }
         }
     }
 

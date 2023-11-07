@@ -13,19 +13,23 @@ import net.minecraft.client.gui.inventory.GuiInventory
 
 class SkyHanniTracker<Data : TrackerData>(
     private val name: String,
-    private val currentSessionData: Data,
+    private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
     private val update: () -> Unit,
 ) {
     private var inventoryOpen = false
     private var displayMode = DisplayMode.TOTAL
+    private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
 
     fun isInventoryOpen() = inventoryOpen
 
     private fun getSharedTracker(): SharedTracker<Data>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-        return SharedTracker(getStorage(profileSpecific), currentSessionData)
+        return SharedTracker(getStorage(profileSpecific), getCurrentSession(profileSpecific))
     }
+
+    private fun getCurrentSession(profileSpecific: Storage.ProfileSpecific) =
+        currentSessions.getOrPut(profileSpecific) { createNewSession() }
 
     fun addSessionResetButton(list: MutableList<List<Any>>) {
         if (!inventoryOpen || displayMode != DisplayMode.SESSION) return
