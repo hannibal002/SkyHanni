@@ -144,7 +144,7 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public DicerDropTracker dicerDropsTracker = new DicerDropTracker();
+            public DicerDropTracker dicerDropTracker = new DicerDropTracker();
 
             public static class DicerDropTracker extends TrackerData {
 
@@ -153,7 +153,7 @@ public class Storage {
                 }
 
                 @Expose
-                public Map<CropType, Map<at.hannibal2.skyhanni.features.garden.farming.DicerDropsTracker.DropRarity, Integer>> drops = new HashMap<>();
+                public Map<CropType, Map<at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker.DropRarity, Integer>> drops = new HashMap<>();
 
             }
 

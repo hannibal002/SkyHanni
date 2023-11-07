@@ -26,7 +26,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object DicerDropsTracker {
+object DicerDropTracker {
     private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden.dicerCounters
@@ -95,7 +95,7 @@ object DicerDropsTracker {
         }
 
         if (inventoryOpen && TrackerUtils.currentDisplayMode == DisplayMode.CURRENT) {
-            addSessionResetButton("Dicer Drops Tracker", getSharedTracker()) {
+            addSessionResetButton("Dicer Drop Tracker", getSharedTracker()) {
                 update()
             }
         }
@@ -132,7 +132,7 @@ object DicerDropsTracker {
             inventoryOpen = currentlyOpen
             update()
         }
-        config.pos.renderStringsAndItems(display, posLabel = "Dicer Drops Tracker")
+        config.pos.renderStringsAndItems(display, posLabel = "Dicer Drop Tracker")
     }
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Regex)
@@ -145,7 +145,7 @@ object DicerDropsTracker {
         event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounters.hideChat")
         event.move(3, "garden.dicerCounterPos", "garden.dicerCounters.pos")
 
-        event.move(7, "#profile.garden.dicerRngDrops", "#profile.garden.dicerDropsTracker.drops") { old ->
+        event.move(7, "#profile.garden.dicerRngDrops", "#profile.garden.dicerDropTracker.drops") { old ->
             val items: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
             val oldItems = ConfigManager.gson.fromJson<Map<String, Int>>(old, Map::class.java)
             for ((internalName, amount) in oldItems) {
@@ -164,11 +164,11 @@ object DicerDropsTracker {
 
     private fun getSharedTracker(): SharedTracker<DicerDropTracker>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-        return SharedTracker(profileSpecific.garden.dicerDropsTracker, currentSessionData)
+        return SharedTracker(profileSpecific.garden.dicerDropTracker, currentSessionData)
     }
 
     fun resetCommand(args: Array<String>) {
-        TrackerUtils.resetCommand("Dicer Drops Tracker", "shresetdicertracker", args, getSharedTracker()) {
+        TrackerUtils.resetCommand("Dicer Drop Tracker", "shresetdicertracker", args, getSharedTracker()) {
             update()
         }
     }

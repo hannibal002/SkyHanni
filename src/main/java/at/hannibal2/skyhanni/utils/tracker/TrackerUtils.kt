@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 object TrackerUtils {
-
     var currentDisplayMode = DisplayMode.TOTAL
 
     fun MutableList<List<Any>>.addDisplayModeToggle(update: () -> Unit) {

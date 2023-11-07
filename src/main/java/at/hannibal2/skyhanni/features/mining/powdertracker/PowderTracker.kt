@@ -356,7 +356,7 @@ object PowderTracker {
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS && config.enabled
 
-    fun clearProfitCommand(args: Array<String>) {
+    fun resetCommand(args: Array<String>) {
         TrackerUtils.resetCommand("Powder Tracker", "shresetpowdertracker", args, getSharedTracker()) {
             saveAndUpdate()
         }
