@@ -157,6 +157,10 @@
 + Added commands /shresetpowdertracker and /shresetdicertracker to reset the Powder Tracker and Dicer Drop Tracker - hannibal2
 + Added current session/total session switch for Dicer Drop Tracker. - hannibal2
 + Added a button to reset the local session for Dicer Drop Tracker and for Powder Tracker. - hannibal2
++ Added more features for Ender Node Tracker and Armor Drop Tracker. - hannibal2
+    + Added session/display mode support, added a button to reset the current session, and added the commands /shresetendernodetracker and /shresetarmordroptracker to reset the full data.
++ Added support for different current sessions per profile for all new trackers: Ender Node, Armor Drop, Dicer Drop, Powder and Slayer Profit Tracker
++ Added the option to change the Blaze Slayer Dagger GUI positions. - hannibal2
 
 ### Bug Fixes
 
@@ -235,6 +239,8 @@
   accidentally. - hannibal2
 + Hopefully fixed resets of Visitor Drops stats. - hannibal2
 + Fixed typo in The Art Of Peace. - walker
++ Fixed compatibility problems with ChatTriggers that caused flickering in the Estimated Item Value while inside the NEU Profile Viewer. - hannibal2
++ Fixed Quest Item Helper showing negative numbers. - hannibal2
 
 #### Config
 
@@ -275,6 +281,7 @@
 + Added the slayer profit tracker logic (command to reset, toggle between total view and session view, and button to delete session) to powder tracker and Dicer Drop Tracker. - hannibal2
 + Added support for migrating parts of the player or session storage. - nea
 + Changed the config format for dicerRngDrops/dicerDropsTracker. - hannibal2
++ Created SkyHanniTracker, the core API for working with tracker stuff. This should be used everywhere someday in the future. - hannibal2
 
 ## Version 0.20
 
