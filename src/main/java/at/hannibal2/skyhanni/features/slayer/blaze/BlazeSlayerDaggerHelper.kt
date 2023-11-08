@@ -22,8 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
-
-    private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
     private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
 
     private var clientSideClicked = false
