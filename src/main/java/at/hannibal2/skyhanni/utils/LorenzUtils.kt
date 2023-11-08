@@ -205,7 +205,7 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
     fun isRewardChest(): Boolean {
         val isCorrectIsland = skyBlockIsland.equalsOneOf(IslandType.DUNGEON_HUB, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
