@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,19 +10,18 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiInventory
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.annotations.Expose
 import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
-class PowderTracker {
+object PowderTracker {
 
     private val config get() = SkyHanniMod.feature.mining.powderTracker
     private var display = emptyList<List<Any>>()
@@ -42,9 +39,6 @@ class PowderTracker {
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var powderTimer = ""
-    private var currentDisplayMode = DisplayMode.TOTAL
-    private var inventoryOpen = false
-    private var currentSessionData = mutableMapOf<Int, Storage.ProfileSpecific.PowderTracker>()
     private val gemstones = listOf(
         "Ruby" to "§c",
         "Sapphire" to "§b",
@@ -65,33 +59,38 @@ class PowderTracker {
         }
     }
 
+    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { saveAndUpdate() }
+
+    class Data : TrackerData() {
+        override fun reset() {
+            rewards.clear()
+            totalChestPicked = 0
+        }
+
+        @Expose
+        var totalChestPicked = 0
+
+        @Expose
+        var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
+    }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
-        if (inventoryOpen != currentlyOpen) {
-            inventoryOpen = currentlyOpen
-            saveAndUpdate()
-        }
-
         if (config.onlyWhenPowderGrinding && !isGrinding) return
 
-        config.position.renderStringsAndItems(
-            display,
-            posLabel = "Powder Chest Tracker"
-        )
+        tracker.renderDisplay(config.position, display)
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val msg = event.message
-        val both = currentLog() ?: return
 
         if (config.greatExplorerMaxed) {
             uncovered.matchMatcher(msg) {
-                both.modify {
+                tracker.modify {
                     it.totalChestPicked += 1
                 }
                 isGrinding = true
@@ -100,7 +99,7 @@ class PowderTracker {
         }
 
         picked.matchMatcher(msg) {
-            both.modify {
+            tracker.modify {
                 it.totalChestPicked += 1
             }
             isGrinding = true
@@ -112,7 +111,7 @@ class PowderTracker {
 
         for (reward in PowderChestReward.entries) {
             reward.pattern.matchMatcher(msg) {
-                both.modify {
+                tracker.modify {
                     val count = it.rewards[reward] ?: 0
                     var amount = group("amount").formatNumber()
                     if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder)
@@ -171,6 +170,10 @@ class PowderTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.powderTrackerConfig", "mining.powderTracker")
+
+        event.move(8, "#profile.powderTracker", "#profile.powderTracker") { old ->
+            old.asJsonObject.get("0")
+        }
     }
 
     private fun saveAndUpdate() {
@@ -187,26 +190,19 @@ class PowderTracker {
         for (index in config.textFormat.get()) {
             add(map[index])
         }
+
+        tracker.addSessionResetButton(this)
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§b§lPowder Tracker")
-        if (inventoryOpen) {
-            addSelector<DisplayMode>(
-                "§7Display Mode: ",
-                getName = { type -> type.displayName },
-                isCurrent = { it == currentDisplayMode },
-                onChange = {
-                    currentDisplayMode = it
-                    saveAndUpdate()
-                }
-            )
-        } else {
+        tracker.addDisplayModeToggle(this)
+
+        if (!tracker.isInventoryOpen()) {
             addAsSingletonList("")
         }
 
-        val both = currentLog() ?: return@buildList
-        val display = both.get(currentDisplayMode)
+        val display = tracker.currentDisplay() ?: return@buildList
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
@@ -262,13 +258,13 @@ class PowderTracker {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
-
     }
 
     private fun MutableList<List<Any>>.addPerHour(
         map: MutableMap<PowderChestReward, Long>,
         reward: PowderChestReward,
-        info: ResourceInfo) {
+        info: ResourceInfo
+    ) {
         val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
         val mithrilPerHour = format(info.perHour)
         addAsSingletonList("§b$mithrilCount ${reward.displayName} §7($mithrilPerHour/h)")
@@ -301,18 +297,14 @@ class PowderTracker {
     }
 
     private fun calculate(info: ResourceInfo, reward: PowderChestReward) {
-        val both = currentLog() ?: return
-        val display = both.get(currentDisplayMode)
+        val display = tracker.currentDisplay() ?: return
         val rewards = display.rewards
-        info.estimated = 0
-        info.estimated += rewards.getOrDefault(reward, 0)
+        info.estimated = rewards.getOrDefault(reward, 0)
     }
 
     private fun calculateChest() {
-        val both = currentLog() ?: return
-        val display = both.get(currentDisplayMode)
-        chestInfo.estimated = 0
-        chestInfo.estimated += display.totalChestPicked
+        val display = tracker.currentDisplay() ?: return
+        chestInfo.estimated = display.totalChestPicked.toLong()
     }
 
     private fun convert(roughCount: Long): Gem {
@@ -342,37 +334,10 @@ class PowderTracker {
         val perMin: MutableList<Long>
     )
 
-    enum class DisplayMode(val displayName: String) {
-        TOTAL("Total"),
-        CURRENT("This Session"),
-        ;
-    }
-
-    private fun currentLog(): AbstractPowderTracker? {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-
-        return AbstractPowderTracker(
-            profileSpecific.powderTracker.getOrPut(0) { Storage.ProfileSpecific.PowderTracker() },
-            currentSessionData.getOrPut(0) { Storage.ProfileSpecific.PowderTracker() }
-        )
-    }
-
-    class AbstractPowderTracker(
-        private val total: Storage.ProfileSpecific.PowderTracker,
-        private val currentSession: Storage.ProfileSpecific.PowderTracker,
-    ) {
-
-        fun modify(modifyFunction: (Storage.ProfileSpecific.PowderTracker) -> Unit) {
-            modifyFunction(total)
-            modifyFunction(currentSession)
-        }
-
-        fun get(displayMode: DisplayMode) = when (displayMode) {
-            DisplayMode.TOTAL -> total
-            DisplayMode.CURRENT -> currentSession
-        }
-    }
-
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS && config.enabled
+
+    fun resetCommand(args: Array<String>) {
+        tracker.resetCommand(args, "shresetpowdertracker")
+    }
 }

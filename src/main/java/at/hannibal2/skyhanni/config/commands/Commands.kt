@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -18,13 +19,16 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -32,7 +36,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -150,7 +154,7 @@ object Commands {
         registerCommand(
             "shclearslayerprofits",
             "Clearing the total slayer profit for the current slayer type"
-        ) { SlayerItemProfitTracker.clearProfitCommand(it) }
+        ) { SlayerProfitTracker.clearProfitCommand(it) }
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3"
@@ -159,7 +163,17 @@ object Commands {
             "shclearfarmingitems",
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
-        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
+        registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
+        registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerDropTracker.resetCommand(it) }
+        registerCommand(
+            "shresetendernodetracker",
+            "Resets the Ender Node Tracker"
+        ) { EnderNodeTracker.resetCommand(it) }
+        registerCommand(
+            "shresetarmordroptracker",
+            "Resets the Armor Drop Tracker"
+        ) { ArmorDropTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -168,9 +182,9 @@ object Commands {
         registerCommand(
             "shcopytranslation",
             "<language code (2 letters)> <messsage to translate>\n" +
-                    "Requires the Chat > Translator feature to be enabled.\n" +
-                    "Copies the translation for a given message to your clipboard. " +
-                    "Language codes are at the end of the translation when you click on a message."
+                "Requires the Chat > Translator feature to be enabled.\n" +
+                "Copies the translation for a given message to your clipboard. " +
+                "Language codes are at the end of the translation when you click on a message."
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shmouselock",
@@ -216,6 +230,10 @@ object Commands {
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
+        registerCommand(
+            "shpumpkin",
+            "Toggles receiving the 12 fortune from pumpkins"
+        ) { CaptureFarmingGear.reversePumpkinFortune() }
         registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
@@ -373,15 +391,16 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
         } else {
+            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
 
     private fun clearFarmingItems() {
-        val config = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         LorenzUtils.chat("§e[SkyHanni] clearing farming items")
-        config.farmingItems.clear()
-        config.outdatedItems.clear()
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
@@ -393,7 +412,7 @@ object Commands {
         name: String,
         description: String,
         function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
     ) {
         val command = SimpleCommand(
             name,

@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -161,7 +161,7 @@ class FrozenTreasureTracker {
         event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
     }
 
-    private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)
+    private fun onJerryWorkshop() = IslandType.WINTER.isInIsland()
 
     private fun inGlacialCave() = onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 }

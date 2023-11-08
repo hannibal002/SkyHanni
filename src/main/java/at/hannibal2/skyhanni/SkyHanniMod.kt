@@ -107,6 +107,8 @@ import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
@@ -138,10 +140,10 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestStatsSummary
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
+import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropCounter
-import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops
+import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenBurrowingSporesNotifier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
@@ -237,6 +239,7 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.PabloHelper
 import at.hannibal2.skyhanni.features.nether.QuestItemHelper
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazes
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangBlazingSouls
@@ -272,9 +275,9 @@ import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
 import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround
 import at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning
 import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterDisplay
 import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
@@ -324,7 +327,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.17",
+    version = "0.21.Beta.21",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -388,6 +391,7 @@ class SkyHanniMod {
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
+        loadModule(FishingAPI)
         loadModule(MaxwellAPI)
 
         // features
@@ -499,12 +503,12 @@ class SkyHanniMod {
         loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
-        loadModule(DicerRngDropCounter())
+        loadModule(DicerDropTracker)
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
-        loadModule(FarmingArmorDrops())
+        loadModule(ArmorDropTracker)
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
@@ -553,7 +557,7 @@ class SkyHanniMod {
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
         loadModule(GetFromSacksTabComplete)
-        loadModule(SlayerItemProfitTracker)
+        loadModule(SlayerProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
@@ -594,8 +598,8 @@ class SkyHanniMod {
         loadModule(GriffinPetWarning())
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
-        loadModule(HarpFeatures())
-        loadModule(EnderNodeTracker())
+        loadModule(HarpFeatures)
+        loadModule(EnderNodeTracker)
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
@@ -604,7 +608,7 @@ class SkyHanniMod {
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
-        loadModule(PowderTracker())
+        loadModule(PowderTracker)
         loadModule(ModifyVisualWords)
         loadModule(TabListReader)
         loadModule(TabListRenderer)
@@ -622,6 +626,8 @@ class SkyHanniMod {
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(DungeonFinderFeatures())
+        loadModule(PabloHelper())
+        loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())
 
         init()
