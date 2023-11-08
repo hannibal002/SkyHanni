@@ -12,22 +12,37 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson
 import at.hannibal2.skyhanni.utils.jsonobjects.ArmorDropsJson.DropInfo
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class FarmingArmorDrops {
-    private var display = emptyList<String>()
-    private val storage get() = GardenAPI.config
+object ArmorDropTracker {
+    private var display = emptyList<List<Any>>()
 
     private var hasArmor = false
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = SkyHanniMod.feature.garden.farmingArmorDrop
+
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) { update() }
+
+    class Data : TrackerData() {
+        override fun reset() {
+            drops.clear()
+        }
+
+        @Expose
+        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
+    }
 
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
@@ -54,9 +69,9 @@ class FarmingArmorDrops {
     }
 
     private fun addDrop(drop: ArmorDropType) {
-        val drops = storage?.farmArmorDrops ?: return
-        val old = drops[drop] ?: 0
-        drops[drop] = old + 1
+        tracker.modify {
+            it.drops.addOrPut(drop, 1)
+        }
         update()
     }
 
@@ -64,14 +79,17 @@ class FarmingArmorDrops {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList {
-        val drops = storage?.farmArmorDrops ?: return@buildList
+    private fun drawDisplay() = buildList<List<Any>> {
+        val drops = tracker.currentDisplay()?.drops ?: return@buildList
 
-        add("§7RNG Drops for Farming Armor:")
+        addAsSingletonList("§7RNG Drops for Farming Armor:")
+        tracker.addDisplayModeToggle(this)
         for ((drop, amount) in drops.sortedDesc()) {
             val dropName = drop.dropName
-            add(" §7- §e${amount.addSeparators()}x $dropName")
+            addAsSingletonList(" §7- §e${amount.addSeparators()}x $dropName")
         }
+
+        tracker.addSessionResetButton(this)
     }
 
     @SubscribeEvent
@@ -80,12 +98,12 @@ class FarmingArmorDrops {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
         if (!hasArmor) return
 
-        config.pos.renderStrings(display, posLabel = "Farming Armor Drops")
+        tracker.renderDisplay(config.pos, display)
     }
 
     @SubscribeEvent
@@ -111,32 +129,30 @@ class FarmingArmorDrops {
         armorDropInfo = data.special_crops
     }
 
-    companion object {
-        var armorDropInfo = mapOf<String, DropInfo>()
-        private var currentArmorDropChance = 0.0
-        private var lastCalculationTime = SimpleTimeMark.farPast()
+    private var armorDropInfo = mapOf<String, DropInfo>()
+    private var currentArmorDropChance = 0.0
+    private var lastCalculationTime = SimpleTimeMark.farPast()
 
-        fun getDropsPerHour(crop: CropType?): Double {
-            if (crop == null) return 0.0
+    fun getDropsPerHour(crop: CropType?): Double {
+        if (crop == null) return 0.0
 
-            if (lastCalculationTime.passedSince() > 5.seconds) {
-                lastCalculationTime = SimpleTimeMark.now()
+        if (lastCalculationTime.passedSince() > 5.seconds) {
+            lastCalculationTime = SimpleTimeMark.now()
 
-                val armorDropName = crop.specialDropType
-                val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
-                val pieceCount = InventoryUtils.getArmor()
-                    .mapNotNull { it?.getInternalName()?.asString() }
-                    .count { it.contains(armorName) || it.contains("FERMENTO") }
+            val armorDropName = crop.specialDropType
+            val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
+            val pieceCount = InventoryUtils.getArmor()
+                .mapNotNull { it?.getInternalName()?.asString() }
+                .count { it.contains(armorName) || it.contains("FERMENTO") }
 
-                val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
-                var dropRate = 0.0
-                if (pieceCount > 0 && dropRates.size >= pieceCount) {
-                    dropRate = dropRates[pieceCount - 1]
-                }
-                currentArmorDropChance = (dropRate * 60 * 60.0) / 100
+            val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
+            var dropRate = 0.0
+            if (pieceCount > 0 && dropRates.size >= pieceCount) {
+                dropRate = dropRates[pieceCount - 1]
             }
-            return currentArmorDropChance
+            currentArmorDropChance = (dropRate * 60 * 60.0) / 100
         }
+        return currentArmorDropChance
     }
 
     @SubscribeEvent
@@ -144,5 +160,15 @@ class FarmingArmorDrops {
         event.move(3, "garden.farmingArmorDropsEnabled", "garden.farmingArmorDrop.enabled")
         event.move(3, "garden.farmingArmorDropsHideChat", "garden.farmingArmorDrop.hideChat")
         event.move(3, "garden.farmingArmorDropsPos", "garden.farmingArmorDrop.pos")
+
+        event.move(8, "#profile.garden.farmArmorDrops", "#profile.garden.armorDropTracker") { old ->
+            val new = JsonObject()
+            new.add("drops", old)
+            new
+        }
+    }
+
+    fun resetCommand(args: Array<String>) {
+        tracker.resetCommand(args, "shresetarmordroptracker")
     }
 }
