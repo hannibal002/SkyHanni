@@ -20,7 +20,7 @@ class MayorElection {
     companion object {
         var rawMayorData: MayorJson? = null
         var candidates = mapOf<Int, MayorJson.Candidate>()
-        var currentCandidate: MayorJson.Candidate? = null
+        var currentCandidate: MayorJson.Candidate? = null  //todo: should it not be called currentMayor?
 
         fun isPerkActive(mayor: String, perk: String) = currentCandidate?.let { currentCandidate ->
             currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }

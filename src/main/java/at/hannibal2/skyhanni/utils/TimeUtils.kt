@@ -119,7 +119,7 @@ object TimeUtils {
         }.toLong()
     }
 
-    fun SkyBlockTime.formatted(): String {
+    fun SkyBlockTime.formatted(hoursAndMinutes : Boolean = true): String {
         val hour = if (this.hour > 12) this.hour - 12 else this.hour
         val timeOfDay = if (this.hour > 11) "pm" else "am" // hooray for 12-hour clocks
         var minute = this.minute.toString()
@@ -131,6 +131,9 @@ object TimeUtils {
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)
         val year = this.year
+
+        if (!hoursAndMinutes) return "$month $day$daySuffix, Year $year" // Early Winter 1st Year 300
+
         return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
     }
 }

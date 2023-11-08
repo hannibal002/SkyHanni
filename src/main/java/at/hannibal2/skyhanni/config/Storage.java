@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.Powers;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
@@ -79,6 +80,9 @@ public class Storage {
 
         @Expose
         public String currentPet = "";
+
+        @Expose
+        public Powers currentPower = null;
 
         @Expose
         public Map<LorenzVec, MinionConfig> minions = new HashMap<>();
