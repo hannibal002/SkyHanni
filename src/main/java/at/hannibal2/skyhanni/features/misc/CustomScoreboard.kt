@@ -211,7 +211,7 @@ enum class CustomScoreboardElements (
                 " §7- §e${SlayerAPI.latestSlayerProgress.trim()}"
             )
         },
-        listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE),
+        listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.THE_RIFT),
         0,
         14
     ),
