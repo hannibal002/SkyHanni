@@ -43,7 +43,7 @@ class SkyHanniTracker<Data : TrackerData>(
                     "§c$name"
                 ),
             ) {
-                reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
+                reset(DisplayMode.SESSION, "Reset this session of $name!")
             })
     }
 
@@ -65,12 +65,12 @@ class SkyHanniTracker<Data : TrackerData>(
 
     fun resetCommand(args: Array<String>, command: String) {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
-            reset(DisplayMode.TOTAL, "§e[SkyHanni] Reset total $name!")
+            reset(DisplayMode.TOTAL, "Reset total $name!")
             return
         }
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Are you sure you want to reset your total $name? Click here to confirm.",
+            "Are you sure you want to reset your total $name? Click here to confirm.",
             "$command confirm"
         )
     }
