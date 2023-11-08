@@ -22,7 +22,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
@@ -32,7 +31,7 @@ import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -42,7 +41,6 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.misc.customScoreboard
@@ -321,7 +319,7 @@ class CustomScoreboard {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         // Draws the custom scoreboard
         display = drawScoreboard()
 
