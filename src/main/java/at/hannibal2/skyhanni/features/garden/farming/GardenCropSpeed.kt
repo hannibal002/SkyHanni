@@ -22,8 +22,8 @@ import kotlin.concurrent.fixedRateTimer
 
 object GardenCropSpeed {
     private val config get() = SkyHanniMod.feature.garden
-    private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenAPI.config?.cropsPerSecond
-    private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestBlocksPerSecond
+    private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropsPerSecond
+    private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestBlocksPerSecond
 
     var lastBrokenCrop: CropType? = null
     var lastBrokenTime = 0L

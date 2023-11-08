@@ -44,7 +44,7 @@ object GardenCropMilestones {
 
     private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
