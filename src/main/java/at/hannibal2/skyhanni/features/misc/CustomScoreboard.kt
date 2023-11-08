@@ -280,7 +280,7 @@ enum class CustomScoreboardElements (
                 false ->
                     when (config.displayNumbersFirst)
                     {
-                        true -> listOf("§e${MaxwellAPI.currentPower?.power} Power")
+                        true -> listOf("${MaxwellAPI.currentPower?.power} Power")
                         false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
                     }
             }
