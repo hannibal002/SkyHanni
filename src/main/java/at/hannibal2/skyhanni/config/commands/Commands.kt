@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
@@ -34,7 +36,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -151,7 +153,7 @@ object Commands {
         registerCommand(
             "shclearslayerprofits",
             "Clearing the total slayer profit for the current slayer type"
-        ) { SlayerItemProfitTracker.clearProfitCommand(it) }
+        ) { SlayerProfitTracker.clearProfitCommand(it) }
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3"
@@ -161,8 +163,16 @@ object Commands {
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
-        registerCommand("shresetpowdertracker", "Resets the powder tracker") { PowderTracker.resetCommand(it) }
-        registerCommand("shresetdicertracker", "Resets the dicer counter") { DicerDropTracker.resetCommand(it) }
+        registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerDropTracker.resetCommand(it) }
+        registerCommand(
+            "shresetendernodetracker",
+            "Resets the Ender Node Tracker"
+        ) { EnderNodeTracker.resetCommand(it) }
+        registerCommand(
+            "shresetarmordroptracker",
+            "Resets the Armor Drop Tracker"
+        ) { ArmorDropTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
