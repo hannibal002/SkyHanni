@@ -39,8 +39,10 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun modify(modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.modify(modifyFunction)
-        update()
+        getSharedTracker()?.let {
+            it.modify(modifyFunction)
+            update()
+        }
     }
 
     fun renderDisplay(position: Position) {
@@ -54,19 +56,17 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun update() {
-        display = buildFinalDisplay()
+        display = getSharedTracker()?.let {
+            buildFinalDisplay(drawDisplay(it.get(displayMode)))
+        } ?: emptyList()
     }
 
-    private fun buildFinalDisplay(): List<List<Any>> {
-        val data = currentDisplay() ?: return emptyList()
-
-        return drawDisplay(data).toMutableList().also {
-            if (inventoryOpen) {
-                it.add(1, buildDisplayModeView())
-            }
-            if (inventoryOpen && displayMode == DisplayMode.SESSION) {
-                it.addAsSingletonList(buildSessionResetButton())
-            }
+    private fun buildFinalDisplay(rawList: List<List<Any>>) = rawList.toMutableList().also {
+        if (inventoryOpen) {
+            it.add(1, buildDisplayModeView())
+        }
+        if (inventoryOpen && displayMode == DisplayMode.SESSION) {
+            it.addAsSingletonList(buildSessionResetButton())
         }
     }
 
@@ -94,19 +94,13 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     )
 
-    private fun currentDisplay() = getSharedTracker()?.get(displayMode)
-
-    private fun getSharedTracker(): SharedTracker<Data>? {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-        return SharedTracker(getStorage(profileSpecific), getCurrentSession(profileSpecific))
+    private fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
+        SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
     }
 
-    private fun getCurrentSession(profileSpecific: Storage.ProfileSpecific) =
-        currentSessions.getOrPut(profileSpecific) { createNewSession() }
-
     private fun reset(displayMode: DisplayMode, message: String) {
-        getSharedTracker()?.get(displayMode)?.let {
-            it.reset()
+        getSharedTracker()?.let {
+            it.get(displayMode).reset()
             LorenzUtils.chat(message)
             update()
         }
@@ -129,5 +123,4 @@ class SkyHanniTracker<Data : TrackerData>(
         SESSION("This Session"),
         ;
     }
-
 }
