@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
+import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniTracker<Data : TrackerData>(
     private val name: String,
@@ -20,6 +22,7 @@ class SkyHanniTracker<Data : TrackerData>(
     private var displayMode = DisplayMode.TOTAL
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
     private var display = emptyList<List<Any>>()
+    private var sessionResetTime = SimpleTimeMark.farPast()
 
     fun isInventoryOpen() = inventoryOpen
 
@@ -51,36 +54,45 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun update() {
-        display = currentDisplay()?.let {
-            val list = drawDisplay(it).toMutableList()
+        display = buildFinalDisplay()
+    }
+
+    private fun buildFinalDisplay(): List<List<Any>> {
+        val data = currentDisplay() ?: return emptyList()
+
+        return drawDisplay(data).toMutableList().also {
             if (inventoryOpen) {
-                list.add(1, LorenzUtils.buildSelector<DisplayMode>(
-                    "§7Display Mode: ",
-                    getName = { type -> type.displayName },
-                    isCurrent = { it == displayMode },
-                    onChange = {
-                        displayMode = it
-                        update()
-                    }
-                ))
+                it.add(1, buildDisplayModeView())
             }
             if (inventoryOpen && displayMode == DisplayMode.SESSION) {
-                list.addAsSingletonList(
-                    Renderable.clickAndHover(
-                        "§cReset session!",
-                        listOf(
-                            "§cThis will reset your",
-                            "§ccurrent session of",
-                            "§c$name"
-                        ),
-                    ) {
-                        reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
-                    })
+                it.addAsSingletonList(buildSessionResetButton())
             }
-
-            list
-        } ?: emptyList()
+        }
     }
+
+    private fun buildSessionResetButton() = Renderable.clickAndHover(
+        "§cReset session!",
+        listOf(
+            "§cThis will reset your",
+            "§ccurrent session of",
+            "§c$name"
+        ),
+    ) {
+        if (sessionResetTime.passedSince() > 3.seconds) {
+            reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
+            sessionResetTime = SimpleTimeMark.now()
+        }
+    }
+
+    private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
+        "§7Display Mode: ",
+        getName = { type -> type.displayName },
+        isCurrent = { it == displayMode },
+        onChange = {
+            displayMode = it
+            update()
+        }
+    )
 
     private fun currentDisplay() = getSharedTracker()?.get(displayMode)
 
