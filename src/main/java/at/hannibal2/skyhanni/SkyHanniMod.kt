@@ -560,7 +560,7 @@ class SkyHanniMod {
         loadModule(QuickModMenuSwitch)
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
-        loadModule(FrozenTreasureTracker())
+        loadModule(FrozenTreasureTracker)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())

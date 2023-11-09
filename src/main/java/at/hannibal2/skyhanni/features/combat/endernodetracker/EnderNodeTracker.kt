@@ -215,9 +215,6 @@ object EnderNodeTracker {
         if (!ProfileStorageData.loaded) return emptyList<List<Any>>()
 
         addAsSingletonList("§5§lEnder Node Tracker")
-
-        tracker.addDisplayModeToggle(this)
-
         addAsSingletonList("§d${storage.totalNodesMined.addSeparators()} Ender Nodes mined")
         addAsSingletonList("§6${format(lootProfit.values.sum())} Coins made")
         addAsSingletonList(" ")
@@ -244,8 +241,6 @@ object EnderNodeTracker {
         val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (storage.lootCount[it] ?: 0).addSeparators() }
         val profit = format(EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 })
         addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
-
-        tracker.addSessionResetButton(this)
     }
 
     private fun calculateEnderArmor(storage: Data) =
@@ -259,7 +254,11 @@ object EnderNodeTracker {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
             newList.add(map[index])
+            if (newList.size == 1) {
+                tracker.addDisplayModeToggle(newList)
+            }
         }
+        tracker.addSessionResetButton(newList)
         return newList
     }
 

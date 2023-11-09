@@ -23,14 +23,6 @@ class SkyHanniTracker<Data : TrackerData>(
 
     fun isInventoryOpen() = inventoryOpen
 
-    private fun getSharedTracker(): SharedTracker<Data>? {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-        return SharedTracker(getStorage(profileSpecific), getCurrentSession(profileSpecific))
-    }
-
-    private fun getCurrentSession(profileSpecific: Storage.ProfileSpecific) =
-        currentSessions.getOrPut(profileSpecific) { createNewSession() }
-
     fun addSessionResetButton(list: MutableList<List<Any>>) {
         if (!inventoryOpen || displayMode != DisplayMode.SESSION) return
 
@@ -89,6 +81,14 @@ class SkyHanniTracker<Data : TrackerData>(
         position.renderStringsAndItems(display, posLabel = name)
     }
 
+    private fun getSharedTracker(): SharedTracker<Data>? {
+        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
+        return SharedTracker(getStorage(profileSpecific), getCurrentSession(profileSpecific))
+    }
+
+    private fun getCurrentSession(profileSpecific: Storage.ProfileSpecific) =
+        currentSessions.getOrPut(profileSpecific) { createNewSession() }
+
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.get(displayMode)?.let {
             it.reset()
@@ -97,7 +97,7 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data, ) {
+    class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data) {
         fun modify(modifyFunction: (Data) -> Unit) {
             modifyFunction(total)
             modifyFunction(currentSession)

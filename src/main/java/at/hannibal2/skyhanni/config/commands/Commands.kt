@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -169,10 +170,8 @@ object Commands {
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
         ) { EnderNodeTracker.resetCommand(it) }
-        registerCommand(
-            "shresetarmordroptracker",
-            "Resets the Armor Drop Tracker"
-        ) { ArmorDropTracker.resetCommand(it) }
+        registerCommand("shresetarmordroptracker", "Resets the Armor Drop Tracker") { ArmorDropTracker.resetCommand(it) }
+        registerCommand("shresetfrozentreasuretracker", "Resets the Frozen Treasure Tracker") { FrozenTreasureTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
