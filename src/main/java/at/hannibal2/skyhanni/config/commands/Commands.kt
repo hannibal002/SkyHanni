@@ -46,12 +46,12 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
-import at.hannibal2.skyhanni.test.command.CopyTabListCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -259,6 +259,7 @@ object Commands {
 
     private fun developersCodingHelp() {
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
+        registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
@@ -277,7 +278,7 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
-        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { CopyTabListCommand.command(it) }
+        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { TabListData.copyCommand(it) }
         registerCommand(
             "shcopyscoreboard",
             "Copies the scoreboard data to the clipboard"
@@ -427,3 +428,71 @@ object Commands {
         }
     }
 }
+/**
+ *
+ *          §r§a§lPlayers §r§f(21)
+ * §8[§r§9307§r§8] §r§c[§r§fYOUTUBE§r§c] Pigicial§r§f §r§7Σ
+ * §8[§r§6409§r§8] §r§6tmoe617 §r§6➶
+ * §8[§r§5395§r§8] §r§6CraftedFury §r§6§l℻
+ * §8[§r§d355§r§8] §r§6Mr_Minecraft_Ash §r§7§l:zap:
+ * §8[§r§9304§r§8] §r§6ClockSeller §r§6§lᛝ
+ * §8[§r§3269§r§8] §r§6SubAt0mic §r§7➶
+ * §8[§r§6402§r§8] §r§bMasterofBoom §r§6〣
+ * §8[§r§5392§r§8] §r§bIm_Krazy §r§6♔§r§7♲
+ * §8[§r§5386§r§8] §r§b987654321kaboom §r§6ᛃ
+ * §8[§r§5386§r§8] §r§bEisengolem §r§6⚔
+ * §8[§r§5369§r§8] §r§bVictone §r§6ᱪ
+ * §8[§r§d330§r§8] §r§bRolexDE §r§6ᛃ
+ * §8[§r§d321§r§8] §r§bshanny_boi
+ * §8[§r§9304§r§8] §r§bRainIsCake
+ * §8[§r§9294§r§8] §r§bCloutCarrot §r§6⚔
+ * §8[§r§3276§r§8] §r§bderNiklaas §r§7§lツ
+ * §8[§r§b234§r§8] §r§bAnyKun_ §r§6♫
+ * §8[§r§b231§r§8] §r§bBlackIronSweat §r§7♲
+ * §8[§r§2179§r§8] §r§bDiabeticShoes §r§7Σ
+ *          §r§a§lPlayers §r§f(21)
+ * §8[§r§9282§r§8] §r§bjanaj777 §r§6❁
+ * §8[§r§e101§r§8] §r§7DomAmelie
+ *        §r§3§lServer Info
+ * §b§lArea: §r§7Hub
+ *  Server: §r§8mini7B
+ *  Gems: §r§a0
+ *        §r§6§lAccount Info
+ * §e§lProfile: §r§aKiwi
+ *  Pet Sitter: §r§bN/A
+ *  Bank: §r§61B/1B
+ *  Interest: §r§e1h 57m
+ * §e§lSkills: §r§aForaging 50: §r§c§lMAX
+ *  Speed: §r§f✦400
+ *  Strength: §r§c❁770
+ *  Crit Chance: §r§9☣100
+ *  Crit Damage: §r§9☠454
+ *  Attack Speed: §r§e⚔0
+ * §e§lEvent: §r§bElection Over!
+ *  Starts In: §r§e17 Minutes
+ * §e§lElection: §r§b17 Minutes
+ *  §r§aDiana: §r§a|||||||§r§f||| §r§f(70%)
+ *  §r§cMarina: §r§c||§r§f|||||||| §r§f(20%)
+ *  §r§eFinnegan: §r§e||§r§f|||||||| §r§f(16%)
+ * §8[§9307§8] §cPigicial §7Σ
+ * §8[§9304§8] §6ClockSeller §6§lᛝ
+ * §8[§d355§8] §6Mr_Minecraft_Ash §7§l:zap:
+ * §8[§3269§8] §6SubAt0mic §7➶
+ * §8[§5395§8] §6CraftedFury §6§l℻
+ * §8[§6409§8] §6tmoe617 §6➶
+ * §8[§5386§8] §bEisengolem §6⚔
+ * §8[§d330§8] §bRolexDE §6ᛃ
+ * §8[§5386§8] §b987654321kaboom §6ᛃ
+ * §8[§5392§8] §bIm_Krazy §6♔§7♲
+ * §8[§3276§8] §bderNiklaas §7§lツ
+ * §8[§6402§8] §bMasterofBoom §6〣
+ * §8[§2179§8] §bDiabeticShoes §7Σ
+ * §8[§5369§8] §bVictone §6ᱪ
+ * §8[§b231§8] §bBlackIronSweat §7♲
+ * §8[§9294§8] §bCloutCarrot §6⚔
+ * §8[§b234§8] §bAnyKun_ §6♫
+ * §8[§9304§8] §bRainIsCake
+ * §8[§d321§8] §bshanny_boi
+ * §8[§9282§8] §bjanaj777 §6❁
+ *
+ */
