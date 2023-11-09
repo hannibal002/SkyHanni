@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -128,6 +130,12 @@ object EstimatedItemValue {
             display = oldData
             lastToolTipTime = System.currentTimeMillis()
             return
+        }
+
+        if (InventoryUtils.openInventoryName().startsWith("Museum ")) {
+            if (item.getLore().any { it.contains("Armor Set") }) {
+                return
+            }
         }
 
         val newDisplay = try {
