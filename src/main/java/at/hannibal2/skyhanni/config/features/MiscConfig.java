@@ -802,6 +802,12 @@ public class MiscConfig {
         public boolean showMayorPerks = true;
 
         @Expose
+        @ConfigOption(name = "Hide consecutive empty lines", desc = "Hide lines that are empty and have an empty line above them.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideConsecutiveEmptyLines = true;
+
+        @Expose
         @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard.\nUse & for colors")
         @ConfigEditorText
         public Property<String> customTitle = Property.of("&6&lSKYBLOCK");

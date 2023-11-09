@@ -379,6 +379,11 @@ class CustomScoreboard {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
             lineMap[index]?.let {
+                // Hide consecutive empty lines
+                if (config.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull()?.get(0) == "") {
+                    continue
+                }
+
                 // Adds empty lines
                 if(it[0] == "<empty>"){
                     newList.add(listOf(""))
