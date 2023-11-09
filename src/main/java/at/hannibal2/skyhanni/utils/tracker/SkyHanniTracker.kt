@@ -68,6 +68,7 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     private fun buildFinalDisplay(rawList: List<List<Any>>) = rawList.toMutableList().also {
+        if (it.isEmpty()) return@also
         if (inventoryOpen) {
             it.add(1, buildDisplayModeView())
         }
