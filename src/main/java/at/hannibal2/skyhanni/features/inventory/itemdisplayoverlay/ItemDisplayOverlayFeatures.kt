@@ -59,7 +59,7 @@ class ItemDisplayOverlayFeatures {
             return itemName.substring(itemName.length - 1)
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.D_H_FLOOR_NUM) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.DUNGEON_HEAD_FLOOR_NUMBER) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
             when {
                 itemName.contains("Bonzo") -> return "1"
                 itemName.contains("Scarf") -> return "2"
@@ -71,7 +71,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.SB_YR)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.SKYBLOCK_YEAR)) {
             if (itemName.startsWith("New Year Cake (")) return "§b" + itemName.split("(Year ", ")")[1]
             if (itemName.startsWith("Spooky Pie")) {
                 for (line in item.getLore()) {
@@ -132,7 +132,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.D_POTION_LVL) && (itemName.startsWith("Dungeon ") && itemName.contains(" Potion"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.DUNGEON_POTION_LEVEL) && (itemName.startsWith("Dungeon ") && itemName.contains(" Potion"))) {
             item.name?.let {
                 "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
@@ -161,11 +161,11 @@ class ItemDisplayOverlayFeatures {
                 if (threshold != 1) { return (((blocksWalked.toFloat()) / (threshold.toFloat())) * 100).toInt().toString() }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.NEC_LAD) && itemName.contains("Necron's Ladder")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.NECRONS_LADDER) && itemName.contains("Necron's Ladder")) {
             return item.getNecronHandlesFound().toString().replace("null", "")
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.FRUIT) && itemName.contains("Fruit Bowl")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.FRUIT_BOWL) && itemName.contains("Fruit Bowl")) {
             val lore = item.getLore()
             if (lore.anyContains(" found:")) {
                 var numFound = 0
@@ -284,7 +284,7 @@ class ItemDisplayOverlayFeatures {
             return "" + colorCode + numSlots
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.COMP_DELE)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.COMPACTOR_DELETOR)) {
             if (chestName.contains("Personal Compactor ") || chestName.contains("Personal Deletor ")) {
                 //§aCompactor Currently OFF!
                 //§aCompactor Currently ON!
@@ -321,7 +321,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.EDT_AUC)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.EDITION_AUCTION_NUMBER)) {
             var thatNumber = 0
             if (item.getLore().anyContains("Auction ")) {
                 thatNumber = item.getAuctionNumber() ?: 0
@@ -334,7 +334,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.STACKING_ENCH) && !(itemName.contains("✪"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.STACKING_ENCHANTMENT) && !(itemName.contains("✪"))) {
             val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
             val possibleEnchantments = item.getEnchantments()
             if (possibleEnchantments != null) {

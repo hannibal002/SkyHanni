@@ -72,7 +72,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.UNLOCKED)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.UNLOCKED_RECIPES)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
                     if (line.contains(" Book Unlocked: ")) {
@@ -89,7 +89,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.FAIRY_ENIGMA)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.FAIRY_ENIGMA_SOULS_QUESTS)) {
             val lore = item.getLore()
             if (chestName == "Quest Log") {
                 if (itemName == "Find all Fairy Souls") {
@@ -126,7 +126,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.TRADES) && (itemName == "Trades")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.TRADES_UNLOCKED) && (itemName == "Trades")) {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.contains("Trades Unlocked")) {
@@ -135,11 +135,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.WARDROBE) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.WARDROBE_SLOT) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
             return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
         }
         
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.STATS) && chestName.startsWith("Your Stats Breakdown")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.ABBV_STATS) && chestName.startsWith("Your Stats Breakdown")) {
             val statName = item.name ?: return ""
             if (statName.isNotEmpty()) {
                 skyblockStatBreakdownPattern.matchMatcher(statName) {
@@ -182,7 +182,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.FRUITS) && (chestName.lowercase() == ("skyblock menu"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.CUTE_NAME) && (chestName.lowercase() == ("skyblock menu"))) {
             val nameWithColor = item.name ?: return ""
             if (nameWithColor != "§aProfile Management") return ""
             val lore = item.getLore()
@@ -217,7 +217,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.DOJO) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
             for (line in item.getLore()) {
                 if (line.contains("Your Rank:")) {
                     dojoTestOfGradePattern.matchMatcher(line) {
@@ -227,7 +227,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.BANK) && chestName.contains("Bank")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.BANK_UTILS) && chestName.contains("Bank")) {
             val lore = item.getLore()
             if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%") && lore.anyContains("Amount to withdraw: ")) {
                 for (line in lore) {
@@ -327,7 +327,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.AH_BZ)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.AUCTION_BAZAAR_VARIOUS)) {
             if (itemName.isEmpty()) return ""
             val lore = item.getLore()
             if (chestName.contains("Bazaar")) {

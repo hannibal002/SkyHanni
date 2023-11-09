@@ -415,12 +415,12 @@ public class InventoryConfig {
             name = "Item Number",
             desc = "Showing the item number as a stack size for these items." // Some values may be truncated percentages or §a✔§r§7s.
         )
-        @ConfigEditorDraggableList(requireNonEmpty = true)
+        @ConfigEditorDraggableList
         public List<ItemNumber> itemNumber = new ArrayList<>(Arrays.asList(
             ItemNumber.MASTER_STAR,
             ItemNumber.MASTER_SKULL,
-            ItemNumber.SB_YR,
-            ItemNumber.CRIM_STARS,
+            ItemNumber.SKYBLOCK_YEAR,
+            ItemNumber.CRIMSON_STARS,
             ItemNumber.LARVA_HOOK,
             ItemNumber.ARMADILLO,
             ItemNumber.BEASTMASTER,
@@ -430,18 +430,18 @@ public class InventoryConfig {
         public enum ItemNumber {
             MASTER_STAR("§bMaster Star Tier"),
             MASTER_SKULL("§bMaster Skull Tier"),
-            D_H_FLOOR_NUM("§bGolden/Diamond Dungeon Head Floor Number"),
-            SB_YR("§bNew Year Cake/Spooky Pie SB Year"),
+            DUNGEON_HEAD_FLOOR_NUMBER("§bGolden/Diamond Dungeon Head Floor Number"),
+            SKYBLOCK_YEAR("§bNew Year Cake/Spooky Pie SB Year"),
             PET_LVL("§bPet Level"),
             MINION_TIER("§bMinion Tier"),
-            CRIM_STARS("§bCrimson Armor Crimson Stars"),
+            CRIMSON_STARS("§bCrimson Armor Crimson Stars"),
             KUUDRA("§bKuudra Key"),
             RANCHER_SPEED("§bRancher's Boots Speed"),
             LARVA_HOOK("§bLarva Hook"),
-            D_POTION_LVL("§bDungeon Potion Level"),
+            DUNGEON_POTION_LEVEL("§bDungeon Potion Level"),
             ARMADILLO("§bArmadillo Blocks Walked Progress (%)"),
-            NEC_LAD("§bNecron's Ladder Progress"),
-            FRUIT("§bFruit Bowl Progress"),
+            NECRONS_LADDER("§bNecron's Ladder Progress"),
+            FRUIT_BOWL("§bFruit Bowl Progress"),
             BEASTMASTER("§bBeastmaster Crest Kill Progress (%)"),
             CAMPFIRE("§bCampfire Talisman Tier"),
             BLOOD_GOD("§bBlood God Crest Strength"),
@@ -451,10 +451,10 @@ public class InventoryConfig {
             SOULFLOW("§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)"),
             CRUX("§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)"),
             STORAGE_TIER("§bMinion Storage Tier (#)"),
-            COMP_DELE("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
+            COMPACTOR_DELETOR("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
             ABIPHONE("§bAbiphone Tier"),
-            EDT_AUC("§bItem Edition/Auction Number (if less than 1000)"),
-            STACKING_ENCH("§bStacking Enchantment Tier (for items without dungeon stars)");
+            EDITION_AUCTION_NUMBER("§bItem Edition/Auction Number (if less than 1000)"),
+            STACKING_ENCHANTMENT("§bStacking Enchantment Tier (for items without dungeon stars)");
 
             final String str;
 
@@ -480,29 +480,29 @@ public class InventoryConfig {
                 name = "General",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<PlayerGeneral> player = new ArrayList<>(Arrays.asList(
-                PlayerGeneral.SBLVL,
-                PlayerGeneral.ALL_LEVEL,
-                PlayerGeneral.AVERAGE,
-                PlayerGeneral.COLL,
-                PlayerGeneral.MINIONS,
-                PlayerGeneral.MUSEUM,
-                PlayerGeneral.PETS,
-                PlayerGeneral.ESSENCE
+                PlayerGeneral.SKYBLOCK_LEVEL,
+                PlayerGeneral.SKILL_GARDEN_DUNGEON_LEVELS,
+                PlayerGeneral.SKILL_AVERAGE,
+                PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS,
+                PlayerGeneral.CRAFTED_MINIONS,
+                PlayerGeneral.MUSEUM_PROGRESS,
+                PlayerGeneral.PET_SCORE_STATUS,
+                PlayerGeneral.ESSENCE_COUNTS
             ));
 
             public enum PlayerGeneral {
-                SBLVL("§bSkyblock Level (#, won't work in Rift)"),
-                ALL_LEVEL("§bSkill + Garden + Dungeoneering Levels (#)"),
-                AVERAGE("§bSkill Average (#)"),
-                COLL("§bCollection Level + Progress (%)"),
-                MINIONS("§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)"),
-                MUSEUM("§bMuseum Donation Progress (%, # for Special Items)"),
-                PROFILE("§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)"),
-                PETS("§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)"),
-                ESSENCE("§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)"),
-                QUICK("§bQuick Upgrade Missing Count (#)");
+                SKYBLOCK_LEVEL("§bSkyblock Level (#, won't work in Rift)"),
+                SKILL_GARDEN_DUNGEON_LEVELS("§bSkill + Garden + Dungeoneering Levels (#)"),
+                SKILL_AVERAGE("§bSkill Average (#)"),
+                COLLECTION_LEVELS_AND_PROGRESS("§bCollection Level + Progress (%)"),
+                CRAFTED_MINIONS("§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)"),
+                MUSEUM_PROGRESS("§bMuseum Donation Progress (%, # for Special Items)"),
+                PROFILE_ICON("§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)"),
+                PET_SCORE_STATUS("§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)"),
+                ESSENCE_COUNTS("§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)"),
+                MINION_QUICK_UPGRADE("§bQuick Upgrade Missing Count (#)");
 
                 final String str;
 
@@ -521,25 +521,25 @@ public class InventoryConfig {
                 name = "Advanced",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<PlayerAdvanced> playerAdvanced = new ArrayList<>(Arrays.asList(
-                PlayerAdvanced.UNLOCKED,
-                PlayerAdvanced.AH_BZ,
-                PlayerAdvanced.DOJO,
-                PlayerAdvanced.BANK,
+                PlayerAdvanced.UNLOCKED_RECIPES,
+                PlayerAdvanced.AUCTION_BAZAAR_VARIOUS,
+                PlayerAdvanced.DOJO_PROGRESS,
+                PlayerAdvanced.BANK_UTILS,
                 PlayerAdvanced.MAYOR_PERKS
             ));
 
             public enum PlayerAdvanced {
-                UNLOCKED("§bUnlocked Recipes (%)"),
-                FAIRY_ENIGMA("§bCollected Fairy/Enigma Souls + Completed Quests (#)"),
-                TRADES("§bTrades Unlocked (%)"),
-                WARDROBE("§bWardrobe Slot (#)"),
-                STATS("§bSkyblock Stat Names (Abbvs)"),
-                FRUITS("§bSkyblock Profile Fruits Name (Abbvs)"),
-                AH_BZ("§bAuction House + Bazaar (Various)"),
-                DOJO("§bDojo Progress (Abbv)"),
-                BANK("§bBank Utilities (Abbvs)"),
+                UNLOCKED_RECIPES("§bUnlocked Recipes (%)"),
+                FAIRY_ENIGMA_SOULS_QUESTS("§bCollected Fairy/Enigma Souls + Completed Quests (#)"),
+                TRADES_UNLOCKED("§bTrades Unlocked (%)"),
+                WARDROBE_SLOT("§bWardrobe Slot (#)"),
+                ABBV_STATS("§bSkyblock Stat Names (Abbvs)"),
+                CUTE_NAME("§bSkyblock Profile Fruits Name (Abbvs)"),
+                AUCTION_BAZAAR_VARIOUS("§bAuction House + Bazaar (Various)"),
+                DOJO_PROGRESS("§bDojo Progress (Abbv)"),
+                BANK_UTILS("§bBank Utilities (Abbvs)"),
                 MAYOR_PERKS("§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)");
 
                 final String str;
@@ -559,24 +559,24 @@ public class InventoryConfig {
                 name = "Tryhard",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<PlayerTryhard> playerTryhard = new ArrayList<>(Arrays.asList(
-                PlayerTryhard.MENU_NAV,
-                PlayerTryhard.ACCESSORY,
-                PlayerTryhard.COUNTDOWN
+                PlayerTryhard.MENU_NAVIGATION,
+                PlayerTryhard.ACCESSORY_BAG_UTILS,
+                PlayerTryhard.EVENT_COUNTDOWN_ABBV
             ));
 
             public enum PlayerTryhard {
-                MENU_NAV("§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)"),
-                RNG_METER("§bRNG Meter Drop Odds (Abbvs)"),
-                UPGRADES("§bCommunity Shop + Essence Shop Upgrade Tiers (#)"),
-                SELEC_TAB("§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)"),
-                FAME_BITS("§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)"),
-                BOOSTER_COOKIE("§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]"),
-                POTIONS("§bCurrently Active Potion Effects Count (#)"),
-                ACCESSORY("§bAccessory Bag Utilities (Various)"),
-                COUNTDOWN("§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]"),
-                ACHIEVE("§bSkyBlock Achievements Points (%)");
+                MENU_NAVIGATION("§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)"),
+                RNG_METER_ODDS("§bRNG Meter Drop Odds (Abbvs)"),
+                COMMUNITY_ESSENCE_UPGRADES("§bCommunity Shop + Essence Shop Upgrade Tiers (#)"),
+                SELECTED_TAB("§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)"),
+                FAME_RANK_BITS("§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)"),
+                BOOSTER_COOKIE_DURATION("§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]"),
+                ACTIVE_POTION_COUNT("§bCurrently Active Potion Effects Count (#)"),
+                ACCESSORY_BAG_UTILS("§bAccessory Bag Utilities (Various)"),
+                EVENT_COUNTDOWN_ABBV("§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]"),
+                SKYBLOCK_ACHIEVEMENT_POINTS("§bSkyBlock Achievements Points (%)");
 
                 final String str;
 
@@ -595,19 +595,19 @@ public class InventoryConfig {
                 name = "§aFarming§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<Farming> farming = new ArrayList<>(Arrays.asList(
-                Farming.MEDALS,
-                Farming.VISIT_MILES,
-                Farming.COMPOSTER
+                Farming.JACOBS_MEDALS,
+                Farming.VISITOR_MILESTONES,
+                Farming.COMPOSTER_INSERT_ABBV
             ));
 
             public enum Farming {
-                MEDALS("§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)"),
-                LOG_COUNTDOWN("§bVisitor's Logbook Countdown (#, highest unit of time only)"),
-                VISIT_MILES("§bVisitor Milestones Progress (%)"),
-                NPC_RARITIES("§bGarden Visitor's Logbook NPC Rarities (Abbv)"),
-                COMPOSTER("§bComposter \"Insert from \" Counts (Abbv)");
+                JACOBS_MEDALS("§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)"),
+                VISITORS_LOGBOOK_COUNTDOWN("§bVisitor's Logbook Countdown (#, highest unit of time only)"),
+                VISITOR_MILESTONES("§bVisitor Milestones Progress (%)"),
+                VISITOR_NPC_RARITIES("§bGarden Visitor's Logbook NPC Rarities (Abbv)"),
+                COMPOSTER_INSERT_ABBV("§bComposter \"Insert from \" Counts (Abbv)");
 
                 final String str;
 
@@ -626,17 +626,17 @@ public class InventoryConfig {
                 name = "§aMining§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<Mining> mining = new ArrayList<>(Arrays.asList(
-                Mining.HOTM_LV,
-                Mining.HOTM_TIER
+                Mining.HOTM_PERK_LEVELS,
+                Mining.HOTM_OVERALL_TIERS
             ));
 
             public enum Mining {
-                SKYMALL("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
-                HOTM_LV("§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)"),
-                HOTM_TIER("§bHOTM Tiers Progress (%)"),
-                CH_NUCLEUS("§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)");
+                CURRENT_SKYMALL_PERK("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
+                HOTM_PERK_LEVELS("§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)"),
+                HOTM_OVERALL_TIERS("§bHOTM Tiers Progress (%)"),
+                CRYSTAL_HOLLOWS_NUCLEUS("§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)");
 
                 final String str;
 
@@ -655,20 +655,20 @@ public class InventoryConfig {
                 name = "§aCombat§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<Combat> combat = new ArrayList<>(Arrays.asList(
-                Combat.BE_LV,
-                Combat.BE_PROG,
-                Combat.SLAY_LV
+                Combat.BESTIARY_LEVEL,
+                Combat.BESTIARY_OVERALL_FAMILY_PROGRESS,
+                Combat.SLAYER_LEVELS
             ));
 
             public enum Combat {
-                BE_LV("§bBestiary Level (#)"),
-                BE_PROG("§bBestiary Progress (%, Overall + per Family)"),
-                SLAY_LV("§bCurrent Slayer Levels (#)"),
-                SLAY_CW("§bSlayer Combat Wisdom Buff (#)"),
-                RNG_PROG("§bSlayer/Catacombs RNG Meter Progress (%)"),
-                RECIPES("§bUnlocked Slayer Recipes (#)");
+                BESTIARY_LEVEL("§bBestiary Level (#)"),
+                BESTIARY_OVERALL_FAMILY_PROGRESS("§bBestiary Progress (%, Overall + per Family)"),
+                SLAYER_LEVELS("§bCurrent Slayer Levels (#)"),
+                SLAYER_COMBAT_WISDOM_BUFF("§bSlayer Combat Wisdom Buff (#)"),
+                RNG_METER_PROGRESS("§bSlayer/Catacombs RNG Meter Progress (%)"),
+                UNLOCKED_SLAYER_RECIPES("§bUnlocked Slayer Recipes (#)");
 
                 final String str;
 
@@ -687,18 +687,18 @@ public class InventoryConfig {
                 name = "§aSB Levels§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<SBLeveling> sbLeveling = new ArrayList<>(Arrays.asList(
-                SBLeveling.GUIDE,
-                SBLeveling.WAYS,
-                SBLeveling.REWARDS
+                SBLeveling.GUIDE_PROGRESS,
+                SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS,
+                SBLeveling.SB_LEVELING_REWARDS
             ));
 
             public enum SBLeveling {
-                GUIDE("§bSkyblock Guide Progress (%)"),
-                WAYS("§bSkyblock Ways To Level Up Tasks (%)"),
-                REWARDS("§bSkyblock Leveling Rewards Progress (%)"),
-                EMBLOCKED("§bEmblems Unlocked (#)");
+                GUIDE_PROGRESS("§bSkyblock Guide Progress (%)"),
+                WAYS_TO_LEVEL_UP_PROGRESS("§bSkyblock Ways To Level Up Tasks (%)"),
+                SB_LEVELING_REWARDS("§bSkyblock Leveling Rewards Progress (%)"),
+                EMBLEMS_UNLOCKED("§bEmblems Unlocked (#)");
 
                 final String str;
 
@@ -717,23 +717,23 @@ public class InventoryConfig {
                 name = "§aAb§9ip§5ho§6ne§ds§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(requireNonEmpty = true)
+            @ConfigEditorDraggableList
             public List<Abiphone> abiphone = new ArrayList<>(Arrays.asList(
-                Abiphone.CONTACTS,
-                Abiphone.DND,
-                Abiphone.RELAYS,
-                Abiphone.RINGTONE,
-                Abiphone.NAVI
+                Abiphone.CONTACTS_DIRECTORY,
+                Abiphone.DO_NOT_DISTURB,
+                Abiphone.RELAYS_COMPLETED,
+                Abiphone.SELECTED_RINGTONE,
+                Abiphone.NAVIGATION
             ));
 
             public enum Abiphone {
-                CONTACTS("§bContacts Directory (#)"),
-                DND("§bDND Indicator (§c§l✖§b)"),
-                RELAYS("§bRelays Finished (#)"),
-                RINGTONE("§bSelected Ringtone (Abbv)"),
-                TTT("§bTic Tac Toe Stats (§aW§eT§cL§b)"),
+                CONTACTS_DIRECTORY("§bContacts Directory (#)"),
+                DO_NOT_DISTURB("§bDND Indicator (§c§l✖§b)"),
+                RELAYS_COMPLETED("§bRelays Finished (#)"),
+                SELECTED_RINGTONE("§bSelected Ringtone (Abbv)"),
+                TIC_TAC_TOE("§bTic Tac Toe Stats (§aW§eT§cL§b)"),
                 SNAKE("§bSnake Highest Score (#)"),
-                NAVI("§bSorting/Filtering Abbreviations");
+                NAVIGATION("§bSorting/Filtering Abbreviations");
 
                 final String str;
 

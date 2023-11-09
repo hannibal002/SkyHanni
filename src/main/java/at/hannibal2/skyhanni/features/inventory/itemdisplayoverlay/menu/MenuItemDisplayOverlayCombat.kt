@@ -31,11 +31,11 @@ class MenuItemDisplayOverlayCombat {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.combat
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.BE_LV) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty() && (itemName.contains("Bestiary Milestone ")))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.BESTIARY_LEVEL) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty() && (itemName.contains("Bestiary Milestone ")))) {
             return itemName.split(" ").last()
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.BE_PROG) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty())) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.BESTIARY_OVERALL_FAMILY_PROGRESS) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty())) {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
@@ -44,7 +44,7 @@ class MenuItemDisplayOverlayCombat {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.SLAY_LV)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.SLAYER_LEVELS)) {
             if ((chestName.contains("Slayer")) && itemName.isNotEmpty()) {
                 val lore = item.getLore()
                 for (line in lore) {
@@ -63,7 +63,7 @@ class MenuItemDisplayOverlayCombat {
             }
         }
 
-        if ((stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.SLAY_CW)) && (itemName.contains("Global Combat Wisdom"))) {
+        if ((stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.SLAYER_COMBAT_WISDOM_BUFF)) && (itemName.contains("Global Combat Wisdom"))) {
             for (line in item.getLore()) {
                 if (line.contains("Total buff")) {
                     return "§3" + line.removeColor().replace("Total buff: +", "").replace("☯ Combat Wisdom", "")
@@ -71,7 +71,7 @@ class MenuItemDisplayOverlayCombat {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.RNG_PROG) && itemName.contains("RNG Meter")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.RNG_METER_PROGRESS) && itemName.contains("RNG Meter")) {
             for (line in item.getLore()) {
                 if (line.contains("Progress: ")) {
                     return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
@@ -79,7 +79,7 @@ class MenuItemDisplayOverlayCombat {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.RECIPES) && itemName.contains("Slayer Recipes")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Combat.UNLOCKED_SLAYER_RECIPES) && itemName.contains("Slayer Recipes")) {
             for (line in item.getLore()) {
                 if (line.contains("Unlocked: ")) {
                     return line.removeColor().lowercase().split("unlocked: ", " recipes")[1] //need to use lowercase here because one day the admins are going to capitalize the word "recipes" in "Unlocked: 26 Recipes" and it'll break this feature i may as well futureproof it right now

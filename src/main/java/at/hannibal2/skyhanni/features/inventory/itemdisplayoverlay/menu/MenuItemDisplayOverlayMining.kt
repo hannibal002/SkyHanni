@@ -26,7 +26,7 @@ class MenuItemDisplayOverlayMining {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.mining
         val chestName = InventoryUtils.openInventoryName()
         
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.SKYMALL) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.CURRENT_SKYMALL_PERK) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
             if (lore.last().contains("Right-click to ") && lore.last().contains("disable") && lore.anyContains("Your Current Effect")) {
                 // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
@@ -59,7 +59,7 @@ class MenuItemDisplayOverlayMining {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.HOTM_LV) && (chestName == "Heart of the Mountain")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.HOTM_PERK_LEVELS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
             if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
                 val lore = item.getLore()
@@ -78,7 +78,7 @@ class MenuItemDisplayOverlayMining {
         //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
         //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
         //ping @erymanthus on the skyhanni discord if you find any bugs with this
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.HOTM_TIER) && chestName == ("Heart of the Mountain") && item.cleanName().contains("Tier ")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.HOTM_OVERALL_TIERS) && chestName == ("Heart of the Mountain") && item.cleanName().contains("Tier ")) {
             val nameWithColor = item.name ?: return ""
             if (nameWithColor.contains("§a")) return ""
             val lore = item.getLore()
@@ -93,7 +93,7 @@ class MenuItemDisplayOverlayMining {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.CH_NUCLEUS) && (chestName == "Heart of the Mountain")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.CRYSTAL_HOLLOWS_NUCLEUS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
             if (nameWithColor != "§5Crystal Hollows Crystals") return ""
             val lore = item.getLore()
