@@ -415,38 +415,58 @@ public class InventoryConfig {
             name = "Item Number",
             desc = "Showing the item number as a stack size for these items." // Some values may be truncated percentages or §a✔§r§7s.
         )
-        @ConfigEditorDraggableList(
-            exampleText = {
-                ("§bMaster Star Tier"),
-                ("§bMaster Skull Tier"),
-                ("§bGolden/Diamond Dungeon Head Floor Number"),
-                ("§bNew Year Cake/Spooky Pie SB Year"),
-                ("§bPet Level"),
-                ("§bMinion Tier"),
-                ("§bCrimson Armor Crimson Stars"),
-                ("§bKuudra Key"),
-                ("§bRancher's Boots Speed"),
-                ("§bLarva Hook"),
-                ("§bDungeon Potion Level"),
-                ("§bArmadillo Blocks Walked Progress (%)"),
-                ("§bNecron's Ladder Progress"),
-                ("§bFruit Bowl Progress"),
-                ("§bBeastmaster Crest Kill Progress (%)"),
-                ("§bCampfire Talisman Tier"),
-                ("§bBlood God Crest Strength"),
-                ("§bYeti Rod Bonus"),
-                ("§bShredder Bonus Damage"),
-                ("§bBottle of Jyrre Intelligence Bonus"),
-                ("§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)"),
-                ("§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)"),
-                ("§bMinion Storage Tier (#)"),
-                ("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
-                ("§bAbiphone Tier"),
-                ("§bItem Edition/Auction Number (if less than 1000)"),
-                ("§bStacking Enchantment Tier (for items without dungeon stars)"),
+        @ConfigEditorDraggableList(requireNonEmpty = true)
+        public List<ItemNumber> itemNumber = new ArrayList<>(Arrays.asList(
+            ItemNumber.MASTER_STAR,
+            ItemNumber.MASTER_SKULL,
+            ItemNumber.SB_YR,
+            ItemNumber.CRIM_STARS,
+            ItemNumber.LARVA_HOOK,
+            ItemNumber.ARMADILLO,
+            ItemNumber.BEASTMASTER,
+            ItemNumber.CAMPFIRE
+        ));
+
+        public enum ItemNumber {
+            MASTER_STAR("§bMaster Star Tier"),
+            MASTER_SKULL("§bMaster Skull Tier"),
+            D_H_FLOOR_NUM("§bGolden/Diamond Dungeon Head Floor Number"),
+            SB_YR("§bNew Year Cake/Spooky Pie SB Year"),
+            PET_LVL("§bPet Level"),
+            MINION_TIER("§bMinion Tier"),
+            CRIM_STARS("§bCrimson Armor Crimson Stars"),
+            KUUDRA("§bKuudra Key"),
+            RANCHER_SPEED("§bRancher's Boots Speed"),
+            LARVA_HOOK("§bLarva Hook"),
+            D_POTION_LVL("§bDungeon Potion Level"),
+            ARMADILLO("§bArmadillo Blocks Walked Progress (%)"),
+            NEC_LAD("§bNecron's Ladder Progress"),
+            FRUIT("§bFruit Bowl Progress"),
+            BEASTMASTER("§bBeastmaster Crest Kill Progress (%)"),
+            CAMPFIRE("§bCampfire Talisman Tier"),
+            BLOOD_GOD("§bBlood God Crest Strength"),
+            YETI_ROD("§bYeti Rod Bonus"),
+            SHREDDER("§bShredder Bonus Damage"),
+            JYRRE("§bBottle of Jyrre Intelligence Bonus"),
+            SOULFLOW("§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)"),
+            CRUX("§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)"),
+            STORAGE_TIER("§bMinion Storage Tier (#)"),
+            COMP_DELE("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
+            ABIPHONE("§bAbiphone Tier"),
+            EDT_AUC("§bItem Edition/Auction Number (if less than 1000)"),
+            STACKING_ENCH("§bStacking Enchantment Tier (for items without dungeon stars)");
+
+            final String str;
+
+            ItemNumber(String str) {
+                this.str = str;
             }
-        )
-        public List<Integer> itemNumber = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
+
+            @Override
+            public String toString() {
+                return str;
+            }
+        }
 
         @Expose
         @Accordion
@@ -460,145 +480,271 @@ public class InventoryConfig {
                 name = "General",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bSkyblock Level (#, won't work in Rift)"),
-                    ("§bSkill + Garden + Dungeoneering Levels (#)"),
-                    ("§bSkill Average (#)"),
-                    ("§bCollection Level + Progress (%)"),
-                    ("§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)"),
-                    ("§bMuseum Donation Progress (%, # for Special Items)"),
-                    ("§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)"),
-                    ("§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)"),
-                    ("§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)"),
-                    ("§bQuick Upgrade Missing Count (#)"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<PlayerGeneral> player = new ArrayList<>(Arrays.asList(
+                PlayerGeneral.SBLVL,
+                PlayerGeneral.ALL_LEVEL,
+                PlayerGeneral.AVERAGE,
+                PlayerGeneral.COLL,
+                PlayerGeneral.MINIONS,
+                PlayerGeneral.MUSEUM,
+                PlayerGeneral.PETS,
+                PlayerGeneral.ESSENCE
+            ));
+
+            public enum PlayerGeneral {
+                SBLVL("§bSkyblock Level (#, won't work in Rift)"),
+                ALL_LEVEL("§bSkill + Garden + Dungeoneering Levels (#)"),
+                AVERAGE("§bSkill Average (#)"),
+                COLL("§bCollection Level + Progress (%)"),
+                MINIONS("§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)"),
+                MUSEUM("§bMuseum Donation Progress (%, # for Special Items)"),
+                PROFILE("§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)"),
+                PETS("§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)"),
+                ESSENCE("§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)"),
+                QUICK("§bQuick Upgrade Missing Count (#)");
+
+                final String str;
+
+                PlayerGeneral(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> player = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "Advanced",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bUnlocked Recipes (%)"),
-                    ("§bCollected Fairy/Enigma Souls + Completed Quests (#)"),
-                    ("§bTrades Unlocked (%)"),
-                    ("§bWardrobe Slot (#)"),
-                    ("§bSkyblock Stat Names (Abbvs)"),
-                    ("§bSkyblock Profile Fruits Name (Abbvs)"),
-                    ("§bAuction House + Bazaar (Various)"),
-                    ("§bDojo Progress (Abbv)"),
-                    ("§bBank Utilities (Abbvs)"),
-                    ("§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<PlayerAdvanced> playerAdvanced = new ArrayList<>(Arrays.asList(
+                PlayerAdvanced.UNLOCKED,
+                PlayerAdvanced.AH_BZ,
+                PlayerAdvanced.DOJO,
+                PlayerAdvanced.BANK,
+                PlayerAdvanced.MAYOR_PERKS
+            ));
+
+            public enum PlayerAdvanced {
+                UNLOCKED("§bUnlocked Recipes (%)"),
+                FAIRY_ENIGMA("§bCollected Fairy/Enigma Souls + Completed Quests (#)"),
+                TRADES("§bTrades Unlocked (%)"),
+                WARDROBE("§bWardrobe Slot (#)"),
+                STATS("§bSkyblock Stat Names (Abbvs)"),
+                FRUITS("§bSkyblock Profile Fruits Name (Abbvs)"),
+                AH_BZ("§bAuction House + Bazaar (Various)"),
+                DOJO("§bDojo Progress (Abbv)"),
+                BANK("§bBank Utilities (Abbvs)"),
+                MAYOR_PERKS("§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)");
+
+                final String str;
+
+                PlayerAdvanced(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> playerAdvanced = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 9));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "Tryhard",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)"),
-                    ("§bRNG Meter Drop Odds (Abbvs)"),
-                    ("§bCommunity Shop + Essence Shop Upgrade Tiers (#)"),
-                    ("§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)"),
-                    ("§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)"),
-                    ("§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]"),
-                    ("§bCurrently Active Potion Effects Count (#)"),
-                    ("§bAccessory Bag Utilities (Various)"),
-                    ("§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]"),
-                    ("§bSkyBlock Achievements Points (%)"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<PlayerTryhard> playerTryhard = new ArrayList<>(Arrays.asList(
+                PlayerTryhard.MENU_NAV,
+                PlayerTryhard.ACCESSORY,
+                PlayerTryhard.COUNTDOWN
+            ));
+
+            public enum PlayerTryhard {
+                MENU_NAV("§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)"),
+                RNG_METER("§bRNG Meter Drop Odds (Abbvs)"),
+                UPGRADES("§bCommunity Shop + Essence Shop Upgrade Tiers (#)"),
+                SELEC_TAB("§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)"),
+                FAME_BITS("§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)"),
+                BOOSTER_COOKIE("§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]"),
+                POTIONS("§bCurrently Active Potion Effects Count (#)"),
+                ACCESSORY("§bAccessory Bag Utilities (Various)"),
+                COUNTDOWN("§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]"),
+                ACHIEVE("§bSkyBlock Achievements Points (%)");
+
+                final String str;
+
+                PlayerTryhard(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> playerTryhard = new ArrayList<>(Arrays.asList(2, 4, 5, 8));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "§aFarming§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)"),
-                    ("§bVisitor's Logbook Countdown (#, highest unit of time only)"),
-                    ("§bVisitor Milestones Progress (%)"),
-                    ("§bGarden Visitor's Logbook NPC Rarities (Abbv)"),
-                    ("§bComposter \"Insert from \" Counts (Abbv)"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<Farming> farming = new ArrayList<>(Arrays.asList(
+                Farming.MEDALS,
+                Farming.VISIT_MILES,
+                Farming.COMPOSTER
+            ));
+
+            public enum Farming {
+                MEDALS("§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)"),
+                LOG_COUNTDOWN("§bVisitor's Logbook Countdown (#, highest unit of time only)"),
+                VISIT_MILES("§bVisitor Milestones Progress (%)"),
+                NPC_RARITIES("§bGarden Visitor's Logbook NPC Rarities (Abbv)"),
+                COMPOSTER("§bComposter \"Insert from \" Counts (Abbv)");
+
+                final String str;
+
+                Farming(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> farming = new ArrayList<>(Arrays.asList(0, 1, 2));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "§aMining§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
-                    ("§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)"),
-                    ("§bHOTM Tiers Progress (%)"),
-                    ("§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<Mining> mining = new ArrayList<>(Arrays.asList(
+                Mining.HOTM_LV,
+                Mining.HOTM_TIER
+            ));
+
+            public enum Mining {
+                SKYMALL("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
+                HOTM_LV("§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)"),
+                HOTM_TIER("§bHOTM Tiers Progress (%)"),
+                CH_NUCLEUS("§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)");
+
+                final String str;
+
+                Mining(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> mining = new ArrayList<>(Arrays.asList(1, 2));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "§aCombat§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bBestiary Level (#)"),
-                    ("§bBestiary Progress (%, Overall + per Family)"),
-                    ("§bCurrent Slayer Levels (#)"),
-                    ("§bSlayer Combat Wisdom Buff (#)"),
-                    ("§bSlayer/Catacombs RNG Meter Progress (%)"),
-                    ("§bUnlocked Slayer Recipes (#)"),
-                }
-            )
-            public List<Integer> combat = new ArrayList<>(Arrays.asList(0, 2));
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<Combat> combat = new ArrayList<>(Arrays.asList(
+                Combat.BE_LV,
+                Combat.BE_PROG,
+                Combat.SLAY_LV
+            ));
 
+            public enum Combat {
+                BE_LV("§bBestiary Level (#)"),
+                BE_PROG("§bBestiary Progress (%, Overall + per Family)"),
+                SLAY_LV("§bCurrent Slayer Levels (#)"),
+                SLAY_CW("§bSlayer Combat Wisdom Buff (#)"),
+                RNG_PROG("§bSlayer/Catacombs RNG Meter Progress (%)"),
+                RECIPES("§bUnlocked Slayer Recipes (#)");
+
+                final String str;
+
+                Combat(String str) {
+                    this.str = str;
+                }
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "§aSB Levels§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bSkyblock Guide Progress (%)"),
-                    ("§bSkyblock Ways To Level Up Tasks (%)"),
-                    ("§bSkyblock Leveling Rewards Progress (%)"),
-                    ("§bEmblems Unlocked (#)"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<SBLeveling> sbLeveling = new ArrayList<>(Arrays.asList(
+                SBLeveling.GUIDE,
+                SBLeveling.WAYS,
+                SBLeveling.REWARDS
+            ));
+
+            public enum SBLeveling {
+                GUIDE("§bSkyblock Guide Progress (%)"),
+                WAYS("§bSkyblock Ways To Level Up Tasks (%)"),
+                REWARDS("§bSkyblock Leveling Rewards Progress (%)"),
+                EMBLOCKED("§bEmblems Unlocked (#)");
+
+                final String str;
+
+                SBLeveling(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> sbLeveling = new ArrayList<>(Arrays.asList(0));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
 
             @Expose
             @ConfigOption(
                 name = "§aAb§9ip§5ho§6ne§ds§7",
                 desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
             )
-            @ConfigEditorDraggableList(
-                exampleText = {
-                    ("§bContacts Directory (#)"),
-                    ("§bDND Indicator (§c§l✖§b)"),
-                    ("§bRelays Finished (#)"),
-                    ("§bSelected Ringtone (Abbv)"),
-                    ("§bTic Tac Toe Stats (§aW§eT§cL§b)"),
-                    ("§bSnake Highest Score (#)"),
-                    ("§bSorting/Filtering Abbreviations"),
+            @ConfigEditorDraggableList(requireNonEmpty = true)
+            public List<Abiphone> abiphone = new ArrayList<>(Arrays.asList(
+                Abiphone.CONTACTS,
+                Abiphone.DND,
+                Abiphone.RINGTONE,
+                Abiphone.NAVI
+            ));
+
+            public enum Abiphone {
+                CONTACTS("§bContacts Directory (#)"),
+                DND("§bDND Indicator (§c§l✖§b)"),
+                RELAYS("§bRelays Finished (#)"),
+                RINGTONE("§bSelected Ringtone (Abbv)"),
+                TTT("§bTic Tac Toe Stats (§aW§eT§cL§b)"),
+                SNAKE("§bSnake Highest Score (#)"),
+                NAVI("§bSorting/Filtering Abbreviations");
+
+                final String str;
+
+                Abiphone(String str) {
+                    this.str = str;
                 }
-            )
-            public List<Integer> abiphone = new ArrayList<>(Arrays.asList(0, 1, 2));
+
+                @Override
+                public String toString() {
+                    return str;
+                }
+            }
         }
     }
 

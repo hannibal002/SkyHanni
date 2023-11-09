@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.InventoryConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -41,7 +42,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerTryhard
         val chestName = InventoryUtils.openInventoryName()
         
-        if (stackSizeConfig.contains(0)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.MENU_NAV)) {
             val lore = item.getLore()
             if ((itemName == "Previous Page" || itemName == "Next Page")) {
                 val line = lore.first().replace(",", "")
@@ -70,7 +71,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(1) && (chestName.contains(" RNG Meter"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.RNG_METER) && (chestName.contains(" RNG Meter"))) {
             for (line in item.getLore()) {
                 if (line.contains("Odds: ")) {
                     return rngMeterPattern.matchMatcher(line) { group("odds").take(3) } ?: ""
@@ -78,7 +79,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
         
-        if (stackSizeConfig.contains(2) && (chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.UPGRADES) && (chestName.contains("Community Shop")) || (chestName.contains(" Essence Shop"))) {
             also {
                 val lore = item.getLore()
                 if (lore.isNotEmpty()) {
@@ -99,7 +100,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
         
-        if (stackSizeConfig.contains(3) && (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.SELEC_TAB) && (chestName.contains("Auction") || chestName.contains("Bazaar") || chestName.contains("Community Shop"))) {
             val lore = item.getLore()
             if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                 if (chestName.contains("Community Shop")) {
@@ -111,7 +112,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
 
         
-        if (stackSizeConfig.contains(4)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.FAME_BITS)) {
             if ((chestName == "Booster Cookie" && itemName == "Fame Rank")) {
                 for (line in item.getLore()) {
                     totalFamePattern.matchMatcher(line) {
@@ -176,7 +177,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(5) && (chestName.isNotEmpty() && item.getLore().isNotEmpty() && itemName.isNotEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.BOOSTER_COOKIE) && (chestName.isNotEmpty() && item.getLore().isNotEmpty() && itemName.isNotEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
             for (line in item.getLore()) {
                 if (line.contains("Duration:")) {
                     genericDurationPattern.matchMatcher(line) {
@@ -195,7 +196,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(6) && (chestName.contains("Equipment and Stats") && itemName.contains("Active Effects"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.POTIONS) && (chestName.contains("Equipment and Stats") && itemName.contains("Active Effects"))) {
             for (line in item.getLore()) {
                 if (line.contains("Currently Active: ")) {
                     return line.split(" ").last()
@@ -203,7 +204,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(7)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.ACCESSORY)) {
             val lore = item.getLore()
             if (chestName.contains("Your Bags") && itemName.contains("Accessory Bag")) {
                 for (line in lore) {
@@ -280,7 +281,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(8)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.COUNTDOWN)) {
             val lore = item.getLore()
             var theStringToUse = ""
             if (lore.isNotEmpty() && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
@@ -309,10 +310,10 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(9) && (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.ACHIEVE) && (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements"))) {
             for (line in item.getLore()) {
                 if (line.contains("Points: ")) {
-                    return line.removeColor().split(" ").last().between("(", "%)")
+                    return line.removeColor().split(" ").last().split("(", "%)")[1]
                 }
             }
         }

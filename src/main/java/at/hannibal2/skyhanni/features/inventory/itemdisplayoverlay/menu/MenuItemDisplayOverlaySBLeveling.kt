@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.InventoryConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -25,7 +26,7 @@ class MenuItemDisplayOverlaySBLeveling {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.sbLeveling
         val chestName = InventoryUtils.openInventoryName()
         
-        if (stackSizeConfig.contains(0)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.GUIDE)) {
             if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (itemName.isNotEmpty())) {
                 val lore = item.getLore()
                 for (line in lore) {
@@ -37,7 +38,7 @@ class MenuItemDisplayOverlaySBLeveling {
             }
         }
 
-        if (stackSizeConfig.contains(1)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.WAYS)) {
             for (line in item.getLore()) {
                 if (line.contains("Progress to Complete Category")) {
                     return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
@@ -45,7 +46,7 @@ class MenuItemDisplayOverlaySBLeveling {
             }
         }
 
-        if (stackSizeConfig.contains(2)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.REWARDS)) {
             if ((chestName.contains("Rewards") || chestName.lowercase().contains("skyblock leveling")) && (itemName.isNotEmpty())) {
                 val lore = item.getLore()
                 for (line in lore) {
@@ -56,7 +57,7 @@ class MenuItemDisplayOverlaySBLeveling {
             }
         }
 
-        if (stackSizeConfig.contains(3)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.EMBLOCKED)) {
             val nameWithColor = item.name ?: return ""
             if ((chestName.contains("Emblems")) && (itemName.isNotEmpty() && (nameWithColor.contains("§a")) && !(itemName.contains(" ")))) {
                 val bruh = item.getLore().first().removeColor().split(" ").first().trim()

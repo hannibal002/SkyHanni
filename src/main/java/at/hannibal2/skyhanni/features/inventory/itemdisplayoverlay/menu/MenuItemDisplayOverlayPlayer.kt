@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.config.features.InventoryConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -39,7 +40,7 @@ class MenuItemDisplayOverlayPlayer {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.player
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(0) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.SBLVL) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
             for (line in item.getLore()) {
                 if (line.contains(" Level: ")) {
                     skyblockLevelPattern.matchMatcher(line) {
@@ -49,7 +50,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(1)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.ALL_LEVEL)) {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
                 if (item.getLore().anyContains("Click to view!")) {
                     if (chestName == "Your Skills") {
@@ -71,7 +72,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(2) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.AVERAGE) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
             for (line in item.getLore()) {
                 if (line.contains(" Skill Avg. ")) {
                     return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
@@ -79,7 +80,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(3)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.COLL)) {
             if (chestName.endsWith(" Collections")) {
                 val lore = item.getLore()
                 if (lore.anyContains("Click to view!")) {
@@ -112,14 +113,14 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(4) && chestName.startsWith("Crafted Minions")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.MINIONS) && chestName.startsWith("Crafted Minions")) {
             val lore = item.getLore()
             if (itemName == "Information") {
                 for (line in lore) {
                     if (line.contains("Craft ") && line.contains("more") && line.contains("unique")) {
                         //§7Craft §b22 §7more §aunique
                         //Craft 22 more unique
-                        return line.removeColor().trim().between("Craft ", " more unique")
+                        return line.removeColor().trim().split("Craft ", " more unique")[1]
                     }
                 }
             }
@@ -134,7 +135,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(5) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.MUSEUM) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
             for (line in item.getLore()) {
                 if (line.contains("Items Donated")) {
                     return museumDonationPattern.matchMatcher(line) { group("amount").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
@@ -142,11 +143,11 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(6) && chestName == ("Profile Management") && itemName.contains("Profile: ")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.PROFILE) && chestName == ("Profile Management") && itemName.contains("Profile: ")) {
             profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
         }
 
-        if (stackSizeConfig.contains(7)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.PETS)) {
             if ((chestName.lowercase() == "skyblock menu") && itemName.contains("Pets")) {
                 for (line in item.getLore()) {
                     if ((line.contains("Selected pet: ")) && (line.contains("None"))) return "§c§l✖"
@@ -159,7 +160,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(8)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.ESSENCE)) {
             if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
@@ -188,13 +189,13 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(9) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.QUICK) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
             //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
             val lore = item.getLore()
             if ((lore.anyContains("You need ")) && (lore.anyContains("more"))) {
                 for (line in lore) {
                     if (line.contains("You need ") && line.contains("more")) {
-                        return line.removeColor().between("You need ", " more")
+                        return line.removeColor().split("You need ", " more")[1]
                     }
                 }
             }

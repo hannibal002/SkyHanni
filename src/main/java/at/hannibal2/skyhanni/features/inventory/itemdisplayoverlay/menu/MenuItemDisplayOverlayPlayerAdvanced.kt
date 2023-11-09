@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.InventoryConfig
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -71,7 +72,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(0)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.UNLOCKED)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
                     if (line.contains(" Book Unlocked: ")) {
@@ -88,7 +89,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(1)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.FAIRY_ENIGMA)) {
             val lore = item.getLore()
             if (chestName == "Quest Log") {
                 if (itemName == "Find all Fairy Souls") {
@@ -125,7 +126,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(2) && (itemName == "Trades")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.TRADES) && (itemName == "Trades")) {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.contains("Trades Unlocked")) {
@@ -134,11 +135,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(3) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.WARDROBE) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
             return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
         }
         
-        if (stackSizeConfig.contains(4) && chestName.startsWith("Your Stats Breakdown")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.STATS) && chestName.startsWith("Your Stats Breakdown")) {
             val statName = item.name ?: return ""
             if (statName.isNotEmpty()) {
                 skyblockStatBreakdownPattern.matchMatcher(statName) {
@@ -181,7 +182,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(5) && (chestName.lowercase() == ("skyblock menu"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.FRUITS) && (chestName.lowercase() == ("skyblock menu"))) {
             val nameWithColor = item.name ?: return ""
             if (nameWithColor != "§aProfile Management") return ""
             val lore = item.getLore()
@@ -216,7 +217,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(6) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.DOJO) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
             for (line in item.getLore()) {
                 if (line.contains("Your Rank:")) {
                     dojoTestOfGradePattern.matchMatcher(line) {
@@ -226,7 +227,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(7) && chestName.contains("Bank")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.BANK) && chestName.contains("Bank")) {
             val lore = item.getLore()
             if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%") && lore.anyContains("Amount to withdraw: ")) {
                 for (line in lore) {
@@ -273,7 +274,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(8)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.MAYOR_PERKS)) {
             val lore = item.getLore()
             if ((chestName.contains("Election"))) {
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
@@ -326,7 +327,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(9)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.AH_BZ)) {
             if (itemName.isEmpty()) return ""
             val lore = item.getLore()
             if (chestName.contains("Bazaar")) {
@@ -343,7 +344,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName == "Instasell Ignore List" && lore.anyContains("Ignored: ")) {
                     for (line in lore) {
                         if (line.contains("Ignored: ")) { //§7Ignored: §c47 Products --> Ignored: 47 Products --> Ignored: 47 Product --> 47
-                            return line.removeColor().replace("Products", "Product").between("Ignored: ", " Product")
+                            return line.removeColor().replace("Products", "Product").split("Ignored: ", " Product")[1]
                         }
                     }
                 }
