@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -15,45 +14,14 @@ class SkyHanniTracker<Data : TrackerData>(
     private val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
-    private val update: () -> Unit,
+    private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
     private var inventoryOpen = false
     private var displayMode = DisplayMode.TOTAL
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
+    private var display = emptyList<List<Any>>()
 
     fun isInventoryOpen() = inventoryOpen
-
-    fun addSessionResetButton(list: MutableList<List<Any>>) {
-        if (!inventoryOpen || displayMode != DisplayMode.SESSION) return
-
-        list.addAsSingletonList(
-            Renderable.clickAndHover(
-                "§cReset session!",
-                listOf(
-                    "§cThis will reset your",
-                    "§ccurrent session of",
-                    "§c$name"
-                ),
-            ) {
-                reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
-            })
-    }
-
-    fun addDisplayModeToggle(list: MutableList<List<Any>>) {
-        if (!inventoryOpen) return
-
-        list.addSelector<DisplayMode>(
-            "§7Display Mode: ",
-            getName = { type -> type.displayName },
-            isCurrent = { it == displayMode },
-            onChange = {
-                displayMode = it
-                update()
-            }
-        )
-    }
-
-    fun currentDisplay() = getSharedTracker()?.get(displayMode)
 
     fun resetCommand(args: Array<String>, command: String) {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
@@ -69,9 +37,10 @@ class SkyHanniTracker<Data : TrackerData>(
 
     fun modify(modifyFunction: (Data) -> Unit) {
         getSharedTracker()?.modify(modifyFunction)
+        update()
     }
 
-    fun renderDisplay(position: Position, display: List<List<Any>>) {
+    fun renderDisplay(position: Position) {
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
@@ -80,6 +49,40 @@ class SkyHanniTracker<Data : TrackerData>(
 
         position.renderStringsAndItems(display, posLabel = name)
     }
+
+    fun update() {
+        display = currentDisplay()?.let {
+            val list = drawDisplay(it).toMutableList()
+            if (inventoryOpen) {
+                list.add(1, LorenzUtils.buildSelector<DisplayMode>(
+                    "§7Display Mode: ",
+                    getName = { type -> type.displayName },
+                    isCurrent = { it == displayMode },
+                    onChange = {
+                        displayMode = it
+                        update()
+                    }
+                ))
+            }
+            if (inventoryOpen && displayMode == DisplayMode.SESSION) {
+                list.addAsSingletonList(
+                    Renderable.clickAndHover(
+                        "§cReset session!",
+                        listOf(
+                            "§cThis will reset your",
+                            "§ccurrent session of",
+                            "§c$name"
+                        ),
+                    ) {
+                        reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
+                    })
+            }
+
+            list
+        } ?: emptyList()
+    }
+
+    private fun currentDisplay() = getSharedTracker()?.get(displayMode)
 
     private fun getSharedTracker(): SharedTracker<Data>? {
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null

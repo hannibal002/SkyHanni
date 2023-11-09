@@ -48,7 +48,6 @@ object SlayerProfitTracker {
 
     private var itemLogCategory = ""
     private var baseSlayerType = ""
-    private var display = emptyList<List<Any>>()
     private val logger = LorenzLogger("slayer/profit_tracker")
     private var lastClickDelay = 0L
     private val trackers = mutableMapOf<String, SkyHanniTracker<Data>>()
@@ -106,7 +105,6 @@ object SlayerProfitTracker {
         getTracker()?.modify {
             it.slayerSpawnCost += price
         }
-        update()
     }
 
     private var allowedItems = mapOf<String, List<NEUInternalName>>()
@@ -135,14 +133,13 @@ object SlayerProfitTracker {
         val newSlayer = event.newSlayer
         itemLogCategory = newSlayer.removeColor()
         baseSlayerType = itemLogCategory.substringBeforeLast(" ")
-        update()
+        getTracker()?.update()
     }
 
     private fun addMobKillCoins(coins: Int) {
         getTracker()?.modify {
             it.mobKillCoins += coins
         }
-        update()
     }
 
     private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
@@ -152,8 +149,6 @@ object SlayerProfitTracker {
             slayerItemProfit.timesDropped++
             slayerItemProfit.totalAmount += stackSize
         }
-
-        update()
     }
 
     private fun getTracker(): SkyHanniTracker<Data>? {
@@ -165,7 +160,7 @@ object SlayerProfitTracker {
                     itemLogCategory
                 ) { Data() }
             }
-            SkyHanniTracker("$itemLogCategory Profit Tracker", { Data() }, getStorage) { update() }
+            SkyHanniTracker("$itemLogCategory Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
         }
     }
 
@@ -174,8 +169,6 @@ object SlayerProfitTracker {
         getTracker()?.modify {
             it.slayerCompletedCount++
         }
-
-        update()
     }
 
     @SubscribeEvent
@@ -238,16 +231,9 @@ object SlayerProfitTracker {
         return internalName in allowedList
     }
 
-    fun update() {
-        val tracker = getTracker() ?: return
-        display = drawDisplay(tracker)
-    }
-
-    private fun drawDisplay(tracker: SkyHanniTracker<Data>) = buildList<List<Any>> {
-        val itemLog = tracker.currentDisplay() ?: return@buildList
-
+    private fun drawDisplay(itemLog: Data) = buildList<List<Any>> {
+        val tracker = getTracker() ?: return@buildList
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
-        tracker.addDisplayModeToggle(this)
 
         var profit = 0.0
         val map = mutableMapOf<Renderable, Long>()
@@ -291,7 +277,7 @@ object SlayerProfitTracker {
                         itemProfit.hidden = !hidden
                         lastClickDelay = System.currentTimeMillis()
                     }
-                    update()
+                    tracker.update()
                 }
             } else Renderable.string(text)
             if (tracker.isInventoryOpen() || !hidden) {
@@ -349,11 +335,10 @@ object SlayerProfitTracker {
                 isCurrent = { it.ordinal == config.priceFrom },
                 onChange = {
                     config.priceFrom = it.ordinal
-                    update()
+                    tracker.update()
                 }
             )
         }
-        tracker.addSessionResetButton(this)
     }
 
     private fun getPrice(internalName: NEUInternalName) = when (config.priceFrom) {
@@ -368,7 +353,7 @@ object SlayerProfitTracker {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
 
-        getTracker()?.renderDisplay(config.pos, display)
+        getTracker()?.renderDisplay(config.pos)
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

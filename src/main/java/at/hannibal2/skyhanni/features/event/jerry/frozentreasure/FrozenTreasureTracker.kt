@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -24,7 +23,6 @@ import kotlin.concurrent.fixedRateTimer
 
 object FrozenTreasureTracker {
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
-    private var display = emptyList<List<Any>>()
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
     private var icePerSecond = mutableListOf<Long>()
@@ -32,7 +30,7 @@ object FrozenTreasureTracker {
     private var stoppedChecks = 0
     private var compactPattern = "COMPACT! You found an Enchanted Ice!".toPattern()
     private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
-    { saveAndUpdate() }
+    { formatDisplay(drawDisplay(it)) }
 
     init {
         fixedRateTimer(name = "skyhanni-frozen-treasure-tracker", period = 1000) {
@@ -64,7 +62,7 @@ object FrozenTreasureTracker {
         icePerHour = 0
         stoppedChecks = 0
         icePerSecond = mutableListOf()
-        saveAndUpdate()
+        tracker.update()
     }
 
     private fun calculateIcePerHour() {
@@ -99,11 +97,7 @@ object FrozenTreasureTracker {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
             newList.add(map[index])
-            if (newList.size == 1) {
-                tracker.addDisplayModeToggle(newList)
-            }
         }
-        tracker.addSessionResetButton(newList)
         return newList
     }
 
@@ -118,7 +112,6 @@ object FrozenTreasureTracker {
             tracker.modify {
                 it.compactProcs += 1
             }
-            saveAndUpdate()
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
@@ -128,18 +121,13 @@ object FrozenTreasureTracker {
                     it.treasuresMined += 1
                     it.treasureCount.addOrPut(treasure, 1)
                 }
-                saveAndUpdate()
                 if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
             }
         }
     }
 
-    @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
-        display = emptyList()
-    }
-
-    private fun drawTreasureDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+        calculateIce(data)
         addAsSingletonList("§1§lFrozen Treasure Tracker")
         addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
         addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
@@ -160,12 +148,6 @@ object FrozenTreasureTracker {
         return "$amount"
     }
 
-    private fun saveAndUpdate() {
-        val data = tracker.currentDisplay() ?: return
-        calculateIce(data)
-        display = formatDisplay(drawTreasureDisplay(data))
-    }
-
     private fun calculateIce(data: Data) {
         estimatedIce = data.compactProcs * 160L
         for (treasure in FrozenTreasure.entries) {
@@ -180,7 +162,7 @@ object FrozenTreasureTracker {
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return
 
-        tracker.renderDisplay(config.position, display)
+        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent

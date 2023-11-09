@@ -30,13 +30,15 @@ object EnderNodeTracker {
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
 
     private var miteGelInInventory = 0
-    private var display = emptyList<List<Any>>()
-    private var lootProfit = mapOf<EnderNode, Double>()
 
     private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) { update() }
+    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
+        formatDisplay(
+            drawDisplay(it)
+        )
+    }
 
     class Data : TrackerData() {
 
@@ -94,7 +96,6 @@ object EnderNodeTracker {
                 storage.lootCount.addOrPut(it, amount)
             }
         }
-        update()
     }
 
     @SubscribeEvent
@@ -119,8 +120,6 @@ object EnderNodeTracker {
         tracker.modify { storage ->
             storage.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
         }
-
-        update()
     }
 
     @SubscribeEvent
@@ -138,7 +137,6 @@ object EnderNodeTracker {
                 tracker.modify { storage ->
                     storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
                 }
-                update()
             }
             miteGelInInventory = newMiteGelInInventory
         }
@@ -149,15 +147,15 @@ object EnderNodeTracker {
         if (!config.enabled) return
         if (!isInTheEnd()) return
 
-        tracker.renderDisplay(config.position, display)
+        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange {
-            update()
+            tracker.update()
         }
-        update()
+        tracker.update()
     }
 
     @SubscribeEvent
@@ -183,12 +181,6 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun update() {
-        val storage = tracker.currentDisplay() ?: return
-        lootProfit = calculateProfit(storage)
-        display = formatDisplay(drawDisplay(storage))
-    }
-
     private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
 
     private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
@@ -212,7 +204,7 @@ object EnderNodeTracker {
     }
 
     private fun drawDisplay(storage: Data) = buildList<List<Any>> {
-        if (!ProfileStorageData.loaded) return emptyList<List<Any>>()
+        val lootProfit = calculateProfit(storage)
 
         addAsSingletonList("§5§lEnder Node Tracker")
         addAsSingletonList("§d${storage.totalNodesMined.addSeparators()} Ender Nodes mined")
@@ -254,11 +246,7 @@ object EnderNodeTracker {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
             newList.add(map[index])
-            if (newList.size == 1) {
-                tracker.addDisplayModeToggle(newList)
-            }
         }
-        tracker.addSessionResetButton(newList)
         return newList
     }
 
