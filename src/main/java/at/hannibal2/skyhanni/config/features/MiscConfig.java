@@ -755,7 +755,7 @@ public class MiscConfig {
                 "",
                 "Heat: §c♨ 0",
                 "§9§lParty (4):\n §7- §fhannibal2\n §7- §f Moulberry\n §7- §f Vahvl\n §7- §f J10a1n15",
-                "§7Maxwell Power",
+                "Power: Sighted",
                 "§ewww.hypixel.net",
             }
         )
