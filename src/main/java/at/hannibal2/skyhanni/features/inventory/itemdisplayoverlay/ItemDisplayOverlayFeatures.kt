@@ -339,7 +339,7 @@ class ItemDisplayOverlayFeatures {
             if (possibleEnchantments != null) {
                 for (enchant in tieredEnchants) {
                     if (possibleEnchantments[enchant] != null && possibleEnchantments[enchant] != -1) {
-                        return "§d§l${possibleEnchantments[enchant]}"
+                        return "${possibleEnchantments[enchant]}"
                     }
                 }
             }
