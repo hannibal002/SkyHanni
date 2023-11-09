@@ -721,6 +721,7 @@ public class InventoryConfig {
             public List<Abiphone> abiphone = new ArrayList<>(Arrays.asList(
                 Abiphone.CONTACTS,
                 Abiphone.DND,
+                Abiphone.RELAYS,
                 Abiphone.RINGTONE,
                 Abiphone.NAVI
             ));
