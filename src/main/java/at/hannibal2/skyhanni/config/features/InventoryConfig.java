@@ -417,33 +417,33 @@ public class InventoryConfig {
         )
         @ConfigEditorDraggableList(
             exampleText = {
-                "§bMaster Star Tier",
-                "§bMaster Skull Tier",
-                "§bGolden/Diamond Dungeon Head Floor Number",
-                "§bNew Year Cake/Spooky Pie SB Year",
-                "§bPet Level",
-                "§bMinion Tier",
-                "§bCrimson Armor Crimson Stars",
-                "§bKuudra Key",
-                "§bRancher's Boots Speed",
-                "§bLarva Hook",
-                "§bDungeon Potion Level",
-                "§bArmadillo Blocks Walked Progress (%)",
-                "§bNecron's Ladder Progress",
-                "§bFruit Bowl Progress",
-                "§bBeastmaster Crest Kill Progress (%)",
-                "§bCampfire Talisman Tier",
-                "§bBlood God Crest Strength",
-                "§bYeti Rod Bonus",
-                "§bShredder Bonus Damage",
-                "§bBottle of Jyrre Intelligence Bonus",
-                "§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)",
-                "§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)",
-                "§bMinion Storage Tier (#)",
-                "§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)",
-                "§bAbiphone Tier",
-                "§bItem Edition/Auction Number (if less than 1000)",
-                "§bStacking Enchantment Tier (for items without dungeon stars)",
+                ("§bMaster Star Tier"),
+                ("§bMaster Skull Tier"),
+                ("§bGolden/Diamond Dungeon Head Floor Number"),
+                ("§bNew Year Cake/Spooky Pie SB Year"),
+                ("§bPet Level"),
+                ("§bMinion Tier"),
+                ("§bCrimson Armor Crimson Stars"),
+                ("§bKuudra Key"),
+                ("§bRancher's Boots Speed"),
+                ("§bLarva Hook"),
+                ("§bDungeon Potion Level"),
+                ("§bArmadillo Blocks Walked Progress (%)"),
+                ("§bNecron's Ladder Progress"),
+                ("§bFruit Bowl Progress"),
+                ("§bBeastmaster Crest Kill Progress (%)"),
+                ("§bCampfire Talisman Tier"),
+                ("§bBlood God Crest Strength"),
+                ("§bYeti Rod Bonus"),
+                ("§bShredder Bonus Damage"),
+                ("§bBottle of Jyrre Intelligence Bonus"),
+                ("§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)"),
+                ("§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)"),
+                ("§bMinion Storage Tier (#)"),
+                ("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
+                ("§bAbiphone Tier"),
+                ("§bItem Edition/Auction Number (if less than 1000)"),
+                ("§bStacking Enchantment Tier (for items without dungeon stars)"),
             }
         )
         public List<Integer> itemNumber = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
@@ -462,16 +462,16 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bSkyblock Level (#, won't work in Rift)",
-                    "§bSkill + Garden + Dungeoneering Levels (#)",
-                    "§bSkill Average (#)",
-                    "§bCollection Level + Progress (%)",
-                    "§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)",
-                    "§bMuseum Donation Progress (%, # for Special Items)",
-                    "§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)",
-                    "§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)",
-                    "§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)",
-                    "§bQuick Upgrade Missing Count (#)",
+                    ("§bSkyblock Level (#, won't work in Rift)"),
+                    ("§bSkill + Garden + Dungeoneering Levels (#)"),
+                    ("§bSkill Average (#)"),
+                    ("§bCollection Level + Progress (%)"),
+                    ("§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)"),
+                    ("§bMuseum Donation Progress (%, # for Special Items)"),
+                    ("§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)"),
+                    ("§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)"),
+                    ("§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)"),
+                    ("§bQuick Upgrade Missing Count (#)"),
                 }
             )
             public List<Integer> player = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9));
@@ -483,16 +483,16 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bUnlocked Recipes (%)",
-                    "§bCollected Fairy/Enigma Souls + Completed Quests (#)",
-                    "§bTrades Unlocked (%)",
-                    "§bWardrobe Slot (#)",
-                    "§bSkyblock Stat Names (Abbvs)",
-                    "§bSkyblock Profile Fruits Name (Abbvs)",
-                    "§bAuction House + Bazaar (Various)",
-                    "§bDojo Progress (Abbv)",
-                    "§bBank Utilities (Abbvs)",
-                    "§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)",
+                    ("§bUnlocked Recipes (%)"),
+                    ("§bCollected Fairy/Enigma Souls + Completed Quests (#)"),
+                    ("§bTrades Unlocked (%)"),
+                    ("§bWardrobe Slot (#)"),
+                    ("§bSkyblock Stat Names (Abbvs)"),
+                    ("§bSkyblock Profile Fruits Name (Abbvs)"),
+                    ("§bAuction House + Bazaar (Various)"),
+                    ("§bDojo Progress (Abbv)"),
+                    ("§bBank Utilities (Abbvs)"),
+                    ("§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)"),
                 }
             )
             public List<Integer> playerAdvanced = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 9));
@@ -504,16 +504,16 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)",
-                    "§bRNG Meter Drop Odds (Abbvs)",
-                    "§bCommunity Shop + Essence Shop Upgrade Tiers (#)",
-                    "§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)",
-                    "§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)",
-                    "§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]",
-                    "§bCurrently Active Potion Effects Count (#)",
-                    "§bAccessory Bag Utilities (Various)",
-                    "§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]",
-                    "§bSkyBlock Achievements Points (%)",
+                    ("§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)"),
+                    ("§bRNG Meter Drop Odds (Abbvs)"),
+                    ("§bCommunity Shop + Essence Shop Upgrade Tiers (#)"),
+                    ("§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)"),
+                    ("§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)"),
+                    ("§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]"),
+                    ("§bCurrently Active Potion Effects Count (#)"),
+                    ("§bAccessory Bag Utilities (Various)"),
+                    ("§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]"),
+                    ("§bSkyBlock Achievements Points (%)"),
                 }
             )
             public List<Integer> playerTryhard = new ArrayList<>(Arrays.asList(2, 4, 5, 8));
@@ -525,11 +525,11 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)",
-                    "§bVisitor's Logbook Countdown (#, highest unit of time only)",
-                    "§bVisitor Milestones Progress (%)",
-                    "§bGarden Visitor's Logbook NPC Rarities (Abbv)",
-                    "§bComposter \"Insert from \" Counts (Abbv)"
+                    ("§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)"),
+                    ("§bVisitor's Logbook Countdown (#, highest unit of time only)"),
+                    ("§bVisitor Milestones Progress (%)"),
+                    ("§bGarden Visitor's Logbook NPC Rarities (Abbv)"),
+                    ("§bComposter \"Insert from \" Counts (Abbv)"),
                 }
             )
             public List<Integer> farming = new ArrayList<>(Arrays.asList(0, 1, 2));
@@ -541,10 +541,10 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bCurrent Sky Mall Perk (Abbv)", //do not move this PLEASE otherwise one of the other stack size features will break
-                    "§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)",
-                    "§bHOTM Tiers Progress (%)",
-                    "§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)",
+                    ("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
+                    ("§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)"),
+                    ("§bHOTM Tiers Progress (%)"),
+                    ("§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)"),
                 }
             )
             public List<Integer> mining = new ArrayList<>(Arrays.asList(1, 2));
@@ -556,12 +556,12 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bBestiary Level (#)",
-                    "§bBestiary Progress (%, Overall + per Family)",
-                    "§bCurrent Slayer Levels (#)",
-                    "§bSlayer Combat Wisdom Buff (#)",
-                    "§bSlayer/Catacombs RNG Meter Progress (%)",
-                    "§bUnlocked Slayer Recipes (#)",
+                    ("§bBestiary Level (#)"),
+                    ("§bBestiary Progress (%, Overall + per Family)"),
+                    ("§bCurrent Slayer Levels (#)"),
+                    ("§bSlayer Combat Wisdom Buff (#)"),
+                    ("§bSlayer/Catacombs RNG Meter Progress (%)"),
+                    ("§bUnlocked Slayer Recipes (#)"),
                 }
             )
             public List<Integer> combat = new ArrayList<>(Arrays.asList(0, 2));
@@ -574,10 +574,10 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bSkyblock Guide Progress (%)",
-                    "§bSkyblock Ways To Level Up Tasks (%)",
-                    "§bSkyblock Leveling Rewards Progress (%)",
-                    "§bEmblems Unlocked (#)",
+                    ("§bSkyblock Guide Progress (%)"),
+                    ("§bSkyblock Ways To Level Up Tasks (%)"),
+                    ("§bSkyblock Leveling Rewards Progress (%)"),
+                    ("§bEmblems Unlocked (#)"),
                 }
             )
             public List<Integer> sbLeveling = new ArrayList<>(Arrays.asList(0));
@@ -589,13 +589,13 @@ public class InventoryConfig {
             )
             @ConfigEditorDraggableList(
                 exampleText = {
-                    "§bContacts Directory (#)",
-                    "§bDND Indicator (§c§l✖§b)",
-                    "§bRelays Finished (#)",
-                    "§bSelected Ringtone (Abbv)",
-                    "§bTic Tac Toe Stats (§aW§eT§cL§b)",
-                    "§bSnake Highest Score (#)",
-                    "§bSorting/Filtering Abbreviations",
+                    ("§bContacts Directory (#)"),
+                    ("§bDND Indicator (§c§l✖§b)"),
+                    ("§bRelays Finished (#)"),
+                    ("§bSelected Ringtone (Abbv)"),
+                    ("§bTic Tac Toe Stats (§aW§eT§cL§b)"),
+                    ("§bSnake Highest Score (#)"),
+                    ("§bSorting/Filtering Abbreviations"),
                 }
             )
             public List<Integer> abiphone = new ArrayList<>(Arrays.asList(0, 1, 2));
