@@ -23,6 +23,7 @@ class SkyHanniTracker<Data : TrackerData>(
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
     private var display = emptyList<List<Any>>()
     private var sessionResetTime = SimpleTimeMark.farPast()
+    private var dirty = false
 
     fun isInventoryOpen() = inventoryOpen
 
@@ -52,13 +53,18 @@ class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
+        if (dirty) {
+            display = getSharedTracker()?.let {
+                buildFinalDisplay(drawDisplay(it.get(displayMode)))
+            } ?: emptyList()
+            dirty = false
+        }
+
         position.renderStringsAndItems(display, posLabel = name)
     }
 
     fun update() {
-        display = getSharedTracker()?.let {
-            buildFinalDisplay(drawDisplay(it.get(displayMode)))
-        } ?: emptyList()
+        dirty = true
     }
 
     private fun buildFinalDisplay(rawList: List<List<Any>>) = rawList.toMutableList().also {
