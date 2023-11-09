@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAuctionNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBloodGodKills
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getYetiRodFishesCaught
@@ -318,18 +319,30 @@ class ItemDisplayOverlayFeatures {
                 else -> ""
             }
         }
-		
-		if (stackSizeConfig.contains(25)) {
-            var thatNumber = ""
+
+        if (stackSizeConfig.contains(25)) {
+            var thatNumber = 0
             if (item.getLore().anyContains("Auction ")) {
-                thatNumber = item.getAuctionNumber().toString()
+                thatNumber = item.getAuctionNumber() ?: 0
             }
             if (item.getLore().anyContains("Edition ")) {
-                thatNumber = item.getEdition().toString()
+                thatNumber = item.getEdition() ?: 0
             }
-            if (thatNumber == "null") { return "" }
-            if (thatNumber.length >= 4){ return "" }
-            else { return (thatNumber) }
+            if (thatNumber in 1..999) {
+                return "$thatNumber"
+            }
+        }
+
+        if (stackSizeConfig.contains(26) && !(itemName.contains("✪"))) {
+            val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
+            val possibleEnchantments = item.getEnchantments()
+            if (possibleEnchantments != null) {
+                for (enchant in tieredEnchants) {
+                    if (possibleEnchantments[enchant] != null && possibleEnchantments[enchant] != -1) {
+                        return "§d§l${possibleEnchantments[enchant]}"
+                    }
+                }
+            }
         }
 
         return ""

@@ -443,6 +443,7 @@ public class InventoryConfig {
                 "§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)",
                 "§bAbiphone Tier",
                 "§bItem Edition/Auction Number (if less than 1000)",
+                "§bStacking Enchantment Tier (for items without dungeon stars)",
             }
         )
         public List<Integer> itemNumber = new ArrayList<>(Arrays.asList(3, 6, 9, 11, 12));
