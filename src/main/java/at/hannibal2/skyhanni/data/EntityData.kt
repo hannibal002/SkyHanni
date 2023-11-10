@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.EntityData.EntityActionState.DeSpawn
-import at.hannibal2.skyhanni.data.EntityData.EntityActionState.Spawn
 import at.hannibal2.skyhanni.data.EntityData.counter.addEntityName
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
@@ -31,6 +29,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
@@ -54,9 +53,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.FileOutputStream
 
 private const val MAX_RETRIES = 100
-private const val RETRIES_BLOCK_DEFAULT = 40
 
-private const val MAX_DISTANCE_TO_PLAYER = 32.0 * 32.0 // TODO correct Distance
+private const val MAX_DISTANCE_TO_PLAYER = 18.0// TODO correct Distance
 
 class EntityData {
 
@@ -158,26 +156,20 @@ class EntityData {
 
         (currentEntityLiving - previousEntityLiving).forEach {
             counter.instancedFinish++
-            if (!handelEntityInstancing(it, Spawn)) {
-                retry(it, Spawn)
+            if (!EntitySpawn(it)) {
+                retry(it)
                 counter.instancedFinish--
                 counter.startedRetries++
             }
         }
-        (previousEntityLiving - currentEntityLiving).forEach {
-            counter.instancedFinish++
-            if (!handelEntityInstancing(it, DeSpawn)) {
-                retry(it, DeSpawn)
-                counter.instancedFinish--
-                counter.startedRetries++
-            }
-        }
+        (previousEntityLiving - currentEntityLiving).forEach { EntityDeSpawn(it) }
     }
 
     private object counter {
         var retries = 0
         var outOfRangeRetries = 0
-        var handle = 0
+        var spawn = 0
+        var deSpawn = 0
         var misses = 0
         var instancedFinish = 0
         var startedRetries = 0
@@ -196,7 +188,8 @@ class EntityData {
 
         fun reset() {
             retries = 0
-            handle = 0
+            spawn = 0
+            deSpawn = 0
             misses = 0
             instancedFinish = 0
             startedRetries = 0
@@ -213,13 +206,17 @@ class EntityData {
     fun onExit(event: IslandChangeEvent) {
         FileOutputStream("$LogPath\\LOG.txt").apply {
             write(
-                "Retries: ${counter.retries}\nOutOfRangeRetires: ${counter.outOfRangeRetries}\nHandle: ${
-                    counter.handle
-                }\nInstancedFinish: ${
-                    counter.instancedFinish
-                }\nStartedRetries: ${counter.startedRetries}\nRetiresAVG: ${
-                    counter.retriesAvg
-                }\nMisses: ${counter.misses}\n\nName List:\n".toByteArray()
+                (buildString {
+                    append("Retries: ${counter.retries}\n")
+                    append("OutOfRangeRetires: ${counter.outOfRangeRetries}\n")
+                    append("Spawn: ${counter.spawn}\n")
+                    append("Despawn: ${counter.deSpawn}\n")
+                    append("InstancedFinish: ${counter.instancedFinish}\n")
+                    append("StartedRetries: ${counter.startedRetries}\n")
+                    append("RetiresAVG: ${counter.retriesAvg}\n")
+                    append("Misses: ${counter.misses}\n")
+                    append("\nName List:\n")
+                }).toByteArray()
             )
             write(counter.EntityNames.joinToString("\n").toByteArray())
             close()
@@ -227,82 +224,70 @@ class EntityData {
         // counter.reset()
     }
 
-    private enum class EntityActionState {
-        Spawn, DeSpawn
+    private fun EntitySpawn(entity: EntityLivingBase): Boolean {
+        counter.spawn++
+        when {
+            entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
+            entity.isDisplayNPC() -> EntityDisplayNPCSpawnEvent(DisplayNPC(entity)).postAndCatch()
+            entity.isSkyBlockMob() -> {
+                val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
+                if (it is SummoningMob) {
+                    EntitySummoningSpawnEvent(it)
+                } else if (it is SkyblockMob) {
+                    SkyblockMobSpawnEvent(it).postAndCatch()
+                }
+            }
+        }
+        return true
     }
 
-    private fun handelEntityInstancing(entity: EntityLivingBase, state: EntityActionState): Boolean {
-        counter.handle++
+    private fun EntityDeSpawn(entity: EntityLivingBase) {
+        counter.deSpawn++
         when {
-            entity is EntityPlayer && entity.isRealPlayer() -> {
-                when (state) {
-                    Spawn -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
-                    DeSpawn -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
-                }
-                return true
-            }
-
-            entity.isDisplayNPC() -> {
-                val e = DisplayNPC(entity) ?: return false
-                when (state) {
-                    Spawn -> EntityDisplayNPCSpawnEvent(e).postAndCatch()
-                    DeSpawn -> EntityDisplayNPCDeSpawnEvent(e).postAndCatch()
-                }
-                return true
-            }
-
+            entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
+            entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
-                when (state) {
-                    Spawn -> {
-                        val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
-                        if (it is SummoningMob) {
-                            EntitySummoningSpawnEvent(it)
-                        } else if (it is SkyblockMob) {
-                            SkyblockMobSpawnEvent(it).postAndCatch()
+                _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it) }
+                    ?: _currentSkyblockMobs[entity.hashCode()]?.let {
+                        if (it.isInRender()) {
+                            SkyblockMobDeathEvent(it).postAndCatch()
+                        } else {
+                            SkyblockMobLeavingRenderEvent(it).postAndCatch()
                         }
-                    }
-
-                    DeSpawn -> {
-                        _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it) }
-                            ?: _currentSkyblockMobs[entity.hashCode()]?.let {
-                                if (it.isInRender()) {
-                                    SkyblockMobDeathEvent(it).postAndCatch()
-                                } else {
-                                    SkyblockMobLeavingRenderEvent(it).postAndCatch()
-                                }
-                                SkyblockMobDeSpawnEvent(it).postAndCatch()
-                            } ?: retries.removeIf { it.entity == entity && it.state == Spawn }
-                    }
-                }
-                return true
+                        SkyblockMobDeSpawnEvent(it).postAndCatch()
+                    } ?: retries.removeIf { it.entity == entity }
             }
-
-            else -> return true
         }
     }
 
-    private fun retry(entity: EntityLivingBase, state: EntityActionState) =
-        retries.add(RetryEntityInstancing(entity, state, 0))
+    private fun retry(entity: EntityLivingBase) = retries.add(RetryEntityInstancing(entity, 0))
 
-    private data class RetryEntityInstancing(val entity: EntityLivingBase, val state: EntityActionState, var times: Int)
+    private data class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int)
 
     private fun handleReTries() {
-        counter.retries++
         val iterator = retries.iterator()
         while (iterator.hasNext()) {
             val retry = iterator.next()
             if (retry.entity.getLorenzVec()
-                    .distanceSqIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
+                    .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
             ) {
                 counter.outOfRangeRetries++
                 continue
             }
+            counter.retries++
             if (retry.times > MAX_RETRIES) {
+                LorenzDebug.log(
+                    "I missed. Distance: ${
+                        retry.entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                    } , ${
+                        retry.entity.getLorenzVec().subtract(LocationUtils.playerLocation())
+                    }"
+                )
                 counter.misses++
                 iterator.remove()
                 continue
             }
-            if (!handelEntityInstancing(retry.entity, retry.state)) {
+            if (!EntitySpawn(retry.entity)) {
                 retry.times++
                 continue
             }

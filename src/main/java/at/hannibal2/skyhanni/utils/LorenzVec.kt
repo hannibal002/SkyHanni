@@ -7,6 +7,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
+import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.max
@@ -38,6 +39,8 @@ data class LorenzVec(
     fun distanceSq(x: Double, y: Double, z: Double): Double = distanceSq(LorenzVec(x, y, z))
 
     fun distance(x: Double, y: Double, z: Double): Double = distance(LorenzVec(x, y, z))
+
+    fun distanceChebyshevIgnoreY(other: LorenzVec) = max(abs(this.x - other.x), abs(this.z - other.z))
 
     fun distanceSq(other: LorenzVec): Double {
         val dx = (other.x - x)
