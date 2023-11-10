@@ -38,3 +38,5 @@ abstract class SkyblockEntity(val baseEntity: Entity, val armorStand: EntityArmo
 
     fun isInRender() = baseEntity.distanceToPlayer() < EntityData.ENTITY_RENDER_RANGE_IN_BLOCKS
 }
+
+inline fun <reified T : SkyblockEntity> T.toHashPair(): Pair<Int, T> = Pair(this.hashCode(), this)

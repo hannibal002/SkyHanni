@@ -215,6 +215,11 @@ public class DevConfig {
     public static class MobDetection {
 
         @Expose
+        @ConfigOption(name = "Force Reset", desc = "Resets all Mobs, turn off to enable Mob Detetcion again")
+        @ConfigEditorBoolean
+        public boolean forceReset = false;
+
+        @Expose
         @ConfigOption(name = "SkyblockMob Highlight", desc = "Highlight each entity that is a valid SkyblockMob in green")
         @ConfigEditorBoolean
         public boolean skyblockMobHighlight = false;

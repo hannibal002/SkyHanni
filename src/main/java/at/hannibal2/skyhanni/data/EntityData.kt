@@ -3,9 +3,12 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityData.EntityActionState.DeSpawn
 import at.hannibal2.skyhanni.data.EntityData.EntityActionState.Spawn
+import at.hannibal2.skyhanni.data.EntityData.counter.addEntityName
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
+import at.hannibal2.skyhanni.data.skyblockentities.toHashPair
 import at.hannibal2.skyhanni.events.EntityDisplayNPCDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityDisplayNPCSpawnEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
@@ -14,6 +17,7 @@ import at.hannibal2.skyhanni.events.EntityRealPlayerDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityRealPlayerSpawnEvent
 import at.hannibal2.skyhanni.events.EntitySummoningDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntitySummoningSpawnEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -25,13 +29,17 @@ import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -43,11 +51,16 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.FileOutputStream
 
 private const val MAX_RETRIES = 100
+private const val RETRIES_BLOCK_DEFAULT = 40
+
+private const val MAX_DISTANCE_TO_PLAYER = 32.0 * 32.0 // TODO correct Distance
 
 class EntityData {
 
+    private val LogPath: String = "config/skyhanni/logs/mob/"
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
 
     @SubscribeEvent
@@ -111,15 +124,15 @@ class EntityData {
     private val mobConfig get() = SkyHanniMod.feature.dev.mobDetection
 
     companion object {
-        val currentSkyblockMobs get() = _currentSkyblockMobs as Set<SkyblockMob>
-        val currentDisplayNPCs get() = _currentDisplayNPCs as Set<DisplayNPC>
-        val currentRealPlayers get() = _currentRealPlayers as Set<EntityPlayer>
-        val currentSummoningMobs get() = _currentSummoningMobs as Set<SummoningMob>
+        val currentSkyblockMobs get() = _currentSkyblockMobs.values.toList()
+        val currentDisplayNPCs get() = _currentDisplayNPCs.values.toList()
+        val currentRealPlayers get() = _currentRealPlayers.toList()
+        val currentSummoningMobs get() = _currentSummoningMobs.values.toList()
 
-        private val _currentSkyblockMobs = mutableSetOf<SkyblockMob>()
-        private val _currentDisplayNPCs = mutableSetOf<DisplayNPC>()
+        private val _currentSkyblockMobs = mutableMapOf<Int, SkyblockMob>()
+        private val _currentDisplayNPCs = mutableMapOf<Int, DisplayNPC>()
         private val _currentRealPlayers = mutableSetOf<EntityPlayer>()
-        private val _currentSummoningMobs = mutableSetOf<SummoningMob>()
+        private val _currentSummoningMobs = mutableMapOf<Int, SummoningMob>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
@@ -128,17 +141,90 @@ class EntityData {
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
     }
 
+
     @SubscribeEvent
     fun onTickForEntityDetection(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (event.isMod(2)) return
+
         handleReTries()
 
         previousEntityLiving.clear()
         previousEntityLiving.addAll(currentEntityLiving)
         currentEntityLiving.clear()
-        currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
+        if (!mobConfig.forceReset) {
+            currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
+        }
 
-        (currentEntityLiving - previousEntityLiving).forEach { if (!handelEntityInstancing(it, Spawn)) retry(it, Spawn) }
-        (previousEntityLiving - currentEntityLiving).forEach { if (!handelEntityInstancing(it, DeSpawn)) retry(it, DeSpawn) }
+        (currentEntityLiving - previousEntityLiving).forEach {
+            counter.instancedFinish++
+            if (!handelEntityInstancing(it, Spawn)) {
+                retry(it, Spawn)
+                counter.instancedFinish--
+                counter.startedRetries++
+            }
+        }
+        (previousEntityLiving - currentEntityLiving).forEach {
+            counter.instancedFinish++
+            if (!handelEntityInstancing(it, DeSpawn)) {
+                retry(it, DeSpawn)
+                counter.instancedFinish--
+                counter.startedRetries++
+            }
+        }
+    }
+
+    private object counter {
+        var retries = 0
+        var outOfRangeRetries = 0
+        var handle = 0
+        var misses = 0
+        var instancedFinish = 0
+        var startedRetries = 0
+        val retriesAvg get() = retries / startedRetries
+
+        val EntityNames = sortedSetOf<String>()
+        fun addEntityName(entity: SkyblockEntity) {
+            if (EntityNames.contains(entity.name)) return
+            val type = when (entity) {
+                is DisplayNPC -> "DNPC "
+                is SkyblockMob -> "SMOB "
+                else -> "NONE "
+            }
+            EntityNames.add(type + entity.name)
+        }
+
+        fun reset() {
+            retries = 0
+            handle = 0
+            misses = 0
+            instancedFinish = 0
+            startedRetries = 0
+            EntityNames.clear()
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandJoin(event: IslandChangeEvent) {
+
+    }
+
+    @SubscribeEvent
+    fun onExit(event: IslandChangeEvent) {
+        FileOutputStream("$LogPath\\LOG.txt").apply {
+            write(
+                "Retries: ${counter.retries}\nOutOfRangeRetires: ${counter.outOfRangeRetries}\nHandle: ${
+                    counter.handle
+                }\nInstancedFinish: ${
+                    counter.instancedFinish
+                }\nStartedRetries: ${counter.startedRetries}\nRetiresAVG: ${
+                    counter.retriesAvg
+                }\nMisses: ${counter.misses}\n\nName List:\n".toByteArray()
+            )
+            write(counter.EntityNames.joinToString("\n").toByteArray())
+            close()
+        }
+        // counter.reset()
     }
 
     private enum class EntityActionState {
@@ -146,6 +232,7 @@ class EntityData {
     }
 
     private fun handelEntityInstancing(entity: EntityLivingBase, state: EntityActionState): Boolean {
+        counter.handle++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> {
                 when (state) {
@@ -165,23 +252,26 @@ class EntityData {
             }
 
             entity.isSkyBlockMob() -> {
-                val e = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
-                if (e is SkyblockMob) {
-                    when (state) {
-                        Spawn -> SkyblockMobSpawnEvent(e).postAndCatch()
-                        DeSpawn -> {
-                            if (e.isInRender()) {
-                                SkyblockMobDeathEvent(e).postAndCatch()
-                            } else {
-                                SkyblockMobLeavingRenderEvent(e).postAndCatch()
-                            }
-                            SkyblockMobDeSpawnEvent(e).postAndCatch()
+                when (state) {
+                    Spawn -> {
+                        val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
+                        if (it is SummoningMob) {
+                            EntitySummoningSpawnEvent(it)
+                        } else if (it is SkyblockMob) {
+                            SkyblockMobSpawnEvent(it).postAndCatch()
                         }
                     }
-                } else if (e is SummoningMob) {
-                    when (state) {
-                        Spawn -> EntitySummoningSpawnEvent(e)
-                        DeSpawn -> EntitySummoningDeSpawnEvent(e)
+
+                    DeSpawn -> {
+                        _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it) }
+                            ?: _currentSkyblockMobs[entity.hashCode()]?.let {
+                                if (it.isInRender()) {
+                                    SkyblockMobDeathEvent(it).postAndCatch()
+                                } else {
+                                    SkyblockMobLeavingRenderEvent(it).postAndCatch()
+                                }
+                                SkyblockMobDeSpawnEvent(it).postAndCatch()
+                            } ?: retries.removeIf { it.entity == entity && it.state == Spawn }
                     }
                 }
                 return true
@@ -197,10 +287,18 @@ class EntityData {
     private data class RetryEntityInstancing(val entity: EntityLivingBase, val state: EntityActionState, var times: Int)
 
     private fun handleReTries() {
+        counter.retries++
         val iterator = retries.iterator()
         while (iterator.hasNext()) {
             val retry = iterator.next()
+            if (retry.entity.getLorenzVec()
+                    .distanceSqIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
+            ) {
+                counter.outOfRangeRetries++
+                continue
+            }
             if (retry.times > MAX_RETRIES) {
+                counter.misses++
                 iterator.remove()
                 continue
             }
@@ -215,22 +313,24 @@ class EntityData {
 
     @SubscribeEvent
     fun onSkyblockMobSpawnEvent(event: SkyblockMobSpawnEvent) {
-        _currentSkyblockMobs.add(event.entity)
+        _currentSkyblockMobs.put(event.entity.toHashPair())
+        addEntityName(event.entity)
     }
 
     @SubscribeEvent
     fun onSkyblockMobDeSpawnEvent(event: SkyblockMobDeSpawnEvent) {
-        _currentSkyblockMobs.remove(event.entity)
+        _currentSkyblockMobs.remove(event.entity.hashCode())
     }
 
     @SubscribeEvent
     fun onEntityDisplayNPCSpawnEvent(event: EntityDisplayNPCSpawnEvent) {
-        _currentDisplayNPCs.add(event.entity)
+        _currentDisplayNPCs.put(event.entity.toHashPair())
+        addEntityName(event.entity)
     }
 
     @SubscribeEvent
     fun onEntityDisplayNPCSpawnDeEvent(event: EntityDisplayNPCDeSpawnEvent) {
-        _currentDisplayNPCs.remove(event.entity)
+        _currentDisplayNPCs.remove(event.entity.hashCode())
     }
 
     @SubscribeEvent
@@ -245,12 +345,12 @@ class EntityData {
 
     @SubscribeEvent
     fun onEntitySummonSpawnEvent(event: EntitySummoningSpawnEvent) {
-        _currentSummoningMobs.add(event.entity)
+        _currentSummoningMobs.put(event.entity.toHashPair())
     }
 
     @SubscribeEvent
     fun onEntitySummonDeSpawnEvent(event: EntitySummoningDeSpawnEvent) {
-        _currentSummoningMobs.remove(event.entity)
+        _currentSummoningMobs.remove(event.entity.hashCode())
     }
 
     @SubscribeEvent
