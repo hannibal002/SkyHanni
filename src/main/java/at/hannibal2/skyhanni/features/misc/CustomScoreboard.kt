@@ -435,6 +435,10 @@ private fun translateMayorNameToColor(input: String) : String {
         "Foxy"      ->  "§d$input"
         "Marina"    ->  "§b$input"
         "Paul"      ->  "§c$input"
+        "Scorpius"  ->  "§d$input"
+        "Jerry"     ->  "§d$input"
+        "Derpy"     ->  "§d$input"
+        "Dante"     ->  "§d$input"
         else        ->  "§7$input"
     }
 }
