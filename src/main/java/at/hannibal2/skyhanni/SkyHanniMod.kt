@@ -639,6 +639,7 @@ class SkyHanniMod {
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
         loadModule(TestShowSlotNumber())
+        loadModule(SkyHanniDebugsAndTests)
     }
 
     @Mod.EventHandler
