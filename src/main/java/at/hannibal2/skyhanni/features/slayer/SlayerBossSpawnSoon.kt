@@ -29,7 +29,7 @@ class SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                LorenzUtils.sendTitle("§cSlayer boss soon!", 2.seconds)
+                LorenzUtils.sendTitle("§eSlayer boss soon!", 2.seconds)
                 warned = true
             }
         } else {
