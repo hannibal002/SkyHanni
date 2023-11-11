@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityData.counter.addEntityName
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
@@ -374,7 +375,8 @@ class EntityData {
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (mobConfig.skyblockMobHighlight) {
             currentSkyblockMobs.forEach {
-                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.GREEN.toColor(), 0.3f)
+                val color = if (it is SkyblockBossMob) LorenzColor.DARK_GREEN else LorenzColor.GREEN
+                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), color.toColor(), 0.3f)
             }
         }
         if (mobConfig.displayNPCHighlight) {

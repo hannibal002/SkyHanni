@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.createSkyblockMobIfValid
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
@@ -56,7 +56,7 @@ object EntityKill {
 
     fun addToMobHitList(entity: Entity, trigger: hitTrigger) {
         val mob = mobHitList.firstOrNull { it == entity } ?: run {
-            val it = createSkyblockMobIfValid(entity) ?: return
+            val it = EntityData.currentSkyblockMobs.find { it == entity } ?: return
             mobHitList.add(it)
             return@run it
         }

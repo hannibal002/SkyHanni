@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 
 // TODO Test Boss mobs
-open class SkyblockMob(baseEntity: Entity, armorStand: EntityArmorStand? = SkyblockMobUtils.getArmorStand(baseEntity)) : SkyblockEntity(baseEntity, armorStand) {
+open class SkyblockMob(baseEntity: Entity, armorStand: EntityArmorStand?) : SkyblockEntity(baseEntity, armorStand) {
     override val name = armorStand?.name?.let {
         SkyblockMobUtils.mobNameFilter.find(it.removeColor())?.groupValues?.get(1) ?: it.removeColor()
     } ?: run { SkyblockMobUtils.errorNameFinding(baseEntity.name) }
