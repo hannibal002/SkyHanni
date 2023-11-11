@@ -22,9 +22,9 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 
 object SkyblockMobUtils {
-    val mobNameFilter = "\\[.*\\] (.*) \\d+".toRegex()
+    val mobNameFilter = "(\\[(.*)\\] )?(.*) \\d+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
-    val bossMobNameFilter = "^. (.*) \\d+".toRegex()
+    val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) \\d+".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
     private val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     private const val defaultArmorStandName = "Armor Stand"
@@ -55,7 +55,7 @@ object SkyblockMobUtils {
         val name = armorStand.name.removeColor()
         slayerNameFilter.find(name)
             ?.also { return SkyblockSlayerBoss(baseEntity, armorStand, it.groupValues[1], it.groupValues[2]) }
-        bossMobNameFilter.find(name)?.also { return SkyblockBossMob(baseEntity, armorStand, it.groupValues[1]) }
+        bossMobNameFilter.find(name)?.also { return SkyblockBossMob(baseEntity, armorStand, it.groupValues[3]) }
 
         return if (DungeonAPI.inDungeon()) DungeonMob(baseEntity, armorStand) else SkyblockMob(baseEntity, armorStand)
     }
