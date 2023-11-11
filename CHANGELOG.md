@@ -161,6 +161,11 @@
     + Added session/display mode support, added a button to reset the current session, and added the commands /shresetendernodetracker and /shresetarmordroptracker to reset the full data.
 + Added support for different current sessions per profile for all new trackers: Ender Node, Armor Drop, Dicer Drop, Powder and Slayer Profit Tracker
 + Added the option to change the Blaze Slayer Dagger GUI positions. - hannibal2
++ Added more features to the Frozen Treasure Tracker. - hannibal2
+    + Added session/display mode support, added a button to reset the current session, and added the commands /shresetfrozentreasuretracker to reset the full data.
++ Added Slayer Profit Tracker support for loot from area mini-bosses. - hannibal2
++ No longer opening the empty /shdefaultoptions GUI. - walker
++ Added the SkyHanni icon and a link to the GitHub page for MC launchers like Prism to display. - hannibal2
 
 ### Bug Fixes
 
@@ -241,6 +246,14 @@
 + Fixed typo in The Art Of Peace. - walker
 + Fixed compatibility problems with ChatTriggers that caused flickering in the Estimated Item Value while inside the NEU Profile Viewer. - hannibal2
 + Fixed Quest Item Helper showing negative numbers. - hannibal2
++ Fixed YouTuber and Admin ranks getting lost in the tab list. - walker
++ Added a cooldown to the current session tracker reset button to fix the chat spam. - hannibal2
++ Changed the color of the "Slayer boss soon!" warning from red to yellow. - hannibal2
++ Fixed a bug where some items were counted twice in the Slayer Profit Tracker. - hannibal2
++ Fixed item rarity errors in the museum. - hannibal2
++ Fixed mob highlighting problems with Blaze Slayer and Skytils. - hannibal2
++ Pablo Helper: Fixed some messages not showing the "get from sack" clickable message. - hannibal2
++ Fixed scoreboard date number suffixes are missing sometimes. - Erymanthus
 
 #### Config
 
@@ -282,6 +295,12 @@
 + Added support for migrating parts of the player or session storage. - nea
 + Changed the config format for dicerRngDrops/dicerDropsTracker. - hannibal2
 + Created SkyHanniTracker, the core API for working with tracker stuff. This should be used everywhere someday in the future. - hannibal2
++ Used SkyHanniTracker in FrozenTreasureTracker. - hannibal2
++ Added /shdebugwaypoint as a test/debug command. - hannibal2
++ Added debug messages to detect hot swaps. - hannibal2
++ Added /shdebugtablist
++ Set your clipboard as a fake tab list. - hannibal2
++ /shversion now copies the SkyHanni version into the clipboard as well. - hannibal2
 
 ## Version 0.20
 
