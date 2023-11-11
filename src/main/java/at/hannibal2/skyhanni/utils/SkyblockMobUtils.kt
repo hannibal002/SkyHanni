@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isFarmMob
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -22,6 +23,12 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.passive.EntityChicken
+import net.minecraft.entity.passive.EntityCow
+import net.minecraft.entity.passive.EntityMooshroom
+import net.minecraft.entity.passive.EntityPig
+import net.minecraft.entity.passive.EntityRabbit
+import net.minecraft.entity.passive.EntitySheep
 import net.minecraft.entity.player.EntityPlayer
 
 object SkyblockMobUtils {
@@ -71,6 +78,7 @@ object SkyblockMobUtils {
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
+        if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
         val armorStand = getArmorStand(baseEntity) ?: getArmorStandByRange(baseEntity, 1.5) ?: return null
         LorenzDebug.log(armorStand.name.removeColor())
         if (armorStand.inventory?.get(4) != null) return armorStandOnlyMobs(baseEntity, armorStand)
@@ -85,6 +93,17 @@ object SkyblockMobUtils {
         if (armorStand.inventory[4].getSkullTexture() == "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=") return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
         return null
     }
+
+    private fun createFarmMobs(baseEntity: EntityLivingBase): SkyblockEntity? = when (baseEntity) {
+        is EntityMooshroom -> SkyblockSpecialMob(baseEntity, null, "Farm Mooshroom")
+        is EntityCow -> SkyblockSpecialMob(baseEntity, null, "Farm Cow")
+        is EntityPig -> SkyblockSpecialMob(baseEntity, null, "Farm Pig")
+        is EntityChicken -> SkyblockSpecialMob(baseEntity, null, "Farm Chicken")
+        is EntityRabbit -> SkyblockSpecialMob(baseEntity, null, "Farm Rabbit")
+        is EntitySheep -> SkyblockSpecialMob(baseEntity, null, "Farm Sheep")
+        else -> null // TODO something else because this trigger an retry that leads to a miss which is wasted performance
+    }
+
 
     fun createSkyblockMobIfValid(baseEntity: EntityLivingBase): SkyblockMob? =
         if (baseEntity.isSkyBlockMob()) createSkyblockEntity(baseEntity) as? SkyblockMob else null
