@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -50,6 +52,12 @@ object SkyblockMobUtils {
     fun getArmorStand(entity: Entity, offSet: Int) =
         EntityUtils.getEntityByID(entity.entityId + offSet) as? EntityArmorStand
 
+    fun getArmorStandByRangeAll(entity: Entity, range: Double) =
+        EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
+
+    fun getArmorStandByRange(entity: Entity, range: Double) =
+        getArmorStandByRangeAll(entity, range).filter { entity.rotationYaw == it.rotationYaw }.firstOrNull()
+
     fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
 
     private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockMob {
@@ -63,12 +71,19 @@ object SkyblockMobUtils {
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
-        val armorStand = getArmorStand(baseEntity) ?: return null
+        val armorStand = getArmorStand(baseEntity) ?: getArmorStandByRange(baseEntity, 1.5) ?: return null
         LorenzDebug.log(armorStand.name.removeColor())
+        if (armorStand.inventory?.get(4) != null) return armorStandOnlyMobs(baseEntity, armorStand)
         if (armorStand.isDefaultValue()) return null
         val sumReg =
             summoningRegex.find(armorStand.name.removeColor()) ?: return createSkyblockMob(baseEntity, armorStand)
         return SummoningMob(baseEntity, armorStand, sumReg)
+    }
+
+    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockEntity? {
+        // TODO move to repo
+        if (armorStand.inventory[4].getSkullTexture() == "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=") return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
+        return null
     }
 
     fun createSkyblockMobIfValid(baseEntity: EntityLivingBase): SkyblockMob? =
