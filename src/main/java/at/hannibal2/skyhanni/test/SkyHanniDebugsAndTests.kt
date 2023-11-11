@@ -262,7 +262,9 @@ class SkyHanniDebugsAndTests {
         }
 
         fun debugVersion() {
-            LorenzUtils.chat("§eYou are using SkyHanni ${SkyHanniMod.version}")
+            val name = "SkyHanni ${SkyHanniMod.version}"
+            LorenzUtils.chat("§eYou are using $name")
+            OSUtils.copyToClipboard(name)
         }
 
         fun debugData(args: Array<String>) {
