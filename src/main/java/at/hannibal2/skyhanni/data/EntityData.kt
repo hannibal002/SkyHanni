@@ -264,7 +264,7 @@ class EntityData {
             entity.isSkyBlockMob() -> {
                 val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
                 if (it is SummoningMob) {
-                    EntitySummoningSpawnEvent(it)
+                    EntitySummoningSpawnEvent(it).postAndCatch()
                 } else if (it is SkyblockMob) {
                     SkyblockMobSpawnEvent(it).postAndCatch()
                 }
@@ -279,7 +279,7 @@ class EntityData {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
-                _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it) }
+                _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
                     ?: _currentSkyblockMobs[entity.hashCode()]?.let {
                         if (it.isInRender()) {
                             SkyblockMobDeathEvent(it).postAndCatch()

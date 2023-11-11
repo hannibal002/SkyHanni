@@ -6,8 +6,8 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 
 class SummoningMob(baseEntity: Entity, armorStand: EntityArmorStand? = SkyblockMobUtils.getArmorStand(baseEntity), result: MatchResult) : SkyblockEntity(baseEntity, armorStand) {
-    override val name = result.groupValues[1]
+    override val name = result.groupValues[2]
 
-    private val ownerName = result.groupValues[0]
+    private val ownerName = result.groupValues[1]
     val owner = EntityData.currentRealPlayers.firstOrNull { it.name == ownerName }
 }
