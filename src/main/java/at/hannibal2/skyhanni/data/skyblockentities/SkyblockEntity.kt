@@ -8,7 +8,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
-abstract class SkyblockEntity(val baseEntity: EntityLivingBase, val armorStand: EntityArmorStand?) {
+abstract class SkyblockEntity(val baseEntity: EntityLivingBase, open val armorStand: EntityArmorStand?) {
 
     // If an entity has a hologram (second ArmorStand) it has the ID + 2 if not there will be another mob
     val hologram by lazy {
