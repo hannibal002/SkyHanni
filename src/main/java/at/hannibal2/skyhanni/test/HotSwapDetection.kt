@@ -13,7 +13,8 @@ object HotSwapDetection {
     private var hotswap = false
 
     init {
-        fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
+        // TODO seems broken somehow?
+        fixedRateTimer(name = "skyhanni-hot-swap-detection", period = 1000L) {
             val currentTick = MinecraftData.totalTicks
             val diff = currentTick - latestTick
             latestTick = currentTick
