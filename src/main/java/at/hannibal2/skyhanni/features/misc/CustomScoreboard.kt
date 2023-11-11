@@ -314,7 +314,7 @@ enum class CustomScoreboardElements (
 class CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isCustomScoreboardEnabled()) return
         config.position.renderStringsAndItems(display, posLabel = "Custom Scoreboard")
     }
 
@@ -413,20 +413,23 @@ class CustomScoreboard {
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post){
-        if (event.type == RenderGameOverlayEvent.ElementType.HELMET && config.hideVanillaScoreboard && LorenzUtils.inSkyBlock){
-            GuiIngameForge.renderObjective = false
-        } else if (event.type == RenderGameOverlayEvent.ElementType.HELMET && !config.hideVanillaScoreboard && LorenzUtils.inSkyBlock){
-            GuiIngameForge.renderObjective = true
+        if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
+            GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
         }
     }
 
-    private fun isEnabled() : Boolean{
+    private fun isCustomScoreboardEnabled() : Boolean {
         return config.enabled && LorenzUtils.inSkyBlock
+    }
+
+    private fun isHideVanillaScoreboardEnabled() : Boolean {
+        return config.hideVanillaScoreboard && LorenzUtils.inSkyBlock
     }
 }
 
 private fun translateMayorNameToColor(input: String) : String {
     return when (input) {
+        // Normal Mayors
         "Aatrox"    ->  "§3$input"
         "Cole"      ->  "§e$input"
         "Diana"     ->  "§2$input"
@@ -435,11 +438,13 @@ private fun translateMayorNameToColor(input: String) : String {
         "Foxy"      ->  "§d$input"
         "Marina"    ->  "§b$input"
         "Paul"      ->  "§c$input"
+
+        // Special Mayors
         "Scorpius"  ->  "§d$input"
         "Jerry"     ->  "§d$input"
         "Derpy"     ->  "§d$input"
         "Dante"     ->  "§d$input"
-        else        ->  "§7$input"
+        else        ->  "§cUnknown Mayor: §7$input"
     }
 }
 
@@ -451,9 +456,9 @@ private fun extractLobbyCode(input: String): String? {
 
 private fun getProfileTypeAsSymbol(): String {
     return when {
-        HypixelData.ironman -> "§7♲ " // Ironman
-        HypixelData.stranded -> "§a☀ " // Stranded
-        HypixelData.bingo -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(0, 3) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
-        else -> "§e" // Default case
+        HypixelData.ironman     -> "§7♲ " // Ironman
+        HypixelData.stranded    -> "§a☀ " // Stranded
+        HypixelData.bingo       -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(0, 3) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
+        else                    -> "§e" // Default case
     }
 }
