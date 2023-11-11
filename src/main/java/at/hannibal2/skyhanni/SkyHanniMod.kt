@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
+import at.hannibal2.skyhanni.data.LocationData
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -337,6 +338,7 @@ class SkyHanniMod {
         loadModule(this)
         loadModule(ChatManager)
         loadModule(HypixelData())
+        loadModule(LocationData)
         loadModule(DungeonAPI())
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
