@@ -79,7 +79,7 @@ class HypixelData {
                 .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                 ?.substring(5)?.removeColor()
                 ?: "?"
-            skyBlockArea = LocationData.fixLocation(skyBlockIsland) ?: originalLocation
+            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
 
             checkProfileName()
         }
@@ -174,7 +174,7 @@ class HypixelData {
     }
 
     private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
-        val islandType = IslandType.getBySidebarName(newIsland)
+        val islandType = IslandType.getByNameOrUnknown(newIsland)
         if (guesting) {
             if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
             if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
