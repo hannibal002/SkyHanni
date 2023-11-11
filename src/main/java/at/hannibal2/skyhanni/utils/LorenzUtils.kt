@@ -30,9 +30,8 @@ import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.Collections
+import java.util.*
 import java.util.Timer
-import java.util.TimerTask
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -308,11 +307,9 @@ object LorenzUtils {
         whenChanged { _, new -> observer(new) }
     }
 
-    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
-        toMutableMap().also { function(it) }.toMap()
+    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
-    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
-        toMutableList().also { function(it) }.toList()
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
 
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
@@ -341,7 +338,7 @@ object LorenzUtils {
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit
+        crossinline onChange: (T) -> Unit,
     ) = buildList {
         add(prefix)
         for (entry in enumValues<T>()) {
@@ -398,19 +395,18 @@ object LorenzUtils {
 //        }
 //    }
 
-    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) =
-        object : ReadWriteProperty<Any?, T?> {
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-                val rootObj = root.get() ?: return null
-                return child.get(rootObj)
-            }
-
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-                if (value == null) return
-                val rootObj = root.get() ?: return
-                child.set(rootObj, value)
-            }
+    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) = object : ReadWriteProperty<Any?, T?> {
+        override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+            val rootObj = root.get() ?: return null
+            return child.get(rootObj)
         }
+
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
+            if (value == null) return
+            val rootObj = root.get() ?: return
+            child.set(rootObj, value)
+        }
+    }
 
     fun List<String>.nextAfter(after: String, skip: Int = 1): String? {
         var missing = -1
@@ -433,9 +429,7 @@ object LorenzUtils {
         if (this !is AccessorGuiEditSign) return false
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
-        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^" && tileSign.signText[2].unformattedText.removeColor() == "Set your" && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
@@ -536,4 +530,6 @@ object LorenzUtils {
     }
 
     fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
+
+    operator fun MatchResult?.get(index: Int) = this?.groupValues?.get(index)
 }

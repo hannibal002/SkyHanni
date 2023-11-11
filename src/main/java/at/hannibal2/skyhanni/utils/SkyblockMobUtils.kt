@@ -23,7 +23,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 
 object SkyblockMobUtils {
-    val mobNameFilter = "(\\[(.*)\\] )?(.*) \\d+".toRegex()
+    val mobNameFilter = "(\\[(.*)\\] )?(.Corrupted )?(.*) \\d+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) \\d+".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
@@ -52,7 +52,7 @@ object SkyblockMobUtils {
 
     fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
 
-    private fun createSkyblockMob(baseEntity: Entity, armorStand: EntityArmorStand): SkyblockMob {
+    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockMob {
         val name = armorStand.name.removeColor()
         slayerNameFilter.find(name)
             ?.also { return SkyblockSlayerBoss(baseEntity, armorStand, it.groupValues[1], it.groupValues[2]) }
@@ -62,7 +62,7 @@ object SkyblockMobUtils {
     }
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
-    fun createSkyblockEntity(baseEntity: Entity): SkyblockEntity? {
+    fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
         val armorStand = getArmorStand(baseEntity) ?: return null
         LorenzDebug.log(armorStand.name.removeColor())
         if (armorStand.isDefaultValue()) return null
@@ -71,7 +71,7 @@ object SkyblockMobUtils {
         return SummoningMob(baseEntity, armorStand, sumReg)
     }
 
-    fun createSkyblockMobIfValid(baseEntity: Entity): SkyblockMob? =
+    fun createSkyblockMobIfValid(baseEntity: EntityLivingBase): SkyblockMob? =
         if (baseEntity.isSkyBlockMob()) createSkyblockEntity(baseEntity) as? SkyblockMob else null
 
 
