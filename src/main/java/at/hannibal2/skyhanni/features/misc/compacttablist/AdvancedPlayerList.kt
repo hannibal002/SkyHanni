@@ -65,7 +65,7 @@ object AdvancedPlayerList {
                     val name = fullName.split(" ")
                     val coloredName = name[index]
                     if (index == 1) {
-                        playerData.coloredName = name[0] + coloredName
+                        playerData.coloredName = name[0] + " " + coloredName
                     } else {
                         playerData.coloredName = coloredName
                     }
