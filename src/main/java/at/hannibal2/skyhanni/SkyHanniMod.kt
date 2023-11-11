@@ -291,6 +291,7 @@ import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
+import at.hannibal2.skyhanni.test.HotSwapDetection
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.ParkourWaypointSaver
 import at.hannibal2.skyhanni.test.ShowItemUuid
@@ -327,7 +328,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.Beta.21",
+    version = "0.21.Beta.22",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -563,7 +564,7 @@ class SkyHanniMod {
         loadModule(QuickModMenuSwitch)
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
-        loadModule(FrozenTreasureTracker())
+        loadModule(FrozenTreasureTracker)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
@@ -643,6 +644,8 @@ class SkyHanniMod {
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
         loadModule(TestShowSlotNumber())
+        loadModule(SkyHanniDebugsAndTests)
+        loadModule(HotSwapDetection)
     }
 
     @Mod.EventHandler

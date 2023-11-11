@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -39,22 +38,6 @@ object SlayerAPI {
     fun getLatestProgressChangeTime() = if (latestSlayerProgress == "§eSlay the boss!") {
         System.currentTimeMillis()
     } else latestProgressChangeTime
-
-
-    // TODO use repo
-    fun ignoreSlayerDrop(name: String) = when (name.removeColor()) {
-        // maybe everywhere?
-        "Stone" -> true
-        "Head" -> true
-
-        // Spider
-        "Cobweb" -> true
-
-        // Blaze
-        "Water Bottle" -> true
-
-        else -> false
-    }
 
     fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
         val key = internalName to amount

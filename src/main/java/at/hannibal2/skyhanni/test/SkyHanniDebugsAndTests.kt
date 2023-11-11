@@ -8,10 +8,12 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -19,15 +21,18 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -66,6 +71,31 @@ class SkyHanniDebugsAndTests {
 
         private fun print(text: String) {
             LorenzDebug.log(text)
+        }
+
+        private var testLocation: LorenzVec? = null
+
+        @SubscribeEvent
+        fun onRenderWorld(event: LorenzRenderWorldEvent) {
+            testLocation?.let {
+                event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
+                event.drawDynamicText(it, "Test", 1.5)
+            }
+        }
+
+        fun waypoint(args: Array<String>) {
+            SoundUtils.playBeepSound()
+
+            if (args.isEmpty()) {
+                testLocation = null
+                LorenzUtils.chat("reset test waypoint")
+            }
+
+            val x = args[0].toDouble()
+            val y = args[1].toDouble()
+            val z = args[2].toDouble()
+            testLocation = LorenzVec(x, y, z)
+            LorenzUtils.chat("set test waypoint")
         }
 
         fun testCommand(args: Array<String>) {
@@ -232,7 +262,9 @@ class SkyHanniDebugsAndTests {
         }
 
         fun debugVersion() {
-            LorenzUtils.chat("§eYou are using SkyHanni ${SkyHanniMod.version}")
+            val name = "SkyHanni ${SkyHanniMod.version}"
+            LorenzUtils.chat("§eYou are using $name")
+            OSUtils.copyToClipboard(name)
         }
 
         fun debugData(args: Array<String>) {

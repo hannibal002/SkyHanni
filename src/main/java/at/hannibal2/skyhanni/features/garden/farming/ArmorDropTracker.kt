@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -27,13 +26,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object ArmorDropTracker {
-    private var display = emptyList<List<Any>>()
 
     private var hasArmor = false
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = SkyHanniMod.feature.garden.farmingArmorDrop
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) { update() }
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
+    { drawDisplay(it) }
 
     class Data : TrackerData() {
         override fun reset() {
@@ -52,7 +51,6 @@ object ArmorDropTracker {
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
-        display = emptyList()
         hasArmor = false
     }
 
@@ -72,29 +70,14 @@ object ArmorDropTracker {
         tracker.modify {
             it.drops.addOrPut(drop, 1)
         }
-        update()
     }
 
-    private fun update() {
-        display = drawDisplay()
-    }
-
-    private fun drawDisplay() = buildList<List<Any>> {
-        val drops = tracker.currentDisplay()?.drops ?: return@buildList
-
+    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7RNG Drops for Farming Armor:")
-        tracker.addDisplayModeToggle(this)
-        for ((drop, amount) in drops.sortedDesc()) {
+        for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
             addAsSingletonList(" §7- §e${amount.addSeparators()}x $dropName")
         }
-
-        tracker.addSessionResetButton(this)
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        update()
     }
 
     @SubscribeEvent
@@ -103,7 +86,7 @@ object ArmorDropTracker {
         if (!config.enabled) return
         if (!hasArmor) return
 
-        tracker.renderDisplay(config.pos, display)
+        tracker.renderDisplay(config.pos)
     }
 
     @SubscribeEvent
