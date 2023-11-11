@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
@@ -57,7 +58,7 @@ object SkyblockMobUtils {
             ?.also { return SkyblockSlayerBoss(baseEntity, armorStand, it.groupValues[1], it.groupValues[2]) }
         bossMobNameFilter.find(name)?.also { return SkyblockBossMob(baseEntity, armorStand, it.groupValues[3]) }
 
-        return if (DungeonAPI.inDungeon()) DungeonMob(baseEntity, armorStand) else SkyblockMob(baseEntity, armorStand)
+        return if (DungeonAPI.inDungeon()) DungeonMob(baseEntity, armorStand) else SkyblockBasicMob(baseEntity, armorStand)
     }
 
     /** baseEntity must have passed the .isSkyBlockMob() function */

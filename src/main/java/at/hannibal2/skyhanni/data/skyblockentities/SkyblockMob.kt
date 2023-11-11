@@ -6,9 +6,13 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 
 
-open class SkyblockMob(baseEntity: Entity, armorStand: EntityArmorStand?) : SkyblockEntity(baseEntity, armorStand) {
-    private val regexResult by lazy { armorStand?.name?.removeColor()?.let { SkyblockMobUtils.mobNameFilter.find(it) } }
+abstract class SkyblockMob(baseEntity: Entity, armorStand: EntityArmorStand?) : SkyblockEntity(baseEntity, armorStand)
+
+class SkyblockBasicMob(baseEntity: Entity, armorStand: EntityArmorStand?) : SkyblockMob(
+    baseEntity, armorStand
+) {
+    private val regexResult = armorStand?.name?.removeColor()?.let { SkyblockMobUtils.mobNameFilter.find(it) }
 
     override val name = regexResult?.groupValues?.get(3) ?: run { SkyblockMobUtils.errorNameFinding(baseEntity.name) }
-    val level by lazy { regexResult?.groupValues?.get(2) }
+    val level = regexResult?.groupValues?.get(2)
 }
