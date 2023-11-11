@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.events.SkyblockMobDeSpawnEvent
 import at.hannibal2.skyhanni.events.SkyblockMobDeathEvent
 import at.hannibal2.skyhanni.events.SkyblockMobLeavingRenderEvent
 import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
@@ -263,6 +264,7 @@ class EntityData {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
+                if (RiftAPI.inRift()) return true
                 val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
                 if (it is SummoningMob) {
                     EntitySummoningSpawnEvent(it).postAndCatch()
@@ -280,6 +282,7 @@ class EntityData {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
+                if (RiftAPI.inRift()) return
                 _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
                     ?: _currentSkyblockMobs[entity.hashCode()]?.let {
                         if (it.isInRender()) {
