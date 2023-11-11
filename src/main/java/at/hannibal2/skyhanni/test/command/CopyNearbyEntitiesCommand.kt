@@ -1,6 +1,11 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
@@ -177,7 +182,18 @@ object CopyNearbyEntitiesCommand {
     }
 
     private fun getType(entity: Entity) = buildString {
-        if (entity.isSkyBlockMob()) append("SkyblockMob, ")
+        if (entity.isSkyBlockMob()) {
+            append("SkyblockMob(")
+            val mob = EntityData.currentSkyblockMobs.firstOrNull() { it == entity }
+            if (mob != null) when (mob) {
+                is SkyblockSlayerBoss -> append("Slayer")
+                is SkyblockBossMob -> append("Boss")
+                is SkyblockBasicMob -> append("Basic")
+                is DungeonMob -> append("Dungeon")
+                is SkyblockSpecialMob -> append("Special")
+            } else append("None")
+            append("), ")
+        }
         if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
         if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
         if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
