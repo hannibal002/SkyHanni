@@ -100,7 +100,7 @@ class TabListData {
         val tabList = readTabList() ?: return
         if (cache != tabList) {
             cache = tabList
-            TabListUpdateEvent(debugCache ?: cache).postAndCatch()
+            TabListUpdateEvent(getTabList()).postAndCatch()
         }
     }
 }
