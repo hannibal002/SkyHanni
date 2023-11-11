@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDate
     private val monthAndDatePattern =
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}((nd|rd|th|st)?).*".toPattern()
+        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*".toPattern()
     private var display = ""
 
     // sun, moon, spooky
@@ -59,9 +59,11 @@ class InGameDateDisplay {
                 else "$theBaseString ☽"
             }
         }
-        if (!config.includeOrdinal) theBaseString = theBaseString.replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
+        if (!config.includeOrdinal) theBaseString = theBaseString.removeOrdinal()
         display = theBaseString
     }
+
+    private fun String.removeOrdinal() = replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
