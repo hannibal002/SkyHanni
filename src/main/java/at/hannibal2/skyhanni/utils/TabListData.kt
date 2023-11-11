@@ -42,7 +42,7 @@ class TabListData {
 
         fun copyCommand(args: Array<String>) {
             if (debugCache != null) {
-                LorenzUtils.clickableChat("§c[SkyHanni] Tab list debug is enambed!", "shdebugtablist")
+                LorenzUtils.clickableChat("§c[SkyHanni] Tab list debug is enabled!", "shdebugtablist")
                 return
             }
 
