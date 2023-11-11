@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.EntityRealPlayerDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityRealPlayerSpawnEvent
 import at.hannibal2.skyhanni.events.EntitySummoningDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntitySummoningSpawnEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -50,7 +51,11 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.nio.file.Files
+import java.nio.file.Paths
 
 private const val MAX_RETRIES = 100
 
@@ -58,7 +63,7 @@ private const val MAX_DISTANCE_TO_PLAYER = 18.0// TODO correct Distance
 
 class EntityData {
 
-    private val LogPath: String = "config/skyhanni/logs/mob/"
+    private val devTrackerPath: String = "config/skyhanni/logs/mob/Tracker.txt"
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
 
     @SubscribeEvent
@@ -173,7 +178,7 @@ class EntityData {
         var misses = 0
         var instancedFinish = 0
         var startedRetries = 0
-        val retriesAvg get() = retries / startedRetries
+        val retriesAvg get() = if (startedRetries != 0) retries / startedRetries else 0
 
         val EntityNames = sortedSetOf<String>()
         fun addEntityName(entity: SkyblockEntity) {
@@ -198,13 +203,40 @@ class EntityData {
     }
 
     @SubscribeEvent
-    fun onIslandJoin(event: IslandChangeEvent) {
-
+    fun onIslandJoin(event: HypixelJoinEvent) {
+        var foundNameList = false
+        try {
+            FileInputStream(devTrackerPath).apply {
+                reader().forEachLine {
+                    if (!foundNameList) {
+                        when {
+                            it.contains("Retries") -> counter.retries = trackerLineToCounter(it)
+                            it.contains("OutOfRangeRetires") -> counter.outOfRangeRetries = trackerLineToCounter(it)
+                            it.contains("Spawn") -> counter.spawn = trackerLineToCounter(it)
+                            it.contains("Despawn") -> counter.deSpawn = trackerLineToCounter(it)
+                            it.contains("InstancedFinish") -> counter.instancedFinish = trackerLineToCounter(it)
+                            it.contains("StartedRetries") -> counter.startedRetries = trackerLineToCounter(it)
+                            it.contains("Misses") -> counter.misses = trackerLineToCounter(it)
+                            it.contains("Name List:") -> foundNameList = true
+                        }
+                    } else {
+                        counter.EntityNames.add(it)
+                    }
+                }
+            }.apply { close() }
+        } catch (e: FileNotFoundException) {
+            Files.createDirectories(Paths.get(devTrackerPath.substring(0, devTrackerPath.indexOfLast { it == '/' })))
+            return
+        } catch (e: SecurityException) {
+            return
+        }
     }
+
+    private fun trackerLineToCounter(it: String) = it.substring(it.indexOf(":") + 2, it.length).toInt()
 
     @SubscribeEvent
     fun onExit(event: IslandChangeEvent) {
-        FileOutputStream("$LogPath\\LOG.txt").apply {
+        FileOutputStream(devTrackerPath).apply {
             write(
                 (buildString {
                     append("Retries: ${counter.retries}\n")
