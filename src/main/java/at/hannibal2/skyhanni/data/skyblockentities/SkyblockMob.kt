@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
+import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LorenzUtils.get
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -22,5 +23,6 @@ class SkyblockBasicMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStan
         SkyblockMobUtils.errorNameFinding(baseEntity.name)
     }
     val level = regexResult[2]
-    val isCorrupted = baseEntity.isCorrupted()
+    val isCorrupted get() = baseEntity.isCorrupted() // Can change
+    val isRunic = baseEntity.isRunic() // Does not Change
 }
