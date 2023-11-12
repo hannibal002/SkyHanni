@@ -172,13 +172,9 @@ class CustomScoreboard {
         }
     }
 
-    private fun isCustomScoreboardEnabled() : Boolean {
-        return config.enabled && LorenzUtils.inSkyBlock
-    }
+    private fun isCustomScoreboardEnabled() = config.enabled && LorenzUtils.inSkyBlock
 
-    private fun isHideVanillaScoreboardEnabled() : Boolean {
-        return config.hideVanillaScoreboard && LorenzUtils.inSkyBlock
-    }
+    private fun isHideVanillaScoreboardEnabled() = config.hideVanillaScoreboard && LorenzUtils.inSkyBlock
 }
 
 fun translateMayorNameToColor(input: String) : String {
