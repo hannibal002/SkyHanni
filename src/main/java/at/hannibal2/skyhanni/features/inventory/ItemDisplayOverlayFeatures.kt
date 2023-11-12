@@ -73,7 +73,9 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5) && itemName.contains(" Minion ") && item.getLore().any { it.contains("Place this minion") }) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5) && itemName.contains(" Minion ") &&
+            !itemName.contains("Recipe") && item.getLore().any { it.contains("Place this minion") }
+        ) {
             val array = itemName.split(" ")
             val last = array[array.size - 1]
             return last.romanToDecimal().toString()
