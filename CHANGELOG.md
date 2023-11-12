@@ -136,8 +136,8 @@
 + Made Fatal Tempo same as Chimera in Estimated Item Value. - jani
 + Added debug options for fishing hook display. - hannibal2
     + This should help find values that the fishing hook display works 100% with.
-+ Changed the color for the tab list Special Persons Mark.
-+ Mark SkyHanni Devs in the tab list special.
++ Changed the color for the tab list Special Persons Mark. - hannibal2
++ Mark SkyHanni Devs in the tab list special. - hannibal2
 + Added buttons to change the format of the price and the number in the sack display. - HiZe
 + Made Smoldering same as Fatal Tempo and Chimera in Estimated Item Value. - jani
 + Added an option to change where to get the items from in the composter overlay: from the bazaar or from sacks. - HiZe
