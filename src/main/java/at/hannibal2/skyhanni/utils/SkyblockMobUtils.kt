@@ -24,6 +24,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityChicken
 import net.minecraft.entity.passive.EntityCow
@@ -82,7 +83,7 @@ object SkyblockMobUtils {
         if (baseEntity is EntityBat) return createBat(baseEntity)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
 
-        val armorStand = getArmorStand(baseEntity) ?: /* getArmorStandByRange(baseEntity, 1.5) ?: */ return null
+        val armorStand = getArmorStand(baseEntity) ?: getArmorStandOnly(baseEntity) ?: return null
         LorenzDebug.log(armorStand.name.removeColor())
 
         if (armorStand.inventory?.get(4) != null) return armorStandOnlyMobs(baseEntity, armorStand)
@@ -93,8 +94,25 @@ object SkyblockMobUtils {
         return SummoningMob(baseEntity, armorStand, sumReg)
     }
 
+    private fun getArmorStandOnly(baseEntity: EntityLivingBase): EntityArmorStand? {
+        if (baseEntity !is EntityZombie) return null
+        return when {/* baseEntity.maxHealth == 5000f -> generateSequence(1) { it + 1 }.take(10).map { i ->
+                getArmorStand(
+                    baseEntity, i
+                )
+            }.firstOrNull {
+                it != null && it.distanceTo(baseEntity) < 2.0 && it.inventory?.get(4)?.getSkullTexture() == RatSkull
+            }
+            // Rat */
+            else -> null
+        }
+    }
+
+    private val RatSkull =
+        "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
+
     private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockEntity? {
-        if (armorStand.inventory[4].getSkullTexture() == "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=") return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
+        if (armorStand.inventory[4].getSkullTexture() == RatSkull) return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
         return null
     }
 
