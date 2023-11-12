@@ -4,9 +4,16 @@
 
 ### New Features
 
+#### Inventory
+
 + Added Quick Craft Confirmation. - Cad
     + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
     + Sack items can be crafted normally.
++ Added Shift Click Equipment. - Thunderblade73
+    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Added option to highlight items that are full in the sack inventory.
+
+#### GUI
 + Added **Compact Tab List**.
     + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
     + Option to hide Hypixel advertisment banners. - CalMWolfs
@@ -16,21 +23,21 @@
           party/friends/guild
         + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
           level
-+ Added Kick Duration. - hannibal2
-    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
-    + Useful if you get blocked because of 'You were kicked while joining that server!'.
-    + Send a warning and sound after a custom amount of seconds.
-+ Added Time In Limbo. - hannibal2
-    + Show the time since you entered limbo.
-    + Show a chat message for how long you were in limbo once you leave it.
-+ Added Highlight Party Members. - Cad
-    + Marking party members with a bright outline to better find them in the world.
-+ Added Shift Click Equipment. - Thunderblade73
-    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Added AFK time to Discord RPC. - NetheriteMiner
+
+#### Chat
+
 + Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Added Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
+
+#### Rendering
+
++ Added Highlight Party Members. - Cad
+    + Marking party members with a bright outline to better find them in the world.
 + Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
     + Options to change speed, size, saturation and direction.
 + Added Modify Visual Words (command /shwords). - CalMWolfs
@@ -39,50 +46,49 @@
 + Added In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
++ Added **Arrow Trail cosmetic** - Thunderblade73
+    + Draw a colored line behind the arrows in the air.
+    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
+      color, to change the time alive, and the line width.
+
+#### Crimson Isle
+
 + Added Quest Item Helper. - NetheriteMiner
     + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
       needed from the sacks.
++ Added Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
+    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
+
+##### Fishing
+
 + Added alerts when the player catches a Legendary Sea Creature. - Cad
++ Added **Fishing Bait Warnings.** - cimbraien
+    + Option to warn when no bait is used.
+    + Option to warn when used bait is changed.
+
+#### Dungeon
+
 + Added Soulweaver Skull Hider to the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
-+ Added /shmouselock command to lock mouse rotation for farming. - Cad
 + Added **Dungeon party finder** QOL improvements - Cad
     + Floor stack size.
     + Mark Paid Carries red.
     + Mark Low-Class levels orange.
     + Mark groups you can't join dark red.
     + Mark groups without your current classes green.
-+ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
-    + /pw -> party warp
-    + /pk -> party kick
-    + /pt -> party transfer
-    + /pp -> party promote
-    + /pko -> party kickoffline
 + Added working **Livid Finder** (should work 100% of the time). - hannibal2
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
-+ Added AFK time to Discord RPC. - NetheriteMiner
-+ Added option to highlight items that are full in the sack inventory.
-+ Added **Arrow Trail cosmetic** - Thunderblade73
-    + Draw a colored line behind the arrows in the air.
-    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
-      color, to change the time alive, and the line width.
-+ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
-    + E.g. inside the SkyBlock leveling guide.
-+ Added Chat **Translator** - NetheriteMiner
-    + After enabling, click on any chat message sent by another player to translate it to English.
+
+
+#### Garden
+
++ Added /shmouselock command to lock mouse rotation for farming. - Cad
 + Added Highlight Visitors in SkyBlock. - nea
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
-+ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff
-  display. - CalMWolfs
 + Added auto-detection of Expired Pumpkin farming fortune. - CalMWolfs
-+ Added Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
-    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
-+ Added **Fishing Bait Warnings.** - cimbraien
-    + Option to warn when no bait is used.
-    + Option to warn when used bait is changed.
 
 #### Events
 
@@ -96,6 +102,29 @@
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
 + Play warning sound when the next Primal Fear can spawn. - thunderblade73
+
+#### Commands
+
++ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
+    + /pw -> party warp
+    + /pk -> party kick
+    + /pt -> party transfer
+    + /pp -> party promote
+    + /pko -> party kickoffline
++ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
+    + E.g. inside the SkyBlock leveling guide.
++ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff
+  display. - CalMWolfs
+
+#### Misc
+
++ Added Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send a warning and sound after a custom amount of seconds.
++ Added Time In Limbo. - hannibal2
+    + Show the time since you entered limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
 
 ### Changes
 
