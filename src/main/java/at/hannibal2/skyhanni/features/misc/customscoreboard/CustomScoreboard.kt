@@ -79,6 +79,8 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!isCustomScoreboardEnabled()) return
+
         // Draws the custom scoreboard
         display = drawScoreboard()
 
