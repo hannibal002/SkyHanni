@@ -39,7 +39,7 @@ import net.minecraft.entity.player.EntityPlayer
 object SkyblockMobUtils {
     val mobNameFilter = "(\\[(.*)\\] )?(.Corrupted )?(.*) \\d+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
-    val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) \\d+".toRegex()
+    val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) (\\d+|█+)".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
     private val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     private const val defaultArmorStandName = "Armor Stand"
