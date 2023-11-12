@@ -161,14 +161,7 @@ class EntityData {
             currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
         }
 
-        (currentEntityLiving - previousEntityLiving).forEach {
-            counter.instancedFinish++
-            if (!EntitySpawn(it)) {
-                retry(it)
-                counter.instancedFinish--
-                counter.startedRetries++
-            }
-        }
+        (currentEntityLiving - previousEntityLiving).forEach { retry(it) }
         (previousEntityLiving - currentEntityLiving).forEach { EntityDeSpawn(it) }
     }
 
@@ -296,7 +289,8 @@ class EntityData {
         }
     }
 
-    private fun retry(entity: EntityLivingBase) = retries.add(RetryEntityInstancing(entity, 0))
+    private fun retry(entity: EntityLivingBase) =
+        retries.add(RetryEntityInstancing(entity, 0)).also { counter.startedRetries++ }
 
     private data class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int)
 

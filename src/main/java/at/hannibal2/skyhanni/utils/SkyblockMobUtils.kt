@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockInvalidEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockProjectileEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
@@ -28,6 +29,7 @@ import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityChicken
 import net.minecraft.entity.passive.EntityCow
+import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityMooshroom
 import net.minecraft.entity.passive.EntityPig
 import net.minecraft.entity.passive.EntityRabbit
@@ -50,6 +52,7 @@ object SkyblockMobUtils {
     fun Entity.isSkyBlockMob(): Boolean {
         if (this !is EntityLivingBase) return false
         if (this is EntityArmorStand) return false
+        if (this is EntityHorse && this.maxHealth != 35_000f) return false
         if (this is EntityOtherPlayerMP && this.isRealPlayer()) return false
         if (this.isDisplayNPC()) return false
         if (this is EntityWither && (this.entityId < 0 || this.name == "Wither")) return false
@@ -83,12 +86,11 @@ object SkyblockMobUtils {
         if (baseEntity is EntityBat) return createBat(baseEntity)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
 
-        val armorStand = getArmorStand(baseEntity) ?: getArmorStandOnly(baseEntity) ?: return null
-        LorenzDebug.log(armorStand.name.removeColor())
+        val armorStand = getArmorStand(baseEntity)
+        exceptions(baseEntity, armorStand)?.also { return it }
 
-        if (armorStand.inventory?.get(4) != null) return armorStandOnlyMobs(baseEntity, armorStand)
-        if (armorStand.isDefaultValue()) return null
 
+        if (armorStand == null || armorStand.isDefaultValue()) return null
         val sumReg =
             summoningRegex.find(armorStand.name.removeColor()) ?: return createSkyblockMob(baseEntity, armorStand)
         return SummoningMob(baseEntity, armorStand, sumReg)
@@ -111,8 +113,22 @@ object SkyblockMobUtils {
     private val RatSkull =
         "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
 
-    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockEntity? {
-        if (armorStand.inventory[4].getSkullTexture() == RatSkull) return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
+    private fun exceptions(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?): SkyblockEntity? {
+        armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
+        if (armorStand == null) return null
+        if (baseEntity is EntityPig && armorStand.name.endsWith("'s Pig")) return SkyblockInvalidEntity(baseEntity, "Pig Pet")
+        return null
+    }
+
+    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?): SkyblockEntity? {
+        if (baseEntity !is EntityZombie) return null
+        if (armorStand != null) {
+            if (armorStand.name.endsWith("'s Armadillo")) return SkyblockInvalidEntity(baseEntity, "Armadillo Pet")
+            if (armorStand.name.endsWith("'s Rat")) return SkyblockInvalidEntity(baseEntity, "Rat Pet")
+        }
+        if (armorStand?.inventory?.get(4)
+                ?.getSkullTexture() == RatSkull
+        ) return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
         return null
     }
 
@@ -123,7 +139,7 @@ object SkyblockMobUtils {
         is EntityChicken -> SkyblockSpecialMob(baseEntity, null, "Farm Chicken")
         is EntityRabbit -> SkyblockSpecialMob(baseEntity, null, "Farm Rabbit")
         is EntitySheep -> SkyblockSpecialMob(baseEntity, null, "Farm Sheep")
-        else -> null // TODO something else because this trigger an retry that leads to a miss which is wasted performance
+        else -> null
     }
 
     private fun createBat(baseEntity: EntityLivingBase): SkyblockEntity? = when (baseEntity.maxHealth) {
