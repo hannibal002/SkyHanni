@@ -89,39 +89,23 @@ class CustomScoreboard {
 
         // Gets some values from the tablist
         for (line in TabListData.getTabList()){
-            if (line.startsWith(" Gems: §r§a")){
-                gems = line.removePrefix(" Gems: §r§a")
-            }
-            if (line.startsWith(" Bank: §r§6")){
-                bank = line.removePrefix(" Bank: §r§6")
-            }
-            if (line.startsWith(" §r§fMithril Powder: §r§2")){
-                mithrilPowder = line.removePrefix(" §r§fMithril Powder: §r§2")
-            }
-            if (line.startsWith(" §r§fGemstone Powder: §r§d")){
-                gemstonePowder = line.removePrefix(" §r§fGemstone Powder: §r§d")
+            when {
+                line.startsWith(" Gems: §r§a") -> gems = line.removePrefix(" Gems: §r§a")
+                line.startsWith(" Bank: §r§6") -> bank = line.removePrefix(" Bank: §r§6")
+                line.startsWith(" §r§fMithril Powder: §r§2") -> mithrilPowder = line.removePrefix(" §r§fMithril Powder: §r§2")
+                line.startsWith(" §r§fGemstone Powder: §r§d") -> gemstonePowder = line.removePrefix(" §r§fGemstone Powder: §r§d")
             }
         }
 
         // Gets some values from the scoreboard
         for (line in ScoreboardData.sidebarLinesFormatted){
-            if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
-                location = line
-            }
-            if (line.startsWith("Motes: §d")){
-                motes = line.removePrefix("Motes: §d")
-            }
-            if (extractLobbyCode(line) is String ){
-                lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
-            }
-            if (line.startsWith("Heat: ")){
-                heat = line.removePrefix("Heat: ")
-            }
-            if (line.startsWith("Bits: §b")){
-                bits = line.removePrefix("Bits: §b")
-            }
-            if (line.startsWith("Copper: §c")){
-                copper = line.removePrefix("Copper: §c")
+            when {
+                line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
+                line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
+                extractLobbyCode(line) is String -> lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
+                line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
+                line.startsWith("Bits: §b") -> bits = line.removePrefix("Bits: §b")
+                line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
             }
         }
         purse = LorenzUtils.formatInteger(PurseAPI.currentPurse.toInt())
