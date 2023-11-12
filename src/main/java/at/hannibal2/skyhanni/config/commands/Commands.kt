@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
@@ -318,6 +319,10 @@ object Commands {
             "shcopyactionbar",
             "Copies the actionbar to the clipboard"
         ) { CopyActionBar.command(it) }
+        registerCommand(
+            "shcopycustomscoreboard",
+            "Copies the custom scoreboard to the clipboard"
+        ) { CustomScoreboard.copyScoreboard(it) }
     }
 
     private fun internalCommands() {

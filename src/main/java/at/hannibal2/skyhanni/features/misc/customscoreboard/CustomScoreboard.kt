@@ -22,6 +22,7 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
@@ -35,9 +36,12 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -49,6 +53,7 @@ import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<List<Any>>()
+private var cache = emptyList<List<Any>>()
 var partyCount = 0
 
 // Stats / Numbers
@@ -80,7 +85,7 @@ class CustomScoreboard {
         // Resets Party count
         partyCount = 0
 
-        // Gets some values for the tablist
+        // Gets some values from the tablist
         for (line in TabListData.getTabList()){
             if (line.startsWith(" Gems: §r§a")){
                 gems = line.removePrefix(" Gems: §r§a")
@@ -96,7 +101,7 @@ class CustomScoreboard {
             }
         }
 
-        // Gets some values for the scoreboard
+        // Gets some values from the scoreboard
         for (line in ScoreboardData.sidebarLinesFormatted){
             if (line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ")){
                 location = line
@@ -125,6 +130,8 @@ class CustomScoreboard {
         for (element in Elements.entries) {
             lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
         }
+
+        cache = lineMap.values.toList()
 
         return formatDisplay(lineMap)
     }
@@ -175,6 +182,23 @@ class CustomScoreboard {
     private fun isCustomScoreboardEnabled() = config.enabled && LorenzUtils.inSkyBlock
 
     private fun isHideVanillaScoreboardEnabled() = config.hideVanillaScoreboard && LorenzUtils.inSkyBlock
+
+    companion object {
+        fun copyScoreboard(args: Array<String>) {
+            var string = ""
+
+            for (index in config.textFormat) {
+                cache[index].let {
+                    for (line in it){
+                        string = string + line + "\n"
+                    }
+                }
+            }
+
+            OSUtils.copyToClipboard(string)
+            LorenzUtils.chat("§e[SkyHanni] Custom Scoreboard copied into your clipboard!")
+        }
+    }
 }
 
 fun translateMayorNameToColor(input: String) : String {
