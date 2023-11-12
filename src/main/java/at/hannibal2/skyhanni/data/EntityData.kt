@@ -58,6 +58,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 
 private const val MAX_RETRIES = 100
 
@@ -129,6 +130,7 @@ class EntityData {
     private val mobConfig get() = SkyHanniMod.feature.dev.mobDetection
 
     companion object {
+
         val currentSkyblockMobs get() = _currentSkyblockMobs.values.toList()
         val currentDisplayNPCs get() = _currentDisplayNPCs.values.toList()
         val currentRealPlayers get() = _currentRealPlayers.toList()
@@ -141,9 +143,11 @@ class EntityData {
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
-        private val retries = mutableListOf<RetryEntityInstancing>()
+        private val retries = TreeSet<RetryEntityInstancing>()
 
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
+
+        fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
     }
 
 
@@ -284,7 +288,7 @@ class EntityData {
                             SkyblockMobLeavingRenderEvent(it).postAndCatch()
                         }
                         SkyblockMobDeSpawnEvent(it).postAndCatch()
-                    } ?: retries.removeIf { it.entity == entity }
+                    } ?: removeRetry(entity)
             }
         }
     }
@@ -292,13 +296,18 @@ class EntityData {
     private fun retry(entity: EntityLivingBase) =
         retries.add(RetryEntityInstancing(entity, 0)).also { counter.startedRetries++ }
 
-    private data class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int)
+    private class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int) : Comparable<RetryEntityInstancing> {
+        override fun hashCode() = entity.hashCode()
+        override fun compareTo(other: RetryEntityInstancing) = this.hashCode() - other.hashCode()
+        override fun equals(other: Any?) = (other as? EntityLivingBase) == entity
+    }
 
     private fun handleReTries() {
         val iterator = retries.iterator()
         while (iterator.hasNext()) {
             val retry = iterator.next()
-            if (retry.entity.getLorenzVec()
+            val entity = retry.entity
+            if (entity.getLorenzVec()
                     .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
             ) {
                 counter.outOfRangeRetries++
@@ -308,16 +317,16 @@ class EntityData {
             if (retry.times > MAX_RETRIES) {
                 LorenzDebug.log(
                     "I missed. Distance: ${
-                        retry.entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                        entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     } , ${
-                        retry.entity.getLorenzVec().subtract(LocationUtils.playerLocation())
+                        entity.getLorenzVec().subtract(LocationUtils.playerLocation())
                     }"
                 )
                 counter.misses++
                 iterator.remove()
                 continue
             }
-            if (!EntitySpawn(retry.entity)) {
+            if (!EntitySpawn(entity)) {
                 retry.times++
                 continue
             }

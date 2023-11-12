@@ -151,7 +151,7 @@ object EntityUtils {
     fun EntityLivingBase.isDisplayNPC() =
         (this is EntityPlayer && isNPC() && name.any { it in '0'..'9' }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPC in the Village
             || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
-            || (this is EntityCow && this.entityId == 175) // Shania NPC TODO FIX??
+            || (this is EntityCow && this.entityId == 175) // Shania NPC
 
     fun EntityLivingBase.isFarmMob() =
         this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f)

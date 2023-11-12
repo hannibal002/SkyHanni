@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
-class DungeonMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : SkyblockMob(baseEntity, armorStand) {
+class DungeonMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : SkyblockMob(baseEntity, armorStand, null) {
 
     val Attribute: String?
     val hasStar: Boolean

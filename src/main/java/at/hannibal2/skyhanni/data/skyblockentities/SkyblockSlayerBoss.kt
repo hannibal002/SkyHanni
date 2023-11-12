@@ -12,7 +12,7 @@ import kotlin.time.toDuration
 
 private val regex = "Spawned by: (.*)".toRegex()
 
-open class SkyblockSlayerBoss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, nameS: String, tierS: String) : SkyblockBossMob(baseEntity, armorStand, nameS) {
+open class SkyblockSlayerBoss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, nameS: String, tierS: String, extraEntityList: List<EntityLivingBase>) : SkyblockBossMob(baseEntity, armorStand, nameS, extraEntityList) {
     val tier = tierS.romanToDecimal()
 
     private val timeArmorStand = hologram1

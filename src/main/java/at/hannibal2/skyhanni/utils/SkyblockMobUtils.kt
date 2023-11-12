@@ -53,6 +53,9 @@ object SkyblockMobUtils {
         if (this !is EntityLivingBase) return false
         if (this is EntityArmorStand) return false
         if (this is EntityHorse && this.maxHealth != 35_000f) return false
+
+        // Maybe a Problem with Summons TODO find other solution (broke stuff)
+        // if (this is EntitySlime && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE) return false
         if (this is EntityOtherPlayerMP && this.isRealPlayer()) return false
         if (this.isDisplayNPC()) return false
         if (this is EntityWither && (this.entityId < 0 || this.name == "Wither")) return false
@@ -60,9 +63,10 @@ object SkyblockMobUtils {
         return true
     }
 
-    // The corresponding ArmorStand for a mob has always the ID + 1 (with some small exceptions)
-    fun getArmorStand(entity: Entity, offSet: Int = 1) =
-        EntityUtils.getEntityByID(entity.entityId + offSet) as? EntityArmorStand
+    // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
+    fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
+
+    fun getNextEntity(entity: Entity, offset: Int) = EntityUtils.getEntityByID(entity.entityId + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
@@ -72,13 +76,14 @@ object SkyblockMobUtils {
 
     fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
 
-    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockMob {
+    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): SkyblockMob {
         val name = armorStand.name.removeColor()
         slayerNameFilter.find(name)
-            ?.also { return SkyblockSlayerBoss(baseEntity, armorStand, it.groupValues[1], it.groupValues[2]) }
-        bossMobNameFilter.find(name)?.also { return SkyblockBossMob(baseEntity, armorStand, it.groupValues[3]) }
+            ?.also { return SkyblockSlayerBoss(baseEntity, armorStand, it.groupValues[1], it.groupValues[2], extraEntityList) }
+        bossMobNameFilter.find(name)
+            ?.also { return SkyblockBossMob(baseEntity, armorStand, it.groupValues[3], extraEntityList) }
 
-        return if (DungeonAPI.inDungeon()) DungeonMob(baseEntity, armorStand) else SkyblockBasicMob(baseEntity, armorStand)
+        return if (DungeonAPI.inDungeon()) DungeonMob(baseEntity, armorStand) else SkyblockBasicMob(baseEntity, armorStand, extraEntityList)
     }
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
@@ -86,14 +91,29 @@ object SkyblockMobUtils {
         if (baseEntity is EntityBat) return createBat(baseEntity)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
 
-        val armorStand = getArmorStand(baseEntity)
+        val extraEntityList =
+            generateSequence(getNextEntity(baseEntity, 1) as? EntityLivingBase) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive {
+                it !is EntityArmorStand
+            }.toList()
+        val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return null
+
         exceptions(baseEntity, armorStand)?.also { return it }
 
 
-        if (armorStand == null || armorStand.isDefaultValue()) return null
-        val sumReg =
-            summoningRegex.find(armorStand.name.removeColor()) ?: return createSkyblockMob(baseEntity, armorStand)
+        if (armorStand.isDefaultValue()) return null
+        val sumReg = summoningRegex.find(armorStand.name.removeColor())
+            ?: return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))
         return SummoningMob(baseEntity, armorStand, sumReg)
+    }
+
+    fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
+        with(iterator()) {
+            while (hasNext()) {
+                val next = next()
+                yield(next)
+                if (!predicate(next)) break
+            }
+        }
     }
 
     private fun getArmorStandOnly(baseEntity: EntityLivingBase): EntityArmorStand? {

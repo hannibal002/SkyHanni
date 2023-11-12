@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
-class SummoningMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand? = SkyblockMobUtils.getArmorStand(baseEntity), result: MatchResult) : SkyblockEntity(baseEntity, armorStand) {
+class SummoningMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, result: MatchResult) : SkyblockEntity(baseEntity, armorStand) {
     override val name = result.groupValues[2]
 
     val owner = SkyblockMobUtils.ownerShip(result.groupValues[1])

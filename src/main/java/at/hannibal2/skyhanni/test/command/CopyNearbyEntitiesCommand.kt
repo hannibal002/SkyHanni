@@ -45,7 +45,7 @@ object CopyNearbyEntitiesCommand {
         val resultList = mutableListOf<String>()
         var counter = 0
 
-        for (entity in EntityUtils.getAllEntities()) {
+        for (entity in EntityUtils.getAllEntities().sortedBy { it.entityId }) {
             val position = entity.position
             val vec = position.toLorenzVec()
             val distance = start.distance(vec)
