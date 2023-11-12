@@ -150,8 +150,8 @@ object EntityUtils {
     fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4 && uniqueID.variant() == 2
     fun EntityLivingBase.isDisplayNPC() =
         (this is EntityPlayer && isNPC() && name.any { it in '0'..'9' }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPC in the Village
-            || (this is EntityWitch && this.maxHealth == 26.0f) // Alchemist NPC
-            || (this is EntityCow && this.getLorenzVec() == LorenzVec(48.0, 72.0, -160.0)) // Shania NPC TODO FIX??
+            || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
+            || (this is EntityCow && this.entityId == 175) // Shania NPC TODO FIX??
 
     fun EntityLivingBase.isFarmMob() =
         this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f)

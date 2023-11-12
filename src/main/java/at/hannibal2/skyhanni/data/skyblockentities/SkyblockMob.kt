@@ -9,7 +9,10 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
 
-abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : SkyblockEntity(baseEntity, armorStand)
+abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : SkyblockEntity(baseEntity, armorStand) {
+    val hologram1 by lazy { SkyblockMobUtils.getArmorStand(baseEntity, 2) }
+    val hologram2 by lazy { SkyblockMobUtils.getArmorStand(baseEntity, 3) }
+}
 
 class SkyblockBasicMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : SkyblockMob(
     baseEntity, armorStand

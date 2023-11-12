@@ -15,8 +15,8 @@ private val regex = "Spawned by: (.*)".toRegex()
 open class SkyblockSlayerBoss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, nameS: String, tierS: String) : SkyblockBossMob(baseEntity, armorStand, nameS) {
     val tier = tierS.romanToDecimal()
 
-    private val timeArmorStand = SkyblockMobUtils.getArmorStand(baseEntity, 2)
-    private val ownerArmorStand = SkyblockMobUtils.getArmorStand(baseEntity, 3)
+    private val timeArmorStand = hologram1
+    private val ownerArmorStand = hologram2
 
     val owner = SkyblockMobUtils.ownerShip(
         regex.find(ownerArmorStand?.name?.removeColor() ?: "")[1] ?: ""

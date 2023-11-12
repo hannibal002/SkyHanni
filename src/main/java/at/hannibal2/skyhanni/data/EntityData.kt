@@ -61,7 +61,7 @@ import java.nio.file.Paths
 
 private const val MAX_RETRIES = 100
 
-private const val MAX_DISTANCE_TO_PLAYER = 18.0// TODO correct Distance
+private const val MAX_DISTANCE_TO_PLAYER = 22.8
 
 class EntityData {
 
