@@ -32,12 +32,16 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import net.minecraft.client.Minecraft
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -75,13 +79,17 @@ enum class CustomScoreboardElements (
     val index: Int
 ){
     SKYBLOCK(
-        { listOf(config.customTitle.get().toString().replace("&", "§")) },
+        {
+            listOf(config.customTitle.get().toString().replace("&", "§"))
+        },
         listOf(),
         0,
         0
     ),
     PROFILE(
-        { listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase()) },
+        {
+            listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
+        },
         listOf(),
         0,
         1
@@ -159,25 +167,33 @@ enum class CustomScoreboardElements (
         7
     ),
     EMPTY_LINE(
-        { listOf("<empty>") },
+        {
+            listOf("<empty>")
+        },
         listOf(),
         0,
         8
     ),
     LOCATION(
-        { listOf(location) },
+        {
+            listOf(location)
+        },
         listOf(),
         0,
         9
     ),
     SKYBLOCK_TIME(
-        { listOf(SkyBlockTime.now().formatted(false)) },
+        {
+            listOf(SkyBlockTime.now().formatted(false))
+        },
         listOf(),
         0,
         10
     ),
     LOBBY_CODE(
-        { listOf("§8$lobbyCode") },
+        {
+            listOf("§8$lobbyCode")
+        },
         listOf(),
         0,
         11
@@ -194,7 +210,9 @@ enum class CustomScoreboardElements (
         12
     ),
     EMPTY_LINE2(
-        { listOf("<empty>") },
+        {
+            listOf("<empty>")
+        },
         listOf(),
         0,
         13
@@ -214,7 +232,9 @@ enum class CustomScoreboardElements (
         14
     ),
     CURRENT_EVENT(
-        { listOf("§cCurrent Event") },
+        {
+            Events.getFirstEvent().getLine()
+        },
         listOf(),
         0,
         15
@@ -234,7 +254,9 @@ enum class CustomScoreboardElements (
         16
     ),
     EMPTY_LINE3(
-        { listOf("<empty>") },
+        {
+            listOf("<empty>")
+        },
         listOf(),
         0,
         17
@@ -290,7 +312,9 @@ enum class CustomScoreboardElements (
         20
     ),
     WEBSITE(
-        { listOf(config.customFooter.get().toString().replace("&", "§")) },
+        {
+            listOf(config.customFooter.get().toString().replace("&", "§"))
+        },
         listOf(),
         0,
         21
@@ -307,6 +331,143 @@ enum class CustomScoreboardElements (
             0 -> islands.contains(HypixelData.skyBlockIsland)
             1 -> !islands.contains(HypixelData.skyBlockIsland)
             else -> true
+        }
+    }
+}
+
+private enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean){
+    NONE(
+        {
+            when {
+                config.hideEmptyLines -> listOf("<hidden>")
+                else -> listOf("§cNo Event")
+            }
+        },
+        {
+            false
+        }
+    ),
+    DUNGEONS(
+        {
+            listOf("§cDungeons Event")
+        },
+        {
+            HypixelData.skyBlockIsland == IslandType.CATACOMBS
+        }
+    ),
+    KUUDRA(
+        {
+            listOf("§cKuudra Event")
+        },
+        {
+            HypixelData.skyBlockIsland == IslandType.KUUDRA_ARENA
+        }
+    ),
+    JACOB(
+        {
+            listOf("§cJacob Event")
+        },
+        {
+            false
+        }
+    ),
+    WINTER(
+        {
+            listOf("§bWinter Event")
+        },
+        {
+            false
+        }
+    ),
+    SPOOKY(
+        {
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("§6Spooky Festival§f") }) + // Time
+                (getFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }) // Candy
+        },
+        {
+            ScoreboardData.sidebarLines.any { it.startsWith("§6Spooky Festival§f") }
+        }
+    ),
+    MARINA(
+        {
+            listOf("§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")?.removePrefix(" Ends In: "))
+        },
+        {
+            TabListData.getTabList().any { it.startsWith("§e§lEvent: §r§bFishing Festival") }
+        }
+    ),
+    NEW_YEAR(
+        {
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("§dNew Year Event!§f") })
+        },
+        {
+            ScoreboardData.sidebarLines.any { it.startsWith("§dNew Year Event!§f") }
+        }
+    ),
+    ORINGO(
+        {
+            listOf("§6Oringo Event")
+        },
+        {
+            false
+        }
+    ),
+    MINING_EVENTS(
+        {
+            val list = mutableListOf<String>()
+
+            // Mining Fiesta
+            if (TabListData.getTabList().any { it.startsWith("§6Mining Festival§f") }) {
+                list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")?.removePrefix(" Ends In: ")
+            }
+
+            // Wind
+            if (ScoreboardData.sidebarLines.first { it == "§9Wind Compass" }.isNotEmpty()){
+                list += "§9Wind Compass"
+                list += ScoreboardData.sidebarLines.nextAfter("§9Wind Compass") ?: "§7No Wind Compass for some reason"
+            }
+
+            // Better Together
+            if (ScoreboardData.sidebarLines.first { it.startsWith("Nearby Players:") }.isNotEmpty()){
+                list += "§9Better Together"
+                list += ScoreboardData.sidebarLines.first { it.startsWith("Nearby Players:")}
+            }
+
+            list
+        },
+        {
+            HypixelData.skyBlockIsland == IslandType.DWARVEN_MINES || HypixelData.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS
+        }
+    ),
+    DAMAGE(
+        {
+            listOf(ScoreboardData.sidebarLines.first { "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }) +
+                (ScoreboardData.sidebarLines.firstOrNull { "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) } ?: "")
+        },
+        {
+            ScoreboardData.sidebarLines.any { "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }
+        }
+    ),
+    ESSENCE(
+        {
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("Essence: ") })
+        },
+        {
+            ScoreboardData.sidebarLines.any { it.startsWith("Essence: ") }
+        }
+    );
+
+    fun getLine(): List<String> {
+        return displayLine.get()
+    }
+
+    companion object {
+        fun getFirstEvent(): Events {
+            return getAllEventsToDisplay().firstOrNull() ?: NONE
+        }
+
+        fun getAllEventsToDisplay(): List<Events> {
+            return entries.filter { it.showWhen.invoke() }
         }
     }
 }
@@ -461,4 +622,10 @@ private fun getProfileTypeAsSymbol(): String {
         HypixelData.bingo       -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(0, 3) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
         else                    -> "§e" // Default case
     }
+}
+
+private fun getFooter() : String{
+    val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+    if (tabList.footer_skyhanni == null) return ""
+    return tabList.footer_skyhanni.formattedText
 }
