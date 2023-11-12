@@ -47,7 +47,7 @@
 + Added In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
-+ Added **Arrow Trail cosmetic** - Thunderblade73
++ Added **Arrow Trail Cosmetic** - Thunderblade73
     + Draw a colored line behind the arrows in the air.
     + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
       color, to change the time alive, and the line width.
@@ -88,7 +88,7 @@
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
-+ Added auto-detection of Expired Pumpkin farming fortune. - CalMWolfs
++ Added Auto-Detection of Expired Pumpkin farming fortune. - CalMWolfs
 
 #### Events
 
@@ -100,7 +100,7 @@
 + Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
-+ Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
++ Added support for showing the Primal Fear data from tab list as GUI elements. - Erymanthus
 + Play warning sound when the next Primal Fear can spawn. - thunderblade73
 
 #### Commands
