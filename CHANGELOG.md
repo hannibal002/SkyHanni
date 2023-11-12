@@ -254,6 +254,11 @@
 + Fixed mob highlighting problems with Blaze Slayer and Skytils. - hannibal2
 + Pablo Helper: Fixed some messages not showing the "get from sack" clickable message. - hannibal2
 + Fixed scoreboard date number suffixes are missing sometimes. - Erymanthus
++ Fixed the leftStronghold area not getting detected. - hannibal2
++ Fixed error message with Ashfang Blazes. - hannibal2
++ Fixed crash with pet exp tooltip. - hannibal2
++ Fixed dungeoneering showing as 0 in the skill menu. - hannibal2
++ Fixed showing minion level as 101 in some menus. - hannibal2
 
 #### Config
 
@@ -301,6 +306,8 @@
 + Added /shdebugtablist
 + Set your clipboard as a fake tab list. - hannibal2
 + /shversion now copies the SkyHanni version into the clipboard as well. - hannibal2
++ Moved location fixes to the repo. - hannibal2
++ Added debug information for PetExpTooltip crash. - hannibal2
 
 ## Version 0.20
 
