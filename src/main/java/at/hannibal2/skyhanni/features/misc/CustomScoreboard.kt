@@ -47,7 +47,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.function.Supplier
 
-private val config get() = SkyHanniMod.feature.misc.customScoreboard
+private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<List<Any>>()
 private var partyCount = 0
 
