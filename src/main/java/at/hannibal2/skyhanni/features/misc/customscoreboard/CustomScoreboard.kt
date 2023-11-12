@@ -9,8 +9,10 @@
 // TODO LIST
 // V1 RELEASE
 //  - the things that arent done yet (EVENTS SOON)
+//  - change from renderitemsandstrings to renderstrings or smth idk
 //
 // V2 RELEASE
+//  - icons maybe
 //  - Soulflow API
 //  - Bank API
 //  - Custom Scoreboard Background
