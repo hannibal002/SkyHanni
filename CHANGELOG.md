@@ -14,6 +14,7 @@
 + Added option to highlight items that are full in the sack inventory.
 
 #### GUI
+
 + Added **Compact Tab List**.
     + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
     + Option to hide Hypixel advertisment banners. - CalMWolfs
@@ -80,7 +81,6 @@
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
 
-
 #### Garden
 
 + Added /shmouselock command to lock mouse rotation for farming. - Cad
@@ -113,7 +113,8 @@
     + /pko -> party kickoffline
 + Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
-+ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true ff
++ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true
+  ff
   display. - CalMWolfs
 
 #### Misc
@@ -183,15 +184,19 @@
 + Added a GUI element to remind you while /shmouselock is enabled. - CalMWolfs
 + Make Crimson Isle Quest Item Helper only get amount needed. - NetheriteMiner
 + Change config order to alphabetical. - walker
-+ Added commands /shresetpowdertracker and /shresetdicertracker to reset the Powder Tracker and Dicer Drop Tracker - hannibal2
++ Added commands /shresetpowdertracker and /shresetdicertracker to reset the Powder Tracker and Dicer Drop Tracker -
+  hannibal2
 + Added current session/total session switch for Dicer Drop Tracker. - hannibal2
 + Added a button to reset the local session for Dicer Drop Tracker and for Powder Tracker. - hannibal2
 + Added more features for Ender Node Tracker and Armor Drop Tracker. - hannibal2
-    + Added session/display mode support, added a button to reset the current session, and added the commands /shresetendernodetracker and /shresetarmordroptracker to reset the full data.
-+ Added support for different current sessions per profile for all new trackers: Ender Node, Armor Drop, Dicer Drop, Powder and Slayer Profit Tracker
+    + Added session/display mode support, added a button to reset the current session, and added the commands
+      /shresetendernodetracker and /shresetarmordroptracker to reset the full data.
++ Added support for different current sessions per profile for all new trackers: Ender Node, Armor Drop, Dicer Drop,
+  Powder and Slayer Profit Tracker
 + Added the option to change the Blaze Slayer Dagger GUI positions. - hannibal2
 + Added more features to the Frozen Treasure Tracker. - hannibal2
-    + Added session/display mode support, added a button to reset the current session, and added the commands /shresetfrozentreasuretracker to reset the full data.
+    + Added session/display mode support, added a button to reset the current session, and added the commands
+      /shresetfrozentreasuretracker to reset the full data.
 + Added Slayer Profit Tracker support for loot from area mini-bosses. - hannibal2
 + No longer opening the empty /shdefaultoptions GUI. - walker
 + Added the SkyHanni icon and a link to the GitHub page for MC launchers like Prism to display. - hannibal2
@@ -273,7 +278,8 @@
   accidentally. - hannibal2
 + Hopefully fixed resets of Visitor Drops stats. - hannibal2
 + Fixed typo in The Art Of Peace. - walker
-+ Fixed compatibility problems with ChatTriggers that caused flickering in the Estimated Item Value while inside the NEU Profile Viewer. - hannibal2
++ Fixed compatibility problems with ChatTriggers that caused flickering in the Estimated Item Value while inside the NEU
+  Profile Viewer. - hannibal2
 + Fixed Quest Item Helper showing negative numbers. - hannibal2
 + Fixed YouTuber and Admin ranks getting lost in the tab list. - walker
 + Added a cooldown to the current session tracker reset button to fix the chat spam. - hannibal2
@@ -324,11 +330,14 @@
   over the border between two items. - hannibal2
 + Using visitorDrops.visitorRarities directly from the config instead of accessing the local field. Hopefully this will
   prevent partial config resets in the future. - hannibal2
-+ Added a tracker API that can be used for all features in SkyHanni that currently track stuff that the user collects. - hannibal2
-+ Added the slayer profit tracker logic (command to reset, toggle between total view and session view, and button to delete session) to powder tracker and Dicer Drop Tracker. - hannibal2
++ Added a tracker API that can be used for all features in SkyHanni that currently track stuff that the user collects. -
+  hannibal2
++ Added the slayer profit tracker logic (command to reset, toggle between total view and session view, and button to
+  delete session) to powder tracker and Dicer Drop Tracker. - hannibal2
 + Added support for migrating parts of the player or session storage. - nea
 + Changed the config format for dicerRngDrops/dicerDropsTracker. - hannibal2
-+ Created SkyHanniTracker, the core API for working with tracker stuff. This should be used everywhere someday in the future. - hannibal2
++ Created SkyHanniTracker, the core API for working with tracker stuff. This should be used everywhere someday in the
+  future. - hannibal2
 + Used SkyHanniTracker in FrozenTreasureTracker. - hannibal2
 + Added /shdebugwaypoint as a test/debug command. - hannibal2
 + Added debug messages to detect hot swaps. - hannibal2
