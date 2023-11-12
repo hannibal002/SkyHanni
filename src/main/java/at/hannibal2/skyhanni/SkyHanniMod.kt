@@ -224,7 +224,7 @@ import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.CustomScoreboard
+import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
