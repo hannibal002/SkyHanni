@@ -93,7 +93,7 @@ object SkyblockMobUtils {
 
         val extraEntityList =
             generateSequence(getNextEntity(baseEntity, 1) as? EntityLivingBase) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive {
-                it !is EntityArmorStand
+                !(it is EntityArmorStand && !it.isDefaultValue())
             }.toList()
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return null
 
