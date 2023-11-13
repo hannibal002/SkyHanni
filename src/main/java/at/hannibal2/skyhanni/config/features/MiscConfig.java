@@ -195,12 +195,6 @@ public class MiscConfig {
         public boolean armor = true;
 
         @Expose
-        @ConfigOption(name = "Hide Tracker", desc = "Hide all trackers while the Estimated Item Value is visible.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideTracker = true;
-
-        @Expose
         public Position itemPriceDataPos = new Position(140, 90, false, true);
     }
 
@@ -716,6 +710,21 @@ public class MiscConfig {
 
         @Expose
         public Position position = new Position(400, 200, 1.3f);
+    }
+
+    @Expose
+    @ConfigOption(name = "Tracker Settings", desc = "")
+    @Accordion
+    public TrackersConfig trackers = new TrackersConfig();
+
+    public static class TrackersConfig {
+
+        @Expose
+        @ConfigOption(name = "Hide with Item Value", desc = "Hide all trackers while the Estimated Item Value is visible.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideInEstimatedItemValue = true;
+
     }
 
     @Expose

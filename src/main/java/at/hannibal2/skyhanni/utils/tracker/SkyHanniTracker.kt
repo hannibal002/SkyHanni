@@ -49,7 +49,7 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
-        if (SkyHanniMod.feature.misc.estimatedItemValues.hideTracker) {
+        if (SkyHanniMod.feature.misc.trackers.hideInEstimatedItemValue) {
             if (EstimatedItemValue.currentlyShowing) {
                 return
             }
