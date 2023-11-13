@@ -73,7 +73,7 @@ object ArmorDropTracker {
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7RNG Drops for Farming Armor:")
+        addAsSingletonList("§7Armor Drop Tracker:")
         for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
             addAsSingletonList(" §7- §e${amount.addSeparators()}x $dropName")
