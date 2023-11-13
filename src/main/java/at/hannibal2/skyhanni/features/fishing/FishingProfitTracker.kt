@@ -76,7 +76,6 @@ object FishingProfitTracker {
 
             val price = (getPrice(internalName) * amount).toLong()
 
-//             val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName)
             val cleanName = internalName.getItemName()
             var name = cleanName
             val priceFormat = NumberUtil.format(price)
@@ -177,10 +176,13 @@ object FishingProfitTracker {
 
     private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
         tracker.modify {
+            it.totalCatchAmount++
+
             val fishingItem = it.items.getOrPut(internalName) { Data.FishingItem() }
 
             fishingItem.timesCaught++
             fishingItem.totalAmount += stackSize
+
         }
     }
 
