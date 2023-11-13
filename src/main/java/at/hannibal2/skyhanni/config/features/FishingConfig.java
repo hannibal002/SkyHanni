@@ -303,6 +303,11 @@ public class FishingConfig {
         @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
         @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
         public int priceFrom = 1;
+
+        @Expose
+        @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently caught items.")
+        @ConfigEditorBoolean
+        public boolean showRecentDropss = false;
     }
 
     @Expose

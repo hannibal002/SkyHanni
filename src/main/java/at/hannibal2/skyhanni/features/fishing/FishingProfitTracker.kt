@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.FishingProfitItemsJson
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object FishingProfitTracker {
     private val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
@@ -67,6 +69,8 @@ object FishingProfitTracker {
                 ", totalAmount=" + totalAmount +
                 ", hidden=" + hidden +
                 '}'
+
+            var lastTimeUpdated = SimpleTimeMark.farPast()
         }
     }
 
@@ -95,24 +99,23 @@ object FishingProfitTracker {
             var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
+
+            val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDropss
+            val numberColor = if (newDrop) "§a§l" else "§7"
+
             if (hidden) {
                 name = "§8§m" + name.removeColor(keepFormatting = true).replace("§r", "")
             }
 
-            val text = " §7${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
+            val text = " $numberColor${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
 
             val timesCaught = itemProfit.timesCaught
             val percentage = timesCaught.toDouble() / data.totalCatchAmount
             val catchRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
 
             val renderable = if (tracker.isInventoryOpen()) Renderable.clickAndHover(
-                text, listOf(
-                    "§7Caught §e${timesCaught.addSeparators()} §7times.",
-                    "§7Your catch rate: §c$catchRate",
-                    "",
-                    "§eClick to " + (if (hidden) "show" else "hide") + "!",
-                    "§eControl + Click to remove this item!",
-                )
+                text,
+                buildLore(timesCaught, catchRate, hidden, newDrop)
             ) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
 
@@ -167,6 +170,23 @@ object FishingProfitTracker {
         }
     }
 
+    private fun buildLore(
+        timesCaught: Long,
+        catchRate: String,
+        hidden: Boolean,
+        newDrop: Boolean
+    ) = buildList {
+        add("§7Caught §e${timesCaught.addSeparators()} §7times.")
+        add("§7Your catch rate: §c$catchRate")
+        add("")
+        if (newDrop) {
+            add("§aYou caught this item recently.")
+            add("")
+        }
+        add("§eClick to " + (if (hidden) "show" else "hide") + "!")
+        add("§eControl + Click to remove this item!")
+    }
+
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled()) return
@@ -203,7 +223,7 @@ object FishingProfitTracker {
 
             fishingItem.timesCaught++
             fishingItem.totalAmount += stackSize
-
+            fishingItem.lastTimeUpdated = SimpleTimeMark.now()
         }
     }
 
