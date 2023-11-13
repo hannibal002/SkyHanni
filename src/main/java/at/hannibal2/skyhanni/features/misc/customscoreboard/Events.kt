@@ -139,10 +139,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             HypixelData.skyBlockIsland == IslandType.DWARVEN_MINES || HypixelData.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS
         }
     ),
-    DAMAGE( // WHY THE FUCK DOES THE REGEX NOT WORK
+    DAMAGE(
         {
-            listOf(ScoreboardData.sidebarLines.first { it.startsWith("Protector HP: §a") || it.startsWith("Dragon HP: §a") }) + //{ "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }) +
-                (ScoreboardData.sidebarLines.first{ it.startsWith("Your Damage: §c") }) //{ "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) })
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("Protector HP: §a") || it.startsWith("Dragon HP: §a") }) +
+                (ScoreboardData.sidebarLines.first{ it.startsWith("Your Damage: §c") })
         },
         {
             ScoreboardData.sidebarLines.any { it.startsWith("Your Damage: §c") }
