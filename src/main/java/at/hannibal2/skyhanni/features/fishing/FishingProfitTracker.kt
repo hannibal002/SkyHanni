@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.FishingProfitItemsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -87,10 +87,7 @@ object FishingProfitTracker {
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
-                while (name.startsWith("§f")) {
-                    name = name.substring(2)
-                }
-                name = StringUtils.addFormat(name, "§m")
+                name = "§8§m" + name.removeColor(keepFormatting = true).replace("§r", "")
             }
             val text = " §7${amount.addSeparators()}x $name§7: §6$priceFormat"
 
