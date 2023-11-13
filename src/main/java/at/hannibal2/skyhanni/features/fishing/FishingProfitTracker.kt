@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
@@ -19,6 +20,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.FishingProfitItemsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -67,6 +70,9 @@ object FishingProfitTracker {
         }
     }
 
+    private val SKYBLOCK_COIN by lazy { "SKYBLOCK_COIN".asInternalName() }
+    private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
+
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lFishing Profit Tracker")
 
@@ -75,21 +81,25 @@ object FishingProfitTracker {
         for ((internalName, itemProfit) in data.items) {
             val amount = itemProfit.totalAmount
 
-            var pricePer = getPrice(internalName)
+            var pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else getPrice(internalName)
             if (pricePer == 0.0) {
-                pricePer = getPrice("MAGMA_FISH".asInternalName()) * FishingAPI.getFilletPerTrophy(internalName)
+                pricePer = getPrice(MAGMA_FISH) * FishingAPI.getFilletPerTrophy(internalName)
             }
 
             val price = (pricePer * amount).toLong()
+            val displayAmount = if (internalName == SKYBLOCK_COIN) {
+                itemProfit.timesCaught
+            } else amount
 
-            val cleanName = internalName.getItemName()
+            val cleanName = if (internalName == SKYBLOCK_COIN) "§6Coins" else internalName.getItemName()
             var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
                 name = "§8§m" + name.removeColor(keepFormatting = true).replace("§r", "")
             }
-            val text = " §7${amount.addSeparators()}x $name§7: §6$priceFormat"
+
+            val text = " §7${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
 
             val timesCaught = itemProfit.timesCaught
             val percentage = timesCaught.toDouble() / data.totalCatchAmount
@@ -165,7 +175,7 @@ object FishingProfitTracker {
             val change = sackChange.delta
             if (change > 0) {
                 val internalName = sackChange.internalName
-                addItem(internalName, change)
+                maybeAddItem(internalName, change)
             }
         }
     }
@@ -174,10 +184,18 @@ object FishingProfitTracker {
     fun onItemAdd(event: ItemAddInInventoryEvent) {
         if (!isEnabled()) return
 
-        addItem(event.internalName, event.amount)
+        maybeAddItem(event.internalName, event.amount)
     }
 
-    private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.".toPattern().matchMatcher(event.message) {
+            val coins = group("coins").formatNumber()
+            addItem(SKYBLOCK_COIN, coins.toInt())
+        }
+    }
+
+    private fun addItem(internalName: NEUInternalName, stackSize: Int) {
         tracker.modify {
             it.totalCatchAmount++
 
@@ -196,13 +214,13 @@ object FishingProfitTracker {
         tracker.renderDisplay(config.position)
     }
 
-    private fun addItem(internalName: NEUInternalName, amount: Int) {
+    private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {
         if (!isAllowedItem(internalName)) {
             LorenzUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
         }
 
-        addItemPickup(internalName, amount)
+        addItem(internalName, amount)
     }
 
     private var allowedItems = listOf<NEUInternalName>()
