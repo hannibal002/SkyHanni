@@ -236,7 +236,7 @@ object FishingProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (isMoving) return
+        if (isMoving && config.hideMoving) return
 
         tracker.renderDisplay(config.position)
     }
@@ -275,21 +275,21 @@ object FishingProfitTracker {
 
     @SubscribeEvent
     fun onEntityMove(event: EntityMoveEvent) {
-        if (!isEnabled()) return
-        if (event.entity == Minecraft.getMinecraft().thePlayer) {
-            val distance = event.newLocation.distanceIgnoreY(event.oldLocation)
-            if (distance < 0.1) {
-                lastSteps.clear()
-                return
-            }
-            lastSteps.add(distance)
-            if (lastSteps.size > 20) {
-                lastSteps.removeAt(0)
-            }
-            val total = lastSteps.sum()
-            if (total > 3) {
-                isMoving = true
-            }
+        if (!LorenzUtils.inSkyBlock || !config.enabled || !config.hideMoving) return
+        if (event.entity != Minecraft.getMinecraft().thePlayer) return
+
+        val distance = event.newLocation.distanceIgnoreY(event.oldLocation)
+        if (distance < 0.1) {
+            lastSteps.clear()
+            return
+        }
+        lastSteps.add(distance)
+        if (lastSteps.size > 20) {
+            lastSteps.removeAt(0)
+        }
+        val total = lastSteps.sum()
+        if (total > 3) {
+            isMoving = true
         }
     }
 

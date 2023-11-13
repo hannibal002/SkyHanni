@@ -307,7 +307,12 @@ public class FishingConfig {
         @Expose
         @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently caught items.")
         @ConfigEditorBoolean
-        public boolean showRecentDropss = false;
+        public boolean showRecentDropss = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Moving", desc = "Hide the Fishing Profit Tracker while moving.")
+        @ConfigEditorBoolean
+        public boolean hideMoving = true;
     }
 
     @Expose
