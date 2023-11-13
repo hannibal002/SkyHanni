@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -74,7 +75,12 @@ object FishingProfitTracker {
         for ((internalName, itemProfit) in data.items) {
             val amount = itemProfit.totalAmount
 
-            val price = (getPrice(internalName) * amount).toLong()
+            var pricePer = getPrice(internalName)
+            if (pricePer == 0.0) {
+                pricePer = getPrice("MAGMA_FISH".asInternalName()) * FishingAPI.getFilletPerTrophy(internalName)
+            }
+
+            val price = (pricePer * amount).toLong()
 
             val cleanName = internalName.getItemName()
             var name = cleanName
