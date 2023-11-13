@@ -18,7 +18,7 @@ enum class VisitorReward(private val rawInternalName: String) {
 
     private val internalName by lazy { rawInternalName.asInternalName() }
     val itemStack by lazy { internalName.getItemStack() }
-    val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.toString() }
+    val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 
     companion object {
         fun getByInternalName(internalName: NEUInternalName) = entries.firstOrNull { it.internalName == internalName }

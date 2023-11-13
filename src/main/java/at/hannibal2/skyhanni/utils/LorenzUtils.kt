@@ -139,6 +139,7 @@ object LorenzUtils {
     }
 
     // TODO replace all calls with regex
+    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
     // TODO use derpy() on every use case
@@ -203,7 +204,7 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
@@ -333,22 +334,29 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
     ) {
-        add(buildList {
-            add(prefix)
-            for (entry in enumValues<T>()) {
-                val display = getName(entry)
-                if (isCurrent(entry)) {
-                    add("§a[$display]")
-                } else {
-                    add("§e[")
-                    add(Renderable.link("§e$display") {
-                        onChange(entry)
-                    })
-                    add("§e]")
-                }
-                add(" ")
+        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit
+    ) = buildList {
+        add(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                add("§a[$display]")
+            } else {
+                add("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                add("§e]")
             }
-        })
+            add(" ")
+        }
     }
 
     inline fun MutableList<List<Any>>.addButton(
@@ -426,13 +434,11 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) = inSkyBlock && (skyBlockIsland == island || island == IslandType.CATACOMBS && inDungeons)
-
-    fun IslandType.isInIsland() = inIsland(this)
+    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
         val currentValue = this[key] ?: 0

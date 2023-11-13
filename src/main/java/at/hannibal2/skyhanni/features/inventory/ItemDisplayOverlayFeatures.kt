@@ -75,7 +75,8 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSize.contains(5) && itemName.contains(" Minion ") && item.getLore()
+        if (stackSize.contains(5) && itemName.contains(" Minion ") &&
+            !itemName.contains("Recipe") && item.getLore()
                 .any { it.contains("Place this minion") }
         ) {
             val array = itemName.split(" ")
@@ -99,29 +100,31 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSize.contains(9) && InventoryUtils.openInventoryName() == "Your Skills" && item.getLore()
+        if (stackSize.contains(9) &&
+            InventoryUtils.openInventoryName() == "Your Skills" &&
+            item.getLore()
                 .any { it.contains("Click to view!") }
         ) {
             if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
             val split = itemName.split(" ")
-            if (split.size < 2) return "0"
             if (!itemName.contains("Dungeon")) {
                 val text = split.last()
+                if (split.size < 2) return "0"
                 return "" + text.romanToDecimalIfNeeded()
             }
         }
 
         if (stackSize.contains(10) && InventoryUtils.openInventoryName().endsWith(" Collections")) {
-                val lore = item.getLore()
-                if (lore.any { it.contains("Click to view!") }) {
-                    if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                    item.name?.let {
-                        if (it.startsWith("§e")) {
-                            val text = it.split(" ").last()
-                            return "" + text.romanToDecimalIfNeeded()
-                        }
+            val lore = item.getLore()
+            if (lore.any { it.contains("Click to view!") }) {
+                if (CollectionAPI.isCollectionTier0(lore)) return "0"
+                item.name?.let {
+                    if (it.startsWith("§e")) {
+                        val text = it.split(" ").last()
+                        return "" + text.romanToDecimalIfNeeded()
                     }
                 }
+            }
         }
 
         if (stackSize.contains(11) && itemName.contains("Rancher's Boots")) {
