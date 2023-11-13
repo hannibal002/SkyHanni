@@ -23,7 +23,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             false
         }
     ),
-    DUNGEONS(
+    DUNGEONS( // not tested
         {
             listOf("§cDungeons Event")
         },
@@ -31,7 +31,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             HypixelData.skyBlockIsland == IslandType.CATACOMBS
         }
     ),
-    KUUDRA(
+    KUUDRA( // not tested
         {
             listOf("§cKuudra Event")
         },
@@ -39,15 +39,31 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             HypixelData.skyBlockIsland == IslandType.KUUDRA_ARENA
         }
     ),
-    JACOB(
+    JACOB( // not tested
         {
-            listOf("§cJacob Event")
+            val list = mutableListOf<String>()
+
+            // Contest
+            if (ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") }) {
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§e○ §f") }
+                list += ScoreboardData.sidebarLines.nextAfter("§e○ §f") ?: "§7No Ranking"
+                list += ScoreboardData.sidebarLines.nextAfter("§e○ §f", 2) ?: "§7No Amount for next"
+            }
+
+            // Medals
+            if (ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals: ") }) {
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§6§lGOLD §fmedals: ") }
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§f§lSILVER §fmedals: ") }
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§c§lBRONZE §fmedals: ") }
+            }
+
+            list
         },
         {
-            false
+            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") } || ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals: ") }
         }
     ),
-    WINTER(
+    WINTER( // not tested
         {
             listOf("§bWinter Event")
         },
@@ -55,7 +71,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             false
         }
     ),
-    SPOOKY(
+    SPOOKY( // not tested
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("§6Spooky Festival§f") }) + // Time
                 (getFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }) // Candy
@@ -64,7 +80,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLines.any { it.startsWith("§6Spooky Festival§f") }
         }
     ),
-    MARINA(
+    MARINA( // not tested
         {
             listOf("§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")?.removePrefix(" Ends In: "))
         },
@@ -72,7 +88,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             TabListData.getTabList().any { it.startsWith("§e§lEvent: §r§bFishing Festival") }
         }
     ),
-    NEW_YEAR(
+    NEW_YEAR( // not tested
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("§dNew Year Event!§f") })
         },
@@ -80,15 +96,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLines.any { it.startsWith("§dNew Year Event!§f") }
         }
     ),
-    ORINGO(
+    ORINGO( // works
         {
-            listOf("§6Oringo Event")
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("§aTraveling Zoo") })
         },
         {
-            false
+            ScoreboardData.sidebarLines.any { it.startsWith("§aTraveling Zoo") }
         }
     ),
-    MINING_EVENTS(
+    MINING_EVENTS( // not sure
         {
             val list = mutableListOf<String>()
 
@@ -98,33 +114,41 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             }
 
             // Wind
-            if (ScoreboardData.sidebarLines.first { it == "§9Wind Compass" }.isNotEmpty()){
+            if (ScoreboardData.sidebarLines.any { it == "§9Wind Compass" }){
                 list += "§9Wind Compass"
                 list += ScoreboardData.sidebarLines.nextAfter("§9Wind Compass") ?: "§7No Wind Compass for some reason"
             }
 
             // Better Together
-            if (ScoreboardData.sidebarLines.first { it.startsWith("Nearby Players:") }.isNotEmpty()){
+            if (ScoreboardData.sidebarLines.any { it.startsWith("Nearby Players:") }){
                 list += "§9Better Together"
                 list += ScoreboardData.sidebarLines.first { it.startsWith("Nearby Players:")}
             }
 
-            list
+            // Mithril
+            if (ScoreboardData.sidebarLines.any { it.startsWith("Event: ")}){
+                list += ScoreboardData.sidebarLines.first { it.startsWith("Event: ")}.removePrefix("Event: ") + " §rin " + ScoreboardData.sidebarLines.first { it.startsWith("Zone: ")}.removePrefix("Zone: ")
+            }
+
+            if (list.size == 0) when (config.hideEmptyLines){
+                true -> listOf("<hidden>")
+                false -> listOf("§cNo Mining Event")
+            } else list
         },
         {
             HypixelData.skyBlockIsland == IslandType.DWARVEN_MINES || HypixelData.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS
         }
     ),
-    DAMAGE(
+    DAMAGE( // not sure
         {
             listOf(ScoreboardData.sidebarLines.first { "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }) +
-                (ScoreboardData.sidebarLines.firstOrNull { "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) } ?: "")
+                (ScoreboardData.sidebarLines.first { "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) })
         },
         {
-            ScoreboardData.sidebarLines.any { "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }
+            ScoreboardData.sidebarLines.any { "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) }
         }
     ),
-    ESSENCE(
+    ESSENCE( // works
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("Essence: ") })
         },
@@ -142,7 +166,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             return getAllEventsToDisplay().firstOrNull() ?: NONE
         }
 
-        fun getAllEventsToDisplay(): List<Events> {
+        private fun getAllEventsToDisplay(): List<Events> {
             return entries.filter { it.showWhen.invoke() }
         }
     }
