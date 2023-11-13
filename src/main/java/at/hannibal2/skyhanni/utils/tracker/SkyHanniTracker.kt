@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -47,6 +49,12 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
+        if (SkyHanniMod.feature.misc.estimatedItemValues.hideTracker) {
+            if (EstimatedItemValue.currentlyShowing) {
+                return
+            }
+        }
+
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen

@@ -159,7 +159,7 @@ public class MiscConfig {
 
     public static class EstimatedItemValueConfig {
         @Expose
-        @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
+        @ConfigOption(name = "Enabled", desc = "Displays an Estimated Item Value for the item you hover over.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = false;
@@ -193,6 +193,12 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean armor = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Tracker", desc = "Hide all trackers while the Estimated Item Value is visible.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideTracker = true;
 
         @Expose
         public Position itemPriceDataPos = new Position(140, 90, false, true);
