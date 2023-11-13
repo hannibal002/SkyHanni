@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
+import at.hannibal2.skyhanni.features.fishing.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
@@ -390,6 +391,16 @@ public class Storage {
 
             @Expose
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
+        }
+
+        @Expose
+        public FishingStorage fishing = new FishingStorage();
+
+        public static class FishingStorage {
+
+            @Expose
+            public FishingProfitTracker.Data fishingProfitTracker = new FishingProfitTracker.Data();
+
         }
     }
 }

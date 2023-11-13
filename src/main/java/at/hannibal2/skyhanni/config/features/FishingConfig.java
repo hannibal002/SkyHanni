@@ -284,6 +284,28 @@ public class FishingConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Fishing Profit Tracker", desc = "")
+    @Accordion
+    public FishingProfitTrackerConfig fishingProfitTracker = new FishingProfitTrackerConfig();
+
+    public static class FishingProfitTrackerConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Count all items you pick up while fishing.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        public Position position = new Position(20, 20, false, true);
+
+        @Expose
+        @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+        @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
+        public int priceFrom = 1;
+    }
+
+    @Expose
     @ConfigOption(
             name = "Shark Fish Counter",
             desc = "Counts how many Sharks have been caught."
