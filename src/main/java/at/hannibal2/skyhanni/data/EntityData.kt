@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.EntityData.counter.addEntityName
+import at.hannibal2.skyhanni.data.EntityData.devTracker.addEntityName
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
@@ -42,6 +42,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -53,11 +55,8 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.io.File
+import java.io.IOException
 import java.util.*
 
 private const val MAX_RETRIES = 100
@@ -66,7 +65,6 @@ private const val MAX_DISTANCE_TO_PLAYER = 22.8
 
 class EntityData {
 
-    private val devTrackerPath: String = "config/skyhanni/logs/mob/Tracker.txt"
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
 
     @SubscribeEvent
@@ -169,94 +167,8 @@ class EntityData {
         (previousEntityLiving - currentEntityLiving).forEach { EntityDeSpawn(it) }
     }
 
-    private object counter {
-        var retries = 0
-        var outOfRangeRetries = 0
-        var spawn = 0
-        var deSpawn = 0
-        var misses = 0
-        var instancedFinish = 0
-        var startedRetries = 0
-        val retriesAvg get() = if (startedRetries != 0) retries / startedRetries else 0
-
-        val EntityNames = sortedSetOf<String>()
-        fun addEntityName(entity: SkyblockEntity) {
-            if (EntityNames.contains(entity.name)) return
-            val type = when (entity) {
-                is DisplayNPC -> "DNPC "
-                is SkyblockMob -> "SMOB "
-                else -> "NONE "
-            }
-            EntityNames.add(type + entity.name)
-        }
-
-        fun reset() {
-            retries = 0
-            spawn = 0
-            deSpawn = 0
-            misses = 0
-            instancedFinish = 0
-            startedRetries = 0
-            EntityNames.clear()
-        }
-    }
-
-    @SubscribeEvent
-    fun onIslandJoin(event: HypixelJoinEvent) {
-        var foundNameList = false
-        try {
-            FileInputStream(devTrackerPath).apply {
-                reader().forEachLine {
-                    if (!foundNameList) {
-                        when {
-                            it.contains("Retries") -> counter.retries = trackerLineToCounter(it)
-                            it.contains("OutOfRangeRetires") -> counter.outOfRangeRetries = trackerLineToCounter(it)
-                            it.contains("Spawn") -> counter.spawn = trackerLineToCounter(it)
-                            it.contains("Despawn") -> counter.deSpawn = trackerLineToCounter(it)
-                            it.contains("InstancedFinish") -> counter.instancedFinish = trackerLineToCounter(it)
-                            it.contains("StartedRetries") -> counter.startedRetries = trackerLineToCounter(it)
-                            it.contains("Misses") -> counter.misses = trackerLineToCounter(it)
-                            it.contains("Name List:") -> foundNameList = true
-                        }
-                    } else {
-                        counter.EntityNames.add(it)
-                    }
-                }
-            }.apply { close() }
-        } catch (e: FileNotFoundException) {
-            Files.createDirectories(Paths.get(devTrackerPath.substring(0, devTrackerPath.indexOfLast { it == '/' })))
-            return
-        } catch (e: SecurityException) {
-            return
-        }
-    }
-
-    private fun trackerLineToCounter(it: String) = it.substring(it.indexOf(":") + 2, it.length).toInt()
-
-    @SubscribeEvent
-    fun onExit(event: IslandChangeEvent) {
-        FileOutputStream(devTrackerPath).apply {
-            write(
-                (buildString {
-                    append("Retries: ${counter.retries}\n")
-                    append("OutOfRangeRetires: ${counter.outOfRangeRetries}\n")
-                    append("Spawn: ${counter.spawn}\n")
-                    append("Despawn: ${counter.deSpawn}\n")
-                    append("InstancedFinish: ${counter.instancedFinish}\n")
-                    append("StartedRetries: ${counter.startedRetries}\n")
-                    append("RetiresAVG: ${counter.retriesAvg}\n")
-                    append("Misses: ${counter.misses}\n")
-                    append("\nName List:\n")
-                }).toByteArray()
-            )
-            write(counter.EntityNames.joinToString("\n").toByteArray())
-            close()
-        }
-        // counter.reset()
-    }
-
     private fun EntitySpawn(entity: EntityLivingBase): Boolean {
-        counter.spawn++
+        devTracker.data.spawn++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCSpawnEvent(DisplayNPC(entity)).postAndCatch()
@@ -274,7 +186,7 @@ class EntityData {
     }
 
     private fun EntityDeSpawn(entity: EntityLivingBase) {
-        counter.deSpawn++
+        devTracker.data.deSpawn++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
@@ -294,7 +206,7 @@ class EntityData {
     }
 
     private fun retry(entity: EntityLivingBase) =
-        retries.add(RetryEntityInstancing(entity, 0)).also { counter.startedRetries++ }
+        retries.add(RetryEntityInstancing(entity, 0)).also { devTracker.data.startedRetries++ }
 
     private fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
 
@@ -317,10 +229,10 @@ class EntityData {
             if (entity.getLorenzVec()
                     .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
             ) {
-                counter.outOfRangeRetries++
+                devTracker.data.outOfRangeRetries++
                 continue
             }
-            counter.retries++
+            devTracker.data.retries++
             if (retry.times > MAX_RETRIES) {
                 LorenzDebug.log(
                     "I missed. Distance: ${
@@ -329,7 +241,7 @@ class EntityData {
                         entity.getLorenzVec().subtract(LocationUtils.playerLocation())
                     }"
                 )
-                counter.misses++
+                devTracker.data.misses++
                 iterator.remove()
                 continue
             }
@@ -340,7 +252,6 @@ class EntityData {
             iterator.remove()
         }
     }
-
 
     @SubscribeEvent
     fun onSkyblockMobSpawnEvent(event: SkyblockMobSpawnEvent) {
@@ -407,5 +318,102 @@ class EntityData {
                 event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.3f)
             }
         }
+    }
+
+    private object devTracker {
+
+        const val FILE_NAME: String = "config/skyhanni/logs/mob/Tracker.txt"
+
+        val data = Data()
+
+        class Data {
+            var retries = 0
+            var outOfRangeRetries = 0
+            var spawn = 0
+            var deSpawn = 0
+            var misses = 0
+            var instancedFinish = 0
+            var startedRetries = 0
+            val retriesAvg: Int
+                get() = if (startedRetries != 0) retries / startedRetries else 0
+
+            val entityNames = sortedSetOf<String>()
+
+            fun reset() {
+                retries = 0
+                spawn = 0
+                outOfRangeRetries = 0
+                deSpawn = 0
+                misses = 0
+                instancedFinish = 0
+                startedRetries = 0
+                entityNames.clear()
+            }
+        }
+
+        fun addEntityName(entity: SkyblockEntity) {
+            if (data.entityNames.contains(entity.name)) return
+            val type = when (entity) {
+                is DisplayNPC -> "DNPC "
+                is SkyblockMob -> "SMOB "
+                else -> "NONE "
+            }
+            data.entityNames.add(type + entity.name)
+        }
+
+        fun saveToFile() {
+            try {
+                val gson = GsonBuilder().setPrettyPrinting().create()
+                val json = gson.toJson(data)
+
+                // Write the JSON data to the file
+                File(FILE_NAME).writeText(json)
+            } catch (e: IOException) {
+                LorenzDebug.log("Error saving data to file: ${e.message}")
+            }
+        }
+
+        fun loadFromFile() {
+            try {
+                // Create the parent directory and its ancestors recursively if they don't exist
+                val parentDir = File(FILE_NAME).parentFile
+                parentDir.mkdirs()
+
+                // Load data from the file
+                if (File(FILE_NAME).exists()) {
+                    val gson = Gson()
+                    val json = File(FILE_NAME).readText()
+                    val loadedData = gson.fromJson(json, Data::class.java)
+                    // Update the existing data with loaded data
+                    data.retries = loadedData.retries
+                    data.outOfRangeRetries = loadedData.outOfRangeRetries
+                    data.spawn = loadedData.spawn
+                    data.deSpawn = loadedData.deSpawn
+                    data.misses = loadedData.misses
+                    data.instancedFinish = loadedData.instancedFinish
+                    data.startedRetries = loadedData.startedRetries
+                    data.entityNames.clear()
+                    data.entityNames.addAll(loadedData.entityNames)
+                }
+            } catch (e: IOException) {
+                LorenzDebug.log("Error loading data from file: ${e.message}")
+            }
+        }
+
+        override fun toString(): String {
+            return "TrackerData(retries=${data.retries}, outOfRangeRetries=${data.outOfRangeRetries}, " + "spawn=${data.spawn}, deSpawn=${data.deSpawn}, misses=${data.misses}, " + "instancedFinish=${data.instancedFinish}, startedRetries=${data.startedRetries}, " + "retriesAvg=${data.retriesAvg}, entityNames=${data.entityNames})"
+        }
+
+    }
+
+    @SubscribeEvent
+    fun onIslandJoin(event: HypixelJoinEvent) {
+        devTracker.loadFromFile()
+    }
+
+    @SubscribeEvent
+    fun onExit(event: IslandChangeEvent) {
+        devTracker.saveToFile()
+        // counter.reset()
     }
 }

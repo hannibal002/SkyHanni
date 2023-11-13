@@ -7,5 +7,5 @@ import net.minecraft.entity.item.EntityArmorStand
 class SummoningMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, result: MatchResult) : SkyblockEntity(baseEntity, armorStand) {
     override val name = result.groupValues[2]
 
-    val owner = SkyblockMobUtils.ownerShip(result.groupValues[1])
+    val owner = SkyblockMobUtils.OwnerShip(result.groupValues[1])
 }

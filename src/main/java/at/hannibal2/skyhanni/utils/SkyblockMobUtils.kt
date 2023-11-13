@@ -88,8 +88,7 @@ object SkyblockMobUtils {
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
-        if (baseEntity is EntityBat) return createBat(baseEntity)
-        if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
+        noArmorStandMobs(baseEntity)?.also { return it }
 
         val extraEntityList =
             generateSequence(getNextEntity(baseEntity, 1) as? EntityLivingBase) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive {
@@ -99,11 +98,15 @@ object SkyblockMobUtils {
 
         exceptions(baseEntity, armorStand)?.also { return it }
 
-
-        if (armorStand.isDefaultValue()) return null
         val sumReg = summoningRegex.find(armorStand.name.removeColor())
             ?: return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))
         return SummoningMob(baseEntity, armorStand, sumReg)
+    }
+
+    private fun noArmorStandMobs(baseEntity: EntityLivingBase): SkyblockEntity? {
+        if (baseEntity is EntityBat) return createBat(baseEntity)
+        if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
+        return null
     }
 
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
@@ -113,20 +116,6 @@ object SkyblockMobUtils {
                 yield(next)
                 if (!predicate(next)) break
             }
-        }
-    }
-
-    private fun getArmorStandOnly(baseEntity: EntityLivingBase): EntityArmorStand? {
-        if (baseEntity !is EntityZombie) return null
-        return when {/* baseEntity.maxHealth == 5000f -> generateSequence(1) { it + 1 }.take(10).map { i ->
-                getArmorStand(
-                    baseEntity, i
-                )
-            }.firstOrNull {
-                it != null && it.distanceTo(baseEntity) < 2.0 && it.inventory?.get(4)?.getSkullTexture() == RatSkull
-            }
-            // Rat */
-            else -> null
         }
     }
 
@@ -174,11 +163,7 @@ object SkyblockMobUtils {
     }
 
 
-    fun createSkyblockMobIfValid(baseEntity: EntityLivingBase): SkyblockMob? =
-        if (baseEntity.isSkyBlockMob()) createSkyblockEntity(baseEntity) as? SkyblockMob else null
-
-
-    class ownerShip(val ownerName: String) {
+    class OwnerShip(val ownerName: String) {
         val ownerPlayer = EntityData.currentRealPlayers.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
             if (other is EntityPlayer) return ownerPlayer == other || ownerName == other.name

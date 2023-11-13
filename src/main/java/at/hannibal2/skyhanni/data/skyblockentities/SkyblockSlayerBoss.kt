@@ -18,7 +18,7 @@ open class SkyblockSlayerBoss(baseEntity: EntityLivingBase, armorStand: EntityAr
     private val timeArmorStand = hologram1
     private val ownerArmorStand = hologram2
 
-    val owner = SkyblockMobUtils.ownerShip(
+    val owner = SkyblockMobUtils.OwnerShip(
         regex.find(ownerArmorStand?.name?.removeColor() ?: "")[1] ?: ""
     )
 
