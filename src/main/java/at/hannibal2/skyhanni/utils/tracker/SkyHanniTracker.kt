@@ -113,6 +113,12 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
+    fun firstUpdate() {
+        if (display.isEmpty()) {
+            update()
+        }
+    }
+
     class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data) {
         fun modify(modifyFunction: (Data) -> Unit) {
             modifyFunction(total)
