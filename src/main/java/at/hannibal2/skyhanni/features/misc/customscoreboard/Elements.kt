@@ -182,7 +182,7 @@ enum class Elements (
     ),
     CURRENT_EVENT(
         {
-            Events.getFirstEvent().getLine()
+            Events.getFirstEvent().getLines()
         },
         listOf(),
         0,

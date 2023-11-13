@@ -12,7 +12,7 @@ import java.util.function.Supplier
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean){
-    NONE(
+    NONE( // maybe use default state tablist: "Events: smth" idk
         {
             when {
                 config.hideEmptyLines -> listOf("<hidden>")
@@ -51,10 +51,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             }
 
             // Medals
-            if (ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals: ") }) {
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§6§lGOLD §fmedals: ") }
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§f§lSILVER §fmedals: ") }
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§c§lBRONZE §fmedals: ") }
+            if (ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals:") }) {
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§6§lGOLD §fmedals:") }
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§f§lSILVER §fmedals:") }
+                list += ScoreboardData.sidebarLines.first { it.startsWith("§c§lBRONZE §fmedals:") }
             }
 
             list
@@ -96,7 +96,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLines.any { it.startsWith("§dNew Year Event!§f") }
         }
     ),
-    ORINGO( // works
+    ORINGO(
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("§aTraveling Zoo") })
         },
@@ -139,16 +139,16 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             HypixelData.skyBlockIsland == IslandType.DWARVEN_MINES || HypixelData.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS
         }
     ),
-    DAMAGE( // not sure
+    DAMAGE( // WHY THE FUCK DOES THE REGEX NOT WORK
         {
-            listOf(ScoreboardData.sidebarLines.first { "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }) +
-                (ScoreboardData.sidebarLines.first { "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) })
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("Protector HP: §a") || it.startsWith("Dragon HP: §a") }) + //{ "(Protector|Dragon) HP: §a\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)? §c❤".toPattern().matches(it) }) +
+                (ScoreboardData.sidebarLines.first{ it.startsWith("Your Damage: §c") }) //{ "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) })
         },
         {
-            ScoreboardData.sidebarLines.any { "Your Damage: §c\\d{1,3}(,\\d{3})*(\\.\\d+)?".toPattern().matches(it) }
+            ScoreboardData.sidebarLines.any { it.startsWith("Your Damage: §c") }
         }
     ),
-    ESSENCE( // works
+    ESSENCE(
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("Essence: ") })
         },
@@ -157,17 +157,13 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         }
     );
 
-    fun getLine(): List<String> {
+    fun getLines(): List<String> {
         return displayLine.get()
     }
 
     companion object {
         fun getFirstEvent(): Events {
-            return getAllEventsToDisplay().firstOrNull() ?: NONE
-        }
-
-        private fun getAllEventsToDisplay(): List<Events> {
-            return entries.filter { it.showWhen.invoke() }
+            return entries.firstOrNull { it.showWhen() } ?: NONE
         }
     }
 }
