@@ -20,7 +20,9 @@ abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmor
     init {
         LorenzDebug.log("SkyblockMob init block")
         LorenzDebug.log(extraEntities.toString())
-        extraEntities?.forEach { EntityData.removeRetry(it) }
+        extraEntities?.count { EntityData.retries.contains(EntityData.RetryEntityInstancing(it, 0)) }?.also {
+            EntityData.externRemoveOfRetryAmount += it
+        }
     }
 }
 

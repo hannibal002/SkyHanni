@@ -143,11 +143,11 @@ class EntityData {
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
-        private val retries = TreeSet<RetryEntityInstancing>()
+        val retries = TreeSet<RetryEntityInstancing>()
 
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
 
-        fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
+        var externRemoveOfRetryAmount = 0
     }
 
 
@@ -296,7 +296,9 @@ class EntityData {
     private fun retry(entity: EntityLivingBase) =
         retries.add(RetryEntityInstancing(entity, 0)).also { counter.startedRetries++ }
 
-    private class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int) : Comparable<RetryEntityInstancing> {
+    private fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
+
+    class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int) : Comparable<RetryEntityInstancing> {
         override fun hashCode() = entity.hashCode()
         override fun compareTo(other: RetryEntityInstancing) = this.hashCode() - other.hashCode()
         override fun equals(other: Any?) = (other as? EntityLivingBase) == entity
@@ -306,6 +308,11 @@ class EntityData {
         val iterator = retries.iterator()
         while (iterator.hasNext()) {
             val retry = iterator.next()
+            if (externRemoveOfRetryAmount > 0) {
+                iterator.remove()
+                externRemoveOfRetryAmount--
+                continue
+            }
             val entity = retry.entity
             if (entity.getLorenzVec()
                     .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
