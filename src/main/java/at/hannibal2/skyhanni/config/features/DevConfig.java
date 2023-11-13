@@ -95,6 +95,11 @@ public class DevConfig {
         @ConfigOption(name = "Highlight Missing Repo Items", desc = "Highlights each item in the current inventory that is not in your current NEU repo.")
         @ConfigEditorBoolean
         public boolean highlightMissingRepo = false;
+
+        @Expose
+        @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
+        @ConfigEditorBoolean
+        public boolean hotSwapDetection = false;
     }
 
     @Expose

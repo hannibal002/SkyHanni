@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
-import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
@@ -307,18 +307,7 @@ public class Storage {
         public PowderTracker.Data powderTracker = new PowderTracker.Data();
 
         @Expose
-        public FrozenTreasureTracker frozenTreasureTracker = new FrozenTreasureTracker();
-
-        public static class FrozenTreasureTracker {
-            @Expose
-            public int treasuresMined = 0;
-
-            @Expose
-            public int compactProcs = 0;
-
-            @Expose
-            public Map<FrozenTreasure, Integer> treasureCount = new HashMap<>();
-        }
+        public FrozenTreasureTracker.Data frozenTreasureTracker = new FrozenTreasureTracker.Data();
 
         @Expose
         public EnderNodeTracker.Data enderNodeTracker = new EnderNodeTracker.Data();
