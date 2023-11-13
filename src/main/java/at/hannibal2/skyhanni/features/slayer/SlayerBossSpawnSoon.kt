@@ -21,6 +21,7 @@ class SlayerBossSpawnSoon {
     @SubscribeEvent
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
+        if (!SlayerAPI.isInCorrectArea) return
 
         val completion = pattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()
