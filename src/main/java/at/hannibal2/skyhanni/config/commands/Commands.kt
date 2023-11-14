@@ -209,6 +209,10 @@ object Commands {
             "Reset data about minion profit and the name display on the private island"
         ) { MinionFeatures.clearMinionData() }
         registerCommand(
+            "whereami",
+            "Print current island in chat"
+        ) { SkyHanniDebugsAndTests.whereami() }
+        registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
         ) { SkyHanniConfigSearchResetCommand.command(it) }
