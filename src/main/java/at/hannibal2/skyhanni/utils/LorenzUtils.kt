@@ -341,22 +341,29 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
     ) {
-        add(buildList {
-            add(prefix)
-            for (entry in enumValues<T>()) {
-                val display = getName(entry)
-                if (isCurrent(entry)) {
-                    add("§a[$display]")
-                } else {
-                    add("§e[")
-                    add(Renderable.link("§e$display") {
-                        onChange(entry)
-                    })
-                    add("§e]")
-                }
-                add(" ")
+        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit
+    ) = buildList {
+        add(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                add("§a[$display]")
+            } else {
+                add("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                add("§e]")
             }
-        })
+            add(" ")
+        }
     }
 
     inline fun MutableList<List<Any>>.addButton(

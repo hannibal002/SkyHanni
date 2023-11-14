@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -47,8 +48,8 @@ class AreaMiniBossFeatures {
             if (config.areaBossHighlight) {
                 val color = bossType.color.toColor().withAlpha(bossType.colorOpacity)
                 RenderLivingEntityHelper.setEntityColor(entity, color)
-                { config.areaBossHighlight }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.areaBossHighlight }
+                { config.areaBossHighlight && SlayerAPI.isInAnyArea }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { config.areaBossHighlight && SlayerAPI.isInAnyArea }
             }
 
             // TODO add sound
