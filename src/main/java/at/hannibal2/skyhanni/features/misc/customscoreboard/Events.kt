@@ -45,22 +45,23 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
 
             // Contest
             if (ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") }) {
+                list += "§eJacob's Contest"
                 list += ScoreboardData.sidebarLines.first { it.startsWith("§e○ §f") }
                 list += ScoreboardData.sidebarLines.nextAfter("§e○ §f") ?: "§7No Ranking"
                 list += ScoreboardData.sidebarLines.nextAfter("§e○ §f", 2) ?: "§7No Amount for next"
             }
 
             // Medals
-            if (ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals:") }) {
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§6§lGOLD §fmedals:") }
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§f§lSILVER §fmedals:") }
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§c§lBRONZE §fmedals:") }
+            if (ScoreboardData.sidebarLines.any { it.trim().startsWith("§6§lGOLD §fmedals:") }) {
+                list += ScoreboardData.sidebarLines.first { it.trim().startsWith("§6§lGOLD §fmedals:") }
+                list += ScoreboardData.sidebarLines.first { it.trim().startsWith("§f§lSILVER §fmedals:") }
+                list += ScoreboardData.sidebarLines.first { it.trim().startsWith("§c§lBRONZE §fmedals:") }
             }
 
             list
         },
         {
-            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") } || ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals: ") }
+            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") } || ScoreboardData.sidebarLines.any { it.trim().startsWith("§6§lGOLD §fmedals: ") }
         }
     ),
     WINTER( // not tested
@@ -90,10 +91,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     NEW_YEAR( // not tested
         {
-            listOf(ScoreboardData.sidebarLines.first { it.startsWith("§dNew Year Event!§f") })
+            listOf(ScoreboardData.sidebarLines.first { it.contains("§dNew Year Event") })
         },
         {
-            ScoreboardData.sidebarLines.any { it.startsWith("§dNew Year Event!§f") }
+            ScoreboardData.sidebarLines.any { it.contains("§dNew Year Event") }
         }
     ),
     ORINGO(
