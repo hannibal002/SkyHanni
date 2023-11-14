@@ -33,6 +33,7 @@ object GardenVisitorColorNames {
         "uncommon" -> "§a"
         "rare" -> "§9"
         "legendary" -> "§6"
+        "mythic" -> "§d"
         "special" -> "§c"
 
         else -> throw RuntimeException("Unknown rarity for '$rarity'")
