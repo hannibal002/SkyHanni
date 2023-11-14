@@ -65,10 +65,7 @@ object DefaultConfigFeatures {
                 }
             }
             .filter { (_, filteredOptions) -> filteredOptions.isNotEmpty() }
-        if (optionList.isEmpty()) {
-            LorenzUtils.chat("There are no new options to configure between $old and $new")
-            return
-        }
+
         SkyHanniMod.screenToOpen = DefaultConfigOptionGui(optionList, old, new)
     }
 

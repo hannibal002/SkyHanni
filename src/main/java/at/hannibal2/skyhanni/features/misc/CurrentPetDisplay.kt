@@ -48,7 +48,7 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        val storage = ProfileStorageData.profileSpecific ?: return
+        val config = ProfileStorageData.profileSpecific ?: return
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
@@ -56,7 +56,7 @@ class CurrentPetDisplay {
         for (line in lore) {
             selectedPetPattern.matchMatcher(line) {
                 val newPet = group("pet")
-                storage.currentPet = if (newPet != "§cNone") newPet else ""
+                config.currentPet = if (newPet != "§cNone") newPet else ""
             }
         }
     }
@@ -67,9 +67,9 @@ class CurrentPetDisplay {
         if (RiftAPI.inRift()) return
 
         if (!SkyHanniMod.feature.misc.pets.display) return
-        val storage = ProfileStorageData.profileSpecific ?: return
+        val config = ProfileStorageData.profileSpecific ?: return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(storage.currentPet, posLabel = "Current Pet")
+        SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
     }
 
     @SubscribeEvent

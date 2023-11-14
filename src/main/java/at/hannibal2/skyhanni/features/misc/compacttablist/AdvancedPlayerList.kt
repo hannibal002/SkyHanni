@@ -24,7 +24,7 @@ object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
     // TODO USE SH-REPO
-    private val pattern = ".*\\[(?<level>.*)] §r(?<name>.*)".toPattern()
+    private val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
@@ -59,21 +59,14 @@ object AdvancedPlayerList {
                     val playerData = PlayerData(removeColor.toInt())
                     currentData[line] = playerData
 
-                    var index = 0
                     val fullName = group("name")
-                    if (fullName.contains("[")) index++
                     val name = fullName.split(" ")
-                    val coloredName = name[index]
-                    if (index == 1) {
-                        playerData.coloredName = name[0] + " " + coloredName
-                    } else {
-                        playerData.coloredName = coloredName
-                    }
+                    val coloredName = name[0]
+                    playerData.coloredName = coloredName
                     playerData.name = coloredName.removeColor()
                     playerData.levelText = levelText
-                    index++
-                    if (name.size > index) {
-                        val nameSuffix = name.drop(index).joinToString(" ")
+                    if (name.size > 1) {
+                        val nameSuffix = name.drop(1).joinToString(" ")
                         playerData.nameSuffix = nameSuffix
                         if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
@@ -168,7 +161,7 @@ object AdvancedPlayerList {
             suffix += " " + getSocialScoreIcon(score)
         }
         if (config.markSkyHanniContributors && data.name in contributors) {
-            suffix += "§c:O"
+            suffix += " §c:O"
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {

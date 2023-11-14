@@ -9,7 +9,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object ComposterAPI {
     var tabListData = mapOf<ComposterDisplay.DataType, String>()
-    val composterUpgrades: MutableMap<ComposterUpgrade, Int>? get() = GardenAPI.storage?.composterUpgrades
+    val composterUpgrades: MutableMap<ComposterUpgrade, Int>? get() = GardenAPI.config?.composterUpgrades
 
     fun ComposterUpgrade.getLevel(addOne: ComposterUpgrade?) = (composterUpgrades?.get(this) ?: 0) + if (addOne == this) 1 else 0
 

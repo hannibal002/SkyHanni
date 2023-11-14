@@ -115,9 +115,9 @@ class KloonHacking {
         if (!RiftAPI.inRift()) return
         if (!config.waypoints) return
         if (!wearingHelmet) return
-        val storage = ProfileStorageData.profileSpecific?.rift ?: return
+        val hidden = ProfileStorageData.profileSpecific?.rift ?: return
         for (terminal in KloonTerminal.entries) {
-            if (terminal !in storage.completedKloonTerminals) {
+            if (terminal !in hidden.completedKloonTerminals) {
                 event.drawWaypointFilled(terminal.location, LorenzColor.DARK_RED.toColor(), true, true)
             }
         }
@@ -128,11 +128,11 @@ class KloonHacking {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
         pattern.matchMatcher(event.message.removeColor()) {
-            val storage = ProfileStorageData.profileSpecific?.rift ?: return
+            val hidden = ProfileStorageData.profileSpecific?.rift ?: return
             val colour = group("colour")
             val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == colour } ?: return
             if (completedTerminal != nearestTerminal) return
-            storage.completedKloonTerminals.add(completedTerminal)
+            hidden.completedKloonTerminals.add(completedTerminal)
         }
     }
 

@@ -21,7 +21,6 @@ class SlayerBossSpawnSoon {
     @SubscribeEvent
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
 
         val completion = pattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()
@@ -30,7 +29,7 @@ class SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                LorenzUtils.sendTitle("§eSlayer boss soon!", 2.seconds)
+                LorenzUtils.sendTitle("§cSlayer boss soon!", 2.seconds)
                 warned = true
             }
         } else {

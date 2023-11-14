@@ -1,16 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
-import at.hannibal2.skyhanni.utils.LorenzUtils.conditionalTransform
-import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.world.WorldSettings
@@ -22,43 +16,9 @@ class TabListData {
 
     companion object {
         private var cache = emptyList<String>()
-        private var debugCache: List<String>? = null
 
         // TODO replace with TabListUpdateEvent
-        fun getTabList() = debugCache ?: cache
-
-        fun toggleDebugCommand() {
-            if (debugCache != null) {
-                LorenzUtils.chat("§e[SkyHanni] Disabled tab list debug.")
-                debugCache = null
-                return
-            }
-            SkyHanniMod.coroutineScope.launch {
-                val clipboard = OSUtils.readFromClipboard() ?: return@launch
-                debugCache = clipboard.lines()
-                LorenzUtils.chat("§e[SkyHanni] Enabled tab list debug with your clipboard.")
-            }
-        }
-
-        fun copyCommand(args: Array<String>) {
-            if (debugCache != null) {
-                LorenzUtils.clickableChat("§c[SkyHanni] Tab list debug is enambed!", "shdebugtablist")
-                return
-            }
-
-            val resultList = mutableListOf<String>()
-            val noColor = args.size == 1 && args[0] == "true"
-            for (line in getTabList()) {
-                val tabListLine = line.transformIf({ noColor }) { removeColor() }
-                if (tabListLine != "") resultList.add("'$tabListLine'")
-            }
-            val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-            val tabHeader = tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
-            val tabFooter = tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
-            val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
-            OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] Tab list copied into the clipboard!")
-        }
+        fun getTabList() = cache
     }
 
     private val playerOrdering = Ordering.from(PlayerComparator())
@@ -100,7 +60,7 @@ class TabListData {
         val tabList = readTabList() ?: return
         if (cache != tabList) {
             cache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
+            TabListUpdateEvent(cache).postAndCatch()
         }
     }
 }

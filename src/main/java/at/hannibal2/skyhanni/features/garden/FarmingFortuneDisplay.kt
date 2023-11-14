@@ -142,7 +142,7 @@ class FarmingFortuneDisplay {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden.farmingFortunes
-        private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestTrueFarmingFortune
+        private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestTrueFarmingFortune
 
         private val currentCrop get() = GardenAPI.getCurrentlyFarmedCrop()
 
@@ -275,12 +275,12 @@ class FarmingFortuneDisplay {
             var otherFortune = 0.0
 
             if (currentCrop == CropType.CARROT) {
-                GardenAPI.storage?.fortune?.let {
+                GardenAPI.config?.fortune?.let {
                     if (it.carrotFortune) otherFortune = 12.0
                 }
             }
             if (currentCrop == CropType.PUMPKIN) {
-                GardenAPI.storage?.fortune?.let {
+                GardenAPI.config?.fortune?.let {
                     if (it.pumpkinFortune) otherFortune = 12.0
                 }
             }

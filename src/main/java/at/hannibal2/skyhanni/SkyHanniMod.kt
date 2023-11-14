@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
-import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -140,10 +139,10 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestStatsSummary
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
-import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropCounter
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenBurrowingSporesNotifier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
@@ -282,9 +281,9 @@ import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
 import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
+import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround
 import at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures
-import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning
 import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterDisplay
 import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
@@ -298,7 +297,6 @@ import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
-import at.hannibal2.skyhanni.test.HotSwapDetection
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.ParkourWaypointSaver
 import at.hannibal2.skyhanni.test.ShowItemUuid
@@ -335,7 +333,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21",
+    version = "0.21.Beta.18",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -346,7 +344,6 @@ class SkyHanniMod {
         loadModule(this)
         loadModule(ChatManager)
         loadModule(HypixelData())
-        loadModule(LocationFixData)
         loadModule(DungeonAPI())
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
@@ -519,12 +516,12 @@ class SkyHanniMod {
         loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
-        loadModule(DicerDropTracker)
+        loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
-        loadModule(ArmorDropTracker)
+        loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
@@ -573,13 +570,13 @@ class SkyHanniMod {
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
         loadModule(GetFromSacksTabComplete)
-        loadModule(SlayerProfitTracker)
+        loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
-        loadModule(FrozenTreasureTracker)
+        loadModule(FrozenTreasureTracker())
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
@@ -615,7 +612,7 @@ class SkyHanniMod {
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
         loadModule(HarpFeatures)
-        loadModule(EnderNodeTracker)
+        loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
@@ -624,7 +621,7 @@ class SkyHanniMod {
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
-        loadModule(PowderTracker)
+        loadModule(PowderTracker())
         loadModule(ModifyVisualWords)
         loadModule(TabListReader)
         loadModule(TabListRenderer)
@@ -658,8 +655,6 @@ class SkyHanniMod {
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
         loadModule(TestShowSlotNumber())
-        loadModule(SkyHanniDebugsAndTests)
-        loadModule(HotSwapDetection)
     }
 
     @Mod.EventHandler

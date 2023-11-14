@@ -1,22 +1,20 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
+import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNode;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
-import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
-import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
-import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
@@ -145,7 +143,7 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public DicerDropTracker.Data dicerDropTracker = new DicerDropTracker.Data();
+            public Map<String, Integer> dicerRngDrops = new HashMap<>();
 
             @Expose
             public long informedAboutLowMatter = 0;
@@ -160,7 +158,7 @@ public class Storage {
             public long nextSixthVisitorArrival = 0;
 
             @Expose
-            public ArmorDropTracker.Data armorDropTracker = new ArmorDropTracker.Data();
+            public Map<FarmingArmorDrops.ArmorDropType, Integer> farmArmorDrops = new HashMap<>();
 
             @Expose
             public Map<ComposterUpgrade, Integer> composterUpgrades = new HashMap<>();
@@ -304,13 +302,43 @@ public class Storage {
         }
 
         @Expose
-        public PowderTracker.Data powderTracker = new PowderTracker.Data();
+        public Map<Integer, PowderTracker> powderTracker = new HashMap<>();
+
+        public static class PowderTracker {
+            @Expose
+            public int totalChestPicked = 0;
+
+            @Expose
+            public Map<PowderChestReward, Long> rewards = new HashMap<>();
+        }
 
         @Expose
-        public FrozenTreasureTracker.Data frozenTreasureTracker = new FrozenTreasureTracker.Data();
+        public FrozenTreasureTracker frozenTreasureTracker = new FrozenTreasureTracker();
+
+        public static class FrozenTreasureTracker {
+            @Expose
+            public int treasuresMined = 0;
+
+            @Expose
+            public int compactProcs = 0;
+
+            @Expose
+            public Map<FrozenTreasure, Integer> treasureCount = new HashMap<>();
+        }
 
         @Expose
-        public EnderNodeTracker.Data enderNodeTracker = new EnderNodeTracker.Data();
+        public EnderNodeTracker enderNodeTracker = new EnderNodeTracker();
+
+        public static class EnderNodeTracker {
+            @Expose
+            public int totalNodesMined = 0;
+
+            @Expose
+            public int totalEndermiteNests = 0;
+
+            @Expose
+            public Map<EnderNode, Integer> lootCount = new HashMap<>();
+        }
 
         @Expose
         public RiftStorage rift = new RiftStorage();
@@ -323,7 +351,53 @@ public class Storage {
         }
 
         @Expose
-        public Map<String, SlayerProfitTracker.Data> slayerProfitData = new HashMap<>();
+        public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
+
+        public static class SlayerProfitList {
+
+            @Expose
+            public Map<NEUInternalName, SlayerItemProfit> items = new HashMap<>();
+
+            @Expose
+            public long mobKillCoins = 0;
+
+            @Expose
+            public long slayerSpawnCost = 0;
+
+            @Expose
+            public int slayerCompletedCount = 0;
+
+            public static class SlayerItemProfit {
+                @Expose
+                public NEUInternalName internalName;
+                @Expose
+                public long timesDropped;
+                @Expose
+                public long totalAmount;
+                @Expose
+                public boolean hidden;
+
+                @Override
+                public String toString() {
+                    return "SlayerItemProfit{" +
+                        "internalName='" + internalName + '\'' +
+                        ", timesDropped=" + timesDropped +
+                        ", totalAmount=" + totalAmount +
+                        ", hidden=" + hidden +
+                        '}';
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "SlayerProfitList{" +
+                    "items=" + items +
+                    ", mobKillCoins=" + mobKillCoins +
+                    ", slayerSpawnCost=" + slayerSpawnCost +
+                    ", slayerCompletedCount=" + slayerCompletedCount +
+                    '}';
+            }
+        }
 
         @Expose
         public Map<String, SlayerRngMeterStorage> slayerRngMeter = new HashMap<>();

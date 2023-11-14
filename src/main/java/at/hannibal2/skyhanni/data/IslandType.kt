@@ -28,9 +28,8 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     ;
 
     companion object {
-        fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
-        fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
-
-        fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getBySidebarName(name: String): IslandType {
+            return entries.firstOrNull { it.displayName == name } ?: UNKNOWN
+        }
     }
 }

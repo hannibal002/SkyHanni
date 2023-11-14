@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.minion
 
+import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -43,7 +43,7 @@ class MinionCollectLogic {
             val diff = amount - old
 
             if (diff > 0) {
-                ItemAddInInventoryEvent(internalId, diff).postAndCatch()
+                CollectionAPI.addFromInventory(internalId, diff)
             }
         }
 

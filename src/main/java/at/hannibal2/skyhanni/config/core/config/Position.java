@@ -31,8 +31,6 @@ public class Position {
     private int y;
     @Expose
     private float scale = 1F;
-    @Expose
-    private boolean center = false;
 
     @Expose
     private boolean centerX;
@@ -54,15 +52,6 @@ public class Position {
         this.scale = scale;
     }
 
-    public Position(int x, int y, float scale, boolean center) {
-        this.x = x;
-        this.y = y;
-        this.centerX = false;
-        this.centerY = true;
-        this.scale = scale;
-        this.center = center;
-    }
-
     public Position(int x, int y, boolean centerX, boolean centerY) {
         this.x = x;
         this.y = y;
@@ -76,7 +65,6 @@ public class Position {
         this.centerX = other.centerX;
         this.centerY = other.centerY;
         this.scale = other.getScale();
-        this.center = other.isCenter();
     }
 
     public float getEffectiveScale() {
@@ -86,10 +74,6 @@ public class Position {
     public float getScale() {
         if (scale == 0) return 1f;
         return scale;
-    }
-
-    public boolean isCenter() {
-        return center;
     }
 
     public void setScale(float newScale) {

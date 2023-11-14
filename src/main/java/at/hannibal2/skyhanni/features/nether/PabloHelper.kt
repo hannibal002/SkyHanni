@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatchers
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -17,17 +17,16 @@ import kotlin.time.Duration.Companion.minutes
 class PabloHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    private val patterns = listOf(
-        "\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*".toPattern(),
-        "\\[NPC] Pablo: Bring me that (?<flower>[\\w ]+) as soon as you can!".toPattern()
-    )
+    // There is a different message if the player asks Pablo with an item in their hand, but I don't think it's necessary
+    // I'll add it if requested ~NetheriteMiner
+    private val pabloMessagePattern = "\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*".toPattern()
     private var lastSentMessage = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
-        val itemName = patterns.matchMatchers(event.message.removeColor()) {
+        val itemName = pabloMessagePattern.matchMatcher(event.message.removeColor()) {
             group("flower")
         } ?: return
 

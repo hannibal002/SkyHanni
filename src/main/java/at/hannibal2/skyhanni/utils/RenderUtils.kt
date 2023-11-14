@@ -303,6 +303,7 @@ object RenderUtils {
         val z =
             pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
 
+
         //7 – 25
 
         val translate = LorenzVec(x, y, z)
@@ -352,6 +353,7 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
+
     fun Position.transform(): Pair<Int, Int> {
         GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
         GlStateManager.scale(effectiveScale, effectiveScale, 1F)
@@ -363,11 +365,11 @@ object RenderUtils {
     fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string == null) return
         if (string == "") return
-        val x = renderString0(string, offsetX, offsetY, isCenter)
+        val x = renderString0(string, offsetX, offsetY)
         GuiEditManager.add(this, posLabel, x, 10)
     }
 
-    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
+    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()
@@ -378,16 +380,7 @@ object RenderUtils {
         val y = offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
-
-        if (centered) {
-            val strLen: Int = renderer.getStringWidth(string)
-            val x2 = x - strLen / 2f
-            GL11.glTranslatef(x2, 0f, 0f)
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
-            GL11.glTranslatef(-x2, 0f, 0f)
-        } else {
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
-        }
+        renderer.drawStringWithShadow(display, 0f, 0f, 0)
 
 
         GlStateManager.popMatrix()
@@ -401,7 +394,7 @@ object RenderUtils {
         var offsetY = 0
         var longestX = 0
         for (s in list) {
-            val x = renderString0(s, offsetY = offsetY, centered = false)
+            val x = renderString0(s, offsetY = offsetY)
             if (x > longestX) {
                 longestX = x
             }
@@ -763,6 +756,7 @@ object RenderUtils {
         return LorenzVec(x, y, z)
     }
 
+
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
@@ -933,12 +927,7 @@ object RenderUtils {
         GlStateManager.disableBlend()
     }
 
-    fun LorenzRenderWorldEvent.outlineTopFace(
-        boundingBox: AxisAlignedBB,
-        lineWidth: Int,
-        colour: Color,
-        depth: Boolean
-    ) {
+    fun LorenzRenderWorldEvent.outlineTopFace(boundingBox: AxisAlignedBB, lineWidth: Int, colour: Color, depth: Boolean) {
         val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
         val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
         val cornerThree = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)

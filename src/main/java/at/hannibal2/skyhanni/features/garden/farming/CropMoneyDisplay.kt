@@ -54,7 +54,7 @@ object CropMoneyDisplay {
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
-    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
+    private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
@@ -155,7 +155,7 @@ object CropMoneyDisplay {
 
             if (config.armor) {
                 val amountPerHour =
-                    it.multiplier * GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
+                    it.multiplier * GardenCropSpeed.getRecentBPS() * FarmingArmorDrops.getDropsPerHour(it)
                 extraArmorCoins = amountPerHour * it.specialDropType.asInternalName().getNpcPrice()
             }
         }

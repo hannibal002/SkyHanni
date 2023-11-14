@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsWith
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
@@ -26,9 +25,9 @@ class AshfangBlazes {
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
     private val blazeColor = mutableMapOf<EntityBlaze, LorenzColor>()
-    private var blazeArmorStand = mapOf<EntityBlaze, EntityArmorStand>()
+    private val blazeArmorStand = mutableMapOf<EntityBlaze, EntityArmorStand>()
 
-    private var nearAshfang = false
+    var nearAshfang = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -44,21 +43,19 @@ class AshfangBlazes {
                 val list = entity.getAllNameTagsWith(2, "Ashfang")
                 if (list.size == 1) {
                     val armorStand = list[0]
+                    blazeArmorStand[entity] = armorStand
                     val color = when {
                         armorStand.name.contains("Ashfang Follower") -> LorenzColor.DARK_GRAY
                         armorStand.name.contains("Ashfang Underling") -> LorenzColor.RED
                         armorStand.name.contains("Ashfang Acolyte") -> LorenzColor.BLUE
                         else -> {
-                            blazeArmorStand = blazeArmorStand.editCopy {
-                                remove(entity)
-                            }
-                            continue
+                            blazeArmorStand.remove(entity)
+                            null
                         }
                     }
-                    blazeArmorStand = blazeArmorStand.editCopy {
-                        this[entity] = armorStand
+                    color?.let {
+                        blazeColor[entity] = it
                     }
-                    blazeColor[entity] = color
                 }
             }
         }
@@ -72,9 +69,7 @@ class AshfangBlazes {
         if (entityId !in blazeArmorStand.keys.map { it.entityId }) return
 
         if (event.health % 10_000_000 != 0) {
-            blazeArmorStand = blazeArmorStand.editCopy {
-                keys.removeIf { it.entityId == entityId }
-            }
+            blazeArmorStand.keys.removeIf { it.entityId == entityId }
         }
     }
 
@@ -117,7 +112,7 @@ class AshfangBlazes {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         blazeColor.clear()
-        blazeArmorStand = emptyMap()
+        blazeArmorStand.clear()
     }
 
     @SubscribeEvent

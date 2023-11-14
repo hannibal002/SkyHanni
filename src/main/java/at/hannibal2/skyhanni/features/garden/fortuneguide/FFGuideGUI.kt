@@ -46,7 +46,7 @@ open class FFGuideGUI : GuiScreen() {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
         fun FarmingItems.getItem(): ItemStack {
-            val fortune = GardenAPI.storage?.fortune ?: return getFallbackItem(this)
+            val fortune = GardenAPI.config?.fortune ?: return getFallbackItem(this)
 
             val farmingItems = fortune.farmingItems
             farmingItems[this]?.let { return it }

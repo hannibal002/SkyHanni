@@ -31,7 +31,7 @@ class AnitaExtraFarmingFortune {
 
         if (!stack.displayName.contains("Extra Farming Fortune")) return
 
-        val anitaUpgrade = GardenAPI.storage?.fortune?.anitaUpgrade ?: return
+        val anitaUpgrade = GardenAPI.config?.fortune?.anitaUpgrade ?: return
 
         var contributionFactor = 1.0
         val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets ?: return

@@ -205,7 +205,7 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
 
     fun isRewardChest(): Boolean {
         val isCorrectIsland = skyBlockIsland.equalsOneOf(IslandType.DUNGEON_HUB, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
@@ -341,29 +341,22 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
     ) {
-        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
-    }
-
-    inline fun <reified T : Enum<T>> buildSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit
-    ) = buildList {
-        add(prefix)
-        for (entry in enumValues<T>()) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                add("§a[$display]")
-            } else {
-                add("§e[")
-                add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
-                add("§e]")
+        add(buildList {
+            add(prefix)
+            for (entry in enumValues<T>()) {
+                val display = getName(entry)
+                if (isCurrent(entry)) {
+                    add("§a[$display]")
+                } else {
+                    add("§e[")
+                    add(Renderable.link("§e$display") {
+                        onChange(entry)
+                    })
+                    add("§e]")
+                }
+                add(" ")
             }
-            add(" ")
-        }
+        })
     }
 
     inline fun MutableList<List<Any>>.addButton(

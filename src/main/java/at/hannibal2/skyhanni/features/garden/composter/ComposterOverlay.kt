@@ -74,15 +74,15 @@ object ComposterOverlay {
     private var testOffset = 0
 
     var currentOrganicMatterItem: String?
-        get() = GardenAPI.storage?.composterCurrentOrganicMatterItem
+        get() = GardenAPI.config?.composterCurrentOrganicMatterItem
         private set(value) {
-            GardenAPI.storage?.composterCurrentOrganicMatterItem = value
+            GardenAPI.config?.composterCurrentOrganicMatterItem = value
         }
 
     var currentFuelItem: String?
-        get() = GardenAPI.storage?.composterCurrentFuelItem
+        get() = GardenAPI.config?.composterCurrentFuelItem
         private set(value) {
-            GardenAPI.storage?.composterCurrentFuelItem = value
+            GardenAPI.config?.composterCurrentFuelItem = value
         }
 
     fun onCommand(args: Array<String>) {

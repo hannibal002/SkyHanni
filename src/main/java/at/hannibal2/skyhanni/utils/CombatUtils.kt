@@ -72,8 +72,8 @@ object CombatUtils {
         lastKillUpdate = System.currentTimeMillis()
         killGainHourLast = killGainHour
 
-        GhostCounter.storage?.bestiaryNextLevel?.toInt()?.let { nextLevel ->
-            GhostCounter.storage?.bestiaryCurrentKill?.toInt()?.let { kill ->
+        GhostCounter.hidden?.bestiaryNextLevel?.toInt()?.let { nextLevel ->
+            GhostCounter.hidden?.bestiaryCurrentKill?.toInt()?.let { kill ->
                 val sum = GhostData.bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
                 val cKill = sum + kill
                 val totalKill = if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill else cKill

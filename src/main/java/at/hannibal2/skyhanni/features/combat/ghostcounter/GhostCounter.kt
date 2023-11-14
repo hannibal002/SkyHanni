@@ -61,7 +61,7 @@ import kotlin.math.roundToLong
 object GhostCounter {
 
     val config get() = SkyHanniMod.feature.combat.ghostCounter
-    val storage get() = ProfileStorageData.profileSpecific?.ghostCounter
+    val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File =
         File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
@@ -127,7 +127,7 @@ object GhostCounter {
         }
         val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> "${((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting
@@ -151,9 +151,9 @@ object GhostCounter {
         }
 
         val bestiaryFormatting = textFormatting.bestiaryFormatting
-        val currentKill = storage?.bestiaryCurrentKill?.toInt() ?: 0
-        val killNeeded = storage?.bestiaryKillNeeded?.toInt() ?: 0
-        val nextLevel = storage?.bestiaryNextLevel?.toInt() ?: -1
+        val currentKill = hidden?.bestiaryCurrentKill?.toInt() ?: 0
+        val killNeeded = hidden?.bestiaryKillNeeded?.toInt() ?: 0
+        val nextLevel = hidden?.bestiaryNextLevel?.toInt() ?: -1
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
@@ -283,7 +283,7 @@ object GhostCounter {
                         Option.KILLCOMBO.add(num)
                         Option.SKILLXPGAINED.add(gained * num.roundToLong())
                         Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                        storage?.bestiaryCurrentKill = storage?.bestiaryCurrentKill?.plus(num) ?: num
+                        hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
                     }
                     lastXp = res
                 }
@@ -385,7 +385,7 @@ object GhostCounter {
                     Option.SORROWCOUNT, Option.VOLTACOUNT, Option.PLASMACOUNT, Option.GHOSTLYBOOTS -> {
                         opt.add(1.0)
                         opt.add(1.0, true)
-                        storage?.totalMF = storage?.totalMF?.plus(group("mf").substring(4).toDouble())
+                        hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
                             ?: group("mf").substring(4).toDouble()
                         Option.TOTALDROPS.add(1.0)
                         if (opt == Option.SORROWCOUNT)
@@ -424,16 +424,16 @@ object GhostCounter {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
                 26 -> {
-                    storage?.bestiaryNextLevel = 26.0
-                    storage?.bestiaryCurrentKill = 250_000.0
-                    storage?.bestiaryKillNeeded = 0.0
+                    hidden?.bestiaryNextLevel = 26.0
+                    hidden?.bestiaryCurrentKill = 250_000.0
+                    hidden?.bestiaryKillNeeded = 0.0
                 }
 
                 else -> {
                     val killNeeded: Int = bestiaryData[nextLevel] ?: -1
-                    storage?.bestiaryNextLevel = nextLevel.toDouble()
-                    storage?.bestiaryCurrentKill = 0.0
-                    storage?.bestiaryKillNeeded = killNeeded.toDouble()
+                    hidden?.bestiaryNextLevel = nextLevel.toDouble()
+                    hidden?.bestiaryCurrentKill = 0.0
+                    hidden?.bestiaryKillNeeded = killNeeded.toDouble()
                 }
             }
             update()
@@ -459,7 +459,7 @@ object GhostCounter {
         val bestiaryNextLevel =
             if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8)
                 .romanToDecimal() + 1
-        storage?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
+        hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         var kills = 0.0
         for (line in ghostStack.getLore()) {
             val l = line.removeColor().trim()
@@ -467,8 +467,8 @@ object GhostCounter {
                 kills = "Kills: (.*)".toRegex().find(l)?.groupValues?.get(1)?.formatNumber()?.toDouble() ?: 0.0
             }
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {
-                storage?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatNumber().toDouble()
-                storage?.bestiaryKillNeeded = group("total").formatNumber().toDouble()
+                hidden?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatNumber().toDouble()
+                hidden?.bestiaryKillNeeded = group("total").formatNumber().toDouble()
             }
         }
         update()
@@ -476,10 +476,10 @@ object GhostCounter {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        if (storage?.configUpdateVersion == 0) {
+        if (hidden?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
             chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
-            storage?.configUpdateVersion = CONFIG_VALUE_VERSION
+            hidden?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
     }
 

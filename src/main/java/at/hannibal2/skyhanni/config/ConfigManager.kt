@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -94,15 +93,6 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): LorenzRarity {
                     return LorenzRarity.valueOf(reader.nextString())
-                }
-            }.nullSafe())
-            .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
-                override fun write(out: JsonWriter, value: IslandType) {
-                    out.value(value.name)
-                }
-
-                override fun read(reader: JsonReader): IslandType {
-                    return IslandType.valueOf(reader.nextString())
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()
