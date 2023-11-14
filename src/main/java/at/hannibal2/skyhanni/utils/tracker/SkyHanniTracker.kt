@@ -21,11 +21,16 @@ class SkyHanniTracker<Data : TrackerData>(
     private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
     private var inventoryOpen = false
-    private var displayMode = DisplayMode.TOTAL
+    private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
     private var display = emptyList<List<Any>>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var dirty = false
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.misc.trackers
+        private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+    }
 
     fun isInventoryOpen() = inventoryOpen
 
@@ -49,11 +54,7 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
-        if (SkyHanniMod.feature.misc.trackers.hideInEstimatedItemValue) {
-            if (EstimatedItemValue.currentlyShowing) {
-                return
-            }
-        }
+        if (config.hideInEstimatedItemValue && EstimatedItemValue.currentlyShowing) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
@@ -63,7 +64,7 @@ class SkyHanniTracker<Data : TrackerData>(
 
         if (dirty) {
             display = getSharedTracker()?.let {
-                buildFinalDisplay(drawDisplay(it.get(displayMode)))
+                buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
             } ?: emptyList()
             dirty = false
         }
@@ -80,7 +81,7 @@ class SkyHanniTracker<Data : TrackerData>(
         if (inventoryOpen) {
             it.add(1, buildDisplayModeView())
         }
-        if (inventoryOpen && displayMode == DisplayMode.SESSION) {
+        if (inventoryOpen && getDisplayMode() == DisplayMode.SESSION) {
             it.addAsSingletonList(buildSessionResetButton())
         }
     }
@@ -102,9 +103,10 @@ class SkyHanniTracker<Data : TrackerData>(
     private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
         "§7Display Mode: ",
         getName = { type -> type.displayName },
-        isCurrent = { it == displayMode },
+        isCurrent = { it == getDisplayMode() },
         onChange = {
             displayMode = it
+            storedTrackers[name] = it
             update()
         }
     )
@@ -119,6 +121,12 @@ class SkyHanniTracker<Data : TrackerData>(
             LorenzUtils.chat(message)
             update()
         }
+    }
+
+    private fun getDisplayMode() = displayMode ?: run {
+        val newValue = config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
+        displayMode = newValue
+        newValue
     }
 
     fun firstUpdate() {
@@ -143,5 +151,14 @@ class SkyHanniTracker<Data : TrackerData>(
         TOTAL("Total"),
         SESSION("This Session"),
         ;
+    }
+
+    enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {
+        TOTAL("Total", DisplayMode.TOTAL),
+        SESSION("This Session", DisplayMode.SESSION),
+        REMEMBER_LAST("Remember Last", null),
+        ;
+
+        override fun toString() = display
     }
 }

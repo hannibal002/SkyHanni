@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
@@ -51,6 +52,9 @@ public class Storage {
 
     @Expose
     public Boolean contestSendingAsked = false;
+
+    @Expose
+    public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();

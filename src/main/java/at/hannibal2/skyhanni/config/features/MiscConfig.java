@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -724,6 +725,11 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideInEstimatedItemValue = true;
+
+        @Expose
+        @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown when starting.")
+        @ConfigEditorDropdown
+        public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.TOTAL);
 
     }
 

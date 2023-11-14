@@ -295,6 +295,7 @@ object FishingProfitTracker {
 
     @SubscribeEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
+        if (!config.enabled || !config.hideMoving) return
         isMoving = false
         tracker.firstUpdate()
     }

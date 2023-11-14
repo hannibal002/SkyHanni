@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
@@ -33,6 +34,8 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.UUID
 import kotlin.concurrent.fixedRateTimer
+
+typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
 class ConfigManager {
     companion object {
@@ -103,6 +106,15 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): IslandType {
                     return IslandType.valueOf(reader.nextString())
+                }
+            }.nullSafe())
+            .registerTypeAdapter(TrackerDisplayMode::class.java, object : TypeAdapter<TrackerDisplayMode>() {
+                override fun write(out: JsonWriter, value: TrackerDisplayMode) {
+                    out.value(value.name)
+                }
+
+                override fun read(reader: JsonReader): TrackerDisplayMode {
+                    return TrackerDisplayMode.valueOf(reader.nextString())
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()
