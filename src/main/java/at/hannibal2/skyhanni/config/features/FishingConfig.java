@@ -132,6 +132,14 @@ public class FishingConfig {
 
         @Expose
         @ConfigOption(
+                name = "Lava Fishing",
+                desc = "Show the Barn Fishing Timer even while in the Crimson Isle."
+        )
+        @ConfigEditorBoolean
+        public boolean crimsonIsle = true;
+
+        @Expose
+        @ConfigOption(
                 name = "Winter Fishing",
                 desc = "Show the Barn Fishing Timer even on the Jerry's Workshop."
         )
