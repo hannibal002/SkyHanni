@@ -48,6 +48,7 @@ object FishingProfitTracker {
     class Data : TrackerData() {
         override fun reset() {
             items.clear()
+            totalCatchAmount = 0
         }
 
         @Expose
@@ -236,6 +237,7 @@ object FishingProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!FishingAPI.hasFishingRodInHand()) return
         if (isMoving && config.hideMoving) return
 
         tracker.renderDisplay(config.position)
@@ -250,15 +252,21 @@ object FishingProfitTracker {
         addItem(internalName, amount)
     }
 
-    private var allowedItems = listOf<NEUInternalName>()
+    private var itemCategories = mutableMapOf<String, List<NEUInternalName>>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedItems = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").items
+        itemCategories = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").categories
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean {
-        return internalName in allowedItems
+        for ((name, items) in itemCategories) {
+            if (internalName in items) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private fun getPrice(internalName: NEUInternalName) = when (config.priceFrom) {
@@ -275,7 +283,7 @@ object FishingProfitTracker {
 
     @SubscribeEvent
     fun onEntityMove(event: EntityMoveEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.enabled || !config.hideMoving) return
+        if (!isEnabled() || !config.hideMoving) return
         if (event.entity != Minecraft.getMinecraft().thePlayer) return
 
         val distance = event.newLocation.distanceIgnoreY(event.oldLocation)
@@ -295,7 +303,7 @@ object FishingProfitTracker {
 
     @SubscribeEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
-        if (!config.enabled || !config.hideMoving) return
+        if (!isEnabled() || !config.hideMoving) return
         isMoving = false
         tracker.firstUpdate()
     }
@@ -310,5 +318,5 @@ object FishingProfitTracker {
         tracker.resetCommand(args, "shresetfishingtracker")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.hasFishingRodInHand()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
