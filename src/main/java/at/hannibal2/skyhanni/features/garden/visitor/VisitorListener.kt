@@ -75,7 +75,7 @@ class VisitorListener {
             }
             if (!found) continue
 
-            if (line.isEmpty()) {
+            if (line.isEmpty() || line.contains("Account Info")) {
                 found = false
                 continue
             }
