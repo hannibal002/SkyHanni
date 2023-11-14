@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -152,9 +153,12 @@ object EntityUtils {
         (this is EntityPlayer && isNPC() && name.any { it in '0'..'9' }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPC in the Village
             || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
             || (this is EntityCow && this.entityId == 175) // Shania NPC
+            || (this is EntityPlayer && this.name == "Guy ") // Guy NPC (but only as visitor)
+            || (this is EntityPlayer && this.name == "§bSam ") // Sam NPC (in Private Island)
+            || (this is EntityPlayer && this.name == "BarbarianGuard ") // BarbarianGuard NPCs
 
     fun EntityLivingBase.isFarmMob() =
-        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f)
+        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 

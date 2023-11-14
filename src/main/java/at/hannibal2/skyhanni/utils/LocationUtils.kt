@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
 import kotlin.math.max
 import kotlin.math.min
 
@@ -46,12 +47,12 @@ object LocationUtils {
         return noBlocks && notTooFar && inFov
     }
 
-    fun AxisAlignedBB.minBox() = LorenzVec(minX,minY,minZ)
+    fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
 
-    fun AxisAlignedBB.maxBox() = LorenzVec(maxX,maxY,maxZ)
+    fun AxisAlignedBB.maxBox() = LorenzVec(maxX, maxY, maxZ)
 
     fun AxisAlignedBB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
-        //Reference for Algorithm https://tavianator.com/2011/ray_box.html
+        // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
         val t1 = (this.minBox().subtract(origin)).multiply(rayDirectionInverse)
         val t2 = (this.maxBox().subtract(origin)).multiply(rayDirectionInverse)
@@ -60,4 +61,32 @@ object LocationUtils {
         val tmax = min(t1.maxOfEachElement(t2).min(), Double.POSITIVE_INFINITY)
         return tmax >= tmin && tmax >= 0.0
     }
+
+    fun AxisAlignedBB.union(aabbs: List<AxisAlignedBB>?): AxisAlignedBB? {
+        if (aabbs.isNullOrEmpty()) {
+            return null
+        }
+
+        var minX = this.minX
+        var minY = this.minY
+        var minZ = this.minZ
+        var maxX = this.maxX
+        var maxY = this.maxY
+        var maxZ = this.maxZ
+
+        aabbs.forEach { aabb ->
+            if (aabb.minX < minX) minX = aabb.minX
+            if (aabb.minY < minY) minY = aabb.minY
+            if (aabb.minZ < minZ) minZ = aabb.minZ
+            if (aabb.maxX > maxX) maxX = aabb.maxX
+            if (aabb.maxY > maxY) maxY = aabb.maxY
+            if (aabb.maxZ > maxZ) maxZ = aabb.maxZ
+        }
+
+        val combinedMin = BlockPos(minX, minY, minZ)
+        val combinedMax = BlockPos(maxX, maxY, maxZ)
+
+        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+    }
 }
+

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
@@ -23,8 +24,10 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityChicken
@@ -37,7 +40,7 @@ import net.minecraft.entity.passive.EntitySheep
 import net.minecraft.entity.player.EntityPlayer
 
 object SkyblockMobUtils {
-    val mobNameFilter = "(\\[(.*)\\] )?(.Corrupted )?(.*) \\d+".toRegex()
+    val mobNameFilter = "(\\[(.*)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤\\?]+|█+) .$".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
@@ -52,7 +55,7 @@ object SkyblockMobUtils {
     fun Entity.isSkyBlockMob(): Boolean {
         if (this !is EntityLivingBase) return false
         if (this is EntityArmorStand) return false
-        if (this is EntityHorse && this.maxHealth != 35_000f) return false
+        // if (this is EntityHorse && this.maxHealth != 35_000f) return false
 
         // Maybe a Problem with Summons TODO find other solution (broke stuff)
         // if (this is EntitySlime && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE) return false
@@ -90,14 +93,17 @@ object SkyblockMobUtils {
     fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
         noArmorStandMobs(baseEntity)?.also { return it }
 
+        val nextEntity = getNextEntity(baseEntity, 1)
+        if (nextEntity !is EntityArmorStand && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) return SkyblockInvalidEntity(baseEntity, "Minion Mob " + baseEntity.name) // TODO fix to always include Valid Mobs on Private Island
+        exceptions(baseEntity, nextEntity as? EntityArmorStand)?.also { return it }
+
         val extraEntityList =
-            generateSequence(getNextEntity(baseEntity, 1) as? EntityLivingBase) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive {
+            generateSequence(nextEntity as? EntityLivingBase) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive {
                 !(it is EntityArmorStand && !it.isDefaultValue())
             }.toList()
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return null
 
-        exceptions(baseEntity, armorStand)?.also { return it }
-
+        if (armorStand.isDefaultValue()) return null
         val sumReg = summoningRegex.find(armorStand.name.removeColor())
             ?: return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))
         return SummoningMob(baseEntity, armorStand, sumReg)
@@ -106,6 +112,7 @@ object SkyblockMobUtils {
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): SkyblockEntity? {
         if (baseEntity is EntityBat) return createBat(baseEntity)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
+        if (baseEntity is EntityDragon) return SkyblockBossMob(baseEntity, null, baseEntity.name.removeColor(), null)
         return null
     }
 
@@ -121,23 +128,45 @@ object SkyblockMobUtils {
 
     private val RatSkull =
         "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
+    private val HellwispTentacleSkull =
+        "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+
 
     private fun exceptions(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?): SkyblockEntity? {
-        armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
         if (armorStand == null) return null
-        if (baseEntity is EntityPig && armorStand.name.endsWith("'s Pig")) return SkyblockInvalidEntity(baseEntity, "Pig Pet")
-        return null
+        armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
+        return when {
+            baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> SkyblockInvalidEntity(
+                baseEntity, "Pig Pet"
+            )
+
+            baseEntity is EntityHorse && armorStand.name.endsWith("'s Skeleton Horse") -> SkyblockInvalidEntity(
+                baseEntity, "Skeleton Horse Pet"
+            )
+
+            baseEntity is EntityHorse && armorStand.name.endsWith("'s Horse") -> SkyblockInvalidEntity(
+                baseEntity, "Horse Pet"
+            )
+
+            baseEntity is EntityGuardian && armorStand.name.removeColor()
+                .matches("^\\d+".toRegex()) -> SkyblockInvalidEntity(
+                baseEntity, "Wierd Sea Guardian Ability"
+            )
+
+            else -> null
+        }
     }
 
-    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?): SkyblockEntity? {
+    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): SkyblockEntity? {
         if (baseEntity !is EntityZombie) return null
-        if (armorStand != null) {
-            if (armorStand.name.endsWith("'s Armadillo")) return SkyblockInvalidEntity(baseEntity, "Armadillo Pet")
-            if (armorStand.name.endsWith("'s Rat")) return SkyblockInvalidEntity(baseEntity, "Rat Pet")
+        when {
+            armorStand.name.endsWith("'s Armadillo") -> return SkyblockInvalidEntity(baseEntity, "Armadillo Pet")
+            armorStand.name.endsWith("'s Rat") -> return SkyblockInvalidEntity(baseEntity, "Rat Pet")
         }
-        if (armorStand?.inventory?.get(4)
-                ?.getSkullTexture() == RatSkull
-        ) return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
+        when (armorStand.inventory?.get(4)?.getSkullTexture()) {
+            RatSkull -> return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
+            HellwispTentacleSkull -> return SkyblockInvalidEntity(baseEntity, "Hellwisp Tentacle")
+        }
         return null
     }
 
@@ -152,7 +181,8 @@ object SkyblockMobUtils {
     }
 
     private fun createBat(baseEntity: EntityLivingBase): SkyblockEntity? = when (baseEntity.maxHealth) {
-        // TODO Bat Pinata, Mega Bat, Cinderbat
+        // TODO Bat Pinata, Mega Bat
+        5_000_000f -> SkyblockSpecialMob(baseEntity, null, "Cinderbat")
         100f -> SkyblockSpecialMob(
             baseEntity, null, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else "Private Island Bat"
         )

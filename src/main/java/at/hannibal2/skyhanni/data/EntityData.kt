@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.events.SkyblockMobDeSpawnEvent
 import at.hannibal2.skyhanni.events.SkyblockMobDeathEvent
 import at.hannibal2.skyhanni.events.SkyblockMobLeavingRenderEvent
 import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
@@ -173,7 +172,7 @@ class EntityData {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
-                if (RiftAPI.inRift()) return true
+                if (islandException()) return true
                 val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
                 if (it is SummoningMob) {
                     EntitySummoningSpawnEvent(it).postAndCatch()
@@ -185,13 +184,19 @@ class EntityData {
         return true
     }
 
+    private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
+        IslandType.THE_RIFT -> true
+        IslandType.PRIVATE_ISLAND_GUEST -> true
+        else -> false
+    }
+
     private fun EntityDeSpawn(entity: EntityLivingBase) {
         devTracker.data.deSpawn++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
-                if (RiftAPI.inRift()) return
+                if (islandException()) return
                 _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
                     ?: _currentSkyblockMobs[entity.hashCode()]?.let {
                         if (it.isInRender()) {
@@ -300,7 +305,7 @@ class EntityData {
         if (mobConfig.skyblockMobHighlight) {
             currentSkyblockMobs.forEach {
                 val color = if (it is SkyblockBossMob) LorenzColor.DARK_GREEN else LorenzColor.GREEN
-                event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), color.toColor(), 0.3f)
+                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.toColor(), 0.3f)
             }
         }
         if (mobConfig.displayNPCHighlight) {

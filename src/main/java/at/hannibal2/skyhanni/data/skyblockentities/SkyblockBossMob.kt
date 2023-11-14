@@ -10,7 +10,7 @@ import net.minecraft.entity.item.EntityArmorStand
 //﴾ [Lv500] Magma Boss █████████████████████████ ﴿
 open class SkyblockBossMob(
     baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, override val name: String,
-    extraEntities: List<EntityLivingBase>,
+    extraEntities: List<EntityLivingBase>?,
 ) : SkyblockMob(baseEntity, armorStand, extraEntities) {
     init {
         LorenzDebug.log("BossName: '$name' , Colorless: '${armorStand?.name?.removeColor()}' , Raw: '${armorStand?.name}'")
