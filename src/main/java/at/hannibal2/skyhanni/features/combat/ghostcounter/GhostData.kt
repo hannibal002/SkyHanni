@@ -63,28 +63,28 @@ object GhostData {
             if (s)
                 session[this] = session[this]?.plus(i) ?: i
             else
-                GhostCounter.hidden?.data?.set(this, GhostCounter.hidden?.data?.get(this)?.plus(i) ?: i)
+                GhostCounter.storage?.data?.set(this, GhostCounter.storage?.data?.get(this)?.plus(i) ?: i)
         }
 
         fun set(i: Double, s: Boolean = false) {
             if (s)
                 session[this] = i
             else
-                GhostCounter.hidden?.data?.set(this, i)
+                GhostCounter.storage?.data?.set(this, i)
         }
 
         fun getInt(s: Boolean = false): Int {
             return if (s)
                 session[this]?.roundToInt() ?: 0
             else
-                GhostCounter.hidden?.data?.get(this)?.roundToInt() ?: 0
+                GhostCounter.storage?.data?.get(this)?.roundToInt() ?: 0
         }
 
         fun get(s: Boolean = false): Double {
             return if (s)
                 session[this] ?: 0.0
             else
-                GhostCounter.hidden?.data?.get(this) ?: 0.0
+                GhostCounter.storage?.data?.get(this) ?: 0.0
         }
     }
 }

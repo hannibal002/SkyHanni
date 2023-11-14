@@ -59,25 +59,59 @@ public class Features extends Config {
         return "SkyHanni " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
+    /*
+     * If you are adding a new category, please insert it alphabetically
+     * The only exceptions to this are About and GUI, which are pinned to the top
+     * and Misc and Dev, which are to be at the bottom. Thanks!
+     */
+
     @Expose
-    @Category(name = "About", desc = "Information about SkyHanni and updates")
+    @Category(name = "About", desc = "Information about SkyHanni and updates.")
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     public GUIConfig gui = new GUIConfig();
 
     @Expose
-    @Category(name = "Chroma", desc = "Settings for Chroma text. (Credit to SBA)")
-    public ChromaConfig chroma = new ChromaConfig();
+    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
     public ChatConfig chat = new ChatConfig();
 
     @Expose
+    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
+    public ChromaConfig chroma = new ChromaConfig();
+
+    @Expose
+    @Category(name = "Combat", desc = "Everything combat and PvE related.")
+    public CombatConfig combat = new CombatConfig();
+
+    @Expose
+    @Category(name = "Commands", desc = "Enable or disable commands.")
+    public CommandsConfig commands = new CommandsConfig();
+
+    @Expose
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
+
+    @Expose
     @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
+
+    @Expose
+    @Category(name = "Events", desc = "Stuff that is not always available.")
+    public EventConfig event = new EventConfig();
+
+    @Expose
+    @Category(name = "Fishing", desc = "Fishing stuff.")
+    public FishingConfig fishing = new FishingConfig();
+
+    @Expose
+    @Category(name = "Garden", desc = "Features for the Garden island.")
+    public GardenConfig garden = new GardenConfig();
 
     @Expose
     @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
@@ -88,48 +122,20 @@ public class Features extends Config {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
-    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
+    @Category(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
+    public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
-    @Category(name = "Minion", desc = "The minions on your private island.")
+    @Category(name = "Minions", desc = "The minions on your private island.")
     public MinionsConfig minions = new MinionsConfig();
-
-    @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
-    public BazaarConfig bazaar = new BazaarConfig();
-
-    @Expose
-    @Category(name = "Fishing", desc = "Fishing stuff.")
-    public FishingConfig fishing = new FishingConfig();
-
-    @Expose
-    @Category(name = "Combat", desc = "Everything combat and PvE related.")
-    public CombatConfig combat = new CombatConfig();
-
-    @Expose
-    @Category(name = "Slayer", desc = "Slayer features.")
-    public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
     @Category(name = "Mining", desc = "Features that help you break blocks.")
     public MiningConfig mining = new MiningConfig();
 
     @Expose
-    @Category(name = "Commands", desc = "Enable or disable commands.")
-    public CommandsConfig commands = new CommandsConfig();
-
-    @Expose
-    @Category(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
-    public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
-
-    @Expose
-    @Category(name = "Events", desc = "Stuff that is not always available.")
-    public EventConfig event = new EventConfig();
-
-    @Expose
-    @Category(name = "Garden", desc = "Features for the Garden island.")
-    public GardenConfig garden = new GardenConfig();
+    @Category(name = "Slayer", desc = "Slayer features.")
+    public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")
@@ -147,6 +153,6 @@ public class Features extends Config {
     public Storage storage = new Storage();
 
     @Expose
-    public int lastVersion = ConfigUpdaterMigrator.INSTANCE.getConfigVersion();
+    public int lastVersion = ConfigUpdaterMigrator.CONFIG_VERSION;
 
 }

@@ -1,14 +1,13 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -92,10 +91,7 @@ class OwnInventoryData {
         val (_, amount) = NEUItems.getMultiplier(internalName)
         if (amount > 1) return
 
-        addMultiplier(internalName, add)
+        ItemAddInInventoryEvent(internalName, add).postAndCatch()
     }
 
-    private fun addMultiplier(internalName: NEUInternalName, amount: Int) {
-        CollectionAPI.addFromInventory(internalName, amount)
-    }
 }
