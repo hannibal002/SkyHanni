@@ -163,7 +163,7 @@ public class FishingConfig {
         public boolean wormLimitAlert = true;
 
         @Expose
-        @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manualy")
+        @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manually")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int manualResetTimer = Keyboard.KEY_NONE;
 
