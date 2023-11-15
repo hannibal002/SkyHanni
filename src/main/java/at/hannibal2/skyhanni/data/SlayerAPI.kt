@@ -28,6 +28,7 @@ object SlayerAPI {
 
     var questStartTime = 0L
     var isInCorrectArea = false
+    var isInAnyArea = false
     var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
     var latestWrongAreaWarning = 0L
@@ -122,9 +123,12 @@ object SlayerAPI {
 
         if (event.isMod(5)) {
             isInCorrectArea = if (LorenzUtils.isStrandedProfile) {
+                isInAnyArea = true
                 true
             } else {
-                getSlayerTypeForCurrentArea() == getActiveSlayer()
+                val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
+                isInAnyArea = slayerTypeForCurrentArea != null
+                slayerTypeForCurrentArea == getActiveSlayer() && slayerTypeForCurrentArea != null
             }
         }
     }

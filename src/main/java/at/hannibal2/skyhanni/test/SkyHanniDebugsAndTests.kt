@@ -322,6 +322,7 @@ class SkyHanniDebugsAndTests {
                     builder.append("Doing slayer!\n")
                     builder.append(" activeSlayer: ${SlayerAPI.getActiveSlayer()}\n")
                     builder.append(" isInCorrectArea: ${SlayerAPI.isInCorrectArea}\n")
+                    builder.append(" isInAnyArea: ${SlayerAPI.isInAnyArea}\n")
                 }
 
             }
