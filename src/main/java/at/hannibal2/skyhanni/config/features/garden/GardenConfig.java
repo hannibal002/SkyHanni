@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features;
+package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.commands.Commands;

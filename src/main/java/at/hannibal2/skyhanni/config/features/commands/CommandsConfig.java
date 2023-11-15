@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features;
+package at.hannibal2.skyhanni.config.features.commands;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;

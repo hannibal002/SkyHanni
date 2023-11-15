@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features;
+package at.hannibal2.skyhanni.config.features.chroma;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features;
+package at.hannibal2.skyhanni.config.features.markedplayer;
 
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
