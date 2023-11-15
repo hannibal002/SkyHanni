@@ -117,9 +117,10 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val stack = event.stack ?: return
+        var finneganContest = false
 
         for (line in stack.getLore()) {
-            val finneganContest = line.contains("Contest boosted by Finnegan!")
+            if (line.contains("Contest boosted by Finnegan!")) finneganContest = true
 
             val color = contestEarnedPattern.matchMatcher(line) { group("medalColour") } ?: continue
             val medalEarned = ContestBracket.entries.find { it.color == color } ?: return
