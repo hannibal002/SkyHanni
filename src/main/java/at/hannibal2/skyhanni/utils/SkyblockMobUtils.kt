@@ -27,7 +27,9 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityChicken
@@ -124,6 +126,7 @@ object SkyblockMobUtils {
         if (baseEntity is EntityBat) return createBat(baseEntity)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
         if (baseEntity is EntityDragon) return SkyblockBossMob(baseEntity, null, baseEntity.name.removeColor(), null)
+        if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return SkyblockProjectileEntity(baseEntity, "Giant Sword") // May false trigger if there is another Dinnerbone Giant
         return null
     }
 
@@ -163,6 +166,8 @@ object SkyblockMobUtils {
                 .matches("^\\d+".toRegex()) -> SkyblockInvalidEntity(
                 baseEntity, "Wierd Sea Guardian Ability"
             )
+
+            baseEntity is EntitySlime && armorStand.name == "§f§lCOLLECT!" && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE -> SkyblockInvalidEntity(baseEntity, "Heavy Pearl") // Change to make Heavy Pearl Highlighter
 
             else -> null
         }
