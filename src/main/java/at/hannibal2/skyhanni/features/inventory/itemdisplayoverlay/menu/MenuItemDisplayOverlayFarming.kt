@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayFarming {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val composterPattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\d]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
+    private val composterPattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -69,6 +69,8 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.COMPOSTER_INSERT_ABBV) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from "))) {
             val lore = item.getLore()
+            //§7Totalling §2§240k Fuel§7.
+            //Totalling 40k Fuel.
             for (line in lore) {
                 composterPattern.matchMatcher(line) {
                     return group("resourceCount")
