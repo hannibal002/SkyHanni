@@ -204,7 +204,7 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
@@ -334,22 +334,29 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
     ) {
-        add(buildList {
-            add(prefix)
-            for (entry in enumValues<T>()) {
-                val display = getName(entry)
-                if (isCurrent(entry)) {
-                    add("§a[$display]")
-                } else {
-                    add("§e[")
-                    add(Renderable.link("§e$display") {
-                        onChange(entry)
-                    })
-                    add("§e]")
-                }
-                add(" ")
+        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit
+    ) = buildList {
+        add(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                add("§a[$display]")
+            } else {
+                add("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                add("§e]")
             }
-        })
+            add(" ")
+        }
     }
 
     inline fun MutableList<List<Any>>.addButton(
@@ -528,5 +535,15 @@ object LorenzUtils {
         TitleManager.sendTitle(text, duration, height)
     }
 
+    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
     fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
+
+    inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
+        val enums = enumValues<T>()
+        return enums.firstOrNull { it.name == name }
+    }
+
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
+        enumValueOfOrNull<T>(name)
+            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 }

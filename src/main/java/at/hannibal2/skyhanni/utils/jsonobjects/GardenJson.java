@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.jsonobjects;
 
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,10 @@ public class GardenJson {
 
     public static class GardenVisitor {
         @Expose
-        public String rarity;
+        public LorenzRarity rarity;
+
+        @Expose
+        public LorenzRarity new_rarity;
 
         @Nullable
         @Expose

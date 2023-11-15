@@ -135,6 +135,15 @@ public class GUIConfig {
 
         @Expose
         @ConfigOption(
+            name = "Show Date Ordinal",
+            desc = "Show the date's ordinal suffix. Ex: (1st <-> 1, 22nd <-> 22, 23rd <-> 3, 24th <-> 24, etc.)"
+        )
+        @ConfigEditorBoolean
+        //@FeatureToggle
+        public boolean includeOrdinal = false;
+
+        @Expose
+        @ConfigOption(
             name = "Refresh Rate",
             desc = "Change the time in seconds you would like to refresh the In-Game Date Display." +
                 "\n§eNOTE: If \"Use Scoreboard for Date\" is enabled, this setting is ignored."
