@@ -156,6 +156,8 @@ object EntityUtils {
             || (this is EntityPlayer && this.name == "Guy ") // Guy NPC (but only as visitor)
             || (this is EntityPlayer && this.name == "§bSam ") // Sam NPC (in Private Island)
             || (this is EntityPlayer && this.name == "BarbarianGuard ") // BarbarianGuard NPCs
+            || (this is EntityPlayer && this.name == "Branchstrutter ") // Those guys in the Trees in the first area in Rift
+
 
     fun EntityLivingBase.isFarmMob() =
         this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND

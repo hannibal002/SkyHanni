@@ -96,13 +96,13 @@ object SkyblockMobUtils {
         noArmorStandMobs(baseEntity)?.also { return it }
 
         val nextEntity = getNextEntity(baseEntity, 1) as? EntityLivingBase
+
+        exceptions(baseEntity, nextEntity)?.also { return if (it is exceptionSkipDetection) null else it }
+
         nextEntity?.let { nextEntity ->
             EntityData.currentSkyblockMobsMap[nextEntity]?.apply { addEntityInFront(baseEntity) }
                 ?.also { return SkyblockInvalidEntity(baseEntity, "Added to $it") }
         }
-
-        if (nextEntity !is EntityArmorStand && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) return SkyblockInvalidEntity(baseEntity, "Minion Mob " + baseEntity.name) // TODO fix to always include Valid Mobs on Private Island
-        exceptions(baseEntity, nextEntity as? EntityArmorStand)?.also { return it }
 
         var caughtSkyblockMob: SkyblockMob? = null
         val extraEntityList =
@@ -140,14 +140,39 @@ object SkyblockMobUtils {
         }
     }
 
-    private val RatSkull =
-        "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
-    private val HellwispTentacleSkull =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private class exceptionSkipDetection(baseEntity: EntityLivingBase) : SkyblockEntity(baseEntity, null) {
+        override val name: String = ""
+    }
 
+    private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): SkyblockEntity? {
+        when (LorenzUtils.skyBlockIsland) {
+            IslandType.PRIVATE_ISLAND -> if (nextEntity !is EntityArmorStand) return SkyblockInvalidEntity(baseEntity, "Minion Mob " + baseEntity.name) // TODO fix to always include Valid Mobs on Private Island
+            IslandType.THE_RIFT -> if (baseEntity is EntitySlime && nextEntity is EntitySlime) return SkyblockInvalidEntity(baseEntity, "Bacte Tentacle")
+            IslandType.CRIMSON_ISLE -> {
+                if (baseEntity is EntitySlime && nextEntity?.name == "§f§lCOLLECT!") return SkyblockInvalidEntity(baseEntity, "Heavy Pearl")
+                if (baseEntity is EntityPig && nextEntity is EntityPig) return SkyblockInvalidEntity(baseEntity, "Matriarch Tongue")
+            }
 
-    private fun exceptions(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?): SkyblockEntity? {
-        if (armorStand == null) return null
+            IslandType.HUB -> {
+                if (baseEntity is EntityZombie) { // Rat
+                    val from = 5
+                    val to = 9
+                    generateSequence(from) { it + 1 }.take(to - from).map { i ->
+                        getArmorStand(
+                            baseEntity, i
+                        )
+                    }.firstOrNull {
+                        it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)
+                            ?.getSkullTexture() == RatSkull
+                    }?.also { return SkyblockSpecialMob(baseEntity, it, "Rat") }
+                    if (nextEntity is EntityZombie) return exceptionSkipDetection(baseEntity)
+                }
+            }
+
+            else -> {}
+        }
+
+        val armorStand = nextEntity as? EntityArmorStand ?: return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
         return when {
             baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> SkyblockInvalidEntity(
@@ -182,9 +207,20 @@ object SkyblockMobUtils {
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
             RatSkull -> return SkyblockSpecialMob(baseEntity, armorStand, "Rat")
             HellwispTentacleSkull -> return SkyblockInvalidEntity(baseEntity, "Hellwisp Tentacle")
+            RiftEyeSkull1 -> return SkyblockInvalidEntity(baseEntity, "Rift Teleport Eye")
+            RiftEyeSkull2 -> return SkyblockInvalidEntity(baseEntity, "Rift Teleport Eye")
         }
         return null
     }
+
+    private val RatSkull =
+        "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
+    private val HellwispTentacleSkull =
+        "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val RiftEyeSkull1 =
+        "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val RiftEyeSkull2 =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
 
     private fun createFarmMobs(baseEntity: EntityLivingBase): SkyblockEntity? = when (baseEntity) {
         is EntityMooshroom -> SkyblockSpecialMob(baseEntity, null, "Farm Mooshroom")

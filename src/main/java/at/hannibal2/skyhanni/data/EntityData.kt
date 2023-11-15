@@ -183,7 +183,7 @@ class EntityData {
     }
 
     private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
-        IslandType.THE_RIFT -> true
+        IslandType.THE_RIFT -> false
         IslandType.PRIVATE_ISLAND_GUEST -> true
         else -> false
     }
