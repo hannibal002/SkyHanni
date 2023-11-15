@@ -91,10 +91,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     NEW_YEAR( // not tested
         {
-            listOf(ScoreboardData.sidebarLines.first { it.contains("§dNew Year Event") })
+            listOf(ScoreboardData.sidebarLines.first { it.startsWith("§dNew Year Event") })
         },
         {
-            ScoreboardData.sidebarLines.any { it.contains("§dNew Year Event") }
+            ScoreboardData.sidebarLines.any { it.startsWith("§dNew Year Event") }
         }
     ),
     ORINGO(
