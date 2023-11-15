@@ -171,7 +171,7 @@ class JacobContestTimeNeeded {
         })
     }
 
-    private fun addBpsTitle() = if (config.jacobContestCustomBps) "Fix Blocks/Second: " else "Your Blocks/Second: "
+    private fun addBpsTitle() = if (config.jacobContestCustomBps) "Custom Blocks/Second: " else "Your Blocks/Second: "
 
     private fun CropType.getBps() = if (config.jacobContestCustomBps) {
         config.jacobContestCustomBpsValue
