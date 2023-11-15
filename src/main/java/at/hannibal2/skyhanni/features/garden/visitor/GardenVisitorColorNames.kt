@@ -16,7 +16,8 @@ object GardenVisitorColorNames {
         visitorColours.clear()
         visitorItems.clear()
         for ((visitor, visitorData) in data.visitors) {
-            visitorColours[visitor] = getColor(visitorData.rarity)
+            val rarity = visitorData.new_rarity ?: visitorData.rarity
+            visitorColours[visitor] = rarity.color.getChatColor()
             visitorItems[visitor] = visitorData.need_items
         }
     }
@@ -27,14 +28,5 @@ object GardenVisitorColorNames {
         val cleanName = name.removeColor()
         val color = visitorColours[cleanName] ?: return name
         return color + cleanName
-    }
-
-    private fun getColor(rarity: String) = when (rarity) {
-        "uncommon" -> "§a"
-        "rare" -> "§9"
-        "legendary" -> "§6"
-        "special" -> "§c"
-
-        else -> throw RuntimeException("Unknown rarity for '$rarity'")
     }
 }

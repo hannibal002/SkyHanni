@@ -89,6 +89,15 @@ object StringUtils {
         }
     }
 
+    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
+        for (pattern in iterator()) {
+            pattern.matchMatcher<T>(text) {
+                return consumer()
+            }
+        }
+        return null
+    }
+
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
         val stringPattern = "§[0123456789abcdef].*".toPattern()
 
