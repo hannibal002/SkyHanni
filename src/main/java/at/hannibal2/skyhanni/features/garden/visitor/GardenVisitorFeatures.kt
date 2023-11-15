@@ -112,9 +112,8 @@ class GardenVisitorFeatures {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): List<List<Any>> {
-        val newDisplay = mutableListOf<List<Any>>()
-        if (!config.needs.display) return newDisplay
+    private fun drawDisplay() = buildList<List<Any>> {
+        if (!config.needs.display) return@buildList
 
         val requiredItems = mutableMapOf<NEUInternalName, Int>()
         val newVisitors = mutableListOf<String>()
@@ -132,7 +131,7 @@ class GardenVisitorFeatures {
         }
         if (requiredItems.isNotEmpty()) {
             var totalPrice = 0.0
-            newDisplay.addAsSingletonList("§7Visitor items needed:")
+            addAsSingletonList("§7Visitor items needed:")
             for ((internalName, amount) in requiredItems) {
                 val name = internalName.getItemName()
                 val itemStack = internalName.getItemStack()
@@ -156,20 +155,20 @@ class GardenVisitorFeatures {
                     list.add(" §7(§6$format§7)")
                 }
 
-                newDisplay.add(list)
+                add(list)
             }
             if (totalPrice > 0) {
                 val format = NumberUtil.format(totalPrice)
-                newDisplay[0] = listOf("§7Visitor items needed: §7(§6$format§7)")
+                this[0] = listOf("§7Visitor items needed: §7(§6$format§7)")
             }
         }
         if (newVisitors.isNotEmpty()) {
             if (requiredItems.isNotEmpty()) {
-                newDisplay.addAsSingletonList("")
+                addAsSingletonList("")
             }
             val amount = newVisitors.size
             val visitorLabel = if (amount == 1) "visitor" else "visitors"
-            newDisplay.addAsSingletonList("§e$amount §7new $visitorLabel:")
+            addAsSingletonList("§e$amount §7new $visitorLabel:")
             for (visitor in newVisitors) {
                 val displayName = GardenVisitorColorNames.getColoredName(visitor)
 
@@ -200,11 +199,9 @@ class GardenVisitorFeatures {
                     }
                 }
 
-                newDisplay.add(list)
+                add(list)
             }
         }
-
-        return newDisplay
     }
 
     @SubscribeEvent
@@ -439,7 +436,8 @@ class GardenVisitorFeatures {
             if (!visitor.inSacks) {
                 val status = visitor.status
                 if (status == VisitorAPI.VisitorStatus.WAITING || status == VisitorAPI.VisitorStatus.READY) {
-                    val newStatus = if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
+                    val newStatus =
+                        if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
                     VisitorAPI.changeStatus(visitor, newStatus, "hasItemsInInventory")
                 }
             }
@@ -571,7 +569,11 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorExperiencePrice", "garden.visitors.inventory.experiencePrice")
         event.move(3, "garden.visitorRewardWarning.notifyInChat", "garden.visitors.rewardWarning.notifyInChat")
         event.move(3, "garden.visitorRewardWarning.showOverName", "garden.visitors.rewardWarning.showOverName")
-        event.move(3, "garden.visitorRewardWarning.preventRefusing", "garden.visitors.rewardWarning.preventRefusing")
+        event.move(
+            3,
+            "garden.visitorRewardWarning.preventRefusing",
+            "garden.visitors.rewardWarning.preventRefusing"
+        )
         event.move(3, "garden.visitorRewardWarning.bypassKey", "garden.visitors.rewardWarning.bypassKey")
         event.move(3, "garden.visitorRewardWarning.drops", "garden.visitors.rewardWarning.drops")
         event.move(3, "garden.visitorNotificationChat", "garden.visitors.notificationChat")
