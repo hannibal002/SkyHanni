@@ -23,7 +23,7 @@ class WrongFungiCutterWarning {
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
             mode = FungiMode.RED
         }
-        if (message == "§eFungi Cutter Mode: §r§cBrown Mushrooms") {
+        if (message == "§eFungi Cutter Mode: §r§6Brown Mushrooms") {
             mode = FungiMode.BROWN
         }
     }
@@ -62,12 +62,13 @@ class WrongFungiCutterWarning {
     }
 
     private fun readItem(item: ItemStack) {
+        // TODO Update to use NBT data: fungi_cutter_mode: "BROWN"
         for (line in item.getLore()) {
             if (line == "§eMode: §cRed Mushrooms") {
                 mode = FungiMode.RED
             }
 
-            if (line == "§eMode: §cBrown Mushrooms") {
+            if (line == "§eMode: §6Brown Mushrooms") {
                 mode = FungiMode.BROWN
             }
         }
