@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -116,31 +117,29 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val stack = event.stack ?: return
-        var finneganContest = false
 
         for (line in stack.getLore()) {
-            if (line.contains("Contest boosted by Finnegan!")) finneganContest = true
+            val finneganContest = line.contains("Contest boosted by Finnegan!")
 
-            val matcher = contestEarnedPattern.matcher(line)
-            if (matcher.matches()) {
-                val medalEarned = ContestBracket.entries.find { it.color == matcher.group("medalColour") } ?: return
+            val color = contestEarnedPattern.matchMatcher(line) { group("medalColour") } ?: continue
+            val medalEarned = ContestBracket.entries.find { it.color == color } ?: return
 
-                var stackTip = "§${medalEarned.color}✦"
-                var x = event.x + 9
-                var y = event.y + 1
-                var scale = .7f
+            var stackTip = "§${medalEarned.color}✦"
+            var x = event.x + 9
+            var y = event.y + 1
+            var scale = .7f
 
-                if (finneganContest && config.finneganIcon) {
-                    stackTip = "§${medalEarned.color}▲"
-                    x = event.x + 5
-                    y = event.y - 2
-                    scale = 1.3f
-                }
-
-                event.drawSlotText(x, y, stackTip, scale)
+            if (finneganContest && config.finneganIcon) {
+                stackTip = "§${medalEarned.color}▲"
+                x = event.x + 5
+                y = event.y - 2
+                scale = 1.3f
             }
+
+            event.drawSlotText(x, y, stackTip, scale)
         }
     }
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.jacobFarmingContestHighlightRewards", "inventory.jacobFarmingContests.highlightRewards")
