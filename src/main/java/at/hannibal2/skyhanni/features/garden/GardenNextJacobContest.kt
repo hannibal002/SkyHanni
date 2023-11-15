@@ -44,7 +44,7 @@ object GardenNextJacobContest {
     private var inCalendar = false
     private val patternDay = "§aDay (?<day>.*)".toPattern()
     private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§e○ §7(?<crop>.*)".toPattern()
+    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
 
     private const val maxContestsPerYear = 124
     private const val contestDuration = 1_000 * 60 * 20
@@ -146,17 +146,13 @@ object GardenNextJacobContest {
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
             val name = item.name ?: continue
-            val matcherDay = patternDay.matcher(name)
-            if (!matcherDay.matches()) continue
+            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
 
-            val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                val matcherCrop = patternCrop.matcher(line)
-                if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByName(matcherCrop.group("crop")))
+                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
