@@ -93,14 +93,25 @@ object SkyblockMobUtils {
     fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
         noArmorStandMobs(baseEntity)?.also { return it }
 
-        val nextEntity = getNextEntity(baseEntity, 1)
+        val nextEntity = getNextEntity(baseEntity, 1) as? EntityLivingBase
+        nextEntity?.let { nextEntity ->
+            EntityData.currentSkyblockMobsMap[nextEntity]?.apply { addEntityInFront(baseEntity) }
+                ?.also { return SkyblockInvalidEntity(baseEntity, "Added to $it") }
+        }
+
         if (nextEntity !is EntityArmorStand && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) return SkyblockInvalidEntity(baseEntity, "Minion Mob " + baseEntity.name) // TODO fix to always include Valid Mobs on Private Island
         exceptions(baseEntity, nextEntity as? EntityArmorStand)?.also { return it }
 
+        var caughtSkyblockMob: SkyblockMob? = null
         val extraEntityList =
-            generateSequence(nextEntity as? EntityLivingBase) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive {
-                !(it is EntityArmorStand && !it.isDefaultValue())
+            generateSequence(nextEntity) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
+                !(entity is EntityArmorStand && !entity.isDefaultValue()) && EntityData.currentSkyblockMobsMap[entity]?.also {
+                    caughtSkyblockMob = it
+                }?.run { false } ?: true
             }.toList()
+
+        caughtSkyblockMob?.apply { addEntityInFront(extraEntityList.dropLast(1)) }
+            ?.also { return SkyblockInvalidEntity(baseEntity, "Added to $it") }
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return null
 
         if (armorStand.isDefaultValue()) return null
@@ -223,14 +234,13 @@ object SkyblockMobUtils {
     fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<SkyblockMob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        val possibleEntitys = EntityData.currentSkyblockMobs.filter {
-            it.baseEntity.entityBoundingBox.rayIntersects(
+        val possibleEntitys = EntityData.currentSkyblockMobsMap.filterKeys {
+            it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
                 pos, look
             )
         }
         if (possibleEntitys.isEmpty()) return null
-        possibleEntitys.sortedBy { it.baseEntity.distanceTo(pos) }
-        return possibleEntitys
+        return possibleEntitys.toList().sortedBy { it.first.distanceTo(pos) }.map { it.second }
     }
 
 }

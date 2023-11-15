@@ -11,7 +11,7 @@ import net.minecraft.entity.item.EntityArmorStand
 open class SkyblockBossMob(
     baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, override val name: String,
     extraEntities: List<EntityLivingBase>?,
-) : SkyblockMob(baseEntity, armorStand, extraEntities) {
+) : SkyblockMob(baseEntity, armorStand, extraEntities?.toMutableList()) {
     init {
         LorenzDebug.log("BossName: '$name' , Colorless: '${armorStand?.name?.removeColor()}' , Raw: '${armorStand?.name}'")
     }

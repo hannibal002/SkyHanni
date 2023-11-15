@@ -36,4 +36,4 @@ abstract class SkyblockEntity(val baseEntity: EntityLivingBase, open val armorSt
     fun canBeSeen() = baseEntity.canBeSeen()
 }
 
-inline fun <reified T : SkyblockEntity> T.toHashPair(): Pair<Int, T> = Pair(this.hashCode(), this)
+inline fun <reified T : SkyblockEntity> T.toPair(): Pair<EntityLivingBase, T> = Pair(this.baseEntity, this)

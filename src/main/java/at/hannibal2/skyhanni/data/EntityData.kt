@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
-import at.hannibal2.skyhanni.data.skyblockentities.toHashPair
+import at.hannibal2.skyhanni.data.skyblockentities.toPair
 import at.hannibal2.skyhanni.events.EntityDisplayNPCDeSpawnEvent
 import at.hannibal2.skyhanni.events.EntityDisplayNPCSpawnEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
@@ -83,9 +83,9 @@ class EntityData {
         maxHealthMap.clear()
 
         // Only Backup normally this should do nothing
-        _currentSkyblockMobs.clear()
-        _currentDisplayNPCs.clear()
-        _currentRealPlayers.clear()
+        currentSkyblockMobs.clear()
+        currentDisplayNPCs.clear()
+        currentRealPlayers.clear()
     }
 
     @SubscribeEvent
@@ -128,15 +128,13 @@ class EntityData {
 
     companion object {
 
-        val currentSkyblockMobs get() = _currentSkyblockMobs.values.toList()
-        val currentDisplayNPCs get() = _currentDisplayNPCs.values.toList()
-        val currentRealPlayers get() = _currentRealPlayers.toList()
-        val currentSummoningMobs get() = _currentSummoningMobs.values.toList()
-
-        private val _currentSkyblockMobs = mutableMapOf<Int, SkyblockMob>()
-        private val _currentDisplayNPCs = mutableMapOf<Int, DisplayNPC>()
-        private val _currentRealPlayers = mutableSetOf<EntityPlayer>()
-        private val _currentSummoningMobs = mutableMapOf<Int, SummoningMob>()
+        val currentRealPlayers = mutableSetOf<EntityPlayer>()
+        val currentSkyblockMobs = mutableSetOf<SkyblockMob>()
+        val currentDisplayNPCs get() = currentDisplayNPCsMap.values
+        val currentSummoningMobs get() = currentSummoningMobsMap.values
+        val currentSkyblockMobsMap = mutableMapOf<EntityLivingBase, SkyblockMob>()
+        val currentDisplayNPCsMap = mutableMapOf<EntityLivingBase, DisplayNPC>()
+        val currentSummoningMobsMap = mutableMapOf<EntityLivingBase, SummoningMob>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
@@ -197,8 +195,8 @@ class EntityData {
             entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
             entity.isSkyBlockMob() -> {
                 if (islandException()) return
-                _currentSummoningMobs[entity.hashCode()]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
-                    ?: _currentSkyblockMobs[entity.hashCode()]?.let {
+                currentSummoningMobsMap[entity]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
+                    ?: currentSkyblockMobsMap[entity]?.let {
                         if (it.isInRender()) {
                             SkyblockMobDeathEvent(it).postAndCatch()
                         } else {
@@ -260,44 +258,51 @@ class EntityData {
 
     @SubscribeEvent
     fun onSkyblockMobSpawnEvent(event: SkyblockMobSpawnEvent) {
-        _currentSkyblockMobs.put(event.entity.toHashPair())
+        currentSkyblockMobs.add(event.entity)
+        currentSkyblockMobsMap.put(event.entity.toPair())
+        event.entity.extraEntities?.filter { it !is EntityArmorStand }?.map { it to event.entity }
+            ?.also { currentSkyblockMobsMap.putAll(it) }
         addEntityName(event.entity)
     }
 
     @SubscribeEvent
     fun onSkyblockMobDeSpawnEvent(event: SkyblockMobDeSpawnEvent) {
-        _currentSkyblockMobs.remove(event.entity.hashCode())
+        val entity = event.entity
+        entity.extraEntities?.forEach { currentSkyblockMobsMap.remove(it);currentEntityLiving.remove(it) }
+        currentSkyblockMobsMap.remove(entity.baseEntity)
+        currentSkyblockMobs.remove(entity)
+
     }
 
     @SubscribeEvent
     fun onEntityDisplayNPCSpawnEvent(event: EntityDisplayNPCSpawnEvent) {
-        _currentDisplayNPCs.put(event.entity.toHashPair())
+        currentDisplayNPCsMap.put(event.entity.toPair())
         addEntityName(event.entity)
     }
 
     @SubscribeEvent
     fun onEntityDisplayNPCSpawnDeEvent(event: EntityDisplayNPCDeSpawnEvent) {
-        _currentDisplayNPCs.remove(event.entity.hashCode())
+        currentDisplayNPCsMap.remove(event.entity.baseEntity)
     }
 
     @SubscribeEvent
     fun onEntityRealPlayerSpawnEvent(event: EntityRealPlayerSpawnEvent) {
-        _currentRealPlayers.add(event.entity)
+        currentRealPlayers.add(event.entity)
     }
 
     @SubscribeEvent
     fun onEntityRealPlayerDeSpawnEvent(event: EntityRealPlayerDeSpawnEvent) {
-        _currentRealPlayers.remove(event.entity)
+        currentRealPlayers.remove(event.entity)
     }
 
     @SubscribeEvent
     fun onEntitySummonSpawnEvent(event: EntitySummoningSpawnEvent) {
-        _currentSummoningMobs.put(event.entity.toHashPair())
+        currentSummoningMobsMap.put(event.entity.toPair())
     }
 
     @SubscribeEvent
     fun onEntitySummonDeSpawnEvent(event: EntitySummoningDeSpawnEvent) {
-        _currentSummoningMobs.remove(event.entity.hashCode())
+        currentSummoningMobsMap.remove(event.entity.baseEntity)
     }
 
     @SubscribeEvent
