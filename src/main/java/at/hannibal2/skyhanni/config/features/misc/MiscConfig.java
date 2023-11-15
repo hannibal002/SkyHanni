@@ -15,8 +15,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class MiscConfig {
 
     @Expose
-    @ConfigOption(name = "Pet", desc = "")
-    @Accordion
+    @Category(name = "Pets", desc = "")
     public PetConfig pets = new PetConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
@@ -65,8 +64,7 @@ public class MiscConfig {
     public QuickModMenuSwitchConfig quickModMenuSwitch = new QuickModMenuSwitchConfig();
 
     @Expose
-    @ConfigOption(name = "Cosmetic", desc = "")
-    @Accordion
+    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
     public CosmeticConfig cosmetic = new CosmeticConfig();
 
 
@@ -81,7 +79,7 @@ public class MiscConfig {
     public HighlightPartyMembersConfig highlightPartyMembers = new HighlightPartyMembersConfig();
 
     @Expose
-    @ConfigOption(name = "Compact Tab List", desc = "")
+    @Category(name = "Compact Tab List", desc = "")
     @Accordion
     public CompactTabListConfig compactTabList = new CompactTabListConfig();
 

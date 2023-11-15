@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedCon
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
@@ -20,8 +21,7 @@ public class GardenConfig {
     public SkyMartConfig skyMart = new SkyMartConfig();
 
     @Expose
-    @ConfigOption(name = "Visitor", desc = "")
-    @Accordion
+    @Category(name = "Visitor", desc = "")
     public VisitorConfig visitors = new VisitorConfig();
 
     @Expose
@@ -30,8 +30,7 @@ public class GardenConfig {
     public NumbersConfig number = new NumbersConfig();
 
     @Expose
-    @ConfigOption(name = "Crop Milestones", desc = "")
-    @Accordion
+    @Category(name = "Crop Milestones", desc = "")
     public CropMilestonesConfig cropMilestones = new CropMilestonesConfig();
 
     // TODO moulconfig runnable support
@@ -41,8 +40,7 @@ public class GardenConfig {
     public KeyBindConfig keyBind = new KeyBindConfig();
 
     @Expose
-    @ConfigOption(name = "Optimal Speed", desc = "")
-    @Accordion
+    @Category(name = "Optimal Speed", desc = "")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
 
     @Expose
@@ -82,8 +80,7 @@ public class GardenConfig {
     public AnitaShopConfig anitaShop = new AnitaShopConfig();
 
     @Expose
-    @ConfigOption(name = "Composter", desc = "")
-    @Accordion
+    @Category(name = "Composter", desc = "Composter")
     public ComposterConfig composters = new ComposterConfig();
 
     @Expose

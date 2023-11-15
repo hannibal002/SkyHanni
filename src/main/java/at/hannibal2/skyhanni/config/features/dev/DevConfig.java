@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dev;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -39,8 +40,7 @@ public class DevConfig {
     public Position debugLocationPos = new Position(1, 160, false, true);
 
     @Expose
-    @ConfigOption(name = "Minecraft Console", desc = "")
-    @Accordion
+    @Category(name = "Minecraft Console", desc = "")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
 }

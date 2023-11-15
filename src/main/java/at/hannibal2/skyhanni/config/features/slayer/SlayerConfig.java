@@ -6,25 +6,23 @@ import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig;
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class SlayerConfig {
 
     @Expose
-    @ConfigOption(name = "Enderman Slayer Features", desc = "")
+    @Category(name = "Endermen", desc = "Endermen Slayer Feature")
     @Accordion
     public EndermanConfig endermen = new EndermanConfig();
 
-
     @Expose
-    @ConfigOption(name = "Blaze", desc = "")
-    @Accordion
+    @Category(name = "Blaze", desc = "Blaze Slayer Features")
     public BlazeConfig blazes = new BlazeConfig();
 
     @Expose
-    @ConfigOption(name = "Vampire Slayer Features", desc = "")
-    @Accordion
+    @Category(name = "Vampire", desc = "Vampire Slayer Features")
     public VampireConfig vampire = new VampireConfig();
 
     @Expose

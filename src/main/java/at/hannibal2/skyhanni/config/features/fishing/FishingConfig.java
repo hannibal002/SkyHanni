@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class FishingConfig {
 
     @Expose
-    @ConfigOption(name = "Trophy Fishing", desc = "")
-    @Accordion
+    @Category(name = "Trophy Fishing", desc = "Trophy Fishing Settings")
     public TrophyFishingConfig trophyFishing = new TrophyFishingConfig();
 
     @Expose

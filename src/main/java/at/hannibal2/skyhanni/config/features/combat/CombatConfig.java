@@ -5,19 +5,18 @@ import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndica
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class CombatConfig {
 
     @Expose
-    @ConfigOption(name = "Damage Indicator", desc = "")
-    @Accordion
+    @Category(name = "Damage Indicator", desc = "Damage Indicator settings")
     public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
-    @ConfigOption(name = "Ghost Counter", desc = "")
-    @Accordion
+    @Category(name = "Ghost Counter", desc = "Ghost counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.rift.area.RiftAreasConfig;
 import at.hannibal2.skyhanni.config.features.rift.motes.MotesConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
@@ -25,14 +26,12 @@ public class RiftConfig {
     @Expose
     public EnigmaSoulConfig enigmaSoulWaypoints = new EnigmaSoulConfig();
 
-    @ConfigOption(name = "Rift Areas", desc = "")
-    @Accordion
+    @Category(name = "Rift Areas", desc = "")
     @Expose
     public RiftAreasConfig area = new RiftAreasConfig();
 
     @Expose
-    @ConfigOption(name = "Motes Sell Price", desc = "")
-    @Accordion
+    @Category(name = "Motes", desc = "Motes Sell Price")
     public MotesConfig motes = new MotesConfig();
 
     @Expose

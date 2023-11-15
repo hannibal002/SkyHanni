@@ -5,22 +5,20 @@ import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class EventConfig {
 
-    @ConfigOption(name = "Monthly Bingo", desc = "")
-    @Accordion
+    @Category(name = "Bingo", desc = "Monthly Bingo Event settings")
     @Expose
     public BingoConfig bingo = new BingoConfig();
 
-    @ConfigOption(name = "Diana's Mythological Burrows", desc = "")
-    @Accordion
+    @Category(name = "Diana", desc = "Diana's Mythological Burrows")
     @Expose
     public DianaConfig diana = new DianaConfig();
 
-    @ConfigOption(name = "Winter Season on Jerry's Island", desc = "")
-    @Accordion
+    @Category(name = "Winter", desc = "Winter Season on Jerry's Island")
     @Expose
     public WinterConfig winter = new WinterConfig();
 

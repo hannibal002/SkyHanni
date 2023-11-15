@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.rift.area.westvillage.WestVillageCo
 import at.hannibal2.skyhanni.config.features.rift.area.wyldwoods.WyldWoodsConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class RiftAreasConfig {

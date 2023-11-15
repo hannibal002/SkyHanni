@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class CrimsonIsleConfig {
 
-    @ConfigOption(name = "Ashfang", desc = "")
-    @Accordion
+    @Category(name = "Ashfang", desc = "Ashfang settings")
     @Expose
     public AshfangConfig ashfang = new AshfangConfig();
 
