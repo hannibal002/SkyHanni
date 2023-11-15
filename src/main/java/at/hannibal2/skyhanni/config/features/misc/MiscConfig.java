@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
+import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
@@ -26,265 +26,30 @@ public class MiscConfig {
     @Accordion
     public PetConfig pets = new PetConfig();
 
-    public static class PetConfig {
-        @Expose
-        @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean display = false;
-
-        @Expose
-        @ConfigOption(name = "Pet Experience Tooltip", desc = "")
-        @Accordion
-        public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
-
-        public static class PetExperienceToolTipConfig {
-
-            @Expose
-            @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing shift key.")
-            @ConfigEditorBoolean
-            @FeatureToggle
-            public boolean petDisplay = true;
-
-            @Expose
-            @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
-            @ConfigEditorBoolean
-            public boolean showAlways = false;
-
-            @Expose
-            @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
-            @ConfigEditorBoolean
-            public boolean showGoldenDragonEgg = true;
-
-        }
-    }
-
-    @Expose
-    public Position petDisplayPos = new Position(-330, -15, false, true);
-
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    public HideArmor hideArmor2 = new HideArmor();
-
-    public static class HideArmor {
-
-        @Expose
-        @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
-        @ConfigEditorDropdown(values = {"All", "Own Armor", "Other's Armor", "Off"})
-        public int mode = 3;
-
-        @Expose
-        @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
-        @ConfigEditorBoolean()
-        public Boolean onlyHelmet = false;
-
-    }
+    public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
     @ConfigOption(name = "Potion Effects", desc = "")
     @Accordion
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
 
-    public static class PotionEffectsConfig {
-        @Expose
-        @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean nonGodPotEffectDisplay = false;
-
-        @Expose
-        @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean nonGodPotEffectShowMixins = false;
-
-        @Expose
-        public Position nonGodPotEffectPos = new Position(10, 10, false, true);
-    }
-
     @Expose
     @ConfigOption(name = "Particle Hider", desc = "")
     @Accordion
     public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
-
-    public static class ParticleHiderConfig {
-        @Expose
-        @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideBlazeParticles = false;
-
-        @Expose
-        @ConfigOption(name = "Enderman Particles", desc = "Hide Enderman particles.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideEndermanParticles = false;
-
-        @Expose
-        @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideFireballParticles = true;
-
-        @Expose
-        @ConfigOption(name = "Fire Particles", desc = "Hide particles from the fire block.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideFireBlockParticles = true;
-
-        @Expose
-        @ConfigOption(name = "Smoke Particles", desc = "Hide smoke particles.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideSmokeParticles = false;
-
-        @Expose
-        @ConfigOption(name = "Far Particles", desc = "Hide particles that are more than 40 blocks away.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideFarParticles = true;
-
-        @Expose
-        @ConfigOption(name = "Close Redstone Particles", desc = "Hide Redstone particles around the player (appear for some potion effects).")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean hideCloseRedstoneParticles = true;
-    }
 
     @Expose
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
     @Accordion
     public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
 
-    public static class EstimatedItemValueConfig {
-        @Expose
-        @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
-        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-        public int hotkey = Keyboard.KEY_NONE;
-
-        @Expose
-        @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
-        @ConfigEditorBoolean
-        public boolean alwaysEnabled = true;
-
-        @Expose
-        @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
-        @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 30,
-            minStep = 1
-        )
-        public Property<Integer> enchantmentsCap = Property.of(7);
-
-        @Expose
-        @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
-        @ConfigEditorBoolean
-        public boolean exactPrice = false;
-
-        @Expose
-        @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean armor = true;
-
-        @Expose
-        public Position itemPriceDataPos = new Position(140, 90, false, true);
-    }
-
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
     @Expose
-    public DiscordRPC discordRPC = new DiscordRPC();
-
-    public static class DiscordRPC {
-
-        @Expose
-        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your SkyBlock session displayed through Discord.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public Property<Boolean> enabled = Property.of(false);
-
-        @Expose
-        @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
-        @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "SkyBlock Date",
-            "Profile",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
-        })
-        public Property<Integer> firstLine = Property.of(0);
-
-        @Expose
-        @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
-        @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "SkyBlock Date",
-            "Profile",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
-        })
-        public Property<Integer> secondLine = Property.of(0);
-
-        @Expose
-        @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
-        @ConfigEditorText
-        public Property<String> customText = Property.of("");
-
-        @Expose
-        @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
-        @ConfigEditorDraggableList(
-            exampleText = {
-                "Crop Milestones",
-                "Slayer",
-                "Stacking Enchantment",
-                "Dungeon",
-                "AFK Indicator"
-            }
-        )
-        public List<Integer> autoPriority = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
-
-        @Expose
-        @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
-        @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "SkyBlock Date",
-            "Profile",
-            "Slayer",
-            "Custom",
-            "Crop Milestone",
-            "Current Pet"
-        })
-        public Property<Integer> auto = Property.of(0);
-    }
+    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
 
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
@@ -589,128 +354,15 @@ public class MiscConfig {
 
     }
 
-
     @Expose
     @ConfigOption(name = "Compact Tab List", desc = "")
     @Accordion
     public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
-    public static class CompactTabListConfig {
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Compacts the tablist to make it look much nicer like SBA did. Also " +
-            "doesn't break god-pot detection and shortens some other lines.")
-        //made tablist one word here so both searches will pick it up
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist.")
-        @ConfigEditorBoolean
-        public boolean hideAdverts = false;
-
-        @Expose
-        @ConfigOption(name = "Advanced Player List", desc = "")
-        @Accordion
-        public AdvancedPlayerList advancedPlayerList = new AdvancedPlayerList();
-
-        public static class AdvancedPlayerList {
-
-            @Expose
-            @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
-            @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
-            public int playerSortOrder = 0;
-
-            @Expose
-            @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
-            @ConfigEditorBoolean
-            public boolean reverseSort = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons/skins of player in the tab list.")
-            @ConfigEditorBoolean
-            public boolean hidePlayerIcons = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
-            @ConfigEditorBoolean
-            public boolean hideRankColor = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Emblems", desc = "Hide the emblems behind the player name.")
-            @ConfigEditorBoolean
-            public boolean hideEmblem = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Level", desc = "Hide the SkyBlock level numbers.")
-            @ConfigEditorBoolean
-            public boolean hideLevel = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
-            @ConfigEditorBoolean
-            public boolean hideLevelBrackets = false;
-
-            @Expose
-            @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
-            @ConfigEditorBoolean
-            public boolean useLevelColorForName = false;
-
-            @Expose
-            @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familar with bingo.")
-            @ConfigEditorBoolean
-            public boolean showBingoRankNumber = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Factions", desc = "Hide the icon of the Crimson Isle Faction in the tab list.")
-            @ConfigEditorBoolean
-            public boolean hideFactions = false;
-
-            @Expose
-            @ConfigOption(name = "Mark Special Persons", desc = "Show speical icons behind the name of guild members, party members, friends, and marked players.")
-            @ConfigEditorBoolean
-            public boolean markSpecialPersons = false;
-
-            @Expose
-            @ConfigOption(
-                name = "Mark SkyHanni Devs",
-                desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
-                    "§eThose are the folks that coded the mod for you for free :)"
-            )
-            @ConfigEditorBoolean
-            public boolean markSkyHanniContributors = false;
-        }
-    }
-
     @Expose
     @ConfigOption(name = "Kick Duration", desc = "")
     @Accordion
     public KickDurationConfig kickDuration = new KickDurationConfig();
-
-    public static class KickDurationConfig {
-
-        @Expose
-        @ConfigOption(
-            name = "Enabled",
-            desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock (" +
-                "useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
-        )
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = true;
-
-        @Expose
-        @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
-        @ConfigEditorSlider(
-            minValue = 5,
-            maxValue = 300,
-            minStep = 1
-        )
-        public Property<Integer> warnTime = Property.of(60);
-
-        @Expose
-        public Position position = new Position(400, 200, 1.3f);
-    }
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
