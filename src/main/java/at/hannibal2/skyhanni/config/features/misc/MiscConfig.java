@@ -3,20 +3,14 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
+import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MiscConfig {
 
@@ -53,305 +47,38 @@ public class MiscConfig {
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
     @Expose
-    public TrevorTheTrapper trevorTheTrapper = new TrevorTheTrapper();
-
-    public static class TrevorTheTrapper {
-
-        @Expose
-        @ConfigOption(
-            name = "Enable Data Tracker",
-            desc = "Tracks all of your data from doing Trevor Quests.\n" +
-                "Shows based on the setting below."
-        )
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean dataTracker = true;
-
-        @Expose
-        @ConfigOption(
-            name = "Show Between Quests",
-            desc = "Shows the tracker during and between quests otherwise it will only show during them." +
-                "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
-        )
-        @ConfigEditorBoolean
-        public boolean displayType = true;
-
-        @Expose
-        @ConfigOption(
-            name = "Text Format",
-            desc = "Drag text to change the appearance of the overlay."
-        )
-        @ConfigEditorDraggableList(
-            exampleText = {
-                "§b§lTrevor Data Tracker",
-                "§b1,428 §9Quests Started",
-                "§b11,281 §5Total Pelts Gained",
-                "§b2,448 §5Pelts Per Hour",
-                "",
-                "§b850 §cKilled Animals",
-                "§b153 §cSelf Killing Animals",
-                "§b788 §fTrackable Animals",
-                "§b239 §aUntrackable Animals",
-                "§b115 §9Undetected Animals",
-                "§b73 §5Endangered Animals",
-                "§b12 §6Elusive Animals"
-            }
-        )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11));
-
-        @Expose
-        public Position position = new Position(10, 80, false, true);
-
-        @Expose
-        @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
-            "§cWill not help you to find rabbits or sheep in the Oasis!")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean trapperSolver = true;
-
-        @Expose
-        @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
-        @ConfigEditorBoolean
-        public boolean trapperMobDiedMessage = true;
-
-        @Expose
-        @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den. Works only inside the Farming Islands.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean warpToTrapper = false;
-
-        @Expose
-        @ConfigOption(name = "Accept Trapper Quest", desc = "Click this key after the chat prompt to accept Trevor's quest.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean acceptQuest = false;
-
-        @Expose
-        @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
-            "§eRequires the relevant above settings to be toggled")
-        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-        public int keyBindWarpTrapper = Keyboard.KEY_NONE;
-
-
-        @Expose
-        @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean trapperTalkCooldown = true;
-
-        @Expose
-        @ConfigOption(
-            name = "Trapper Cooldown GUI",
-            desc = "Show the cooldown on screen in an overlay (intended for Abiphone users)."
-        )
-        @ConfigEditorBoolean
-        public boolean trapperCooldownGui = false;
-
-        @Expose
-        public Position trapperCooldownPos = new Position(10, 10, false, true);
-    }
+    public TrevorTheTrapperConfig trevorTheTrapper = new TrevorTheTrapperConfig();
 
     @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
     @Accordion
     @Expose
-    public TeleportPad teleportPad = new TeleportPad();
-
-    public static class TeleportPad {
-
-        @Expose
-        @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean compactName = false;
-
-        @Expose
-        @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean inventoryNumbers = false;
-    }
+    public TeleportPadConfig teleportPad = new TeleportPadConfig();
 
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
     @Expose
-    public PocketSackInASack pocketSackInASack = new PocketSackInASack();
-
-    public static class PocketSackInASack {
-
-        @Expose
-        @ConfigOption(name = "Show in Overlay", desc = "Show the number of Pocket Sack-In-A-Sack applied on a sack icon as an overlay.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean showOverlay = false;
-
-        @Expose
-        @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean replaceLore = true;
-    }
+    public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
     @Accordion
     @Expose
-    public QuickModMenuSwitch quickModMenuSwitch = new QuickModMenuSwitch();
-
-    public static class QuickModMenuSwitch {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to quickly switch between different mod menus.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Inside Escape Menu", desc = "Show the mod list while inside the Escape menu.")
-        @ConfigEditorBoolean
-        public boolean insideEscapeMenu = true;
-
-        @Expose
-        @ConfigOption(name = "Inside Inventory", desc = "Show the mod list while inside the player inventory (no chest inventory).")
-        @ConfigEditorBoolean
-        public boolean insidePlayerInventory = false;
-
-        @Expose
-        public Position pos = new Position(-178, 143, false, true);
-    }
+    public QuickModMenuSwitchConfig quickModMenuSwitch = new QuickModMenuSwitchConfig();
 
     @Expose
     @ConfigOption(name = "Cosmetic", desc = "")
     @Accordion
-    public CosmeticConfig cosmeticConfig = new CosmeticConfig();
-
-    public static class CosmeticConfig {
-
-        @Expose
-        @ConfigOption(name = "Following Line", desc = "")
-        @Accordion
-        public FollowingLineConfig followingLineConfig = new FollowingLineConfig();
-
-        public static class FollowingLineConfig {
-
-            @Expose
-            @ConfigOption(name = "Enabled", desc = "Draw a colored line behind the player.")
-            @ConfigEditorBoolean
-            @FeatureToggle
-            public boolean enabled = false;
-
-            @Expose
-            @ConfigOption(name = "Line Color", desc = "Color of the line.")
-            @ConfigEditorColour
-            public String lineColor = "0:255:255:255:255";
-
-            @Expose
-            @ConfigOption(name = "Time Alive", desc = "Time in seconds until the line fades out.")
-            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 30)
-            public int secondsAlive = 3;
-
-            @Expose
-            @ConfigOption(name = "Max Line Width", desc = "Max width of the line.")
-            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
-            public int lineWidth = 4;
-
-            @Expose
-            @ConfigOption(name = "Behind Blocks", desc = "Show behind blocks.")
-            @ConfigEditorBoolean
-            public boolean behindBlocks = false;
-        }
-
-        @Expose
-        @ConfigOption(name = "Arrow Trail", desc = "")
-        @Accordion
-        public ArrowTrailConfig arrowTrailConfig = new ArrowTrailConfig();
-
-        public static class ArrowTrailConfig {
-            @Expose
-            @ConfigOption(name = "Enabled", desc = "Draw a colored line behind arrows in the air.")
-            @ConfigEditorBoolean
-            @FeatureToggle
-            public boolean enabled = false;
-
-            @Expose
-            @ConfigOption(name = "Hide Nonplayer Arrows", desc = "Only shows for arrows the player has shot.")
-            @ConfigEditorBoolean
-            public boolean hideOtherArrows = true;
-
-            @Expose
-            @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
-            @ConfigEditorColour
-            public String arrowColor = "0:200:85:255:85";
-
-            @Expose
-            @ConfigOption(name = "Player Arrows", desc = "Different color for the line of arrows that you have shot.")
-            @ConfigEditorBoolean
-            public boolean handlePlayerArrowsDifferently = false;
-
-            @Expose
-            @ConfigOption(name = "Player Arrow Color", desc = "Color of the line of your own arrows.")
-            @ConfigEditorColour
-            public String playerArrowColor = "0:200:85:255:255";
-
-            @Expose
-            @ConfigOption(name = "Time Alive", desc = "Time in seconds until the trail fades out.")
-            @ConfigEditorSlider(minStep = 0.1f, minValue = 0.1f, maxValue = 10)
-            public float secondsAlive = 0.5f;
-
-            @Expose
-            @ConfigOption(name = "Line Width", desc = "Width of the line.")
-            @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
-            public int lineWidth = 4;
-        }
-    }
+    public CosmeticConfig cosmetic = new CosmeticConfig();
 
 
     @Expose
     @ConfigOption(name = "Glowing Dropped Items", desc = "")
     @Accordion
-    public GlowingDroppedItems glowingDroppedItems = new GlowingDroppedItems();
-
-    public static class GlowingDroppedItems {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around all dropped items on the ground.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Highlight Showcase Items", desc = "Draws a glowing outline around showcase items.")
-        @ConfigEditorBoolean
-        public boolean highlightShowcase = false;
-
-        @Expose
-        @ConfigOption(name = "Highlight Fishing Bait", desc = "Draws a glowing outline around fishing bait.")
-        @ConfigEditorBoolean
-        public boolean highlightFishingBait = false;
-
-    }
-
+    public GlowingDroppedItemsConfig glowingDroppedItems = new GlowingDroppedItemsConfig();
 
     @Expose
     @ConfigOption(name = "Highlight Party Members", desc = "")
     @Accordion
-    public HighlightPartyMembers highlightPartyMembers = new HighlightPartyMembers();
-
-    public static class HighlightPartyMembers {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Marking party members with a bright outline to better find them in the world.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(
-            name = "Outline Color",
-            desc = "The color to outline party members in."
-        )
-        @ConfigEditorColour
-        public String outlineColor = "0:245:85:255:85";
-
-    }
+    public HighlightPartyMembersConfig highlightPartyMembers = new HighlightPartyMembersConfig();
 
     @Expose
     @ConfigOption(name = "Compact Tab List", desc = "")
