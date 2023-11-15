@@ -67,14 +67,15 @@ class MenuItemDisplayOverlayMining {
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
                 if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
                 if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
+                if (nameWithColor.startsWith("§a")) return "§a✔"
                 xOutOfYNoColorRequiredPattern.matchMatcher(lore.first()) {
                     //§7Level 64/§8100
                     var colorCode = ""
                     var level = group("useful")
-                    if (nameWithColor.startsWith("§a")) level = "✔"
                     if (lore.takeLast(3).any { it.removeColor().replace("Right click to ", "").contains("enable") }) colorCode = "§c"
                     return "$colorCode$level"
                 }
+                if (nameWithColor.startsWith("§c")) return "§c✔"
             }
         }
 
