@@ -117,6 +117,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
 
+    fun ItemStack.getFungiCutterMode() = getAttributeString("fungi_cutter_mode")
+
     fun ItemStack.getRune(): NEUInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
         val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()

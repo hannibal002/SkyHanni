@@ -128,7 +128,7 @@ object SlayerAPI {
             } else {
                 val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
                 isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == getActiveSlayer()
+                slayerTypeForCurrentArea == getActiveSlayer() && slayerTypeForCurrentArea != null
             }
         }
     }
