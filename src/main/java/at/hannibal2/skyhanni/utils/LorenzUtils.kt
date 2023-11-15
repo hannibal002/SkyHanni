@@ -535,5 +535,6 @@ object LorenzUtils {
         TitleManager.sendTitle(text, duration, height)
     }
 
+    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
     fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 }
