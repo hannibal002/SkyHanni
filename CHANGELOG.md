@@ -6,7 +6,7 @@
 ### Changes
 
 + Added mythic/Maeve visitor support. - walker + hannibal2
-+ Added option to use custom Blocks per Second value in some GUIs instead of the real one. - hannibal2
++ Added option to use custom Blocks per Second value in some Garden GUIs instead of the real one. - hannibal2
 
 ### Fixes
 
