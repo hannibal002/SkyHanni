@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -15,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayFarming {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
+    private val composterPattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\d]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -51,11 +50,9 @@ class MenuItemDisplayOverlayFarming {
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.VISITOR_MILESTONES) && (chestName == "Visitor Milestones")) {
             val lore = item.getLore()
             if (lore.isNotEmpty()) {
-                if ((lore.anyContains("Progress ")) && (lore.anyContains(": ")) && (lore.anyContains("%"))) {
-                    for (line in lore) {
-                        if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
-                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
+                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }
@@ -63,25 +60,18 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.VISITOR_NPC_RARITIES) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
-            if (lore.isNotEmpty() && (lore.anyContains("Times Visited: "))) {
-                return lore.first().take(5).replace("T", "☉")
+            for (line in lore) {
+                if (line.startsWith("§7Times Visited: ")) {
+                    return lore.first().take(5).replace("T", "☉")
+                }
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.COMPOSTER_INSERT_ABBV) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from ")) && (item.getLore().anyContains("Totalling "))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.COMPOSTER_INSERT_ABBV) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from "))) {
             val lore = item.getLore()
             for (line in lore) {
-                if (line.contains("Totalling ")) {
-                    //§7Totalling §e§e615 Organic Matter§7.
-                    //§7Totalling §e§e844 Organic Matter§7.
-                    //Totalling 615 Organic Matter.
-                    //Totalling 844 Organic Matter.
-                    if (itemName.contains(" Crops ")) {
-                        return line.removeColor().split("Totalling ", " Organic Matter.")[1]
-                    }
-                    if (itemName.contains(" Fuel ")) {
-                        return line.removeColor().split("Totalling ", " Fuel.")[1]
-                    }
+                composterPattern.matchMatcher(line) {
+                    return group("resourceCount")
                 }
             }
         }

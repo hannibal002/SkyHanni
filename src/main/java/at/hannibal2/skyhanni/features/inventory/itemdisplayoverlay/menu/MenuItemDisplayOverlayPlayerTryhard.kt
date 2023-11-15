@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -61,7 +59,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
             if (!(chestName.contains("Auction")) && !(chestName.contains("Abiphone") || chestName.contains("AⒷiphone")) && !(chestName.contains("Contacts Directory"))) {
-                if (((itemName.contains("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)) && (lore.anyContains("▶ ") ))) || ((itemName.contains("Filter") && (item.getItem() is ItemEnderEye)) && (lore.anyContains("▶ ")))) {
+                if (((itemName.contains("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)))) || ((itemName.contains("Filter") && (item.getItem() is ItemEnderEye)))) {
                     for (line in lore) {
                         if (line.contains("▶ ")) {
                             return line.removeColor().replace("▶ ","").replace(" ","").take(3)
@@ -237,20 +235,18 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 return "$totalSlotsResult"
             }
             if (chestName.contains("Stats Tuning") && itemName == ("Stats Tuning")) {
-                if (lore.anyContains("Tuning Points: ")) {
-                    for (line in lore) {
-                        if (line.contains("Tuning Points: ")) {
-                            tuningPointsPattern.matchMatcher(line) {
-                                val usefulAsString = group("useful")
-                                val totalAsString = group("total").replace(",", "")
-                                val suffix = when (totalAsString.length) {
-                                    in 1..3 -> ""
-                                    in 4..6 -> "k"
-                                    else -> "§b§z:)"
-                                }
-                                if (suffix == "§b§z:)") return suffix
-                                else return "" + usefulAsString + suffix
+                for (line in lore) {
+                    if (line.contains("Tuning Points: ")) {
+                        tuningPointsPattern.matchMatcher(line) {
+                            val usefulAsString = group("useful")
+                            val totalAsString = group("total").replace(",", "")
+                            val suffix = when (totalAsString.length) {
+                                in 1..3 -> ""
+                                in 4..6 -> "k"
+                                else -> "§b§z:)"
                             }
+                            if (suffix == "§b§z:)") return suffix
+                            else return "" + usefulAsString + suffix
                         }
                     }
                 }
@@ -286,11 +282,9 @@ class MenuItemDisplayOverlayPlayerTryhard {
             val lore = item.getLore()
             var theStringToUse = ""
             if (lore.isNotEmpty() && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
-                if (lore.anyContains(" in: ")) {
-                    for (line in lore) {
-                        if (line.contains(" in: ")) {
-                            theStringToUse = line
-                        }
+                for (line in lore) {
+                    if (line.contains(" in: ")) {
+                        theStringToUse = line
                     }
                 }
             }

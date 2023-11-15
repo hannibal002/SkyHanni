@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
@@ -89,10 +87,14 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.MINION_TIER) && (itemName.contains(" Minion ")) && !(itemName.endsWith(" Recipes")) && (item.getLore().anyContains("Place this minion"))) {
-            val array = itemName.split(" ")
-            val last = array[array.size - 1]
-            return last.romanToDecimal().toString()
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.MINION_TIER) && (itemName.contains(" Minion ")) && !(itemName.endsWith(" Recipes"))) {
+            for (line in item.getLore()){
+                if (line.equals("§7Place this minion and it will")){
+                    val array = itemName.split(" ")
+                    val last = array[array.size - 1]
+                    return last.romanToDecimal().toString()
+                }
+            }
         }
 
         if (SkyHanniMod.feature.inventory.displaySackName && ItemUtils.isSack(item)) {
@@ -167,14 +169,12 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.FRUIT_BOWL) && itemName.contains("Fruit Bowl")) {
             val lore = item.getLore()
-            if (lore.anyContains(" found:")) {
-                var numFound = 0
-                for (line in lore) {
-                    if (line.contains("§e")) {
-                        numFound += (line.split("§e").size - 1) //shoutout to IR42 for this one-liner: https://stackoverflow.com/a/61752225
-                    } else if (line.contains("Names missing:")) {
-                        return numFound.toString()
-                    }
+            var numFound = 0
+            for (line in lore) {
+                if (line.contains("§e")) {
+                    numFound += (line.split("§e").size - 1) //shoutout to IR42 for this one-liner: https://stackoverflow.com/a/61752225
+                } else if (line.contains("Names missing:")) {
+                    return numFound.toString()
                 }
             }
         }
@@ -207,22 +207,18 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.SHREDDER) && internalName == ("THE_SHREDDER")) {
             val lore = item.getLore()
-                if ((lore.anyContains("cap): ")) && (lore.anyContains("Bonus Damage "))) {
-                    for (line in lore) {
-                        whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern.matchMatcher(line) {
-                            return group("dmgbonus")
-                        }
-                    }
+            for (line in lore) {
+                whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern.matchMatcher(line) {
+                    return group("dmgbonus")
                 }
+            }
         }
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.JYRRE) && internalName == ("BOTTLE_OF_JYRRE")) {
             val lore = item.getLore()
-            if (lore.anyContains("Intelligence Bonus: ")) {
-                for (line in lore) {
-                    iReallyHateTheBottleOfJerryPattern.matchMatcher(line) {
-                        return group("intelbonus")
-                    }
+            for (line in lore) {
+                iReallyHateTheBottleOfJerryPattern.matchMatcher(line) {
+                    return group("intelbonus")
                 }
             }
         }
@@ -323,10 +319,10 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.ItemNumber.EDITION_AUCTION_NUMBER)) {
             var thatNumber = 0
-            if (item.getLore().anyContains("Auction ")) {
+            if (item.getLore().any {it.startsWith("§8Auction ")}) {
                 thatNumber = item.getAuctionNumber() ?: 0
             }
-            if (item.getLore().anyContains("Edition ")) {
+            if (item.getLore().any {it.startsWith("§8Edition ")}) {
                 thatNumber = item.getEdition() ?: 0
             }
             if (thatNumber in 1..999) {

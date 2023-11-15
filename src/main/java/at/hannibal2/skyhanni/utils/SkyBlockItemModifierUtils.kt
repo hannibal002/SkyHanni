@@ -183,9 +183,21 @@ object SkyBlockItemModifierUtils {
     
     fun ItemStack.getYetiRodFishesCaught() = getAttributeInt("fishes_caught")
 
-    fun ItemStack.getEdition() = getAttributeInt("edition")
+    fun ItemStack.getEdition(): Int? {
+        val data = cachedData
+        if (data.editionNumber == -1) {
+            data.editionNumber = getAttributeInt("edition")
+        }
+        return data.editionNumber
+    }// = getAttributeInt("edition")
 
-    fun ItemStack.getAuctionNumber() = getAttributeInt("auction")
+    fun ItemStack.getAuctionNumber(): Int? {
+        val data = cachedData
+        if (data.auctionNumber == -1) {
+            data.auctionNumber = getAttributeInt("auction")
+        }
+        return data.auctionNumber
+    }// = getAttributeInt("auction")
 
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")

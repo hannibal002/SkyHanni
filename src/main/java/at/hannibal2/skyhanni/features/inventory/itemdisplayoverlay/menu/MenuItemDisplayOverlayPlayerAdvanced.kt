@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.init.Blocks
@@ -113,12 +111,10 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
             if (chestName == "Rift Guide") {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
-                    if (lore.anyContains("Enigma Souls: ")) {
-                        for (line in lore) {
-                            if (line.contains("Enigma Souls: ")) {
-                                enigmaSoulsPattern.matchMatcher(line) {
-                                    return group("useful")
-                                }
+                    for (line in lore) {
+                        if (line.contains("Enigma Souls: ")) {
+                            enigmaSoulsPattern.matchMatcher(line) {
+                                return group("useful")
                             }
                         }
                     }
@@ -229,7 +225,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.BANK_UTILS) && chestName.contains("Bank")) {
             val lore = item.getLore()
-            if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%") && lore.anyContains("Amount to withdraw: ")) {
+            if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%")) {
                 for (line in lore) {
                     if (line.contains("Amount to withdraw: ")) {
                         amtToWithdrawPattern.matchMatcher(line) {
@@ -281,44 +277,46 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 val nameWithColor = item.name ?: return ""
                 if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (lore.isNotEmpty()) {
-                    if (lore.anyContains("Candidate")) {
+                    if (lore.first().equals("§8Candidate")) {
                         val colorCode = nameWithColor.take(2)
                         var numPerks = 0
                         for (line in item.getLore()) {
                             if (line.startsWith(colorCode) &&
-                                !(line.contains("You voted for this candidate!")) &&
-                                !(line.contains("Leading in votes!")) &&
-                                !(line.contains("Click to vote for ")) && 
-                                !(line.contains("SPECIAL ")) && 
+                                !(line.equals("${colorCode}You voted for this candidate!")) &&
+                                !(line.equals("${colorCode}Leading in votes!")) &&
+                                !(line.startsWith("${colorCode}Click to vote for ")) &&
+                                !(line.equals("SPECIAL ")) &&
                                 !(line.startsWith("$colorCode§"))) {
                                     numPerks++
                             }
                         }
-                        return "" + colorCode + numPerks
+                        return "$colorCode$numPerks"
                     }
                 }
             }
             if (((chestName == "Calendar and Events") || (chestName.contains("Mayor ")))) {
+                val nameWithColor = item.name ?: return ""
+                val colorCode = nameWithColor.take(2)
                 if (itemName.startsWith("JERRY IS MAYOR")) {
-                    return grabPerkpocalypseMayor(lore)
+                    return grabPerkpocalypseMayor(lore, colorCode)
                 }
-                if (itemName.contains("Mayor ")) {
+                if (itemName.startsWith("Mayor ")) {
                     if (itemName.lowercase().contains("dante")) return "§c§l✖"
-                    val nameWithColor = item.name ?: return ""
-                    if (lore.anyContains(" the closing of")) {
-                        if (!(itemName.contains("Jerry")) || chestName.contains("Mayor")) {
-                            val colorCode = nameWithColor.take(2)
-                            var numPerks = 0
-                            for (line in lore) {
-                                if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
-                                    numPerks++
+                    for (line in lore) {
+                        if (line.equals("§7players until the closing of")) {
+                            if (!(itemName.endsWith(" Jerry")) || chestName.contains("Mayor")) {
+                                var numPerks = 0
+                                for (line in lore) {
+                                    if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
+                                        numPerks++
+                                    }
                                 }
-                            }
-                            return "" + colorCode + numPerks
-                        } else {
-                            for (line in lore) {
-                                if (lore.anyContains("Perkpocalypse")) {
-                                    return grabPerkpocalypseMayor(lore)
+                                return "$colorCode$numPerks"
+                            } else {
+                                for (line in lore) {
+                                    if (line.startsWith("${colorCode}Perkpocalypse")) {
+                                        return grabPerkpocalypseMayor(lore, colorCode)
+                                    }
                                 }
                             }
                         }
@@ -341,7 +339,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                     return result
                 }
-                if (itemName == "Instasell Ignore List" && lore.anyContains("Ignored: ")) {
+                if (itemName == "Instasell Ignore List") {
                     for (line in lore) {
                         if (line.contains("Ignored: ")) { //§7Ignored: §c47 Products --> Ignored: 47 Products --> Ignored: 47 Product --> 47
                             return line.removeColor().replace("Products", "Product").split("Ignored: ", " Product")[1]
@@ -352,7 +350,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     return itemName.take(3)
                 }
             }
-            if (chestName.contains(" ➜ ") && itemName.contains("Instasell Ignore") && lore.anyContains("Bulk Instasell: ")) {
+            if (chestName.contains(" ➜ ") && itemName.contains("Instasell Ignore")) {
                 for (line in lore) {
                     if (line.contains("Bulk Instasell: ")) {
                         //§cIgnored!
@@ -411,15 +409,15 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         return ""
     }
 
-    private fun grabPerkpocalypseMayor(lore: List<String>): String {
-        if (lore.anyContains("SLASHED Pricing") || lore.anyContains("Slayer XP Buff") || lore.anyContains("Pathfinder")) return "§bAtx"
-        if (lore.anyContains("Prospection") || lore.anyContains("Mining XP Buff") || lore.anyContains("Mining Fiesta")) return "§bCle"
-        if (lore.anyContains("Lucky!") || lore.anyContains("Pet XP Buff") || lore.anyContains("Mythological Ritual")) return "§bDna"
-        if (lore.anyContains("Barrier Street") || lore.anyContains("Shopping Spree")) return "§c§l✖" //diaz gets an automatic X.
-        if (lore.anyContains("Farming Simulator") || lore.anyContains("Pelt-pocalypse") || lore.anyContains("GOATed")) return "§bFng"
-        if (lore.anyContains("Sweet Tooth") || lore.anyContains("Benevolence") || lore.anyContains("Extra Event")) return "§bFxy"
-        if (lore.anyContains("Luck of the Sea 2.0") || lore.anyContains("Fishing XP Buff") || lore.anyContains("Fishing Festival")) return "§bMrn"
-        if (lore.anyContains("Marauder") || lore.anyContains("EZPZ") || lore.anyContains("Benediction")) return "§bPul"
+    private fun grabPerkpocalypseMayor(lore: List<String>, colorCode: String): String {
+        if (lore.any { it == ("${colorCode}SLASHED Pricing") } || lore.any { it == ("${colorCode}Slayer XP Buff") } || lore.any { it == ("${colorCode}Pathfinder") }) return "§bAtx"
+        if (lore.any { it == ("${colorCode}Prospection") } || lore.any { it == ("${colorCode}Mining XP Buff") } || lore.any { it == ("${colorCode}Mining Fiesta") }) return "§bCle"
+        if (lore.any { it == ("${colorCode}Lucky!") } || lore.any { it == ("${colorCode}Pet XP Buff") } || lore.any { it == ("${colorCode}Mythological Ritual") }) return "§bDna"
+        if (lore.any { it == ("${colorCode}Farming Simulator") } || lore.any { it == ("${colorCode}Pelt-pocalypse") } || lore.any { it == ("${colorCode}GOATed") }) return "§bFng"
+        if (lore.any { it == ("${colorCode}Sweet Tooth") } || lore.any { it == ("${colorCode}Benevolence") } || lore.any { it == ("${colorCode}Extra Event") }) return "§bFxy"
+        if (lore.any { it == ("${colorCode}Luck of the Sea 2.0") } || lore.any { it == ("${colorCode}Fishing XP Buff") } || lore.any { it == ("${colorCode}Fishing Festival") }) return "§bMrn"
+        if (lore.any { it == ("${colorCode}Marauder") } || lore.any { it == ("${colorCode}EZPZ") } || lore.any { it == ("${colorCode}Benediction") }) return "§bPul"
+        if (lore.any { it == ("${colorCode}Barrier Street") } || lore.any { it == ("${colorCode}Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
         else return "§c?"
     }
 }

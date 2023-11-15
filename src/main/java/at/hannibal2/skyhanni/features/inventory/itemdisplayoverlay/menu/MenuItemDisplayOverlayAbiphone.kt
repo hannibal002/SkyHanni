@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -39,9 +38,13 @@ class MenuItemDisplayOverlayAbiphone {
 
         if ((stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Abiphone.DO_NOT_DISTURB)) && isAbiphone) {
             val nameWithColor = item.name ?: return ""
-            val lore = item.getLore()
-            if ((nameWithColor.startsWith("§f§")) && (lore.anyContains("§cDo Not Disturb")) && lore.anyContains("enabled!")) {
-                return "§c§l✖"
+            if ((nameWithColor.startsWith("§f§"))) {
+                val lore = item.getLore()
+                for (line in lore) {
+                    if (line.equals("§cDo Not Disturb enabled!")) {
+                        return "§c§l✖"
+                    }
+                }
             }
         }
 

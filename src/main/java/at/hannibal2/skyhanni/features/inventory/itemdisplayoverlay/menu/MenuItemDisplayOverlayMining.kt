@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -15,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayMining {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
+    private val xOutOfYNoColorRequiredPattern = ".* (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -28,7 +28,7 @@ class MenuItemDisplayOverlayMining {
         
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.CURRENT_SKYMALL_PERK) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
-            if (lore.last().contains("Right-click to ") && lore.last().contains("disable") && lore.anyContains("Your Current Effect")) {
+            if (lore.last().contains("Right-click to ") && lore.last().contains("disable")) {
                 // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
                 /*
                 "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
@@ -62,16 +62,19 @@ class MenuItemDisplayOverlayMining {
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Mining.HOTM_PERK_LEVELS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
             if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
+                //§7Level 64/§8100
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
                 if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
                 if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
-                var level = lore.first().removeColor().replace("Level ", "")
-                var colorCode = ""
-                if (level.contains("/")) level = level.split("/")[0]
-                if (nameWithColor.startsWith("§a")) level = "✔"
-                if (lore.takeLast(3).any { it.removeColor().replace("Right click to ", "").contains("enable") }) colorCode = "§c"
-                return "" + colorCode + level
+                xOutOfYNoColorRequiredPattern.matchMatcher(lore.first()) {
+                    //§7Level 64/§8100
+                    var colorCode = ""
+                    var level = group("useful")
+                    if (nameWithColor.startsWith("§a")) level = "✔"
+                    if (lore.takeLast(3).any { it.removeColor().replace("Right click to ", "").contains("enable") }) colorCode = "§c"
+                    return "$colorCode$level"
+                }
             }
         }
 
@@ -83,11 +86,9 @@ class MenuItemDisplayOverlayMining {
             if (nameWithColor.contains("§a")) return ""
             val lore = item.getLore()
             if (lore != null && lore.isNotEmpty()) {
-                if ((lore.anyContains("Progress: ")) && (lore.anyContains("%"))) {
-                    for (line in lore) {
-                        if (line.contains("Progress: ") && line.contains("%")) {
-                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                for (line in lore) {
+                    if (line.startsWith("§7Progress: ") && line.endsWith("%")) {
+                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
                     }
                 }
             }

@@ -8,4 +8,6 @@ data class CachedItemData(
     /** null = not loaded */ var riftExportable: Boolean? = null,
     /** null = not loaded */ var itemRarityLastCheck: Long = 0L, // Cant use SimpleTimeMark here
     /** null = not loaded */ var itemRarity: LorenzRarity? = null,
+    /** -1 = not loaded */ var auctionNumber: Int? = -1,
+    /** -1 = not loaded */ var editionNumber: Int? = -1,
 )

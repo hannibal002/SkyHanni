@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -52,7 +50,7 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.SKILL_GARDEN_DUNGEON_LEVELS)) {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
-                if (item.getLore().anyContains("Click to view!")) {
+                if (item.getLore().last().equals("§eClick to view!")) {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore()) && !(itemName.contains("Dungeoneering"))) return "0"
                         if (itemName.removeColor().split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
@@ -83,7 +81,7 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
             if (chestName.endsWith(" Collections")) {
                 val lore = item.getLore()
-                if (lore.anyContains("Click to view!")) {
+                if (lore.last().equals("§eClick to view!")) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
                         if (it.startsWith("§e")) {
@@ -124,7 +122,7 @@ class MenuItemDisplayOverlayPlayer {
                     }
                 }
             }
-            if (lore.anyContains("Click to view ")) {
+            if (lore.last().startsWith("§eClick to view ")) {
                 var tiersToSubtract = 0
                 var totalTiers = 0
                 for (line in lore) {
@@ -166,23 +164,21 @@ class MenuItemDisplayOverlayPlayer {
             }
             if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) || (chestName.endsWith(" Essence"))) {
                 val lore = item.getLore()
-                if ((lore.anyContains("Your ")) && (lore.anyContains(" Essence: "))) {
-                    for (line in lore) {
-                        if (line.contains("Your ") && line.contains(" Essence: ")) {
-                            essenceCountPattern.matchMatcher(line) {
-                                val usefulAsString = group("useful")
-                                val totalAsString = group("total").replace(",", "")
-                                val suffix = when (totalAsString.length) {
-                                    in 1..3 -> ""
-                                    in 4..6 -> "k"
-                                    in 7..9 -> "M"
-                                    in 10..12 -> "B"
-                                    in 13..15 -> "T"
-                                    else -> "§b§z:)"
-                                }
-                                if (suffix == "§b§z:)") return suffix
-                                else return "" + usefulAsString + suffix
+                for (line in lore) {
+                    if (line.contains("Your ") && line.contains(" Essence: ")) {
+                        essenceCountPattern.matchMatcher(line) {
+                            val usefulAsString = group("useful")
+                            val totalAsString = group("total").replace(",", "")
+                            val suffix = when (totalAsString.length) {
+                                in 1..3 -> ""
+                                in 4..6 -> "k"
+                                in 7..9 -> "M"
+                                in 10..12 -> "B"
+                                in 13..15 -> "T"
+                                else -> "§b§z:)"
                             }
+                            if (suffix == "§b§z:)") return suffix
+                            else return "" + usefulAsString + suffix
                         }
                     }
                 }
@@ -192,11 +188,9 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
             //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
             val lore = item.getLore()
-            if ((lore.anyContains("You need ")) && (lore.anyContains("more"))) {
-                for (line in lore) {
-                    if (line.contains("You need ") && line.contains("more")) {
-                        return line.removeColor().split("You need ", " more")[1]
-                    }
+            for (line in lore) {
+                if (line.contains("You need ") && line.contains("more")) {
+                    return line.removeColor().split("You need ", " more")[1]
                 }
             }
         }
