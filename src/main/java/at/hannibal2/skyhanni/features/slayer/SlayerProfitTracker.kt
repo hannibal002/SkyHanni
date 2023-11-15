@@ -52,7 +52,7 @@ object SlayerProfitTracker {
         }
 
         @Expose
-        var items: MutableMap<NEUInternalName, SlayerItemProfit> = HashMap()
+        var items: MutableMap<NEUInternalName, SlayerItem> = HashMap()
 
         @Expose
         var mobKillCoins: Long = 0
@@ -63,7 +63,7 @@ object SlayerProfitTracker {
         @Expose
         var slayerCompletedCount = 0
 
-        class SlayerItemProfit {
+        class SlayerItem {
             @Expose
             var internalName: NEUInternalName? = null
 
@@ -76,7 +76,7 @@ object SlayerProfitTracker {
             @Expose
             var hidden = false
 
-            override fun toString() = "SlayerItemProfit{" +
+            override fun toString() = "SlayerItem{" +
                 "internalName='" + internalName + '\'' +
                 ", timesDropped=" + timesDropped +
                 ", totalAmount=" + totalAmount +
@@ -84,7 +84,7 @@ object SlayerProfitTracker {
                 '}'
         }
 
-        override fun toString() = "SlayerProfitList{" +
+        override fun toString() = "SlayerProfitTracker.Data{" +
             "items=" + items +
             ", mobKillCoins=" + mobKillCoins +
             ", slayerSpawnCost=" + slayerSpawnCost +
@@ -135,10 +135,10 @@ object SlayerProfitTracker {
 
     private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
         getTracker()?.modify {
-            val slayerItemProfit = it.items.getOrPut(internalName) { Data.SlayerItemProfit() }
+            val slayerItem = it.items.getOrPut(internalName) { Data.SlayerItem() }
 
-            slayerItemProfit.timesDropped++
-            slayerItemProfit.totalAmount += stackSize
+            slayerItem.timesDropped++
+            slayerItem.totalAmount += stackSize
         }
     }
 

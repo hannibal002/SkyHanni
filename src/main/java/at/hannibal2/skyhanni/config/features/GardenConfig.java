@@ -1438,9 +1438,29 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to jacobContestTimes
     public boolean jacobContextTimes = true;
 
     @Expose
+    @ConfigOption(
+        name = "Custom BPS",
+        desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
+    )
+    @ConfigEditorBoolean
+    public boolean jacobContestCustomBps = true;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(name = "Custom BPS Value", desc = "Set a custom Blocks per Second value.")
+    @ConfigEditorSlider(
+        minValue = 15,
+        maxValue = 20,
+        minStep = 0.1f
+    )
+    public double jacobContestCustomBpsValue = 19.9;
+
+    @Expose
+    // TODO rename to jacobContestTimesPos
     public Position jacobContextTimesPos = new Position(-359, 149, false, true);
 
     @Expose
