@@ -109,8 +109,7 @@ class AnitaMedalProfit {
                 val bronze = medal.factorBronze * amount
                 bronze * jacobTicketPrice
             } else {
-                val internalName = NEUItems.getRawInternalName(name)
-                NEUItems.getPrice(internalName) * amount
+                NEUInternalName.fromItemName(name).getPrice() * amount
             }
         }
         return otherItemsPrice
