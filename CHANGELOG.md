@@ -1,5 +1,32 @@
 # SkyHanni - Change Log
 
+## Version 0.21.11 (unreleased)
+
+
+### Changes
+
++ Added mythic/Maeve visitor support. - walker + hannibal2
++ Added option to use custom Blocks per Second value in some Garden GUIs instead of the real one. - hannibal2
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed new visitor alerts triggering wrongly and constantly. - Cad
++ Fixed visitor timer. - hannibal2****
++ Fixed wrong Fungi Cutter mode warning not working. - walker
++ Fixed Maximum FF Needed display not showing in Jacob NPC menu. - hannibal2
++ Fixed calendar contest detection failing. - hannibal2
++ Fixed plot borders flickering and consistency errors when pressing the keybind - hannibal2
++ Fixed wrong ff needed values in Time Needed for Gold Medal GUI. - hannibal2
++ Fixed Farming Contest Medal Icons in Inventory not showing. - hannibal2
+
+#### Other Fixes
+
++ Fixed showing "slayer boss spawn soon" message outside the correct slayer area. - hannibal2
++ Fixed blocking clicks on bazaar with player name "wiki". - hannibal2
++ Fixed highlighting some mobs in the dungeon wrongly as area mini bosses. - hannibal2
+
 ## Version 0.21
 
 ### New Features
