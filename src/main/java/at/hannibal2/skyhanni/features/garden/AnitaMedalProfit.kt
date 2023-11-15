@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -56,8 +57,7 @@ class AnitaMedalProfit {
             try {
                 readItem(item, table)
             } catch (e: Throwable) {
-                LorenzUtils.error("Error in AnitaMedalProfit while reading item '$item'")
-                e.printStackTrace()
+                ErrorManager.logError(e, "Error in AnitaMedalProfit while reading item '$item'")
             }
         }
 
