@@ -21,7 +21,7 @@ public class GardenConfig {
     public SkyMartConfig skyMart = new SkyMartConfig();
 
     @Expose
-    @Category(name = "Visitor", desc = "")
+    @Category(name = "Visitor", desc = "Visitor Settings")
     public VisitorConfig visitors = new VisitorConfig();
 
     @Expose
@@ -30,7 +30,7 @@ public class GardenConfig {
     public NumbersConfig number = new NumbersConfig();
 
     @Expose
-    @Category(name = "Crop Milestones", desc = "")
+    @Category(name = "Crop Milestones", desc = "Crop Milestones Settings")
     public CropMilestonesConfig cropMilestones = new CropMilestonesConfig();
 
     // TODO moulconfig runnable support
@@ -40,7 +40,7 @@ public class GardenConfig {
     public KeyBindConfig keyBind = new KeyBindConfig();
 
     @Expose
-    @Category(name = "Optimal Speed", desc = "")
+    @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
 
     @Expose
@@ -80,7 +80,7 @@ public class GardenConfig {
     public AnitaShopConfig anitaShop = new AnitaShopConfig();
 
     @Expose
-    @Category(name = "Composter", desc = "Composter")
+    @Category(name = "Composter", desc = "Composter Settings")
     public ComposterConfig composters = new ComposterConfig();
 
     @Expose

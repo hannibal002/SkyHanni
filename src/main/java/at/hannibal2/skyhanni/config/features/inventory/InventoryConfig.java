@@ -47,7 +47,7 @@ public class InventoryConfig {
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
     @Expose
-    @Category(name = "Helpers", desc = "")
+    @Category(name = "Helpers", desc = "Settings for Helpers")
     public HelperConfig helper = new HelperConfig();
 
     @Expose

@@ -15,7 +15,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class MiscConfig {
 
     @Expose
-    @Category(name = "Pets", desc = "")
+    @Category(name = "Pets", desc = "Pets Settings")
     public PetConfig pets = new PetConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
@@ -79,7 +79,7 @@ public class MiscConfig {
     public HighlightPartyMembersConfig highlightPartyMembers = new HighlightPartyMembersConfig();
 
     @Expose
-    @Category(name = "Compact Tab List", desc = "")
+    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
     @Accordion
     public CompactTabListConfig compactTabList = new CompactTabListConfig();
 

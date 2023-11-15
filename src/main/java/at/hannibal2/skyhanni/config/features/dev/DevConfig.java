@@ -40,7 +40,7 @@ public class DevConfig {
     public Position debugLocationPos = new Position(1, 160, false, true);
 
     @Expose
-    @Category(name = "Minecraft Console", desc = "")
+    @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
 }

@@ -26,7 +26,7 @@ public class RiftConfig {
     @Expose
     public EnigmaSoulConfig enigmaSoulWaypoints = new EnigmaSoulConfig();
 
-    @Category(name = "Rift Areas", desc = "")
+    @Category(name = "Rift Areas", desc = "Rift Area Settings")
     @Expose
     public RiftAreasConfig area = new RiftAreasConfig();
 
