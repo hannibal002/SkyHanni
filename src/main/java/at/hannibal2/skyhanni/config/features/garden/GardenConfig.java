@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
@@ -160,6 +161,24 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean jacobContextTimes = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Custom BPS",
+        desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
+    )
+    @ConfigEditorBoolean
+    public boolean jacobContestCustomBps = true;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(name = "Custom BPS Value", desc = "Set a custom Blocks per Second value.")
+    @ConfigEditorSlider(
+        minValue = 15,
+        maxValue = 20,
+        minStep = 0.1f
+    )
+    public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
     public Position jacobContextTimesPos = new Position(-359, 149, false, true);
