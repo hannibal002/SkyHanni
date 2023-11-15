@@ -31,13 +31,13 @@ class GardenPlotBorders {
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
         if (event.keyCode == Keyboard.KEY_G && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+            timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }
         if (event.keyCode == Keyboard.KEY_F3 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
+            timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }
-
-        timeLastSaved = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
