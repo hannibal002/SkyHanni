@@ -1443,21 +1443,21 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(
-        name = "Assume Fix BPS",
-        desc = "Use a fixed Block Per Seconds value for the Contest Time Needed and Contest Summary Feature. When disabled, using the last tracked BPS value."
+        name = "Custom BPS",
+        desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
     )
     @ConfigEditorBoolean
-    public boolean jacobContestAssumeFixBps = true;
+    public boolean jacobContestCustomBps = true;
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Fix BPS Value", desc = "Set your fix Blocks per Second here.")
+    @ConfigOption(name = "Custom BPS Value", desc = "Set a custom Blocks per Second value.")
     @ConfigEditorSlider(
         minValue = 15,
         maxValue = 20,
         minStep = 0.1f
     )
-    public double jacobContestAssumeFixBpsValue = 19.9;
+    public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
     // TODO rename to jacobContestTimesPos

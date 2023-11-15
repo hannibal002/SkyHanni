@@ -171,10 +171,10 @@ class JacobContestTimeNeeded {
         })
     }
 
-    private fun addBpsTitle() = if (config.jacobContestAssumeFixBps) "Fix Blocks/Second: " else "Your Blocks/Second: "
+    private fun addBpsTitle() = if (config.jacobContestCustomBps) "Fix Blocks/Second: " else "Your Blocks/Second: "
 
-    private fun CropType.getBps() = if (config.jacobContestAssumeFixBps) {
-        config.jacobContestAssumeFixBpsValue
+    private fun CropType.getBps() = if (config.jacobContestCustomBps) {
+        config.jacobContestCustomBpsValue
     } else getLatestBlocksPerSecond()
 
     @SubscribeEvent
