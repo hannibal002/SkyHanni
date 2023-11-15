@@ -1433,14 +1433,34 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(
-            name = "Contest Time Needed",
-            desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory."
+        name = "Contest Time Needed",
+        desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory."
     )
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to jacobContestTimes
     public boolean jacobContextTimes = true;
 
     @Expose
+    @ConfigOption(
+        name = "Assume Fix BPS",
+        desc = "Use a fixed Block Per Seconds value for the Contest Time Needed and Contest Summary Feature. When disabled, using the last tracked BPS value."
+    )
+    @ConfigEditorBoolean
+    public boolean jacobContestAssumeFixBps = true;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(name = "Fix BPS Value", desc = "Set your fix Blocks per Second here.")
+    @ConfigEditorSlider(
+        minValue = 15,
+        maxValue = 20,
+        minStep = 0.1f
+    )
+    public double jacobContestAssumeFixBpsValue = 19.9;
+
+    @Expose
+    // TODO rename to jacobContestTimesPos
     public Position jacobContextTimesPos = new Position(-359, 149, false, true);
 
     @Expose
