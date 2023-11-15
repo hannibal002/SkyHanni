@@ -112,9 +112,15 @@ class GardenVisitorFeatures {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList<List<Any>> {
+    private fun drawDisplay() = buildList {
         if (!config.needs.display) return@buildList
+        val (requiredItems, newVisitors) = prepareDrawingData()
 
+        drawRequiredItems(requiredItems)
+        drawVisitors(newVisitors, requiredItems)
+    }
+
+    private fun prepareDrawingData(): Pair<MutableMap<NEUInternalName, Int>, MutableList<String>> {
         val requiredItems = mutableMapOf<NEUInternalName, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
@@ -129,6 +135,10 @@ class GardenVisitorFeatures {
                 requiredItems[internalName] = old + amount
             }
         }
+        return requiredItems to newVisitors
+    }
+
+    private fun MutableList<List<Any>>.drawRequiredItems(requiredItems: MutableMap<NEUInternalName, Int>) {
         if (requiredItems.isNotEmpty()) {
             var totalPrice = 0.0
             addAsSingletonList("§7Visitor items needed:")
@@ -162,6 +172,12 @@ class GardenVisitorFeatures {
                 this[0] = listOf("§7Visitor items needed: §7(§6$format§7)")
             }
         }
+    }
+
+    private fun MutableList<List<Any>>.drawVisitors(
+        newVisitors: MutableList<String>,
+        requiredItems: MutableMap<NEUInternalName, Int>
+    ) {
         if (newVisitors.isNotEmpty()) {
             if (requiredItems.isNotEmpty()) {
                 addAsSingletonList("")
