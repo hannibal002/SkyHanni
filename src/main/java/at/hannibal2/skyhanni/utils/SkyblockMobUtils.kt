@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockProjectileEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
+import at.hannibal2.skyhanni.data.skyblockentities.SummingOrSkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
@@ -99,34 +100,38 @@ object SkyblockMobUtils {
 
         exceptions(baseEntity, nextEntity)?.also { return if (it is exceptionSkipDetection) null else it }
 
+        // Check if Late Stack
         nextEntity?.let { nextEntity ->
-            EntityData.currentSkyblockMobsMap[nextEntity]?.apply { addEntityInFront(baseEntity) }
+            EntityData.getSummonOrSkyblockMob(nextEntity)?.apply { addEntityInFront(baseEntity) }
                 ?.also { return SkyblockInvalidEntity(baseEntity, "Added to $it") }
         }
 
-        var caughtSkyblockMob: SkyblockMob? = null
+        // Stack up the mob
+        var caughtSkyblockMob: SummingOrSkyblockMob? = null
         val extraEntityList =
             generateSequence(nextEntity) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
-                !(entity is EntityArmorStand && !entity.isDefaultValue()) && EntityData.currentSkyblockMobsMap[entity]?.also {
-                    caughtSkyblockMob = it
-                }?.run { false } ?: true
+                !(entity is EntityArmorStand && !entity.isDefaultValue()) && EntityData.getSummonOrSkyblockMob(entity)
+                    ?.also {
+                        caughtSkyblockMob = it
+                    }?.run { false } ?: true
             }.toList()
-
+        // If Late Stack add all entities
         caughtSkyblockMob?.apply { addEntityInFront(extraEntityList.dropLast(1)) }
             ?.also { return SkyblockInvalidEntity(baseEntity, "Added to $it") }
+
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return null
 
         if (armorStand.isDefaultValue()) return null
         val sumReg = summoningRegex.find(armorStand.name.removeColor())
             ?: return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))
-        return SummoningMob(baseEntity, armorStand, sumReg)
+        return SummoningMob(baseEntity, armorStand, extraEntityList.dropLast(1).toMutableList(), sumReg)
     }
 
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): SkyblockEntity? {
         if (baseEntity is EntityBat) return createBat(baseEntity)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
         if (baseEntity is EntityDragon) return SkyblockBossMob(baseEntity, null, baseEntity.name.removeColor(), null)
-        if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return SkyblockProjectileEntity(baseEntity, "Giant Sword") // May false trigger if there is another Dinnerbone Giant
+        if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return SkyblockProjectileEntity(baseEntity, "Giant Sword") // Will false trigger if there is another Dinnerbone Giant
         return null
     }
 

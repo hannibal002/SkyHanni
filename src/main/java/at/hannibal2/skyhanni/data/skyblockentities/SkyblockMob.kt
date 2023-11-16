@@ -13,13 +13,18 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 
 
-abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, private var extraEntitiesList: MutableList<EntityLivingBase>?) : SkyblockEntity(
-    baseEntity, armorStand
+abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, extraEntitiesList: MutableList<EntityLivingBase>?) : SummingOrSkyblockMob(
+    baseEntity, armorStand, extraEntitiesList
 ) {
 
     val hologram1 by lazy { SkyblockMobUtils.getArmorStand(baseEntity, 2) }
     val hologram2 by lazy { SkyblockMobUtils.getArmorStand(baseEntity, 3) }
 
+}
+
+abstract class SummingOrSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, private var extraEntitiesList: MutableList<EntityLivingBase>?) : SkyblockEntity(
+    baseEntity, armorStand
+) {
     private var relativeBoundingBox: AxisAlignedBB?
     val boundingBox: AxisAlignedBB
         get() = (relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
@@ -44,16 +49,15 @@ abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmor
     fun addEntityInFront(entity: EntityLivingBase) {
         extraEntitiesList?.add(0, entity) ?: run { extraEntitiesList = mutableListOf(entity) }
         relativeBoundingBox = makeRelativeBoundingBox()
-        EntityData.currentSkyblockMobsMap[entity] = this
+        EntityData.putSummonOrSkyblockMob(entity, this)
     }
 
     fun addEntityInFront(entities: Collection<EntityLivingBase>) {
         extraEntitiesList?.addAll(0, entities) ?: run { extraEntitiesList = entities.toMutableList() }
         relativeBoundingBox = makeRelativeBoundingBox()
         removeExtraEntitiesFromChecking()
-        EntityData.currentSkyblockMobsMap.putAll(entities.map { it to this })
+        EntityData.putAllSummonOrSkyblockMob(entities, this)
     }
-
 }
 
 class SkyblockBasicMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, extraEntities: List<EntityLivingBase>) : SkyblockMob(

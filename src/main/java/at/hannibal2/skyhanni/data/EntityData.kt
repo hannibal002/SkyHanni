@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.EntityData.devTracker.addEntityName
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
+import at.hannibal2.skyhanni.data.skyblockentities.SummingOrSkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.data.skyblockentities.toPair
 import at.hannibal2.skyhanni.events.EntityDisplayNPCDeSpawnEvent
@@ -129,14 +129,27 @@ class EntityData {
     companion object {
 
         val currentRealPlayers = mutableSetOf<EntityPlayer>()
-        val currentSkyblockMobs = mutableSetOf<SkyblockMob>()
         val currentDisplayNPCs get() = currentDisplayNPCsMap.values
-        val currentSummoningMobs get() = currentSummoningMobsMap.values
-        val currentSkyblockMobsMap = mutableMapOf<EntityLivingBase, SkyblockMob>()
+        val currentSkyblockMobs = mutableSetOf<SkyblockMob>()
+        val currentSummoningMobs = mutableSetOf<SummoningMob>()
+
         val currentDisplayNPCsMap = mutableMapOf<EntityLivingBase, DisplayNPC>()
+        val currentSkyblockMobsMap = mutableMapOf<EntityLivingBase, SkyblockMob>()
         val currentSummoningMobsMap = mutableMapOf<EntityLivingBase, SummoningMob>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
+
+        fun getSummonOrSkyblockMob(entity: EntityLivingBase) =
+            currentSkyblockMobsMap[entity] ?: currentSummoningMobsMap[entity]
+
+        fun putSummonOrSkyblockMob(entity: EntityLivingBase, mob: SummingOrSkyblockMob) =
+            if (mob is SkyblockMob) currentSkyblockMobsMap[entity] =
+                mob else if (mob is SummoningMob) currentSummoningMobsMap[entity] = mob else {
+            }
+
+        fun putAllSummonOrSkyblockMob(entity: Collection<EntityLivingBase>, mob: SummingOrSkyblockMob) =
+            if (mob is SkyblockMob) currentSkyblockMobsMap.putAll(entity.associateWith { mob }) else if (mob is SummoningMob) currentSummoningMobsMap.putAll(entity.associateWith { mob }) else {
+            }
 
         val retries = TreeSet<RetryEntityInstancing>()
 
@@ -260,9 +273,9 @@ class EntityData {
     fun onSkyblockMobSpawnEvent(event: SkyblockMobSpawnEvent) {
         currentSkyblockMobs.add(event.entity)
         currentSkyblockMobsMap.put(event.entity.toPair())
-        event.entity.extraEntities?.filter { it !is EntityArmorStand }?.map { it to event.entity }
+        event.entity.extraEntities?.filter { it !is EntityArmorStand }?.associateWith { event.entity }
             ?.also { currentSkyblockMobsMap.putAll(it) }
-        addEntityName(event.entity)
+        devTracker.addEntityName(event.entity)
     }
 
     @SubscribeEvent
@@ -275,9 +288,26 @@ class EntityData {
     }
 
     @SubscribeEvent
+    fun onEntitySummonSpawnEvent(event: EntitySummoningSpawnEvent) {
+        currentSummoningMobs.add(event.entity)
+        currentSummoningMobsMap.put(event.entity.toPair())
+        event.entity.extraEntities?.filter { it !is EntityArmorStand }?.associateWith { event.entity }
+            ?.also { currentSummoningMobsMap.putAll(it) }
+        devTracker.addEntityName(event.entity)
+    }
+
+    @SubscribeEvent
+    fun onEntitySummonDeSpawnEvent(event: EntitySummoningDeSpawnEvent) {
+        val entity = event.entity
+        entity.extraEntities?.forEach { currentSummoningMobsMap.remove(it);currentEntityLiving.remove(it) }
+        currentSummoningMobsMap.remove(entity.baseEntity)
+        currentSummoningMobs.remove(entity)
+    }
+
+    @SubscribeEvent
     fun onEntityDisplayNPCSpawnEvent(event: EntityDisplayNPCSpawnEvent) {
         currentDisplayNPCsMap.put(event.entity.toPair())
-        addEntityName(event.entity)
+        devTracker.addEntityName(event.entity)
     }
 
     @SubscribeEvent
@@ -293,16 +323,6 @@ class EntityData {
     @SubscribeEvent
     fun onEntityRealPlayerDeSpawnEvent(event: EntityRealPlayerDeSpawnEvent) {
         currentRealPlayers.remove(event.entity)
-    }
-
-    @SubscribeEvent
-    fun onEntitySummonSpawnEvent(event: EntitySummoningSpawnEvent) {
-        currentSummoningMobsMap.put(event.entity.toPair())
-    }
-
-    @SubscribeEvent
-    fun onEntitySummonDeSpawnEvent(event: EntitySummoningDeSpawnEvent) {
-        currentSummoningMobsMap.remove(event.entity.baseEntity)
     }
 
     @SubscribeEvent
