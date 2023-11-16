@@ -9,7 +9,6 @@
 // TODO LIST
 // V1 RELEASE
 //  - the things that arent done yet (EVENTS SOON)
-//  - change from renderitemsandstrings to renderstrings or smth idk
 //
 // V2 RELEASE
 //  - icons maybe
@@ -32,6 +31,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
@@ -40,7 +40,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
-private var display = emptyList<List<Any>>()
+private var display = emptyList<String>()
 private var cache = emptyList<List<Any>>()
 var partyCount = 0
 
@@ -62,7 +62,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCustomScoreboardEnabled()) return
-        config.position.renderStringsAndItems(display, posLabel = "Custom Scoreboard")
+        config.position.renderStrings(display, posLabel = "Custom Scoreboard")
     }
 
     @SubscribeEvent
@@ -99,7 +99,7 @@ class CustomScoreboard {
         purse = LorenzUtils.formatInteger(PurseAPI.currentPurse.toInt())
     }
 
-    private fun drawScoreboard() = buildList<List<Any>> {
+    private fun drawScoreboard() = buildList<String> {
         val lineMap = HashMap<Int, List<Any>>()
         for (element in Elements.entries) {
             lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
@@ -110,18 +110,18 @@ class CustomScoreboard {
         return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
+    private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<String> {
+        val newList = mutableListOf<String>()
         for (index in config.textFormat) {
             lineMap[index]?.let {
                 // Hide consecutive empty lines
-                if (config.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull()?.get(0) == "") {
+                if (config.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull() == "") {
                     continue
                 }
 
                 // Adds empty lines
                 if(it[0] == "<empty>"){
-                    newList.add(listOf(""))
+                    newList.add("")
                     continue
                 }
 
@@ -133,12 +133,12 @@ class CustomScoreboard {
                 // Multiline support
                 if (it.size > 1) {
                     for (item in it) {
-                        newList.add(listOf(item))
+                        newList.add(item.toString())
                     }
                     continue
                 }
 
-                newList.add(it)
+                newList.add(it[0].toString())
             }
         }
 
