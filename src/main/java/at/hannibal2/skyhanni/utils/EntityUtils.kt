@@ -157,6 +157,7 @@ object EntityUtils {
             || (this is EntityPlayer && this.name == "§bSam ") // Sam NPC (in Private Island)
             || (this is EntityPlayer && this.name == "BarbarianGuard ") // BarbarianGuard NPCs
             || (this is EntityPlayer && this.name == "Branchstrutter ") // Those guys in the Trees in the first area in Rift
+            || (this is EntityPlayer && this.name == "vswiblxdxg") // Mayor Cole
 
 
     fun EntityLivingBase.isFarmMob() =
