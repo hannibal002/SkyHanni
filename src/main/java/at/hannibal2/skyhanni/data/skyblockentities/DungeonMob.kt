@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
+import at.hannibal2.skyhanni.data.MobFilter
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -22,7 +22,7 @@ class DungeonMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : 
             hasStar = (words[initStartIndex] == "✯").also { if (it) initStartIndex++ }
 
             Attribute =
-                SkyblockMobUtils.dungeonAttribute.firstOrNull { it == words[initStartIndex] }?.also { initStartIndex++ }
+                MobFilter.dungeonAttribute.firstOrNull { it == words[initStartIndex] }?.also { initStartIndex++ }
 
             // For a wierd reason the Undead Skeletons (or similar)
             // can spawn with a level if they are summoned with the 3 skulls
@@ -32,7 +32,7 @@ class DungeonMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?) : 
         } else {
             Attribute = null
             hasStar = false
-            name = SkyblockMobUtils.errorNameFinding(baseEntity.name)
+            name = MobFilter.errorNameFinding(baseEntity.name)
         }
     }
 }

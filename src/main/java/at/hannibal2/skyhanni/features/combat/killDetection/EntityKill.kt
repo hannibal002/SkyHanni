@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.events.SkyblockMobKillEvent
 import at.hannibal2.skyhanni.events.onMobHitEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.MobUtils.rayTraceForSkyblockMobs
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.rayTraceForSkyblockMobs
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

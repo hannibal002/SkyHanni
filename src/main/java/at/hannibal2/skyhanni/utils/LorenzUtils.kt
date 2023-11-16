@@ -532,4 +532,14 @@ object LorenzUtils {
     fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 
     operator fun MatchResult?.get(index: Int) = this?.groupValues?.get(index)
+
+    fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
+        with(iterator()) {
+            while (hasNext()) {
+                val next = next()
+                yield(next)
+                if (!predicate(next)) break
+            }
+        }
+    }
 }

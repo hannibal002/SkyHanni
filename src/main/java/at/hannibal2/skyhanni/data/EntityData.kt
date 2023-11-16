@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
+import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.data.skyblockentities.DisplayNPC
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
@@ -27,8 +30,6 @@ import at.hannibal2.skyhanni.events.SkyblockMobDeathEvent
 import at.hannibal2.skyhanni.events.SkyblockMobLeavingRenderEvent
 import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
-import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -39,8 +40,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -185,7 +184,7 @@ class EntityData {
             entity.isDisplayNPC() -> return createDisplayNPC(entity)
             entity.isSkyBlockMob() -> {
                 if (islandException()) return true
-                val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
+                val it = MobFilter.createSkyblockEntity(entity) ?: return false
                 if (it is SummoningMob) {
                     EntitySummoningSpawnEvent(it).postAndCatch()
                 } else if (it is SkyblockMob) {
@@ -359,16 +358,14 @@ class EntityData {
         if (mobConfig.skyblockMobShowName) {
             currentSkyblockMobs.forEach {
                 event.drawDynamicText(
-                    it.baseEntity.getLorenzVec()
-                        .add(y = 1.0), "§5" + it.name, 0.5, ignoreBlocks = false, smallestDistanceVew = 10.0
+                    it.baseEntity.getLorenzVec(), "§5" + it.name, 0.5, ignoreBlocks = false, smallestDistanceVew = 10.0, yOff = 1.5f
                 )
             }
         }
         if (mobConfig.displayNPCShowName) {
             currentDisplayNPCs.forEach {
                 event.drawDynamicText(
-                    it.baseEntity.getLorenzVec()
-                        .add(y = 1.0), "§d" + it.name, 0.5, ignoreBlocks = false, smallestDistanceVew = 10.0
+                    it.baseEntity.getLorenzVec(), "§d" + it.name, 0.5, ignoreBlocks = false, smallestDistanceVew = 10.0, yOff = 1.5f
                 )
             }
         }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.getArmorStandByRangeAll
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isDefaultValue
+import at.hannibal2.skyhanni.utils.MobUtils.getArmorStandByRangeAll
+import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 

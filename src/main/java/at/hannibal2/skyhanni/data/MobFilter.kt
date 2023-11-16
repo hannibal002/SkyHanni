@@ -1,12 +1,9 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.data.EntityData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockEntity
-import at.hannibal2.skyhanni.data.skyblockentities.SkyblockInvalidEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockProjectileEntity
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
@@ -14,12 +11,14 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummingOrSkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
-import at.hannibal2.skyhanni.utils.EntityUtils.isFarmMob
-import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
+import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
+import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
+import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -31,7 +30,9 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntitySlime
+import net.minecraft.entity.monster.EntityWitch
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.passive.EntityAnimal
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityChicken
 import net.minecraft.entity.passive.EntityCow
@@ -40,15 +41,15 @@ import net.minecraft.entity.passive.EntityMooshroom
 import net.minecraft.entity.passive.EntityPig
 import net.minecraft.entity.passive.EntityRabbit
 import net.minecraft.entity.passive.EntitySheep
+import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 
-object SkyblockMobUtils {
+object MobFilter {
     val mobNameFilter = "(\\[(.*)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤\\?]+|█+) .$".toRegex()
     val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
-    private val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
-    private const val defaultArmorStandName = "Armor Stand"
+    val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
 
     fun errorNameFinding(name: String): String {
         LorenzDebug.chatAndLog("Skyblock Name of Mob $name not found")
@@ -65,18 +66,34 @@ object SkyblockMobUtils {
         else -> true
     }
 
-    // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
-    fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
+    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
 
-    fun getNextEntity(entity: Entity, offset: Int) = EntityUtils.getEntityByID(entity.entityId + offset)
+    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && when {
+        this.name.any { it in '0'..'9' } -> true
+        extraDisplayNPCByName.contains(this.name) -> true
+        else -> false
+    }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
+        || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
+        || (this is EntityCow && this.entityId == 175) // Shania NPC
+        || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
 
-    fun getArmorStandByRangeAll(entity: Entity, range: Double) =
-        EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
+    private val extraDisplayNPCByName = setOf(
+        "Guy ", // Guy NPC (but only as visitor)
+        "§bSam ", // Sam NPC (in Private Island)
+        "BarbarianGuard ", // BarbarianGuard NPCs
+        "Branchstrutter ", // Those guys in the Trees in the first area in Rift
+        "vswiblxdxg", // Mayor Cole
+    )
 
-    fun getArmorStandByRange(entity: Entity, range: Double) =
-        getArmorStandByRangeAll(entity, range).filter { entity.rotationYaw == it.rotationYaw }.firstOrNull()
+    fun EntityLivingBase.isFarmMob() =
+        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
-    fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
+
+    private class exceptionSkipDetection(baseEntity: EntityLivingBase) : SkyblockEntity(baseEntity, null) {
+        override val name: String = ""
+    }
+
+    class SkyblockInvalidEntity(baseEntity: EntityLivingBase, override val name: String) : SkyblockEntity(baseEntity, null) {}
 
     private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): SkyblockMob {
         val name = armorStand.name.removeColor()
@@ -92,7 +109,7 @@ object SkyblockMobUtils {
     fun createSkyblockEntity(baseEntity: EntityLivingBase): SkyblockEntity? {
         noArmorStandMobs(baseEntity)?.also { return it }
 
-        val nextEntity = getNextEntity(baseEntity, 1) as? EntityLivingBase
+        val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? EntityLivingBase
 
         exceptions(baseEntity, nextEntity)?.also { return if (it is exceptionSkipDetection) null else it }
 
@@ -105,7 +122,7 @@ object SkyblockMobUtils {
         // Stack up the mob
         var caughtSkyblockMob: SummingOrSkyblockMob? = null
         val extraEntityList =
-            generateSequence(nextEntity) { getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
+            generateSequence(nextEntity) { MobUtils.getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
                 !(entity is EntityArmorStand && !entity.isDefaultValue()) && EntityData.getSummonOrSkyblockMob(entity)
                     ?.also {
                         caughtSkyblockMob = it
@@ -118,9 +135,9 @@ object SkyblockMobUtils {
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return null
 
         if (armorStand.isDefaultValue()) return null
-        val sumReg = summoningRegex.find(armorStand.name.removeColor())
-            ?: return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))
-        return SummoningMob(baseEntity, armorStand, extraEntityList.dropLast(1).toMutableList(), sumReg)
+        return summoningRegex.find(armorStand.name.removeColor())
+            ?.let { SummoningMob(baseEntity, armorStand, extraEntityList.dropLast(1).toMutableList(), it) }
+            ?: createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))
     }
 
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): SkyblockEntity? {
@@ -129,20 +146,6 @@ object SkyblockMobUtils {
         if (baseEntity is EntityDragon) return SkyblockBossMob(baseEntity, null, baseEntity.name.removeColor(), null)
         if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return SkyblockProjectileEntity(baseEntity, "Giant Sword") // Will false trigger if there is another Dinnerbone Giant
         return null
-    }
-
-    fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
-        with(iterator()) {
-            while (hasNext()) {
-                val next = next()
-                yield(next)
-                if (!predicate(next)) break
-            }
-        }
-    }
-
-    private class exceptionSkipDetection(baseEntity: EntityLivingBase) : SkyblockEntity(baseEntity, null) {
-        override val name: String = ""
     }
 
     private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): SkyblockEntity? {
@@ -159,7 +162,7 @@ object SkyblockMobUtils {
                     val from = 5
                     val to = 9
                     generateSequence(from) { it + 1 }.take(to - from + 1).map { i ->
-                        getArmorStand(
+                        MobUtils.getArmorStand(
                             baseEntity, i
                         )
                     }.firstOrNull {
@@ -244,45 +247,4 @@ object SkyblockMobUtils {
         6f -> SkyblockProjectileEntity(baseEntity, "Spirit Scepter Bat") // TODO fix false triggers
         else -> null
     }
-
-
-    class OwnerShip(val ownerName: String) {
-        val ownerPlayer = EntityData.currentRealPlayers.firstOrNull { it.name == ownerName }
-        override fun equals(other: Any?): Boolean {
-            if (other is EntityPlayer) return ownerPlayer == other || ownerName == other.name
-            if (other is String) return ownerName == other
-            return false
-        }
-
-        override fun hashCode(): Int {
-            return ownerName.hashCode()
-        }
-    }
-
-
-    fun rayTraceForSkyblockMob(entity: Entity, distance: Double, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForSkyblockMob(entity, partialTicks, offset)?.takeIf {
-            it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
-        }
-
-    fun rayTraceForSkyblockMobs(entity: Entity, distance: Double, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForSkyblockMobs(entity, partialTicks, offset)?.filter {
-            it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
-        }.takeIf { it?.isNotEmpty() ?: false }
-
-    fun rayTraceForSkyblockMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForSkyblockMobs(entity, partialTicks, offset)?.first()
-
-    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<SkyblockMob>? {
-        val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
-        val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        val possibleEntitys = EntityData.currentSkyblockMobsMap.filterKeys {
-            it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
-                pos, look
-            )
-        }
-        if (possibleEntitys.isEmpty()) return null
-        return possibleEntitys.toList().sortedBy { it.first.distanceTo(pos) }.map { it.second }
-    }
-
 }

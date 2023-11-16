@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
+import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
@@ -9,9 +12,7 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
-import at.hannibal2.skyhanni.utils.EntityUtils.isDisplayNPC
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
-import at.hannibal2.skyhanni.utils.EntityUtils.isRealPlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity

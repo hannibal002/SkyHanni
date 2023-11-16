@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -13,10 +13,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntityWitch
-import net.minecraft.entity.passive.EntityAnimal
-import net.minecraft.entity.passive.EntityCow
-import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
@@ -147,28 +143,6 @@ object EntityUtils {
     }
 
     fun EntityPlayer.isNPC() = !isRealPlayer()
-
-    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
-    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && when {
-        this.name.any { it in '0'..'9' } -> true
-        extraDisplayNPCByName.contains(this.name) -> true
-        else -> false
-    }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
-        || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
-        || (this is EntityCow && this.entityId == 175) // Shania NPC
-        || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
-
-    private val extraDisplayNPCByName = setOf(
-        "Guy ", // Guy NPC (but only as visitor)
-        "§bSam ", // Sam NPC (in Private Island)
-        "BarbarianGuard ", // BarbarianGuard NPCs
-        "Branchstrutter ", // Those guys in the Trees in the first area in Rift
-        "vswiblxdxg", // Mayor Cole
-    )
-
-
-    fun EntityLivingBase.isFarmMob() =
-        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
 import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobFilter
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzUtils.get
+import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -17,8 +18,8 @@ abstract class SkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmor
     baseEntity, armorStand, extraEntitiesList
 ) {
 
-    val hologram1 by lazy { SkyblockMobUtils.getArmorStand(baseEntity, 2) }
-    val hologram2 by lazy { SkyblockMobUtils.getArmorStand(baseEntity, 3) }
+    val hologram1 by lazy { MobUtils.getArmorStand(baseEntity, 2) }
+    val hologram2 by lazy { MobUtils.getArmorStand(baseEntity, 3) }
 
 }
 
@@ -63,13 +64,13 @@ abstract class SummingOrSkyblockMob(baseEntity: EntityLivingBase, armorStand: En
 class SkyblockBasicMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, extraEntities: List<EntityLivingBase>) : SkyblockMob(
     baseEntity, armorStand, extraEntities.toMutableList()
 ) {
-    private val regexResult = armorStand?.name?.removeColor()?.let { SkyblockMobUtils.mobNameFilter.find(it) }
+    private val regexResult = armorStand?.name?.removeColor()?.let { MobFilter.mobNameFilter.find(it) }
 
     private fun removeCorruptedSuffix(string: String) =
         if (regexResult[3]?.isNotEmpty() == true) string.dropLast(1) else string
 
     override val name = regexResult[4]?.let { removeCorruptedSuffix(it) } ?: run {
-        SkyblockMobUtils.errorNameFinding(baseEntity.name)
+        MobFilter.errorNameFinding(baseEntity.name)
     }
     val level = regexResult[2]
     val isCorrupted get() = baseEntity.isCorrupted() // Can change

@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.get
+import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyblockMobUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -18,7 +18,7 @@ open class SkyblockSlayerBoss(baseEntity: EntityLivingBase, armorStand: EntityAr
     private val timeArmorStand = hologram1
     private val ownerArmorStand = hologram2
 
-    val owner = SkyblockMobUtils.OwnerShip(
+    val owner = MobUtils.OwnerShip(
         regex.find(ownerArmorStand?.name?.removeColor() ?: "")[1] ?: ""
     )
 
