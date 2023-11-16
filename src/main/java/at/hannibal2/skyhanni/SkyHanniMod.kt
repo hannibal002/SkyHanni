@@ -271,6 +271,7 @@ import at.hannibal2.skyhanni.features.rift.everywhere.HighlightRiftGuide
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
+import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesStats
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
 import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
@@ -595,6 +596,7 @@ class SkyHanniMod {
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
+        loadModule(RiftMotesStats())
         loadModule(GriffinPetWarning())
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
