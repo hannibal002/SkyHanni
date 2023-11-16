@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.InventoryConfig
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils

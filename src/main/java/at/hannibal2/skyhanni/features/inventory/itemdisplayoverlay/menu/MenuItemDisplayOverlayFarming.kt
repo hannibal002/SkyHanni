@@ -26,7 +26,7 @@ class MenuItemDisplayOverlayFarming {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.farming
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.JACOBS_MEDALS) && ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.Farming.JACOBS_MEDALS) && ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!"))) {
             var gold = "§60"
             var silver = "§f0"
             var bronze = "§c0"
@@ -39,7 +39,7 @@ class MenuItemDisplayOverlayFarming {
             return gold + silver + bronze
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.VISITORS_LOGBOOK_COUNTDOWN) && ((chestName == "Visitor's Logbook") && itemName == ("Logbook"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.Farming.VISITORS_LOGBOOK_COUNTDOWN) && ((chestName == "Visitor's Logbook") && itemName == ("Logbook"))) {
             for (line in item.getLore()) {
                 if (line.contains("Next Visitor: ")) {
                     return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m", "")
@@ -47,7 +47,7 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.VISITOR_MILESTONES) && (chestName == "Visitor Milestones")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.Farming.VISITOR_MILESTONES) && (chestName == "Visitor Milestones")) {
             val lore = item.getLore()
             if (lore.isNotEmpty()) {
                 for (line in lore) {
@@ -58,7 +58,7 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.VISITOR_NPC_RARITIES) && (chestName == "Visitor's Logbook")) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.Farming.VISITOR_NPC_RARITIES) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
             for (line in lore) {
                 if (line.startsWith("§7Times Visited: ")) {
@@ -67,7 +67,7 @@ class MenuItemDisplayOverlayFarming {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.Farming.COMPOSTER_INSERT_ABBV) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from "))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.Farming.COMPOSTER_INSERT_ABBV) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from "))) {
             val lore = item.getLore()
             //§7Totalling §2§240k Fuel§7.
             //Totalling 40k Fuel.

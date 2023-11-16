@@ -51,29 +51,8 @@ public class InventoryConfig {
     public HelperConfig helper = new HelperConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Item Number",
-        desc = "Showing the item number as a stack size for these items."
-    )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§bMaster Star Tier",
-            "§bMaster Skull Tier",
-            "§bDungeon Head Floor Number",
-            "§bNew Year Cake",
-            "§bPet Level",
-            "§bMinion Tier",
-            "§bCrimson Armor",
-            "§7(Removed)",
-            "§bKuudra Key",
-            "§bSkill Level",
-            "§bCollection Level",
-            "§bRancher's Boots speed",
-            "§bLarva Hook",
-            "§bDungeon Potion Level"
-        }
-    )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+    @Category(name = "Stack Size", desc = "Stack Sizes in Inventories")
+    public StackSizeConfig stackSize = new StackSizeConfig();
 
     @Expose
     @ConfigOption(

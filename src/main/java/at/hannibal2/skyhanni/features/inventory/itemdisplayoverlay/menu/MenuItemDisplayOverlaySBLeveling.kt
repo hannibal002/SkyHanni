@@ -25,7 +25,7 @@ class MenuItemDisplayOverlaySBLeveling {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.sbLeveling
         val chestName = InventoryUtils.openInventoryName()
         
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.GUIDE_PROGRESS)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.SBLeveling.GUIDE_PROGRESS)) {
             ((".*(Guide |Task).*").toPattern()).matchMatcher(chestName) {
                 if (itemName.isNotEmpty()) {
                     for (line in item.getLore()) {
@@ -38,7 +38,7 @@ class MenuItemDisplayOverlaySBLeveling {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
             for (line in item.getLore()) {
                 (".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
                     return group("percent").replace("100", "§a✔")
@@ -46,7 +46,7 @@ class MenuItemDisplayOverlaySBLeveling {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
             if ((itemName.isNotEmpty())) {
                 ((".*(rewards|skyblock leveling).*").toPattern()).matchMatcher(chestName.lowercase()) {
                     for (line in item.getLore()) {
@@ -60,7 +60,7 @@ class MenuItemDisplayOverlaySBLeveling {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.EMBLEMS_UNLOCKED)) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.SBLeveling.EMBLEMS_UNLOCKED)) {
             val nameWithColor = item.name ?: return ""
             if ((chestName == ("Emblems"))) {
                 (("^§a(\\S*)\$").toPattern()).matchMatcher(nameWithColor) {
