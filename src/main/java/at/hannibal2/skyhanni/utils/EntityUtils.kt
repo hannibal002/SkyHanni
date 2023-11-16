@@ -146,18 +146,25 @@ object EntityUtils {
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
-    fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
+    fun EntityPlayer.isNPC() = !isRealPlayer()
 
-    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4 && uniqueID.variant() == 2
-    fun EntityLivingBase.isDisplayNPC() =
-        (this is EntityPlayer && isNPC() && name.any { it in '0'..'9' }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPC in the Village
-            || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
-            || (this is EntityCow && this.entityId == 175) // Shania NPC
-            || (this is EntityPlayer && this.name == "Guy ") // Guy NPC (but only as visitor)
-            || (this is EntityPlayer && this.name == "§bSam ") // Sam NPC (in Private Island)
-            || (this is EntityPlayer && this.name == "BarbarianGuard ") // BarbarianGuard NPCs
-            || (this is EntityPlayer && this.name == "Branchstrutter ") // Those guys in the Trees in the first area in Rift
-            || (this is EntityPlayer && this.name == "vswiblxdxg") // Mayor Cole
+    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
+    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && when {
+        this.name.any { it in '0'..'9' } -> true
+        extraDisplayNPCByName.contains(this.name) -> true
+        else -> false
+    }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
+        || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
+        || (this is EntityCow && this.entityId == 175) // Shania NPC
+        || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
+
+    private val extraDisplayNPCByName = setOf(
+        "Guy ", // Guy NPC (but only as visitor)
+        "§bSam ", // Sam NPC (in Private Island)
+        "BarbarianGuard ", // BarbarianGuard NPCs
+        "Branchstrutter ", // Those guys in the Trees in the first area in Rift
+        "vswiblxdxg", // Mayor Cole
+    )
 
 
     fun EntityLivingBase.isFarmMob() =

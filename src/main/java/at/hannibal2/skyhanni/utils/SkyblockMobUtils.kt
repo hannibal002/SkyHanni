@@ -55,18 +55,14 @@ object SkyblockMobUtils {
         return ""
     }
 
-    fun Entity.isSkyBlockMob(): Boolean {
-        if (this !is EntityLivingBase) return false
-        if (this is EntityArmorStand) return false
-        // if (this is EntityHorse && this.maxHealth != 35_000f) return false
-
-        // Maybe a Problem with Summons TODO find other solution (broke stuff)
-        // if (this is EntitySlime && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE) return false
-        if (this is EntityOtherPlayerMP && this.isRealPlayer()) return false
-        if (this.isDisplayNPC()) return false
-        if (this is EntityWither && (this.entityId < 0 || this.name == "Wither")) return false
-        if (this is EntityPlayerSP) return false
-        return true
+    fun Entity.isSkyBlockMob(): Boolean = when {
+        this !is EntityLivingBase -> false
+        this is EntityArmorStand -> false
+        this is EntityOtherPlayerMP && this.isRealPlayer() -> false
+        this.isDisplayNPC() -> false
+        this is EntityWither && (this.entityId < 0 || this.name == "Wither") -> false
+        this is EntityPlayerSP -> false
+        else -> true
     }
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
@@ -162,7 +158,7 @@ object SkyblockMobUtils {
                 if (baseEntity is EntityZombie) { // Rat
                     val from = 5
                     val to = 9
-                    generateSequence(from) { it + 1 }.take(to - from).map { i ->
+                    generateSequence(from) { it + 1 }.take(to - from + 1).map { i ->
                         getArmorStand(
                             baseEntity, i
                         )
