@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -73,7 +74,7 @@ object GardenVisitorDropStatistics {
         if (!ProfileStorageData.loaded) return
         if (lastAccept - System.currentTimeMillis() <= 0 && lastAccept - System.currentTimeMillis() > -1000) {
             val message = event.message.removeColor().trim()
-            val storage = GardenAPI.config?.visitorDrops ?: return
+            val storage = GardenAPI.storage?.visitorDrops ?: return
 
             copperPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
@@ -115,8 +116,8 @@ object GardenVisitorDropStatistics {
 
     private fun setRarities(rarity: String) {
         acceptedVisitors += 1
-        val currentRarity = VisitorRarity.valueOf(rarity)
-        val visitorRarities = GardenAPI.config?.visitorDrops?.visitorRarities ?: return
+        val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
+        val visitorRarities = GardenAPI.storage?.visitorDrops?.visitorRarities ?: return
         val temp = visitorRarities[currentRarity.ordinal] + 1
         visitorRarities[currentRarity.ordinal] = temp
         saveAndUpdate()
@@ -194,7 +195,7 @@ object GardenVisitorDropStatistics {
 
     fun saveAndUpdate() {
         if (!GardenAPI.inGarden()) return
-        val storage = GardenAPI.config?.visitorDrops ?: return
+        val storage = GardenAPI.storage?.visitorDrops ?: return
         storage.acceptedVisitors = acceptedVisitors
         storage.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
@@ -205,7 +206,7 @@ object GardenVisitorDropStatistics {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val storage = GardenAPI.config?.visitorDrops ?: return
+        val storage = GardenAPI.storage?.visitorDrops ?: return
         if (storage.visitorRarities.size == 0) {
             storage.visitorRarities.add(0)
             storage.visitorRarities.add(0)
@@ -243,5 +244,5 @@ object GardenVisitorDropStatistics {
 }
 
 enum class VisitorRarity {
-    UNCOMMON, RARE, LEGENDARY, SPECIAL,
+    UNCOMMON, RARE, LEGENDARY, MYTHIC, SPECIAL,
 }
