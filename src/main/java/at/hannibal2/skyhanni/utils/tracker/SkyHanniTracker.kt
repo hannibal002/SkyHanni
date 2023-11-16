@@ -28,7 +28,7 @@ class SkyHanniTracker<Data : TrackerData>(
     private var dirty = false
 
     companion object {
-        private val config get() = SkyHanniMod.feature.misc.trackers
+        private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
     }
 
