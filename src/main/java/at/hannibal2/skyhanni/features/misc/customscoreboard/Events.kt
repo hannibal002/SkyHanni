@@ -5,13 +5,12 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
-enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean){
+enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
     NONE( // maybe use default state tablist: "Events: smth" idk
         {
             when {
@@ -61,7 +60,9 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             list
         },
         {
-            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") } || ScoreboardData.sidebarLines.any { it.trim().startsWith("§6§lGOLD §fmedals: ") }
+            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") } || ScoreboardData.sidebarLines.any {
+                it.trim().startsWith("§6§lGOLD §fmedals: ")
+            }
         }
     ),
     WINTER( // not tested
@@ -83,10 +84,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     MARINA( // not tested
         {
-            listOf("§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")?.removePrefix(" Ends In: "))
+            listOf(
+                "§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")
+                    ?.removePrefix(" Ends In: ")
+            )
         },
         {
-            TabListData.getTabList().any { it.startsWith("§e§lEvent: §r§bFishing Festival") } && TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
+            TabListData.getTabList()
+                .any { it.startsWith("§e§lEvent: §r§bFishing Festival") } && TabListData.getTabList()
+                .nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
         }
     ),
     NEW_YEAR( // not tested
@@ -110,28 +116,32 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             val list = mutableListOf<String>()
 
             // Mining Fiesta
-            if (TabListData.getTabList().any { it.startsWith("§6Mining Fiesta§f") } && TabListData.getTabList().nextAfter("§6Mining Fiesta§f")?.startsWith(" Ends In: ") == true){
-                list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")?.removePrefix(" Ends In: ")
+            if (TabListData.getTabList().any { it.startsWith("§6Mining Fiesta§f") } && TabListData.getTabList()
+                    .nextAfter("§6Mining Fiesta§f")?.startsWith(" Ends In: ") == true) {
+                list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
+                    ?.removePrefix(" Ends In: ")
             }
 
             // Wind
-            if (ScoreboardData.sidebarLines.any { it == "§9Wind Compass" }){
+            if (ScoreboardData.sidebarLines.any { it == "§9Wind Compass" }) {
                 list += "§9Wind Compass"
                 list += ScoreboardData.sidebarLines.nextAfter("§9Wind Compass") ?: "§7No Wind Compass for some reason"
             }
 
             // Better Together
-            if (ScoreboardData.sidebarLines.any { it.startsWith("Nearby Players:") }){
+            if (ScoreboardData.sidebarLines.any { it.startsWith("Nearby Players:") }) {
                 list += "§9Better Together"
-                list += ScoreboardData.sidebarLines.first { it.startsWith("Nearby Players:")}
+                list += ScoreboardData.sidebarLines.first { it.startsWith("Nearby Players:") }
             }
 
             // Mithril
-            if (ScoreboardData.sidebarLines.any { it.startsWith("Event: ")}){
-                list += ScoreboardData.sidebarLines.first { it.startsWith("Event: ")}.removePrefix("Event: ") + " §rin " + ScoreboardData.sidebarLines.first { it.startsWith("Zone: ")}.removePrefix("Zone: ")
+            if (ScoreboardData.sidebarLines.any { it.startsWith("Event: ") }) {
+                list += ScoreboardData.sidebarLines.first { it.startsWith("Event: ") }
+                    .removePrefix("Event: ") + " §rin " + ScoreboardData.sidebarLines.first { it.startsWith("Zone: ") }
+                    .removePrefix("Zone: ")
             }
 
-            if (list.size == 0) when (config.hideEmptyLines){
+            if (list.size == 0) when (config.hideEmptyLines) {
                 true -> listOf("<hidden>")
                 false -> listOf("§cNo Mining Event")
             } else list
@@ -143,7 +153,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     DAMAGE(
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("Protector HP: §a") || it.startsWith("Dragon HP: §a") }) +
-                (ScoreboardData.sidebarLines.first{ it.startsWith("Your Damage: §c") })
+                (ScoreboardData.sidebarLines.first { it.startsWith("Your Damage: §c") })
         },
         {
             ScoreboardData.sidebarLines.any { it.startsWith("Your Damage: §c") }

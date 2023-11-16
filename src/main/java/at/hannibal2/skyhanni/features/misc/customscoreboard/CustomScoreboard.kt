@@ -75,21 +75,25 @@ class CustomScoreboard {
         partyCount = 0
 
         // Gets some values from the tablist
-        for (line in TabListData.getTabList()){
+        for (line in TabListData.getTabList()) {
             when {
                 line.startsWith(" Gems: §r§a") -> gems = line.removePrefix(" Gems: §r§a")
                 line.startsWith(" Bank: §r§6") -> bank = line.removePrefix(" Bank: §r§6")
-                line.startsWith(" §r§fMithril Powder: §r§2") -> mithrilPowder = line.removePrefix(" §r§fMithril Powder: §r§2")
-                line.startsWith(" §r§fGemstone Powder: §r§d") -> gemstonePowder = line.removePrefix(" §r§fGemstone Powder: §r§d")
+                line.startsWith(" §r§fMithril Powder: §r§2") -> mithrilPowder =
+                    line.removePrefix(" §r§fMithril Powder: §r§2")
+
+                line.startsWith(" §r§fGemstone Powder: §r§d") -> gemstonePowder =
+                    line.removePrefix(" §r§fGemstone Powder: §r§d")
             }
         }
 
         // Gets some values from the scoreboard
-        for (line in ScoreboardData.sidebarLinesFormatted){
+        for (line in ScoreboardData.sidebarLinesFormatted) {
             when {
                 line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
                 line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
-                extractLobbyCode(line) is String -> lobbyCode = extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
+                extractLobbyCode(line) is String -> lobbyCode =
+                    extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
                 line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
                 line.startsWith("Bits: §b") -> bits = line.removePrefix("Bits: §b")
                 line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
@@ -119,13 +123,13 @@ class CustomScoreboard {
                 }
 
                 // Adds empty lines
-                if(it[0] == "<empty>"){
+                if (it[0] == "<empty>") {
                     newList.add("")
                     continue
                 }
 
                 // Does not display this line
-                if(it[0] == "<hidden>"){
+                if (it[0] == "<hidden>") {
                     continue
                 }
 
@@ -146,7 +150,7 @@ class CustomScoreboard {
 
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
-    fun onRenderScoreboard(event: RenderGameOverlayEvent.Post){
+    fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
             GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
         }
@@ -162,7 +166,7 @@ class CustomScoreboard {
 
             for (index in config.textFormat) {
                 cache[index].let {
-                    for (line in it){
+                    for (line in it) {
                         string = string + line + "\n"
                     }
                 }
@@ -174,24 +178,24 @@ class CustomScoreboard {
     }
 }
 
-fun translateMayorNameToColor(input: String) : String {
+fun translateMayorNameToColor(input: String): String {
     return when (input) {
         // Normal Mayors
-        "Aatrox"    ->  "§3$input"
-        "Cole"      ->  "§e$input"
-        "Diana"     ->  "§2$input"
-        "Diaz"      ->  "§6$input"
-        "Finnegan"  ->  "§c$input"
-        "Foxy"      ->  "§d$input"
-        "Marina"    ->  "§b$input"
-        "Paul"      ->  "§c$input"
+        "Aatrox" -> "§3$input"
+        "Cole" -> "§e$input"
+        "Diana" -> "§2$input"
+        "Diaz" -> "§6$input"
+        "Finnegan" -> "§c$input"
+        "Foxy" -> "§d$input"
+        "Marina" -> "§b$input"
+        "Paul" -> "§c$input"
 
         // Special Mayors
-        "Scorpius"  ->  "§d$input"
-        "Jerry"     ->  "§d$input"
-        "Derpy"     ->  "§d$input"
-        "Dante"     ->  "§d$input"
-        else        ->  "§cUnknown Mayor: §7$input"
+        "Scorpius" -> "§d$input"
+        "Jerry" -> "§d$input"
+        "Derpy" -> "§d$input"
+        "Dante" -> "§d$input"
+        else -> "§cUnknown Mayor: §7$input"
     }
 }
 
@@ -203,14 +207,17 @@ private fun extractLobbyCode(input: String): String? {
 
 fun getProfileTypeAsSymbol(): String {
     return when {
-        HypixelData.ironman     -> "§7♲ " // Ironman
-        HypixelData.stranded    -> "§a☀ " // Stranded
-        HypixelData.bingo       -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(0, 3) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
-        else                    -> "§e" // Default case
+        HypixelData.ironman -> "§7♲ " // Ironman
+        HypixelData.stranded -> "§a☀ " // Stranded
+        HypixelData.bingo -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(
+            0,
+            3
+        ) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
+        else -> "§e" // Default case
     }
 }
 
-fun getFooter() : String{
+fun getFooter(): String {
     val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
     if (tabList.footer_skyhanni == null) return ""
     return tabList.footer_skyhanni.formattedText

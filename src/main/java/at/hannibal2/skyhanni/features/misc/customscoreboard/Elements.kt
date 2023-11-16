@@ -14,7 +14,7 @@ import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
-enum class Elements (
+enum class Elements(
     // displayLine: The line that is displayed on the scoreboard
     private val displayLine: Supplier<List<String>>?,
 
@@ -22,11 +22,11 @@ enum class Elements (
     private val islands: List<IslandType>,
 
     // visibilityOption: The option that is used to hide this line - use 0 to only display on the listed islands, 1 to hide on the listed islands
-    private val visibilityOption : Int,
+    private val visibilityOption: Int,
 
     // index: The index of the line
     val index: Int
-){
+) {
     SKYBLOCK(
         {
             listOf(config.customTitle.get().toString().replace("&", "§"))
@@ -149,7 +149,7 @@ enum class Elements (
     ),
     POWDER(
         {
-            when (config.displayNumbersFirst){
+            when (config.displayNumbersFirst) {
                 true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
                 false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
             }
@@ -176,7 +176,14 @@ enum class Elements (
                 " §7- §e${SlayerAPI.latestSlayerProgress.trim()}"
                 )
         },
-        listOf(IslandType.HUB, IslandType.SPIDER_DEN, IslandType.THE_PARK, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.THE_RIFT),
+        listOf(
+            IslandType.HUB,
+            IslandType.SPIDER_DEN,
+            IslandType.THE_PARK,
+            IslandType.THE_END,
+            IslandType.CRIMSON_ISLE,
+            IslandType.THE_RIFT
+        ),
         0,
         14
     ),
@@ -224,10 +231,11 @@ enum class Elements (
     ),
     PARTY(
         {
-            val partyTitle : List<String> = if (PartyAPI.partyMembers.isEmpty() && config.hideEmptyLines) {
+            val partyTitle: List<String> = if (PartyAPI.partyMembers.isEmpty() && config.hideEmptyLines) {
                 listOf("<hidden>")
             } else {
-                val title = if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
+                val title =
+                    if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
                 val partyList = PartyAPI.partyMembers
                     .takeWhile { partyCount < config.maxPartyList.get() }
                     .map {
@@ -249,8 +257,7 @@ enum class Elements (
             when (MaxwellAPI.currentPower == null) {
                 true -> listOf("§c§lPlease visit Maxwell!")
                 false ->
-                    when (config.displayNumbersFirst)
-                    {
+                    when (config.displayNumbersFirst) {
                         true -> listOf("${MaxwellAPI.currentPower?.power} Power")
                         false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
                     }
