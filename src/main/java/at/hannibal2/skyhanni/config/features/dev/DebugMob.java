@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.dev;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DebugMob {
@@ -50,61 +49,4 @@ public class DebugMob {
         @ConfigEditorBoolean
         public boolean displayNPCShowName = false;
     }
-
-    @Expose
-    @ConfigOption(name = "Mob Hit Detection", desc = "Debugs for the ways to Hit a Mob")
-    @Accordion
-    public MobHitDetecion mobHitDetecion = new MobHitDetecion();
-
-    public static class MobHitDetecion {
-
-        @Expose
-        @ConfigOption(name = "Hit Highlight", desc = "Highlight each entity that is in the HitList")
-        @ConfigEditorBoolean
-        public boolean skyblockMobHitHighlight = false;
-
-        @Expose
-        @ConfigOption(name = "Highlight Ray Hit", desc = "Highlights the SkyblockMob that is directly in front of the camera")
-        @ConfigEditorBoolean
-        public boolean skyblockMobHighlightRayHit = false;
-
-        @Expose
-        @ConfigOption(name = "Kill Message", desc = "Shows a Kill Message in Chat")
-        @ConfigEditorBoolean
-        public boolean ShowNameOfKilledMob = false;
-
-        @Expose
-        @ConfigOption(name = "Log HitList", desc = "Logs the complete HitList each Tick")
-        @ConfigEditorBoolean
-        public boolean LogMobHitList = false;
-
-        @Expose
-        @ConfigOption(name = "HitList Log as ID", desc = "The HitList will be log only as Mob ID instead of the Mob Name")
-        @ConfigEditorBoolean
-        public boolean LogMobHitListId = false;
-
-        @Expose
-        @ConfigOption(name = "Debug Arrow", desc = "Enables all Debug functions for the Arrow Detection")
-        @ConfigEditorBoolean
-        public boolean arrowDebug = false;
-
-        @Expose
-        @ConfigOption(name = "Bow Strength", desc = "Adjust default strength of Bows")
-        @ConfigEditorSlider(minValue = 1.0f, maxValue = 10.0f, minStep = 0.1f)
-        public double bowStrength = 3.0;
-        @Expose
-        @ConfigOption(name = "Arrow Gravity", desc = "Adjust default Gravity of Arrows")
-        @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.0001f)
-        public double arrowGravity = 0.025;
-        @Expose
-        @ConfigOption(name = "Arrow Drag", desc = "Adjust default Drag of Arrows")
-        @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.001f)
-        public double arrowDrag = 0.99;
-
-        @Expose
-        @ConfigOption(name = "Debug Cleave", desc = "Logs Cleave Hits and shows range")
-        @ConfigEditorBoolean
-        public boolean cleaveDebug = false;
-    }
-
 }
