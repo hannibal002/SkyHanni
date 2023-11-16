@@ -9,10 +9,6 @@ import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class InventoryConfig {
 
     @Expose
