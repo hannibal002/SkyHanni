@@ -86,7 +86,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             listOf("§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")?.removePrefix(" Ends In: "))
         },
         {
-            TabListData.getTabList().any { it.startsWith("§e§lEvent: §r§bFishing Festival") }
+            TabListData.getTabList().any { it.startsWith("§e§lEvent: §r§bFishing Festival") } && TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
         }
     ),
     NEW_YEAR( // not tested
@@ -110,7 +110,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             val list = mutableListOf<String>()
 
             // Mining Fiesta
-            if (TabListData.getTabList().any { it.startsWith("§6Mining Festival§f") }) {
+            if (TabListData.getTabList().any { it.startsWith("§6Mining Fiesta§f") } && TabListData.getTabList().nextAfter("§6Mining Fiesta§f")?.startsWith(" Ends In: ") == true){
                 list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")?.removePrefix(" Ends In: ")
             }
 
