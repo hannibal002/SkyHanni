@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftUpsideDownParkour {
-    private val config get() = RiftAPI.config.area.mirrorVerseConfig.upsideDownParkour
+    private val config get() = RiftAPI.config.area.mirrorverse.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent

@@ -96,7 +96,7 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): LorenzRarity {
-                    return LorenzRarity.valueOf(reader.nextString())
+                    return LorenzRarity.valueOf(reader.nextString().uppercase())
                 }
             }.nullSafe())
             .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
@@ -105,7 +105,7 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): IslandType {
-                    return IslandType.valueOf(reader.nextString())
+                    return IslandType.valueOf(reader.nextString().uppercase())
                 }
             }.nullSafe())
             .registerTypeAdapter(TrackerDisplayMode::class.java, object : TypeAdapter<TrackerDisplayMode>() {
