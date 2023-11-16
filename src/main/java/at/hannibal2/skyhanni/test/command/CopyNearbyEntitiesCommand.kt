@@ -192,7 +192,10 @@ object CopyNearbyEntitiesCommand {
                 is DungeonMob -> append("Dungeon")
                 is SkyblockSpecialMob -> append("Special")
             } else append("None")
-            append("), ")
+            if (mob?.baseEntity == entity) append("/Base")
+            append(")\"")
+            append(mob?.name ?: "")
+            append("\", ")
         }
         if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
         if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
