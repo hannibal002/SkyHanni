@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -23,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class KloonHacking {
-    private val config get() = RiftAPI.config.area.westVillageConfig.hacking
+    private val config get() = RiftAPI.config.area.westVillage.hacking
 
     // TODO USE SH-REPO
     val pattern = "You've set the color of this terminal to (?<colour>.*)!".toPattern()
@@ -161,5 +162,10 @@ class KloonHacking {
         }
         nearestTerminal = closestTerminal
         return closestTerminal
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
     }
 }

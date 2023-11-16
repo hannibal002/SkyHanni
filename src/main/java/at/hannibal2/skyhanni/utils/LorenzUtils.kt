@@ -32,6 +32,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Timer
+import java.util.TimerTask
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -529,7 +530,17 @@ object LorenzUtils {
         TitleManager.sendTitle(text, duration, height)
     }
 
+    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
     fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
+
+    inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
+        val enums = enumValues<T>()
+        return enums.firstOrNull { it.name == name }
+    }
+
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
+        enumValueOfOrNull<T>(name)
+            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     operator fun MatchResult?.get(index: Int) = this?.groupValues?.get(index)
 

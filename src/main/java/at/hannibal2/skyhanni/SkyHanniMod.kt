@@ -253,7 +253,7 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.area.RiftLarva
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper
@@ -331,7 +331,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21",
+    version = "0.21.1.Beta.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler

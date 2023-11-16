@@ -69,11 +69,12 @@ class CurrentPetDisplay {
         if (!SkyHanniMod.feature.misc.pets.display) return
         val storage = ProfileStorageData.profileSpecific ?: return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(storage.currentPet, posLabel = "Current Pet")
+        SkyHanniMod.feature.misc.pets.displayPos.renderString(storage.currentPet, posLabel = "Current Pet")
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
+        event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
     }
 }
