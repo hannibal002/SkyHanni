@@ -11,20 +11,20 @@ import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummingOrSkyblockMob
 import at.hannibal2.skyhanni.data.skyblockentities.SummoningMob
 import at.hannibal2.skyhanni.data.skyblockentities.toPair
-import at.hannibal2.skyhanni.events.EntityDisplayNPCDeSpawnEvent
-import at.hannibal2.skyhanni.events.EntityDisplayNPCSpawnEvent
-import at.hannibal2.skyhanni.events.EntityRealPlayerDeSpawnEvent
-import at.hannibal2.skyhanni.events.EntityRealPlayerSpawnEvent
-import at.hannibal2.skyhanni.events.EntitySummoningDeSpawnEvent
-import at.hannibal2.skyhanni.events.EntitySummoningSpawnEvent
+import at.hannibal2.skyhanni.events.DisplayNPCDeSpawnEvent
+import at.hannibal2.skyhanni.events.DisplayNPCSpawnEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.RealPlayerDeSpawnEvent
+import at.hannibal2.skyhanni.events.RealPlayerSpawnEvent
 import at.hannibal2.skyhanni.events.SkyblockMobDeSpawnEvent
 import at.hannibal2.skyhanni.events.SkyblockMobDeathEvent
 import at.hannibal2.skyhanni.events.SkyblockMobLeavingRenderEvent
 import at.hannibal2.skyhanni.events.SkyblockMobSpawnEvent
+import at.hannibal2.skyhanni.events.SummoningDeSpawnEvent
+import at.hannibal2.skyhanni.events.SummoningSpawnEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -124,13 +124,13 @@ class MobData {
     private fun EntitySpawn(entity: EntityLivingBase): Boolean {
         devTracker.data.spawn++
         when {
-            entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
+            entity is EntityPlayer && entity.isRealPlayer() -> RealPlayerSpawnEvent(entity).postAndCatch()
             entity.isDisplayNPC() -> return createDisplayNPC(entity)
             entity.isSkyBlockMob() -> {
                 if (islandException()) return true
                 val it = MobFilter.createSkyblockEntity(entity) ?: return false
                 if (it is SummoningMob) {
-                    EntitySummoningSpawnEvent(it).postAndCatch()
+                    SummoningSpawnEvent(it).postAndCatch()
                 } else if (it is SkyblockMob) {
                     SkyblockMobSpawnEvent(it).postAndCatch()
                 }
@@ -140,7 +140,7 @@ class MobData {
     }
 
     private fun createDisplayNPC(entity: EntityLivingBase): Boolean = DisplayNPC(entity).let { npc ->
-        if (npc.name.isEmpty()) false else EntityDisplayNPCSpawnEvent(npc).postAndCatch().let { true }
+        if (npc.name.isEmpty()) false else DisplayNPCSpawnEvent(npc).postAndCatch().let { true }
     }
 
 
@@ -153,13 +153,13 @@ class MobData {
     private fun EntityDeSpawn(entity: EntityLivingBase) {
         devTracker.data.deSpawn++
         when {
-            entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
-            entity.isDisplayNPC() -> currentDisplayNPCsMap[entity]?.let { EntityDisplayNPCDeSpawnEvent(it).postAndCatch() }
+            entity is EntityPlayer && entity.isRealPlayer() -> RealPlayerDeSpawnEvent(entity).postAndCatch()
+            entity.isDisplayNPC() -> currentDisplayNPCsMap[entity]?.let { DisplayNPCDeSpawnEvent(it).postAndCatch() }
                 ?: removeRetry(entity)
 
             entity.isSkyBlockMob() -> {
                 if (islandException()) return
-                currentSummoningMobsMap[entity]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
+                currentSummoningMobsMap[entity]?.let { SummoningDeSpawnEvent(it).postAndCatch() }
                     ?: currentSkyblockMobsMap[entity]?.let {
                         if (it.isInRender()) {
                             SkyblockMobDeathEvent(it).postAndCatch()
@@ -239,7 +239,7 @@ class MobData {
     }
 
     @SubscribeEvent
-    fun onEntitySummonSpawnEvent(event: EntitySummoningSpawnEvent) {
+    fun onSummonSpawnEvent(event: SummoningSpawnEvent) {
         currentSummoningMobs.add(event.entity)
         currentSummoningMobsMap.put(event.entity.toPair())
         event.entity.extraEntities?.filter { it !is EntityArmorStand }?.associateWith { event.entity }
@@ -248,7 +248,7 @@ class MobData {
     }
 
     @SubscribeEvent
-    fun onEntitySummonDeSpawnEvent(event: EntitySummoningDeSpawnEvent) {
+    fun onSummonDeSpawnEvent(event: SummoningDeSpawnEvent) {
         val entity = event.entity
         entity.extraEntities?.forEach { currentSummoningMobsMap.remove(it);currentEntityLiving.remove(it) }
         currentSummoningMobsMap.remove(entity.baseEntity)
@@ -256,23 +256,23 @@ class MobData {
     }
 
     @SubscribeEvent
-    fun onEntityDisplayNPCSpawnEvent(event: EntityDisplayNPCSpawnEvent) {
+    fun onDisplayNPCSpawnEvent(event: DisplayNPCSpawnEvent) {
         currentDisplayNPCsMap.put(event.entity.toPair())
         devTracker.addEntityName(event.entity)
     }
 
     @SubscribeEvent
-    fun onEntityDisplayNPCSpawnDeEvent(event: EntityDisplayNPCDeSpawnEvent) {
+    fun onDisplayNPCSpawnDeEvent(event: DisplayNPCDeSpawnEvent) {
         currentDisplayNPCsMap.remove(event.entity.baseEntity)
     }
 
     @SubscribeEvent
-    fun onEntityRealPlayerSpawnEvent(event: EntityRealPlayerSpawnEvent) {
+    fun onRealPlayerSpawnEvent(event: RealPlayerSpawnEvent) {
         currentRealPlayers.add(event.entity)
     }
 
     @SubscribeEvent
-    fun onEntityRealPlayerDeSpawnEvent(event: EntityRealPlayerDeSpawnEvent) {
+    fun onRealPlayerDeSpawnEvent(event: RealPlayerDeSpawnEvent) {
         currentRealPlayers.remove(event.entity)
     }
 
