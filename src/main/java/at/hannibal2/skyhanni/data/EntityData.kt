@@ -181,7 +181,7 @@ class EntityData {
         devTracker.data.spawn++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerSpawnEvent(entity).postAndCatch()
-            entity.isDisplayNPC() -> EntityDisplayNPCSpawnEvent(DisplayNPC(entity)).postAndCatch()
+            entity.isDisplayNPC() -> return createDisplayNPC(entity)
             entity.isSkyBlockMob() -> {
                 if (islandException()) return true
                 val it = SkyblockMobUtils.createSkyblockEntity(entity) ?: return false
@@ -195,6 +195,11 @@ class EntityData {
         return true
     }
 
+    private fun createDisplayNPC(entity: EntityLivingBase): Boolean = DisplayNPC(entity).let { npc ->
+        if (npc.name.isEmpty()) false else EntityDisplayNPCSpawnEvent(npc).postAndCatch().let { true }
+    }
+
+
     private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
         IslandType.THE_RIFT -> false
         IslandType.PRIVATE_ISLAND_GUEST -> true
@@ -205,7 +210,9 @@ class EntityData {
         devTracker.data.deSpawn++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> EntityRealPlayerDeSpawnEvent(entity).postAndCatch()
-            entity.isDisplayNPC() -> EntityDisplayNPCDeSpawnEvent(DisplayNPC(entity)).postAndCatch()
+            entity.isDisplayNPC() -> currentDisplayNPCsMap[entity]?.let { EntityDisplayNPCDeSpawnEvent(it).postAndCatch() }
+                ?: removeRetry(entity)
+
             entity.isSkyBlockMob() -> {
                 if (islandException()) return
                 currentSummoningMobsMap[entity]?.let { EntitySummoningDeSpawnEvent(it).postAndCatch() }
