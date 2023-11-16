@@ -249,12 +249,11 @@ class SkyHanniDebugsAndTests {
         }
 
         fun whereami() {
-            val currentIsland = SkyHanniMod.modules
             if (LorenzUtils.inSkyBlock) {
-                LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+                LorenzUtils.chat("§e[SkyHanni] You are currently in ${LorenzUtils.skyBlockIsland}.")
                 return
             }
-            LorenzUtils.chat("§eYou are not in Skyblock.")
+            LorenzUtils.chat("§e[SkyHanni] You are not in Skyblock.")
         }
 
         fun copyLocation(args: Array<String>) {
