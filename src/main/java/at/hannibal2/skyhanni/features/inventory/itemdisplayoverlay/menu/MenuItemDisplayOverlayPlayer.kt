@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
-import at.hannibal2.skyhanni.config.features.InventoryConfig
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -38,7 +38,7 @@ class MenuItemDisplayOverlayPlayer {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.player
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
             for (line in item.getLore()) {
                 if (line.contains(" Level: ")) {
                     skyblockLevelPattern.matchMatcher(line) {
@@ -48,7 +48,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.SKILL_GARDEN_DUNGEON_LEVELS)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKILL_GARDEN_DUNGEON_LEVELS)) {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
                 if (item.getLore().isNotEmpty() && item.getLore().last().equals("§eClick to view!")) {
                     if (chestName == "Your Skills") {
@@ -70,7 +70,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.SKILL_AVERAGE) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKILL_AVERAGE) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
             for (line in item.getLore()) {
                 if (line.contains(" Skill Avg. ")) {
                     return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
@@ -78,7 +78,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
             if (chestName.endsWith(" Collections")) {
                 val lore = item.getLore()
                 if (lore.last().equals("§eClick to view!")) {
@@ -111,7 +111,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.CRAFTED_MINIONS) && chestName.startsWith("Crafted Minions")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.CRAFTED_MINIONS) && chestName.startsWith("Crafted Minions")) {
             val lore = item.getLore()
             if (itemName == "Information") {
                 for (line in lore) {
@@ -133,7 +133,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
             for (line in item.getLore()) {
                 if (line.contains("Items Donated")) {
                     return museumDonationPattern.matchMatcher(line) { group("amount").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
@@ -141,11 +141,11 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management") && itemName.contains("Profile: ")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management") && itemName.contains("Profile: ")) {
             profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.PET_SCORE_STATUS)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PET_SCORE_STATUS)) {
             if ((chestName.lowercase() == "skyblock menu") && itemName.contains("Pets")) {
                 for (line in item.getLore()) {
                     if ((line.contains("Selected pet: ")) && (line.contains("None"))) return "§c§l✖"
@@ -158,7 +158,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.ESSENCE_COUNTS)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.ESSENCE_COUNTS)) {
             if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
@@ -185,7 +185,7 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
             //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
             val lore = item.getLore()
             for (line in lore) {
