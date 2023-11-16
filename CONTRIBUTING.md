@@ -74,7 +74,7 @@ You can write in the description of the pr the wording for the changelog as well
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 - Do not use `toRegex()`, use `toPattern()` instead.
-- Please use Regex instead of String comparison when it is possible Hypixel can change the message in the future.
+- Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 
 ## Software Used in SkyHanni
 
