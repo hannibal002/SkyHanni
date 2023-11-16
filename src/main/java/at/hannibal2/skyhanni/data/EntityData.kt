@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyblockMobUtils
@@ -353,6 +354,22 @@ class EntityData {
         if (mobConfig.summonHighlight) {
             currentSummoningMobs.forEach {
                 event.drawFilledBoundingBox_nea(it.baseEntity.entityBoundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.3f)
+            }
+        }
+        if (mobConfig.skyblockMobShowName) {
+            currentSkyblockMobs.forEach {
+                event.drawDynamicText(
+                    it.baseEntity.getLorenzVec()
+                        .add(y = 1.0), "§5" + it.name, 0.5, ignoreBlocks = false, smallestDistanceVew = 10.0
+                )
+            }
+        }
+        if (mobConfig.displayNPCShowName) {
+            currentDisplayNPCs.forEach {
+                event.drawDynamicText(
+                    it.baseEntity.getLorenzVec()
+                        .add(y = 1.0), "§d" + it.name, 0.5, ignoreBlocks = false, smallestDistanceVew = 10.0
+                )
             }
         }
     }

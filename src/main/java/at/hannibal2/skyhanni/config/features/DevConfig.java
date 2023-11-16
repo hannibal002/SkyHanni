@@ -12,8 +12,7 @@ import org.lwjgl.input.Keyboard;
 public class DevConfig {
 
     @Expose
-    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" +
-            "§cOnly disable this if you know what you are doing!")
+    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" + "§cOnly disable this if you know what you are doing!")
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
 
@@ -34,11 +33,7 @@ public class DevConfig {
         public boolean commandLogs = false;
 
         @Expose
-        @ConfigOption(
-            name = "Mod Menu Log",
-            desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
-                "Useful for adding more mods to quick mod menu switch."
-        )
+        @ConfigOption(name = "Mod Menu Log", desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " + "Useful for adding more mods to quick mod menu switch.")
         @ConfigEditorBoolean
         public boolean modMenuLog = false;
 
@@ -155,18 +150,12 @@ public class DevConfig {
         public boolean logUnfilteredFile = false;
 
         @Expose
-        @ConfigOption(
-                name = "Outside SkyBlock",
-                desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
-        )
+        @ConfigOption(name = "Outside SkyBlock", desc = "Print the debug information for unfiltered console messages outside SkyBlock too.")
         @ConfigEditorBoolean
         public boolean printUnfilteredDebugsOutsideSkyBlock = false;
 
         @Expose
-        @ConfigOption(
-                name = "Log Filtered",
-                desc = "Log the filtered messages into the console."
-        )
+        @ConfigOption(name = "Log Filtered", desc = "Log the filtered messages into the console.")
         @ConfigEditorBoolean
         public boolean printFilteredReason = false;
 
@@ -192,8 +181,7 @@ public class DevConfig {
             public boolean filterUnknownSound = true;
 
             @Expose
-            @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " +
-                    "removeObjective and 'scoreboard team already exists'.")
+            @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " + "removeObjective and 'scoreboard team already exists'.")
             @ConfigEditorBoolean
             public boolean filterScoreboardErrors = true;
 
@@ -255,6 +243,16 @@ public class DevConfig {
         @ConfigOption(name = "Summon Highlight", desc = "Highlight each entity that is a valid Summon in yellow")
         @ConfigEditorBoolean
         public boolean summonHighlight = false;
+
+        @Expose
+        @ConfigOption(name = "SkyblockMob Show Name", desc = "Addes Hologram to each SkyblockMob that shows there name")
+        @ConfigEditorBoolean
+        public boolean skyblockMobShowName = false;
+
+        @Expose
+        @ConfigOption(name = "DisplayNPC Show Name", desc = "Addes Hologram to each DisplayNPC that shows there name")
+        @ConfigEditorBoolean
+        public boolean displayNPCShowName = false;
 
         @Expose
         @ConfigOption(name = "Mob Hit Detection", desc = "")
