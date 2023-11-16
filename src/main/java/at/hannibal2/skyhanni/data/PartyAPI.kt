@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
@@ -112,7 +111,7 @@ object PartyAPI {
         partyMemberListPattern.matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
-                if (playerName == Minecraft.getMinecraft().thePlayer.name) continue
+                if (playerName == LorenzUtils.getPlayerName()) continue
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
             }
         }

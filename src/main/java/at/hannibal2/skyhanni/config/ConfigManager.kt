@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -93,7 +93,16 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): LorenzRarity {
-                    return LorenzRarity.valueOf(reader.nextString())
+                    return LorenzRarity.valueOf(reader.nextString().uppercase())
+                }
+            }.nullSafe())
+            .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
+                override fun write(out: JsonWriter, value: IslandType) {
+                    out.value(value.name)
+                }
+
+                override fun read(reader: JsonReader): IslandType {
+                    return IslandType.valueOf(reader.nextString().uppercase())
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()
@@ -126,16 +135,9 @@ class ConfigManager {
             try {
                 val inputStreamReader = InputStreamReader(FileInputStream(configFile!!), StandardCharsets.UTF_8)
                 val bufferedReader = BufferedReader(inputStreamReader)
-                val builder = StringBuilder()
-                for (line in bufferedReader.lines()) {
-                    val result = fixConfig(line)
-                    builder.append(result)
-                    builder.append("\n")
-                }
-
 
                 logger.log("load-config-now")
-                val jsonObject = gson.fromJson(builder.toString(), JsonObject::class.java)
+                val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                 val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                 features = gson.fromJson(
                     newJsonObject,
@@ -160,16 +162,10 @@ class ConfigManager {
             try {
                 val inputStreamReader = InputStreamReader(FileInputStream(sackFile!!), StandardCharsets.UTF_8)
                 val bufferedReader = BufferedReader(inputStreamReader)
-                val builder = StringBuilder()
-                for (line in bufferedReader.lines()) {
-                    builder.append(line)
-                    builder.append("\n")
-                }
-
 
                 logger.log("load-sacks-now")
                 sackData = gson.fromJson(
-                    builder.toString(),
+                    bufferedReader.readText(),
                     SackData::class.java
                 )
                 logger.log("Loaded sacks from file")
@@ -203,18 +199,6 @@ class ConfigManager {
             features,
             processor
         )
-    }
-
-    private fun fixConfig(line: String): String {
-        var result = line
-        for (type in CropType.entries) {
-            val normal = "\"${type.cropName}\""
-            val enumName = "\"${type.name}\""
-            while (result.contains(normal)) {
-                result = result.replace(normal, enumName)
-            }
-        }
-        return result
     }
 
     fun saveConfig(reason: String) {

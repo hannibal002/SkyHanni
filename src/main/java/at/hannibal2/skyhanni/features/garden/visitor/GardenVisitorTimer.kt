@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,8 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
     private val config get() = SkyHanniMod.feature.garden.visitors.timer
-    private val patternNextVisitor = " Next Visitor: §r§b(?<time>.*)".toPattern()
-    private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
+    private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
     private var render = ""
     private var lastMillis = 0L
     private var sixthVisitorArrivalTime: Long = 0
@@ -33,10 +33,10 @@ class GardenVisitorTimer {
     //TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Long?
-        get() = GardenAPI.config?.visitorInterval
+        get() = GardenAPI.storage?.visitorInterval
         set(value) {
             value?.let {
-                GardenAPI.config?.visitorInterval = it
+                GardenAPI.storage?.visitorInterval = it
             }
         }
 
@@ -75,31 +75,30 @@ class GardenVisitorTimer {
     private fun updateVisitorDisplay() {
         if (!isEnabled()) return
 
-        var visitorsAmount = 0
+        var visitorsAmount = VisitorAPI.visitorsInTabList(TabListData.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
         for (line in TabListData.getTabList()) {
-            val matcher = patternNextVisitor.matcher(line)
-            if (matcher.matches()) {
-                val rawTime = matcher.group("time")
-                millis = TimeUtils.getMillis(rawTime)
-            } else if (line == " Next Visitor: §r§c§lQueue Full!") {
+            if (line == "§b§lVisitors: §r§f(§r§c§lQueue Full!§r§f)") {
                 queueFull = true
-            } else if (line == " Next Visitor: §r§cNot Unlocked!") {
+                continue
+            }
+            if (line == "§b§lVisitors: §r§cNot Unlocked!") {
                 render = ""
                 return
             }
 
-            patternVisitors.matchMatcher(line) {
-                visitorsAmount = group("amount").toInt()
+            pattern.matchMatcher(line) {
+                val rawTime = group("time").removeColor()
+                millis = TimeUtils.getMillis(rawTime)
             }
         }
 
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
                 visitorInterval = ((millis - 1) / 60_000L + 1) * 60_000L
-                GardenAPI.config?.visitorInterval = visitorInterval
+                GardenAPI.storage?.visitorInterval = visitorInterval
             } else {
                 updateSixthVisitorArrivalTime()
             }
@@ -112,7 +111,7 @@ class GardenVisitorTimer {
                 sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime - System.currentTimeMillis()
-            GardenAPI.config?.nextSixthVisitorArrival =
+            GardenAPI.storage?.nextSixthVisitorArrival =
                 System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
             if (isSixthVisitorEnabled() && millis < 0) {
                 visitorsAmount++
@@ -135,7 +134,7 @@ class GardenVisitorTimer {
             val factor = diff / 1000.0
             "§7/§$formatColor" + TimeUtils.formatDuration((millis / factor).roundToLong())
         } else ""
-        if (config.newVisitorPing && millis < 10000){
+        if (config.newVisitorPing && millis < 10000) {
             SoundUtils.playBeepSound()
         }
         val formatDuration = TimeUtils.formatDuration(millis)
@@ -156,7 +155,7 @@ class GardenVisitorTimer {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
-        GardenAPI.config?.nextSixthVisitorArrival?.let {
+        GardenAPI.storage?.nextSixthVisitorArrival?.let {
             sixthVisitorArrivalTime = it
         }
         sixthVisitorReady = false

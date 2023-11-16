@@ -104,9 +104,9 @@ class CropAccessoryData {
         val pagesLoaded get() = accessoryPage.size
 
         var cropAccessory: CropAccessory?
-            get() = GardenAPI.config?.savedCropAccessory
+            get() = GardenAPI.storage?.savedCropAccessory
             private set(accessory) {
-                GardenAPI.config?.savedCropAccessory = accessory
+                GardenAPI.storage?.savedCropAccessory = accessory
             }
 
         // Derived partially from NotEnoughUpdates/NotEnoughUpdates, ProfileViewer.Profile#getInventoryInfo

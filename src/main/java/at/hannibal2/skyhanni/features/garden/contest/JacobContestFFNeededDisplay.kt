@@ -116,7 +116,7 @@ class JacobContestFFNeededDisplay {
     }
 
     private fun getLine(bracket: ContestBracket, map: Map<ContestBracket, Int>, crop: CropType): String {
-        val counter = map[bracket]!!
+        val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"
         val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
         val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
