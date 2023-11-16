@@ -50,7 +50,7 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerGeneral.SKILL_GARDEN_DUNGEON_LEVELS)) {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
-                if (item.getLore().last().equals("§eClick to view!")) {
+                if (item.getLore().isNotEmpty() && item.getLore().last().equals("§eClick to view!")) {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore()) && !(itemName.contains("Dungeoneering"))) return "0"
                         if (itemName.removeColor().split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line

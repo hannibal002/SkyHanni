@@ -149,27 +149,25 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
             if ((chestName == "Community Shop" && itemName == "Community Shop")) {
                 for (line in item.getLore()) {
-                    if (line.contains("Fame Rank: ")) {
-                        return when (line.removeColor().replace("Fame Rank: ", "")) {
-                            "New Player" -> "NP"
-                            "Settler" -> "Str"
-                            "Citizen" -> "Ctz"
-                            "Contributor" -> "Ctb"
-                            "Philanthropist" -> "Phl"
-                            "Patron" -> "Ptn"
-                            "Famous Player" -> "FP"
-                            "Attaché" -> "Atc"
-                            "Ambassador" -> "Abd"
-                            "Statesperson" -> "Stp"
-                            "Senator" -> "Snt"
-                            "Dignitary" -> "Dgn"
-                            "Councilor" -> "Cnl"
-                            "Minister" -> "Mst"
-                            "Premier" -> "Pmr"
-                            "Chancellor" -> "Chr"
-                            "Supreme" -> "Sup"
-                            else -> "?"
-                        }
+                    return when ((("(§.)*Fame Rank: (§.)*(?<fameRank>[\\w ]+)").toPattern()).matchMatcher(line) { group("fameRank") }) {
+                        "New Player" -> "NP"
+                        "Settler" -> "Str"
+                        "Citizen" -> "Ctz"
+                        "Contributor" -> "Ctb"
+                        "Philanthropist" -> "Phl"
+                        "Patron" -> "Ptn"
+                        "Famous Player" -> "FP"
+                        "Attaché" -> "Atc"
+                        "Ambassador" -> "Abd"
+                        "Statesperson" -> "Stp"
+                        "Senator" -> "Snt"
+                        "Dignitary" -> "Dgn"
+                        "Councilor" -> "Cnl"
+                        "Minister" -> "Mst"
+                        "Premier" -> "Pmr"
+                        "Chancellor" -> "Chr"
+                        "Supreme" -> "Sup"
+                        else -> "?"
                     }
                 }
             }
@@ -177,7 +175,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.BOOSTER_COOKIE_DURATION) && (chestName.isNotEmpty() && item.getLore().isNotEmpty() && itemName.isNotEmpty() && ((itemName.contains("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
             for (line in item.getLore()) {
-                if (line.contains("Duration:")) {
+                if (line.startsWith("§7Duration: ")) {
                     genericDurationPattern.matchMatcher(line) {
                         val yString = group("years") ?: ""
                         val dString = group("days") ?: ""
@@ -236,43 +234,39 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
             if (chestName.contains("Stats Tuning") && itemName == ("Stats Tuning")) {
                 for (line in lore) {
-                    if (line.contains("Tuning Points: ")) {
-                        tuningPointsPattern.matchMatcher(line) {
-                            val usefulAsString = group("useful")
-                            val totalAsString = group("total").replace(",", "")
-                            val suffix = when (totalAsString.length) {
-                                in 1..3 -> ""
-                                in 4..6 -> "k"
-                                else -> "§b§z:)"
-                            }
-                            if (suffix == "§b§z:)") return suffix
-                            else return "" + usefulAsString + suffix
+                    tuningPointsPattern.matchMatcher(line) {
+                        val usefulAsString = group("useful")
+                        val totalAsString = group("total").replace(",", "")
+                        val suffix = when (totalAsString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            else -> "§b§z:)"
                         }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "" + usefulAsString + suffix
                     }
                 }
             }
             if (chestName.contains("Power Stones Guide")) {
-                if (lore.isNotEmpty() && item.getLore().last().contains("Learned: ")) {
-                    val symbol = lore.last().split(" ").last()
-                    if (symbol == "✖") return "§c$symbol"
-                    else return "§a$symbol"
+                if (lore.isNotEmpty()) {
+                    ("(§.)*Learned: (?<colorCode>§.)*(?<status>[\\w ]+) (?<icon>.)".toPattern()).matchMatcher(lore.last()) {
+                        return "${group("colorCode")}${group("icon")}"
+                    }
                 }
             }
             if (chestName.contains(" Thaumaturgy") && itemName.contains(" Breakdown")) {
                 for (line in lore) {
-                    if (line.contains("Total: ")) {
-                        magicalPowerSecondPattern.matchMatcher(line) {
-                            val usefulString = group("useful")
-                            val totalString = group("total").replace(",", "")
-                            val suffix = when (totalString.length) {
-                                in 1..3 -> ""
-                                in 4..6 -> "k"
-                                in 7..9 -> "M"
-                                else -> "§b§z:)"
-                            }
-                            if (suffix == "§b§z:)") return suffix
-                            else return "" + usefulString + suffix
+                    magicalPowerSecondPattern.matchMatcher(line) {
+                        val usefulString = group("useful")
+                        val totalString = group("total").replace(",", "")
+                        val suffix = when (totalString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            else -> "§b§z:)"
                         }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "" + usefulString + suffix
                     }
                 }
             }
@@ -283,13 +277,16 @@ class MenuItemDisplayOverlayPlayerTryhard {
             var theStringToUse = ""
             if (lore.isNotEmpty() && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
                 for (line in lore) {
-                    if (line.contains(" in: ")) {
+                    (("§7Starting in: .*").toPattern()).matchMatcher(line) {
                         theStringToUse = line
                     }
+                    break
                 }
             }
-            if (lore.isNotEmpty() && lore.first().contains(" in: ") && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
-                theStringToUse = lore.first()
+            if (lore.isNotEmpty() && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
+                (("§7Starts in: .*").toPattern()).matchMatcher(lore.first()) {
+                    theStringToUse = lore.first()
+                }
             }
             genericDurationPattern.matchMatcher(theStringToUse) {
                 val yString = group("years") ?: ""
@@ -306,10 +303,11 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
         }
 
-        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.SKYBLOCK_ACHIEVEMENT_POINTS) && (chestName.contains("Equipment and Stats") && itemName.lowercase().contains("skyblock achievements"))) {
+        if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerTryhard.SKYBLOCK_ACHIEVEMENT_POINTS) && (chestName.equals("Equipment and Stats") && itemName.lowercase().equals("skyblock achievements"))) {
+            //§7Points: §e1,995§7/§e2,835 §8(70%§8)
             for (line in item.getLore()) {
-                if (line.contains("Points: ")) {
-                    return line.removeColor().split(" ").last().split("(", "%)")[1]
+                (("(§.)*Points: (§.)*([\\d,]+)(§.)*\\/(§.)*([\\d,]+) (§.)*\\((?<percent>[\\d]+%)(§.)*\\)").toPattern()).matchMatcher(line) {
+                    return group("percent")
                 }
             }
         }

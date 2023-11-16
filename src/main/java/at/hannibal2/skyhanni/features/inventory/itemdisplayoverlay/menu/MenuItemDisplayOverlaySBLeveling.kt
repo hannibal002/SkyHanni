@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -27,31 +26,35 @@ class MenuItemDisplayOverlaySBLeveling {
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.GUIDE_PROGRESS)) {
-            if (((chestName.contains("Guide ")) || chestName.contains("Task")) && (itemName.isNotEmpty())) {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("Progress")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+            ((".*(Guide |Task).*").toPattern()).matchMatcher(chestName) {
+                if (itemName.isNotEmpty()) {
+                    for (line in item.getLore()) {
+                        (".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                            return group("percent").replace("100", "§a✔")
+                        }
                     }
+                    if (itemName.contains("✔")) return "§a✔"
                 }
-                if (itemName.contains("✔")) return "§a✔"
             }
         }
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
             for (line in item.getLore()) {
-                if (line.contains("Progress to Complete Category")) {
-                    return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+                (".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                    return group("percent").replace("100", "§a✔")
                 }
             }
         }
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
-            if ((chestName.contains("Rewards") || chestName.lowercase().contains("skyblock leveling")) && (itemName.isNotEmpty())) {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains("Progress to ") || line.contains("Rewards Unlocked: ")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+            if ((itemName.isNotEmpty())) {
+                ((".*(rewards|skyblock leveling).*").toPattern()).matchMatcher(chestName.lowercase()) {
+                    for (line in item.getLore()) {
+                        if (line.contains("Progress to ") || line.contains("Rewards Unlocked: ")) {
+                            (".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                                 return group("percent").replace("100", "§a✔")
+                            }
+                        }
                     }
                 }
             }
@@ -59,9 +62,12 @@ class MenuItemDisplayOverlaySBLeveling {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.SBLeveling.EMBLEMS_UNLOCKED)) {
             val nameWithColor = item.name ?: return ""
-            if ((chestName.contains("Emblems")) && (itemName.isNotEmpty() && (nameWithColor.contains("§a")) && !(itemName.contains(" ")))) {
-                val bruh = item.getLore().first().removeColor().split(" ").first().trim()
-                if (bruh.toIntOrNull() is Int) return bruh
+            if ((chestName == ("Emblems"))) {
+                (("^§a(\\S*)\$").toPattern()).matchMatcher(nameWithColor) {
+                    (("(§.)?(?<emblems>[\\d]+) Unlocked").toPattern()).matchMatcher(item.getLore().first()) {
+                        return group("emblems")
+                    }
+                }
             }
         }
 

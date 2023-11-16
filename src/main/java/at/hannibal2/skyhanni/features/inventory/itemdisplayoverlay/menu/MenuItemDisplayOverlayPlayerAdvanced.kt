@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerAdvanced {
-    private val dojoTestOfGradePattern = "§7(§6)?Your Rank: (?<grade>§.[A-Z]).*".toPattern()
+    private val dojoTestOfGradePattern = ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*".toPattern()
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
     private val enigmaSoulsPattern = "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?.*".toPattern()
@@ -132,7 +132,9 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
         
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.WARDROBE_SLOT) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
-            return itemName.replace("Slot ", "").substring(0,2).trim().replace(":", "")
+            (("(§.)?Slot (?<slotNumber>[0-9]): .*").toPattern()).matchMatcher(itemName) {
+                return group("slotNumber")
+            }
         }
         
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.ABBV_STATS) && chestName.startsWith("Your Stats Breakdown")) {
@@ -183,8 +185,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (nameWithColor != "§aProfile Management") return ""
             val lore = item.getLore()
             for (line in lore) {
-                if (line.contains("§7Playing on: §a")) {
-                    return when (val profileName = line.replace("§7Playing on: §a", "").removeColor().trim()) {
+                if (line.startsWith("§7Playing on: §a")) {
+                    return when (val profileName = line.removePrefix("§7Playing on: §a")) {
                         "Apple" -> "Apl"
                         "Banana" -> "Bna"
                         "Blueberry" -> "Blu"
@@ -215,19 +217,17 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
             for (line in item.getLore()) {
-                if (line.contains("Your Rank:")) {
-                    dojoTestOfGradePattern.matchMatcher(line) {
-                        return group("grade").removeColor()
-                    }
+                dojoTestOfGradePattern.matchMatcher(line) {
+                    return group("grade")
                 }
             }
         }
 
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.BANK_UTILS) && chestName.contains("Bank")) {
             val lore = item.getLore()
-            if (chestName.contains("Withdrawal") && itemName.contains("Withdraw 20%")) {
+            if (chestName.equals("Bank Withdrawal") && itemName.equals("§aWithdraw 20%")) {
                 for (line in lore) {
-                    if (line.contains("Amount to withdraw: ")) {
+                    if (line.startsWith("§7Amount to withdraw: ")) {
                         amtToWithdrawPattern.matchMatcher(line) {
                             val totalAsString = group("total").replace(",", "")
                             val usefulPartAsString = group("useful")
@@ -272,22 +272,22 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.MAYOR_PERKS)) {
             val lore = item.getLore()
-            if ((chestName.contains("Election"))) {
+            (("Election, Year .*").toPattern()).matchMatcher(chestName) {
+                if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
-                if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (lore.isNotEmpty()) {
                     if (lore.first().equals("§8Candidate")) {
                         val colorCode = nameWithColor.take(2)
                         var numPerks = 0
-                        for (line in item.getLore()) {
+                        for (line in lore) {
                             if (line.startsWith(colorCode) &&
-                                !(line.equals("${colorCode}You voted for this candidate!")) &&
-                                !(line.equals("${colorCode}Leading in votes!")) &&
+                                line != "${colorCode}You voted for this candidate!" &&
+                                line != "${colorCode}Leading in votes!" &&
                                 !(line.startsWith("${colorCode}Click to vote for ")) &&
-                                !(line.equals("SPECIAL ")) &&
+                                line != "${colorCode}This is a SPECIAL candidate!" &&
                                 !(line.startsWith("$colorCode§"))) {
-                                    numPerks++
+                                numPerks++
                             }
                         }
                         return "$colorCode$numPerks"
@@ -297,14 +297,14 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (((chestName == "Calendar and Events") || (chestName.contains("Mayor ")))) {
                 val nameWithColor = item.name ?: return ""
                 val colorCode = nameWithColor.take(2)
-                if (itemName.startsWith("JERRY IS MAYOR")) {
+                (("JERRY IS MAYOR.*").toPattern()).matchMatcher(itemName) {
                     return grabPerkpocalypseMayor(lore, colorCode)
                 }
-                if (itemName.startsWith("Mayor ")) {
-                    if (itemName.lowercase().contains("dante")) return "§c§l✖"
+                (("Mayor .*").toPattern()).matchMatcher(itemName) {
+                    ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" }
                     for (line in lore) {
-                        if (line.equals("§7players until the closing of")) {
-                            if (!(itemName.endsWith(" Jerry")) || chestName.contains("Mayor")) {
+                        if (line == ("§7players until the closing of") || line == ("§7until the closing of the next")) {
+                            if (!(itemName.endsWith(" Jerry")) || chestName.startsWith("Mayor")) {
                                 var numPerks = 0
                                 for (line in lore) {
                                     if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
@@ -314,7 +314,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                                 return "$colorCode$numPerks"
                             } else {
                                 for (line in lore) {
-                                    if (line.startsWith("${colorCode}Perkpocalypse")) {
+                                    (("${colorCode}Perkpocalypse").toPattern()).matchMatcher(line) {
                                         return grabPerkpocalypseMayor(lore, colorCode)
                                     }
                                 }
@@ -328,7 +328,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(InventoryConfig.StackSizeConfig.MenuConfig.PlayerAdvanced.AUCTION_BAZAAR_VARIOUS)) {
             if (itemName.isEmpty()) return ""
             val lore = item.getLore()
-            if (chestName.contains("Bazaar")) {
+            (("Bazaar.*").toPattern()).matchMatcher(chestName) {
                 if (itemName == "Manage Orders") {
                     var result = ""
                     for (line in lore) {
@@ -341,8 +341,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
                 if (itemName == "Instasell Ignore List") {
                     for (line in lore) {
-                        if (line.contains("Ignored: ")) { //§7Ignored: §c47 Products --> Ignored: 47 Products --> Ignored: 47 Product --> 47
-                            return line.removeColor().replace("Products", "Product").split("Ignored: ", " Product")[1]
+                        (("(§.)*Ignored: (§.)*(?<products>\\w+) Products").toPattern()).matchMatcher(line) {
+                            return group("products")
                         }
                     }
                 }
@@ -350,51 +350,63 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     return itemName.take(3)
                 }
             }
-            if (chestName.contains(" ➜ ") && itemName.contains("Instasell Ignore")) {
-                for (line in lore) {
-                    if (line.contains("Bulk Instasell: ")) {
-                        //§cIgnored!
-                        //§aAllowed!
-                        return line.replace("Bulk Instasell: ", "").take(5)
-                    }
-                }
-            }
-            if ((chestName == "Auction View")) {
-                if (itemName != "Bid History") return ""
-                if (!(lore.first().contains("Total "))) return ""
-                return lore.first().removeColor().replace("Total bids: ", "").replace(" bids", "").replace(" bid", "")
-            }
-            if ((chestName.contains("Auction House"))) {
-                if (itemName != "View Bids" && itemName != "Manage Auctions") return ""
-                if ((itemName == "View Bids") && (lore.first().removeColor().contains(" top bid ") || lore.first().removeColor().contains("a bid "))) return "1"
-                if ((itemName == "View Bids") && lore.first().contains("You placed ")) "(§.)?You placed (§.)?(?<bids>[0-9]+) bid(.{0,3}) (§.)?on pending".toPattern().matchMatcher(lore.first()) { return group("bids") }
-                if ((itemName == "Manage Auctions")) {
+            ((".* ➜ .*").toPattern()).matchMatcher(chestName) {
+                (("Instasell Ignore").toPattern()).matchMatcher(itemName) {
                     for (line in lore) {
-                        if (line.contains("Your auction")) {
-                            return line.removeColor().replace("Your auctions have ", "").replace("Your auction has ", "").replace(" bids", "").replace(" bid", "")
+                        (("(§.)*Bulk Instasell: (?<display>(§.)*A)llowed!").toPattern()).matchMatcher(line) {
+                            return group("display")
                         }
                     }
                 }
             }
-            if (chestName.contains("Auction")) {
+            if ((chestName == "Auction View")) {
+                if (itemName == "Bid History") {
+                    (("(§.)*Total bids: (§.)*(?<bids>[\\S]+) .*").toPattern()).matchMatcher(lore.first()) {
+                        return group("bids")
+                    }
+                }
+            }
+            ((".*Auction House").toPattern()).matchMatcher(chestName) {
+                if (itemName != "View Bids" && itemName != "Manage Auctions") return ""
+                if ((itemName == "View Bids")) {
+                    ((".*top bid .*").toPattern()).matchMatcher(lore.first()) {
+                        return "1"
+                    }
+                    (("(§.)?You placed (§.)?(?<bids>[0-9]+) bid(.{0,3}) (§.)?on pending").toPattern()).matchMatcher(lore.first()) {
+                        return group("bids")
+                    }
+                }
+                if ((itemName == "Manage Auctions")) {
+                    for (line in lore) {
+                        (("(§.)*Your (§.)*auction(s?) (§.)*ha(ve|s) (§.)*(?<bidcount>[\\S]+) (§.)*bid(s?)").toPattern()).matchMatcher(line) {
+                            return group("bidcount")
+                        }
+                    }
+                }
+            }
+            ((".*Auction").toPattern()).matchMatcher(chestName) {
                 if (itemName != "Item Tier" && itemName != "BIN Filter" && itemName != "Sort") return ""
                 for (line in lore) {
-                    if (line.contains("▶ ")) {
-                        val betterLine = line.removeColor().replace("▶ ", "")
+                    (("(§.)*▶ (?<text>[\\w ]+)").toPattern()).matchMatcher(line) {
+                        val theText = group("text")
                         if (itemName == "Sort") {
-                            return when (betterLine.replace(" Price", "").replace(" Bid", "")) {
-                                "Highest" -> "§c⬆"
-                                "Lowest" -> "§a⬇"
+                            return when (theText) {
+                                "Highest Price" -> "§c⬆"
+                                "Lowest Price" -> "§a⬇"
+                                "Highest Bid" -> "§c⬆"
+                                "Lowest Bid" -> "§a⬇"
                                 "Ending soon" -> "§e☉"
                                 "Random" -> "R"
                                 else -> ""
                             }
                         }
                         if (itemName == "Item Tier") {
-                            return line.take(5).replace("▶ ", "")
+                            (("((?<colorCode>§.)*▶ (?<singleChar>[\\w ]))([\\w ])+").toPattern()).matchMatcher(line) {
+                                return "${group("colorCode")}${group("singleChar")}"
+                            }
                         }
                         if (itemName == "BIN Filter") {
-                            return when (betterLine) {
+                            return when (theText) {
                                 "Show All" -> "All"
                                 "BIN Only" -> "§2BIN"
                                 "Auctions Only" -> "§6Auc"

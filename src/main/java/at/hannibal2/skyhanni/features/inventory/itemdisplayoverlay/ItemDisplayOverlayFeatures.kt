@@ -250,14 +250,12 @@ class ItemDisplayOverlayFeatures {
             var numberOfLines = 0 //"zoMG ERY WHY NOT JUST REPLACE "CRUX_TALISMAN"?!?!?" yeah i considered that too but then realized hypixel might change that one day
             var killCount = 0
             val currentKillThresholdPerMobFamily = 100 //change this in case hypixel increases the kill count to max a crux accessory
-            if (lore.any {it.endsWith("kills")}) {
-                for (line in lore) {
-                    if (line.endsWith("kills")) {
-                        numberOfLines++
-                        xOutOfYNoColorRequiredPattern.matchMatcher(line) {
-                            val mobSpecificKillCount = group("useful").toIntOrNull() ?: 0
-                            killCount += mobSpecificKillCount
-                        }
+            for (line in lore) {
+                if (line.endsWith("kills")) {
+                    numberOfLines++
+                    xOutOfYNoColorRequiredPattern.matchMatcher(line) {
+                        val mobSpecificKillCount = group("useful").toIntOrNull() ?: 0
+                        killCount += mobSpecificKillCount
                     }
                 }
                 val totalKillsNecessary = currentKillThresholdPerMobFamily * numberOfLines
