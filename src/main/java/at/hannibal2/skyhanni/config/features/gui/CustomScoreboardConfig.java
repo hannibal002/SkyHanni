@@ -18,7 +18,7 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show a custom scoreboard instead of the default one." //TODO: MAKE COOLER
+        desc = "Show a custom scoreboard instead of the default one."
     )
     @ConfigEditorBoolean
     @FeatureToggle
