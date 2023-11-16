@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object EntityKill {
 
     private var mobHitList = mutableSetOf<SkyblockMob>()
-    val config get() = SkyHanniMod.feature.dev.mobDetection.mobHitDetecion
+    val config get() = SkyHanniMod.feature.dev.mobDebug.mobHitDetecion
 
 
     @SubscribeEvent

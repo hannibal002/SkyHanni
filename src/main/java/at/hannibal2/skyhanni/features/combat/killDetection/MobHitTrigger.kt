@@ -86,7 +86,7 @@ object MobHitTrigger {
 
     // Needs Bugfixing
 
-    private val config get() = SkyHanniMod.feature.dev.mobDetection.mobHitDetecion
+    private val config get() = SkyHanniMod.feature.dev.mobDebug.mobHitDetecion
 
 
     @SubscribeEvent

@@ -51,7 +51,8 @@ private const val MAX_RETRIES = 100
 private const val MAX_DISTANCE_TO_PLAYER = 22.8
 
 class MobData {
-    private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDetection
+    private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
+    private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
 
     companion object {
 
@@ -106,12 +107,18 @@ class MobData {
         previousEntityLiving.clear()
         previousEntityLiving.addAll(currentEntityLiving)
         currentEntityLiving.clear()
-        if (!mobDebugConfig.forceReset) {
-            currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
+        currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
+
+        if (forceReset) {
+            currentEntityLiving.clear()
         }
 
         (currentEntityLiving - previousEntityLiving).forEach { retry(it) }
         (previousEntityLiving - currentEntityLiving).forEach { EntityDeSpawn(it) }
+
+        if (forceReset) {
+            mobDetectionReset()
+        }
     }
 
     private fun EntitySpawn(entity: EntityLivingBase): Boolean {
