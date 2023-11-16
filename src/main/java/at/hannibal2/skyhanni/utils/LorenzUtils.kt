@@ -32,7 +32,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Timer
-import java.util.TimerTask
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -538,9 +537,8 @@ object LorenzUtils {
         return enums.firstOrNull { it.name == name }
     }
 
-    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
-        enumValueOfOrNull<T>(name)
-            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) = enumValueOfOrNull<T>(name)
+        ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     operator fun MatchResult?.get(index: Int) = this?.groupValues?.get(index)
 

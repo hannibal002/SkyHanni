@@ -57,7 +57,7 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
                 resultList.add("Type of Mob: ${getType(entity)}")
-                resultList.add("uuid version: ${entity.uniqueID.version()} / ${entity.uniqueID.variant()}(${entity.uniqueID})")
+                resultList.add("uuid version: ${entity.uniqueID.version()} (${entity.uniqueID})")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")

@@ -24,7 +24,7 @@ class EntityData {
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
 
     @SubscribeEvent
-    fun onTickForHealth(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
             val maxHealth = entity.baseMaxHealth
             val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
