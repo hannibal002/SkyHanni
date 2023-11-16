@@ -138,4 +138,37 @@ object VisitorAPI {
         ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
         REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
     }
+
+    fun visitorsInTabList(tabList: List<String>): MutableList<String> {
+        var found = false
+        val visitorsInTab = mutableListOf<String>()
+        for (line in tabList) {
+            if (line.startsWith("§b§lVisitors:")) {
+                found = true
+                continue
+            }
+            if (!found) continue
+
+            if (line.isEmpty() || line.contains("Account Info")) {
+                found = false
+                continue
+            }
+            val name = VisitorAPI.fromHypixelName(line)
+
+            // Hide hypixel watchdog entries
+            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
+                logger.log("Ignore wrong red name: '$name'")
+                continue
+            }
+
+            //hide own player name
+            if (name.contains(LorenzUtils.getPlayerName())) {
+                logger.log("Ignore wrong own name: '$name'")
+                continue
+            }
+
+            visitorsInTab.add(name)
+        }
+        return visitorsInTab
+    }
 }
