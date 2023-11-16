@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.InventoryConfig
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -52,7 +52,7 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!SkyHanniMod.feature.inventory.stackSize.itemNumber.contains(InventoryConfig.StackSizeConfig.ItemNumber.CRIMSON_STARS)) return
+        if (!SkyHanniMod.feature.inventory.stackSize.itemNumber.contains(StackSizeConfig.ItemNumber.CRIMSON_STARS)) return
         val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
         if (number != -1) {
