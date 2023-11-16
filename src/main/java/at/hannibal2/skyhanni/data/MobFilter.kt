@@ -93,7 +93,7 @@ object MobFilter {
         override val name: String = ""
     }
 
-    class SkyblockInvalidEntity(baseEntity: EntityLivingBase, override val name: String) : SkyblockEntity(baseEntity, null) {}
+    private class SkyblockInvalidEntity(baseEntity: EntityLivingBase, override val name: String) : SkyblockEntity(baseEntity, null) {}
 
     private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): SkyblockMob {
         val name = armorStand.name.removeColor()
@@ -115,7 +115,7 @@ object MobFilter {
 
         // Check if Late Stack
         nextEntity?.let { nextEntity ->
-            EntityData.getSummonOrSkyblockMob(nextEntity)?.apply { addEntityInFront(baseEntity) }
+            MobData.getSummonOrSkyblockMob(nextEntity)?.apply { addEntityInFront(baseEntity) }
                 ?.also { return SkyblockInvalidEntity(baseEntity, "Added to $it") }
         }
 
@@ -123,7 +123,7 @@ object MobFilter {
         var caughtSkyblockMob: SummingOrSkyblockMob? = null
         val extraEntityList =
             generateSequence(nextEntity) { MobUtils.getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
-                !(entity is EntityArmorStand && !entity.isDefaultValue()) && EntityData.getSummonOrSkyblockMob(entity)
+                !(entity is EntityArmorStand && !entity.isDefaultValue()) && MobData.getSummonOrSkyblockMob(entity)
                     ?.also {
                         caughtSkyblockMob = it
                     }?.run { false } ?: true

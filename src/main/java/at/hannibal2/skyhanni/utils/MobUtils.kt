@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
@@ -26,7 +26,7 @@ object MobUtils {
 
 
     class OwnerShip(val ownerName: String) {
-        val ownerPlayer = EntityData.currentRealPlayers.firstOrNull { it.name == ownerName }
+        val ownerPlayer = MobData.currentRealPlayers.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
             if (other is EntityPlayer) return ownerPlayer == other || ownerName == other.name
             if (other is String) return ownerName == other
@@ -55,7 +55,7 @@ object MobUtils {
     fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<SkyblockMob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        val possibleEntitys = EntityData.currentSkyblockMobsMap.filterKeys {
+        val possibleEntitys = MobData.currentSkyblockMobsMap.filterKeys {
             it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
                 pos, look
             )

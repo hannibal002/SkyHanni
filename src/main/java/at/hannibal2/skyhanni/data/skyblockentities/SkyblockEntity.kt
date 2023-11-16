@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
-import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import net.minecraft.entity.Entity
@@ -31,7 +31,7 @@ abstract class SkyblockEntity(val baseEntity: EntityLivingBase, open val armorSt
         return false
     }
 
-    fun isInRender() = baseEntity.distanceToPlayer() < EntityData.ENTITY_RENDER_RANGE_IN_BLOCKS
+    fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen() = baseEntity.canBeSeen()
 }

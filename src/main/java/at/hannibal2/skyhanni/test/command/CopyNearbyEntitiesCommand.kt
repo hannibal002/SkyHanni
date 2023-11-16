@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
@@ -184,7 +184,7 @@ object CopyNearbyEntitiesCommand {
     private fun getType(entity: Entity) = buildString {
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
-            val mob = EntityData.currentSkyblockMobs.firstOrNull() { it == entity }
+            val mob = MobData.currentSkyblockMobs.firstOrNull() { it == entity }
             if (mob != null) when (mob) {
                 is SkyblockSlayerBoss -> append("Slayer")
                 is SkyblockBossMob -> append("Boss")
@@ -197,7 +197,7 @@ object CopyNearbyEntitiesCommand {
         if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
         if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
         if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
-        if (EntityData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
+        if (MobData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
 
         if (isNotEmpty()) {
             delete(length - 2, length) // Remove the last ", "

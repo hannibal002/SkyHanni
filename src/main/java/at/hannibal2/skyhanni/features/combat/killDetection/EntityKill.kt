@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.killDetection
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -56,7 +56,7 @@ object EntityKill {
 
     fun addToMobHitList(entity: Entity, trigger: hitTrigger) {
         val mob = mobHitList.firstOrNull { it == entity } ?: run {
-            val it = EntityData.currentSkyblockMobs.find { it == entity } ?: return
+            val it = MobData.currentSkyblockMobs.find { it == entity } ?: return
             mobHitList.add(it)
             return@run it
         }

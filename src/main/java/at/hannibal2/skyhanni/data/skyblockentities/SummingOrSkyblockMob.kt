@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.skyblockentities
 
-import at.hannibal2.skyhanni.data.EntityData
+import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.entity.EntityLivingBase
@@ -23,8 +23,8 @@ abstract class SummingOrSkyblockMob(baseEntity: EntityLivingBase, armorStand: En
     }
 
     private fun removeExtraEntitiesFromChecking() =
-        extraEntities?.count { EntityData.retries.contains(EntityData.RetryEntityInstancing(it, 0)) }?.also {
-            EntityData.externRemoveOfRetryAmount += it
+        extraEntities?.count { MobData.retries.contains(MobData.RetryEntityInstancing(it, 0)) }?.also {
+            MobData.externRemoveOfRetryAmount += it
         }
 
     private fun makeRelativeBoundingBox() =
@@ -34,13 +34,13 @@ abstract class SummingOrSkyblockMob(baseEntity: EntityLivingBase, armorStand: En
     fun addEntityInFront(entity: EntityLivingBase) {
         extraEntitiesList?.add(0, entity) ?: run { extraEntitiesList = mutableListOf(entity) }
         relativeBoundingBox = makeRelativeBoundingBox()
-        EntityData.putSummonOrSkyblockMob(entity, this)
+        MobData.putSummonOrSkyblockMob(entity, this)
     }
 
     fun addEntityInFront(entities: Collection<EntityLivingBase>) {
         extraEntitiesList?.addAll(0, entities) ?: run { extraEntitiesList = entities.toMutableList() }
         relativeBoundingBox = makeRelativeBoundingBox()
         removeExtraEntitiesFromChecking()
-        EntityData.putAllSummonOrSkyblockMob(entities, this)
+        MobData.putAllSummonOrSkyblockMob(entities, this)
     }
 }
