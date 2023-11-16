@@ -40,10 +40,8 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
             for (line in item.getLore()) {
-                if (line.contains(" Level: ")) {
-                    skyblockLevelPattern.matchMatcher(line) {
-                        return group("sblvl").toInt().toString()
-                    }
+                skyblockLevelPattern.matchMatcher(line) {
+                    return group("sblvl").toInt().toString()
                 }
             }
         }
@@ -52,41 +50,40 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
                 if (item.getLore().isNotEmpty() && item.getLore().last().equals("§eClick to view!")) {
                     if (chestName == "Your Skills") {
-                        if (CollectionAPI.isCollectionTier0(item.getLore()) && !(itemName.contains("Dungeoneering"))) return "0"
-                        if (itemName.removeColor().split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
-                        if (!itemName.contains("Dungeon")) {
-                            val text = itemName.removeColor().split(" ").last()
-                            return "" + text.romanToDecimalIfNeeded()
+                        if (CollectionAPI.isCollectionTier0(item.getLore()) && (itemName != ("Dungeoneering"))) return "0"
+                        if (itemName.split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
+                        (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern()).matchMatcher(itemName) {
+                            return "${group(" level").romanToDecimalIfNeeded()}"
                         }
                     } else if (chestName == "Dungeoneering") {
-                        dungeonClassLevelPattern.matchMatcher(itemName.removeColor()) {
+                        dungeonClassLevelPattern.matchMatcher(itemName) {
                             return group("level")
                         }
                     }
                 }
-            } else if (((chestName == "Farming Skill") || (chestName == "Desk")) && itemName.contains("Garden Level ")) {
-                if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
-                return itemName.replace("Garden Level ", "")
+            } else if (((chestName == "Farming Skill") || (chestName == "Desk"))) {
+               (("Garden Level (?<level>[\\w]+)").toPattern()).matchMatcher(itemName) {
+                   if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
+                   return group("level")
+               }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKILL_AVERAGE) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
             for (line in item.getLore()) {
-                if (line.contains(" Skill Avg. ")) {
-                    return skillAvgPattern.matchMatcher(line) { group("avg").toDouble().toInt().toString() } ?: ""
-                }
+                skillAvgPattern.matchMatcher(line) { return group("avg").toDouble().toInt().toString() }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
-            if (chestName.endsWith(" Collections")) {
+            ((".*Collections").toPattern()).matchMatcher(chestName) {
                 val lore = item.getLore()
-                if (lore.last().equals("§eClick to view!")) {
+                if (lore.last() == ("§eClick to view!")) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
                         if (it.startsWith("§e")) {
                             val text = it.split(" ").last()
-                            return "" + text.romanToDecimalIfNeeded()
+                            return "${text.romanToDecimalIfNeeded()}"
                         }
                     }
                 }
@@ -103,9 +100,7 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName.contains("Collections")) {
                 if (itemName.contains("Collections")) {
                     for (line in item.getLore()) {
-                        if (line.contains("Collections ") && line.contains(": §")) {
-                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                        (".*Collections .*: .*(§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
@@ -115,29 +110,25 @@ class MenuItemDisplayOverlayPlayer {
             val lore = item.getLore()
             if (itemName == "Information") {
                 for (line in lore) {
-                    if (line.contains("Craft ") && line.contains("more") && line.contains("unique")) {
-                        //§7Craft §b22 §7more §aunique
-                        //Craft 22 more unique
-                        return line.removeColor().trim().split("Craft ", " more unique")[1]
+                    (("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*").toPattern()).matchMatcher(line) {
+                        return group("count")
                     }
                 }
             }
-            if (lore.last().startsWith("§eClick to view ")) {
+            (("§eClick to view .*").toPattern()).matchMatcher(lore.last()) {
                 var tiersToSubtract = 0
                 var totalTiers = 0
                 for (line in lore) {
-                    if (line.contains(" Tier ")) { totalTiers++ }
-                    if (line.contains(" Tier ") && line.contains("§c")) { tiersToSubtract++ }
+                    ((".* Tier .*").toPattern()).matchMatcher(line) { totalTiers++ } //§c
+                    ((".* Tier .*§c.*").toPattern()).matchMatcher(line) { tiersToSubtract++ }
                 }
-                return (totalTiers - tiersToSubtract).toString().replace(totalTiers.toString(), "§a✔")
+                return "${totalTiers - tiersToSubtract}".replace("$totalTiers", "§a✔")
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
             for (line in item.getLore()) {
-                if (line.contains("Items Donated")) {
-                    return museumDonationPattern.matchMatcher(line) { group("amount").toDouble().toInt().toString().replace("100", "§a✔") } ?: ""
-                }
+                museumDonationPattern.matchMatcher(line) { return group("amount").toDouble().toInt().toString().replace("100", "§a✔") }
             }
         }
 
@@ -146,14 +137,18 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PET_SCORE_STATUS)) {
-            if ((chestName.lowercase() == "skyblock menu") && itemName.contains("Pets")) {
-                for (line in item.getLore()) {
-                    if ((line.contains("Selected pet: ")) && (line.contains("None"))) return "§c§l✖"
+            if ((chestName.lowercase() == "skyblock menu")) {
+                ((".*Pets.*").toPattern()).matchMatcher(itemName) {
+                    for (line in item.getLore()) {
+                        (("(§.)*Selected Pet: (§.)*None").toPattern()).matchMatcher(line) { return "§c§l✖" }
+                    }
                 }
             }
-            if (chestName.contains("Pets")) {
-                if (itemName.contains("Pet Score Rewards") && item.getLore().isNotEmpty()) {
-                    return item.getLore().last().removeColor().split(" ").last()
+            ((".* Pets").toPattern()).matchMatcher(chestName) {
+                if (itemName == ("Pet Score Rewards") && item.getLore().isNotEmpty()) {
+                    (("(§.)*Your Pet Score: (§.)*(?<score>[\\w]+)").toPattern()).matchMatcher(item.getLore().last()) {
+                        return group("score")
+                    }
                 }
             }
         }
