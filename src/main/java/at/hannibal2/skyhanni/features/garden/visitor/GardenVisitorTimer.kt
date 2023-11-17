@@ -11,32 +11,40 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
-import kotlin.math.roundToLong
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class GardenVisitorTimer {
     private val config get() = SkyHanniMod.feature.garden.visitors.timer
     private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
     private var render = ""
-    private var lastMillis = 0L
-    private var sixthVisitorArrivalTime: Long = 0
+    private var lastMillis = 0.seconds
+    private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
     private var visitorJustArrived = false
     private var sixthVisitorReady = false
+    private var lastTimerValue = ""
+    private var lastTimerUpdate = SimpleTimeMark.farPast()
 
     //TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
-    private var visitorInterval: Long?
-        get() = GardenAPI.storage?.visitorInterval
+    private var visitorInterval: Duration?
+        get() = GardenAPI.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
             value?.let {
-                GardenAPI.storage?.visitorInterval = it
+                GardenAPI.storage?.visitorInterval = it.inWholeMilliseconds
             }
         }
 
@@ -66,8 +74,8 @@ class GardenVisitorTimer {
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
         render = ""
-        lastMillis = 0
-        sixthVisitorArrivalTime = 0
+        lastMillis = 0.seconds
+        sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
         sixthVisitorReady = false
     }
@@ -91,14 +99,18 @@ class GardenVisitorTimer {
 
             pattern.matchMatcher(line) {
                 val rawTime = group("time").removeColor()
-                millis = TimeUtils.getMillis(rawTime)
+                if (lastTimerValue != rawTime) {
+                    lastTimerUpdate = SimpleTimeMark.now()
+                    lastTimerValue = rawTime
+                }
+                millis = TimeUtils.getDuration(rawTime)
             }
         }
 
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
-                visitorInterval = ((millis - 1) / 60_000L + 1) * 60_000L
-                GardenAPI.storage?.visitorInterval = visitorInterval
+                visitorInterval = millis
+                this.visitorInterval = visitorInterval
             } else {
                 updateSixthVisitorArrivalTime()
             }
@@ -110,10 +122,11 @@ class GardenVisitorTimer {
                 visitorJustArrived = false
                 sixthVisitorReady = false
             }
-            millis = sixthVisitorArrivalTime - System.currentTimeMillis()
-            GardenAPI.storage?.nextSixthVisitorArrival =
-                System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
-            if (isSixthVisitorEnabled() && millis < 0) {
+            millis = sixthVisitorArrivalTime.timeUntil()
+
+            val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
+            GardenAPI.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival.toMillis()
+            if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
                     LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
@@ -122,23 +135,33 @@ class GardenVisitorTimer {
                 }
             }
         }
+        val sinceLastTimerUpdate = lastTimerUpdate.passedSince() - 100.milliseconds
+        val guessTime = visitorsAmount < 5 && sinceLastTimerUpdate in 500.milliseconds..60.seconds
+        if (guessTime) {
+            millis -= sinceLastTimerUpdate
+        }
 
         val diff = lastMillis - millis
-        if (diff == 0L && visitorsAmount == lastVisitors) return
+        if (diff == 0.seconds && visitorsAmount == lastVisitors) return
         lastMillis = millis
         lastVisitors = visitorsAmount
 
-        val formatColor = if (queueFull) "6" else "e"
+        val formatColor = when {
+            queueFull -> "6"
+            else -> "e"
+        }
 
-        val extraSpeed = if (diff in 2000..10_000) {
-            val factor = diff / 1000.0
-            "§7/§$formatColor" + TimeUtils.formatDuration((millis / factor).roundToLong())
+        val extraSpeed = if (diff in 2.seconds..10.seconds) {
+            val factor = diff.inWholeSeconds.toDouble()
+            val duration = millis / factor
+            "§7/§$formatColor" + duration.format()
         } else ""
-        if (config.newVisitorPing && millis < 10000) {
+        if (config.newVisitorPing && millis < 10.seconds) {
             SoundUtils.playBeepSound()
         }
+
         val formatDuration = TimeUtils.formatDuration(millis)
-        val next = if (queueFull && (!isSixthVisitorEnabled() || millis < 0)) "§cQueue Full!" else {
+        val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
@@ -156,21 +179,22 @@ class GardenVisitorTimer {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
         GardenAPI.storage?.nextSixthVisitorArrival?.let {
-            sixthVisitorArrivalTime = it
+            sixthVisitorArrivalTime = it.asTimeMark()
         }
         sixthVisitorReady = false
-        lastMillis = sixthVisitorArrivalTime - System.currentTimeMillis()
+        lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
     @SubscribeEvent
     fun onBlockBreak(event: CropClickEvent) {
         if (!isEnabled()) return
-        sixthVisitorArrivalTime -= 100
+        sixthVisitorArrivalTime -= 100.milliseconds
+        lastTimerUpdate -= 100.milliseconds
     }
 
     private fun updateSixthVisitorArrivalTime() {
         visitorInterval?.let {
-            sixthVisitorArrivalTime = System.currentTimeMillis() + it
+            sixthVisitorArrivalTime = SimpleTimeMark.now() + it
         }
     }
 
