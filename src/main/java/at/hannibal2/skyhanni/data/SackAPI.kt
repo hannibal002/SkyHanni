@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -303,7 +304,7 @@ object SackAPI {
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
-        SkyHanniMod.configManager.saveSackData("saving-data")
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
     }
 
     data class SackGemstone(
