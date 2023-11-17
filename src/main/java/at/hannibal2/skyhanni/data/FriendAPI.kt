@@ -21,14 +21,13 @@ object FriendAPI {
     private val addedFriendPattern = "§aYou are now friends with (?<name>.*)".toPattern()
     private val noBestFriendPattern = ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*".toPattern()
     private val bestFriendPattern = ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*".toPattern()
+    private val readFriendListPattern = "/viewprofile (?<uuid>.*)".toPattern()
 
     private val tempFriends = mutableListOf<Friend>()
 
-    private fun getFriends(): MutableMap<UUID, Friend> {
-        return SkyHanniMod.friendsData.players.getOrPut(LorenzUtils.getRawPlayerUuid()) {
-            FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
-        }.friends
-    }
+    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(LorenzUtils.getRawPlayerUuid()) {
+        FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
+    }.friends
 
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
@@ -97,7 +96,7 @@ object FriendAPI {
             val value = chatStyle.chatClickEvent?.value ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
-            val uuid = "/viewprofile (?<uuid>.*)".toPattern().matchMatcher(value) {
+            val uuid = readFriendListPattern.matchMatcher(value) {
                 group("uuid")?.let {
                     try {
                         UUID.fromString(it)
