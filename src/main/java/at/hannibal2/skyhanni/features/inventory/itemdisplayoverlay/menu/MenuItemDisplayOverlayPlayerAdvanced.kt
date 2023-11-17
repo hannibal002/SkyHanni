@@ -32,9 +32,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     */
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!(event.inventoryName.contains("Bank Account"))) return
+        (("^((?!Bank Account).)*\$").toPattern()).matchMatcher(event.inventoryName) {
+            return
+        }
         event.stackTip = getStackTip(event.stack)
-        if (event.stackTip.contains("Balance: ")) {
+        (("Balance: .*").toPattern()).matchMatcher(event.stackTip) {
             event.offsetY = -23
             event.offsetX = 0
             event.alignLeft = false
@@ -43,7 +45,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (event.stack.cleanName().contains("Deposit Coins")) return
+        ((".*Deposit Coins.*").toPattern()).matchMatcher(event.stack.cleanName()) { return }
         /*
         so apparently i have to make a whole separate event for the bank balance display.
         also having everything in this class rely on RenderInventoryItemTipEvent would
@@ -73,15 +75,15 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.UNLOCKED_RECIPES)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
-                    if (line.contains(" Book Unlocked: ")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                    }
+                    ((".* Book Unlocked: .* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                 }
             }
-            if (((chestName == "Recipe Book") || (chestName.contains(" Recipes"))) && (itemName.contains(" Recipes"))) {
-                for (line in item.getLore()) {
-                    if (line.contains("Recipes Unlocked: ")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+            (("(Recipe Book|.* Recipes)").toPattern()).matchMatcher(chestName) {
+                ((".* Recipes").toPattern()).matchMatcher(itemName) {
+                    for (line in item.getLore()) {
+                        ((".*Recipes Unlocked: .*(§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(
+                            line
+                        ) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
@@ -103,18 +105,14 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
                 if (itemName == "Completed Quests") {
                     for (line in lore) {
-                        if (line.contains("§7Completed: §a")) {
-                            return "§a" + line.removeColor().replace("Completed: ", "")
-                        }
+                        (("(§.)*Completed: (§.)*(?<completed>[\\w]+)").toPattern()).matchMatcher(line) { return group("completed") }
                     }
                 }
             }
             if (chestName == "Rift Guide") {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        enigmaSoulsPattern.matchMatcher(line) {
-                            return group("useful")
-                        }
+                        enigmaSoulsPattern.matchMatcher(line) { return group("useful") }
                     }
                 }
             }
@@ -123,16 +121,12 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.TRADES_UNLOCKED) && (itemName == "Trades")) {
             val lore = item.getLore()
             for (line in lore) {
-                if (line.contains("Trades Unlocked")) {
-                    return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                }
+                ((".*Trades Unlocked.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
             }
         }
         
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.WARDROBE_SLOT) && (chestName.startsWith("Wardrobe") && (itemName.startsWith("Slot ") && itemName.contains(":")))) {
-            (("(§.)?Slot (?<slotNumber>[0-9]): .*").toPattern()).matchMatcher(itemName) {
-                return group("slotNumber")
-            }
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.WARDROBE_SLOT) && (chestName.startsWith("Wardrobe"))) {
+            (("(§.)?Slot (?<slotNumber>[0-9]): .*").toPattern()).matchMatcher(itemName) { return group("slotNumber") }
         }
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.ABBV_STATS) && chestName.startsWith("Your Stats Breakdown")) {
@@ -142,7 +136,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     val name = group("name")
                     val color = group("color")
                     val icon = group("icon")
-                    val me = when (name) {
+                    val abbv = when (name) {
                         "Health" -> "HP"
                         "Defense" -> "Def"
                         "Strength" -> "Str"
@@ -171,9 +165,9 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         "Foraging Fortune" -> "FoF"
                         "Farming Fortune" -> "FaF"
                         "Mining Fortune" -> "MiF"
-                        else -> "[icon]"
+                        else -> icon
                     }
-                    return "" + "§" + color + me.replace("[icon]", icon)
+                    return "§$color$abbv"
                 }
             }
         }
@@ -183,7 +177,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (nameWithColor != "§aProfile Management") return ""
             val lore = item.getLore()
             for (line in lore) {
-                if (line.startsWith("§7Playing on: §a")) {
+                (("§7Playing on: §a.*").toPattern()).matchMatcher(line) {
                     return when (val profileName = line.removePrefix("§7Playing on: §a")) {
                         "Apple" -> "Apl"
                         "Banana" -> "Bna"
@@ -215,29 +209,29 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
             for (line in item.getLore()) {
-                dojoTestOfGradePattern.matchMatcher(line) {
-                    return group("grade")
-                }
+                dojoTestOfGradePattern.matchMatcher(line) { return group("grade") }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.BANK_UTILS) && chestName.contains("Bank")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.BANK_UTILS)) {
             val lore = item.getLore()
-            if (chestName.equals("Bank Withdrawal") && itemName.equals("§aWithdraw 20%")) {
-                for (line in lore) {
-                    amtToWithdrawPattern.matchMatcher(line) {
-                        val totalAsString = group("total").replace(",", "")
-                        val usefulPartAsString = group("useful")
-                        val suffix = when (totalAsString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            in 10..12 -> "B"
-                            in 13..15 -> "T"
-                            else -> "§b§z:)"
+            ((".*Bank.*").toPattern()).matchMatcher(chestName) {
+                if (chestName.equals("Bank Withdrawal") && itemName.equals("§aWithdraw 20%")) {
+                    for (line in lore) {
+                        amtToWithdrawPattern.matchMatcher(line) {
+                            val totalAsString = group("total").replace(",", "")
+                            val usefulPartAsString = group("useful")
+                            val suffix = when (totalAsString.length) {
+                                in 1..3 -> ""
+                                in 4..6 -> "k"
+                                in 7..9 -> "M"
+                                in 10..12 -> "B"
+                                in 13..15 -> "T"
+                                else -> "§b§z:)"
+                            }
+                            if (suffix == "§b§z:)") return suffix
+                            else return "§6$usefulPartAsString$suffix"
                         }
-                        if (suffix == "§b§z:)") return suffix
-                        else return "§6$usefulPartAsString$suffix"
                     }
                 }
             }
@@ -248,20 +242,22 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            if (chestName.endsWith("Bank Account") && itemName.contains("Deposit Coins")) {
-                bankBalancePattern.matchMatcher(lore.first()) {
-                    val totalAsString = group("total").replace(",", "")
-                    val usefulPartAsString = group("useful")
-                    val suffix = when (totalAsString.length) {
-                        in 1..3 -> ""
-                        in 4..6 -> "k"
-                        in 7..9 -> "M"
-                        in 10..12 -> "B"
-                        in 13..15 -> "T"
-                        else -> "§b§z:)"
+            ((".*Bank Account").toPattern()).matchMatcher(chestName) {
+                ((".*Deposit Coins.*").toPattern()).matchMatcher(itemName) {
+                    bankBalancePattern.matchMatcher(lore.first()) {
+                        val totalAsString = group("total").replace(",", "")
+                        val usefulPartAsString = group("useful")
+                        val suffix = when (totalAsString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            in 10..12 -> "B"
+                            in 13..15 -> "T"
+                            else -> "§b§z:)"
+                        }
+                        if (suffix == "§b§z:)") return "§6Balance: $suffix"
+                        else return "§6Balance: $usefulPartAsString$suffix"
                     }
-                    if (suffix == "§b§z:)") return "§6Balance: $suffix"
-                    else return "§6Balance: $usefulPartAsString$suffix"
                 }
             }
         }
@@ -270,7 +266,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             val lore = item.getLore()
             (("(Election|Election, Year .*)").toPattern()).matchMatcher(chestName) {
                 if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
-                if (itemName.lowercase().contains("dante")) return "§c§l✖"
+                ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" }
                 val nameWithColor = item.name ?: return ""
                 if (lore.isNotEmpty()) {
                     if (lore.first().equals("§8Candidate")) {
@@ -290,7 +286,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            if (((chestName == "Calendar and Events") || (chestName.contains("Mayor ")))) {
+            (("(Calendar and Events|Mayor .*)").toPattern()).matchMatcher(chestName) {
                 val nameWithColor = item.name ?: return ""
                 val colorCode = nameWithColor.take(2)
                 (("JERRY IS MAYOR.*").toPattern()).matchMatcher(itemName) {
@@ -328,9 +324,9 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (itemName == "Manage Orders") {
                     var result = ""
                     for (line in lore) {
-                        if (line.endsWith("to claim!")) {
-                            if (line.contains("§2") || line.contains("§a")) result += "§2☺"
-                            if (line.contains("§6") || line.contains("§e")) result += "§6☺"
+                        ((".*to claim!").toPattern()).matchMatcher(line) {
+                            ((".*(§2|§a).*").toPattern()).matchMatcher(line) { result += "§2☺" }
+                            ((".*(§6|§e).*").toPattern()).matchMatcher(line) { result += "§6☺" }
                         }
                     }
                     return result
