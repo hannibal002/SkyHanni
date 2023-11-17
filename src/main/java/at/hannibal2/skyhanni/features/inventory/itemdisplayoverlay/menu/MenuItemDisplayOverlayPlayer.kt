@@ -160,21 +160,19 @@ class MenuItemDisplayOverlayPlayer {
             if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) || (chestName.endsWith(" Essence"))) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.contains("Your ") && line.contains(" Essence: ")) {
-                        essenceCountPattern.matchMatcher(line) {
-                            val usefulAsString = group("useful")
-                            val totalAsString = group("total").replace(",", "")
-                            val suffix = when (totalAsString.length) {
-                                in 1..3 -> ""
-                                in 4..6 -> "k"
-                                in 7..9 -> "M"
-                                in 10..12 -> "B"
-                                in 13..15 -> "T"
-                                else -> "§b§z:)"
-                            }
-                            if (suffix == "§b§z:)") return suffix
-                            else return "" + usefulAsString + suffix
+                    essenceCountPattern.matchMatcher(line) {
+                        val usefulAsString = group("useful")
+                        val totalAsString = group("total").replace(",", "")
+                        val suffix = when (totalAsString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            in 10..12 -> "B"
+                            in 13..15 -> "T"
+                            else -> "§b§z:)"
                         }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "" + usefulAsString + suffix
                     }
                 }
             }

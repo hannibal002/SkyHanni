@@ -96,8 +96,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         val totalFairySouls = "242" //change this whenever hypixel adds more fairy souls
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
                         // ✔ Found: 242/242
-                        if (newLine.contains("Found: ")) {
-                            return "§d" + newLine.removeColor().replace(" ✖ Found: ", "").replace(" ✔ Found: ", "").replace(("/$totalFairySouls"), "").replace(totalFairySouls, "§a${totalFairySouls}")
+                        (("(§.)*. (§.)*Found: (§.)*(?<foundSouls>[\\w]+)(§.)*\\/(§.)*(?<maxSouls>[\\w]+)").toPattern()).matchMatcher(line) {
+                            return "§d" + group("foundSouls").replace(totalFairySouls, "§a${totalFairySouls}")
                         }
                     }
                 }
@@ -112,10 +112,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (chestName == "Rift Guide") {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        if (line.contains("Enigma Souls: ")) {
-                            enigmaSoulsPattern.matchMatcher(line) {
-                                return group("useful")
-                            }
+                        enigmaSoulsPattern.matchMatcher(line) {
+                            return group("useful")
                         }
                     }
                 }
@@ -227,21 +225,19 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             val lore = item.getLore()
             if (chestName.equals("Bank Withdrawal") && itemName.equals("§aWithdraw 20%")) {
                 for (line in lore) {
-                    if (line.startsWith("§7Amount to withdraw: ")) {
-                        amtToWithdrawPattern.matchMatcher(line) {
-                            val totalAsString = group("total").replace(",", "")
-                            val usefulPartAsString = group("useful")
-                            val suffix = when (totalAsString.length) {
-                                in 1..3 -> ""
-                                in 4..6 -> "k"
-                                in 7..9 -> "M"
-                                in 10..12 -> "B"
-                                in 13..15 -> "T"
-                                else -> "§b§z:)"
-                            }
-                            if (suffix == "§b§z:)") return suffix
-                            else return "§6$usefulPartAsString$suffix"
+                    amtToWithdrawPattern.matchMatcher(line) {
+                        val totalAsString = group("total").replace(",", "")
+                        val usefulPartAsString = group("useful")
+                        val suffix = when (totalAsString.length) {
+                            in 1..3 -> ""
+                            in 4..6 -> "k"
+                            in 7..9 -> "M"
+                            in 10..12 -> "B"
+                            in 13..15 -> "T"
+                            else -> "§b§z:)"
                         }
+                        if (suffix == "§b§z:)") return suffix
+                        else return "§6$usefulPartAsString$suffix"
                     }
                 }
             }

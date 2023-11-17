@@ -26,7 +26,7 @@ class MenuItemDisplayOverlayAbiphone {
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.abiphone
         val chestName = InventoryUtils.openInventoryName()
-        val isAbiphone = ((chestName.contains("Abiphone") || chestName.contains("AⒷiphone")))
+        val isAbiphone = ((chestName == ("Abiphone") || chestName == ("AⒷiphone")))
         
         if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.CONTACTS_DIRECTORY)) && isAbiphone && (itemName == ("Contacts Directory"))) {
             for (line in item.getLore()) {
@@ -41,7 +41,7 @@ class MenuItemDisplayOverlayAbiphone {
             if ((nameWithColor.startsWith("§f§"))) {
                 val lore = item.getLore()
                 for (line in lore) {
-                    if (line.equals("§cDo Not Disturb enabled!")) {
+                    if (line == ("§cDo Not Disturb enabled!")) {
                         return "§c§l✖"
                     }
                 }
