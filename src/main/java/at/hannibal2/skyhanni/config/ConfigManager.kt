@@ -131,7 +131,7 @@ class ConfigManager {
         if (jsonHolder.isNotEmpty()) {
             logger.log("Loading config despite config being already loaded?")
         }
-        configDirectory.mkdir()
+        configDirectory.mkdirs()
 
 
         for (fileType in ConfigFileType.entries) {
