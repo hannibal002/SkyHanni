@@ -124,7 +124,7 @@ class ConfigManager {
         if (::features.isInitialized) {
             logger.log("Loading config despite config being already loaded?")
         }
-        configDirectory.mkdir()
+        configDirectory.mkdirs()
 
         configFile = File(configDirectory, "config.json")
         sackFile = File(configDirectory, "sacks.json")
