@@ -36,7 +36,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             return
         }
         event.stackTip = getStackTip(event.stack)
-        (("Balance: .*").toPattern()).matchMatcher(event.stackTip) {
+        ((".*Balance: .*").toPattern()).matchMatcher(event.stackTip) {
             event.offsetY = -23
             event.offsetX = 0
             event.alignLeft = false
@@ -75,13 +75,13 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.UNLOCKED_RECIPES)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
-                    ((".* Book Unlocked: .* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                    ((".* Book Unlocked: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                 }
             }
             (("(Recipe Book|.* Recipes)").toPattern()).matchMatcher(chestName) {
                 ((".* Recipes").toPattern()).matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        ((".*Recipes Unlocked: .*(§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(
+                        ((".*Recipes Unlocked: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(
                             line
                         ) { return group("percent").replace("100", "§a✔") }
                     }
@@ -99,7 +99,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
                         // ✔ Found: 242/242
                         (("(§.)*. (§.)*Found: (§.)*(?<foundSouls>[\\w]+)(§.)*\\/(§.)*(?<maxSouls>[\\w]+)").toPattern()).matchMatcher(line) {
-                            return "§d" + group("foundSouls").replace(totalFairySouls, "§a${totalFairySouls}")
+                            return "§d${group("foundSouls").replace(totalFairySouls, "§a${totalFairySouls}")}"
                         }
                     }
                 }
@@ -174,11 +174,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.CUTE_NAME) && (chestName.lowercase() == ("skyblock menu"))) {
             val nameWithColor = item.name ?: return ""
-            if (nameWithColor != "§aProfile Management") return ""
+            if (nameWithColor != "Profile Management") return ""
             val lore = item.getLore()
             for (line in lore) {
-                (("§7Playing on: §a.*").toPattern()).matchMatcher(line) {
-                    return when (val profileName = line.removePrefix("§7Playing on: §a")) {
+                (("(§.)*Playing on: (§.)*(?<cuteName>[\\w]+).*").toPattern()).matchMatcher(line) {
+                    return when (val profileName = group("cuteName")) {
                         "Apple" -> "Apl"
                         "Banana" -> "Bna"
                         "Blueberry" -> "Blu"
@@ -216,7 +216,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.BANK_UTILS)) {
             val lore = item.getLore()
             ((".*Bank.*").toPattern()).matchMatcher(chestName) {
-                if (chestName.equals("Bank Withdrawal") && itemName.equals("§aWithdraw 20%")) {
+                if (chestName.equals("Bank Withdrawal") && itemName.equals("Withdraw 20%")) {
                     for (line in lore) {
                         amtToWithdrawPattern.matchMatcher(line) {
                             val totalAsString = group("total").replace(",", "")
@@ -265,7 +265,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.MAYOR_PERKS)) {
             val lore = item.getLore()
             (("(Election|Election, Year .*)").toPattern()).matchMatcher(chestName) {
-                if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
+                if (item.item == Item.getItemFromBlock(Blocks.glass_pane) || item.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" }
                 val nameWithColor = item.name ?: return ""
                 if (lore.isNotEmpty()) {
@@ -306,7 +306,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                                 return "$colorCode$numPerks"
                             } else {
                                 for (line in lore) {
-                                    (("${colorCode}Perkpocalypse").toPattern()).matchMatcher(line) {
+                                    ((".*${colorCode}Perkpocalypse.*").toPattern()).matchMatcher(line) {
                                         return grabPerkpocalypseMayor(lore, colorCode)
                                     }
                                 }
