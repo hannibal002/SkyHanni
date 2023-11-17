@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -67,7 +68,7 @@ object SackAPI {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
-        val match = sackPattern.matcher(inventoryName).matches()
+        val match = sackPattern.matches(inventoryName)
         if (!match) return
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
