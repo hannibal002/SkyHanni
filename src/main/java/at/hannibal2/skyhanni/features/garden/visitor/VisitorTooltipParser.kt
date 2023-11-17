@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.config.features.GardenConfig
+import at.hannibal2.skyhanni.config.features.garden.GardenConfig
 import at.hannibal2.skyhanni.utils.ItemUtils
 
 class VisitorTooltipParser {
     class ParsedTooltip(
-            val itemsNeeded: MutableMap<String, Int>,
-            val rewards: MutableMap<String, Int>,
-            val config: GardenConfig,
+        val itemsNeeded: MutableMap<String, Int>,
+        val rewards: MutableMap<String, Int>,
+        val config: GardenConfig,
     )
 
     enum class ParsingSection {

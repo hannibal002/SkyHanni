@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -254,7 +255,7 @@ object Commands {
         registerCommand(
             "shconfigsave",
             "Manually saving the config"
-        ) { SkyHanniMod.configManager.saveConfig("manual-command") }
+        ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
     }
 
     private fun developersCodingHelp() {

@@ -6,8 +6,9 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,7 +24,7 @@ class WrongFungiCutterWarning {
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
             mode = FungiMode.RED
         }
-        if (message == "§eFungi Cutter Mode: §r§cBrown Mushrooms") {
+        if (message == "§eFungi Cutter Mode: §r§6Brown Mushrooms") {
             mode = FungiMode.BROWN
         }
     }
@@ -55,27 +56,26 @@ class WrongFungiCutterWarning {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (event.crop == CropType.MUSHROOM) {
-            readItem(event.toolItem!!)
+            readItem(event.toolItem ?: error("Tool item is null"))
         } else {
             mode = FungiMode.UNKNOWN
         }
     }
 
     private fun readItem(item: ItemStack) {
-        for (line in item.getLore()) {
-            if (line == "§eMode: §cRed Mushrooms") {
-                mode = FungiMode.RED
-            }
-
-            if (line == "§eMode: §cBrown Mushrooms") {
-                mode = FungiMode.BROWN
-            }
-        }
+        val rawMode = item.getFungiCutterMode() ?: error("Tool without fungi cutter mode: '${item.name}'")
+        mode = FungiMode.getOrNull(rawMode)
     }
 
     enum class FungiMode {
         RED,
         BROWN,
-        UNKNOWN
+        UNKNOWN,
+        ;
+
+        companion object {
+            fun getOrNull(mode: String) =
+                entries.firstOrNull { it.name == mode } ?: error("Unknown fungi mode: '$mode'")
+        }
     }
 }

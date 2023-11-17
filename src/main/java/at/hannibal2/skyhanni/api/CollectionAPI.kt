@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -83,7 +84,7 @@ class CollectionAPI {
         val collectionValue = mutableMapOf<NEUInternalName, Long>()
         private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
 
-        fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
+        fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
 
         fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
     }

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -56,8 +55,8 @@ class FandomWikiFromMenus {
         } else {
             //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
             val inThirdWikiInventory = // TODO better name for this inventory
-                (itemClickedStack.getLore().anyContains("Wiki") || itemClickedStack.getLore().anyContains("wiki"))
-                    && !itemClickedStack.getLore().anyContains("wikipedia")
+                (itemClickedStack.getLore()
+                    .let { it.any { line -> line == "§7§eClick to view on the SkyBlock" } && it.last() == "§eWiki!" })
             if (inThirdWikiInventory) {
                 wikiDisplayName = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
                 wikiInternalName = wikiDisplayName

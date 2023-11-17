@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -148,8 +149,8 @@ class SkyHanniDebugsAndTests {
             // TODO make it so that it does not reset the config
 
             // saving old config state
-            SkyHanniMod.configManager.saveConfig("reload config manager")
-            SkyHanniMod.configManager.saveSackData("reload config manager")
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
             Thread {
                 Thread.sleep(500)
                 SkyHanniMod.configManager.disableSaving()
