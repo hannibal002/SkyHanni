@@ -89,7 +89,7 @@ object MobFilter {
         this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
 
-    private class exceptionSkipDetection(baseEntity: EntityLivingBase) : SkyblockEntity(baseEntity, null) {
+    private class ExceptionSkipDetection(baseEntity: EntityLivingBase) : SkyblockEntity(baseEntity, null) {
         override val name: String = ""
     }
 
@@ -111,7 +111,7 @@ object MobFilter {
 
         val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? EntityLivingBase
 
-        exceptions(baseEntity, nextEntity)?.also { return if (it is exceptionSkipDetection) null else it }
+        exceptions(baseEntity, nextEntity)?.also { return if (it is ExceptionSkipDetection) null else it }
 
         // Check if Late Stack
         nextEntity?.let { nextEntity ->
@@ -169,7 +169,7 @@ object MobFilter {
                         it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)
                             ?.getSkullTexture() == RatSkull
                     }?.also { return SkyblockSpecialMob(baseEntity, it, "Rat") }
-                    if (nextEntity is EntityZombie) return exceptionSkipDetection(baseEntity)
+                    if (nextEntity is EntityZombie) return ExceptionSkipDetection(baseEntity)
                 }
             }
 
