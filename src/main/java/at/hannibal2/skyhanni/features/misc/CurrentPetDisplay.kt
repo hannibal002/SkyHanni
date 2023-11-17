@@ -2,57 +2,61 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+    private val config get() = SkyHanniMod.feature.misc.pets
 
     // TODO USE SH-REPO
-    private val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
-    private val autoPetEquippedPattern = "§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE".toPattern()
-    private val petSummonedPattern = "§aYou summoned your §r(.*)§r§a!".toPattern()
-    private val petDespawnedPattern = "§aYou despawned your §r(.*)§r§a!".toPattern()
-    private val selectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
+    private val inventoryNamePattern = "Pets( \\(\\d+/\\d+\\) )?".toPattern()
+    private val inventorySelectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
+    private val chatSpawnPattern = "§aYou summoned your §r(?<pet>.*)§r§a!".toPattern()
+    private val chatDespawnPattern = "§aYou despawned your §r.*§r§a!".toPattern()
+    private val chatPetRulePattern = "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE".toPattern()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        val config = ProfileStorageData.profileSpecific ?: return
-        val message = event.message
-        var blocked = false
+        findPetInChat(event.message)?.let {
+            PetAPI.currentPet = it
+            if (config.display) {
+                event.blockedReason = "pets"
+            }
+        }
+    }
 
-        if (autoPetEquippedPattern.matchMatcher(message) {
-                config.currentPet = message.between("] ", "§e!")
-            } != null || petSummonedPattern.matchMatcher(message) {
-                config.currentPet = message.between("your §r", "§r§a")
-            } != null || petDespawnedPattern.matchMatcher(message) { config.currentPet = "" } != null) {
-            blocked = true
+    private fun findPetInChat(message: String): String? {
+        chatSpawnPattern.matchMatcher(message) {
+            return group("pet")
+        }
+        if (chatDespawnPattern.matches(message)) {
+            return ""
+        }
+        chatPetRulePattern.matchMatcher(message) {
+            return group("pet")
         }
 
-        if (blocked && SkyHanniMod.feature.misc.pets.display) {
-            event.blockedReason = "pets"
-        }
+        return null
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        val storage = ProfileStorageData.profileSpecific ?: return
-        if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
+        if (!inventoryNamePattern.matches(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
         for (line in lore) {
-            selectedPetPattern.matchMatcher(line) {
+            inventorySelectedPetPattern.matchMatcher(line) {
                 val newPet = group("pet")
-                storage.currentPet = if (newPet != "§cNone") newPet else ""
+                PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
             }
         }
     }
@@ -62,14 +66,14 @@ class CurrentPetDisplay {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
 
-        if (!SkyHanniMod.feature.misc.pets.display) return
-        val storage = ProfileStorageData.profileSpecific ?: return
+        if (!config.display) return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(storage.currentPet, posLabel = "Current Pet")
+        config.displayPos.renderString(PetAPI.currentPet, posLabel = "Current Pet")
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
+        event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
     }
 }

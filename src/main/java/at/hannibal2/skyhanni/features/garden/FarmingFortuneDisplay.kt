@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -155,7 +156,7 @@ class FarmingFortuneDisplay {
                 CropAccessoryData.cropAccessory?.getFortune(it)
             }
 
-        private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
+        private val collectionPattern = "§7You have §6\\+(?<ff>\\d{1,3})☘ .* Fortune§7.".toPattern()
         private val tooltipFortunePattern =
             "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
         private val armorAbilityPattern = "Tiered Bonus: .* [(](?<pieces>.*)/4[)]".toPattern()
@@ -186,14 +187,8 @@ class FarmingFortuneDisplay {
         }
 
         fun getCollectionFortune(tool: ItemStack?): Double {
-            val lore = tool?.getLore() ?: return 0.0
-            var hasCollectionAbility = false
-            return lore.firstNotNullOfOrNull {
-                if (hasCollectionAbility || it == "§6Collection Analysis") {
-                    hasCollectionAbility = true
-                    collectionPattern.matchEntire(it)?.groups?.get(1)?.value?.toDoubleOrNull()
-                } else null
-            } ?: 0.0
+            val string = tool?.getLore()?.nextAfter("§6Collection Analysis", 3) ?: return 0.0
+            return collectionPattern.matchMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
         }
 
         fun getCounterFortune(tool: ItemStack?): Double {
