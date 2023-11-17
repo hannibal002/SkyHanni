@@ -116,8 +116,8 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             val list = mutableListOf<String>()
 
             // Mining Fiesta
-            if (TabListData.getTabList().any { it.startsWith("§6Mining Fiesta§f") } && TabListData.getTabList()
-                    .nextAfter("§6Mining Fiesta§f")?.startsWith(" Ends In: ") == true) {
+            if (TabListData.getTabList().any { it =="§e§lEvent: §r§6Mining Fiesta" }
+                && TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")?.startsWith(" Ends In:") == true) {
                 list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
                     ?.removePrefix(" Ends In: ")
             }
