@@ -98,7 +98,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         val totalFairySouls = "242" //change this whenever hypixel adds more fairy souls
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
                         // ✔ Found: 242/242
-                        (("(§.)*. (§.)*Found: (§.)*(?<foundSouls>[\\w]+)(§.)*\\/(§.)*(?<maxSouls>[\\w]+)").toPattern()).matchMatcher(line) {
+                        ((".*(§.)*. (§.)*Found: (§.)*(?<foundSouls>[\\w]+)(§.)*\\/(§.)*(?<maxSouls>[\\w]+).*").toPattern()).matchMatcher(line) {
                             return "§d${group("foundSouls").replace(totalFairySouls, "§a${totalFairySouls}")}"
                         }
                     }
@@ -173,11 +173,10 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.CUTE_NAME) && (chestName.lowercase() == ("skyblock menu"))) {
-            val nameWithColor = item.name ?: return ""
-            if (nameWithColor != "Profile Management") return ""
+            if (itemName != "Profile Management") return ""
             val lore = item.getLore()
             for (line in lore) {
-                (("(§.)*Playing on: (§.)*(?<cuteName>[\\w]+).*").toPattern()).matchMatcher(line) {
+                ((".*(§.)*Playing on: (§.)*(?<cuteName>[\\w]+).*").toPattern()).matchMatcher(line) {
                     return when (val profileName = group("cuteName")) {
                         "Apple" -> "Apl"
                         "Banana" -> "Bna"
