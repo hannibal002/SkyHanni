@@ -10,6 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
@@ -110,13 +113,26 @@ class ConfigManager {
     }
 
     lateinit var features: Features
+        private set
     lateinit var sackData: SackData
         private set
+    lateinit var friendsData: FriendsJson
+        private set
+    lateinit var knownFeaturesData: KnownFeaturesJson
+        private set
+    lateinit var jacobContestData: JacobContestsJson
+        private set
+
     private val logger = LorenzLogger("config_manager")
 
     var configDirectory = File("config/skyhanni")
+
     private var configFile: File? = null
     private var sackFile: File? = null
+    private var friendsFile: File? = null
+    private var knowFeaturesFile: File? = null
+    private var jacobContestsFile: File? = null
+
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
 
@@ -128,66 +144,18 @@ class ConfigManager {
 
         configFile = File(configDirectory, "config.json")
         sackFile = File(configDirectory, "sacks.json")
+        friendsFile = File(configDirectory, "friends.json")
+        knowFeaturesFile = File(configDirectory, "known_features.json")
+        jacobContestsFile = File(configDirectory, "jacob_contests.json")
 
-        logger.log("Trying to load config from $configFile")
-
-        if (configFile!!.exists()) {
-            try {
-                val inputStreamReader = InputStreamReader(FileInputStream(configFile!!), StandardCharsets.UTF_8)
-                val bufferedReader = BufferedReader(inputStreamReader)
-
-                logger.log("load-config-now")
-                val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
-                val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                features = gson.fromJson(
-                    newJsonObject,
-                    Features::class.java
-                )
-                logger.log("Loaded config from file")
-            } catch (error: Exception) {
-                error.printStackTrace()
-                val backupFile = configFile!!.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
-                logger.log("Exception while reading $configFile. Will load blank config and save backup to $backupFile")
-                logger.log("Exception was $error")
-                try {
-                    configFile!!.copyTo(backupFile)
-                } catch (e: Exception) {
-                    logger.log("Could not create backup for config file")
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        if (sackFile!!.exists()) {
-            try {
-                val inputStreamReader = InputStreamReader(FileInputStream(sackFile!!), StandardCharsets.UTF_8)
-                val bufferedReader = BufferedReader(inputStreamReader)
-
-                logger.log("load-sacks-now")
-                sackData = gson.fromJson(
-                    bufferedReader.readText(),
-                    SackData::class.java
-                )
-                logger.log("Loaded sacks from file")
-            } catch (error: Exception) {
-                error.printStackTrace()
-            }
-        }
-
-        if (!::features.isInitialized) {
-            logger.log("Creating blank config and saving to file")
-            features = Features()
-            saveConfig("blank config")
-        }
+        features = firstLoadFile(configFile, ConfigFileType.FEATURES, Features(), true)
+        sackData = firstLoadFile(sackFile, ConfigFileType.SACKS, SackData(), false)
+        friendsData = firstLoadFile(friendsFile, ConfigFileType.FRIENDS, FriendsJson(), false)
+        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES, KnownFeaturesJson(), false)
+        jacobContestData = firstLoadFile(jacobContestsFile, ConfigFileType.JACOB_CONTESTS, JacobContestsJson(), false)
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
-            saveConfig("auto-save-60s")
-        }
-
-        if (!::sackData.isInitialized) {
-            logger.log("Creating blank sack data and saving")
-            sackData = SackData()
-            saveSackData("blank config")
+            saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
         val features = SkyHanniMod.feature
@@ -201,18 +169,69 @@ class ConfigManager {
         )
     }
 
-    fun saveConfig(reason: String) {
+    private inline fun <reified T> firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: T, isConfig: Boolean): T {
+        val fileName = fileType.fileName
+        logger.log("Trying to load $fileName from $file")
+        var output: T = defaultValue
+
+        if (file!!.exists()) {
+            try {
+                val inputStreamReader = InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8)
+                val bufferedReader = BufferedReader(inputStreamReader)
+
+                logger.log("load-$fileName-now")
+
+                output = if (isConfig) {
+                    val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
+                    val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
+                    gson.fromJson(newJsonObject, T::class.java)
+                } else {
+                    gson.fromJson(bufferedReader.readText(), T::class.java)
+                }
+
+                logger.log("Loaded $fileName from file")
+            } catch (error: Exception) {
+                error.printStackTrace()
+                val backupFile = file.resolveSibling("$fileName-${System.currentTimeMillis()}-backup.json")
+                logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
+                logger.log("Exception was $error")
+                try {
+                    file.copyTo(backupFile)
+                } catch (e: Exception) {
+                    logger.log("Could not create backup for $fileName file")
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        if (output == defaultValue) {
+            logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
+        }
+
+        return output
+    }
+
+    fun saveConfig(fileType: ConfigFileType, reason: String) {
+        when (fileType) {
+            ConfigFileType.FEATURES -> saveFile(configFile, fileType.fileName, SkyHanniMod.feature, reason)
+            ConfigFileType.SACKS -> saveFile(sackFile, fileType.fileName, SkyHanniMod.sackData, reason)
+            ConfigFileType.FRIENDS -> saveFile(friendsFile, fileType.fileName, SkyHanniMod.friendsData, reason)
+            ConfigFileType.KNOWN_FEATURES -> saveFile(knowFeaturesFile, fileType.fileName, SkyHanniMod.knownFeaturesData, reason)
+            ConfigFileType.JACOB_CONTESTS -> saveFile(jacobContestsFile, fileType.fileName, SkyHanniMod.jacobContestsData, reason)
+        }
+    }
+
+    private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
         logger.log("saveConfig: $reason")
-        val file = configFile ?: throw Error("Can not save config, configFile is null!")
+        if (file == null) throw Error("Can not save $fileName, ${fileName}File is null!")
         try {
-            logger.log("Saving config file")
+            logger.log("Saving $fileName file")
             file.parentFile.mkdirs()
-            val unit = file.parentFile.resolve("config.json.write")
+            val unit = file.parentFile.resolve("$fileName.json.write")
             unit.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                // TODO remove old "hidden" area
-                writer.write(gson.toJson(SkyHanniMod.feature))
+                writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
             Files.move(
@@ -222,24 +241,7 @@ class ConfigManager {
                 StandardCopyOption.ATOMIC_MOVE
             )
         } catch (e: IOException) {
-            logger.log("Could not save config file to $file")
-            e.printStackTrace()
-        }
-    }
-
-    fun saveSackData(reason: String) {
-        if (disableSaving) return
-        logger.log("saveSackData: $reason")
-        val file = sackFile ?: throw Error("Can not save sacks, sackFile is null!")
-        try {
-            logger.log("Saving sack file")
-            file.parentFile.mkdirs()
-            file.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
-                writer.write(gson.toJson(SkyHanniMod.sackData))
-            }
-        } catch (e: IOException) {
-            logger.log("Could not save sacks file to $file")
+            logger.log("Could not save $fileName file to $file")
             e.printStackTrace()
         }
     }
@@ -247,4 +249,13 @@ class ConfigManager {
     fun disableSaving() {
         disableSaving = true
     }
+}
+
+enum class ConfigFileType(val fileName: String) {
+    FEATURES("config"),
+    SACKS("sacks"),
+    FRIENDS("friends"),
+    KNOWN_FEATURES("known_features"),
+    JACOB_CONTESTS("jacob_contests"),
+    ;
 }
