@@ -69,44 +69,44 @@ object ConfigUpdaterMigrator {
                 logger.log("Skipping move from $oldPath to $newPath ($oldPath not present)")
                 return
             }
-            val x = new.at(np.dropLast(1), true)
-            if (x !is JsonObject) {
+            val newParentElement = new.at(np.dropLast(1), true)
+            if (newParentElement !is JsonObject) {
                 logger.log("Catastrophic: element at path $old could not be relocated to $new, since another element already inhabits that path")
                 return
             }
             movesPerformed++
-            x.add(np.last(), transform(oldElem))
+            newParentElement.add(np.last(), transform(oldElem))
             logger.log("Moved element from $oldPath to $newPath")
         }
     }
 
-    private fun merge(a: JsonObject, b: JsonObject): Int {
-        var c = 0
-        b.entrySet().forEach {
-            val e = a.get(it.key)
-            val n = it.value
-            if (e is JsonObject && n is JsonObject) {
-                c += merge(e, n)
+    private fun merge(originalObject: JsonObject, overrideObject: JsonObject): Int {
+        var count = 0
+        overrideObject.entrySet().forEach {
+            val element = originalObject.get(it.key)
+            val newElement = it.value
+            if (element is JsonObject && newElement is JsonObject) {
+                count += merge(element, newElement)
             } else {
-                if (e != null) {
-                    logger.log("Encountered destructive merge. Erasing $e in favour of $n.")
-                    c++
+                if (element != null) {
+                    logger.log("Encountered destructive merge. Erasing $element in favour of $newElement.")
+                    count++
                 }
-                a.add(it.key, n)
+                originalObject.add(it.key, newElement)
             }
         }
-        return c
+        return count
     }
 
     fun fixConfig(config: JsonObject): JsonObject {
-        val lV = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
-        if (lV > CONFIG_VERSION) {
+        val lastVersion = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
+        if (lastVersion > CONFIG_VERSION) {
             error("Cannot downgrade config")
         }
-        if (lV == CONFIG_VERSION) return config
-        return (lV until CONFIG_VERSION).fold(config) { acc, i ->
+        if (lastVersion == CONFIG_VERSION) return config
+        return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
-            val storage = acc.get("storage")?.asJsonObject
+            val storage = accumulator.get("storage")?.asJsonObject
             val dynamicPrefix: Map<String, List<String>> = mapOf(
                 "#profile" to
                     (storage?.get("players")?.asJsonObject?.entrySet()
@@ -120,7 +120,7 @@ object ConfigUpdaterMigrator {
                     (storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }
                         ?: listOf()),
             )
-            val migration = ConfigFixEvent(acc, JsonObject().also {
+            val migration = ConfigFixEvent(accumulator, JsonObject().also {
                 it.add("lastVersion", JsonPrimitive(i + 1))
             }, i, 0, dynamicPrefix).also { it.postAndCatch() }
             logger.log("Transformations scheduled: ${migration.new}")
