@@ -31,8 +31,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.gson.Gson
@@ -212,9 +212,13 @@ class MobData {
                 iterator.remove()
                 continue
             }
-            if (!EntitySpawn(entity)) {
-                retry.times++
-                continue
+            // I know that this line looks stupid but entity is from World.loadedEntities and the result of getEntityByID is from World.entitiesByID which gives the correct instance which is the one you see in-game
+            // And yes those two list are different sometimes. The best place to test this is in Dungeons because the disjunction happens when there are a lot of mobs
+            (EntityUtils.getEntityByID(entity.entityId) as? EntityLivingBase)?.let {
+                if (!EntitySpawn(it)) {
+                    retry.times++
+                    continue
+                }
             }
             iterator.remove()
         }
@@ -301,17 +305,15 @@ class MobData {
         }
         if (mobDebugConfig.skyblockMobShowName) {
             currentSkyblockMobs.forEach {
-                event.drawDynamicText(
-                    it.baseEntity.getLorenzVec()
-                        .add(y = 1.5), "§5" + it.name, 0.75, ignoreBlocks = false, smallestDistanceVew = 10.0
+                event.drawString(
+                    it.baseEntity.getLorenzVec().add(y = 2.5), "§5" + it.name
                 )
             }
         }
         if (mobDebugConfig.displayNPCShowName) {
             currentDisplayNPCs.forEach {
-                event.drawDynamicText(
-                    it.baseEntity.getLorenzVec()
-                        .add(y = 1.5), "§d" + it.name, 0.75, ignoreBlocks = false, smallestDistanceVew = 10.0
+                event.drawString(
+                    it.baseEntity.getLorenzVec().add(y = 2.5), "§d" + it.name
                 )
             }
         }
@@ -409,8 +411,5 @@ class MobData {
     fun onExit(event: IslandChangeEvent) {
         devTracker.saveToFile()
         // counter.reset()
-
-        // Only Backup normally this should do nothing
-        mobDetectionReset()
     }
 }
