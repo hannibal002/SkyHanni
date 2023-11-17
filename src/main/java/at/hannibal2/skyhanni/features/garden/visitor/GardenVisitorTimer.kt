@@ -11,14 +11,17 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
@@ -29,6 +32,8 @@ class GardenVisitorTimer {
     private var sixthVisitorArrivalTime: Long = 0
     private var visitorJustArrived = false
     private var sixthVisitorReady = false
+    private var lastTimerValue = ""
+    private var lastTimerUpdate = SimpleTimeMark.farPast()
 
     //TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
@@ -91,6 +96,10 @@ class GardenVisitorTimer {
 
             pattern.matchMatcher(line) {
                 val rawTime = group("time").removeColor()
+                if (lastTimerValue != rawTime) {
+                    lastTimerUpdate = SimpleTimeMark.now()
+                    lastTimerValue = rawTime
+                }
                 millis = TimeUtils.getMillis(rawTime)
             }
         }
@@ -122,9 +131,11 @@ class GardenVisitorTimer {
                 }
             }
         }
+        val sinceLastTimerUpdate = lastTimerUpdate.passedSince() - 100.milliseconds
+        val showGrayGuess = visitorsAmount < 5 && sinceLastTimerUpdate in 500.milliseconds..60.seconds
 
         val diff = lastMillis - millis
-        if (diff == 0L && visitorsAmount == lastVisitors) return
+        if (diff == 0L && visitorsAmount == lastVisitors && !showGrayGuess) return
         lastMillis = millis
         lastVisitors = visitorsAmount
 
@@ -137,7 +148,13 @@ class GardenVisitorTimer {
         if (config.newVisitorPing && millis < 10000) {
             SoundUtils.playBeepSound()
         }
-        val formatDuration = TimeUtils.formatDuration(millis)
+
+        val formatDuration = if (showGrayGuess) {
+            val oneMinute = 60.seconds
+            val min = TimeUtils.formatDuration(millis - oneMinute.inWholeMilliseconds, maxUnits = 1)
+            val sec = (oneMinute - sinceLastTimerUpdate).format(maxUnits = 1)
+            "$min §7$sec"
+        } else TimeUtils.formatDuration(millis)
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis < 0)) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
