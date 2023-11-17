@@ -136,14 +136,20 @@ class GardenVisitorTimer {
             }
         }
         val sinceLastTimerUpdate = lastTimerUpdate.passedSince() - 100.milliseconds
-        val showGrayGuess = visitorsAmount < 5 && sinceLastTimerUpdate in 500.milliseconds..60.seconds
+        val guessTime = visitorsAmount < 5 && sinceLastTimerUpdate in 500.milliseconds..60.seconds
+        if (guessTime) {
+            millis -= sinceLastTimerUpdate
+        }
 
         val diff = lastMillis - millis
-        if (diff == 0.seconds && visitorsAmount == lastVisitors && !showGrayGuess) return
+        if (diff == 0.seconds && visitorsAmount == lastVisitors) return
         lastMillis = millis
         lastVisitors = visitorsAmount
 
-        val formatColor = if (queueFull) "6" else "e"
+        val formatColor = when {
+            queueFull -> "6"
+            else -> "e"
+        }
 
         val extraSpeed = if (diff in 2.seconds..10.seconds) {
             val factor = diff.inWholeSeconds.toDouble()
@@ -154,12 +160,7 @@ class GardenVisitorTimer {
             SoundUtils.playBeepSound()
         }
 
-        val formatDuration = if (showGrayGuess) {
-            val oneMinute = 60.seconds
-            val min = TimeUtils.formatDuration(millis - oneMinute, maxUnits = 1)
-            val sec = (oneMinute - sinceLastTimerUpdate).format(maxUnits = 1)
-            "$min §7$sec"
-        } else TimeUtils.formatDuration(millis)
+        val formatDuration = TimeUtils.formatDuration(millis)
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
@@ -188,6 +189,7 @@ class GardenVisitorTimer {
     fun onBlockBreak(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
+        lastTimerUpdate -= 100.milliseconds
     }
 
     private fun updateSixthVisitorArrivalTime() {
