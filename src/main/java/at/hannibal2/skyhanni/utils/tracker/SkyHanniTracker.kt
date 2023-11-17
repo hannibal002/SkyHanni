@@ -86,7 +86,7 @@ class SkyHanniTracker<Data : TrackerData>(
         ),
     ) {
         if (sessionResetTime.passedSince() > 3.seconds) {
-            reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
+            reset(DisplayMode.SESSION, "Reset this session of $name!")
             sessionResetTime = SimpleTimeMark.now()
         }
     }
