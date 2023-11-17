@@ -268,7 +268,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.MAYOR_PERKS)) {
             val lore = item.getLore()
-            (("Election, Year .*").toPattern()).matchMatcher(chestName) {
+            (("(Election|Election, Year .*)").toPattern()).matchMatcher(chestName) {
                 if (item.getItem() == Item.getItemFromBlock(Blocks.glass_pane) || item.getItem() == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 if (itemName.lowercase().contains("dante")) return "§c§l✖"
                 val nameWithColor = item.name ?: return ""
@@ -380,7 +380,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
             }
-            ((".*Auction").toPattern()).matchMatcher(chestName) {
+            ((".*Auctions(:| ).*").toPattern()).matchMatcher(chestName) {
                 if (itemName != "Item Tier" && itemName != "BIN Filter" && itemName != "Sort") return ""
                 for (line in lore) {
                     (("(§.)*▶ (?<text>[\\w ]+)").toPattern()).matchMatcher(line) {

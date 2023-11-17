@@ -280,7 +280,6 @@ class MenuItemDisplayOverlayPlayerTryhard {
                     (("§7Starting in: .*").toPattern()).matchMatcher(line) {
                         theStringToUse = line
                     }
-                    break
                 }
             }
             if (lore.isNotEmpty() && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
