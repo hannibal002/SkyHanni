@@ -17,6 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
 
+    // TODO USE SH-REPO
+    private val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         val message = event.message
@@ -45,9 +48,7 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-
-        val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
+        val storage = ProfileStorageData.profileSpecific ?: return
         if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
@@ -55,11 +56,10 @@ class CurrentPetDisplay {
         for (line in lore) {
             selectedPetPattern.matchMatcher(line) {
                 val newPet = group("pet")
-                config.currentPet = if (newPet != "§cNone") newPet else ""
+                storage.currentPet = if (newPet != "§cNone") newPet else ""
             }
         }
     }
-
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -67,13 +67,14 @@ class CurrentPetDisplay {
         if (RiftAPI.inRift()) return
 
         if (!SkyHanniMod.feature.misc.pets.display) return
-        val config = ProfileStorageData.profileSpecific ?: return
+        val storage = ProfileStorageData.profileSpecific ?: return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
+        SkyHanniMod.feature.misc.pets.displayPos.renderString(storage.currentPet, posLabel = "Current Pet")
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
+        event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
     }
 }

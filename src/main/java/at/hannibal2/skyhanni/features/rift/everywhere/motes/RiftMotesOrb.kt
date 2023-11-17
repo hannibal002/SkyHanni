@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -16,9 +17,12 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftMotesOrb {
-    private val config get() = RiftAPI.config.motesOrbsConfig
-    private var motesOrbs = emptyList<MotesOrb>()
+    private val config get() = RiftAPI.config.motesOrbs
+
+    // TODO USE SH-REPO
     private val pattern = "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*".toPattern()
+
+    private var motesOrbs = emptyList<MotesOrb>()
 
     class MotesOrb(
         var location: LorenzVec,
@@ -77,17 +81,19 @@ class RiftMotesOrb {
                 orb.pickedUp = true
             }
 
-            val location = orb.location
-
-            if (orb.pickedUp) {
-                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§7Motes Orb", 1.5, ignoreBlocks = false)
-                event.drawWaypointFilled(location, LorenzColor.GRAY.toColor())
-            } else {
-                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§dMotes Orb", 1.5, ignoreBlocks = false)
-                event.drawWaypointFilled(location, LorenzColor.LIGHT_PURPLE.toColor())
-            }
+            val location = orb.location.add(y = 0.5)
+            val sizeOffset = (5 - config.size) * -0.1
+            val color = if (orb.pickedUp) LorenzColor.GRAY else LorenzColor.LIGHT_PURPLE
+            val text = color.getChatColor() + "Motes Orb"
+            event.drawDynamicText(location, text, 1.5 + sizeOffset, ignoreBlocks = false)
+            event.drawWaypointFilled(location, color.toColor(), extraSize = sizeOffset)
         }
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.motesOrbsConfig", "rift.area.motesOrbs")
+    }
 }

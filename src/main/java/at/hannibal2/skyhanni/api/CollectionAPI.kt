@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CollectionAPI {
+    // TODO USE SH-REPO
     private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
     private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
 
@@ -65,21 +67,24 @@ class CollectionAPI {
         }
     }
 
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddInInventoryEvent) {
+        // TODO add support for replenish (higher collection than actual items in inv)
+        val internalName = event.internalName
+        if (internalName.getItemStackOrNull() == null) {
+            LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
+            return
+        }
+        collectionValue.addOrPut(internalName, event.amount.toLong())
+    }
+
     companion object {
+        // TODO USE SH-REPO
         val collectionValue = mutableMapOf<NEUInternalName, Long>()
         private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
         fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
-
-        // TODO add support for replenish (higher collection than actual items in inv)
-        fun addFromInventory(internalName: NEUInternalName, amount: Int) {
-            if (internalName.getItemStackOrNull() == null) {
-                LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
-                return
-            }
-            collectionValue.addOrPut(internalName, amount.toLong())
-        }
     }
 }

@@ -7,13 +7,12 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import net.minecraft.client.Minecraft
-import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
@@ -116,8 +115,8 @@ object VisitorAPI {
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
 
-        fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
-        fun getNameTagEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
+        fun getEntity() = EntityUtils.getEntityByID(entityId)
+        fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
 
         fun hasReward(): VisitorReward? {
             for (internalName in allRewards) {
@@ -138,5 +137,38 @@ object VisitorAPI {
         READY("§aItems Ready", LorenzColor.GREEN.toColor().withAlpha(80)),
         ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
         REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
+    }
+
+    fun visitorsInTabList(tabList: List<String>): MutableList<String> {
+        var found = false
+        val visitorsInTab = mutableListOf<String>()
+        for (line in tabList) {
+            if (line.startsWith("§b§lVisitors:")) {
+                found = true
+                continue
+            }
+            if (!found) continue
+
+            if (line.isEmpty() || line.contains("Account Info")) {
+                found = false
+                continue
+            }
+            val name = VisitorAPI.fromHypixelName(line)
+
+            // Hide hypixel watchdog entries
+            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
+                logger.log("Ignore wrong red name: '$name'")
+                continue
+            }
+
+            //hide own player name
+            if (name.contains(LorenzUtils.getPlayerName())) {
+                logger.log("Ignore wrong own name: '$name'")
+                continue
+            }
+
+            visitorsInTab.add(name)
+        }
+        return visitorsInTab
     }
 }

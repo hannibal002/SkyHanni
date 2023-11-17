@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -24,7 +24,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftBloodEffigies {
-    private val config get() = RiftAPI.config.area.stillgoreChateauConfig.bloodEffigies
+    private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = mapOf(
         0 to -1L,
@@ -35,6 +35,7 @@ class RiftBloodEffigies {
         5 to -1L,
     )
 
+    // TODO USE SH-REPO
     private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
 
     @SubscribeEvent
@@ -142,4 +143,9 @@ class RiftBloodEffigies {
     }
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
+    }
 }

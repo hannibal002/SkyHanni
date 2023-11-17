@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
+    // TODO USE SH-REPO
     private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
     private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
@@ -43,7 +44,7 @@ object GardenCropMilestones {
 
     private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0

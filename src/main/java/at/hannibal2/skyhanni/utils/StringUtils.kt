@@ -15,6 +15,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+    // TODO USE SH-REPO
     private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
     private val chatUsernamePattern = "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
@@ -86,6 +87,15 @@ object StringUtils {
         } else {
             split[0].removeColor()
         }
+    }
+
+    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
+        for (pattern in iterator()) {
+            pattern.matchMatcher<T>(text) {
+                return consumer()
+            }
+        }
+        return null
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
@@ -234,4 +244,6 @@ object StringUtils {
     fun String.convertToFormatted(): String {
         return this.replace("&&", "§")
     }
+
+    fun Pattern.matches(string: String) = matcher(string).matches()
 }

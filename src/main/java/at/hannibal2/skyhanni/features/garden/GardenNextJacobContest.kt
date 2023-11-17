@@ -37,13 +37,14 @@ import javax.swing.UIManager
 import kotlin.time.Duration.Companion.seconds
 
 object GardenNextJacobContest {
+    private var dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
     private val patternDay = "§aDay (?<day>.*)".toPattern()
     private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§e○ §7(?<crop>.*)".toPattern()
+    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
 
     private const val maxContestsPerYear = 124
     private const val contestDuration = 1_000 * 60 * 20
@@ -145,17 +146,13 @@ object GardenNextJacobContest {
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
             val name = item.name ?: continue
-            val matcherDay = patternDay.matcher(name)
-            if (!matcherDay.matches()) continue
+            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
 
-            val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                val matcherCrop = patternCrop.matcher(line)
-                if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByName(matcherCrop.group("crop")))
+                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
@@ -421,7 +418,7 @@ object GardenNextJacobContest {
     private suspend fun fetchUpcomingContests() {
         try {
             val url = "https://api.elitebot.dev/contests/at/now"
-            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             val newContests = mutableMapOf<Long, FarmingContest>()
 
@@ -482,7 +479,7 @@ object GardenNextJacobContest {
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted)
 
-        val result = withContext(Dispatchers.IO) { APIUtil.postJSONIsSuccessful(url, body) }
+        val result = withContext(dispatcher) { APIUtil.postJSONIsSuccessful(url, body) }
 
         if (result) {
             LorenzUtils.chat("§e[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")

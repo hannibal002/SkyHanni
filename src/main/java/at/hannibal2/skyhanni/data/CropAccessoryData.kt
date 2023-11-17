@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 class CropAccessoryData {
+    // TODO USE SH-REPO
     private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toRegex()
     private var loadedAccessoryThisProfile = false
     private var ticks = 0
@@ -103,9 +104,9 @@ class CropAccessoryData {
         val pagesLoaded get() = accessoryPage.size
 
         var cropAccessory: CropAccessory?
-            get() = GardenAPI.config?.savedCropAccessory
+            get() = GardenAPI.storage?.savedCropAccessory
             private set(accessory) {
-                GardenAPI.config?.savedCropAccessory = accessory
+                GardenAPI.storage?.savedCropAccessory = accessory
             }
 
         // Derived partially from NotEnoughUpdates/NotEnoughUpdates, ProfileViewer.Profile#getInventoryInfo

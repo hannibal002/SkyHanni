@@ -23,6 +23,9 @@ import kotlin.random.Random
 object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
+    // TODO USE SH-REPO
+    private val pattern = ".*\\[(?<level>.*)] §r(?<name>.*)".toPattern()
+
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
     fun createTabLine(text: String, type: TabStringType) = playerDatas[text]?.let {
@@ -34,8 +37,6 @@ object AdvancedPlayerList {
         if (LorenzUtils.inDungeons) return original
 
         if (ignoreCustomTabList()) return original
-
-        val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
         val newList = mutableListOf<String>()
         val currentData = mutableMapOf<String, PlayerData>()
         newList.add(original.first())
@@ -58,14 +59,21 @@ object AdvancedPlayerList {
                     val playerData = PlayerData(removeColor.toInt())
                     currentData[line] = playerData
 
+                    var index = 0
                     val fullName = group("name")
+                    if (fullName.contains("[")) index++
                     val name = fullName.split(" ")
-                    val coloredName = name[0]
-                    playerData.coloredName = coloredName
+                    val coloredName = name[index]
+                    if (index == 1) {
+                        playerData.coloredName = name[0] + " " + coloredName
+                    } else {
+                        playerData.coloredName = coloredName
+                    }
                     playerData.name = coloredName.removeColor()
                     playerData.levelText = levelText
-                    if (name.size > 1) {
-                        val nameSuffix = name.drop(1).joinToString(" ")
+                    index++
+                    if (name.size > index) {
+                        val nameSuffix = name.drop(index).joinToString(" ")
                         playerData.nameSuffix = nameSuffix
                         if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
@@ -160,7 +168,7 @@ object AdvancedPlayerList {
             suffix += " " + getSocialScoreIcon(score)
         }
         if (config.markSkyHanniContributors && data.name in contributors) {
-            suffix += " §c:O"
+            suffix += "§c:O"
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
