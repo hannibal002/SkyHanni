@@ -36,6 +36,12 @@ public class MinionsConfig {
     public boolean hopperProfitDisplay = true;
 
     @Expose
+    @ConfigOption(name = "Show Xp", desc = "Shows how many Exp you will get")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpDisplay = true;
+
+    @Expose
     public Position hopperProfitPos = new Position(360, 90, false, true);
 
     @Expose
