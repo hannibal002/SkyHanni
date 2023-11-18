@@ -217,7 +217,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Lowered Sensitivity", desc = "Applies a Divisor to your current sensitivity")
-    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    @ConfigEditorSlider(minValue = 0, maxValue = 1000, minStep = 1)
     public int divisorSens = 5;
 
     @Expose

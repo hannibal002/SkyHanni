@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,13 +38,17 @@ object LowerMouseSens {
         val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         isToggled = !isToggled
         if (isToggled) {
-            SkyHanniMod.feature.storage.savedMouseSensitivity = gameSettings.mouseSensitivity
-            val newSens = ((SkyHanniMod.feature.storage.savedMouseSensitivity + (1/3))/config.divisorSens - (1/3))
+            SkyHanniMod.feature.storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
+            val step1 = SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F)
+            LorenzUtils.chat("step1 $step1")
+            val step2 = step1/config.divisorSens
+            LorenzUtils.chat("step2 $step2")
+            val newSens = step2-(1F / 3F)
             gameSettings.mouseSensitivity = newSens
-//            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been lowered.")
+            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been lowered from ${SkyHanniMod.feature.storage.savedMouseloweredSensitivity} to $newSens.")
         } else {
-            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseSensitivity
-//            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been restored.")
+            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
+            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been restored.")
         }
     }
 }

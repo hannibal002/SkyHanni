@@ -18,7 +18,7 @@ object LockMouseLook {
         if (lockedMouse) toggleLock()
         val gameSettings = Minecraft.getMinecraft().gameSettings
         if (gameSettings.mouseSensitivity == lockedPosition) {
-            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseSensitivity
+            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouselockedSensitivity
             LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now unlocked because you left it locked.")
         }
     }
@@ -28,13 +28,13 @@ object LockMouseLook {
         lockedMouse = !lockedMouse
 
         if (lockedMouse) {
-            SkyHanniMod.feature.storage.savedMouseSensitivity = gameSettings.mouseSensitivity
+            SkyHanniMod.feature.storage.savedMouselockedSensitivity = gameSettings.mouseSensitivity
             gameSettings.mouseSensitivity = lockedPosition
             if (config.lockMouseLookChatMessage) {
                 LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
             }
         } else {
-            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseSensitivity
+            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouselockedSensitivity
             if (config.lockMouseLookChatMessage) {
                 LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now unlocked.")
             }
