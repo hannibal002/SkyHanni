@@ -71,6 +71,7 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
+    @Deprecated("Do not create a regex pattern each time.", ReplaceWith("toPattern()"))
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     private fun String.removeAtBeginning(text: String): String =
