@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.getArmorStandByRangeAll
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -48,7 +49,7 @@ object MobFilter {
     val mobNameFilter = "(\\[(.*)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤\\?]+|█+) .$".toRegex()
-    val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing")
+    val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing", "Boomer", "Golden")
     val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
 
     fun errorNameFinding(name: String): String {
@@ -145,6 +146,8 @@ object MobFilter {
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)
         if (baseEntity is EntityDragon) return SkyblockBossMob(baseEntity, null, baseEntity.name.removeColor(), null)
         if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return SkyblockProjectileEntity(baseEntity, "Giant Sword") // Will false trigger if there is another Dinnerbone Giant
+        if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return getArmorStandByRangeAll(baseEntity, 3.0).filter { it.name.startsWith("§c§d§lShadow Assassin") }
+            .sortedBy { it.distanceTo(baseEntity) }.firstOrNull()?.let { DungeonMob(baseEntity, it) }
         return null
     }
 
@@ -171,6 +174,10 @@ object MobFilter {
                     }?.also { return SkyblockSpecialMob(baseEntity, it, "Rat") }
                     if (nextEntity is EntityZombie) return ExceptionSkipDetection(baseEntity)
                 }
+            }
+
+            IslandType.CATACOMBS -> {
+                if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return SkyblockInvalidEntity(baseEntity, "Watcher")
             }
 
             else -> {}

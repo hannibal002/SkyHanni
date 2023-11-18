@@ -48,7 +48,7 @@ import java.util.*
 
 private const val MAX_RETRIES = 100
 
-private const val MAX_DISTANCE_TO_PLAYER = 22.8
+private const val MAX_DISTANCE_TO_PLAYER = 22.0
 
 class MobData {
     private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
@@ -177,7 +177,7 @@ class MobData {
 
     private fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
 
-    class RetryEntityInstancing(val entity: EntityLivingBase, var times: Int) : Comparable<RetryEntityInstancing> {
+    class RetryEntityInstancing(var entity: EntityLivingBase, var times: Int) : Comparable<RetryEntityInstancing> {
         override fun hashCode() = entity.hashCode()
         override fun compareTo(other: RetryEntityInstancing) = this.hashCode() - other.hashCode()
         override fun equals(other: Any?) = (other as? EntityLivingBase) == entity
@@ -214,8 +214,10 @@ class MobData {
             }
             // I know that this line looks stupid but entity is from World.loadedEntities and the result of getEntityByID is from World.entitiesByID which gives the correct instance which is the one you see in-game
             // And yes those two list are different sometimes. The best place to test this is in Dungeons because the disjunction happens when there are a lot of mobs
-            (EntityUtils.getEntityByID(entity.entityId) as? EntityLivingBase)?.let {
-                if (!EntitySpawn(it)) {
+            val newEntity = EntityUtils.getEntityByID(entity.entityId) as? EntityLivingBase
+            if (newEntity != null) {
+                if (newEntity !== entity) retry.entity = newEntity
+                if (!EntitySpawn(newEntity)) {
                     retry.times++
                     continue
                 }
