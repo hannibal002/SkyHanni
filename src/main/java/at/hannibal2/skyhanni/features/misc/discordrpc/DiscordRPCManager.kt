@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -188,7 +189,7 @@ object DiscordRPCManager : IPCListener {
         }
 
         if (isActive()) {
-            LorenzUtils.chat("Discord Rich Presence is already active!")
+            LorenzUtils.userError("Discord Rich Presence is already active!")
             return
         }
 
@@ -196,7 +197,10 @@ object DiscordRPCManager : IPCListener {
         try {
             start(true)
         } catch (e: Exception) {
-            LorenzUtils.error("Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.")
+            ErrorManager.logError(
+                e,
+                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer."
+            )
         }
     }
 

@@ -64,7 +64,7 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.chat("§cNo crop item found for '$rawSearchName'", prefixColor = "§c")
+            LorenzUtils.error("No crop item found for '$rawSearchName'.")
             return
         }
 

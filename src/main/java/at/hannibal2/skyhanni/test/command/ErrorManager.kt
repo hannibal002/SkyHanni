@@ -29,7 +29,7 @@ object ErrorManager {
 
     fun command(array: Array<String>) {
         if (array.size != 1) {
-            LorenzUtils.chat("§cUse /shcopyerror <error id>", false)
+            LorenzUtils.userError("Use /shcopyerror <error id>")
             return
         }
 

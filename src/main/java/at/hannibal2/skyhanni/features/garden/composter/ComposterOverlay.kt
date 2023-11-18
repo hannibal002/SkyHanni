@@ -87,7 +87,7 @@ object ComposterOverlay {
 
     fun onCommand(args: Array<String>) {
         if (args.size != 1) {
-            LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+            LorenzUtils.userError("Usage: /shtestcomposter <offset>")
             return
         }
         testOffset = args[0].toInt()

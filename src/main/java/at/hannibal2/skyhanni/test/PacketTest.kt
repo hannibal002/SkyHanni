@@ -37,7 +37,7 @@ class PacketTest {
 
         fun toggle() {
             enabled = !enabled
-            LorenzUtils.chat("Packet test: $enabled", false)
+            LorenzUtils.chat("Packet test: $enabled")
         }
     }
 

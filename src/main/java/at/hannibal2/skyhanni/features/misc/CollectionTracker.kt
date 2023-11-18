@@ -39,7 +39,7 @@ class CollectionTracker {
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
                 if (internalName == null) {
-                    LorenzUtils.chat("§c/shtrackcollection <item name>")
+                    LorenzUtils.userError("/shtrackcollection <item name>")
                     return
                 }
                 LorenzUtils.chat("Stopped collection tracker.")

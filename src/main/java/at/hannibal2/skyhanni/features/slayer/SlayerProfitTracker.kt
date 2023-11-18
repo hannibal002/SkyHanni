@@ -364,10 +364,9 @@ object SlayerProfitTracker {
 
     fun clearProfitCommand(args: Array<String>) {
         if (itemLogCategory == "") {
-            LorenzUtils.chat(
-                "No current slayer data found. " +
-                        "Go to a slayer area and start the specific slayer type you want to reset the data of.",
-                prefixColor = "§c"
+            LorenzUtils.userError(
+                "No current slayer data found! " +
+                    "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
             )
             return
         }

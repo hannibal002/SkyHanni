@@ -35,7 +35,8 @@ class GardenNextPlotPrice {
             }
 
             if (next) {
-                ItemUtils.readItemAmount(line)?.let {
+                val readItemAmount = ItemUtils.readItemAmount(line)
+                readItemAmount?.let {
                     val (itemName, amount) = it
                     val lowestBin = NEUItems.getPrice(NEUItems.getRawInternalName(itemName))
                     val price = lowestBin * amount

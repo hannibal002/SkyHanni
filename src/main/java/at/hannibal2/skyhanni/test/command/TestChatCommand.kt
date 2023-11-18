@@ -8,12 +8,12 @@ import net.minecraftforge.common.MinecraftForge
 object TestChatCommand {
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
-            LorenzUtils.chat("Specify a chat message to test", prefixColor = "§c")
+            LorenzUtils.userError("Specify a chat message to test!")
             return
         }
         val hidden = args.last() == "-s"
         var rawMessage = args.toList().joinToString(" ")
-        if (!hidden) LorenzUtils.chat("testing message: §7$rawMessage", prefixColor = "§a")
+        if (!hidden) LorenzUtils.chat("Testing message: §7$rawMessage", prefixColor = "§a")
         if (hidden) rawMessage = rawMessage.replace(" -s", "")
         val formattedMessage = rawMessage.replace("&", "§")
         LorenzUtils.chat(formattedMessage, false)

@@ -22,7 +22,7 @@ class MarkedPlayerManager {
 
         fun command(args: Array<String>) {
             if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shmarkplayer <name>", false)
+                LorenzUtils.userError("Usage: /shmarkplayer <name>")
                 return
             }
 

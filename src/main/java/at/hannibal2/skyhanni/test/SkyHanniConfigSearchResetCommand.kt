@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
+// TODO in the future change something here
 object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()

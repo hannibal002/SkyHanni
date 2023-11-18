@@ -189,7 +189,7 @@ object InquisitorWaypointShare {
         lastShareTime = System.currentTimeMillis()
 
         if (inquisitor == -1) {
-            LorenzUtils.chat("No Inquisitor Found!", prefixColor = "§c")
+            LorenzUtils.error("No Inquisitor Found!")
             return
         }
 
