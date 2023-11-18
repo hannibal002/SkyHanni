@@ -9,7 +9,10 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class MiscConfig {
 
@@ -206,10 +209,25 @@ public class MiscConfig {
     public boolean lockMouseLookChatMessage = true;
 
     @Expose
+    @ConfigOption(
+        name = "Lower Mouse Sensitivity",
+        desc = "Lowers mouse sensitivity while the key is held.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int mouseSensKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Lowered Sensitivity", desc = "Applies a Divisor to your current sensitivity")
+    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    public int divisorSens = 5;
+
+    @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose
-    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
+    public Position lockedMouseDisplay = new Position(400, 400, 0.8f);
+
+    @Expose
+    public Position loweredMouseDisplay = new Position(400, 400, 0.8f);
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
