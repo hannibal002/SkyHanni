@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import scala.tools.nsc.doc.base.comment.Bold
 
 class MenuItemDisplayOverlayPlayer {
     private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
@@ -38,10 +39,13 @@ class MenuItemDisplayOverlayPlayer {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.player
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu") && itemName.endsWith(" Leveling")) {
-            for (line in item.getLore()) {
-                skyblockLevelPattern.matchMatcher(line) {
-                    return group("sblvl").toInt().toString()
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu")) {
+            //itemName.endsWith(" Leveling")
+            ((".* Leveling").toPattern()).matchMatcher(itemName) {
+                for (line in item.getLore()) {
+                    skyblockLevelPattern.matchMatcher(line) {
+                        return "${group("sblvl")}"
+                    }
                 }
             }
         }
@@ -53,7 +57,7 @@ class MenuItemDisplayOverlayPlayer {
                         if (CollectionAPI.isCollectionTier0(item.getLore()) && (itemName != ("Dungeoneering"))) return "0"
                         if (itemName.split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
                         (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern()).matchMatcher(itemName) {
-                            return "${group(" level").romanToDecimalIfNeeded()}"
+                            return "${group("level").romanToDecimalIfNeeded()}"
                         }
                     } else if (chestName == "Dungeoneering") {
                         dungeonClassLevelPattern.matchMatcher(itemName) {
@@ -78,12 +82,11 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
             ((".*Collections").toPattern()).matchMatcher(chestName) {
                 val lore = item.getLore()
-                if (lore.last() == ("§eClick to view!")) {
+                if (lore.isNotEmpty() && lore.last() == ("§eClick to view!")) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
-                        if (it.startsWith("§e")) {
-                            val text = it.split(" ").last()
-                            return "${text.romanToDecimalIfNeeded()}"
+                        ((".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)").toPattern()).matchMatcher(it) {
+                            return "${group("tier").romanToDecimalIfNeeded()}"
                         }
                     }
                 }
@@ -91,22 +94,20 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
-                        if (line.contains("Collections Unlocked: ")) {
-                            return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
-                        }
+                        ((".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern())).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
-            if (chestName.contains("Collections")) {
-                if (itemName.contains("Collections")) {
+            ((".*Collections").toPattern()).matchMatcher(chestName) {
+                ((".*Collections").toPattern()).matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        (".*Collections .*: .*(§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        (".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.CRAFTED_MINIONS) && chestName.startsWith("Crafted Minions")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.CRAFTED_MINIONS) && chestName == ("Crafted Minions")) {
             val lore = item.getLore()
             if (itemName == "Information") {
                 for (line in lore) {
@@ -115,24 +116,26 @@ class MenuItemDisplayOverlayPlayer {
                     }
                 }
             }
-            (("§eClick to view .*").toPattern()).matchMatcher(lore.last()) {
-                var tiersToSubtract = 0
-                var totalTiers = 0
-                for (line in lore) {
-                    ((".* Tier .*").toPattern()).matchMatcher(line) { totalTiers++ } //§c
-                    ((".* Tier .*§c.*").toPattern()).matchMatcher(line) { tiersToSubtract++ }
+            if (lore.isNotEmpty()) {
+                (("§eClick to view .*").toPattern()).matchMatcher(lore.last()) {
+                    var tiersToSubtract = 0
+                    var totalTiers = 0
+                    for (line in lore) {
+                        ((".* Tier .*").toPattern()).matchMatcher(line) { totalTiers++ } //§c
+                        ((".*§c.* Tier .*").toPattern()).matchMatcher(line) { tiersToSubtract++ }
+                    }
+                    return "${totalTiers - tiersToSubtract}".replace("$totalTiers", "§a✔")
                 }
-                return "${totalTiers - tiersToSubtract}".replace("$totalTiers", "§a✔")
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName.endsWith("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName == ("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
             for (line in item.getLore()) {
                 museumDonationPattern.matchMatcher(line) { return group("amount").toDouble().toInt().toString().replace("100", "§a✔") }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management") && itemName.contains("Profile: ")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management")) {
             profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
         }
 
@@ -140,13 +143,13 @@ class MenuItemDisplayOverlayPlayer {
             if ((chestName.lowercase() == "skyblock menu")) {
                 ((".*Pets.*").toPattern()).matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        (("(§.)*Selected Pet: (§.)*None").toPattern()).matchMatcher(line) { return "§c§l✖" }
+                        (("(§.)*Selected (p|P)et: (§.)*None").toPattern()).matchMatcher(line) { return "§c§l✖" }
                     }
                 }
             }
-            ((".* Pets").toPattern()).matchMatcher(chestName) {
+            (("Pets.*").toPattern()).matchMatcher(chestName) {
                 if (itemName == ("Pet Score Rewards") && item.getLore().isNotEmpty()) {
-                    (("(§.)*Your Pet Score: (§.)*(?<score>[\\w]+)").toPattern()).matchMatcher(item.getLore().last()) {
+                    ((".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*").toPattern()).matchMatcher(item.getLore().last()) {
                         return group("score")
                     }
                 }
@@ -157,7 +160,30 @@ class MenuItemDisplayOverlayPlayer {
             if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
-            if (!(chestName.contains(" ➜ ")) && (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) || (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) || (chestName.endsWith(" Essence"))) {
+            var canDisplayEssence = false
+            (("^((?! ➜ ).)*\$").toPattern()).matchMatcher(chestName) {
+                val endsInEssenceShop = ((".*Essence Shop").toPattern())
+                val endsInEssence = ((".*Essence").toPattern())
+                val containsEssenceGuide = ((".*Essence Guide.*").toPattern())
+                endsInEssenceShop.matchMatcher(chestName) {
+                    endsInEssenceShop.matchMatcher(itemName) {
+                        canDisplayEssence = true
+                    }
+                }
+                containsEssenceGuide.matchMatcher(chestName) {
+                    endsInEssence.matchMatcher(itemName) {
+                        canDisplayEssence = true
+                    }
+                }
+                endsInEssence.matchMatcher(chestName) {
+                    canDisplayEssence = true
+                }
+            }
+            //!(chestName.contains(" ➜ ")) &&
+            // (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) ||
+            // (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) ||
+            // (chestName.endsWith(" Essence"))
+            if (canDisplayEssence) {
                 val lore = item.getLore()
                 for (line in lore) {
                     essenceCountPattern.matchMatcher(line) {
@@ -178,12 +204,20 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE) && (chestName.contains(" Minion ")) && itemName.contains("Quick") && itemName.contains("Upgrade Minion")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE)) {
             //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
-            val lore = item.getLore()
-            for (line in lore) {
-                if (line.contains("You need ") && line.contains("more")) {
-                    return line.removeColor().split("You need ", " more")[1]
+            /*
+             chestName.contains(" Minion ")
+             itemName.contains("Quick") && itemName.contains("Upgrade Minion")
+             */
+            ((".* Minion .*").toPattern()).matchMatcher(chestName) {
+                (("Quick.Upgrade Minion").toPattern()).matchMatcher(itemName) {
+                    val lore = item.getLore()
+                    for (line in lore) {
+                        ((".*You need (§.)*(?<needed>[\\w]+) (§.)*more.*").toPattern()).matchMatcher(line) {
+                            return group("needed")
+                        }
+                    }
                 }
             }
         }
