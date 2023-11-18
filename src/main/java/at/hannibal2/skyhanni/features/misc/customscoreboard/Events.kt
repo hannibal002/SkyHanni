@@ -38,31 +38,33 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             HypixelData.skyBlockIsland == IslandType.KUUDRA_ARENA
         }
     ),
-    JACOB( // not tested
+    JACOB_CONTEST( // not tested
         {
             val list = mutableListOf<String>()
 
-            // Contest
-            if (ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") }) {
-                list += "§eJacob's Contest"
-                list += ScoreboardData.sidebarLines.first { it.startsWith("§e○ §f") }
-                list += ScoreboardData.sidebarLines.nextAfter("§e○ §f") ?: "§7No Ranking"
-                list += ScoreboardData.sidebarLines.nextAfter("§e○ §f", 2) ?: "§7No Amount for next"
-            }
-
-            // Medals
-            if (ScoreboardData.sidebarLines.any { it.trim().startsWith("§6§lGOLD §fmedals:") }) {
-                list += ScoreboardData.sidebarLines.first { it.trim().startsWith("§6§lGOLD §fmedals:") }
-                list += ScoreboardData.sidebarLines.first { it.trim().startsWith("§f§lSILVER §fmedals:") }
-                list += ScoreboardData.sidebarLines.first { it.trim().startsWith("§c§lBRONZE §fmedals:") }
-            }
+            list += "§eJacob's Contest"
+            list += ScoreboardData.sidebarLines.nextAfter("§eJacob's Contest") ?: "§7No Event"
+            list += ScoreboardData.sidebarLines.nextAfter("§eJacob's Contest", 2) ?: "§7No Ranking"
+            list += ScoreboardData.sidebarLines.nextAfter("§eJacob's Contest", 3) ?: "§7No Amount for next"
 
             list
         },
         {
-            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") } || ScoreboardData.sidebarLines.any {
-                it.trim().startsWith("§6§lGOLD §fmedals: ")
-            }
+            ScoreboardData.sidebarLines.any { it.startsWith("§e○ §f") || it.startsWith("§6☘ §f") }
+        }
+    ),
+    JACOB_MEDALS(
+        {
+            val list = mutableListOf<String>()
+
+            list += ScoreboardData.sidebarLines.first { it.startsWith("§6§lGOLD §fmedals") }
+            list += ScoreboardData.sidebarLines.first { it.startsWith("§f§lSILVER §fmedals") }
+            list += ScoreboardData.sidebarLines.first { it.startsWith("§c§lBRONZE §fmedals")}
+
+            list
+        },
+        {
+            ScoreboardData.sidebarLines.any { it.startsWith("§6§lGOLD §fmedals") }
         }
     ),
     WINTER( // not tested
@@ -95,7 +97,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 .nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
         }
     ),
-    NEW_YEAR( // not tested
+    NEW_YEAR(
         {
             listOf(ScoreboardData.sidebarLines.first { it.startsWith("§dNew Year Event") })
         },
@@ -111,13 +113,14 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLines.any { it.startsWith("§aTraveling Zoo") }
         }
     ),
-    MINING_EVENTS( // not sure
+    MINING_EVENTS(
         {
             val list = mutableListOf<String>()
 
             // Mining Fiesta
-            if (TabListData.getTabList().any { it =="§e§lEvent: §r§6Mining Fiesta" }
-                && TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")?.startsWith(" Ends In:") == true) {
+            if (TabListData.getTabList().any { it == "§e§lEvent: §r§6Mining Fiesta" }
+                && TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
+                    ?.startsWith(" Ends In:") == true) {
                 list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
                     ?.removePrefix(" Ends In: ")
             }
