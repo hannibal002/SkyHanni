@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.Item
@@ -31,12 +33,15 @@ object HarpFeatures {
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
+    val inventoryTitleRegex by RepoPattern.pattern("harp.inventory", "^Harp.*")
+
+    private fun isHarpGui() = inventoryTitleRegex.matches(openInventoryName())
 
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
-        if (!openInventoryName().startsWith("Harp")) return
+        if (!isHarpGui()) return
         val chest = event.gui as? GuiChest ?: return
 
         for ((index, key) in KeyIterable.withIndex()) {
@@ -71,7 +76,7 @@ object HarpFeatures {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showNumbers) return
-        if (!openInventoryName().startsWith("Harp")) return
+        if (!isHarpGui()) return
         if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
 
         // Example: §9| §7Click! will select the 9
