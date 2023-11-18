@@ -162,21 +162,11 @@ class MenuItemDisplayOverlayPlayer {
             }
             var canDisplayEssence = false
             (("^((?! ➜ ).)*\$").toPattern()).matchMatcher(chestName) {
-                val endsInEssenceShop = ((".*Essence Shop").toPattern())
-                val endsInEssence = ((".*Essence").toPattern())
-                val containsEssenceGuide = ((".*Essence Guide.*").toPattern())
-                endsInEssenceShop.matchMatcher(chestName) {
-                    endsInEssenceShop.matchMatcher(itemName) {
+                val canDisplayEssencePattern = ((".*Essence( Guide.*| Shop)?").toPattern())
+                canDisplayEssencePattern.matchMatcher(chestName) {
+                    canDisplayEssencePattern.matchMatcher(itemName) {
                         canDisplayEssence = true
                     }
-                }
-                containsEssenceGuide.matchMatcher(chestName) {
-                    endsInEssence.matchMatcher(itemName) {
-                        canDisplayEssence = true
-                    }
-                }
-                endsInEssence.matchMatcher(chestName) {
-                    canDisplayEssence = true
                 }
             }
             //!(chestName.contains(" ➜ ")) &&
