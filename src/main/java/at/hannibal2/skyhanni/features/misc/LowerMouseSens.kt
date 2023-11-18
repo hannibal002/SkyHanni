@@ -39,16 +39,12 @@ object LowerMouseSens {
         isToggled = !isToggled
         if (isToggled) {
             SkyHanniMod.feature.storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
-            val step1 = SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F)
-            LorenzUtils.chat("step1 $step1")
-            val step2 = step1/config.divisorSens
-            LorenzUtils.chat("step2 $step2")
-            val newSens = step2-(1F / 3F)
+            val newSens = ((SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F))/config.divisorSens)-(1F / 3F)
             gameSettings.mouseSensitivity = newSens
-            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been lowered from ${SkyHanniMod.feature.storage.savedMouseloweredSensitivity} to $newSens.")
+//            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been lowered from ${SkyHanniMod.feature.storage.savedMouseloweredSensitivity} to $newSens.")
         } else {
             gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
-            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been restored.")
+//            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been restored.")
         }
     }
 }
