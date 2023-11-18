@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import java.awt.Desktop
 import java.io.IOException
 import java.net.URI
@@ -12,8 +13,7 @@ object OSUtils {
             try {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
-                e.printStackTrace()
-                LorenzUtils.error("Error opening website: $url!")
+                ErrorManager.logError(e, "Error opening website: $url")
             }
         } else {
             copyToClipboard(url)

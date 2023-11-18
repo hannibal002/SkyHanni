@@ -55,7 +55,7 @@ class BingoCardDisplay {
                 return
             }
             if (!config.enabled) {
-                LorenzUtils.userError("§cBingo Card is disabled in the config!")
+                LorenzUtils.userError("Bingo Card is disabled in the config!")
                 return
             }
             toggleMode()

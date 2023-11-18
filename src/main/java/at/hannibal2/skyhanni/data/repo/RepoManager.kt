@@ -175,11 +175,14 @@ class RepoManager(private val configLocation: File) {
     fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
-                LorenzUtils.error("§7Repo Issue! Some features may not work. Please report this error on the Discord!")
-                LorenzUtils.error("§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}", false)
-                LorenzUtils.error("§7If you have Repo Auto Update turned off, please try turning that on.\n§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):", false)
+                LorenzUtils.error(
+                    "§7Repo Issue! Some features may not work. Please report this error on the Discord!\n"
+                        + "§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}\n"
+                        + "§7If you have Repo Auto Update turned off, please try turning that on.\n"
+                        + "§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):"
+                )
                 for (constant in unsuccessfulConstants) {
-                    LorenzUtils.error("   §e- §7$constant", false)
+                    LorenzUtils.chat("   §e- §7$constant")
                 }
             }
             return

@@ -463,8 +463,11 @@ class FarmingWeightDisplay {
 
         private fun error() {
             apiError = true
-            LorenzUtils.error("Loading the farming weight data from elitebot.dev failed!")
-            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!", false)
+            LorenzUtils.error(
+                "Loading the farming weight data from elitebot.dev failed!\n"
+                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!",
+            )
         }
 
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {

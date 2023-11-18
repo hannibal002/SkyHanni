@@ -16,12 +16,12 @@ object GardenCropTimeCommand {
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
-            LorenzUtils.userError("§cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            LorenzUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
         if (args.size < 2) {
-            LorenzUtils.userError("§cUsage: /shcroptime <amount> <item>")
+            LorenzUtils.userError("Usage: /shcroptime <amount> <item>")
             return
         }
 
@@ -29,7 +29,7 @@ object GardenCropTimeCommand {
         val amount = try {
             rawAmount.toInt()
         } catch (e: NumberFormatException) {
-            LorenzUtils.userError("§cNot a valid number: '$rawAmount'")
+            LorenzUtils.userError("Not a valid number: '$rawAmount'")
             return
         }
 

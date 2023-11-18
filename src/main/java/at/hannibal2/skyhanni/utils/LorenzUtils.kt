@@ -64,7 +64,7 @@ object LorenzUtils {
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-
+    // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
@@ -103,15 +103,23 @@ object LorenzUtils {
      * Sends a message to the user that an error occurred caused by something in the code.
      * This should be used for errors that are not caused by the user.
      *
+     * Why deprecate this? Even if this message is descriptive for the user and the developer,
+     * we don't want inconsitencies in errors, and we would need to search
+     * for the code line where this error gets printed any way.
+     * so it's better to use the stack trace still.
+     *
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the error prefix, default true
      *
      * @see ERROR_PREFIX
      */
-    fun error(message: String, prefix: Boolean = true) {
+    @Deprecated(
+        "Do not send the user a non clickable non stacktrace containing error message.",
+        ReplaceWith("ErrorManager")
+    )
+    fun error(message: String) {
         println("error: '$message'")
-        if (prefix) internalChat(ERROR_PREFIX + message)
-        else internalChat("§c$message")
+        internalChat(ERROR_PREFIX + message)
     }
 
     /**
@@ -123,8 +131,11 @@ object LorenzUtils {
      * @see CHAT_PREFIX
      */
     fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
-        if (prefix) internalChat(prefixColor + CHAT_PREFIX + message)
-        else internalChat(message)
+        if (prefix) {
+            internalChat(prefixColor + CHAT_PREFIX + message)
+        } else {
+            internalChat(message)
+        }
     }
 
     private fun internalChat(message: String): Boolean {
@@ -312,7 +323,13 @@ object LorenzUtils {
      *
      * @see CHAT_PREFIX
      */
-    fun hoverableChat(message: String, hover: List<String>, command: String? = null, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun hoverableChat(
+        message: String,
+        hover: List<String>,
+        command: String? = null,
+        prefix: Boolean = true,
+        prefixColor: String = "§e"
+    ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatHoverEvent =
