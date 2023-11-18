@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -142,7 +141,7 @@ class GardenVisitorTimer {
             millis -= sinceLastTimerUpdate
         }
 
-        if (lastMillis == INFINITE) {
+        if (lastMillis == Duration.INFINITE) {
             LorenzUtils.error("Found Visitor Timer bug, reset value (lastMillis was infinite).")
             lastMillis = 0.seconds
         }
@@ -185,7 +184,10 @@ class GardenVisitorTimer {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
         GardenAPI.storage?.nextSixthVisitorArrival?.let {
-            sixthVisitorArrivalTime = it.asTimeMark()
+            val badTime = Duration.INFINITE.inWholeMilliseconds
+            if (it != badTime && it != -9223370336633802065) {
+                sixthVisitorArrivalTime = it.asTimeMark()
+            }
         }
         sixthVisitorReady = false
         lastMillis = sixthVisitorArrivalTime.timeUntil()
