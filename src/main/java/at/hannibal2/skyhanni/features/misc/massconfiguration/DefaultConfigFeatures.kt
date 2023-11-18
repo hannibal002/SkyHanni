@@ -38,7 +38,7 @@ object DefaultConfigFeatures {
                 "shdefaultoptions"
             )
         } else if (updated) {
-            val lastVersion = knownToggles.keys.last()
+            val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
             val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.version}"
             LorenzUtils.clickableChat(
                 "Looks like you updated SkyHanni. " +

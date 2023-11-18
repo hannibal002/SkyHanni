@@ -201,4 +201,7 @@ object NumberUtil {
         val d = text.toDouble()
         return (d * multiplier).toLong()
     }
+
+    val Int.milion get() = this * 1_000_000.0
+    val Double.milion get() = (this * 1_000_000.0).toLong()
 }

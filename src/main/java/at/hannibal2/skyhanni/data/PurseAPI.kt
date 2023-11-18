@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.milion
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -41,18 +42,26 @@ class PurseAPI {
             if (diff == 1.0) {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
+
+            if (diff == 15.milion || diff == 100.milion) {
+                return PurseChangeCause.GAIN_DICE_ROLL
+            }
+
             if (Minecraft.getMinecraft().currentScreen == null) {
                 val timeDiff = System.currentTimeMillis() - inventoryCloseTime
                 if (timeDiff > 2_000) {
                     return PurseChangeCause.GAIN_MOB_KILL
                 }
-
             }
             return PurseChangeCause.GAIN_UNKNOWN
         } else {
             val timeDiff = System.currentTimeMillis() - SlayerAPI.questStartTime
             if (timeDiff < 1500) {
                 return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
+            }
+
+            if (diff == -6_666_666.0 || diff == -666_666.0) {
+                return PurseChangeCause.LOSE_DICE_ROLL_COST
             }
 
             return PurseChangeCause.LOSE_UNKNOWN
