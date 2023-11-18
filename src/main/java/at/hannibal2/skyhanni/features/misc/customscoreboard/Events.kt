@@ -38,7 +38,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             HypixelData.skyBlockIsland == IslandType.KUUDRA_ARENA
         }
     ),
-    JACOB_CONTEST( // not tested
+    JACOB_CONTEST(
         {
             val list = mutableListOf<String>()
 
