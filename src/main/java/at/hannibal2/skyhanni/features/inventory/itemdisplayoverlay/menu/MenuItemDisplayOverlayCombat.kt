@@ -82,13 +82,13 @@ class MenuItemDisplayOverlayCombat {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.RNG_METER_PROGRESS) && itemName == ("RNG Meter")) {
             for (line in item.getLore()) {
-                ((".*Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern()).matchMatcher(line) {
-                    group("percent").replace("100", "§a✔")
+                ((".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern()).matchMatcher(line) {
+                    return group("percent").replace("100", "§a✔")
                 }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.UNLOCKED_SLAYER_RECIPES) && itemName.contains("Slayer Recipes")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.UNLOCKED_SLAYER_RECIPES) && itemName == ("Slayer Recipes")) {
             for (line in item.getLore()) {
                 ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern()).matchMatcher(line) {
                     return group("recipes")
