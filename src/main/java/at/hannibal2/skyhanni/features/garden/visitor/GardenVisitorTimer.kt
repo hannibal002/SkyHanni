@@ -130,7 +130,7 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    LorenzUtils.sendTitle("§a6th Vidsitor Ready", 5.seconds)
+                    LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
                 }
