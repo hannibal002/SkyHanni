@@ -216,8 +216,8 @@ public class MiscConfig {
     public int mouseSensKey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Lowered Sensitivity", desc = "Applies a Divisor to your current sensitivity")
-    @ConfigEditorSlider(minValue = 0, maxValue = 1000, minStep = 1)
+    @ConfigOption(name = "Lower Mouse Sensitivity Divisor", desc = "Applies a Divisor to your current sensitivity")
+    @ConfigEditorSlider(minValue = 0, maxValue = 250, minStep = 1)
     public int divisorSens = 5;
 
     @Expose
