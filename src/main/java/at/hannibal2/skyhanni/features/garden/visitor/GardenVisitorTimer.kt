@@ -143,12 +143,8 @@ class GardenVisitorTimer {
         }
 
         if (lastMillis == INFINITE) {
-            ErrorManager.logErrorState("Visitor Timer got problem detected", "lastMillis is infinite")
-            return
-        }
-        if (millis == INFINITE) {
-            ErrorManager.logErrorState("Visitor Timer got problem detected", "millis is infinite")
-            return
+            LorenzUtils.chat("§c[SkyHanni] Found Visitor Timer bug, reset value (lastMillis was infinite).")
+            lastMillis = 0.seconds
         }
 
         val diff = lastMillis - millis
