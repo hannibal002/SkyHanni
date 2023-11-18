@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -129,7 +130,7 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                    LorenzUtils.sendTitle("§a6th Vidsitor Ready", 5.seconds)
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
                 }
@@ -139,6 +140,15 @@ class GardenVisitorTimer {
         val guessTime = visitorsAmount < 5 && sinceLastTimerUpdate in 500.milliseconds..60.seconds
         if (guessTime) {
             millis -= sinceLastTimerUpdate
+        }
+
+        if (lastMillis == INFINITE) {
+            ErrorManager.logErrorState("Visitor Timer got problem detected", "lastMillis is infinite")
+            return
+        }
+        if (millis == INFINITE) {
+            ErrorManager.logErrorState("Visitor Timer got problem detected", "millis is infinite")
+            return
         }
 
         val diff = lastMillis - millis
