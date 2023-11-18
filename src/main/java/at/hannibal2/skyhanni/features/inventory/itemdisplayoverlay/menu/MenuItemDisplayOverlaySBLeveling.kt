@@ -33,7 +33,9 @@ class MenuItemDisplayOverlaySBLeveling {
                             return group("percent").replace("100", "§a✔")
                         }
                     }
-                    if (itemName.contains("✔")) return "§a✔"
+                    (("✔.*").toPattern()).matchMatcher(itemName) {
+                        return "§a✔"
+                    }
                 }
             }
         }

@@ -31,58 +31,67 @@ class MenuItemDisplayOverlayCombat {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.combat
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_LEVEL) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty() && (itemName.contains("Bestiary Milestone ")))) {
-            return itemName.split(" ").last()
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_LEVEL)) {
+            (("Bestiary.*").toPattern()).matchMatcher(chestName) {
+                (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern()).matchMatcher(itemName) {
+                        return group("milestone")
+                }
+            }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_OVERALL_FAMILY_PROGRESS) && ((chestName.contains("Bestiary")) && itemName.isNotEmpty())) {
-            val lore = item.getLore()
-            for (line in lore) {
-                if (line.contains("Families Completed: ") || line.contains("Overall Progress: ")) {
-                    return genericPercentPattern.matchMatcher(line.removeColor().replace(" (MAX!)", "")) { group("percent").replace("100", "§a✔") } ?: ""
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_OVERALL_FAMILY_PROGRESS)) {
+            (("Bestiary.*").toPattern()).matchMatcher(chestName) {
+                if (itemName.isNotEmpty()) {
+                    val lore = item.getLore()
+                    for (line in lore) {
+                        ((".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern()).matchMatcher(line) {
+                            return group("percent").replace("100", "§a✔")
+                        }
+                    }
                 }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.SLAYER_LEVELS)) {
-            if ((chestName.contains("Slayer")) && itemName.isNotEmpty()) {
-                val lore = item.getLore()
-                for (line in lore) {
-                    if (line.contains(" Slayer: ")) {
-                        return getTheLastWordNoColor(line)
+            val lore = item.getLore()
+            if (chestName == ("Slayer")) {
+                if (itemName.isNotEmpty() && lore.isNotEmpty()) {
+                    for (line in lore) {
+                        (("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)").toPattern()).matchMatcher(line) {
+                            return group("level")
+                        }
                     }
                 }
             }
-            if (itemName.contains("Boss Leveling Rewards")) {
-                val lore = item.getLore()
+            if (itemName == ("Boss Leveling Rewards")) {
                 for (line in lore) {
-                    if (line.contains("Current LVL: ")) {
-                        return getTheLastWordNoColor(line)
+                    (("(§.)*Current LVL: (§.)*(?<level>[\\w]+)").toPattern()).matchMatcher(line) {
+                        return group("level")
                     }
                 }
             }
         }
 
-        if ((stackSizeConfig.contains(StackSizeMenuConfig.Combat.SLAYER_COMBAT_WISDOM_BUFF)) && (itemName.contains("Global Combat Wisdom"))) {
+        if ((stackSizeConfig.contains(StackSizeMenuConfig.Combat.SLAYER_COMBAT_WISDOM_BUFF)) && (itemName == ("Global Combat Wisdom Buff"))) {
             for (line in item.getLore()) {
-                if (line.contains("Total buff")) {
-                    return "§3" + line.removeColor().replace("Total buff: +", "").replace("☯ Combat Wisdom", "")
+                (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern()).matchMatcher(line) {
+                    return group("combatWise")
                 }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.RNG_METER_PROGRESS) && itemName.contains("RNG Meter")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.RNG_METER_PROGRESS) && itemName == ("RNG Meter")) {
             for (line in item.getLore()) {
-                if (line.contains("Progress: ")) {
-                    return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+                ((".*Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern()).matchMatcher(line) {
+                    group("percent").replace("100", "§a✔")
                 }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.UNLOCKED_SLAYER_RECIPES) && itemName.contains("Slayer Recipes")) {
             for (line in item.getLore()) {
-                if (line.contains("Unlocked: ")) {
-                    return line.removeColor().lowercase().split("unlocked: ", " recipes")[1] //need to use lowercase here because one day the admins are going to capitalize the word "recipes" in "Unlocked: 26 Recipes" and it'll break this feature i may as well futureproof it right now
+                ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern()).matchMatcher(line) {
+                    return group("recipes")
                 }
             }
         }

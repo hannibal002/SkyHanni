@@ -37,7 +37,7 @@ class MenuItemDisplayOverlayAbiphone {
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.DO_NOT_DISTURB))) {
                 val nameWithColor = item.name ?: return ""
-                if ((nameWithColor.startsWith("§f§"))) {
+                ((".*§f§.*").toPattern()).matchMatcher(nameWithColor) {
                     val lore = item.getLore()
                     for (line in lore) {
                         if (line == ("§cDo Not Disturb enabled!")) {

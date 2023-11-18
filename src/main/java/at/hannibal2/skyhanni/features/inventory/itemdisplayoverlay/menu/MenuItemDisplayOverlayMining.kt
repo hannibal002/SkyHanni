@@ -26,9 +26,9 @@ class MenuItemDisplayOverlayMining {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.mining
         val chestName = InventoryUtils.openInventoryName()
         
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.CURRENT_SKYMALL_PERK) && (item.cleanName().contains("Sky Mall")) && (chestName == "Heart of the Mountain")) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.CURRENT_SKYMALL_PERK) && (item.cleanName() == ("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
-            if (lore.last().contains("Right-click to ") && lore.last().contains("disable")) {
+            (("(§.)*Right.?click to (§.)*disable(§.)*!").toPattern()).matchMatcher(lore.last()) {
                 // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
                 /*
                 "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
@@ -41,18 +41,20 @@ class MenuItemDisplayOverlayMining {
                 */
                 var currentEffectLineLocated = false
                 for (line in lore) {
-                    if (line.contains("Your Current Effect")) {
+                    ((".*(§.)*Your Current Effect.*").toPattern()).matchMatcher(line) {
                         currentEffectLineLocated = true
                     }
-                    if (currentEffectLineLocated && line.contains(" ■ ")) {
-                        return when (line.removeColor().replace(" ■ ", "").replace(".", "")) {
-                            "Gain +100 ⸕ Mining Speed" -> return "§a+§6⸕"
-                            "Gain +50 ☘ Mining Fortune" -> return "§a+§6☘"
-                            "Gain +15% more Powder while" -> return "§a15%"
-                            "Reduce Pickaxe Ability cooldown" -> return "§a20%"
-                            "10x chance to find Goblins" -> return "§a10x"
-                            "Gain 5x Titanium drops" -> return "§a5x§9T"
-                            else -> "§c!?"
+                    if (currentEffectLineLocated) {
+                        (("(§.)*.*■ (§.)*(?<thePerk>.+)").toPattern()).matchMatcher(line) {
+                            return when (group("thePerk")) {
+                                "Gain §a+100 §6⸕ Mining Speed§7." -> return "§a+§6⸕"
+                                "Gain §a+50 §6☘ Mining Fortune§7." -> return "§a+§6☘"
+                                "Gain §a+15% §7more Powder while" -> return "§a15%"
+                                "Reduce Pickaxe Ability cooldown" -> return "§a20%"
+                                "10x §7chance to find Golden" -> return "§a10x"
+                                "Gain §a5x §9Titanium §7drops." -> return "§a5x§9T"
+                                else -> "§c!?"
+                            }
                         }
                     }
                 }
@@ -65,15 +67,25 @@ class MenuItemDisplayOverlayMining {
                 //§7Level 64/§8100
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
-                if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
-                if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
+//                 if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
+//                 if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
+                (("^((?!(§.)*Level ).)*\$").toPattern()).matchMatcher(lore.first()) {
+                    (("^((?!(§.)*(Right|Left).click to ).)*\$").toPattern()).matchMatcher(lore.last()) {
+                        return ""
+                    }
+                }
+                ((".*(§.)*(Requires .*|.*the Mountain!).*").toPattern()).matchMatcher(lore.last()) { return "" }
                 xOutOfYNoColorRequiredPattern.matchMatcher(lore.first()) {
                     //§7Level 64/§8100
                     var colorCode = ""
                     var level = group("useful")
                     if (group("total") == null) level = "✔"
                     if (nameWithColor.startsWith("§a")) colorCode = "§a"
-                    if (lore.takeLast(3).any { it.removeColor().replace("Right click to ", "").contains("enable") }) colorCode = "§c"
+                    for (line in lore) {
+                        (("(§.)*(.*)click to (§.)*(enable).*").toPattern()).matchMatcher(line) {
+                            colorCode = "§c"
+                        }
+                    }
                     return "$colorCode$level"
                 }
             }
@@ -82,14 +94,16 @@ class MenuItemDisplayOverlayMining {
         //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
         //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
         //ping @erymanthus on the skyhanni discord if you find any bugs with this
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_OVERALL_TIERS) && chestName == ("Heart of the Mountain") && item.cleanName().contains("Tier ")) {
-            val nameWithColor = item.name ?: return ""
-            if (nameWithColor.contains("§a")) return ""
-            val lore = item.getLore()
-            if (lore != null && lore.isNotEmpty()) {
-                for (line in lore) {
-                    if (line.startsWith("§7Progress: ") && line.endsWith("%")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_OVERALL_TIERS) && chestName == ("Heart of the Mountain")) {
+            (("Tier (?<tier>[\\w]+)").toPattern()).matchMatcher(item.cleanName()) {
+                val nameWithColor = item.name ?: return ""
+                (("§aTier (?<tier>[\\w]+)").toPattern()).matchMatcher(nameWithColor) { return "" }
+                val lore = item.getLore()
+                if (lore != null && lore.isNotEmpty()) {
+                    for (line in lore) {
+                        ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) {
+                            return group("percent").replace("100", "§a✔")
+                        }
                     }
                 }
             }
@@ -103,9 +117,9 @@ class MenuItemDisplayOverlayMining {
             var crystalsNotFound = 0
             val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
             for (line in lore) {
-                if (line.contains("Your Other Crystals") || line.contains("Jasper") || line.contains("Ruby")) break //apparently jasper and ruby get counted without this hotfix line, soooo
-                else if (line.contains(" §e✖ Not Placed")) crystalsNotPlaced++
-                else if (line.contains(" §c✖ Not Found")) crystalsNotFound++
+                ((".*(Your Other Crystals|Jasper|Ruby).*").toPattern()).matchMatcher(line) { break }
+                ((".* §e✖ Not Placed").toPattern()).matchMatcher(line) { crystalsNotPlaced++ }
+                ((".* §c✖ Not Found").toPattern()).matchMatcher(line) { crystalsNotFound++ }
             }
             val crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
             return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"

@@ -26,23 +26,20 @@ class MenuItemDisplayOverlayFarming {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.farming
         val chestName = InventoryUtils.openInventoryName()
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.JACOBS_MEDALS) && ((chestName == "Jacob's Farming Contests") && itemName.contains("Claim your rewards!"))) {
-            var gold = "§60"
-            var silver = "§f0"
-            var bronze = "§c0"
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.JACOBS_MEDALS) && ((chestName == "Jacob's Farming Contests") && itemName == ("Claim your rewards!"))) {
+            var result = ""
             for (line in item.getLore()) {
-                val noColorLine = line.removeColor()
-                if (noColorLine.contains("GOLD")) gold = "§6" + noColorLine.split(" ").last()
-                if (noColorLine.contains("SILVER")) silver = "§f" + noColorLine.split(" ").last()
-                if (noColorLine.contains("BRONZE")) bronze = "§c" + noColorLine.split(" ").last()
+                (("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)").toPattern()).matchMatcher(line) {
+                    result = "$result${group("colorCode")}${group("count")}"
+                }
             }
-            return gold + silver + bronze
+            return result
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITORS_LOGBOOK_COUNTDOWN) && ((chestName == "Visitor's Logbook") && itemName == ("Logbook"))) {
             for (line in item.getLore()) {
-                if (line.contains("Next Visitor: ")) {
-                    return line.removeColor().replace("Next Visitor: ", "").trim().take(2).replace("s", "").replace("m", "")
+                (("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*").toPattern()).matchMatcher(line) {
+                    return group("time")
                 }
             }
         }
@@ -51,8 +48,8 @@ class MenuItemDisplayOverlayFarming {
             val lore = item.getLore()
             if (lore.isNotEmpty()) {
                 for (line in lore) {
-                    if (line.contains("Progress ") && line.contains(": ") && line.contains("%")) {
-                        return genericPercentPattern.matchMatcher(line) { group("percent").replace("100", "§a✔") } ?: ""
+                    (("(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) {
+                        return group("percent").replace("100", "§a✔")
                     }
                 }
             }
@@ -61,19 +58,25 @@ class MenuItemDisplayOverlayFarming {
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITOR_NPC_RARITIES) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
             for (line in lore) {
-                if (line.startsWith("§7Times Visited: ")) {
-                    return lore.first().take(5).replace("T", "☉")
+                (("§.§(L|l)(UNCOMMON|RARE|LEGENDARY|SPECIAL|MYTHIC)").toPattern()).matchMatcher(line) {
+                    return line.take(5)
                 }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.COMPOSTER_INSERT_ABBV) && (chestName.contains("Composter")) && (itemName.contains("Insert ") && itemName.contains(" from "))) {
-            val lore = item.getLore()
-            //§7Totalling §2§240k Fuel§7.
-            //Totalling 40k Fuel.
-            for (line in lore) {
-                composterPattern.matchMatcher(line) {
-                    return group("resourceCount")
+        if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.COMPOSTER_INSERT_ABBV)) {
+            //(chestName.contains("Composter"))
+            //(itemName.contains("Insert ") && itemName.contains(" from "))
+            if (chestName == "Composter") {
+                (("Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)").toPattern()).matchMatcher(itemName) {
+                    val lore = item.getLore()
+                    //§7Totalling §2§240k Fuel§7.
+                    //Totalling 40k Fuel.
+                    for (line in lore) {
+                        composterPattern.matchMatcher(line) {
+                            return group("resourceCount")
+                        }
+                    }
                 }
             }
         }
