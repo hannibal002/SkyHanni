@@ -224,7 +224,7 @@ public class MiscConfig {
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose
-    public Position lockedMouseDisplay = new Position(400, 400, 0.8f);
+    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
     public Position loweredMouseDisplay = new Position(400, 400, 0.8f);
