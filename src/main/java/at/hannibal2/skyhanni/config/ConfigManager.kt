@@ -110,49 +110,33 @@ class ConfigManager {
             }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
+
+        var configDirectory = File("config/skyhanni")
     }
 
-    lateinit var features: Features
-        private set
-    lateinit var sackData: SackData
-        private set
-    lateinit var friendsData: FriendsJson
-        private set
-    lateinit var knownFeaturesData: KnownFeaturesJson
-        private set
-    lateinit var jacobContestData: JacobContestsJson
-        private set
+    val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
+    val sackData get() = jsonHolder[ConfigFileType.SACKS] as SackData
+    val friendsData get() = jsonHolder[ConfigFileType.FRIENDS] as FriendsJson
+    val knownFeaturesData get() = jsonHolder[ConfigFileType.KNOWN_FEATURES] as KnownFeaturesJson
+    val jacobContestData get() = jsonHolder[ConfigFileType.JACOB_CONTESTS] as JacobContestsJson
 
     private val logger = LorenzLogger("config_manager")
 
-    var configDirectory = File("config/skyhanni")
-
-    private var configFile: File? = null
-    private var sackFile: File? = null
-    private var friendsFile: File? = null
-    private var knowFeaturesFile: File? = null
-    private var jacobContestsFile: File? = null
+    private val jsonHolder = mutableMapOf<ConfigFileType, Any>()
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
 
     fun firstLoad() {
-        if (::features.isInitialized) {
+        if (jsonHolder.isNotEmpty()) {
             logger.log("Loading config despite config being already loaded?")
         }
-        configDirectory.mkdir()
+        configDirectory.mkdirs()
 
-        configFile = File(configDirectory, "config.json")
-        sackFile = File(configDirectory, "sacks.json")
-        friendsFile = File(configDirectory, "friends.json")
-        knowFeaturesFile = File(configDirectory, "known_features.json")
-        jacobContestsFile = File(configDirectory, "jacob_contests.json")
 
-        features = firstLoadFile(configFile, ConfigFileType.FEATURES, Features(), true)
-        sackData = firstLoadFile(sackFile, ConfigFileType.SACKS, SackData(), false)
-        friendsData = firstLoadFile(friendsFile, ConfigFileType.FRIENDS, FriendsJson(), false)
-        knownFeaturesData = firstLoadFile(knowFeaturesFile, ConfigFileType.KNOWN_FEATURES, KnownFeaturesJson(), false)
-        jacobContestData = firstLoadFile(jacobContestsFile, ConfigFileType.JACOB_CONTESTS, JacobContestsJson(), false)
+        for (fileType in ConfigFileType.entries) {
+            jsonHolder[fileType] = firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance())
+        }
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
@@ -169,10 +153,10 @@ class ConfigManager {
         )
     }
 
-    private inline fun <reified T> firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: T, isConfig: Boolean): T {
+    private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
         val fileName = fileType.fileName
         logger.log("Trying to load $fileName from $file")
-        var output: T = defaultValue
+        var output: Any = defaultValue
 
         if (file!!.exists()) {
             try {
@@ -181,12 +165,12 @@ class ConfigManager {
 
                 logger.log("load-$fileName-now")
 
-                output = if (isConfig) {
+                output = if (fileType == ConfigFileType.FEATURES) {
                     val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                    gson.fromJson(newJsonObject, T::class.java)
+                    gson.fromJson(newJsonObject, defaultValue.javaClass)
                 } else {
-                    gson.fromJson(bufferedReader.readText(), T::class.java)
+                    gson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
                 }
 
                 logger.log("Loaded $fileName from file")
@@ -212,13 +196,8 @@ class ConfigManager {
     }
 
     fun saveConfig(fileType: ConfigFileType, reason: String) {
-        when (fileType) {
-            ConfigFileType.FEATURES -> saveFile(configFile, fileType.fileName, SkyHanniMod.feature, reason)
-            ConfigFileType.SACKS -> saveFile(sackFile, fileType.fileName, SkyHanniMod.sackData, reason)
-            ConfigFileType.FRIENDS -> saveFile(friendsFile, fileType.fileName, SkyHanniMod.friendsData, reason)
-            ConfigFileType.KNOWN_FEATURES -> saveFile(knowFeaturesFile, fileType.fileName, SkyHanniMod.knownFeaturesData, reason)
-            ConfigFileType.JACOB_CONTESTS -> saveFile(jacobContestsFile, fileType.fileName, SkyHanniMod.jacobContestsData, reason)
-        }
+        val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
+        saveFile(fileType.file, fileType.fileName, json, reason)
     }
 
     private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
@@ -251,11 +230,13 @@ class ConfigManager {
     }
 }
 
-enum class ConfigFileType(val fileName: String) {
-    FEATURES("config"),
-    SACKS("sacks"),
-    FRIENDS("friends"),
-    KNOWN_FEATURES("known_features"),
-    JACOB_CONTESTS("jacob_contests"),
+enum class ConfigFileType(val fileName: String, val clazz: Class<*>) {
+    FEATURES("config", Features::class.java),
+    SACKS("sacks", SackData::class.java),
+    FRIENDS("friends", FriendsJson::class.java),
+    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java),
+    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java),
     ;
+
+    val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
 }

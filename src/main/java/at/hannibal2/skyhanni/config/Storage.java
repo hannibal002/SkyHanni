@@ -36,6 +36,7 @@ public class Storage {
     @Expose
     public Float savedMouseSensitivity = .5f;
 
+    @Deprecated
     @Expose
     public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
 

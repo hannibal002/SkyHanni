@@ -141,6 +141,11 @@ class GardenVisitorTimer {
             millis -= sinceLastTimerUpdate
         }
 
+        if (lastMillis == Duration.INFINITE) {
+            LorenzUtils.chat("§c[SkyHanni] Found Visitor Timer bug, reset value (lastMillis was infinite).")
+            lastMillis = 0.seconds
+        }
+
         val diff = lastMillis - millis
         if (diff == 0.seconds && visitorsAmount == lastVisitors) return
         lastMillis = millis
@@ -179,7 +184,10 @@ class GardenVisitorTimer {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
         GardenAPI.storage?.nextSixthVisitorArrival?.let {
-            sixthVisitorArrivalTime = it.asTimeMark()
+            val badTime = Duration.INFINITE.inWholeMilliseconds
+            if (it != badTime && it != -9223370336633802065) {
+                sixthVisitorArrivalTime = it.asTimeMark()
+            }
         }
         sixthVisitorReady = false
         lastMillis = sixthVisitorArrivalTime.timeUntil()

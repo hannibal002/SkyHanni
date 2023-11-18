@@ -1,3 +1,5 @@
+
+
 <h1 align = "center">
 	SkyHanni: Mod for Hypixel SkyBlock
 </h1>
@@ -25,3 +27,5 @@ our [Discord](https://discord.gg/skyhanni-997079228510117908).
 
 If you are interested in the technical side of SkyHanni, read
 the [Contributing Guide](https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md).
+
+*Check out some other really cool 1.8.9 mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/)*

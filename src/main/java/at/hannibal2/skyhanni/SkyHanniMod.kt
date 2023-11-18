@@ -258,7 +258,6 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper
@@ -272,6 +271,7 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkou
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
 import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
@@ -339,7 +339,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.1.Beta.1",
+    version = "0.21.1.Beta.3",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -674,7 +674,7 @@ class SkyHanniMod {
         Runtime.getRuntime().addShutdownHook(Thread {
             configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
         })
-        repo = RepoManager(configManager.configDirectory)
+        repo = RepoManager(ConfigManager.configDirectory)
         try {
             repo.loadRepoInformation()
         } catch (e: Exception) {
@@ -721,7 +721,7 @@ class SkyHanniMod {
         }
 
         val modules: MutableList<Any> = ArrayList()
-        val globalJob: Job = Job(null)
+        private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob)
         )
