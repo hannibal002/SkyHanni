@@ -189,7 +189,7 @@ object NumberUtil {
     }
 
     fun String.formatNumber(): Long {
-        var text = replace(",", "")
+        var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
             text = text.substring(0, text.length - 1)
@@ -197,7 +197,10 @@ object NumberUtil {
         } else if (text.endsWith("m")) {
             text = text.substring(0, text.length - 1)
             1_000_000
-        } else 1
+        }else if (text.endsWith("b")) {
+            text = text.substring(0, text.length - 1)
+            1_000_000_000
+        }else 1
         val d = text.toDouble()
         return (d * multiplier).toLong()
     }
