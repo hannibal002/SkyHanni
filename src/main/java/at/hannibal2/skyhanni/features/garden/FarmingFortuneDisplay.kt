@@ -156,7 +156,7 @@ class FarmingFortuneDisplay {
                 CropAccessoryData.cropAccessory?.getFortune(it)
             }
 
-        private val collectionPattern = "§7You have §6\\+(?<ff>\\d{1,3})☘ .* Fortune§7.".toPattern()
+        private val collectionPattern = "§7You have §6\\+(?<ff>\\d{1,3})☘ .*".toPattern()
         private val tooltipFortunePattern =
             "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
         private val armorAbilityPattern = "Tiered Bonus: .* [(](?<pieces>.*)/4[)]".toPattern()
