@@ -163,12 +163,10 @@ object NumberUtil {
         } else romanSymbols[l] + (this - l).toRoman()
     }
 
-    private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int): Int {
-        return if (lastNumber > decimal) {
-            lastDecimal - decimal
-        } else {
-            lastDecimal + decimal
-        }
+    private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
+        lastDecimal - decimal
+    } else {
+        lastDecimal + decimal
     }
 
     val pattern = "^[0-9]*$".toPattern()
@@ -193,18 +191,19 @@ object NumberUtil {
 
         val multiplier = if (text.endsWith("k")) {
             text = text.substring(0, text.length - 1)
-            1_000
+            1_000.0
         } else if (text.endsWith("m")) {
             text = text.substring(0, text.length - 1)
-            1_000_000
-        }else if (text.endsWith("b")) {
+            1.milion
+        } else if (text.endsWith("b")) {
             text = text.substring(0, text.length - 1)
-            1_000_000_000
-        }else 1
+            1.bilion
+        } else 1.0
         val d = text.toDouble()
         return (d * multiplier).toLong()
     }
 
     val Int.milion get() = this * 1_000_000.0
+    val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
 }
