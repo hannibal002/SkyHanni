@@ -489,10 +489,12 @@ object LorenzUtils {
             }
         }
 
-    fun List<String>.nextAfter(after: String, skip: Int = 1): String? {
+    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after}, skip)
+
+    fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
         var missing = -1
         for (line in this) {
-            if (line == after) {
+            if (after(line)) {
                 missing = skip - 1
                 continue
             }

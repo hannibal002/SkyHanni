@@ -6,7 +6,16 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -34,12 +43,75 @@ object GardenCropMilestones {
             val crop = getCropTypeByLore(stack) ?: continue
             for (line in stack.getLore()) {
                 totalPattern.matchMatcher(line) {
-                    val amount = group("name").replace(",", "").toLong()
+                    val amount = group("name").formatNumber()
                     crop.setCounter(amount)
                 }
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
+
+        val optInToFixWrongData = true
+        if (optInToFixWrongData) {
+            fixForWrongData(event.inventoryItems)
+        }
+    }
+
+    private fun fixForWrongData(inventoryItems: Map<Int, ItemStack>) {
+        val data = mutableListOf<String>()
+        for ((_, stack) in inventoryItems) {
+            val crop = getCropTypeByLore(stack) ?: continue
+            checkForWrongData(stack, crop, data)
+
+            CropMilestoneUpdateEvent().postAndCatch()
+        }
+
+        if (data.isNotEmpty()) {
+            LorenzUtils.chat("Found wrong data in crop milestone menu! Correct data got put into clipboard. Please share it on SkyHanni Discord.")
+            OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
+        }
+    }
+
+    private fun checkForWrongData(
+        stack: ItemStack,
+        crop: CropType,
+        wrongData: MutableList<String>
+    ) {
+        val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
+        val name = stack.name ?: return
+        val rawNumber = name.split(" ").last()
+        val realTier = rawNumber.let {
+            val dec = it.romanToDecimalIfNeeded()
+            if (dec.toRoman() == it) {
+                dec
+            } else it.toIntOrNull() ?: 0
+        }
+        val lore = stack.getLore()
+        val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
+        val total = lore.nextAfter({ totalPattern.matches(it) }, 6) ?: return
+
+        println(" ")
+        println("crop: $crop")
+        println("realTier: $realTier")
+
+        val guessNextMax = getCropsForTier(realTier + 1, crop) - getCropsForTier(realTier, crop)
+        println("guessNextMax: ${guessNextMax.addSeparators()}")
+        val nextMax = pattern.matchMatcher(next) {
+            group("max").formatNumber()
+        } ?: return
+        println("nextMax real: ${nextMax.addSeparators()}")
+        if (nextMax != guessNextMax) {
+            println("wrong, add to list")
+            wrongData.add("$crop:$realTier:${nextMax.addSeparators()}")
+        }
+
+        val guessTotalMax = getCropsForTier(46, crop)
+        //             println("guessTotalMax: ${guessTotalMax.addSeparators()}")
+        val totalMax = pattern.matchMatcher(total) {
+            group("max").formatNumber()
+        } ?: return
+        //             println("totalMax real: ${totalMax.addSeparators()}")
+        val totalOffBy = guessTotalMax - totalMax
+        println("totalOffBy: $totalOffBy")
     }
 
     private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
