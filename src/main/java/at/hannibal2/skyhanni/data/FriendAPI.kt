@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -11,57 +12,40 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.File
-import java.io.FileReader
 import java.util.UUID
 
-class FriendAPI {
-    private val file = File("config/skyhanni/friends.json")
-
+object FriendAPI {
     // TODO USE SH-REPO
     private val removedFriendPattern =
         ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*".toPattern()
     private val addedFriendPattern = "§aYou are now friends with (?<name>.*)".toPattern()
     private val noBestFriendPattern = ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*".toPattern()
     private val bestFriendPattern = ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*".toPattern()
+    private val readFriendListPattern = "/viewprofile (?<uuid>.*)".toPattern()
 
-    companion object {
+    private val tempFriends = mutableListOf<Friend>()
 
-        private var friendsJson: FriendsJson? = null
-
-        private fun getFriends(): MutableMap<UUID, Friend> {
-            val friendsJson = friendsJson ?: error("savedFriends not loaded yet!")
-            return friendsJson.players.getOrPut(LorenzUtils.getRawPlayerUuid()) {
-                FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
-            }.friends
-        }
-
-        private val tempFriends = mutableListOf<Friend>()
-
-        fun getAllFriends(): List<Friend> {
-            val list = mutableListOf<Friend>()
-            list.addAll(getFriends().values)
-            list.addAll(tempFriends)
-            return list
-        }
-    }
+    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(LorenzUtils.getRawPlayerUuid()) {
+        FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
+    }.friends
 
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (file.isFile) {
-            friendsJson = ConfigManager.gson.fromJson(FileReader(file), FriendsJson::class.java)
-        }
-        if (friendsJson == null) {
-            file.parentFile.mkdirs()
-            file.createNewFile()
-            friendsJson = FriendsJson()
-                .also { it.players = mutableMapOf() }
+        if (SkyHanniMod.friendsData.players == null) {
+            SkyHanniMod.friendsData.players = mutableMapOf()
             saveConfig()
         }
     }
 
+    fun getAllFriends(): List<Friend> {
+        val list = mutableListOf<Friend>()
+        list.addAll(getFriends().values)
+        list.addAll(tempFriends)
+        return list
+    }
+
     fun saveConfig() {
-        file.writeText(ConfigManager.gson.toJson(friendsJson))
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FRIENDS, "Save file")
     }
 
     @SubscribeEvent
@@ -112,12 +96,19 @@ class FriendAPI {
             val value = chatStyle.chatClickEvent?.value ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
-            val uuid = "/viewprofile (?<uuid>.*)".toPattern().matchMatcher(value) {
+            val uuid = readFriendListPattern.matchMatcher(value) {
                 group("uuid")?.let {
                     try {
                         UUID.fromString(it)
                     } catch (e: IllegalArgumentException) {
-                        ErrorManager.logError(e, "Error reading friend list.")
+                        ErrorManager.logErrorWithData(
+                            e, "Error reading friend list.",
+                            "raw uuid" to it,
+                            "value" to value,
+                            "chatStyle" to chatStyle,
+                            "event.chatComponent" to event.chatComponent,
+                            "event.message" to event.message,
+                        )
                         return
                     }
                 }

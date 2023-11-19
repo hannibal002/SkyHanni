@@ -152,7 +152,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+                    LorenzUtils.error("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 "hytil" -> {
@@ -168,7 +168,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+                    LorenzUtils.chat("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 else -> {

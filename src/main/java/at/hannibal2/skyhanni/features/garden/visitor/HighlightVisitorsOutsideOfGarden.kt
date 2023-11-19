@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.GardenConfig.VisitorConfig.VisitorBlockBehaviour
+import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -97,7 +97,7 @@ class HighlightVisitorsOutsideOfGarden {
             event.isCanceled = true
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     "/sh block interacting with visitors"
                 )
             }

@@ -53,7 +53,7 @@ class SuperpairsClicksAlert {
                 .any { it.value.stackSize > roundsNeeded })
         ) {
             SoundUtils.playBeepSound()
-            LorenzUtils.chat("§e[SkyHanni] You have reached the maximum possible clicks!")
+            LorenzUtils.chat("You have reached the maximum possible clicks!")
             roundsNeeded = -1
         }
     }

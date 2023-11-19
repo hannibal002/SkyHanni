@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftLavaMazeParkour {
-    private val config get() = RiftAPI.config.area.mirrorVerseConfig.lavaMazeConfig
+    private val config get() = RiftAPI.config.area.mirrorverse.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent

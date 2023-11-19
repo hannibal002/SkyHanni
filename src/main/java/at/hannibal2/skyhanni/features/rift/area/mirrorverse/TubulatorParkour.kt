@@ -14,7 +14,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TubulatorParkour {
-    private val config get() = RiftAPI.config.area.mirrorVerseConfig.tubulatorConfig
+    private val config get() = RiftAPI.config.area.mirrorverse.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
     private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 

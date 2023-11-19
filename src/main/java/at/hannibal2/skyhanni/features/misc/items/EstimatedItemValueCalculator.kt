@@ -198,11 +198,14 @@ object EstimatedItemValueCalculator {
             itemRarity = LorenzRarity.LEGENDARY
         } else {
             if (stack.isRecombobulated()) {
-                val oneBelow = itemRarity.oneBelow()
+                val oneBelow = itemRarity.oneBelow(logError = false)
                 if (oneBelow == null) {
-                    ErrorManager.logErrorState(
+                    ErrorManager.logErrorStateWithData(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
-                        "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
+                        "Recombobulated item is common",
+                        "internal name" to stack.getInternalName(),
+                        "itemRarity" to itemRarity,
+                        "item name" to stack.name,
                     )
                     return null
                 }
@@ -212,9 +215,16 @@ object EstimatedItemValueCalculator {
         val rarityName = itemRarity.name
         if (!reforgeCosts.has(rarityName)) {
             val reforgesFound = reforgeCosts.entrySet().map { it.key }
-            ErrorManager.logErrorState(
-                "Can not calculate reforge cost for item ${stack.name}",
-                "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
+            ErrorManager.logErrorStateWithData(
+                "Could not calculate reforge cost for item ${stack.name}",
+                "Item not in NEU repo reforge cost",
+                "rarityName" to rarityName,
+                "reforgeCosts" to reforgeCosts,
+                "itemRarity" to itemRarity,
+                "reforgesFound" to reforgesFound,
+                "internal name" to stack.getInternalName(),
+                "item name" to stack.name,
+                "reforgeStone" to reforgeStone,
             )
             return null
         }
@@ -633,9 +643,12 @@ object EstimatedItemValueCalculator {
         if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return 0.0
 
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not find gemstone slot price for ${stack.name}",
-                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
+                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
+                "internal name" to internalName,
+                "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
+                "item name" to stack.name,
             )
             return 0.0
         }

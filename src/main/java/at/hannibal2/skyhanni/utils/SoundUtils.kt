@@ -58,7 +58,7 @@ object SoundUtils {
 
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
-            LorenzUtils.chat("§c[SkyHanni] Specify a sound effect to test")
+            LorenzUtils.userError("Specify a sound effect to test")
             return
         }
 

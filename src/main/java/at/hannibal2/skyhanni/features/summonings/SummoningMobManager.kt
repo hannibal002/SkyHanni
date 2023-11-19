@@ -123,7 +123,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
-                LorenzUtils.chat("§e[SkyHanni] Your Summoning Mob just §cdied!")
+                LorenzUtils.chat("Your Summoning Mob just §cdied!")
                 continue
             }
 

@@ -76,13 +76,13 @@ class FishingBaitWarnings {
     private fun showBaitChangeWarning(before: String, after: String) {
         SoundUtils.playClickSound()
         LorenzUtils.sendTitle("§eBait changed!", 2.seconds)
-        LorenzUtils.chat("§e[SkyHanni] Fishing Bait changed: $before -> $after")
+        LorenzUtils.chat("Fishing Bait changed: $before -> $after")
     }
 
     private fun showNoBaitWarning() {
         SoundUtils.playErrorSound()
         LorenzUtils.sendTitle("§cNo bait is used!", 2.seconds)
-        LorenzUtils.chat("§e[SkyHanni] You do not use any fishing baits!")
+        LorenzUtils.chat("You do not use any fishing baits!")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.hasFishingRodInHand()
