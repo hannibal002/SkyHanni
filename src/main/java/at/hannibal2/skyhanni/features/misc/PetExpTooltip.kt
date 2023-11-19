@@ -25,7 +25,6 @@ class PetExpTooltip {
     private val level100Common = 5_624_785
     private val level100Legendary = 25_353_230
     private val level200 = 210_255_385
-    private var debugInfoPrinted = false
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onItemTooltipLow(event: ItemTooltipEvent) {
@@ -59,21 +58,15 @@ class PetExpTooltip {
                 event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
             }
         } catch (e: Exception) {
-            if (!debugInfoPrinted) {
-                println(" ")
-                println("PetExpTooltip debug:")
-                println("itemStack: $itemStack")
-                println("itemStack.name: $name")
-                println("petExperience: $petExperience")
-                println("event.toolTip: ${event.toolTip}")
-                println(" ")
-                println("findIndex(event.toolTip): ${findIndex(event.toolTip)}")
-                println(" ")
-                println("itemStack.getLore(): ${itemStack.getLore()}")
-                println(" ")
-                debugInfoPrinted = true
-            }
-            ErrorManager.logError(e, "Could not add pet exp tooltip. Show the console for more info")
+            ErrorManager.logErrorWithData(
+                e, "Could not add pet exp tooltip",
+                "itemStack" to itemStack,
+                "item name" to name,
+                "petExperience" to petExperience,
+                "toolTip" to event.toolTip,
+                "index" to findIndex(event.toolTip),
+                "getLore" to itemStack.getLore(),
+            )
         }
     }
 

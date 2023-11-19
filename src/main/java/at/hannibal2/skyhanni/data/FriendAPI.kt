@@ -101,7 +101,14 @@ object FriendAPI {
                     try {
                         UUID.fromString(it)
                     } catch (e: IllegalArgumentException) {
-                        ErrorManager.logError(e, "Error reading friend list.")
+                        ErrorManager.logErrorWithData(
+                            e, "Error reading friend list.",
+                            "raw uuid" to it,
+                            "value" to value,
+                            "chatStyle" to chatStyle,
+                            "event.chatComponent" to event.chatComponent,
+                            "event.message" to event.message,
+                        )
                         return
                     }
                 }

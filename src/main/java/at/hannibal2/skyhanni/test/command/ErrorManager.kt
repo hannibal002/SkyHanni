@@ -56,7 +56,12 @@ object ErrorManager {
         logError(IllegalStateException(internalMessage), userMessage, false, *extraData)
     }
 
-    fun logError(throwable: Throwable, message: String, vararg extraData: Pair<String, Any?>) {
+    @Deprecated("Use data as well", ReplaceWith("logErrorWithData()"))
+    fun logError(throwable: Throwable, message: String) {
+        logError(throwable, message, false)
+    }
+
+    fun logErrorWithData(throwable: Throwable, message: String, vararg extraData: Pair<String, Any?>) {
         logError(throwable, message, false, *extraData)
     }
 
