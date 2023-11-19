@@ -140,7 +140,7 @@ private fun String.removeSpam(): String {
         "at net.minecraft.client.Minecraft.addScheduledTask(",
         "at java.lang.reflect.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$",
-        "CopyErrorCommand.logErrorState(CopyErrorCommand.kt:46)",
+        ".ErrorManager.logErrorState(ErrorManager.kt:51)",
         "LorenzEvent.postWithoutCatch(LorenzEvent.kt:24)",
         "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
         "at net.minecraft.launchwrapper.",
