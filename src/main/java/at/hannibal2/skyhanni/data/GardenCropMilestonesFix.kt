@@ -44,8 +44,8 @@ object GardenCropMilestonesFix {
                     "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e."
             )
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
-        } else {
-            LorenzUtils.chat("No wrong crop milestone steps found!")
+//         } else {
+//             LorenzUtils.chat("No wrong crop milestone steps found!")
         }
     }
 
@@ -62,39 +62,39 @@ object GardenCropMilestonesFix {
         val next = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 3) ?: return
         val total = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 6) ?: return
 
-        debug(" ")
-        debug("crop: $crop")
-        debug("realTier: $realTier")
+//         debug(" ")
+//         debug("crop: $crop")
+//         debug("realTier: $realTier")
 
         val guessNextMax = GardenCropMilestones.getCropsForTier(
             realTier + 1,
             crop
         ) - GardenCropMilestones.getCropsForTier(realTier, crop)
-        debug("guessNextMax: ${guessNextMax.addSeparators()}")
+//         debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = pattern.matchMatcher(next) {
             group("max").formatNumber()
         } ?: return
-        debug("nextMax real: ${nextMax.addSeparators()}")
+//         debug("nextMax real: ${nextMax.addSeparators()}")
         if (nextMax != guessNextMax) {
-            debug("wrong, add to list")
+//             debug("wrong, add to list")
             wrongData.add("$crop:$realTier:${nextMax.addSeparators()}")
         }
 
         val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop)
-        //             println("guessTotalMax: ${guessTotalMax.addSeparators()}")
+//         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
         val totalMax = pattern.matchMatcher(total) {
             group("max").formatNumber()
         } ?: return
-        //             println("totalMax real: ${totalMax.addSeparators()}")
+//         println("totalMax real: ${totalMax.addSeparators()}")
         val totalOffBy = guessTotalMax - totalMax
-        debug("totalOffBy: $totalOffBy")
+//         debug("$crop total offf by: ${totalOffBy.addSeparators()}")
     }
 
-    fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debug.enabled) {
+//     fun debug(message: String) {
+//         if (SkyHanniMod.feature.dev.debug.enabled) {
 //             println(message)
-        }
-    }
+//         }
+//     }
 
     /**
      * This helps to fix wrong crop milestone data
