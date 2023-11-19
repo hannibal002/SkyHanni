@@ -387,8 +387,8 @@ class FarmingWeightDisplay {
         private fun chatOffScreenChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
                 "§7Since your last visit to the §aGarden§7, " +
-                        "you have $direction §7on the §dFarming Leaderboard§7. " +
-                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                    "you have $direction §7on the §dFarming Leaderboard§7. " +
+                    "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
         }
 
