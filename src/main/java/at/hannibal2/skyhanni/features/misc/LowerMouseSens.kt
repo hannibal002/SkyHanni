@@ -41,10 +41,10 @@ object LowerMouseSens {
             SkyHanniMod.feature.storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
             val newSens = ((SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F))/config.divisorSens)-(1F / 3F)
             gameSettings.mouseSensitivity = newSens
-//            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been lowered from ${SkyHanniMod.feature.storage.savedMouseloweredSensitivity} to $newSens.")
+//            LorenzUtils.chat("§bMouse Sensitivity has been lowered from ${SkyHanniMod.feature.storage.savedMouseloweredSensitivity} to $newSens.")
         } else {
             gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
-//            LorenzUtils.chat("§e[SkyHanni] §bMouse Sensitivity has been restored.")
+//            LorenzUtils.chat("§bMouse Sensitivity has been restored.")
         }
     }
 }
