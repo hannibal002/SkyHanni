@@ -168,11 +168,18 @@ object FortuneUpgrades {
         val farmingForDummiesCount = tool.getFarmingForDummiesCount() ?: 0
         if (crop in axeCrops) {
             val sunderLvl = enchantments["sunder"] ?: 0
-            if (sunderLvl != 5) {
+            if (sunderLvl < 5) {
                 cropSpecificUpgrades.add(
                     FortuneUpgrade(
                         "§7Enchant your ${tool.displayName} §7with Sunder ${sunderLvl + 1}",
                         10, "SUNDER;1", getNeededBooks(sunderLvl), 12.5
+                    )
+                )
+            } else if (sunderLvl == 5) {
+                cropSpecificUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${tool.displayName} §7with Sunder 6",
+                        10, "SUNDER;6", 1, 12.5
                     )
                 )
             }
@@ -276,14 +283,12 @@ object FortuneUpgrades {
         )
     }
 
-    private fun getNeededBooks(currentLvl: Int): Int {
-        return when (currentLvl) {
-            0 -> 1
-            1 -> 1
-            2 -> 2
-            3 -> 4
-            else -> 8
-        }
+    private fun getNeededBooks(currentLvl: Int) = when (currentLvl) {
+        0 -> 1
+        1 -> 1
+        2 -> 2
+        3 -> 4
+        else -> 8
     }
 
     private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)

@@ -168,7 +168,7 @@ object GardenNextJacobContest {
                     sendContests()
                 } else {
                     LorenzUtils.clickableChat(
-                        "§e[SkyHanni] §2Click here to submit this years farming contests, thank you for helping everyone out!",
+                        "§2Click here to submit this years farming contests, thank you for helping everyone out!",
                         "shsendcontests"
                     )
                 }
@@ -217,7 +217,7 @@ object GardenNextJacobContest {
             if (array[0] == "enable") {
                 config.shareAutomatically = 1
                 SkyHanniMod.feature.storage.contestSendingAsked = true
-                LorenzUtils.chat("§e[SkyHanni] §2Enabled automatic sharing of future contests!")
+                LorenzUtils.chat("§2Enabled automatic sharing of future contests!")
             }
             return
         }
@@ -226,7 +226,7 @@ object GardenNextJacobContest {
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == 0) {
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] §2Click here to automatically share future contests!",
+                "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
             )
         }
@@ -318,7 +318,7 @@ object GardenNextJacobContest {
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
 
         val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
-        LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
+        LorenzUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
@@ -439,11 +439,11 @@ object GardenNextJacobContest {
                     newContests[timestamp + contestDuration] = FarmingContest(timestamp + contestDuration, crops)
                 }
             } else {
-                LorenzUtils.chat("§e[SkyHanni] This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
+                LorenzUtils.chat("This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
             }
 
             if (newContests.count() == maxContestsPerYear) {
-                LorenzUtils.chat("§e[SkyHanni] Successfully loaded this year's contests from elitebot.dev automatically!")
+                LorenzUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
 
                 contests = newContests
                 fetchedFromElite = true
@@ -454,7 +454,7 @@ object GardenNextJacobContest {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            LorenzUtils.error("[SkyHanni] Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+            LorenzUtils.error("Failed to fetch upcoming contests. Please report this error if it continues to occur.")
         }
     }
 
@@ -484,13 +484,13 @@ object GardenNextJacobContest {
         val result = withContext(dispatcher) { APIUtil.postJSONIsSuccessful(url, body) }
 
         if (result) {
-            LorenzUtils.chat("§e[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+            LorenzUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            LorenzUtils.error("[SkyHanni] Something went wrong submitting upcoming contests!")
+            LorenzUtils.error("Something went wrong submitting upcoming contests!")
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        LorenzUtils.error("[SkyHanni] Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        LorenzUtils.error("Failed to submit upcoming contests. Please report this error if it continues to occur.")
         null
     }
 

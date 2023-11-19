@@ -29,20 +29,20 @@ class TabListData {
 
         fun toggleDebugCommand() {
             if (debugCache != null) {
-                LorenzUtils.chat("§e[SkyHanni] Disabled tab list debug.")
+                LorenzUtils.chat("Disabled tab list debug.")
                 debugCache = null
                 return
             }
             SkyHanniMod.coroutineScope.launch {
                 val clipboard = OSUtils.readFromClipboard() ?: return@launch
                 debugCache = clipboard.lines()
-                LorenzUtils.chat("§e[SkyHanni] Enabled tab list debug with your clipboard.")
+                LorenzUtils.chat("Enabled tab list debug with your clipboard.")
             }
         }
 
         fun copyCommand(args: Array<String>) {
             if (debugCache != null) {
-                LorenzUtils.clickableChat("§c[SkyHanni] Tab list debug is enabled!", "shdebugtablist")
+                LorenzUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
                 return
             }
 
@@ -57,7 +57,7 @@ class TabListData {
             val tabFooter = tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
             val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] Tab list copied into the clipboard!")
+            LorenzUtils.chat("Tab list copied into the clipboard!")
         }
     }
 

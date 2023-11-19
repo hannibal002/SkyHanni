@@ -9,13 +9,18 @@
 
 ### Changes
 
-+ Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
-+ Add option to hide the chat message when toggling /shmouselock. - hannibal2
-
-### Changes
+#### Garden Changes
 
 + Added mythic/Maeve visitor support. - walker & hannibal2
 + Added option to use custom Blocks per Second value in some Garden GUIs instead of the real one. - hannibal2
++ Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
++ Added support for Sunder 6 in /ff upgrades. - hannibal2
++ Added support for mythic in Visitor Drop Statistics. - hannibal2
+
+#### Other Changes
+
++ Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
++ Add option to hide the chat message when toggling /shmouselock. - hannibal2
 
 ### Fixes
 
@@ -38,6 +43,9 @@
 + Fixed blocking clicks on bazaar with player name "wiki". - hannibal2
 + Fixed highlighting some mobs in the dungeon wrongly as area mini bosses. - hannibal2
 + Fixed opening the Pet menu no longer updating the current pet display. - hannibal2
++ Fixed Archfiend Dice and High Class Archfiend Dice counting as slayer drops when rolled. - hannibal2
++ Fixed dice roll profit counting as Mob Kill Coins in Slayer Tracker. - hannibal2
++ Fixed Sack Display sometimes not formatting a million correctly. - Hize
 
 ### Technical Details
 
@@ -47,6 +55,7 @@
 + Created PetAPI and deprecated String.matchRegex(). - hannibal2
 + Extracted sacks, friends, known features and Jacob contests in to their separate files. - CalMWolfs
 + Add log clearing. - CalMWolfs
++ Add auto-prefix to chat message methods. - walker
 
 ## Version 0.21
 
