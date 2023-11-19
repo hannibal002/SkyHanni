@@ -250,10 +250,10 @@ class SkyHanniDebugsAndTests {
 
         fun whereami() {
             if (LorenzUtils.inSkyBlock) {
-                LorenzUtils.chat("§e[SkyHanni] You are currently in ${LorenzUtils.skyBlockIsland}.")
+                LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
                 return
             }
-            LorenzUtils.chat("§e[SkyHanni] You are not in Skyblock.")
+            LorenzUtils.chat("§eYou are not in Skyblock.")
         }
 
         fun copyLocation(args: Array<String>) {
