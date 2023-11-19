@@ -513,9 +513,12 @@ class FarmingWeightDisplay {
             openWebsite(name, ignoreCooldown = true)
         }
 
+        var lastName = ""
+
         private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
-            if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds) return
+            if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
             lastOpenWebsite = SimpleTimeMark.now()
+            lastName = name
 
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
             LorenzUtils.chat("Opening Farming Profile of player §b$name")
