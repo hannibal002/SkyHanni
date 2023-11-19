@@ -19,7 +19,7 @@ object LockMouseLook {
         val gameSettings = Minecraft.getMinecraft().gameSettings
         if (gameSettings.mouseSensitivity == lockedPosition) {
             gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouselockedSensitivity
-            LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now unlocked because you left it locked.")
+            LorenzUtils.chat("§bMouse rotation is now unlocked because you left it locked.")
         }
     }
 
