@@ -233,9 +233,10 @@ object NEUItems {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            ErrorManager.logErrorState(
-                "Error grabbing recipe data",
-                "Error reading getMultiplier for item '$internalName'"
+            ErrorManager.logErrorStateWithData(
+                "Cound not load recipe data.",
+                "Failed to find item multiplier",
+                "internalName" to internalName
             )
             return Pair(internalName, 1)
         }
