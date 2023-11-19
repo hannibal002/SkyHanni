@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
+import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -65,7 +68,11 @@ object GardenCropMilestones {
         }
 
         if (data.isNotEmpty()) {
-            LorenzUtils.chat("Found §c${data.size} §ewrong crop milestone steps in the menu! Correct data got put into clipboard. Please share it on SkyHanni Discord.")
+            LorenzUtils.chat(
+                "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
+                    "Correct data got put into clipboard. " +
+                    "Please share it on SkyHanni Discord."
+            )
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
         }
     }
@@ -111,7 +118,7 @@ object GardenCropMilestones {
 
     fun debug(message: String) {
         if (SkyHanniMod.feature.dev.debug.enabled) {
-            println(message)
+//             println(message)
         }
     }
 
@@ -175,5 +182,54 @@ object GardenCropMilestones {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").crop_milestones
+    }
+
+    fun readDataFromClipboard() {
+        SkyHanniMod.coroutineScope.launch {
+            OSUtils.readFromClipboard()?.let {
+                handleInput(it)
+            }
+        }
+    }
+
+    private var totalFixedValues = 0
+
+    fun handleInput(input: String) {
+        println(" ")
+        var fixed = 0
+        var alreadyCorrect = 0
+        for (line in input.lines()) {
+            val split = line.replace("```", "").replace(".", ",").split(":")
+            if (split.size != 3) continue
+            val (rawCrop, tier, amount) = split
+            val crop = LorenzUtils.enumValueOf<CropType>(rawCrop)
+
+            if (tryFix(crop, tier.toInt(), amount.formatNumber().toInt())) {
+                fixed++
+            } else {
+                alreadyCorrect++
+            }
+        }
+        totalFixedValues += fixed
+        LorenzUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
+        val s = ConfigManager.gson.toJsonTree(cropMilestoneData).toString()
+        OSUtils.copyToClipboard("\"crop_milestones\":$s,")
+    }
+
+    private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
+        val guessNextMax = getCropsForTier(tier + 1, crop) - getCropsForTier(tier, crop)
+        if (guessNextMax.toInt() == amount) {
+            return false
+        }
+        cropMilestoneData = cropMilestoneData.editCopy {
+            fix(crop, this, tier, amount)
+        }
+        return true
+    }
+
+    private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
+        map[crop] = map[crop]!!.editCopy {
+            this[tier] = amount
+        }
     }
 }
