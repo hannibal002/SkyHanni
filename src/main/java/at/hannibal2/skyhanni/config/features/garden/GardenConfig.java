@@ -204,7 +204,7 @@ public class GardenConfig {
     public boolean plotBorders = true;
 
     @Expose
-    @ConfigOption(name = "Copy Milestone Data", desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in discord.")
+    @ConfigOption(name = "Copy Milestone Data", desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in SkyHanni discord.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean copyMilestoneData = true;

@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 
 object GardenCropMilestonesFix {
-    
+
     fun openInventory(inventoryItems: Map<Int, ItemStack>) {
         if (SkyHanniMod.feature.garden.copyMilestoneData) {
             fixForWrongData(inventoryItems)
@@ -43,6 +43,8 @@ object GardenCropMilestonesFix {
                     "Please share it on SkyHanni Discord."
             )
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
+        } else {
+            LorenzUtils.chat("No wrong crop milestone steps found!")
         }
     }
 
