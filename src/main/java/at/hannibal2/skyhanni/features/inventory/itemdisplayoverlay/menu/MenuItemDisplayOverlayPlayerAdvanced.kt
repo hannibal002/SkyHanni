@@ -211,7 +211,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName.endsWith("Challenges"))) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName == ("Challenges"))) {
             ("(Rank|Test of .*)").toPattern().matchMatcher(itemName) {
                 for (line in item.getLore()) {
                     dojoTestOfGradePattern.matchMatcher(line) { return group("grade") }
@@ -313,7 +313,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                             return grabPerkpocalypseMayor(lore)
                         }
                         (("§7(players until the closing of|until the closing of the next)").toPattern()).matchMatcher(line) {
-                            if (!(itemName.endsWith(" Jerry")) || chestName.startsWith("Mayor")) {
+                            ((".*(?<! Jerry)\$").toPattern()).matchMatcher(itemName) {
                                 /*
                                 var numPerks = 0
                                 for (line in lore) {
@@ -352,7 +352,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         }
                     }
                 }
-                if (itemName.endsWith(" Mode")) {
+                ((".* Mode").toPattern()).matchMatcher(itemName) {
                     return itemName.take(3)
                 }
             }
