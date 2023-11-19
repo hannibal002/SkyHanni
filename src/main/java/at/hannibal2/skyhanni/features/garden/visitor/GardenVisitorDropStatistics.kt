@@ -72,45 +72,45 @@ object GardenVisitorDropStatistics {
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
-        if (lastAccept - System.currentTimeMillis() <= 0 && lastAccept - System.currentTimeMillis() > -1000) {
-            val message = event.message.removeColor().trim()
-            val storage = GardenAPI.storage?.visitorDrops ?: return
+        if (lastAccept - System.currentTimeMillis() > 0 || lastAccept - System.currentTimeMillis() <= -1000) return
 
-            copperPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.copper += amount
-                saveAndUpdate()
-            }
-            farmingExpPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber()
-                storage.farmingExp += amount
-                saveAndUpdate()
-            }
-            gardenExpPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
-                storage.gardenExp += amount
-                saveAndUpdate()
-            }
-            bitsPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.bits += amount
-                saveAndUpdate()
-            }
-            mithrilPowderPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.mithrilPowder += amount
-                saveAndUpdate()
-            }
-            gemstonePowderPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.gemstonePowder += amount
-                saveAndUpdate()
-            }
-            acceptPattern.matchMatcher(message) {
-                setRarities(group("rarity"))
-                saveAndUpdate()
-            }
+        val message = event.message.removeColor().trim()
+        val storage = GardenAPI.storage?.visitorDrops ?: return
+
+        copperPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.copper += amount
+            saveAndUpdate()
+        }
+        farmingExpPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber()
+            storage.farmingExp += amount
+            saveAndUpdate()
+        }
+        gardenExpPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
+            storage.gardenExp += amount
+            saveAndUpdate()
+        }
+        bitsPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.bits += amount
+            saveAndUpdate()
+        }
+        mithrilPowderPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.mithrilPowder += amount
+            saveAndUpdate()
+        }
+        gemstonePowderPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.gemstonePowder += amount
+            saveAndUpdate()
+        }
+        acceptPattern.matchMatcher(message) {
+            setRarities(group("rarity"))
+            saveAndUpdate()
         }
     }
 
@@ -118,6 +118,7 @@ object GardenVisitorDropStatistics {
         acceptedVisitors += 1
         val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
         val visitorRarities = GardenAPI.storage?.visitorDrops?.visitorRarities ?: return
+        fixRaritiesSize(visitorRarities)
         val temp = visitorRarities[currentRarity.ordinal] + 1
         visitorRarities[currentRarity.ordinal] = temp
         saveAndUpdate()
@@ -130,12 +131,14 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         //2
         val visitorRarities = storage.visitorRarities
+        fixRaritiesSize(visitorRarities)
         if (visitorRarities.isNotEmpty()) {
             addAsSingletonList(
                 "§a${visitorRarities[0].addSeparators()}§f-" +
                     "§9${visitorRarities[1].addSeparators()}§f-" +
                     "§6${visitorRarities[2].addSeparators()}§f-" +
-                    "§c${visitorRarities[3].addSeparators()}"
+                    "§d${visitorRarities[3].addSeparators()}§f-" +
+                    "§c${visitorRarities[4].addSeparators()}"
             )
         } else {
             addAsSingletonList("§c?")
@@ -181,6 +184,15 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
     }
 
+    // Adding the mythic rarity between legendary and special, if missing
+    private fun fixRaritiesSize(list: MutableList<Long>) {
+        if (list.size == 4) {
+            val special = list.last()
+            list[3] = 0L
+            list.add(special)
+        }
+    }
+
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =
         if (config.displayNumbersFirst)
             "$color${format(amount)} $name"
@@ -207,11 +219,13 @@ object GardenVisitorDropStatistics {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val storage = GardenAPI.storage?.visitorDrops ?: return
-        if (storage.visitorRarities.size == 0) {
-            storage.visitorRarities.add(0)
-            storage.visitorRarities.add(0)
-            storage.visitorRarities.add(0)
-            storage.visitorRarities.add(0)
+        val visitorRarities = storage.visitorRarities
+        if (visitorRarities.size == 0) {
+            visitorRarities.add(0)
+            visitorRarities.add(0)
+            visitorRarities.add(0)
+            visitorRarities.add(0)
+            visitorRarities.add(0)
         }
         acceptedVisitors = storage.acceptedVisitors
         deniedVisitors = storage.deniedVisitors

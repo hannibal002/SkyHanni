@@ -32,7 +32,7 @@ class JacobContestStatsSummary {
 
         when (event.phase) {
             FarmingContestPhase.START -> {
-                LorenzUtils.chat("§e[SkyHanni] Started tracking your Jacob Contest Blocks Per Second!")
+                LorenzUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = System.currentTimeMillis()
             }
 
@@ -41,16 +41,16 @@ class JacobContestStatsSummary {
                 val durationInSeconds = duration.toDouble() / 1000
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
                 val cropName = event.crop.cropName
-                LorenzUtils.chat("§e[SkyHanni] Stats for $cropName Contest:")
+                LorenzUtils.chat("Stats for $cropName Contest:")
                 val time = TimeUtils.formatDuration(duration - 999)
-                LorenzUtils.chat("§e[SkyHanni] §7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
+                LorenzUtils.chat("§7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
                 val color = getBlocksPerSecondColor(blocksPerSecond)
-                LorenzUtils.chat("§e[SkyHanni] §7Average Blocks Per Second: $color$blocksPerSecond")
-                LorenzUtils.chat("§e[SkyHanni] §7Participated for §b$time")
+                LorenzUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
+                LorenzUtils.chat("§7Participated for §b$time")
             }
 
             FarmingContestPhase.CHANGE -> {
-                LorenzUtils.chat("§e[SkyHanni] You changed the crop during the contest, resetting the Blocks Per Second calculation..")
+                LorenzUtils.chat("You changed the crop during the contest, resetting the Blocks Per Second calculation..")
                 startTime = System.currentTimeMillis()
             }
         }

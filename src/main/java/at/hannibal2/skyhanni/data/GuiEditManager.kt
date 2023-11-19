@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 class GuiEditManager {
     @SubscribeEvent
@@ -33,7 +35,7 @@ class GuiEditManager {
 
         if (NEUItems.neuHasFocus()) return
 
-        openGuiPositionEditor()
+        openGuiPositionEditor(hotkeyReminder = false)
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -60,9 +62,19 @@ class GuiEditManager {
             }
         }
 
+        private var lastHotkeyReminded = SimpleTimeMark.farPast()
+
         @JvmStatic
-        fun openGuiPositionEditor() {
+        fun openGuiPositionEditor(hotkeyReminder: Boolean) {
             SkyHanniMod.screenToOpen = GuiPositionEditor(latestPositions.values.toList(), 2)
+            if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
+                lastHotkeyReminded = SimpleTimeMark.now()
+                LorenzUtils.chat(
+                    "§eTo edit hidden GUI elements:\n" +
+                        " §7- §e1. Set a key in /sh edit.\n" +
+                        " §7- §e2. Click that key while the GUI element is visible."
+                )
+            }
         }
 
         @JvmStatic

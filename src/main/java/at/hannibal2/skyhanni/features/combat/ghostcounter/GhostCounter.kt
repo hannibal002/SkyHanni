@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -292,8 +293,9 @@ object GhostCounter {
                 notifyCTModule = false
                 if (isUsingCTGhostCounter()) {
                     clickableChat(
-                        "§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
-                        "shimportghostcounterdata"
+                        "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
+                        "shimportghostcounterdata",
+                        prefixColor = "§6",
                     )
                 }
             }
@@ -478,7 +480,7 @@ object GhostCounter {
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (storage?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
-            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
+            chat("Your GhostCounter config has been automatically adjusted.")
             storage?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
     }
@@ -488,7 +490,5 @@ object GhostCounter {
         event.move(2, "ghostCounter", "combat.ghostCounter")
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
-    }
+    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
 }
