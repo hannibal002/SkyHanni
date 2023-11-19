@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -49,9 +50,7 @@ object GardenCropMilestones {
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
-
-        val optInToFixWrongData = true
-        if (optInToFixWrongData) {
+        if (SkyHanniMod.feature.garden.copyMilestoneData) {
             fixForWrongData(event.inventoryItems)
         }
     }
@@ -85,18 +84,18 @@ object GardenCropMilestones {
         val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
         val total = lore.nextAfter({ totalPattern.matches(it) }, 6) ?: return
 
-        println(" ")
-        println("crop: $crop")
-        println("realTier: $realTier")
+        debug(" ")
+        debug("crop: $crop")
+        debug("realTier: $realTier")
 
         val guessNextMax = getCropsForTier(realTier + 1, crop) - getCropsForTier(realTier, crop)
-        println("guessNextMax: ${guessNextMax.addSeparators()}")
+        debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = pattern.matchMatcher(next) {
             group("max").formatNumber()
         } ?: return
-        println("nextMax real: ${nextMax.addSeparators()}")
+        debug("nextMax real: ${nextMax.addSeparators()}")
         if (nextMax != guessNextMax) {
-            println("wrong, add to list")
+            debug("wrong, add to list")
             wrongData.add("$crop:$realTier:${nextMax.addSeparators()}")
         }
 
@@ -107,7 +106,13 @@ object GardenCropMilestones {
         } ?: return
         //             println("totalMax real: ${totalMax.addSeparators()}")
         val totalOffBy = guessTotalMax - totalMax
-        println("totalOffBy: $totalOffBy")
+        debug("totalOffBy: $totalOffBy")
+    }
+
+    fun debug(message: String) {
+        if (SkyHanniMod.feature.dev.debug.enabled) {
+            println(message)
+        }
     }
 
     private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
