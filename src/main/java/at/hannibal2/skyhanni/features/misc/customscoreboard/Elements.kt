@@ -117,13 +117,25 @@ enum class Elements(
         1,
         7
     ),
+    HEAT(
+        {
+            when {
+                heat == "0" -> listOf("<hidden>")
+                config.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
+                else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
+            }
+        },
+        listOf(IslandType.CRYSTAL_HOLLOWS),
+        0,
+        8
+    ),
     EMPTY_LINE(
         {
             listOf("<empty>")
         },
         listOf(),
         0,
-        8
+        9
     ),
     LOCATION(
         {
@@ -131,7 +143,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        9
+        10
     ),
     SKYBLOCK_TIME(
         {
@@ -139,7 +151,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        10
+        11
     ),
     LOBBY_CODE(
         {
@@ -147,18 +159,22 @@ enum class Elements(
         },
         listOf(),
         0,
-        11
+        12
     ),
-    POWDER(
+    MAXWELL(
         {
-            when (config.displayNumbersFirst) {
-                true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
-                false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
+            when (MaxwellAPI.currentPower == null) {
+                true -> listOf("§c§lPlease visit Maxwell!")
+                false ->
+                    when (config.displayNumbersFirst) {
+                        true -> listOf("${MaxwellAPI.currentPower?.power} Power")
+                        false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
+                    }
             }
         },
-        listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES),
-        0,
-        12
+        listOf(IslandType.THE_RIFT),
+        1,
+        13
     ),
     EMPTY_LINE2(
         {
@@ -166,7 +182,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        13
+        14
     ),
     OBJECTIVE(
         {
@@ -177,7 +193,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        14
+        15
     ),
     SLAYER(
         {
@@ -198,7 +214,26 @@ enum class Elements(
             IslandType.THE_RIFT
         ),
         0,
-        15
+        16
+    ),
+    EMPTY_LINE3(
+        {
+            listOf("<empty>")
+        },
+        listOf(),
+        0,
+        17
+    ),
+    POWDER(
+        {
+            when (config.displayNumbersFirst) {
+                true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
+                false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
+            }
+        },
+        listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES),
+        0,
+        18
     ),
     CURRENT_EVENT(
         {
@@ -206,7 +241,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        16
+        19
     ),
     MAYOR(
         {
@@ -220,27 +255,7 @@ enum class Elements(
         },
         listOf(IslandType.THE_RIFT),
         1,
-        17
-    ),
-    EMPTY_LINE3(
-        {
-            listOf("<empty>")
-        },
-        listOf(),
-        0,
-        18
-    ),
-    HEAT(
-        {
-            when {
-                heat == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
-                else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
-            }
-        },
-        listOf(IslandType.CRYSTAL_HOLLOWS),
-        0,
-        19
+        20
     ),
     PARTY(
         {
@@ -263,21 +278,6 @@ enum class Elements(
         },
         listOf(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
         0,
-        20
-    ),
-    MAXWELL(
-        {
-            when (MaxwellAPI.currentPower == null) {
-                true -> listOf("§c§lPlease visit Maxwell!")
-                false ->
-                    when (config.displayNumbersFirst) {
-                        true -> listOf("${MaxwellAPI.currentPower?.power} Power")
-                        false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
-                    }
-            }
-        },
-        listOf(IslandType.THE_RIFT),
-        1,
         21
     ),
     WEBSITE(

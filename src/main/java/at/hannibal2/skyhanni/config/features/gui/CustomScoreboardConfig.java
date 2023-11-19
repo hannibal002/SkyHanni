@@ -39,24 +39,24 @@ public class CustomScoreboardConfig {
             "Bits: §b59,264",
             "Copper: §c23,495",
             "Gems: §a57,873",
+            "Heat: §c♨ 0",
             "",
             "§7⏣ §bVillage",
             "Late Summer 11th, Year 311",
             "§8m77CK",
-            "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234",
+            "Power: Sighted",
             "",
             "Objective:\n§eUpdate SkyHanni",
             "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills",
-            "§7Current Event",
-            "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff",
             "",
-            "Heat: §c♨ 0",
+            "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234",
+            "§7Wide Range of Events\n(too much for this here)",
+            "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff",
             "§9§lParty (4):\n §7- §fhannibal2\n §7- §f Moulberry\n §7- §f Vahvl\n §7- §f J10a1n15",
-            "Power: Sighted",
             "§ewww.hypixel.net",
         }
     )
-    public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21));
+    public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22));
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")
