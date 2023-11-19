@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class FarmingWeightDisplay {
 
@@ -136,6 +138,8 @@ class FarmingWeightDisplay {
             )
         }
 
+        private var lastOpenWebsite = SimpleTimeMark.farPast()
+
         private fun update() {
             if (!GardenAPI.inGarden()) return
             if (apiError) {
@@ -225,7 +229,10 @@ class FarmingWeightDisplay {
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
                 LorenzUtils.error("Invalid Farming Weight Overtake Goal!")
-                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!", false)
+                LorenzUtils.chat(
+                    "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!",
+                    false
+                )
                 config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
@@ -503,10 +510,13 @@ class FarmingWeightDisplay {
 
         fun lookUpCommand(it: Array<String>) {
             val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
-            openWebsite(name)
+            openWebsite(name, ignoreCooldown = true)
         }
 
-        private fun openWebsite(name: String?) {
+        private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
+            if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds) return
+            lastOpenWebsite = SimpleTimeMark.now()
+
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
             LorenzUtils.chat("Opening Farming Profile of player §b$name")
         }
