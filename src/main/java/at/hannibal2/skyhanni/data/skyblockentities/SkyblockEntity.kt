@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
-abstract class SkyblockEntity(val baseEntity: EntityLivingBase, open val armorStand: EntityArmorStand?) {
+abstract class SkyblockEntity(var baseEntity: EntityLivingBase, open val armorStand: EntityArmorStand?) {
 
     abstract val name: String
 
@@ -29,6 +29,10 @@ abstract class SkyblockEntity(val baseEntity: EntityLivingBase, open val armorSt
         }
 
         return false
+    }
+
+    open fun internalUpdateOfEntity(entity: EntityLivingBase) {
+        baseEntity = entity
     }
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS

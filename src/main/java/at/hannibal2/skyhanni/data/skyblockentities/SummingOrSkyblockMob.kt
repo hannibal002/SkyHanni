@@ -43,4 +43,11 @@ abstract class SummingOrSkyblockMob(baseEntity: EntityLivingBase, armorStand: En
         removeExtraEntitiesFromChecking()
         MobData.putAllSummonOrSkyblockMob(entities, this)
     }
+
+    override fun internalUpdateOfEntity(entity: EntityLivingBase) {
+        if (entity == baseEntity) super.internalUpdateOfEntity(entity) else {
+            extraEntitiesList?.remove(entity)
+            extraEntitiesList?.add(entity)
+        }
+    }
 }

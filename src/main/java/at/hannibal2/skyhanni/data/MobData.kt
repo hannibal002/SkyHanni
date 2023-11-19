@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RealPlayerDeSpawnEvent
 import at.hannibal2.skyhanni.events.RealPlayerSpawnEvent
 import at.hannibal2.skyhanni.events.SkyblockMobDeSpawnEvent
@@ -41,10 +42,13 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.server.S0CPacketSpawnPlayer
+import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.LinkedBlockingQueue
 
 private const val MAX_RETRIES = 100
 
@@ -84,6 +88,8 @@ class MobData {
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
 
         var externRemoveOfRetryAmount = 0
+
+        val entitiesThatRequireUpdate = LinkedBlockingQueue<Int>()
     }
 
     private fun mobDetectionReset() {
@@ -102,6 +108,8 @@ class MobData {
         if (!LorenzUtils.inSkyBlock) return
         if (event.isMod(2)) return
 
+        makeEntityUpdate()
+
         handleRetries()
 
         previousEntityLiving.clear()
@@ -118,6 +126,12 @@ class MobData {
 
         if (forceReset) {
             mobDetectionReset()
+        }
+    }
+
+    private fun makeEntityUpdate() {
+        while (entitiesThatRequireUpdate.isNotEmpty()) {
+            handleEntityUpdate(entitiesThatRequireUpdate.take())
         }
     }
 
@@ -212,17 +226,40 @@ class MobData {
                 iterator.remove()
                 continue
             }
-            // I know that this line looks stupid but entity is from World.loadedEntities and the result of getEntityByID is from World.entitiesByID which gives the correct instance which is the one you see in-game
-            // And yes those two list are different sometimes. The best place to test this is in Dungeons because the disjunction happens when there are a lot of mobs
-            val newEntity = EntityUtils.getEntityByID(entity.entityId) as? EntityLivingBase
-            if (newEntity != null) {
-                if (newEntity !== entity) retry.entity = newEntity
-                if (!EntitySpawn(newEntity)) {
-                    retry.times++
-                    continue
-                }
+            if (!EntitySpawn(entity)) {
+                retry.times++
+                continue
             }
             iterator.remove()
+        }
+    }
+
+    private fun handleEntityUpdate(entityID: Int) {
+        val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return
+        retries.firstOrNull { it.hashCode() == entity.hashCode() }?.apply { this.entity = entity }
+        currentEntityLiving.remove(entity)
+        currentEntityLiving.add(entity)
+        // update maps
+        currentSkyblockMobsMap[entity]?.internalUpdateOfEntity(entity)
+        currentSummoningMobsMap[entity]?.internalUpdateOfEntity(entity)
+        currentDisplayNPCsMap[entity]?.internalUpdateOfEntity(entity)
+        // TODO RealPlayer
+    }
+
+
+    @SubscribeEvent
+    fun onEntitySpawnPacket(event: PacketEvent.ReceiveEvent) {
+        val packet = event.packet
+        when (packet) {
+            is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
+            is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
+        }
+    }
+
+    private fun addEntityUpdate(id: Int) {
+        EntityUtils.getEntityByID(id)?.let {
+            entitiesThatRequireUpdate.put(id)
+            LorenzDebug.log("ID: $id")
         }
     }
 
