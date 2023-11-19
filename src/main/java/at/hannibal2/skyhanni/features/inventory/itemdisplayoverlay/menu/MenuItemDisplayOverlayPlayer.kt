@@ -25,6 +25,7 @@ class MenuItemDisplayOverlayPlayer {
     private val dungeonClassLevelPattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
     private val dungeonEssenceRewardPattern = "(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)".toPattern()
     private val essenceCountPattern = "(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val essenceCountOtherPattern = ".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
 
@@ -175,22 +176,31 @@ class MenuItemDisplayOverlayPlayer {
             // (chestName.endsWith(" Essence"))
             if (canDisplayEssence) {
                 val lore = item.getLore()
+                var usefulAsString: String = ""
+                var totalAsString: String = ""
                 for (line in lore) {
+                    essenceCountOtherPattern.matchMatcher(line) {
+                        usefulAsString = group("useful")
+                        totalAsString = group("total").replace(",", "")
+                        break
+                    }
                     essenceCountPattern.matchMatcher(line) {
-                        val usefulAsString = group("useful")
-                        val totalAsString = group("total").replace(",", "")
-                        val suffix = when (totalAsString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            in 10..12 -> "B"
-                            in 13..15 -> "T"
-                            else -> "§b§z:)"
-                        }
-                        if (suffix == "§b§z:)") return suffix
-                        else return "" + usefulAsString + suffix
+                        usefulAsString = group("useful")
+                        totalAsString = group("total").replace(",", "")
+                        break
                     }
                 }
+                    val suffix = when (totalAsString.length) {
+                        0 -> "bruh"
+                        in 1..3 -> ""
+                        in 4..6 -> "k"
+                        in 7..9 -> "M"
+                        in 10..12 -> "B"
+                        in 13..15 -> "T"
+                        else -> "§b§z:)"
+                    }
+                    if (suffix == "§b§z:)") return suffix
+                    else return "" + usefulAsString + suffix
             }
         }
 

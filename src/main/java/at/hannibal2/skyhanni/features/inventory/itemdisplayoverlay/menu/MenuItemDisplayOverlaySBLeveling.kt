@@ -52,10 +52,8 @@ class MenuItemDisplayOverlaySBLeveling {
             if ((itemName.isNotEmpty())) {
                 ((".*(rewards|skyblock leveling).*").toPattern()).matchMatcher(chestName.lowercase()) {
                     for (line in item.getLore()) {
-                        if (line.contains("Progress to ") || line.contains("Rewards Unlocked: ")) {
-                            (".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
-                                 return group("percent").replace("100", "§a✔")
-                            }
+                        (".*(Progress to|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                            return group("percent").replace("100", "§a✔")
                         }
                     }
                 }
