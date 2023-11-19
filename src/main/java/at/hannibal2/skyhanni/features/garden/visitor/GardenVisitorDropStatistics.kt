@@ -72,45 +72,45 @@ object GardenVisitorDropStatistics {
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
-        if (lastAccept - System.currentTimeMillis() <= 0 && lastAccept - System.currentTimeMillis() > -1000) {
-            val message = event.message.removeColor().trim()
-            val storage = GardenAPI.storage?.visitorDrops ?: return
+        if (lastAccept - System.currentTimeMillis() > 0 || lastAccept - System.currentTimeMillis() <= -1000) return
 
-            copperPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.copper += amount
-                saveAndUpdate()
-            }
-            farmingExpPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber()
-                storage.farmingExp += amount
-                saveAndUpdate()
-            }
-            gardenExpPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
-                storage.gardenExp += amount
-                saveAndUpdate()
-            }
-            bitsPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.bits += amount
-                saveAndUpdate()
-            }
-            mithrilPowderPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.mithrilPowder += amount
-                saveAndUpdate()
-            }
-            gemstonePowderPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.gemstonePowder += amount
-                saveAndUpdate()
-            }
-            acceptPattern.matchMatcher(message) {
-                setRarities(group("rarity"))
-                saveAndUpdate()
-            }
+        val message = event.message.removeColor().trim()
+        val storage = GardenAPI.storage?.visitorDrops ?: return
+
+        copperPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.copper += amount
+            saveAndUpdate()
+        }
+        farmingExpPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber()
+            storage.farmingExp += amount
+            saveAndUpdate()
+        }
+        gardenExpPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
+            storage.gardenExp += amount
+            saveAndUpdate()
+        }
+        bitsPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.bits += amount
+            saveAndUpdate()
+        }
+        mithrilPowderPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.mithrilPowder += amount
+            saveAndUpdate()
+        }
+        gemstonePowderPattern.matchMatcher(message) {
+            val amount = group("amount").formatNumber().toInt()
+            storage.gemstonePowder += amount
+            saveAndUpdate()
+        }
+        acceptPattern.matchMatcher(message) {
+            setRarities(group("rarity"))
+            saveAndUpdate()
         }
     }
 
