@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
-import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -78,13 +78,9 @@ object GardenCropMilestones {
     ) {
         val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
         val name = stack.name ?: return
-        val rawNumber = name.split(" ").last()
-        val realTier = rawNumber.let {
-            val dec = it.romanToDecimalIfNeeded()
-            if (dec.toRoman() == it) {
-                dec
-            } else it.toIntOrNull() ?: 0
-        }
+        val rawNumber = name.removeColor().replace(crop.cropName, "").trim()
+        val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNeeded()
+
         val lore = stack.getLore()
         val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
         val total = lore.nextAfter({ totalPattern.matches(it) }, 6) ?: return
