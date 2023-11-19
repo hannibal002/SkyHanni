@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -43,10 +44,10 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.MENU_NAVIGATION)) {
             val lore = item.getLore()
             if ((itemName == "Previous Page" || itemName == "Next Page")) {
-                val line = lore.first().replace(",", "")
+                val line = lore.first()
                 if (chestName.contains("Auction")) {
                     auctionHousePagePattern.matchMatcher(line) {
-                        var pageNum = group("pagenumber").toInt()
+                        var pageNum = group("pagenumber").formatNumber()
                         if (itemName == "Previous Page") {
                             pageNum--
                         } else if (itemName == "Next Page") {
