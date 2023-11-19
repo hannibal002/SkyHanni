@@ -40,7 +40,7 @@ object TestExportTools {
         val data: JsonElement,
     )
 
-    fun <T> toJson(key: Key<T>, value: T): String {
+    private fun <T> toJson(key: Key<T>, value: T): String {
         return gson.toJson(TestValue(key.name, gson.toJsonTree(value)))
     }
 
@@ -63,7 +63,6 @@ object TestExportTools {
         OSUtils.copyToClipboard(json)
         LorenzUtils.chat("Compressed item info copied into the clipboard!")
     }
-
 
     inline fun <reified T> getTestData(category: Key<T>, name: String): T {
         val reader = InputStreamReader(javaClass.getResourceAsStream("/testdata/${category.name}/$name.json")!!)

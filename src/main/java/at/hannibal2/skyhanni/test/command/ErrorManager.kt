@@ -40,8 +40,8 @@ object ErrorManager {
         } else {
             errorMessages[id]
         }
-        val name = if (fullErrorMessage) "Ful error" else "Error"
-        LorenzUtils.userError(errorMessage?.let {
+        val name = if (fullErrorMessage) "Full error" else "Error"
+        LorenzUtils.chat(errorMessage?.let {
             OSUtils.copyToClipboard(it)
             "$name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "Error id not found!")
