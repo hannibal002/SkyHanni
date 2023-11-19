@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
@@ -24,10 +26,52 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     DUNGEONS( // not tested
         {
-            listOf("§cDungeons Event")
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Auto-closing in:") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Auto-closing in:") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Starting in:") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Starting in:") }
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Keys: ") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Keys: ") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Elapsed: ") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Time Elapsed: ") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§rCleared: ") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§rCleared: ") }.toString()
+                    .replace("§r", "").replace("%", "%§") // for some reason this is broken
+            }
+
+            val dungeonPlayers = TabListData.getTabList().first { it.trim().startsWith("§r§b§lParty §r§f(") }
+                .trim().removePrefix("§r§b§lParty §r§f(").removeSuffix(")").toInt()
+
+            if (dungeonPlayers != 0 && list.any { it.startsWith("Cleared: ") }) {
+                list += ""
+
+                if (dungeonPlayers == 1) {
+                    list += "§3§lSolo"
+                } else {
+                    for (i in 2..dungeonPlayers) {
+                        list += ScoreboardData.sidebarLinesFormatted.nextAfter(
+                            "§r" + list.first { it.startsWith("Cleared: ") }.replace("%§", "%"),
+                            i
+                        )
+                            ?: "§cNo Player found"
+                    }
+                }
+            }
+
+            if (list.size == 0) when (config.hideEmptyLines) {
+                true -> listOf("<hidden>")
+                false -> listOf("§cNo Dungeon Data")
+            } else list
         },
         {
-            HypixelData.skyBlockIsland == IslandType.CATACOMBS
+            IslandType.CATACOMBS.isInIsland() || inDungeons
         }
     ),
     KUUDRA( // not tested
@@ -35,7 +79,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             listOf("§cKuudra Event")
         },
         {
-            HypixelData.skyBlockIsland == IslandType.KUUDRA_ARENA
+            IslandType.KUUDRA_ARENA.isInIsland()
         }
     ),
     JACOB_CONTEST(
@@ -59,7 +103,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
 
             list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§6§lGOLD §fmedals") }
             list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§f§lSILVER §fmedals") }
-            list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§c§lBRONZE §fmedals")}
+            list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§c§lBRONZE §fmedals") }
 
             list
         },
@@ -72,7 +116,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             listOf("§bWinter Event")
         },
         {
-            false
+            IslandType.WINTER.isInIsland()
         }
     ),
     SPOOKY( // not tested
@@ -128,7 +172,8 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             // Wind
             if (ScoreboardData.sidebarLinesFormatted.any { it == "§9Wind Compass" }) {
                 list += "§9Wind Compass"
-                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass") ?: "§7No Wind Compass for some reason"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass")
+                    ?: "§7No Wind Compass for some reason"
             }
 
             // Better Together
@@ -150,7 +195,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             } else list
         },
         {
-            HypixelData.skyBlockIsland == IslandType.DWARVEN_MINES || HypixelData.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS
+            IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
         }
     ),
     DAMAGE(

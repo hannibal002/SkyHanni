@@ -248,7 +248,7 @@ enum class Elements(
 
             partyTitle
         },
-        listOf(IslandType.CATACOMBS, IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
+        listOf(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
         0,
         19
     ),
