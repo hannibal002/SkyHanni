@@ -219,11 +219,13 @@ object GardenVisitorDropStatistics {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val storage = GardenAPI.storage?.visitorDrops ?: return
-        if (storage.visitorRarities.size == 0) {
-            storage.visitorRarities.add(0)
-            storage.visitorRarities.add(0)
-            storage.visitorRarities.add(0)
-            storage.visitorRarities.add(0)
+        val visitorRarities = storage.visitorRarities
+        if (visitorRarities.size == 0) {
+            visitorRarities.add(0)
+            visitorRarities.add(0)
+            visitorRarities.add(0)
+            visitorRarities.add(0)
+            visitorRarities.add(0)
         }
         acceptedVisitors = storage.acceptedVisitors
         deniedVisitors = storage.deniedVisitors
