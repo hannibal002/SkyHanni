@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -125,49 +126,53 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
         
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.WARDROBE_SLOT) && (chestName.startsWith("Wardrobe"))) {
-            (("(§.)?Slot (?<slotNumber>[0-9]): .*").toPattern()).matchMatcher(itemName) { return group("slotNumber") }
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.WARDROBE_SLOT)) {
+            (("Wardrobe.*").toPattern()).matchMatcher(chestName) {
+                (("(§.)?Slot (?<slotNumber>[0-9]): .*").toPattern()).matchMatcher(itemName) { return group("slotNumber") }
+            }
         }
         
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.ABBV_STATS) && chestName.startsWith("Your Stats Breakdown")) {
-            val statName = item.name ?: return ""
-            if (statName.isNotEmpty()) {
-                skyblockStatBreakdownPattern.matchMatcher(statName) {
-                    val name = group("name")
-                    val color = group("color")
-                    val icon = group("icon")
-                    val abbv = when (name) {
-                        "Health" -> "HP"
-                        "Defense" -> "Def"
-                        "Strength" -> "Str"
-                        "Intelligence" -> "Int"
-                        "Crit Damage" -> "CD"
-                        "Crit Chance" -> "CC"
-                        "Ferocity" -> "Fer"
-                        "Vitality" -> "Vit"
-                        "Mending" -> "Mnd"
-                        "Speed" -> "Spd"
-                        "Sea Creature Chance" -> "SCC"
-                        "Magic Find" -> "MF"
-                        "Fishing Speed" -> "FiS"
-                        "Combat Wisdom" -> "CoW"
-                        "Mining Wisdom" -> "MiW"
-                        "Farming Wisdom" -> "FaW"
-                        "Foraging Wisdom" -> "FoW"
-                        "Fishing Wisdom" -> "FiW"
-                        "Enchanting Wisdom" -> "EnW"
-                        "Alchemy Wisdom" -> "AlW"
-                        "Carpentry Wisdom" -> "CaW"
-                        "Runecrafting Wisdom" -> "RuW"
-                        "Social Wisdom" -> "SoW"
-                        "Mining Speed" -> "MiS"
-                        "Breaking Power" -> "BP"
-                        "Foraging Fortune" -> "FoF"
-                        "Farming Fortune" -> "FaF"
-                        "Mining Fortune" -> "MiF"
-                        else -> icon
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.ABBV_STATS)) {
+            (("Your Stats Breakdown.*").toPattern()).matchMatcher(chestName) {
+                val statName = item.name ?: return ""
+                if (statName.isNotEmpty()) {
+                    skyblockStatBreakdownPattern.matchMatcher(statName) {
+                        val name = group("name")
+                        val color = group("color")
+                        val icon = group("icon")
+                        val abbv = when (name) {
+                            "Health" -> "HP"
+                            "Defense" -> "Def"
+                            "Strength" -> "Str"
+                            "Intelligence" -> "Int"
+                            "Crit Damage" -> "CD"
+                            "Crit Chance" -> "CC"
+                            "Ferocity" -> "Fer"
+                            "Vitality" -> "Vit"
+                            "Mending" -> "Mnd"
+                            "Speed" -> "Spd"
+                            "Sea Creature Chance" -> "SCC"
+                            "Magic Find" -> "MF"
+                            "Fishing Speed" -> "FiS"
+                            "Combat Wisdom" -> "CoW"
+                            "Mining Wisdom" -> "MiW"
+                            "Farming Wisdom" -> "FaW"
+                            "Foraging Wisdom" -> "FoW"
+                            "Fishing Wisdom" -> "FiW"
+                            "Enchanting Wisdom" -> "EnW"
+                            "Alchemy Wisdom" -> "AlW"
+                            "Carpentry Wisdom" -> "CaW"
+                            "Runecrafting Wisdom" -> "RuW"
+                            "Social Wisdom" -> "SoW"
+                            "Mining Speed" -> "MiS"
+                            "Breaking Power" -> "BP"
+                            "Foraging Fortune" -> "FoF"
+                            "Farming Fortune" -> "FaF"
+                            "Mining Fortune" -> "MiF"
+                            else -> icon
+                        }
+                        return "§$color$abbv"
                     }
-                    return "§$color$abbv"
                 }
             }
         }
@@ -206,9 +211,11 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName.endsWith("Challenges") && (itemName.startsWith("Test of ") || itemName == ("Rank")))) {
-            for (line in item.getLore()) {
-                dojoTestOfGradePattern.matchMatcher(line) { return group("grade") }
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName.endsWith("Challenges"))) {
+            ("(Rank|Test of .*)").toPattern().matchMatcher(itemName) {
+                for (line in item.getLore()) {
+                    dojoTestOfGradePattern.matchMatcher(line) { return group("grade") }
+                }
             }
         }
 
@@ -236,8 +243,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
             if ((itemName == "Bank Upgrades")) {
                 for (line in lore) {
-                    if (line.startsWith("§7Current account: ")) {
-                        return line.removeColor().replace("Current account: ", "").substring(0,1)
+                    (("(§.)*Current account: (?<colorCode>§.)*(?<tier>(?<tierFirstLetter>[\\w])[\\w]+)").toPattern()).matchMatcher(line) {
+                        return "${group("colorCode")}${group("tierFirstLetter")}"
                     }
                 }
             }
@@ -260,36 +267,43 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 }
             }
         }
-        
+
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.MAYOR_PERKS)) {
             val lore = item.getLore()
             (("(Election|Election, Year .*)").toPattern()).matchMatcher(chestName) {
                 if (item.item == Item.getItemFromBlock(Blocks.glass_pane) || item.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
-                ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" }
-                val nameWithColor = item.name ?: return ""
-                if (lore.isNotEmpty()) {
-                    if (lore.first().equals("§8Candidate")) {
-                        val colorCode = nameWithColor.take(2)
-                        var numPerks = 0
-                        for (line in lore) {
-                            if (line.startsWith(colorCode) &&
-                                line != "${colorCode}You voted for this candidate!" &&
-                                line != "${colorCode}Leading in votes!" &&
-                                !(line.startsWith("${colorCode}Click to vote for ")) &&
-                                line != "${colorCode}This is a SPECIAL candidate!" &&
-                                !(line.startsWith("$colorCode§"))) {
-                                numPerks++
-                            }
-                        }
-                        return "$colorCode$numPerks"
+                ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" } //all of my homies possess a strong dislike towards dante
+                val colorCode = item.name?.take(2)
+                val candidates = MayorElection.rawMayorData!!.current!!.candidates!!
+                for (candidate in candidates) {
+                    if (candidate.name == itemName) {
+                        return "$colorCode${candidate.perks.size}"
                     }
                 }
+//                 if (lore.isNotEmpty()) {
+//                     (("(§8)+.*Candidate").toPattern()).matchMatcher(lore.first()) {
+//                         val colorCode = nameWithColor.take(2)
+//                         var numPerks = 0
+//                         for (line in lore) {
+//                             //line.startsWith(colorCode) &&
+//                             //line != "${colorCode}You voted for this candidate!" &&
+//                             //line != "${colorCode}Leading in votes!" &&
+//                             //!(line.startsWith("${colorCode}Click to vote for ")) &&
+//                             //line != "${colorCode}This is a SPECIAL candidate!" &&
+//                             //!(line.startsWith("$colorCode§"))
+//                             (("^${colorCode}(?:(?!\\b(This is a SPECIAL candidate|Click to vote for|You voted for this candidate|Leading in votes)\\b)\\S)*\$").toPattern()).matchMatcher((line)) {
+//                                 numPerks++
+//                             }
+//                         }
+//                         return "$colorCode$numPerks"
+//                     }
+//                 }
             }
             (("(Calendar and Events|Mayor .*)").toPattern()).matchMatcher(chestName) {
                 val nameWithColor = item.name ?: return ""
                 val colorCode = nameWithColor.take(2)
                 (("JERRY IS MAYOR.*").toPattern()).matchMatcher(itemName) {
-                    return grabPerkpocalypseMayor(lore, colorCode)
+                    return grabPerkpocalypseMayor(lore)
                 }
                 (("Mayor .*").toPattern()).matchMatcher(itemName) {
                     ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" }
@@ -306,7 +320,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                             } else {
                                 for (line in lore) {
                                     ((".*${colorCode}Perkpocalypse.*").toPattern()).matchMatcher(line) {
-                                        return grabPerkpocalypseMayor(lore, colorCode)
+                                        return grabPerkpocalypseMayor(lore)
                                     }
                                 }
                             }
@@ -412,15 +426,26 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         return ""
     }
 
-    private fun grabPerkpocalypseMayor(lore: List<String>, colorCode: String): String {
-        if (lore.any { it == ("${colorCode}SLASHED Pricing") } || lore.any { it == ("${colorCode}Slayer XP Buff") } || lore.any { it == ("${colorCode}Pathfinder") }) return "§bAtx"
-        if (lore.any { it == ("${colorCode}Prospection") } || lore.any { it == ("${colorCode}Mining XP Buff") } || lore.any { it == ("${colorCode}Mining Fiesta") }) return "§bCle"
-        if (lore.any { it == ("${colorCode}Lucky!") } || lore.any { it == ("${colorCode}Pet XP Buff") } || lore.any { it == ("${colorCode}Mythological Ritual") }) return "§bDna"
-        if (lore.any { it == ("${colorCode}Farming Simulator") } || lore.any { it == ("${colorCode}Pelt-pocalypse") } || lore.any { it == ("${colorCode}GOATed") }) return "§bFng"
-        if (lore.any { it == ("${colorCode}Sweet Tooth") } || lore.any { it == ("${colorCode}Benevolence") } || lore.any { it == ("${colorCode}Extra Event") }) return "§bFxy"
-        if (lore.any { it == ("${colorCode}Luck of the Sea 2.0") } || lore.any { it == ("${colorCode}Fishing XP Buff") } || lore.any { it == ("${colorCode}Fishing Festival") }) return "§bMrn"
-        if (lore.any { it == ("${colorCode}Marauder") } || lore.any { it == ("${colorCode}EZPZ") } || lore.any { it == ("${colorCode}Benediction") }) return "§bPul"
-        if (lore.any { it == ("${colorCode}Barrier Street") } || lore.any { it == ("${colorCode}Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
-        else return "§c?"
+    private fun grabPerkpocalypseMayor(lore: List<String>): String {
+//         if (lore.any { it == ("SLASHED Pricing") } || lore.any { it == ("Slayer XP Buff") } || lore.any { it == ("Pathfinder") }) return "§bAtx"
+//         if (lore.any { it == ("Prospection") } || lore.any { it == ("Mining XP Buff") } || lore.any { it == ("Mining Fiesta") }) return "§bCle"
+//         if (lore.any { it == ("Lucky!") } || lore.any { it == ("Pet XP Buff") } || lore.any { it == ("Mythological Ritual") }) return "§bDna"
+//         if (lore.any { it == ("Farming Simulator") } || lore.any { it == ("Pelt-pocalypse") } || lore.any { it == ("GOATed") }) return "§bFng"
+//         if (lore.any { it == ("Sweet Tooth") } || lore.any { it == ("Benevolence") } || lore.any { it == ("Extra Event") }) return "§bFxy"
+//         if (lore.any { it == ("Luck of the Sea 2.0") } || lore.any { it == ("Fishing XP Buff") } || lore.any { it == ("Fishing Festival") }) return "§bMrn"
+//         if (lore.any { it == ("Marauder") } || lore.any { it == ("EZPZ") } || lore.any { it == ("Benediction") }) return "§bPul"
+//         if (lore.any { it == ("Barrier Street") } || lore.any { it == ("Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
+//         else return "§c?"
+        for (line in lore) {
+            (("(§.)(SLASHED Pricing|Slayer XP Buff|Pathfinder)").toPattern()).matchMatcher(line) { return "§bAtx" }
+            (("(§.)(Prospection|Mining XP Buff|Mining Fiesta)").toPattern()).matchMatcher(line) { return "§bCle" }
+            (("(§.)(Lucky\\!|Pet XP Buff|Mythological Ritual)").toPattern()).matchMatcher(line) { return "§bDna" }
+            (("(§.)(Farming Simulator|Pelt-pocalypse|GOATed)").toPattern()).matchMatcher(line) { return "§bFng" }
+            (("(§.)(Sweet Tooth|Benevolence|Extra Event)").toPattern()).matchMatcher(line) { return "§bFxy" }
+            (("(§.)(Luck of the Sea 2.0|Fishing XP Buff|Fishing Festival)").toPattern()).matchMatcher(line) { return "§bMrn" }
+            (("(§.)(Marauder|EZPZ|Benediction)").toPattern()).matchMatcher(line) { return "§bPul" }
+            (("(§.)(Barrier Street|Shopping Spree)").toPattern()).matchMatcher(line) { return "§c§l✖" }
+        }
+        return "§c?"
     }
 }

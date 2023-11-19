@@ -63,7 +63,7 @@ class MenuItemDisplayOverlayMining {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_PERK_LEVELS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
-            if ((nameWithColor.startsWith("§a")) || (nameWithColor.startsWith("§e")) || (nameWithColor.startsWith("§c"))) {
+            (("§(a|e|c).*").toPattern()).matchMatcher(nameWithColor) {
                 //§7Level 64/§8100
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
@@ -80,7 +80,9 @@ class MenuItemDisplayOverlayMining {
                     var colorCode = ""
                     var level = group("useful")
                     if (group("total") == null) level = "✔"
-                    if (nameWithColor.startsWith("§a")) colorCode = "§a"
+                    (("§a.*").toPattern()).matchMatcher(nameWithColor) {
+                        colorCode = "§a"
+                    }
                     for (line in lore) {
                         (("(§.)*(.*)click to (§.)*(enable).*").toPattern()).matchMatcher(line) {
                             colorCode = "§c"
