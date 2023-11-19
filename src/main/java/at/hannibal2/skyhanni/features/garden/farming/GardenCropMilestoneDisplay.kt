@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -100,6 +101,8 @@ object GardenCropMilestoneDisplay {
                 val addedCounter = (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
+                // Farming Simulator: There is a 25% chance for Mathematical Hoes and the Cultivating Enchantment to count twice.
+                // 0.8 = 1 / 1.25
                 crop.setCounter(
                     crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {
                         (addedCounter.toDouble() * 0.8).toInt()
@@ -108,8 +111,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            LorenzUtils.error("[SkyHanni] Error in OwnInventoryItemUpdateEvent")
-            e.printStackTrace()
+            ErrorManager.logError(e, "Updating crop counter by reading farming tool nbt data.")
         }
     }
 

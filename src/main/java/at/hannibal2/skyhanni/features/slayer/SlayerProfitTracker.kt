@@ -223,7 +223,7 @@ object SlayerProfitTracker {
         addItemPickup(internalName, amount)
         logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
         if (config.priceInChat && price > config.minimumPrice) {
-            LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
+            LorenzUtils.chat("§a+Slayer Drop§7: §r$itemName")
         }
         if (config.titleWarning && price > config.minimumPriceWarning) {
             LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
@@ -275,7 +275,7 @@ object SlayerProfitTracker {
 
                     if (KeyboardManager.isControlKeyDown()) {
                         itemLog.items.remove(internalName)
-                        LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
+                        LorenzUtils.chat("Removed $cleanName §efrom slayer profit display.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         itemProfit.hidden = !hidden
@@ -364,9 +364,9 @@ object SlayerProfitTracker {
 
     fun clearProfitCommand(args: Array<String>) {
         if (itemLogCategory == "") {
-            LorenzUtils.chat(
-                "§c[SkyHanni] No current slayer data found. " +
-                    "Go to a slayer area and start the specific slayer type you want to reset the data of."
+            LorenzUtils.userError(
+                "No current slayer data found! " +
+                    "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
             )
             return
         }

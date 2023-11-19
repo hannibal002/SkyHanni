@@ -200,7 +200,7 @@ class BingoNextStepHelper {
         done = true
         updateResult()
         if (!silent && config.stepHelper) {
-            LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
+            LorenzUtils.chat("A bingo goal step is done! ($displayName)")
         }
     }
 

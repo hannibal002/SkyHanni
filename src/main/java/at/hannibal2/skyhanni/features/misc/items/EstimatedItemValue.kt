@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -51,7 +52,7 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
@@ -137,6 +138,11 @@ object EstimatedItemValue {
                 return
             }
         }
+
+        // Stats Breakdown
+        val name = item.name ?: return
+        if (name == "§6☘ Category: Item Ability (Passive)") return
+        if (name.contains("Salesperson")) return
 
         val newDisplay = try {
             draw(item)

@@ -2,23 +2,30 @@
 
 ## Version 0.21.1 (unreleased)
 
-
 ### New Features
 
 + Organised the config into sub categories. - nea & walker
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 
 ### Changes
-
-#### Other Changes
-
-+ Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
-+ Add option to hide the chat message when toggling /shmouselock. - hannibal2
 
 #### Garden Changes
 
 + Added mythic/Maeve visitor support. - walker & hannibal2
 + Added option to use custom Blocks per Second value in some Garden GUIs instead of the real one. - hannibal2
 + Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
++ Added support for Sunder 6 in /ff upgrades. - hannibal2
++ Added support for mythic in Visitor Drop Statistics. - hannibal2
+
+#### Other Changes
+
++ Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
++ Add option to hide the chat message when toggling /shmouselock. - hannibal2
 
 ### Fixes
 
@@ -34,6 +41,7 @@
 + Fixed Farming Contest Medal Icons in Inventory not showing. - hannibal2
 + Fixed /ff not detecting collection analyst fortune. - hannibal2
 + Fixed Mushroom Cow Perk display not working. - hannibal2
++ Fixed visitor timer error if the visitors aren't unlocked yet. - hannibal2
 
 #### Other Fixes
 
@@ -42,7 +50,9 @@
 + Fixed highlighting some mobs in the dungeon wrongly as area mini bosses. - hannibal2
 + Fixed opening the Pet menu no longer updating the current pet display. - hannibal2
 + Fixed Archfiend Dice and High Class Archfiend Dice counting as slayer drops when rolled. - hannibal2
-+ Fixed dice roll profit counting as Mob Kill Coins in  Slayer Tracker. - hannibal2
++ Fixed dice roll profit counting as Mob Kill Coins in Slayer Tracker. - hannibal2
++ Fixed Sack Display sometimes not formatting a million correctly. - Hize
++ Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
 
 ### Technical Details
 
@@ -52,6 +62,12 @@
 + Created PetAPI and deprecated String.matchRegex(). - hannibal2
 + Extracted sacks, friends, known features and Jacob contests in to their separate files. - CalMWolfs
 + Add log clearing. - CalMWolfs
++ Add auto-prefix to chat message methods. - walker
++ Added support for extra data in error manager. - hannibal2
++ Added /readcropmilestonefromclipboard. - hannibal2
+    + This command reads the clipboard content, in the format of users sending crop milestone step data.
+    + The new data gets compared to the currently saved data, differences are getting replaced and the result gets put
+      into the clipboard. The clipboard context can be used to update the repo content.
 
 ## Version 0.21
 

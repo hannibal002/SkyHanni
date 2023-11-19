@@ -37,7 +37,7 @@ class KingTalismanHelper {
 
         fun kingFix() {
             currentOffset = null
-            LorenzUtils.chat("§e[SkyHanni] Reset internal offset of King Talisman Helper.")
+            LorenzUtils.chat("Reset internal offset of King Talisman Helper.")
         }
     }
 
