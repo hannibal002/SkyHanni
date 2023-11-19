@@ -156,6 +156,24 @@ class MenuItemDisplayOverlayPlayer {
             }
         }
 
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE)) {
+            //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
+            /*
+             chestName.contains(" Minion ")
+             itemName.contains("Quick") && itemName.contains("Upgrade Minion")
+             */
+            ((".* Minion .*").toPattern()).matchMatcher(chestName) {
+                (("Quick.Upgrade Minion").toPattern()).matchMatcher(itemName) {
+                    val lore = item.getLore()
+                    for (line in lore) {
+                        ((".*(§.)+You need (§.)*(?<needed>[\\w]+).*").toPattern()).matchMatcher(line) {
+                            return group("needed")
+                        }
+                    }
+                }
+            }
+        }
+        //friendly note to future contribs: if you want to add more stack sizes you have to do it above this line or else it wont work. look, i don't make the rules, aight? -ery
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.ESSENCE_COUNTS)) {
             if (item.item != Items.skull) return ""
             if (LorenzUtils.isRewardChest()) {
@@ -178,20 +196,19 @@ class MenuItemDisplayOverlayPlayer {
                 val lore = item.getLore()
                 var usefulAsString: String = ""
                 var totalAsString: String = ""
-                for (line in lore) {
+                loop@for (line in lore) {
                     essenceCountOtherPattern.matchMatcher(line) {
                         usefulAsString = group("useful")
                         totalAsString = group("total").replace(",", "")
-                        break
+                        break@loop
                     }
                     essenceCountPattern.matchMatcher(line) {
                         usefulAsString = group("useful")
                         totalAsString = group("total").replace(",", "")
-                        break
+                        break@loop
                     }
                 }
-                    val suffix = when (totalAsString.length) {
-                        0 -> "bruh"
+                val suffix = when (totalAsString.length) {
                         in 1..3 -> ""
                         in 4..6 -> "k"
                         in 7..9 -> "M"
@@ -201,24 +218,6 @@ class MenuItemDisplayOverlayPlayer {
                     }
                     if (suffix == "§b§z:)") return suffix
                     else return "" + usefulAsString + suffix
-            }
-        }
-
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE)) {
-            //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
-            /*
-             chestName.contains(" Minion ")
-             itemName.contains("Quick") && itemName.contains("Upgrade Minion")
-             */
-            ((".* Minion .*").toPattern()).matchMatcher(chestName) {
-                (("Quick.Upgrade Minion").toPattern()).matchMatcher(itemName) {
-                    val lore = item.getLore()
-                    for (line in lore) {
-                        ((".*You need (§.)*(?<needed>[\\w]+) (§.)*more.*").toPattern()).matchMatcher(line) {
-                            return group("needed")
-                        }
-                    }
-                }
             }
         }
 
