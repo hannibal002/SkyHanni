@@ -280,24 +280,25 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         return "$colorCode${candidate.perks.size}"
                     }
                 }
-//                 if (lore.isNotEmpty()) {
-//                     (("(§8)+.*Candidate").toPattern()).matchMatcher(lore.first()) {
-//                         val colorCode = nameWithColor.take(2)
-//                         var numPerks = 0
-//                         for (line in lore) {
-//                             //line.startsWith(colorCode) &&
-//                             //line != "${colorCode}You voted for this candidate!" &&
-//                             //line != "${colorCode}Leading in votes!" &&
-//                             //!(line.startsWith("${colorCode}Click to vote for ")) &&
-//                             //line != "${colorCode}This is a SPECIAL candidate!" &&
-//                             //!(line.startsWith("$colorCode§"))
-//                             (("^${colorCode}(?:(?!\\b(This is a SPECIAL candidate|Click to vote for|You voted for this candidate|Leading in votes)\\b)\\S)*\$").toPattern()).matchMatcher((line)) {
-//                                 numPerks++
-//                             }
-//                         }
-//                         return "$colorCode$numPerks"
-//                     }
-//                 }
+/*          if (lore.isNotEmpty()) {
+                    (("(§8)+.*Candidate").toPattern()).matchMatcher(lore.first()) {
+                        val colorCode = nameWithColor.take(2)
+                        var numPerks = 0
+                        for (line in lore) {
+                            //line.startsWith(colorCode) &&
+                            //line != "${colorCode}You voted for this candidate!" &&
+                            //line != "${colorCode}Leading in votes!" &&
+                            //!(line.startsWith("${colorCode}Click to vote for ")) &&
+                            //line != "${colorCode}This is a SPECIAL candidate!" &&
+                            //!(line.startsWith("$colorCode§"))
+                            (("^${colorCode}(?:(?!\\b(This is a SPECIAL candidate|Click to vote for|You voted for this candidate|Leading in votes)\\b)\\S)*\$").toPattern()).matchMatcher((line)) {
+                                numPerks++
+                            }
+                        }
+                        return "$colorCode$numPerks"
+                    }
+                 }
+ */
             }
             (("(Calendar and Events|Mayor .*)").toPattern()).matchMatcher(chestName) {
                 val nameWithColor = item.name ?: return ""
@@ -308,21 +309,21 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 (("Mayor .*").toPattern()).matchMatcher(itemName) {
                     ((".*dante.*").toPattern()).matchMatcher(itemName.lowercase()) { return "§c§l✖" }
                     for (line in lore) {
-                        if (line == ("§7players until the closing of") || line == ("§7until the closing of the next")) {
+                        (("^(§.)Perkpocalypse Perks:\$").toPattern()).matchMatcher(line) {
+                            return grabPerkpocalypseMayor(lore)
+                        }
+                        (("§7(players until the closing of|until the closing of the next)").toPattern()).matchMatcher(line) {
                             if (!(itemName.endsWith(" Jerry")) || chestName.startsWith("Mayor")) {
+                                /*
                                 var numPerks = 0
                                 for (line in lore) {
                                     if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
                                         numPerks++
                                     }
                                 }
+                                */
+                                val numPerks = MayorElection.currentCandidate?.perks?.size ?: -1
                                 return "$colorCode$numPerks"
-                            } else {
-                                for (line in lore) {
-                                    ((".*${colorCode}Perkpocalypse.*").toPattern()).matchMatcher(line) {
-                                        return grabPerkpocalypseMayor(lore)
-                                    }
-                                }
                             }
                         }
                     }
