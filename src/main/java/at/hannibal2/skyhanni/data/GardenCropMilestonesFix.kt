@@ -41,7 +41,7 @@ object GardenCropMilestonesFix {
             LorenzUtils.chat(
                 "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
                     "Correct data got put into clipboard. " +
-                    "Please share it on SkyHanni Discord."
+                    "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e."
             )
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
         } else {
