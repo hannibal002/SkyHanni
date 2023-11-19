@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -112,11 +113,13 @@ class FarmingFortuneDisplay {
             list.add(
                 "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
                     LorenzUtils.formatDouble(farmingFortune, 0)
-                } else "?"
+                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
             )
 
             if (GardenAPI.cropInHand == currentCrop) {
-                latestFF?.put(currentCrop, getCurrentFarmingFortune(true))
+                if (!recentlySwitchedTool) {
+                    latestFF?.put(currentCrop, getCurrentFarmingFortune(true))
+                }
             }
         })
 
