@@ -65,7 +65,7 @@ object GardenCropMilestones {
         }
 
         if (data.isNotEmpty()) {
-            LorenzUtils.chat("Found wrong data in crop milestone menu! Correct data got put into clipboard. Please share it on SkyHanni Discord.")
+            LorenzUtils.chat("Found §c${data.size} §ewrong crop milestone steps in the menu! Correct data got put into clipboard. Please share it on SkyHanni Discord.")
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
         }
     }
