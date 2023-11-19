@@ -21,6 +21,6 @@ object CopyScoreboardCommand {
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
-        LorenzUtils.chat("§e[SkyHanni] scoreboard copied into your clipboard!")
+        LorenzUtils.chat("Scoreboard copied into your clipboard!")
     }
 }

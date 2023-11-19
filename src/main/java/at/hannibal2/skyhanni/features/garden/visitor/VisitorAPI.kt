@@ -60,11 +60,11 @@ object VisitorAPI {
 
         if (visitor != null) return visitor
 
-        println("visitors: $visitors")
-        println("name: $name")
-        ErrorManager.logErrorState(
+        ErrorManager.logErrorStateWithData(
             "Error finding the visitor `$name§c`. Try to reopen the inventory",
-            "visitor is null! name='$name', visitors=`$visitors`"
+            "Visitor is null while opening visitor inventory",
+            "name" to name,
+            "visitors" to visitors,
         )
         return null
     }

@@ -47,18 +47,12 @@ object TestCopyBestiaryValues {
         if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = ""
 
-        val backItem = event.inventoryItems[3 + 9 * 5 + 3]
-        if (backItem == null) {
-            return
-        }
+        val backItem = event.inventoryItems[3 + 9 * 5 + 3] ?: return
         if (backItem.getLore().none { it.contains("Bestiary Milestone") }) {
             return
         }
 
-        val rankingItem = event.inventoryItems[3 + 9 * 5 + 2]
-        if (rankingItem == null) {
-            return
-        }
+        val rankingItem = event.inventoryItems[3 + 9 * 5 + 2] ?: return
         if (rankingItem.getLore().none { it.contains("Ranking") }) {
             return
         }
@@ -71,7 +65,7 @@ object TestCopyBestiaryValues {
         val name = titleItem.name ?: return
         val titleName = name.split(" ").dropLast(1).joinToString(" ")
 
-        val obj: BestiarityObject = BestiarityObject()
+        val obj = BestiarityObject()
         obj.name = titleName
         obj.texture = titleItem.getSkullTexture() ?: "no texture found"
         obj.skullOwner = titleItem.getSkullOwner() ?: "no skullOwner found"

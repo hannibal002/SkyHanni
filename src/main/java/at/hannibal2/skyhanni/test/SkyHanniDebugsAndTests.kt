@@ -140,7 +140,8 @@ class SkyHanniDebugsAndTests {
 
             LorenzUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm"
+                "shconfigmanagerreset confirm",
+                false
             )
         }
 
@@ -162,7 +163,7 @@ class SkyHanniDebugsAndTests {
 
                 // resetting the MoulConfigProcessor in use
                 ConfigGuiManager.editor = null
-                LorenzUtils.chat("§e[SkyHanni] Reset the config manager!")
+                LorenzUtils.chat("Reset the config manager!")
             }.start()
         }
 
@@ -235,7 +236,7 @@ class SkyHanniDebugsAndTests {
                     println("Skipped registering listener $simpleName")
                 }
             }
-            LorenzUtils.chat("§e[SkyHanni] reloaded ${modules.size} listener classes.")
+            LorenzUtils.chat("reloaded ${modules.size} listener classes.")
         }
 
         fun stopListeners() {
@@ -246,7 +247,7 @@ class SkyHanniDebugsAndTests {
                 MinecraftForge.EVENT_BUS.unregister(original)
                 println("Unregistered listener $simpleName")
             }
-            LorenzUtils.chat("§e[SkyHanni] stopped ${modules.size} listener classes.")
+            LorenzUtils.chat("stopped ${modules.size} listener classes.")
         }
 
         fun copyLocation(args: Array<String>) {
@@ -353,9 +354,9 @@ class SkyHanniDebugsAndTests {
         fun toggleRender() {
             globalRender = !globalRender
             if (globalRender) {
-                LorenzUtils.chat("§e[SkyHanni] §aEnabled global renderer!")
+                LorenzUtils.chat("§aEnabled global renderer!")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] §cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+                LorenzUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
         }
     }
