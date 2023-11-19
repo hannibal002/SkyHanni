@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
@@ -99,13 +102,13 @@ object EntityUtils {
 
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    //TODO remove baseMaxHealth
+    // TODO remove baseMaxHealth
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
         if (!boss && !LorenzUtils.inDungeons) {
-            //Corrupted
+            // Corrupted
             if (maxHealth == health * 3 * derpyMultiplier) return true
             // Runic
             if (maxHealth == health * 4 * derpyMultiplier) return true
@@ -119,11 +122,8 @@ object EntityUtils {
     fun EntityPlayer.getSkinTexture(): String? {
         val gameProfile = gameProfile ?: return null
 
-        return gameProfile.properties.entries()
-            .filter { it.key == "textures" }
-            .map { it.value }
-            .firstOrNull { it.name == "textures" }
-            ?.value
+        return gameProfile.properties.entries().filter { it.key == "textures" }.map { it.value }
+            .firstOrNull { it.name == "textures" }?.value
     }
 
     inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
@@ -132,6 +132,9 @@ object EntityUtils {
     inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceTo(location) < radius }
 
+    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
+        getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
+
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
@@ -139,7 +142,7 @@ object EntityUtils {
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
-    fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
+    fun EntityPlayer.isNPC() = !isRealPlayer()
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 
@@ -157,4 +160,8 @@ object EntityUtils {
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
+
+    fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
+    fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
+    fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 }

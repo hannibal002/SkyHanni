@@ -7,7 +7,11 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
+import kotlin.math.abs
+import kotlin.math.acos
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.sin
@@ -18,6 +22,7 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
+    constructor() : this(0.0, 0.0, 0.0)
 
     constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
@@ -35,6 +40,8 @@ data class LorenzVec(
 
     fun distance(x: Double, y: Double, z: Double): Double = distance(LorenzVec(x, y, z))
 
+    fun distanceChebyshevIgnoreY(other: LorenzVec) = max(abs(this.x - other.x), abs(this.z - other.z))
+
     fun distanceSq(other: LorenzVec): Double {
         val dx = (other.x - x)
         val dy = (other.y - y)
@@ -48,7 +55,8 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
-    fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
+    fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec =
+        LorenzVec(this.x + x, this.y + y, this.z + z)
 
     fun add(x: Int, y: Int, z: Int): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
@@ -59,11 +67,30 @@ data class LorenzVec(
     fun multiply(d: Int): LorenzVec =
         LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
 
+    fun multiply(v: LorenzVec) = LorenzVec(x multiplyZeroSave v.x, y multiplyZeroSave v.y, z multiplyZeroSave v.z)
+
+    fun dotProduct(other: LorenzVec): Double =
+        x multiplyZeroSave other.x + y multiplyZeroSave other.y + z multiplyZeroSave other.z
+
+    fun angleAsCos(other: LorenzVec) = this.normalize().dotProduct(other.normalize())
+
+    fun angleInRad(other: LorenzVec) = acos(this.angleAsCos(other))
+
+    fun angleInDeg(other: LorenzVec) = Math.toDegrees(this.angleInRad(other))
+
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
 
     fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
 
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
+
+    fun inverse() = LorenzVec(1.0 / x, 1.0 / y, 1.0 / z)
+
+    fun min() = min(x, min(y, z))
+    fun max() = max(x, max(y, z))
+
+    fun minOfEachElement(other: LorenzVec) = LorenzVec(min(x, other.x), min(y, other.y), min(z, other.z))
+    fun maxOfEachElement(other: LorenzVec) = LorenzVec(max(x, other.x), max(y, other.y), max(z, other.z))
 
     fun printWithAccuracy(accuracy: Int): String {
         val x = (round(x * accuracy) / accuracy)
@@ -132,6 +159,10 @@ data class LorenzVec(
 
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
 
+    fun rotateXY(theta: Double) = LorenzVec(x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta), z)
+    fun rotateXZ(theta: Double) = LorenzVec(x * cos(theta) + z * sin(theta), y, -x * sin(theta) + z * cos(theta))
+    fun rotateYZ(theta: Double) = LorenzVec(x, y * cos(theta) - z * sin(theta), y * sin(theta) + z * cos(theta))
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
@@ -162,6 +193,7 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 
@@ -172,3 +204,5 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
+
+fun vectorFromPoints(start: LorenzVec, end: LorenzVec) = end.subtract(start)

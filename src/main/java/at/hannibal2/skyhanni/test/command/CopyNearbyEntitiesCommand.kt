@@ -1,8 +1,18 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.data.MobData
+import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
+import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
+import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
@@ -13,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
@@ -34,7 +45,7 @@ object CopyNearbyEntitiesCommand {
         val resultList = mutableListOf<String>()
         var counter = 0
 
-        for (entity in EntityUtils.getAllEntities()) {
+        for (entity in EntityUtils.getAllEntities().sortedBy { it.entityId }) {
             val position = entity.position
             val vec = position.toLorenzVec()
             val distance = start.distance(vec)
@@ -45,7 +56,8 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("name: '" + entity.name + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
-                resultList.add("uuid version: ${entity.uniqueID.version()} ${if(entity.uniqueID.version() != 4) "NPC " else ""}(${entity.uniqueID})")
+                resultList.add("Type of Mob: ${getType(entity)}")
+                resultList.add("uuid version: ${entity.uniqueID.version()} / ${entity.uniqueID.variant()}(${entity.uniqueID})")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")
@@ -166,6 +178,34 @@ object CopyNearbyEntitiesCommand {
             resultList.add("-     name: '$stackName'")
             resultList.add("-     cleanName: '$cleanName'")
             resultList.add("-     type: $type")
+        }
+    }
+
+    private fun getType(entity: Entity) = buildString {
+        if (entity.isSkyBlockMob()) {
+            append("SkyblockMob(")
+            val mob = MobData.currentSkyblockMobs.firstOrNull() { it == entity }
+            if (mob != null) when (mob) {
+                is SkyblockSlayerBoss -> append("Slayer")
+                is SkyblockBossMob -> append("Boss")
+                is SkyblockBasicMob -> append("Basic")
+                is DungeonMob -> append("Dungeon")
+                is SkyblockSpecialMob -> append("Special")
+            } else append("None")
+            if (mob?.baseEntity == entity) append("/Base")
+            append(")\"")
+            append(mob?.name ?: "")
+            append("\", ")
+        }
+        if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
+        if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
+        if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
+        if (MobData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
+
+        if (isNotEmpty()) {
+            delete(length - 2, length) // Remove the last ", "
+        } else {
+            append("NONE")
         }
     }
 }
