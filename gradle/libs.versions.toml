@@ -1,6 +1,6 @@
 [versions]
 libautoupdate = "1.0.3"
-moulconfig = "2.4.0"
+moulconfig = "2.4.3"
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
