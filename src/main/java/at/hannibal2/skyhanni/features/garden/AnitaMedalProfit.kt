@@ -155,7 +155,7 @@ class AnitaMedalProfit {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3,"garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
-        event.move(3,"garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")
+        event.move(3, "garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
+        event.move(3, "garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")
     }
 }
