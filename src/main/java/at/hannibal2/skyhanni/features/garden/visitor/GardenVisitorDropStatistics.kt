@@ -187,9 +187,9 @@ object GardenVisitorDropStatistics {
     // Adding the mythic rarity between legendary and special, if missing
     private fun fixRaritiesSize(list: MutableList<Long>) {
         if (list.size == 4) {
-            val legendary = list.last()
+            val special = list.last()
             list[3] = 0L
-            list.add(legendary)
+            list.add(special)
         }
     }
 
