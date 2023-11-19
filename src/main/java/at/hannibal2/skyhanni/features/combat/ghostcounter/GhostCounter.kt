@@ -292,8 +292,9 @@ object GhostCounter {
                 notifyCTModule = false
                 if (isUsingCTGhostCounter()) {
                     clickableChat(
-                        "§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
-                        "shimportghostcounterdata"
+                        "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
+                        "shimportghostcounterdata",
+                        prefixColor = "§6",
                     )
                 }
             }
@@ -478,7 +479,7 @@ object GhostCounter {
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (storage?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
-            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
+            chat("Your GhostCounter config has been automatically adjusted.")
             storage?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
     }

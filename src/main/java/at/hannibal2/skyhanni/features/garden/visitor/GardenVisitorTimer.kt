@@ -142,7 +142,7 @@ class GardenVisitorTimer {
         }
 
         if (lastMillis == Duration.INFINITE) {
-            LorenzUtils.chat("§c[SkyHanni] Found Visitor Timer bug, reset value (lastMillis was infinite).")
+            LorenzUtils.error("Found Visitor Timer bug, reset value (lastMillis was infinite).")
             lastMillis = 0.seconds
         }
 

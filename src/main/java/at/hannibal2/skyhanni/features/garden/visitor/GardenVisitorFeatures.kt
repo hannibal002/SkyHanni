@@ -85,7 +85,7 @@ class GardenVisitorFeatures {
 
             val pair = ItemUtils.readItemAmount(line)
             if (pair == null) {
-                LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
+                LorenzUtils.error("Could not read item '$line'")
                 continue
             }
             val (itemName, amount) = pair
@@ -269,7 +269,7 @@ class GardenVisitorFeatures {
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, event.itemStack)
-            LorenzUtils.chat("§e[SkyHanni] Reloaded the visitor data of that inventory, this should not happen.")
+            LorenzUtils.error("Reloaded the visitor data of that inventory, this should not happen.")
         }
 
         toolTip.addAll(visitor.lastLore)
@@ -310,7 +310,7 @@ class GardenVisitorFeatures {
             if (wasEmpty) {
                 visitor.hasReward()?.let { reward ->
                     if (config.rewardWarning.notifyInChat) {
-                        LorenzUtils.chat("§e[SkyHanni] Found Visitor Reward ${reward.displayName}§e!")
+                        LorenzUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
                     }
                 }
             }
@@ -400,7 +400,7 @@ class GardenVisitorFeatures {
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
-            LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
+            LorenzUtils.chat("$displayName §eis visiting your garden!")
         }
 
         if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {

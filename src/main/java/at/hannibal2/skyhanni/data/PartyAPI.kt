@@ -32,17 +32,17 @@ object PartyAPI {
     fun listMembers() {
         val size = partyMembers.size
         if (size == 0) {
-            LorenzUtils.chat("§e[SkyHanni] No tracked party members!")
+            LorenzUtils.chat("No tracked party members!")
             return
         }
-        LorenzUtils.chat("§a[SkyHanni] Tracked party members §7($size) §f:")
+        LorenzUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
         for (member in partyMembers) {
-            LorenzUtils.chat(" §a- §7$member")
+            LorenzUtils.chat(" §a- §7$member", false)
         }
 
         if (Random.nextDouble() < 0.1) {
             OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
-            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"))
+            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"), prefix = false)
         }
     }
 
