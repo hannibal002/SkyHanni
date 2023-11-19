@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 
 object GardenCropMilestonesFix {
+    private val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
 
     fun openInventory(inventoryItems: Map<Int, ItemStack>) {
         if (SkyHanniMod.feature.garden.copyMilestoneData) {
@@ -53,7 +54,6 @@ object GardenCropMilestonesFix {
         crop: CropType,
         wrongData: MutableList<String>
     ) {
-        val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
         val name = stack.name ?: return
         val rawNumber = name.removeColor().replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNeeded()
