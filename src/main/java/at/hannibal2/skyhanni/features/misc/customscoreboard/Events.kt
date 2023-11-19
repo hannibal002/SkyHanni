@@ -185,7 +185,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             // Mithril
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Event: ") }
-                    .removePrefix("Event: ") + " §rin " + ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Zone: ") }
+                    .removePrefix("Event: ") + "\n§fin " + ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Zone: ") }
                     .removePrefix("Zone: ")
             }
 

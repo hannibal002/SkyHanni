@@ -129,7 +129,7 @@ class CustomScoreboard {
                 }
 
                 // Does not display this line
-                if (it[0] == "<hidden>") {
+                if (it.any { i-> i == "<hidden>"}) {
                     continue
                 }
 
