@@ -233,9 +233,10 @@ object NEUItems {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$internalName'"
-            Error(message).printStackTrace()
-            LorenzUtils.error(message)
+            ErrorManager.logErrorState(
+                "Error grabbing recipe data",
+                "Error reading getMultiplier for item '$internalName'"
+            )
             return Pair(internalName, 1)
         }
         for (recipe in getRecipes(internalName)) {
