@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -46,7 +47,7 @@ object GardenAPI {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
-    val mushroomCowPet get() = PetAPI.currentPet?.contains("Mushroom Cow") ?: false
+    val mushroomCowPet get() = PetAPI.currentPet?.contains("Mooshroom Cow") ?: false
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
@@ -136,7 +137,7 @@ object GardenAPI {
         return false
     }
 
-    fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    fun inGarden() = IslandType.GARDEN.isInIsland()
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
@@ -160,7 +161,7 @@ object GardenAPI {
         storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
-        LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+        LorenzUtils.chat("Manually reset all crop speed data!")
     }
 
     @SubscribeEvent

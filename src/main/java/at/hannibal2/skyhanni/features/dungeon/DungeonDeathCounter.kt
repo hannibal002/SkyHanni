@@ -53,7 +53,7 @@ class DungeonDeathCounter {
 
         if (isDeathMessage(event.message)) {
             deaths++
-            LorenzUtils.chat("§c§l$deaths. DEATH!")
+            LorenzUtils.chat("§c§l$deaths. DEATH!", false)
             update()
         }
     }

@@ -36,11 +36,9 @@ public class Storage {
     @Expose
     public Float savedMouseSensitivity = .5f;
 
+    @Deprecated
     @Expose
     public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
-
-    @Expose
-    public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
     public List<VisualWord> modifiedWords = new ArrayList<>();

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -8,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -105,9 +104,9 @@ object GardenPlotIcon {
         if (editMode != 0) {
             if (event.slotId in 54..89) {
                 event.isCanceled = true
-                if (event.slot.stack == null) return
-                copyStack = event.slot.stack
-                chat("§6§lClick an item in the desk menu to replace it with that item!")
+                copyStack = event.slot.stack ?: return
+                // TODO different format, not bold or show not in chat at all.
+                LorenzUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }
             if (event.slotId != 53) {

@@ -581,7 +581,7 @@ open class VisualWordGui : GuiScreen() {
                 }
             }
             if (importedWords > 0 || skippedWords > 0) {
-                chat("§e[SkyHanni] §aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !")
+                chat("§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !")
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false
             }

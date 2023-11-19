@@ -224,8 +224,8 @@ class FarmingWeightDisplay {
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
-                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
+                LorenzUtils.error("Invalid Farming Weight Overtake Goal!")
+                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!", false)
                 config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
@@ -255,7 +255,7 @@ class FarmingWeightDisplay {
 
             if (weightUntilOvertake < 0) {
                 if (weightPerSecond > 0) {
-                    farmingChatMessage("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                    farmingChatMessage("You passed §b$nextName §ein the Farming Weight Leaderboard!")
                 }
 
                 // Lower leaderboard position
@@ -386,9 +386,9 @@ class FarmingWeightDisplay {
 
         private fun chatOffScreenChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
-                "§e[SkyHanni] §7Since your last visit to the §aGarden§7, " +
-                    "you have $direction §7on the §dFarming Leaderboard§7. " +
-                    "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                "§7Since your last visit to the §aGarden§7, " +
+                        "you have $direction §7on the §dFarming Leaderboard§7. " +
+                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
         }
 
@@ -463,8 +463,11 @@ class FarmingWeightDisplay {
 
         private fun error() {
             apiError = true
-            LorenzUtils.error("[SkyHanni] Loading the farming weight data from elitebot.dev failed!")
-            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!")
+            LorenzUtils.error(
+                "Loading the farming weight data from elitebot.dev failed!\n"
+                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!",
+            )
         }
 
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
@@ -505,7 +508,7 @@ class FarmingWeightDisplay {
 
         private fun openWebsite(name: String?) {
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
-            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile of player §b$name")
+            LorenzUtils.chat("Opening Farming Profile of player §b$name")
         }
 
         private val factorPerCrop = mutableMapOf<CropType, Double>()

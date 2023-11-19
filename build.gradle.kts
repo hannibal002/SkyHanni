@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.21.1.Beta.1"
+version = "0.21.1.Beta.4"
 
 // Toolchains:
 java {
@@ -188,7 +188,7 @@ tasks.shadowJar {
         }
     }
     exclude("META-INF/versions/**")
-
+    mergeServiceFiles()
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }
