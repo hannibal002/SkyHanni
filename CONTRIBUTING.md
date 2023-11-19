@@ -56,7 +56,7 @@ You can write in the description of the pr the wording for the changelog as well
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-    - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
+  - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
