@@ -118,6 +118,7 @@ object GardenVisitorDropStatistics {
         acceptedVisitors += 1
         val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
         val visitorRarities = GardenAPI.storage?.visitorDrops?.visitorRarities ?: return
+        fixRaritiesSize(visitorRarities)
         val temp = visitorRarities[currentRarity.ordinal] + 1
         visitorRarities[currentRarity.ordinal] = temp
         saveAndUpdate()
@@ -130,12 +131,14 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         //2
         val visitorRarities = storage.visitorRarities
+        fixRaritiesSize(visitorRarities)
         if (visitorRarities.isNotEmpty()) {
             addAsSingletonList(
                 "§a${visitorRarities[0].addSeparators()}§f-" +
                     "§9${visitorRarities[1].addSeparators()}§f-" +
                     "§6${visitorRarities[2].addSeparators()}§f-" +
-                    "§c${visitorRarities[3].addSeparators()}"
+                    "§d${visitorRarities[3].addSeparators()}§f-" +
+                    "§c${visitorRarities[4].addSeparators()}"
             )
         } else {
             addAsSingletonList("§c?")
@@ -179,6 +182,15 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(storage.mithrilPowder, "Mithril Powder", "§2", "§2"))
         //21
         addAsSingletonList(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
+    }
+
+    // Adding the mythic rarity between legendary and special, if missing
+    private fun fixRaritiesSize(list: MutableList<Long>) {
+        if (list.size == 4) {
+            val legendary = list.last()
+            list[3] = 0L
+            list.add(legendary)
+        }
     }
 
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =
