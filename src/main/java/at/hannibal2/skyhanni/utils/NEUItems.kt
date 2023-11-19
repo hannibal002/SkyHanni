@@ -233,9 +233,10 @@ object NEUItems {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$internalName'"
-            Error(message).printStackTrace()
-            LorenzUtils.error(message)
+            ErrorManager.logErrorState(
+                "Error grabbing recipe data",
+                "Error reading getMultiplier for item '$internalName'"
+            )
             return Pair(internalName, 1)
         }
         for (recipe in getRecipes(internalName)) {
@@ -310,8 +311,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU

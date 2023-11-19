@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -8,10 +9,12 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -19,15 +22,18 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -66,6 +72,31 @@ class SkyHanniDebugsAndTests {
 
         private fun print(text: String) {
             LorenzDebug.log(text)
+        }
+
+        private var testLocation: LorenzVec? = null
+
+        @SubscribeEvent
+        fun onRenderWorld(event: LorenzRenderWorldEvent) {
+            testLocation?.let {
+                event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
+                event.drawDynamicText(it, "Test", 1.5)
+            }
+        }
+
+        fun waypoint(args: Array<String>) {
+            SoundUtils.playBeepSound()
+
+            if (args.isEmpty()) {
+                testLocation = null
+                LorenzUtils.chat("reset test waypoint")
+            }
+
+            val x = args[0].toDouble()
+            val y = args[1].toDouble()
+            val z = args[2].toDouble()
+            testLocation = LorenzVec(x, y, z)
+            LorenzUtils.chat("set test waypoint")
         }
 
         fun testCommand(args: Array<String>) {
@@ -109,7 +140,8 @@ class SkyHanniDebugsAndTests {
 
             LorenzUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm"
+                "shconfigmanagerreset confirm",
+                false
             )
         }
 
@@ -117,8 +149,8 @@ class SkyHanniDebugsAndTests {
             // TODO make it so that it does not reset the config
 
             // saving old config state
-            SkyHanniMod.configManager.saveConfig("reload config manager")
-            SkyHanniMod.configManager.saveSackData("reload config manager")
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
             Thread {
                 Thread.sleep(500)
                 SkyHanniMod.configManager.disableSaving()
@@ -131,7 +163,7 @@ class SkyHanniDebugsAndTests {
 
                 // resetting the MoulConfigProcessor in use
                 ConfigGuiManager.editor = null
-                LorenzUtils.chat("§e[SkyHanni] Reset the config manager!")
+                LorenzUtils.chat("Reset the config manager!")
             }.start()
         }
 
@@ -204,7 +236,7 @@ class SkyHanniDebugsAndTests {
                     println("Skipped registering listener $simpleName")
                 }
             }
-            LorenzUtils.chat("§e[SkyHanni] reloaded ${modules.size} listener classes.")
+            LorenzUtils.chat("reloaded ${modules.size} listener classes.")
         }
 
         fun stopListeners() {
@@ -215,7 +247,7 @@ class SkyHanniDebugsAndTests {
                 MinecraftForge.EVENT_BUS.unregister(original)
                 println("Unregistered listener $simpleName")
             }
-            LorenzUtils.chat("§e[SkyHanni] stopped ${modules.size} listener classes.")
+            LorenzUtils.chat("stopped ${modules.size} listener classes.")
         }
 
         fun copyLocation(args: Array<String>) {
@@ -232,7 +264,9 @@ class SkyHanniDebugsAndTests {
         }
 
         fun debugVersion() {
-            LorenzUtils.chat("§eYou are using SkyHanni ${SkyHanniMod.version}")
+            val name = "SkyHanni ${SkyHanniMod.version}"
+            LorenzUtils.chat("§eYou are using $name")
+            OSUtils.copyToClipboard(name)
         }
 
         fun debugData(args: Array<String>) {
@@ -290,6 +324,7 @@ class SkyHanniDebugsAndTests {
                     builder.append("Doing slayer!\n")
                     builder.append(" activeSlayer: ${SlayerAPI.getActiveSlayer()}\n")
                     builder.append(" isInCorrectArea: ${SlayerAPI.isInCorrectArea}\n")
+                    builder.append(" isInAnyArea: ${SlayerAPI.isInAnyArea}\n")
                 }
 
             }
@@ -319,9 +354,9 @@ class SkyHanniDebugsAndTests {
         fun toggleRender() {
             globalRender = !globalRender
             if (globalRender) {
-                LorenzUtils.chat("§e[SkyHanni] §aEnabled global renderer!")
+                LorenzUtils.chat("§aEnabled global renderer!")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] §cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+                LorenzUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
         }
     }

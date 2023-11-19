@@ -9,6 +9,10 @@ data class EntityEquipmentChangeEvent(
     val newItemStack: ItemStack?
 ) : LorenzEvent() {
     val isHead get() = equipmentSlot == EQUIPMENT_SLOT_HEAD
+    val isChest get() = equipmentSlot == EQUIPMENT_SLOT_CHEST
+    val isLeggings get() = equipmentSlot == EQUIPMENT_SLOT_LEGGINGS
+    val isFeet get() = equipmentSlot == EQUIPMENT_SLOT_FEET
+    val isHand get() = equipmentSlot == EQUIPMENT_SLOT_HAND
 
     companion object {
         const val EQUIPMENT_SLOT_HEAD = 4

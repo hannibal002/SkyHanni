@@ -71,6 +71,7 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
+    @Deprecated("Do not create a regex pattern each time.", ReplaceWith("toPattern()"))
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     private fun String.removeAtBeginning(text: String): String =
@@ -87,6 +88,15 @@ object StringUtils {
         } else {
             split[0].removeColor()
         }
+    }
+
+    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
+        for (pattern in iterator()) {
+            pattern.matchMatcher<T>(text) {
+                return consumer()
+            }
+        }
+        return null
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
@@ -235,4 +245,6 @@ object StringUtils {
     fun String.convertToFormatted(): String {
         return this.replace("&&", "§")
     }
+
+    fun Pattern.matches(string: String) = matcher(string).matches()
 }

@@ -61,11 +61,11 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
             if (mouseX in 0..w && mouseY in 0..(size * 10) && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
-                    LorenzUtils.chat("Copied structured chat line to clipboard")
+                    LorenzUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = LorenzUtils.stripVanillaMessage(msg.message.formattedText)
                     OSUtils.copyToClipboard(message)
-                    LorenzUtils.chat("Copied chat line to clipboard")
+                    LorenzUtils.chat("Copied chat line to clipboard", false)
                 }
             }
             mouseY -= size * 10

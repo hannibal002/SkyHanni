@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class RiftWiltedBerberisHelper {
-    private val config get() = RiftAPI.config.area.dreadfarmConfig.wiltedBerberis
+    private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()

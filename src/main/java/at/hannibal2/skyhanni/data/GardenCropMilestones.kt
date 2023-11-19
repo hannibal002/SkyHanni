@@ -44,7 +44,7 @@ object GardenCropMilestones {
 
     private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
@@ -54,6 +54,7 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
+        // TODO change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }
