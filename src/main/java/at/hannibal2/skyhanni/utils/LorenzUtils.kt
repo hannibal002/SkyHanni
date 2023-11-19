@@ -335,8 +335,8 @@ object LorenzUtils {
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
 
-        if (command != null) {
-            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        command?.let {
+            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${it.removePrefix("/")}")
         }
 
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)

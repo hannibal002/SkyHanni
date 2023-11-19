@@ -11,6 +11,7 @@ object TestChatCommand {
             LorenzUtils.userError("Specify a chat message to test!")
             return
         }
+
         val hidden = args.last() == "-s"
         var rawMessage = args.toList().joinToString(" ")
         if (!hidden) LorenzUtils.chat("Testing message: §7$rawMessage", prefixColor = "§a")

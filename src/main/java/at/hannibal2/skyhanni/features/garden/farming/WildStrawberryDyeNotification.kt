@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,19 +29,20 @@ class WildStrawberryDyeNotification {
         if (!GardenAPI.inGarden()) return
         if (!SkyHanniMod.feature.garden.wildStrawberryDyeNotification) return
 
+        val itemStack = event.itemStack
         MinecraftExecutor.OnThread.execute {
 
             // Prevent false positives when buying the item in ah or moving it from a storage
             val diff = System.currentTimeMillis() - lastCloseTime
             if (diff < 1_000) return@execute
 
-            val internalName = event.itemStack.getInternalName()
+            val internalName = itemStack.getInternalName()
             if (internalName == item) {
-                val name = event.itemStack.name!!
+                val name = itemStack.name!!
                 LorenzUtils.sendTitle(name, 5.seconds)
                 LorenzUtils.chat("You found a $name§e!")
                 SoundUtils.playBeepSound()
-                ItemBlink.setBlink(NEUItems.getItemStackOrNull("DYE_WILD_STRAWBERRY"), 5_000)
+                ItemBlink.setBlink(itemStack, 5_000)
             }
         }
     }

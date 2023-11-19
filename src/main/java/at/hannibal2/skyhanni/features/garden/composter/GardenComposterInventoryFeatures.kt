@@ -46,17 +46,15 @@ class GardenComposterInventoryFeatures {
             if (next) {
                 if (line.endsWith(" Copper")) continue
                 if (line == "") break
-                val pair = ItemUtils.readItemAmount(line)
-                if (pair == null) {
+                val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
                     LorenzUtils.error("Could not read item '$line'")
                     continue
                 }
-                val (itemName, amount) = pair
                 val internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName == null) {
                     LorenzUtils.error(
                         "Error reading internal name for item '$itemName§c' " +
-                                "(in GardenComposterInventoryFeatures)"
+                            "(in GardenComposterInventoryFeatures)"
                     )
                     continue
                 }

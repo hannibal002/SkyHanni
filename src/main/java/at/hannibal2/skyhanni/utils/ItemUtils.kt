@@ -75,7 +75,7 @@ object ItemUtils {
         }
 
         if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-                list.add(player.inventory.itemStack)
+            list.add(player.inventory.itemStack)
         }
         return list
     }
