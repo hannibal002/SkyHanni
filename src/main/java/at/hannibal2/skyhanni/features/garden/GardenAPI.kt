@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -136,7 +137,7 @@ object GardenAPI {
         return false
     }
 
-    fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    fun inGarden() = IslandType.GARDEN.isInIsland()
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()

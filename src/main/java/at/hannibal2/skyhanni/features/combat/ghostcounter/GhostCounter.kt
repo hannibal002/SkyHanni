@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -489,7 +490,5 @@ object GhostCounter {
         event.move(2, "ghostCounter", "combat.ghostCounter")
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
-    }
+    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
 }

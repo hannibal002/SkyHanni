@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -546,7 +547,7 @@ class GardenVisitorFeatures {
     }
 
     private fun showGui(): Boolean {
-        if (config.needs.inBazaarAlley && LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+        if (config.needs.inBazaarAlley && IslandType.HUB.isInIsland() && LorenzUtils.skyBlockArea == "Bazaar Alley") {
             return true
         }
 
