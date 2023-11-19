@@ -12,10 +12,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import scala.tools.nsc.doc.base.comment.Bold
 
 class MenuItemDisplayOverlayPlayer {
     private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
@@ -158,6 +157,7 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.ESSENCE_COUNTS)) {
+            if (item.item != Items.skull) return ""
             if (LorenzUtils.isRewardChest()) {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
