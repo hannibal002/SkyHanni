@@ -45,6 +45,7 @@ public class CustomScoreboardConfig {
             "§8m77CK",
             "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234",
             "",
+            "Objective:\n§eUpdate SkyHanni",
             "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills",
             "§7Current Event",
             "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff",

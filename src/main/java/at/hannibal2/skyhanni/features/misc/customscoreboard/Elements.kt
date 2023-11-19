@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -166,6 +168,17 @@ enum class Elements(
         0,
         13
     ),
+    OBJECTIVE(
+        {
+            when(config.hideEmptyLines){
+                true -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "<hidden>")
+                false -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "§cNo objective")
+            }
+        },
+        listOf(),
+        0,
+        14
+    ),
     SLAYER(
         {
             listOf(
@@ -185,7 +198,7 @@ enum class Elements(
             IslandType.THE_RIFT
         ),
         0,
-        14
+        15
     ),
     CURRENT_EVENT(
         {
@@ -193,7 +206,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        15
+        16
     ),
     MAYOR(
         {
@@ -207,7 +220,7 @@ enum class Elements(
         },
         listOf(IslandType.THE_RIFT),
         1,
-        16
+        17
     ),
     EMPTY_LINE3(
         {
@@ -215,7 +228,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        17
+        18
     ),
     HEAT(
         {
@@ -227,7 +240,7 @@ enum class Elements(
         },
         listOf(IslandType.CRYSTAL_HOLLOWS),
         0,
-        18
+        19
     ),
     PARTY(
         {
@@ -250,7 +263,7 @@ enum class Elements(
         },
         listOf(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
         0,
-        19
+        20
     ),
     MAXWELL(
         {
@@ -265,7 +278,7 @@ enum class Elements(
         },
         listOf(IslandType.THE_RIFT),
         1,
-        20
+        21
     ),
     WEBSITE(
         {
@@ -273,7 +286,7 @@ enum class Elements(
         },
         listOf(),
         0,
-        21
+        22
     );
 
     fun getLine(): List<String> {
