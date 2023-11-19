@@ -97,7 +97,6 @@ object GardenCropMilestonesFix {
     }
 
     /**
-     *
      * This helps to fix wrong crop milestone data
      * This command reads the clipboard content,
      * in the format of users sending crop milestone step data.
