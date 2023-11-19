@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestonesFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -314,6 +315,10 @@ object Commands {
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
         ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
+        registerCommand(
+            "readcropmilestonefromclipboard",
+            "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
+        ) { GardenCropMilestonesFix.readDataFromClipboard() }
     }
 
     private fun internalCommands() {
