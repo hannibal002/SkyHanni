@@ -4,9 +4,14 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class NextJacobContestConfig {
     @Expose
@@ -53,6 +58,27 @@ public class NextJacobContestConfig {
     @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
     @ConfigEditorBoolean
     public boolean warnPopup = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Warn For",
+        desc = "Only Warn for these crops"
+    )
+    @ConfigEditorDraggableList(
+        exampleText = {
+            "Wheat",
+            "Carrot",
+            "Potato",
+            "Nether Wart",
+            "Pumpkin",
+            "Melon",
+            "Cocoa Beans",
+            "Sugar Cane",
+            "Cactus",
+            "Mushroom"
+        }
+    )
+    public List<Integer> warnFor = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
 
     @Expose
     public Position pos = new Position(-200, 10, false, true);
