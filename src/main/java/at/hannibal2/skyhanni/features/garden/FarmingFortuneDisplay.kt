@@ -36,7 +36,8 @@ import kotlin.math.floor
 import kotlin.math.log10
 
 class FarmingFortuneDisplay {
-    private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
+    private val tabFortuneUniversalPattern = " Farming Fortune: §r§6☘(?<fortune>\\d+)".toRegex()
+    private val tabFortuneCropPattern = " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)".toRegex()
 
     private var display = emptyList<List<Any>>()
     private var accessoryProgressDisplay = ""
@@ -52,30 +53,18 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        tabFortune = event.tabList.firstNotNullOfOrNull {
-            tabFortunePattern.matchEntire(it)?.groups?.get(1)?.value?.toDoubleOrNull()
-        } ?: tabFortune
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (event.itemStack.getCropType() == null) return
-        updateToolFortune(event.itemStack)
-    }
-
-    @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
-        val cropBroken = event.crop
-        if (cropBroken != currentCrop) {
-            updateToolFortune(event.itemInHand)
+        event.tabList.firstNotNullOfOrNull {
+            tabFortuneUniversalPattern.matchEntire(it)?.groups?.get("fortune")?.value?.toDoubleOrNull()?.let { tabFortuneUniversal = it }
+            tabFortuneCropPattern.matchEntire(it)?.groups?.let {
+                it.get("crop")?.value?.let { currentCrop = CropType.getByNameOrNull(it) }
+                it.get("fortune")?.value?.toDoubleOrNull()?.let { tabFortuneCrop = it }
+            }
         }
     }
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = System.currentTimeMillis()
-        updateToolFortune(event.toolItem)
     }
 
     @SubscribeEvent
@@ -98,22 +87,46 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(5)) return
-        val displayCrop = currentCrop ?: return
+        val currentCrop = currentCrop ?: return
+
+        val displayCrop = GardenAPI.cropInHand ?: currentCrop
+        var wrongTabCrop = false
+        var farmingFortune = -1.0
 
         val updatedDisplay = mutableListOf<List<Any>>()
         updatedDisplay.add(mutableListOf<Any>().also {
             it.addCropIcon(displayCrop)
-            val recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1000
+
+            var recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1500
+            wrongTabCrop = GardenAPI.cropInHand != null && GardenAPI.cropInHand != currentCrop
+
+            if (wrongTabCrop) {
+                farmingFortune = displayCrop.getLatestTrueFarmingFortune()?.let {
+                    if (config.dropMultiplier) it else it - 100.0
+                } ?: -1.0
+                recentlySwitchedTool = false
+            } else {
+                farmingFortune = getCurrentFarmingFortune()
+            }
+
             it.add(
-                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool) {
-                    LorenzUtils.formatDouble(getCurrentFarmingFortune(), 0)
+                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
+                    LorenzUtils.formatDouble(farmingFortune, 0)
                 } else "?"
             )
-            if (GardenAPI.toolInHand != null) {
-                latestFF?.put(displayCrop, getCurrentFarmingFortune(true))
+
+            if (GardenAPI.cropInHand == currentCrop) {
+                latestFF?.put(currentCrop, getCurrentFarmingFortune(true))
             }
         })
 
+        if (wrongTabCrop) {
+            var text = "§cBreak a §e${GardenAPI.cropInHand?.cropName}§c to see"
+            if (farmingFortune != -1.0) text += " latest"
+            text += " fortune!"
+
+            updatedDisplay.addAsSingletonList(text)
+        }
         if (upgradeFortune == null) {
             updatedDisplay.addAsSingletonList("§cOpen §e/cropupgrades§c for more exact data!")
         }
@@ -130,24 +143,16 @@ class FarmingFortuneDisplay {
         display = updatedDisplay
     }
 
-    private fun updateToolFortune(tool: ItemStack?) {
-        val cropMatchesTool = currentCrop == tool?.getCropType()
-        val toolCounterFortune = if (cropMatchesTool) {
-            getToolFortune(tool) + getCounterFortune(tool) + getCollectionFortune(tool)
-        } else 0.0
-        toolFortune =
-            toolCounterFortune + getTurboCropFortune(tool, currentCrop) + getDedicationFortune(tool, currentCrop)
-    }
-
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestTrueFarmingFortune
 
-        private val currentCrop get() = GardenAPI.getCurrentlyFarmedCrop()
+        private var currentCrop: CropType? = null
 
-        private var tabFortune: Double = 0.0
+        private var tabFortuneUniversal: Double = 0.0
+        private var tabFortuneCrop: Double = 0.0
         private var toolFortune: Double = 0.0
         private val baseFortune: Double get() = if (config.dropMultiplier) 100.0 else 0.0
         private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
@@ -263,23 +268,8 @@ class FarmingFortuneDisplay {
         }
 
         fun getCurrentFarmingFortune(alwaysBaseFortune: Boolean = false): Double {
-            val upgradeFortune = upgradeFortune ?: 0.0
-            val accessoryFortune = accessoryFortune ?: 0.0
-
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            var otherFortune = 0.0
-
-            if (currentCrop == CropType.CARROT) {
-                GardenAPI.storage?.fortune?.let {
-                    if (it.carrotFortune) otherFortune = 12.0
-                }
-            }
-            if (currentCrop == CropType.PUMPKIN) {
-                GardenAPI.storage?.fortune?.let {
-                    if (it.pumpkinFortune) otherFortune = 12.0
-                }
-            }
-            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + otherFortune
+            return baseFortune + tabFortuneUniversal + tabFortuneCrop
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
