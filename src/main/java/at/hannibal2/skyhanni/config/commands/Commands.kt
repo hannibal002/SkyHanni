@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropMilestonesFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -318,7 +318,7 @@ object Commands {
         registerCommand(
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
-        ) { GardenCropMilestones.readDataFromClipboard() }
+        ) { GardenCropMilestonesFix.readDataFromClipboard() }
     }
 
     private fun internalCommands() {
