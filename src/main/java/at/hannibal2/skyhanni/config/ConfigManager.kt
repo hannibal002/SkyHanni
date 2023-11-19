@@ -10,6 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
@@ -93,7 +96,7 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): LorenzRarity {
-                    return LorenzRarity.valueOf(reader.nextString())
+                    return LorenzRarity.valueOf(reader.nextString().uppercase())
                 }
             }.nullSafe())
             .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
@@ -102,92 +105,41 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): IslandType {
-                    return IslandType.valueOf(reader.nextString())
+                    return IslandType.valueOf(reader.nextString().uppercase())
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
+
+        var configDirectory = File("config/skyhanni")
     }
 
-    lateinit var features: Features
-    lateinit var sackData: SackData
-        private set
+    val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
+    val sackData get() = jsonHolder[ConfigFileType.SACKS] as SackData
+    val friendsData get() = jsonHolder[ConfigFileType.FRIENDS] as FriendsJson
+    val knownFeaturesData get() = jsonHolder[ConfigFileType.KNOWN_FEATURES] as KnownFeaturesJson
+    val jacobContestData get() = jsonHolder[ConfigFileType.JACOB_CONTESTS] as JacobContestsJson
+
     private val logger = LorenzLogger("config_manager")
 
-    var configDirectory = File("config/skyhanni")
-    private var configFile: File? = null
-    private var sackFile: File? = null
+    private val jsonHolder = mutableMapOf<ConfigFileType, Any>()
+
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
 
     fun firstLoad() {
-        if (::features.isInitialized) {
+        if (jsonHolder.isNotEmpty()) {
             logger.log("Loading config despite config being already loaded?")
         }
-        configDirectory.mkdir()
+        configDirectory.mkdirs()
 
-        configFile = File(configDirectory, "config.json")
-        sackFile = File(configDirectory, "sacks.json")
 
-        logger.log("Trying to load config from $configFile")
-
-        if (configFile!!.exists()) {
-            try {
-                val inputStreamReader = InputStreamReader(FileInputStream(configFile!!), StandardCharsets.UTF_8)
-                val bufferedReader = BufferedReader(inputStreamReader)
-
-                logger.log("load-config-now")
-                val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
-                val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                features = gson.fromJson(
-                    newJsonObject,
-                    Features::class.java
-                )
-                logger.log("Loaded config from file")
-            } catch (error: Exception) {
-                error.printStackTrace()
-                val backupFile = configFile!!.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
-                logger.log("Exception while reading $configFile. Will load blank config and save backup to $backupFile")
-                logger.log("Exception was $error")
-                try {
-                    configFile!!.copyTo(backupFile)
-                } catch (e: Exception) {
-                    logger.log("Could not create backup for config file")
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        if (sackFile!!.exists()) {
-            try {
-                val inputStreamReader = InputStreamReader(FileInputStream(sackFile!!), StandardCharsets.UTF_8)
-                val bufferedReader = BufferedReader(inputStreamReader)
-
-                logger.log("load-sacks-now")
-                sackData = gson.fromJson(
-                    bufferedReader.readText(),
-                    SackData::class.java
-                )
-                logger.log("Loaded sacks from file")
-            } catch (error: Exception) {
-                error.printStackTrace()
-            }
-        }
-
-        if (!::features.isInitialized) {
-            logger.log("Creating blank config and saving to file")
-            features = Features()
-            saveConfig("blank config")
+        for (fileType in ConfigFileType.entries) {
+            jsonHolder[fileType] = firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance())
         }
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
-            saveConfig("auto-save-60s")
-        }
-
-        if (!::sackData.isInitialized) {
-            logger.log("Creating blank sack data and saving")
-            sackData = SackData()
-            saveSackData("blank config")
+            saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
         val features = SkyHanniMod.feature
@@ -201,18 +153,64 @@ class ConfigManager {
         )
     }
 
-    fun saveConfig(reason: String) {
+    private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
+        val fileName = fileType.fileName
+        logger.log("Trying to load $fileName from $file")
+        var output: Any = defaultValue
+
+        if (file!!.exists()) {
+            try {
+                val inputStreamReader = InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8)
+                val bufferedReader = BufferedReader(inputStreamReader)
+
+                logger.log("load-$fileName-now")
+
+                output = if (fileType == ConfigFileType.FEATURES) {
+                    val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
+                    val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
+                    gson.fromJson(newJsonObject, defaultValue.javaClass)
+                } else {
+                    gson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
+                }
+
+                logger.log("Loaded $fileName from file")
+            } catch (error: Exception) {
+                error.printStackTrace()
+                val backupFile = file.resolveSibling("$fileName-${System.currentTimeMillis()}-backup.json")
+                logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
+                logger.log("Exception was $error")
+                try {
+                    file.copyTo(backupFile)
+                } catch (e: Exception) {
+                    logger.log("Could not create backup for $fileName file")
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        if (output == defaultValue) {
+            logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
+        }
+
+        return output
+    }
+
+    fun saveConfig(fileType: ConfigFileType, reason: String) {
+        val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
+        saveFile(fileType.file, fileType.fileName, json, reason)
+    }
+
+    private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
         logger.log("saveConfig: $reason")
-        val file = configFile ?: throw Error("Can not save config, configFile is null!")
+        if (file == null) throw Error("Can not save $fileName, ${fileName}File is null!")
         try {
-            logger.log("Saving config file")
+            logger.log("Saving $fileName file")
             file.parentFile.mkdirs()
-            val unit = file.parentFile.resolve("config.json.write")
+            val unit = file.parentFile.resolve("$fileName.json.write")
             unit.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                // TODO remove old "hidden" area
-                writer.write(gson.toJson(SkyHanniMod.feature))
+                writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
             Files.move(
@@ -222,24 +220,7 @@ class ConfigManager {
                 StandardCopyOption.ATOMIC_MOVE
             )
         } catch (e: IOException) {
-            logger.log("Could not save config file to $file")
-            e.printStackTrace()
-        }
-    }
-
-    fun saveSackData(reason: String) {
-        if (disableSaving) return
-        logger.log("saveSackData: $reason")
-        val file = sackFile ?: throw Error("Can not save sacks, sackFile is null!")
-        try {
-            logger.log("Saving sack file")
-            file.parentFile.mkdirs()
-            file.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
-                writer.write(gson.toJson(SkyHanniMod.sackData))
-            }
-        } catch (e: IOException) {
-            logger.log("Could not save sacks file to $file")
+            logger.log("Could not save $fileName file to $file")
             e.printStackTrace()
         }
     }
@@ -247,4 +228,15 @@ class ConfigManager {
     fun disableSaving() {
         disableSaving = true
     }
+}
+
+enum class ConfigFileType(val fileName: String, val clazz: Class<*>) {
+    FEATURES("config", Features::class.java),
+    SACKS("sacks", SackData::class.java),
+    FRIENDS("friends", FriendsJson::class.java),
+    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java),
+    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java),
+    ;
+
+    val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
 }

@@ -1,5 +1,58 @@
 # SkyHanni - Change Log
 
+## Version 0.21.1 (unreleased)
+
+
+### New Features
+
++ Organised the config into sub categories. - nea & walker
+
+### Changes
+
+#### Other Changes
+
++ Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
++ Add option to hide the chat message when toggling /shmouselock. - hannibal2
+
+#### Garden Changes
+
++ Added mythic/Maeve visitor support. - walker & hannibal2
++ Added option to use custom Blocks per Second value in some Garden GUIs instead of the real one. - hannibal2
++ Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed new visitor alerts triggering wrongly and constantly. - Cad
++ Fixed visitor timer. - hannibal2
++ Fixed wrong Fungi Cutter mode warning not working. - walker
++ Fixed Maximum FF Needed display not showing in Jacob NPC menu. - hannibal2
++ Fixed calendar contest detection failing. - hannibal2
++ Fixed plot borders flickering and consistency errors when pressing the keybind - hannibal2
++ Fixed wrong ff needed values in Time Needed for Gold Medal GUI. - hannibal2
++ Fixed Farming Contest Medal Icons in Inventory not showing. - hannibal2
++ Fixed /ff not detecting collection analyst fortune. - hannibal2
++ Fixed Mushroom Cow Perk display not working. - hannibal2
+
+#### Other Fixes
+
++ Fixed showing "slayer boss spawn soon" message outside the correct slayer area. - hannibal2
++ Fixed blocking clicks on bazaar with player name "wiki". - hannibal2
++ Fixed highlighting some mobs in the dungeon wrongly as area mini bosses. - hannibal2
++ Fixed opening the Pet menu no longer updating the current pet display. - hannibal2
++ Fixed Archfiend Dice and High Class Archfiend Dice counting as slayer drops when rolled. - hannibal2
++ Fixed dice roll profit counting as Mob Kill Coins in  Slayer Tracker. - hannibal2
+
+### Technical Details
+
++ Updated to a newer version of MoulConfig. - nea & walker
+    + This includes support for the new sub category part in the config.
++ Added TimeUtils.getDuration and deprecated TimeUtils.getMillis. - hannibal2
++ Created PetAPI and deprecated String.matchRegex(). - hannibal2
++ Extracted sacks, friends, known features and Jacob contests in to their separate files. - CalMWolfs
++ Add log clearing. - CalMWolfs
+
 ## Version 0.21
 
 ### New Features

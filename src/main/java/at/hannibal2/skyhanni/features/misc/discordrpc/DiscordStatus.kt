@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -289,7 +289,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     PETS({
-        ProfileStorageData.profileSpecific?.currentPet?.let {
+        PetAPI.currentPet?.let {
             val colorCode = it.substring(1..2).first()
             val petName = it.substring(2)
             val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"

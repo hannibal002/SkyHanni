@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -56,8 +57,7 @@ class AnitaMedalProfit {
             try {
                 readItem(item, table)
             } catch (e: Throwable) {
-                LorenzUtils.error("Error in AnitaMedalProfit while reading item '$item'")
-                e.printStackTrace()
+                ErrorManager.logError(e, "Error in AnitaMedalProfit while reading item '$item'")
             }
         }
 
@@ -99,7 +99,7 @@ class AnitaMedalProfit {
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)
             if (pair == null) {
-                LorenzUtils.error("§c[SkyHanni] Could not read item '$rawItemName'")
+                LorenzUtils.error("Could not read item '$rawItemName'")
                 continue
             }
 
@@ -109,8 +109,7 @@ class AnitaMedalProfit {
                 val bronze = medal.factorBronze * amount
                 bronze * jacobTicketPrice
             } else {
-                val internalName = NEUItems.getRawInternalName(name)
-                NEUItems.getPrice(internalName) * amount
+                NEUInternalName.fromItemName(name).getPrice() * amount
             }
         }
         return otherItemsPrice

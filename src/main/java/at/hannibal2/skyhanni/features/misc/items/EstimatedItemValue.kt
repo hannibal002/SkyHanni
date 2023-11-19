@@ -51,7 +51,7 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
