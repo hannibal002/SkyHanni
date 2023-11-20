@@ -217,8 +217,8 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Lower Mouse Sensitivity Divisor", desc = "Applies a Divisor to your current sensitivity")
-    @ConfigEditorSlider(minValue = 0, maxValue = 250, minStep = 1)
-    public int divisorSens = 5;
+    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    public int divisorSens = 25;
 
     @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
