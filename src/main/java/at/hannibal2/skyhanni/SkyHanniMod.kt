@@ -676,6 +676,7 @@ class SkyHanniMod {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
+                Minecraft.getMinecraft().thePlayer.closeScreen()
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
                 screenTicks = 0
                 screenToOpen = null

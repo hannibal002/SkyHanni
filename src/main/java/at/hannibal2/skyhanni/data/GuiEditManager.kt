@@ -41,7 +41,6 @@ class GuiEditManager {
         if (NEUItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
-        Minecraft.getMinecraft().thePlayer.closeScreen()
         openGuiPositionEditor(hotkeyReminder = false)
     }
 
