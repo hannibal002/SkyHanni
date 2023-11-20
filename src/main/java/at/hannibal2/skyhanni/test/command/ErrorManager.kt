@@ -40,23 +40,37 @@ object ErrorManager {
         } else {
             errorMessages[id]
         }
-        val name = if (fullErrorMessage) "Ful error" else "Error"
-        LorenzUtils.userError(errorMessage?.let {
+        val name = if (fullErrorMessage) "Full error" else "Error"
+        LorenzUtils.chat(errorMessage?.let {
             OSUtils.copyToClipboard(it)
             "$name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "Error id not found!")
     }
 
+    @Deprecated("Use data as well", ReplaceWith("logErrorStateWithData()"))
     fun logErrorState(userMessage: String, internalMessage: String) {
-        logError(IllegalStateException(internalMessage), userMessage)
+        logError(IllegalStateException(internalMessage), userMessage, false)
     }
 
-    // we love java
+    fun logErrorStateWithData(userMessage: String, internalMessage: String, vararg extraData: Pair<String, Any?>) {
+        logError(IllegalStateException(internalMessage), userMessage, false, *extraData)
+    }
+
+    @Deprecated("Use data as well", ReplaceWith("logErrorWithData()"))
     fun logError(throwable: Throwable, message: String) {
         logError(throwable, message, false)
     }
 
-    fun logError(throwable: Throwable, message: String, ignoreErrorCache: Boolean) {
+    fun logErrorWithData(throwable: Throwable, message: String, vararg extraData: Pair<String, Any?>) {
+        logError(throwable, message, false, *extraData)
+    }
+
+    fun logError(
+        throwable: Throwable,
+        message: String,
+        ignoreErrorCache: Boolean,
+        vararg extraData: Pair<String, Any?>
+    ) {
         val error = Error(message, throwable)
         error.printStackTrace()
         Minecraft.getMinecraft().thePlayer ?: return
@@ -73,16 +87,40 @@ object ErrorManager {
         val stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
         val randomId = UUID.randomUUID().toString()
 
+        val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()
-        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n```"
+        errorMessages[randomId] =
+            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
-            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n```"
+            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         LorenzUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
             "shcopyerror $randomId",
             false
         )
+    }
+
+    private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
+        val extraDataString = if (extraData.isNotEmpty()) {
+            val builder = StringBuilder()
+            for ((key, value) in extraData) {
+                builder.append(key)
+                builder.append(": ")
+                if (value is Iterable<*>) {
+                    builder.append("\n")
+                    for (line in value) {
+                        builder.append(" - '$line'")
+                        builder.append("\n")
+                    }
+                } else {
+                    builder.append("'$value'")
+                }
+                builder.append("\n")
+            }
+            "\nExtra data:\n$builder"
+        } else ""
+        return extraDataString
     }
 }
 
@@ -140,7 +178,7 @@ private fun String.removeSpam(): String {
         "at net.minecraft.client.Minecraft.addScheduledTask(",
         "at java.lang.reflect.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$",
-        "CopyErrorCommand.logErrorState(CopyErrorCommand.kt:46)",
+        ".ErrorManager.logErrorState(ErrorManager.kt:51)",
         "LorenzEvent.postWithoutCatch(LorenzEvent.kt:24)",
         "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
         "at net.minecraft.launchwrapper.",

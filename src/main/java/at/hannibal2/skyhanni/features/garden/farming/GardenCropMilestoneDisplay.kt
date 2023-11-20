@@ -101,6 +101,8 @@ object GardenCropMilestoneDisplay {
                 val addedCounter = (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
+                // Farming Simulator: There is a 25% chance for Mathematical Hoes and the Cultivating Enchantment to count twice.
+                // 0.8 = 1 / 1.25
                 crop.setCounter(
                     crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {
                         (addedCounter.toDouble() * 0.8).toInt()

@@ -92,7 +92,7 @@ class GardenVisitorTimer {
                 queueFull = true
                 continue
             }
-            if (line == "§b§lVisitors: §r§cNot Unlocked!") {
+            if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
                 render = ""
                 return
             }
