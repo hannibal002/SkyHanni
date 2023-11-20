@@ -385,17 +385,17 @@ class FarmingWeightDisplay {
             if (diff == 0) return
 
             if (diff > 0) {
-                chatOffScreenChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
+                showLbChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
             } else {
-                chatOffScreenChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
+                showLbChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
             }
         }
 
-        private fun chatOffScreenChange(direction: String, oldPosition: Int) {
+        private fun showLbChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
                 "§7Since your last visit to the §aGarden§7, " +
-                    "you have $direction §7on the §dFarming Leaderboard§7. " +
-                    "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                        "you have $direction §7on the §dFarming Leaderboard§7. " +
+                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
         }
 
@@ -472,8 +472,8 @@ class FarmingWeightDisplay {
             apiError = true
             LorenzUtils.error(
                 "Loading the farming weight data from elitebot.dev failed!\n"
-                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                    "§cIf this message repeats, please report it on Discord!",
+                        + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                        "§cIf this message repeats, please report it on Discord!",
             )
         }
 
