@@ -19,9 +19,13 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 class GuiEditManager {
+
+    var lastHotkeyPressed = SimpleTimeMark.farPast()
+
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -33,7 +37,9 @@ class GuiEditManager {
             if (it is GuiEditSign && !it.isRancherSign()) return
         }
 
+        if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
         if (NEUItems.neuHasFocus()) return
+        lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)
     }
@@ -71,8 +77,8 @@ class GuiEditManager {
                 lastHotkeyReminded = SimpleTimeMark.now()
                 LorenzUtils.chat(
                     "§eTo edit hidden GUI elements:\n" +
-                        " §7- §e1. Set a key in /sh edit.\n" +
-                        " §7- §e2. Click that key while the GUI element is visible."
+                            " §7- §e1. Set a key in /sh edit.\n" +
+                            " §7- §e2. Click that key while the GUI element is visible."
                 )
             }
         }

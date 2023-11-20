@@ -14,6 +14,7 @@
 
 ### Changes
 
+
 #### Garden Changes
 
 + Added mythic/Maeve visitor support. - walker & hannibal2
@@ -21,11 +22,16 @@
 + Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
 + Added support for Sunder 6 in /ff upgrades. - hannibal2
 + Added support for mythic in Visitor Drop Statistics. - hannibal2
++ Use the crop fortune from tab in Farming Fortune HUD. - alexia
++ Shows the last saved ff value in gray while switching tools instead of the question mark. - hannibal2
++ Removed chat message that your crop milestone data is correct. - hannibal2
 
 #### Other Changes
 
 + Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
 + Add option to hide the chat message when toggling /shmouselock. - hannibal2
++ Reminds to use the GUI Position Editor hotkey. - hannibal2
+    + Reminds every 30 minutes after using /sh gui or clicking the GUI edit button.
 
 ### Fixes
 
@@ -42,6 +48,10 @@
 + Fixed /ff not detecting collection analyst fortune. - hannibal2
 + Fixed Mushroom Cow Perk display not working. - hannibal2
 + Fixed visitor timer error if the visitors aren't unlocked yet. - hannibal2
++ Fixed farming weight no longer updating on block breaking. - hannibal2
++ Added cooldown to prevent spam clicking on farming weight buttons to open many web pages. - hannibal2
++ Fixed clickable farming weight GUI no longer opens #1000 in lb website. - hannibal2
++ Fixed /ff upgrade suggests updating bustling reforge even when no farming armor is found. - hannibal2
 
 #### Other Fixes
 
@@ -53,6 +63,7 @@
 + Fixed dice roll profit counting as Mob Kill Coins in Slayer Tracker. - hannibal2
 + Fixed Sack Display sometimes not formatting a million correctly. - Hize
 + Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
++ Fixed a bug with the ender chest and SkyHanni GUI editor. - hannibal2
 
 ### Technical Details
 

@@ -254,8 +254,9 @@ class FarmingWeightDisplay {
                 listOf("§eClick here to load new data right now!"),
                 onClick = recalculate
             )
+            val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
             var nextName =
-                if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
+                if (showRankGoal) "#$rankGoal" else nextPlayer.name
 
             val totalWeight = (localWeight + weight)
             var weightUntilOvertake = nextPlayer.weight - totalWeight
@@ -298,11 +299,16 @@ class FarmingWeightDisplay {
             } else ""
 
             val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
-            return Renderable.clickAndHover(
-                "§e$weightFormat$timeFormat §7behind §b$nextName",
-                listOf("§eClick to open the Farming Profile of §b$nextName.")
-            ) {
-                openWebsite(nextName)
+            val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
+            return if (showRankGoal) {
+                Renderable.string(text)
+            } else {
+                Renderable.clickAndHover(
+                    text,
+                    listOf("§eClick to open the Farming Profile of §b$nextName.")
+                ) {
+                    openWebsite(nextName)
+                }
             }
         }
 
@@ -385,17 +391,17 @@ class FarmingWeightDisplay {
             if (diff == 0) return
 
             if (diff > 0) {
-                chatOffScreenChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
+                showLbChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
             } else {
-                chatOffScreenChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
+                showLbChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
             }
         }
 
-        private fun chatOffScreenChange(direction: String, oldPosition: Int) {
+        private fun showLbChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
                 "§7Since your last visit to the §aGarden§7, " +
-                    "you have $direction §7on the §dFarming Leaderboard§7. " +
-                    "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                        "you have $direction §7on the §dFarming Leaderboard§7. " +
+                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
         }
 
@@ -472,8 +478,8 @@ class FarmingWeightDisplay {
             apiError = true
             LorenzUtils.error(
                 "Loading the farming weight data from elitebot.dev failed!\n"
-                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                    "§cIf this message repeats, please report it on Discord!",
+                        + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                        "§cIf this message repeats, please report it on Discord!",
             )
         }
 
