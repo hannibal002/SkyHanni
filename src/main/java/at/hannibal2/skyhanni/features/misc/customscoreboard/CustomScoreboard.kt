@@ -2,8 +2,6 @@
 // Requested by alpaka8123 (https://discord.com/channels/997079228510117908/1162844830360146080)
 // Done by J10a1n15, with lots of help from hanni, and snippets from item tracker features <3
 //
-// I'm also like really sorry for anyone who has to look at this code, it looks kinda bad
-//
 
 //
 // TODO LIST

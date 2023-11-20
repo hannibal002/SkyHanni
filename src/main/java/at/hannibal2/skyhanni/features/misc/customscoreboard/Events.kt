@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
+import net.minecraft.scoreboard.Score
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
@@ -74,9 +75,44 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             IslandType.CATACOMBS.isInIsland() || inDungeons
         }
     ),
-    KUUDRA( // not tested
+    KUUDRA( // I really need more kuudra scoreboard data, I dont play kuudra
         {
-            listOf("§cKuudra Event")
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Auto-closing in:") }) {
+                ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Auto-closing in:") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Starting in:") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Starting in:") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Instance ShutdowIn:") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Instance ShutdowIn:") }
+                    .replace("Instance ShutdowIn:", "Instance Shutdown In:") // for some reason this is broken
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Elapsed: ") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Time Elapsed: ") }
+            }
+            list += ""
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§f§lWave: §c§l")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§f§lWave: §c§l") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§fTokens: ")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§fTokens: ") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Submerges In: §e")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Submerges In: §e") }
+            }
+            list += ""
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§fObjective:"}){
+                list += "§fObjective:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§fObjective:") ?: "§cNo Objective"
+            }
+
+            if (list.size == 0) when (config.hideEmptyLines) {
+                true -> listOf("<hidden>")
+                false -> listOf("§cNo Kuudra Data")
+            } else list
         },
         {
             IslandType.KUUDRA_ARENA.isInIsland()
