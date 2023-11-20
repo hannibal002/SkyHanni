@@ -25,7 +25,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             false
         }
     ),
-    DUNGEONS( // not tested
+    SERVER_CLOSE(
+        {
+            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§cServer closing: ") })
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cServer closing: ") }
+        }
+    ),
+    DUNGEONS(
         {
             val list = mutableListOf<String>()
 
@@ -149,7 +157,32 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     WINTER( // not tested
         {
-            listOf("§bWinter Event")
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("North Stars: §d")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("North Stars: §d") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event Start: §a")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Event Start: §a") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Next Wave: §a")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Next Wave: §a") }
+            }
+            list += ""
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cWave ")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§cWave ") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left§c")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Magma Cubes Left§c") }
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Damag §c")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Total Damag §c") }.replace("Damag", "Damage")
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage§c")}){
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Cube Damage§c") }
+            }
+
+            list
         },
         {
             IslandType.WINTER.isInIsland()
@@ -164,7 +197,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6Spooky Festival§f") }
         }
     ),
-    MARINA( // not tested
+    MARINA( // not tested, should work
         {
             listOf(
                 "§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")
