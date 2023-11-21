@@ -142,6 +142,21 @@ object SkyBlockItemModifierUtils {
         list.toList()
     }
 
+    fun ItemStack.getFruitBowlNames() = getExtraAttributes()?.let {
+        val list = mutableListOf<String>()
+        for (attributes in it.keySet) {
+            if (attributes == "names_found") {
+                val tagList = it.getTagList(attributes, 8)
+                for (i in 0..21) {
+                    val text = tagList.get(i).toString()
+                    if (text == "END") break
+                    list.add(text.replace("\"", ""))
+                }
+            }
+        }
+        list
+    }
+
     fun ItemStack.getAttributes() = getExtraAttributes()
         ?.takeIf { it.hasKey("attributes", 10) }
         ?.getCompoundTag("attributes")
