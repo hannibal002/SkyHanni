@@ -51,8 +51,6 @@ object GardenCropMilestonesCommunityFix {
         for ((_, stack) in inventoryItems) {
             val crop = GardenCropMilestones.getCropTypeByLore(stack) ?: continue
             checkForWrongData(stack, crop, data)
-
-            CropMilestoneUpdateEvent().postAndCatch()
         }
 
         if (data.isNotEmpty()) {
