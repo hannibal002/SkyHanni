@@ -5,9 +5,6 @@
 
 //
 // TODO LIST
-// V1 RELEASE
-//  - the things that arent done yet (EVENTS SOON)
-//
 // V2 RELEASE
 //  - icons maybe
 //  - Soulflow API
