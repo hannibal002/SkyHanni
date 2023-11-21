@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -49,7 +52,7 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
@@ -58,21 +61,24 @@ object EstimatedItemValue {
         if (!config.enabled) return
 
         if (Minecraft.getMinecraft().currentScreen is GuiProfileViewer) {
-            updateItem(event.itemStack)
-            if (!blockNextFrame && renderedItems < 2) {
-                tryRendering()
+            if (renderedItems == 0) {
+                updateItem(event.itemStack)
             }
+            tryRendering()
             renderedItems++
         }
     }
 
-    // Workaround for NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering over the border between two items.
+    /**
+     * Workaround for NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering
+     * over the border between two items.
+     * Also fixes complications with ChatTriggers where they call the stack.getToolTips() method that causes the
+     * ItemTooltipEvent to getting triggered multiple times per frame.
+     */
     private var renderedItems = 0
-    private var blockNextFrame = false
 
     @SubscribeEvent
     fun onRenderOverlayGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        blockNextFrame = renderedItems > 1
         renderedItems = 0
     }
 
@@ -126,6 +132,17 @@ object EstimatedItemValue {
             lastToolTipTime = System.currentTimeMillis()
             return
         }
+
+        if (InventoryUtils.openInventoryName().startsWith("Museum ")) {
+            if (item.getLore().any { it.contains("Armor Set") }) {
+                return
+            }
+        }
+
+        // Stats Breakdown
+        val name = item.name ?: return
+        if (name == "§6☘ Category: Item Ability (Passive)") return
+        if (name.contains("Salesperson")) return
 
         val newDisplay = try {
             draw(item)

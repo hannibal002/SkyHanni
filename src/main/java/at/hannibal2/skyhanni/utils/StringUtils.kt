@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -71,6 +72,7 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
+    @Deprecated("Do not create a regex pattern each time.", ReplaceWith("toPattern()"))
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     private fun String.removeAtBeginning(text: String): String =
@@ -87,6 +89,15 @@ object StringUtils {
         } else {
             split[0].removeColor()
         }
+    }
+
+    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
+        for (pattern in iterator()) {
+            pattern.matchMatcher<T>(text) {
+                return consumer()
+            }
+        }
+        return null
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
@@ -138,7 +149,7 @@ object StringUtils {
     }
 
     fun optionalPlural(number: Int, singular: String, plural: String) =
-        "$number " + if (number == 1) singular else plural
+        "${number.addSeparators()} " + if (number == 1) singular else plural
 
     fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'

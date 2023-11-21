@@ -65,7 +65,7 @@ object ItemUtils {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
             return list
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -75,7 +75,7 @@ object ItemUtils {
         }
 
         if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-                list.add(player.inventory.itemStack)
+            list.add(player.inventory.itemStack)
         }
         return list
     }
@@ -84,7 +84,7 @@ object ItemUtils {
         val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
             return map
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -220,9 +220,13 @@ object ItemUtils {
         val rarity = LorenzRarity.readItemRarity(this)
         data.itemRarity = rarity
         if (rarity == null && logError) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not read rarity for item $name",
-                "getItemRarityOrNull not found for: $internalName, name:'$name''"
+                "Failed to read rarity from item rarity via item lore",
+                "internal name" to internalName,
+                "item name" to name,
+                "inventory name" to InventoryUtils.openInventoryName(),
+                "lore" to getLore(),
             )
         }
         return rarity
@@ -302,15 +306,18 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
-
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
-                "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
+                "Failed to read rarity from pet item via internal name",
+                "internal name" to pet.getInternalName(),
+                "item name" to name,
+                "rarity id" to rarityId,
+                "inventory name" to InventoryUtils.openInventoryName()
             )
         }
         return rarity

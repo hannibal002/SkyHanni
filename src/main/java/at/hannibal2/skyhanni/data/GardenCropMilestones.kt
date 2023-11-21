@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import net.minecraft.item.ItemStack
@@ -14,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenCropMilestones {
     // TODO USE SH-REPO
     private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
-    private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
+    val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         for (line in itemStack.getLore()) {
@@ -34,15 +35,16 @@ object GardenCropMilestones {
             val crop = getCropTypeByLore(stack) ?: continue
             for (line in stack.getLore()) {
                 totalPattern.matchMatcher(line) {
-                    val amount = group("name").replace(",", "").toLong()
+                    val amount = group("name").formatNumber()
                     crop.setCounter(amount)
                 }
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
+        GardenCropMilestonesFix.openInventory(event.inventoryItems)
     }
 
-    private var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
+    var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
     val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
 
@@ -54,6 +56,7 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
+        // TODO change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }

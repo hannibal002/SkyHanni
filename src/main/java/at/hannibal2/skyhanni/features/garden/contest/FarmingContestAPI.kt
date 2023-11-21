@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -120,12 +121,15 @@ object FarmingContestAPI {
             cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
         } ?: error("Crop not found in lore!")
 
-        val brackets = ContestBracket.entries.associateWith { bracket ->
-            lore.firstNotNullOfOrNull {
-                bracket.pattern.matchMatcher(it) {
-                    group("amount").replace(",", "").toInt()
-                }
-            } ?: error("Farming contest bracket not found in lore!")
+        val brackets = buildMap {
+            for (bracket in ContestBracket.entries) {
+                val amount = lore.firstNotNullOfOrNull {
+                    bracket.pattern.matchMatcher(it) {
+                        group("amount").replace(",", "").toInt()
+                    }
+                } ?: continue
+                put(bracket, amount)
+            }
         }
 
         return FarmingContest(time, crop, brackets)
@@ -137,15 +141,18 @@ object FarmingContestAPI {
 
     fun calculateAverages(crop: CropType): Pair<Int, Map<ContestBracket, Int>> {
         var amount = 0
-        val map = mutableMapOf<ContestBracket, Int>()
+        val crops = mutableMapOf<ContestBracket, Int>()
+        val contests = mutableMapOf<ContestBracket, Int>()
         for (contest in getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
             amount++
-            for ((bracket, count) in contest.brackets) {
-                val old = map.getOrDefault(bracket, 0)
-                map[bracket] = count + old
+            val brackets = contest.brackets
+            for ((bracket, count) in brackets) {
+                val old = crops.getOrDefault(bracket, 0)
+                crops[bracket] = count + old
+                contests.addOrPut(bracket, 1)
             }
             if (amount == 10) break
         }
-        return Pair(amount, map.mapValues { (_, counter) -> counter / amount })
+        return Pair(amount, crops.mapValues { (bracket, counter) -> counter / contests[bracket]!! })
     }
 }

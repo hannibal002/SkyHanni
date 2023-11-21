@@ -45,7 +45,7 @@ object CropMoneyDisplay {
 
     fun toggleShowCalculation() {
         showCalculation = !showCalculation
-        LorenzUtils.chat("§e[SkyHanni] Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
+        LorenzUtils.chat("Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
         update()
     }
 
@@ -155,7 +155,7 @@ object CropMoneyDisplay {
 
             if (config.armor) {
                 val amountPerHour =
-                    it.multiplier * GardenCropSpeed.getRecentBPS() * FarmingArmorDrops.getDropsPerHour(it)
+                    it.multiplier * GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
                 extraArmorCoins = amountPerHour * it.specialDropType.asInternalName().getNpcPrice()
             }
         }

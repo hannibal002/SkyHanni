@@ -2,26 +2,26 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
-import at.hannibal2.skyhanni.config.features.BazaarConfig;
-import at.hannibal2.skyhanni.config.features.ChatConfig;
-import at.hannibal2.skyhanni.config.features.ChromaConfig;
-import at.hannibal2.skyhanni.config.features.CombatConfig;
-import at.hannibal2.skyhanni.config.features.CommandsConfig;
-import at.hannibal2.skyhanni.config.features.CrimsonIsleConfig;
-import at.hannibal2.skyhanni.config.features.DevConfig;
-import at.hannibal2.skyhanni.config.features.DungeonConfig;
-import at.hannibal2.skyhanni.config.features.EventConfig;
-import at.hannibal2.skyhanni.config.features.FishingConfig;
-import at.hannibal2.skyhanni.config.features.GUIConfig;
-import at.hannibal2.skyhanni.config.features.GardenConfig;
-import at.hannibal2.skyhanni.config.features.InventoryConfig;
-import at.hannibal2.skyhanni.config.features.ItemAbilityConfig;
-import at.hannibal2.skyhanni.config.features.MarkedPlayerConfig;
-import at.hannibal2.skyhanni.config.features.MiningConfig;
-import at.hannibal2.skyhanni.config.features.MinionsConfig;
-import at.hannibal2.skyhanni.config.features.MiscConfig;
-import at.hannibal2.skyhanni.config.features.RiftConfig;
-import at.hannibal2.skyhanni.config.features.SlayerConfig;
+import at.hannibal2.skyhanni.config.features.bazaar.BazaarConfig;
+import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
+import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
+import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
+import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
+import at.hannibal2.skyhanni.config.features.dev.DevConfig;
+import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig;
+import at.hannibal2.skyhanni.config.features.event.EventConfig;
+import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
+import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
+import at.hannibal2.skyhanni.config.features.garden.GardenConfig;
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig;
+import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
+import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
+import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
+import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
+import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
+import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
+import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -51,7 +51,7 @@ public class Features extends Config {
 
     @Override
     public void saveNow() {
-        SkyHanniMod.configManager.saveConfig("close-gui");
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui");
     }
 
     @Override
@@ -153,6 +153,6 @@ public class Features extends Config {
     public Storage storage = new Storage();
 
     @Expose
-    public int lastVersion = ConfigUpdaterMigrator.INSTANCE.getConfigVersion();
+    public int lastVersion = ConfigUpdaterMigrator.CONFIG_VERSION;
 
 }

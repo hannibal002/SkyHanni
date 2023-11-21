@@ -26,6 +26,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
 
+    fun ItemStack.getBookwormBookCount() = getAttributeInt("bookworm_books")
+
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
@@ -116,6 +118,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getHelmetSkin() = getAttributeString("skin")?.asInternalName()
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
+
+    fun ItemStack.getFungiCutterMode() = getAttributeString("fungi_cutter_mode")
 
     fun ItemStack.getRune(): NEUInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
