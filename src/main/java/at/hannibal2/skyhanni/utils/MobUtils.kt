@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.MobData
-import at.hannibal2.skyhanni.data.skyblockentities.SkyblockMob
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import net.minecraft.entity.Entity
@@ -52,7 +51,7 @@ object MobUtils {
     fun rayTraceForSkyblockMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
         rayTraceForSkyblockMobs(entity, partialTicks, offset)?.first()
 
-    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<SkyblockMob>? {
+    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<MobData.Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntitys = MobData.currentSkyblockMobsMap.filterKeys {

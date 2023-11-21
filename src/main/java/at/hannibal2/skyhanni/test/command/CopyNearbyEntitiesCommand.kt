@@ -4,11 +4,6 @@ import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.data.skyblockentities.DungeonMob
-import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBasicMob
-import at.hannibal2.skyhanni.data.skyblockentities.SkyblockBossMob
-import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSlayerBoss
-import at.hannibal2.skyhanni.data.skyblockentities.SkyblockSpecialMob
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
@@ -182,25 +177,19 @@ object CopyNearbyEntitiesCommand {
     }
 
     private fun getType(entity: Entity) = buildString {
+        if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
+        if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
+        if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
+        if (MobData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
-            val mob = MobData.currentSkyblockMobs.firstOrNull() { it == entity }
-            if (mob != null) when (mob) {
-                is SkyblockSlayerBoss -> append("Slayer")
-                is SkyblockBossMob -> append("Boss")
-                is SkyblockBasicMob -> append("Basic")
-                is DungeonMob -> append("Dungeon")
-                is SkyblockSpecialMob -> append("Special")
-            } else append("None")
+            val mob = MobData.currentSkyblockMobsMap[entity]
+            append(mob?.mobType?.name ?: "None")
             if (mob?.baseEntity == entity) append("/Base")
             append(")\"")
             append(mob?.name ?: "")
             append("\", ")
         }
-        if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
-        if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
-        if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
-        if (MobData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
 
         if (isNotEmpty()) {
             delete(length - 2, length) // Remove the last ", "
