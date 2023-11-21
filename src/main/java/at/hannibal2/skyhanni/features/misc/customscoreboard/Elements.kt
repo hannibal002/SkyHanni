@@ -147,7 +147,7 @@ enum class Elements(
     ),
     SKYBLOCK_TIME(
         {
-            listOf(SkyBlockTime.now().formatted(false))
+            listOf(SkyBlockTime.now().formatted(yearElement = false,  hoursAndMinutesElement = false))
         },
         listOf(),
         0,

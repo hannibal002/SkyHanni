@@ -42,7 +42,7 @@ public class CustomScoreboardConfig {
             "Heat: §c♨ 0",
             "",
             "§7⏣ §bVillage",
-            "Late Summer 11th, Year 311",
+            "Late Summer 11th",
             "§8m77CK",
             "Power: Sighted",
             "",
