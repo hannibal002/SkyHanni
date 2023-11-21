@@ -88,7 +88,7 @@ class CustomScoreboard {
                 line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
                 line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
                 extractLobbyCode(line) is String -> lobbyCode =
-                    extractLobbyCode(line)!!.substring(1) //removes first char (number of color code)
+                    extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
                 line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
                 line.startsWith("Bits: §b") -> bits = line.removePrefix("Bits: §b")
                 line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
