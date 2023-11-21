@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -16,16 +16,34 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object GardenCropMilestonesFix {
+object GardenCropMilestonesCommunityFix {
     private val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
+    private var showWrongData = false
+    private var showWhenAllCorrect = false
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden")
+        val map = data.crop_milestone_community_help ?: return
+        for ((key, value) in map) {
+            if (key == "show_wrong_data") {
+                showWrongData = value
+            }
+            if (key == "show_when_all_correct") {
+                showWhenAllCorrect = value
+            }
+        }
+    }
 
     fun openInventory(inventoryItems: Map<Int, ItemStack>) {
-        if (SkyHanniMod.feature.garden.copyMilestoneData) {
-            fixForWrongData(inventoryItems)
-        }
+        if (!showWrongData) return
+        if (!SkyHanniMod.feature.garden.copyMilestoneData) return
+        fixForWrongData(inventoryItems)
     }
 
     private fun fixForWrongData(inventoryItems: Map<Int, ItemStack>) {
@@ -44,8 +62,10 @@ object GardenCropMilestonesFix {
                     "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e."
             )
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
-//         } else {
-//             LorenzUtils.chat("No wrong crop milestone steps found!")
+        } else {
+            if (showWhenAllCorrect) {
+                LorenzUtils.chat("No wrong crop milestone steps found!")
+            }
         }
     }
 
