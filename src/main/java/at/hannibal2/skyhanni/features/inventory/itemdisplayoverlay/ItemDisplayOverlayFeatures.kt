@@ -271,12 +271,10 @@ class ItemDisplayOverlayFeatures {
             var killCount = 0
             val currentKillThresholdPerMobFamily = 100 //change this in case hypixel increases the kill count to max a crux accessory
             for (line in lore) {
-                if (line.endsWith("kills")) {
+                ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+) (§.)?kills.*").toPattern()).matchMatcher(line) {
+                    val mobSpecificKillCount = group("useful").toIntOrNull() ?: 0
+                    killCount += mobSpecificKillCount
                     numberOfLines++
-                    xOutOfYNoColorRequiredPattern.matchMatcher(line) {
-                        val mobSpecificKillCount = group("useful").toIntOrNull() ?: 0
-                        killCount += mobSpecificKillCount
-                    }
                 }
                 val totalKillsNecessary = currentKillThresholdPerMobFamily * numberOfLines
                 val percent = (((killCount.toFloat()) / (totalKillsNecessary.toFloat())) * 100) //keep this line here for easier debugging
