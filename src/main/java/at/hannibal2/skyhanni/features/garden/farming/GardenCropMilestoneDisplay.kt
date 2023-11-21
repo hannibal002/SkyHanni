@@ -165,7 +165,7 @@ object GardenCropMilestoneDisplay {
             Collections.singletonList("§e$haveFormat§8/§e$needFormat")
         }
 
-        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
+        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
         val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
 
