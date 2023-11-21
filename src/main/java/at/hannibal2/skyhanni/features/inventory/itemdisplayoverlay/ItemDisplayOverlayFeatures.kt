@@ -266,6 +266,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.CRUX) && internalName.startsWith("CRUX_")) {
+            //  §21 §2Shy§7: §e14§7/§a25 §7kills
             val lore = item.getLore()
             var numberOfLines = 0 //"zoMG ERY WHY NOT JUST REPLACE "CRUX_TALISMAN"?!?!?" yeah i considered that too but then realized hypixel might change that one day
             var killCount = 0
