@@ -72,6 +72,7 @@ class FarmingFortuneDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
+        if (GardenAPI.cropInHand == null) return
         config.pos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
@@ -266,9 +267,7 @@ class FarmingFortuneDisplay {
             }
         }
 
-        fun getCurrentFarmingFortune(): Double {
-            return tabFortuneUniversal + tabFortuneCrop
-        }
+        fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
     }
