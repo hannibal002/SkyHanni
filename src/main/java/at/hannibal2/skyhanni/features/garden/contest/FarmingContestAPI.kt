@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -26,7 +27,7 @@ object FarmingContestAPI {
     var inContest = false
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
-    private val sidebarCropPattern = "§e○ §f(?<crop>.*) §a.*".toPattern()
+    private val sidebarCropPattern = "(?:§e○|§6☘) §f(?<crop>.*) §a.*".toPattern()
 
     var inInventory = false
 
@@ -69,17 +70,9 @@ object FarmingContestAPI {
     }
 
     private fun readCurrentCrop(): CropType? {
-        var next = false
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (line == "§eJacob's Contest") {
-                next = true
-                continue
-            }
-            if (next) {
-                sidebarCropPattern.matchMatcher(line) {
-                    return CropType.getByName(group("crop"))
-                }
-            }
+        val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
+        sidebarCropPattern.matchMatcher(line) {
+            return CropType.getByName(group("crop"))
         }
 
         return null
