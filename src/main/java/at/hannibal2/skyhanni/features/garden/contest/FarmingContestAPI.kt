@@ -71,11 +71,9 @@ object FarmingContestAPI {
 
     private fun readCurrentCrop(): CropType? {
         val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
-        sidebarCropPattern.matchMatcher(line) {
-            return CropType.getByName(group("crop"))
+        return sidebarCropPattern.matchMatcher(line) {
+            CropType.getByName(group("crop"))
         }
-
-        return null
     }
 
     @SubscribeEvent
