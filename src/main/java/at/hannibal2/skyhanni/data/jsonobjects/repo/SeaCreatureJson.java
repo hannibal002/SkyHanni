@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class SeaCreatureJson {
 
-    public static Type TYPE = new TypeToken<Map<String, SeaCreatureJson.Variant>>(){}.getType();
+    public static Type TYPE = new TypeToken<Map<String, SeaCreatureJson.Variant>>() {
+    }.getType();
 
     public static class Variant {
         @Expose

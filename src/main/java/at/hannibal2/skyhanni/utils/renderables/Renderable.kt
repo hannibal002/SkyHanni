@@ -21,7 +21,7 @@ interface Renderable {
     val height: Int
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
         x in (posX..posX + width)
-                && y in (posY..posY + height) // TODO: adjust for variable height?
+            && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -35,7 +35,7 @@ interface Renderable {
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
-            private set
+            set
 
         fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition

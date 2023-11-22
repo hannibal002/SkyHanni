@@ -17,8 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonCopilot {
 
-    var nextStep = ""
-    var searchForKey = false
+    private var nextStep = ""
+    private var searchForKey = false
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

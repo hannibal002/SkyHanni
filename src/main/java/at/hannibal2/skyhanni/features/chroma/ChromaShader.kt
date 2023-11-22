@@ -22,7 +22,8 @@ object ChromaShader : Shader("chroma", "chroma") {
             SkyHanniMod.feature.chroma.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
-            var ticks = (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+            var ticks =
+                (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
 
             ticks = when (SkyHanniMod.feature.chroma.chromaDirection) {
                 0, 2 -> ticks
