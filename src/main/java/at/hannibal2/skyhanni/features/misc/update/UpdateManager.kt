@@ -62,11 +62,11 @@ object UpdateManager {
         }
     }
 
-    fun isBetaRelease(): Boolean {
+    private fun isBetaRelease(): Boolean {
         return getCurrentVersion().contains("beta", ignoreCase = true)
     }
 
-    val config get() = SkyHanniMod.feature.about
+    private val config get() = SkyHanniMod.feature.about
 
     fun reset() {
         updateState = UpdateState.NONE
@@ -119,7 +119,7 @@ object UpdateManager {
         }, MinecraftExecutor.OnThread)
     }
 
-    val context = UpdateContext(
+    private val context = UpdateContext(
         UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         CurrentVersion.ofTag(SkyHanniMod.version),
@@ -137,5 +137,5 @@ object UpdateManager {
         NONE
     }
 
-    var potentialUpdate: PotentialUpdate? = null
+    private var potentialUpdate: PotentialUpdate? = null
 }

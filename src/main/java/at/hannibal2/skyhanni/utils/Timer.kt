@@ -24,7 +24,7 @@ class Timer(
 
     val ended get() = !remaining.isPositive()
     val remaining get() = duration - elapsed
-    val elapsed get() = paused?.let { it - started } ?: started.passedSince()
+    private val elapsed get() = paused?.let { it - started } ?: started.passedSince()
 
     fun pause() {
         paused = SimpleTimeMark.now()

@@ -52,7 +52,7 @@ object QuickModMenuSwitch {
         }
     }
 
-    class Mod(val name: String, val description: List<String>, val command: String, val guiPath: List<String>) {
+    class Mod(val name: String, val description: List<String>, val command: String, private val guiPath: List<String>) {
 
         fun isInGui() = guiPath.any { latestGuiPath.startsWith(it) }
     }

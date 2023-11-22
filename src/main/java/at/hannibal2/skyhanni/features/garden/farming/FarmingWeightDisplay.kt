@@ -519,7 +519,7 @@ class FarmingWeightDisplay {
             openWebsite(name, ignoreCooldown = true)
         }
 
-        var lastName = ""
+        private var lastName = ""
 
         private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
             if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return

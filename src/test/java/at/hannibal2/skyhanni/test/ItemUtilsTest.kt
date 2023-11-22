@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class ItemUtilsTest {
 
-    val items: MutableMap<String, Pair<String, Int>> = mutableMapOf(
+    private val items: MutableMap<String, Pair<String, Int>> = mutableMapOf(
         "§5Hoe of Greatest Tilling" to Pair("§5Hoe of Greatest Tilling", 1),
         "§fSilver medal §8x2" to Pair("§fSilver medal", 2),
         "§aJacob's Ticket §8x32" to Pair("§aJacob's Ticket", 32),

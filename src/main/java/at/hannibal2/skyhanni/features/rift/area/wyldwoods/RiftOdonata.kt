@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class RiftOdonata {
     private val config get() = RiftAPI.config.area.wyldWoods.odonata
     private var hasBottleInHand = false
-    val odonataSkullTexture =
+    private val odonataSkullTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWZkODA2ZGVmZGZkZjU5YjFmMjYwOWM4ZWUzNjQ2NjZkZTY2MTI3YTYyMzQxNWI1NDMwYzkzNThjNjAxZWY3YyJ9fX0="
     private val emptyBottle by lazy { "EMPTY_ODONATA_BOTTLE".asInternalName() }
 

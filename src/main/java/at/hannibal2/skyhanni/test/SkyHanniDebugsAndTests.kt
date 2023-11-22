@@ -62,7 +62,7 @@ class SkyHanniDebugsAndTests {
 
         val debugLogger = LorenzLogger("debug/test")
 
-        fun runn(compound: NBTTagCompound, text: String) {
+        private fun runn(compound: NBTTagCompound, text: String) {
             print("$text'$compound'")
             for (s in compound.keySet) {
                 val element = compound.getCompoundTag(s)

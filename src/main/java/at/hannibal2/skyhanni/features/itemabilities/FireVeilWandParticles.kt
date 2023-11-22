@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class FireVeilWandParticles {
     private val config get() = SkyHanniMod.feature.itemAbilities.fireVeilWands
 
-    var lastClick = 0L
+    private var lastClick = 0L
 
     val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
 

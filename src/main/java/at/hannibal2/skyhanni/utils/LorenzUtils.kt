@@ -367,7 +367,7 @@ object LorenzUtils {
     }
 
     // MoulConfig is in Java, I don't want to downgrade this logic
-    fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
+    private fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
         for (property in properties) {
             property.whenChanged { a, b -> observer.observeChange(a, b) }
         }

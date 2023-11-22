@@ -158,7 +158,7 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
+    private fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
         val render = ItemStack(Items.skull, 1, 3)
         val tag = NBTTagCompound()
         val skullOwner = NBTTagCompound()

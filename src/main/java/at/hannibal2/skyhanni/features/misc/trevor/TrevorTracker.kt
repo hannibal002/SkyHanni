@@ -95,7 +95,7 @@ object TrevorTracker {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         storage.questsDone += 1
         val rarity = matcher.group("rarity")
-        val foundRarity = TrapperMobRarity.values().firstOrNull { it.formattedName == rarity } ?: return
+        val foundRarity = TrapperMobRarity.entries.firstOrNull { it.formattedName == rarity } ?: return
         val old = storage.animalRarities[foundRarity] ?: 0
         storage.animalRarities = storage.animalRarities.editCopy { this[foundRarity] = old + 1 }
         saveAndUpdate()

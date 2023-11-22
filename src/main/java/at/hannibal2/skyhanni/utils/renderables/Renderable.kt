@@ -90,7 +90,7 @@ interface Renderable {
             return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
         }
 
-        fun clickable(
+        private fun clickable(
             render: Renderable,
             onClick: () -> Unit,
             button: Int = 0,
@@ -195,7 +195,7 @@ interface Renderable {
             return result
         }
 
-        fun underlined(renderable: Renderable) = object : Renderable {
+        private fun underlined(renderable: Renderable) = object : Renderable {
             override val width: Int
                 get() = renderable.width
             override val height = 10
@@ -207,7 +207,7 @@ interface Renderable {
             }
         }
 
-        fun hoverable(
+        private fun hoverable(
             hovered: Renderable,
             unhovered: Renderable,
             bypassChecks: Boolean = false,
@@ -254,7 +254,7 @@ interface Renderable {
             }
         }
 
-        fun placeholder(width: Int) = object : Renderable {
+        private fun placeholder(width: Int) = object : Renderable {
             override val width: Int = width
             override val height = 10
 
