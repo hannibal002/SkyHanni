@@ -79,8 +79,7 @@ class DungeonHideItems {
                 event.isCanceled = true
             }
 
-            val itemStack = head
-            if (itemStack != null && itemStack.cleanName() == "Superboom TNT") {
+            if (head != null && head.cleanName() == "Superboom TNT") {
                 event.isCanceled = true
                 hideParticles[entity] = System.currentTimeMillis()
             }
