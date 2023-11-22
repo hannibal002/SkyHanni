@@ -45,7 +45,7 @@ object CropMoneyDisplay {
 
     fun toggleShowCalculation() {
         showCalculation = !showCalculation
-        LorenzUtils.chat("§e[SkyHanni] Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
+        LorenzUtils.chat("Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
         update()
     }
 
@@ -276,8 +276,8 @@ object CropMoneyDisplay {
 
         val onlyNpcPrice =
             (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
-                    (config.useCustomFormat && config.customFormat.size == 1 &&
-                            config.customFormat[0] == 2)
+                (config.useCustomFormat && config.customFormat.size == 1 &&
+                    config.customFormat[0] == 2)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!

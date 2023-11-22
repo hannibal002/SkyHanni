@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
@@ -249,7 +251,6 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper
@@ -263,6 +264,7 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkou
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
 import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
@@ -306,6 +308,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -327,7 +332,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.1.Beta.1",
+    version = "0.21.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -358,6 +363,7 @@ class SkyHanniMod {
         loadModule(TabListData())
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
+        loadModule(GardenCropMilestonesCommunityFix)
         loadModule(GardenCropUpgrades())
         loadModule(VisitorListener())
         loadModule(OwnInventoryData())
@@ -384,7 +390,7 @@ class SkyHanniMod {
         loadModule(GardenAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
-        loadModule(FriendAPI())
+        loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
@@ -652,9 +658,9 @@ class SkyHanniMod {
         configManager.firstLoad()
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread {
-            configManager.saveConfig("shutdown-hook")
+            configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
         })
-        repo = RepoManager(configManager.configDirectory)
+        repo = RepoManager(ConfigManager.configDirectory)
         try {
             repo.loadRepoInformation()
         } catch (e: Exception) {
@@ -672,6 +678,7 @@ class SkyHanniMod {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
+                Minecraft.getMinecraft().thePlayer.closeScreen()
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
                 screenTicks = 0
                 screenToOpen = null
@@ -689,6 +696,10 @@ class SkyHanniMod {
         @JvmStatic
         val feature: Features get() = configManager.features
         val sackData: SackData get() = configManager.sackData
+        val friendsData: FriendsJson get() = configManager.friendsData
+        val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
+        val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
+
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -697,7 +708,7 @@ class SkyHanniMod {
         }
 
         val modules: MutableList<Any> = ArrayList()
-        val globalJob: Job = Job(null)
+        private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob)
         )

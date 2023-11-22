@@ -132,7 +132,7 @@ class SlayerQuestWarning {
         if (lastWarning + 10_000 > System.currentTimeMillis()) return
 
         lastWarning = System.currentTimeMillis()
-        LorenzUtils.chat("§e[SkyHanni] $chatMessage")
+        LorenzUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
             LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)

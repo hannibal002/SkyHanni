@@ -20,7 +20,7 @@ class FixNEUHeavyPearls {
             if (change.internalName == heavyPearl && change.delta == 3) {
                 val specific = NotEnoughUpdates.INSTANCE.config.getProfileSpecific()
                 if (System.currentTimeMillis() > specific.dailyHeavyPearlCompleted + 1.hours.inWholeMilliseconds) {
-                    LorenzUtils.chat("§e[SkyHanni] Mark NEU Heavy Pearls as done.")
+                    LorenzUtils.chat("Mark NEU Heavy Pearls as done.")
                     specific.dailyHeavyPearlCompleted = System.currentTimeMillis()
                 }
             }

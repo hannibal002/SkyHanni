@@ -52,7 +52,7 @@ object QuickModMenuSwitch {
         }
     }
 
-    class Mod(val name: String, val description: List<String>, val command: String, val guiPath: List<String>) {
+    class Mod(val name: String, val description: List<String>, val command: String, private val guiPath: List<String>) {
 
         fun isInGui() = guiPath.any { latestGuiPath.startsWith(it) }
     }
@@ -152,7 +152,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+                    LorenzUtils.error("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 "hytil" -> {
@@ -168,7 +168,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+                    LorenzUtils.chat("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 else -> {

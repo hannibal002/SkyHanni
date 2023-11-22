@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -243,8 +244,7 @@ class ChestValue {
             return true
         }
 
-        val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
-            LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 

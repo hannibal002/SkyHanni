@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -65,7 +67,7 @@ object Commands {
     private val openMainMenu: (Array<String>) -> Unit = {
         if (it.isNotEmpty()) {
             if (it[0].lowercase() == "gui") {
-                GuiEditManager.openGuiPositionEditor()
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             } else {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
@@ -254,7 +256,7 @@ object Commands {
         registerCommand(
             "shconfigsave",
             "Manually saving the config"
-        ) { SkyHanniMod.configManager.saveConfig("manual-command") }
+        ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
     }
 
     private fun developersCodingHelp() {
@@ -313,6 +315,10 @@ object Commands {
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
         ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
+        registerCommand(
+            "readcropmilestonefromclipboard",
+            "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
+        ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
     }
 
     private fun internalCommands() {
@@ -375,7 +381,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!")
+            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!", false)
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -385,7 +391,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
+            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!", false)
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
@@ -394,7 +400,7 @@ object Commands {
 
     private fun clearFarmingItems() {
         val storage = GardenAPI.storage?.fortune ?: return
-        LorenzUtils.chat("§e[SkyHanni] clearing farming items")
+        LorenzUtils.chat("clearing farming items")
         storage.farmingItems.clear()
         storage.outdatedItems.clear()
     }

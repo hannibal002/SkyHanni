@@ -122,7 +122,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 "DOJO" -> return DojoQuest(questName, location, displayItem, dojoGoal, state)
             }
         }
-        LorenzUtils.chat("§c[SkyHanni] Unknown Crimson Isle quest: '$name'")
+        LorenzUtils.error("Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 

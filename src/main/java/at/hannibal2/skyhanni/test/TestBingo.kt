@@ -7,6 +7,6 @@ object TestBingo {
 
     fun toggle() {
         testBingo = !testBingo
-        LorenzUtils.chat("§e[SkyHanni] Test Bingo " + (if (testBingo) "enabled" else "disabled"))
+        LorenzUtils.chat("Test Bingo " + (if (testBingo) "enabled" else "disabled"))
     }
 }
