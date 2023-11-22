@@ -211,7 +211,7 @@ object Commands {
             "Reset data about minion profit and the name display on the private island"
         ) { MinionFeatures.clearMinionData() }
         registerCommand(
-            "whereami",
+            "shwhereami",
             "Print current island in chat"
         ) { SkyHanniDebugsAndTests.whereami() }
         registerCommand(
