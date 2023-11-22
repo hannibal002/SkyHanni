@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -49,7 +50,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object VampireSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
+    private val config get() = SkyHanniMod.feature.slayer.vampire
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
     private val configCoopBoss get() = config.coopBoss
@@ -376,6 +377,11 @@ object VampireSlayerFeatures {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
     }
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau()

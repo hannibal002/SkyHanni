@@ -36,7 +36,7 @@ class ChromaFontRenderer(private val baseColor: Int) {
         }
     }
 
-    fun newChromaEnv() : ChromaFontRenderer {
+    fun newChromaEnv(): ChromaFontRenderer {
         if (ShaderHelper.areShadersSupported()) {
             ChromaShaderManager.begin()
             GlStateManager.shadeModel(GL11.GL_SMOOTH)
@@ -44,7 +44,7 @@ class ChromaFontRenderer(private val baseColor: Int) {
         return this
     }
 
-    fun bindActualColor() : ChromaFontRenderer {
+    fun bindActualColor(): ChromaFontRenderer {
         GlStateManager.color(
             ColorUtils.getRed(baseColor).toFloat() / 255f,
             ColorUtils.getGreen(baseColor).toFloat() / 255f,
@@ -54,7 +54,7 @@ class ChromaFontRenderer(private val baseColor: Int) {
         return this
     }
 
-    fun endChromaEnv() : ChromaFontRenderer {
+    fun endChromaEnv(): ChromaFontRenderer {
         if (ShaderHelper.areShadersSupported()) {
             ChromaShaderManager.end()
             GlStateManager.shadeModel(GL11.GL_FLAT)

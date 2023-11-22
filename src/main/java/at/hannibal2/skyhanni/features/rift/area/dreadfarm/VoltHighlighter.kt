@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class VoltHighlighter {
 
-    private val config get() = RiftAPI.config.area.dreadfarmConfig.voltCrux
+    private val config get() = RiftAPI.config.area.dreadfarm.voltCrux
 
     private val LIGHTNING_DISTANCE = 7F
     private val ARMOR_SLOT_HEAD = 3

@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.21.Beta.12"
+version = "0.21.1"
 
 // Toolchains:
 java {
@@ -57,7 +57,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:f91ed4b") {
+    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
@@ -81,7 +81,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha22:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -93,6 +93,10 @@ dependencies {
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
 //    testImplementation(kotlin("test"))
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
 }
@@ -184,7 +188,7 @@ tasks.shadowJar {
         }
     }
     exclude("META-INF/versions/**")
-
+    mergeServiceFiles()
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }
