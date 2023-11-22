@@ -51,6 +51,7 @@ class BlazeSlayerFirePitsWarning {
                 -> {
                     fireFirePits()
                 }
+
                 else -> {}
             }
         }

@@ -21,7 +21,7 @@ interface Renderable {
     val height: Int
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
         x in (posX..posX + width)
-                && y in (posY..posY + height) // TODO: adjust for variable height?
+            && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**

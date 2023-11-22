@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.21.1 (unreleased)
+## Version 0.21.1
 
 ### New Features
 
@@ -14,7 +14,6 @@
 
 ### Changes
 
-
 #### Garden Changes
 
 + Added mythic/Maeve visitor support. - walker & hannibal2
@@ -25,6 +24,12 @@
 + Use the crop fortune from tab in Farming Fortune HUD. - alexia
 + Shows the last saved ff value in gray while switching tools instead of the question mark. - hannibal2
 + Removed chat message that your crop milestone data is correct. - hannibal2
++ Removed the message when crop milestones look different in the menu than stored SkyHanni data. - hannibal2
+    + We already have the correct data now, and Hypixel rounds the numbers in the menu poorly.
+    + Only show the Total Crop Milestone info in crop milestone inventory when below tier 20. - hannibal2
+    + Hypixel now has their own line for the same information for tier 20+
++ Make the FF Display only visible while holding a farming tool in hand. - hannibal2
++ Hide in crop milestone display the line with time remaining entirely when the milestone is maxed. - hannibal2
 
 #### Other Changes
 
@@ -32,6 +37,7 @@
 + Add option to hide the chat message when toggling /shmouselock. - hannibal2
 + Reminds to use the GUI Position Editor hotkey. - hannibal2
     + Reminds every 30 minutes after using /sh gui or clicking the GUI edit button.
++ Added Bookworm Book to the Estimated Item Value feature. - jani
 
 ### Fixes
 
@@ -52,6 +58,11 @@
 + Added cooldown to prevent spam clicking on farming weight buttons to open many web pages. - hannibal2
 + Fixed clickable farming weight GUI no longer opens #1000 in lb website. - hannibal2
 + Fixed /ff upgrade suggests updating bustling reforge even when no farming armor is found. - hannibal2
++ Fixed maxed sunder fortune in the /ff stats breakdown. - alexia
++ Fixed the farming contest summary not showing when the crop is buffed by Anita Talisman/Ring/Artifact. - hannibal2
++ Fixed Farming Fortune Display not showing for non crop-specific tools. - hannibal2
++ Fixed green thumb fortune in /ff to include Maeve. - hannibal2
++ Fixed crops per second and time remaining not using the 100 base ff in their formula. - alexia
 
 #### Other Fixes
 
@@ -64,6 +75,8 @@
 + Fixed Sack Display sometimes not formatting a million correctly. - Hize
 + Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
 + Fixed a bug with the ender chest and SkyHanni GUI editor. - hannibal2
++ Fixed crimson isle faction icon in tab list showing twice and not going away fully when enabling the "hide faction"
+  option of advanced player list. - hannibal2
 
 ### Technical Details
 
@@ -79,6 +92,14 @@
     + This command reads the clipboard content, in the format of users sending crop milestone step data.
     + The new data gets compared to the currently saved data, differences are getting replaced and the result gets put
       into the clipboard. The clipboard context can be used to update the repo content.
+
+### Removed Features
+
++ Removed 100 Farming Fortune from "Show As Drop Multiplier" from all displays (also known as "base ff"). - hannibal2
+    + This can cause some numbers to show 100 FF too much. Simply update the values to fix it.
+    + Those "base FF" values were never really part of your farming fortune stats. They are just a result of looking at
+      the crop drop formula. SkyHanni used those values to be more comparable with other Discord Bots and spreadsheets.
+      This also caused confusion, so we have removed it entirely now.
 
 ## Version 0.21
 

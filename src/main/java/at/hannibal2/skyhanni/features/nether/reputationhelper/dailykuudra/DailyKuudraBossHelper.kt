@@ -46,8 +46,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
 
         for (line in ScoreboardData.sidebarLines) {
-            if(line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")){
-                val tier = line.substringAfter("(T").substring(0,1).toInt()
+            if (line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")) {
+                val tier = line.substringAfter("(T").substring(0, 1).toInt()
                 val kuudraTier = getByTier(tier)!!
                 finished(kuudraTier)
                 return
