@@ -21,6 +21,7 @@ class UpgradePage : FFGuideGUI.FFGuidePage() {
         val adjustedY = FFGuideGUI.guiTop + 20 + pageScroll
         val inverseScale = 1 / 0.75f
 
+        // TODO fix duplicate drawString lines, add guiLeft, guiTop and inverseScale
         GlStateManager.scale(0.75f, 0.75f, 1f)
         GuiRenderUtils.drawString(
             "Upgrade",

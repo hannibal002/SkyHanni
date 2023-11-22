@@ -72,9 +72,8 @@ class PlayerChatSymbols {
         if (!component.text_skyhanni().contains(rankAndName)) return false
         val oldText = component.text_skyhanni()
 
-        component.setText_skyhanni(
-            component.text_skyhanni().replace(oldText, getNewText(emblemText, oldText, rankAndName))
-        )
+        val newText = getNewText(emblemText, oldText, rankAndName)
+        component.setText_skyhanni(component.text_skyhanni().replace(oldText, newText))
         return true
     }
 

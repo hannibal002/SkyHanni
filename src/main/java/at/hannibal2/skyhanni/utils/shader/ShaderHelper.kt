@@ -1,7 +1,13 @@
 package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import org.lwjgl.opengl.*
+import org.lwjgl.opengl.ARBFragmentShader
+import org.lwjgl.opengl.ARBShaderObjects
+import org.lwjgl.opengl.ARBVertexShader
+import org.lwjgl.opengl.ContextCapabilities
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL20
+import org.lwjgl.opengl.GLContext
 
 /**
  * Class to check shaders support, OpenGL capabilities, and shader helper functions

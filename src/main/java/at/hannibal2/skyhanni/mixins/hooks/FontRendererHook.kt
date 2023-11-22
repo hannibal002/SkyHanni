@@ -141,6 +141,7 @@ object FontRendererHook {
         return if (LorenzUtils.inSkyBlock && !SkyHanniMod.feature.chroma.enabled) constant else "0123456789abcdefklmnorz"
     }
 
+    // TODO add better parameter names
     @JvmStatic
     fun toggleChromaCondition_shouldResetStyles(
         text: String,
