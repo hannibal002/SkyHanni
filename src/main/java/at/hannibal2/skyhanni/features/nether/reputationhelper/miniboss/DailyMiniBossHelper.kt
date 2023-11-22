@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -81,7 +80,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
-                    lineList.add(getItemStack())
+                    lineList.add(getItemStack(displayItem))
                     lineList.add("§5$displayName§7: $result")
                     display.add(lineList)
                 }
