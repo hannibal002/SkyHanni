@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -41,5 +45,15 @@ object FishingAPI {
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
 
     fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
+
+    fun getFilletPerTrophy(internalName: NEUInternalName): Int {
+        val internal = internalName.asString()
+        val trophyFishName = internal.substringBeforeLast("_")
+            .replace("_", "").lowercase()
+        val trophyRarityName = internal.substringAfterLast("_")
+        val info = TrophyFishManager.getInfo(trophyFishName)
+        val rarity = TrophyRarity.getByName(trophyRarityName) ?: TrophyRarity.BRONZE
+        return info?.getFilletValue(rarity) ?: 0
+    }
 
 }

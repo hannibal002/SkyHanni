@@ -115,6 +115,7 @@ import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
+import at.hannibal2.skyhanni.features.fishing.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
@@ -564,6 +565,7 @@ class SkyHanniMod {
         loadModule(PlayerTabComplete)
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
+        loadModule(FishingProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
