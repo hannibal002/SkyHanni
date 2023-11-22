@@ -45,6 +45,7 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("name: '" + entity.name + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
+                resultList.add("uuid version: ${entity.uniqueID.version()} ${if(entity.uniqueID.version() != 4) "NPC " else ""}(${entity.uniqueID})")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")
@@ -146,9 +147,9 @@ object CopyNearbyEntitiesCommand {
         if (counter != 0) {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] $counter entities copied into the clipboard!")
+            LorenzUtils.chat("$counter entities copied into the clipboard!")
         } else {
-            LorenzUtils.chat("§e[SkyHanni] No entities found in a search radius of $searchRadius!")
+            LorenzUtils.chat("No entities found in a search radius of $searchRadius!")
         }
     }
 

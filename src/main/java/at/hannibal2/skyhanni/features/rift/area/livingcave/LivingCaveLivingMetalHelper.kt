@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LivingCaveLivingMetalHelper {
-    private val config get() = RiftAPI.config.area.livingCaveConfig.livingCaveLivingMetalConfig
+    private val config get() = RiftAPI.config.area.livingCave.livingCaveLivingMetalConfig
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var startTime = 0L
@@ -67,7 +67,11 @@ class LivingCaveLivingMetalHelper {
             val percentage = diff.toDouble() / maxTime
             a.slope(b, 1 - percentage)
         } else b
-        event.drawWaypointFilled(location, LorenzColor.AQUA.toColor(), seeThroughBlocks = location.distanceToPlayer() < 10)
+        event.drawWaypointFilled(
+            location,
+            LorenzColor.AQUA.toColor(),
+            seeThroughBlocks = location.distanceToPlayer() < 10
+        )
     }
 
     @SubscribeEvent

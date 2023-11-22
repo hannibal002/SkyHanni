@@ -14,9 +14,11 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -211,9 +213,8 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!onFarmingIsland()) return
-        var entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(trapperID)
-        if (entityTrapper !is EntityLivingBase) entityTrapper =
-            Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
+        var entityTrapper = EntityUtils.getEntityByID(trapperID)
+        if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
             RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
             { config.trapperTalkCooldown }
@@ -231,7 +232,9 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
-                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else TrevorSolver.currentMob!!.mobName
+                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else {
+                    TrevorSolver.currentMob!!.mobName
+                }
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), displayName, 1.5)
@@ -296,8 +299,7 @@ object TrevorFeatures {
         val colorCode = baseColor.getChatColor()
     }
 
-    fun onFarmingIsland() =
-        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS
+    fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 
     fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
 }

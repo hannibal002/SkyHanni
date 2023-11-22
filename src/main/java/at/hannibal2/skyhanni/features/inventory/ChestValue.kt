@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -34,7 +35,7 @@ class ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
-    private val chestItems = mutableMapOf<NEUInternalName, Item>()
+    private val chestItems = mutableMapOf<String, Item>()
     private val inInventory get() = isValidStorage()
 
     @SubscribeEvent
@@ -42,6 +43,11 @@ class ChestValue {
         if (!isEnabled()) return
         if (LorenzUtils.inDungeons && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
+
+        if (!config.showDuringEstimatedItemValue) {
+            if (EstimatedItemValue.currentlyShowing) return
+        }
+
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
@@ -110,6 +116,7 @@ class ChestValue {
         val sortedList = sortedList()
         var totalPrice = 0.0
         var rendered = 0
+
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
         newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
@@ -140,13 +147,11 @@ class ChestValue {
         newDisplay.addAsSingletonList("§6Total value : §b${totalPrice.formatPrice()}")
     }
 
-    private fun sortedList(): MutableList<Item> {
-        return when (config.sortingType) {
-            0 -> chestItems.values.sortedByDescending { it.total }
-            1 -> chestItems.values.sortedBy { it.total }
-            else -> chestItems.values.sortedByDescending { it.total }
-        }.toMutableList()
-    }
+    private fun sortedList() = when (config.sortingType) {
+        0 -> chestItems.values.sortedByDescending { it.total }
+        1 -> chestItems.values.sortedBy { it.total }
+        else -> chestItems.values.sortedByDescending { it.total }
+    }.toMutableList()
 
     private fun addButton(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton("§7Sorted By: ",
@@ -187,13 +192,14 @@ class ChestValue {
                 val internalName = stack.getInternalNameOrNull() ?: continue
                 if (internalName.getItemStackOrNull() == null) continue
                 val list = mutableListOf<String>()
-                val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
+                val pair = EstimatedItemValueCalculator.calculate(stack, list)
                 var (total, _) = pair
+                val key = "$internalName+$total"
                 if (stack.item == Items.enchanted_book)
                     total /= 2
                 list.add("§aTotal: §6§l${total.formatPrice()}")
                 if (total == 0.0) continue
-                val item = chestItems.getOrPut(internalName) {
+                val item = chestItems.getOrPut(key) {
                     Item(mutableListOf(), 0, stack, 0.0, list)
                 }
                 item.index.add(i)
@@ -238,8 +244,7 @@ class ChestValue {
             return true
         }
 
-        val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
-                LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 

@@ -104,13 +104,13 @@ object EntityOutlineRenderer {
         mc.renderManager.setRenderOutlines(true)
 
         // Enable outline mode
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL13.GL_COMBINE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_RGB, GL11.GL_REPLACE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_RGB, GL13.GL_CONSTANT);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_RGB, GL11.GL_SRC_COLOR);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_ALPHA, GL11.GL_REPLACE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_ALPHA, GL11.GL_TEXTURE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA);
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL13.GL_COMBINE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_RGB, GL11.GL_REPLACE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_RGB, GL13.GL_CONSTANT)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_RGB, GL11.GL_SRC_COLOR)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_ALPHA, GL11.GL_REPLACE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_ALPHA, GL11.GL_TEXTURE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA)
 
         // Render x-ray outlines first, ignoring the depth buffer bit
         if (!isXrayCacheEmpty()) {
@@ -293,7 +293,7 @@ object EntityOutlineRenderer {
         // Only render the view entity when sleeping or in 3rd person mode
         if (entity === mc.renderViewEntity &&
             !(mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                    mc.gameSettings.thirdPersonView != 0)
+                mc.gameSettings.thirdPersonView != 0)
         ) {
             false
         } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (mc.renderManager.shouldRender(
@@ -361,7 +361,7 @@ object EntityOutlineRenderer {
      */
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return;
+        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return
 
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal

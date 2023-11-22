@@ -158,7 +158,7 @@ class DamageIndicatorManager {
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
             if (!data.ignoreBlocks && !player.canEntityBeSeen(data.entity)) continue
-            if (data.bossType.bossTypeToggle !in config.bossesToShow) continue
+            if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
 
@@ -253,6 +253,8 @@ class DamageIndicatorManager {
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
     }
+
+    private fun EntityData.isConfigEnabled() = bossType.bossTypeToggle in config.bossesToShow
 
     private fun noDeathDisplay(bossType: BossType): Boolean {
         return when (bossType) {
@@ -359,7 +361,10 @@ class DamageIndicatorManager {
             entityData.timeLastTick = System.currentTimeMillis()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Error checking damage indicator entity $entity")
+            ErrorManager.logErrorWithData(
+                e, "Error checking damage indicator entity",
+                "entity" to entity,
+            )
             return null
         }
     }
@@ -835,7 +840,7 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            if (entityData != null && isEnabled() && config.hideVanillaNametag) {
+            if (entityData != null && isEnabled() && config.hideVanillaNametag && entityData.isConfigEnabled()) {
                 val name = entity.name
                 if (name.contains("Plaesmaflux")) return
                 if (name.contains("Overflux")) return

@@ -37,6 +37,7 @@ class Uniform<T>(
                     val values = newUniformValue as FloatArray
                     ShaderHelper.glUniform3f(uniformID, values[0], values[1], values[2])
                 }
+
                 UniformType.BOOL -> ShaderHelper.glUniform1f(uniformID, if (newUniformValue as Boolean) 1f else 0f)
             }
             previousUniformValue = newUniformValue

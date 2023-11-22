@@ -27,6 +27,8 @@ class DungeonHideItems {
     private val hideParticles = mutableMapOf<EntityArmorStand, Long>()
     private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
 
+    // TODO put in skull data repo part
+
     private val soulWeaverHider =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYyNGVkNjg3NTMwNGZhNGExZjBjNzg1YjJjYjZhNmE3MjU2M2U5ZjNlMjRlYTU1ZTE4MTc4NDUyMTE5YWE2NiJ9fX0="
     private val blessingTexture =
@@ -50,11 +52,7 @@ class DungeonHideItems {
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
         val itemStack = entity.inventory[4]
-        if (itemStack != null && itemStack.cleanName() == "Skeleton Skull") {
-            return true
-        }
-
-        return false
+        return itemStack != null && itemStack.cleanName() == "Skeleton Skull"
     }
 
     @SubscribeEvent

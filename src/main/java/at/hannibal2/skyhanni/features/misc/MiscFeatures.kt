@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  *  I need these features in my dev env
-  */
+ */
 class MiscFeatures {
 
     @SubscribeEvent
@@ -32,6 +32,7 @@ class MiscFeatures {
             EnumParticleTypes.EXPLOSION_HUGE,
             EnumParticleTypes.EXPLOSION_NORMAL,
             -> event.isCanceled = true
+
             else -> {}
         }
     }

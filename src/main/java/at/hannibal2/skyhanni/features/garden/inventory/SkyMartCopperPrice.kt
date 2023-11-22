@@ -73,7 +73,7 @@ class SkyMartCopperPrice {
             config.copperPricePos.renderStringsAndItems(
                 display,
                 extraSpace = 5,
-                itemScale = 1.7,
+                itemScale = config.itemScale,
                 posLabel = "SkyMart Copper Price"
             )
         }

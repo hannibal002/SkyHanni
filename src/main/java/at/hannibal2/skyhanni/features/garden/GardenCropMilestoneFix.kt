@@ -82,7 +82,7 @@ class GardenCropMilestoneFix {
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
             if (!loadedCrops.contains(crop)) {
-                LorenzUtils.chat("§e[SkyHanni] Loaded ${crop.cropName} milestone data from $source!")
+                LorenzUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
                 loadedCrops.add(crop)
             }
         } else if (diff >= minDiff) {
