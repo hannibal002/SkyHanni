@@ -51,6 +51,7 @@ object GardenAPI {
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
+    var totalAmountVisitorsExisting = 0
     var gardenExp: Long?
         get() = storage?.experience
         set(value) {
@@ -239,6 +240,7 @@ object GardenAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.garden_exp
+        totalAmountVisitorsExisting = data.visitors.size
     }
 
     private var gardenExperience = listOf<Int>()
