@@ -20,7 +20,7 @@ import kotlin.time.DurationUnit
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden.composters
-    private val hidden get() = GardenAPI.config
+    private val storage get() = GardenAPI.storage
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
 
@@ -100,7 +100,7 @@ class ComposterDisplay {
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
             val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
-            GardenAPI.config?.composterEmptyTime = System.currentTimeMillis() + millis
+            GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + millis
             val format = TimeUtils.formatDuration(millis, maxUnits = 2)
             listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
         } else {
@@ -139,24 +139,24 @@ class ComposterDisplay {
 
     private fun sendNotify() {
         if (!config.notifyLow.enabled) return
-        val hidden = hidden ?: return
+        val storage = storage ?: return
 
-        if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
+        if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && System.currentTimeMillis() >= storage.informedAboutLowMatter) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
-            LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
-            hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
+            LorenzUtils.chat("§cYour Organic Matter is low!")
+            storage.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
         if (ComposterAPI.getFuel() <= config.notifyLow.fuel &&
-            System.currentTimeMillis() >= hidden.informedAboutLowFuel
+            System.currentTimeMillis() >= storage.informedAboutLowFuel
         ) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
-            LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
-            hidden.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
+            LorenzUtils.chat("§cYour Fuel is low!")
+            storage.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
         }
     }
 
@@ -172,7 +172,7 @@ class ComposterDisplay {
     }
 
     private fun checkWarningsAndOutsideGarden() {
-        val storage = GardenAPI.config ?: return
+        val storage = GardenAPI.storage ?: return
 
         val format = if (storage.composterEmptyTime != 0L) {
             val duration = storage.composterEmptyTime - System.currentTimeMillis()
@@ -195,14 +195,14 @@ class ComposterDisplay {
 
     private fun warn(warningMessage: String) {
         if (!config.warnAlmostClose) return
-        val storage = GardenAPI.config ?: return
+        val storage = GardenAPI.storage ?: return
 
         if (LorenzUtils.inDungeons) return
         if (LorenzUtils.inKuudraFight) return
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
-        LorenzUtils.chat("§e[SkyHanni] $warningMessage")
+        LorenzUtils.chat(warningMessage)
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 

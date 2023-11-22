@@ -16,10 +16,10 @@ import kotlin.time.Duration.Companion.seconds
 class SkyBlockKickDuration {
     private val config get() = SkyHanniMod.feature.misc.kickDuration
 
-    var kickMessage = false
-    var showTime = false
-    var lastKickTime = SimpleTimeMark.farPast()
-    var hasWarned = false
+    private var kickMessage = false
+    private var showTime = false
+    private var lastKickTime = SimpleTimeMark.farPast()
+    private var hasWarned = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

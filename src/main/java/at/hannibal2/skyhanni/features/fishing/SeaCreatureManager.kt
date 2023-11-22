@@ -53,7 +53,6 @@ class SeaCreatureManager {
             }
         }
         SeaCreatureManager.allFishingMobs = allFishingMobs
-        LorenzUtils.debug("Loaded $counter sea creatures from repo")
 
     }
 

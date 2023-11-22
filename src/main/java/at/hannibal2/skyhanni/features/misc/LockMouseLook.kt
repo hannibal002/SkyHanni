@@ -1,36 +1,49 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object LockMouseLook {
+    private val config get() = SkyHanniMod.feature.misc
     private var lockedMouse = false
-    private var oldSensitivity = 0F
-    private val lockedPosition = -1F / 3F
+    private const val lockedPosition = -1F / 3F
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (lockedMouse) toggleLock()
         val gameSettings = Minecraft.getMinecraft().gameSettings
         if (gameSettings.mouseSensitivity == lockedPosition) {
-            gameSettings.mouseSensitivity = 0.5f
-            LorenzUtils.chat("§e[SkyHanni] §bReset your mouse sensitivity to 100%.")
+            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseSensitivity
+            LorenzUtils.chat("§bMouse rotation is now unlocked because you left it locked.")
         }
     }
 
     fun toggleLock() {
+        val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         lockedMouse = !lockedMouse
 
-        val gameSettings = Minecraft.getMinecraft().gameSettings
         if (lockedMouse) {
-            oldSensitivity = gameSettings.mouseSensitivity
+            SkyHanniMod.feature.storage.savedMouseSensitivity = gameSettings.mouseSensitivity
             gameSettings.mouseSensitivity = lockedPosition
-            LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
+            if (config.lockMouseLookChatMessage) {
+                LorenzUtils.chat("§bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
+            }
         } else {
-            gameSettings.mouseSensitivity = oldSensitivity
-            LorenzUtils.chat("§e[SkyHanni] §bMouse rotation is now unlocked.")
+            gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseSensitivity
+            if (config.lockMouseLookChatMessage) {
+                LorenzUtils.chat("§bMouse rotation is now unlocked.")
+            }
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!lockedMouse) return
+        config.lockedMouseDisplay.renderString("§eMouse Locked", posLabel = "Mouse Locked")
     }
 }

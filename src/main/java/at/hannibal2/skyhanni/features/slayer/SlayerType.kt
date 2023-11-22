@@ -15,7 +15,4 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
     INFERNO("Inferno Demonlord", EntityBlaze::class.java),
     VAMPIRE("Riftstalker Bloodfiend", EntityOtherPlayerMP::class.java)
     ;
-
-    companion object {
-    }
 }

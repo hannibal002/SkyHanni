@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -16,7 +17,7 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftMotesOrb {
-    private val config get() = RiftAPI.config.motesOrbsConfig
+    private val config get() = RiftAPI.config.motesOrbs
 
     // TODO USE SH-REPO
     private val pattern = "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*".toPattern()
@@ -90,4 +91,9 @@ class RiftMotesOrb {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.motesOrbsConfig", "rift.area.motesOrbs")
+    }
 }

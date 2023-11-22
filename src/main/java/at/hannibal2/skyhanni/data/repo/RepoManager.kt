@@ -83,7 +83,7 @@ class RepoManager(private val configLocation: File) {
                     if (unsuccessfulConstants.isEmpty()) {
 
                         if (command) {
-                            LorenzUtils.chat("§e[SkyHanni] §7The repo is already up to date!")
+                            LorenzUtils.chat("§7The repo is already up to date!")
                             atomicShouldManuallyReload.set(false)
                         }
                         return@supplyAsync false
@@ -156,12 +156,13 @@ class RepoManager(private val configLocation: File) {
             }
             comp.complete(null)
             if (answerMessage.isNotEmpty() && !error) {
-                LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
+                LorenzUtils.chat("§a$answerMessage")
             }
             if (error) {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Error with the repo detected, try /shupdaterepo to fix it!",
-                    "shupdaterepo"
+                    "Error with the repo detected, try /shupdaterepo to fix it!",
+                    "shupdaterepo",
+                    prefixColor = "§c"
                 )
                 if (unsuccessfulConstants.isEmpty()) {
                     unsuccessfulConstants.add("All Constants")
@@ -174,9 +175,12 @@ class RepoManager(private val configLocation: File) {
     fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
-                LorenzUtils.chat("§c[SkyHanni] §7Repo Issue! Some features may not work. Please report this error on the Discord!")
-                LorenzUtils.chat("§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}")
-                LorenzUtils.chat("§7If you have Repo Auto Update turned off, please try turning that on.\n§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
+                LorenzUtils.error(
+                    "§7Repo Issue! Some features may not work. Please report this error on the Discord!\n"
+                        + "§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}\n"
+                        + "§7If you have Repo Auto Update turned off, please try turning that on.\n"
+                        + "§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):"
+                )
                 for (constant in unsuccessfulConstants) {
                     LorenzUtils.chat("   §e- §7$constant")
                 }
@@ -184,14 +188,14 @@ class RepoManager(private val configLocation: File) {
             return
         }
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            LorenzUtils.chat("§a[SkyHanni] Repo working fine!")
+            LorenzUtils.chat("Repo working fine!", prefixColor = "§a")
             return
         }
-        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("§a[SkyHanni] Successful Constants §7(${successfulConstants.size}):")
+        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("Successful Constants §7(${successfulConstants.size}):", prefixColor = "§a")
         for (constant in successfulConstants) {
             LorenzUtils.chat("   §a- §7$constant")
         }
-        LorenzUtils.chat("§c[SkyHanni] Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
+        LorenzUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
         for (constant in unsuccessfulConstants) {
             LorenzUtils.chat("   §e- §7$constant")
         }

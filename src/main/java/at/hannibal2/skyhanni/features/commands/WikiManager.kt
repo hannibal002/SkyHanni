@@ -43,7 +43,7 @@ class WikiManager {
             if (!(message.startsWith("/wiki"))) return
             event.isCanceled = true
             if (message == "/wiki") {
-                LorenzUtils.chat("§e[SkyHanni] Opening the Fandom Wiki..")
+                LorenzUtils.chat("Opening the Fandom Wiki..")
                 OSUtils.openBrowser("${urlPrefix}Hypixel_SkyBlock_Wiki")
             } else if (message.startsWith("/wiki ") || message == ("/wikithis")) { //conditional to see if we need Special:Search page
                 if (message == ("/wikithis")) {
@@ -51,7 +51,7 @@ class WikiManager {
                     wikiTheItem(itemInHand)
                 } else {
                     val search = packet.message.split("/wiki ").last()
-                    LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$search")
+                    LorenzUtils.chat("Searching the Fandom Wiki for §a$search")
                     val wikiUrlCustom = "$urlSearchPrefix$search&scope=internal"
                     OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
                 }
@@ -73,7 +73,7 @@ class WikiManager {
     private fun wikiTheItem(item: ItemStack) {
         val itemDisplayName = (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
-        LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$itemDisplayName")
+        LorenzUtils.chat("Searching the Fandom Wiki for §a$itemDisplayName")
         val wikiUrlSearch = if (internalName != "NONE") "$urlSearchPrefix$internalName&scope=internal"
         else "$urlSearchPrefix${itemDisplayName.removeColor()}&scope=internal"
         OSUtils.openBrowser(wikiUrlSearch.replace(' ', '+'))

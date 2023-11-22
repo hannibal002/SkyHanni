@@ -1,12 +1,121 @@
 # SkyHanni - Change Log
 
-## Version 0.21 (unreleased)
+## Version 0.21.1
 
 ### New Features
+
++ Organised the config into sub categories. - nea & walker
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
+
+### Changes
+
+#### Garden Changes
+
++ Added mythic/Maeve visitor support. - walker & hannibal2
++ Added option to use custom Blocks per Second value in some Garden GUIs instead of the real one. - hannibal2
++ Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
++ Added support for Sunder 6 in /ff upgrades. - hannibal2
++ Added support for mythic in Visitor Drop Statistics. - hannibal2
++ Use the crop fortune from tab in Farming Fortune HUD. - alexia
++ Shows the last saved ff value in gray while switching tools instead of the question mark. - hannibal2
++ Removed chat message that your crop milestone data is correct. - hannibal2
++ Removed the message when crop milestones look different in the menu than stored SkyHanni data. - hannibal2
+    + We already have the correct data now, and Hypixel rounds the numbers in the menu poorly.
+    + Only show the Total Crop Milestone info in crop milestone inventory when below tier 20. - hannibal2
+    + Hypixel now has their own line for the same information for tier 20+
++ Make the FF Display only visible while holding a farming tool in hand. - hannibal2
++ Hide in crop milestone display the line with time remaining entirely when the milestone is maxed. - hannibal2
+
+#### Other Changes
+
++ Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
++ Add option to hide the chat message when toggling /shmouselock. - hannibal2
++ Reminds to use the GUI Position Editor hotkey. - hannibal2
+    + Reminds every 30 minutes after using /sh gui or clicking the GUI edit button.
++ Added Bookworm Book to the Estimated Item Value feature. - jani
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed new visitor alerts triggering wrongly and constantly. - Cad
++ Fixed visitor timer. - hannibal2
++ Fixed wrong Fungi Cutter mode warning not working. - walker
++ Fixed Maximum FF Needed display not showing in Jacob NPC menu. - hannibal2
++ Fixed calendar contest detection failing. - hannibal2
++ Fixed plot borders flickering and consistency errors when pressing the keybind - hannibal2
++ Fixed wrong ff needed values in Time Needed for Gold Medal GUI. - hannibal2
++ Fixed Farming Contest Medal Icons in Inventory not showing. - hannibal2
++ Fixed /ff not detecting collection analyst fortune. - hannibal2
++ Fixed Mushroom Cow Perk display not working. - hannibal2
++ Fixed visitor timer error if the visitors aren't unlocked yet. - hannibal2
++ Fixed farming weight no longer updating on block breaking. - hannibal2
++ Added cooldown to prevent spam clicking on farming weight buttons to open many web pages. - hannibal2
++ Fixed clickable farming weight GUI no longer opens #1000 in lb website. - hannibal2
++ Fixed /ff upgrade suggests updating bustling reforge even when no farming armor is found. - hannibal2
++ Fixed maxed sunder fortune in the /ff stats breakdown. - alexia
++ Fixed the farming contest summary not showing when the crop is buffed by Anita Talisman/Ring/Artifact. - hannibal2
++ Fixed Farming Fortune Display not showing for non crop-specific tools. - hannibal2
++ Fixed green thumb fortune in /ff to include Maeve. - hannibal2
++ Fixed crops per second and time remaining not using the 100 base ff in their formula. - alexia
+
+#### Other Fixes
+
++ Fixed showing "slayer boss spawn soon" message outside the correct slayer area. - hannibal2
++ Fixed blocking clicks on bazaar with player name "wiki". - hannibal2
++ Fixed highlighting some mobs in the dungeon wrongly as area mini bosses. - hannibal2
++ Fixed opening the Pet menu no longer updating the current pet display. - hannibal2
++ Fixed Archfiend Dice and High Class Archfiend Dice counting as slayer drops when rolled. - hannibal2
++ Fixed dice roll profit counting as Mob Kill Coins in Slayer Tracker. - hannibal2
++ Fixed Sack Display sometimes not formatting a million correctly. - Hize
++ Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
++ Fixed a bug with the ender chest and SkyHanni GUI editor. - hannibal2
++ Fixed crimson isle faction icon in tab list showing twice and not going away fully when enabling the "hide faction"
+  option of advanced player list. - hannibal2
+
+### Technical Details
+
++ Updated to a newer version of MoulConfig. - nea & walker
+    + This includes support for the new sub category part in the config.
++ Added TimeUtils.getDuration and deprecated TimeUtils.getMillis. - hannibal2
++ Created PetAPI and deprecated String.matchRegex(). - hannibal2
++ Extracted sacks, friends, known features and Jacob contests in to their separate files. - CalMWolfs
++ Add log clearing. - CalMWolfs
++ Add auto-prefix to chat message methods. - walker
++ Added support for extra data in error manager. - hannibal2
++ Added /readcropmilestonefromclipboard. - hannibal2
+    + This command reads the clipboard content, in the format of users sending crop milestone step data.
+    + The new data gets compared to the currently saved data, differences are getting replaced and the result gets put
+      into the clipboard. The clipboard context can be used to update the repo content.
+
+### Removed Features
+
++ Removed 100 Farming Fortune from "Show As Drop Multiplier" from all displays (also known as "base ff"). - hannibal2
+    + This can cause some numbers to show 100 FF too much. Simply update the values to fix it.
+    + Those "base FF" values were never really part of your farming fortune stats. They are just a result of looking at
+      the crop drop formula. SkyHanni used those values to be more comparable with other Discord Bots and spreadsheets.
+      This also caused confusion, so we have removed it entirely now.
+
+## Version 0.21
+
+### New Features
+
+#### Inventory
 
 + Added Quick Craft Confirmation. - Cad
     + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
     + Sack items can be crafted normally.
++ Added Shift Click Equipment. - Thunderblade73
+    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Added option to highlight items that are full in the sack inventory.
+
+#### GUI
+
 + Added **Compact Tab List**.
     + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
     + Option to hide Hypixel advertisment banners. - CalMWolfs
@@ -16,21 +125,21 @@
           party/friends/guild
         + Option to hide different parts of the player list: Player skins/icons, Hypixel rank color, Emblems, SkyBlock
           level
-+ Added Kick Duration. - hannibal2
-    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
-    + Useful if you get blocked because of 'You were kicked while joining that server!'.
-    + Send a warning and sound after a custom amount of seconds.
-+ Added Time In Limbo. - hannibal2
-    + Show the time since you entered limbo.
-    + Show a chat message for how long you were in limbo once you leave it.
-+ Added Highlight Party Members. - Cad
-    + Marking party members with a bright outline to better find them in the world.
-+ Added Shift Click Equipment. - Thunderblade73
-    + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Added AFK time to Discord RPC. - NetheriteMiner
+
+#### Chat
+
 + Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Added Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
+
+#### Rendering
+
++ Added Highlight Party Members. - Cad
+    + Marking party members with a bright outline to better find them in the world.
 + Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
     + Options to change speed, size, saturation and direction.
 + Added Modify Visual Words (command /shwords). - CalMWolfs
@@ -39,38 +148,48 @@
 + Added In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
++ Added **Arrow Trail Cosmetic** - Thunderblade73
+    + Draw a colored line behind the arrows in the air.
+    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
+      color, to change the time alive, and the line width.
+
+#### Crimson Isle
+
 + Added Quest Item Helper. - NetheriteMiner
     + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
       needed from the sacks.
++ Added Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
+    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
+
+##### Fishing
+
 + Added alerts when the player catches a Legendary Sea Creature. - Cad
++ Added **Fishing Bait Warnings.** - cimbraien
+    + Option to warn when no bait is used.
+    + Option to warn when used bait is changed.
+
+#### Dungeon
+
 + Added Soulweaver Skull Hider to the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
-+ Added /shmouselock command to lock mouse rotation for farming. - Cad
 + Added **Dungeon party finder** QOL improvements - Cad
     + Floor stack size.
     + Mark Paid Carries red.
     + Mark Low-Class levels orange.
     + Mark groups you can't join dark red.
     + Mark groups without your current classes green.
-+ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
-    + /pw -> party warp
-    + /pk -> party kick
-    + /pt -> party transfer
-    + /pp -> party promote
-    + /pko -> party kickoffline
 + Added working **Livid Finder** (should work 100% of the time). - hannibal2
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
-+ Added AFK time to Discord RPC. - NetheriteMiner
-+ Added option to highlight items that are full in the sack inventory.
-+ Added **Arrow Trail cosmetic** - Thunderblade73
-    + Draw a colored line behind the arrows in the air.
-    + Options to change the color of the line, to only show own arrows or every arrow, to have own arrows in a different
-      color, to change the time alive, and the line width.
-+ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
-    + E.g. inside the SkyBlock leveling guide.
-+ Added Chat **Translator** - NetheriteMiner
-    + After enabling, click on any chat message sent by another player to translate it to English.
+
+#### Garden
+
++ Added /shmouselock command to lock mouse rotation for farming. - Cad
++ Added Highlight Visitors in SkyBlock. - nea
+    + Highlights Visitors outside the Garden.
++ Block Interacting with Visitors. - nea
+    + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
++ Added Auto-Detection of Expired Pumpkin farming fortune. - CalMWolfs
 
 #### Events
 
@@ -82,7 +201,32 @@
 + Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
++ Added support for showing the Primal Fear data from tab list as GUI elements. - Erymanthus
++ Play warning sound when the next Primal Fear can spawn. - thunderblade73
 
+#### Commands
+
++ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
+    + /pw -> party warp
+    + /pk -> party kick
+    + /pt -> party transfer
+    + /pp -> party promote
+    + /pko -> party kickoffline
++ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
+    + E.g. inside the SkyBlock leveling guide.
++ Added command **/shpumpkin** to toggle include/exclude Expired Pumpkin farming fortune in the /ff GUI and in the true
+  ff
+  display. - CalMWolfs
+
+#### Misc
+
++ Added Kick Duration. - hannibal2
+    + Show in the Hypixel lobby since when you were last kicked from SkyBlock.
+    + Useful if you get blocked because of 'You were kicked while joining that server!'.
+    + Send a warning and sound after a custom amount of seconds.
++ Added Time In Limbo. - hannibal2
+    + Show the time since you entered limbo.
+    + Show a chat message for how long you were in limbo once you leave it.
 
 ### Changes
 
@@ -93,8 +237,8 @@
 + Made Fatal Tempo same as Chimera in Estimated Item Value. - jani
 + Added debug options for fishing hook display. - hannibal2
     + This should help find values that the fishing hook display works 100% with.
-+ Changed the color for the tab list Special Persons Mark.
-+ Mark SkyHanni Devs in the tab list special.
++ Changed the color for the tab list Special Persons Mark. - hannibal2
++ Mark SkyHanni Devs in the tab list special. - hannibal2
 + Added buttons to change the format of the price and the number in the sack display. - HiZe
 + Made Smoldering same as Fatal Tempo and Chimera in Estimated Item Value. - jani
 + Added an option to change where to get the items from in the composter overlay: from the bazaar or from sacks. - HiZe
@@ -119,9 +263,11 @@
     + Only items with recipes are tab completed.
 + Added option to set the size of highlighted motes orbs in rift and make them smaller by default. - cimbraien
 + Disabled clicks on SkyHanni GUIs while inside NEU's or Skytils profile viewer. - hannibal2
-+ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks sometimes. - hannibal2
++ Removed armor stand checks for Trevor Solver. This fixes or nerfs the feature to not highlight mobs behind blocks
+  sometimes. - hannibal2
 + Added diamond and gold essence support to PowderTracker. - walker
-+ Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search engine - Erymanthus
++ Change the fandom wiki search engine (under the /wiki command) from Google to the fandom wiki's built-in search
+  engine - Erymanthus
 + Added option to hide Chest Value while the Estimated Item Value display is showing. - hannibal2
 + No longer merging same items with different prices in Chest Value together. - hannibal2
 + Adding Great Spook support for Non God Pot Effect display. - hannibal2
@@ -129,6 +275,32 @@
 + Added support for detecting refreshed farming fortune century cake effect. - alexia
 + Show key to press below burrow warp. - hannibal2
 + Makes the Compact Potion message open the Potion effects menu on click. - jani
++ Added option to show King Talisman Helper outside Dwarven Mines. - hannibal2
++ In-Game Date: Adds support for reading the in-game scoreboard, and also allow sun/moon symbol customization. -
+  Erymanthus
++ Added Estimated Item Value support to NEU Profile Viewer - hannibal2
++ Added support to import SBE Visual Words into SkyHanni. - HiZe
++ Add custom keybinds for Harp Helper. - Thunderblade73
++ Show the custom hotkey name in the Harp inventory. - hannibal2
++ Added a GUI element to remind you while /shmouselock is enabled. - CalMWolfs
++ Make Crimson Isle Quest Item Helper only get amount needed. - NetheriteMiner
++ Change config order to alphabetical. - walker
++ Added commands /shresetpowdertracker and /shresetdicertracker to reset the Powder Tracker and Dicer Drop Tracker -
+  hannibal2
++ Added current session/total session switch for Dicer Drop Tracker. - hannibal2
++ Added a button to reset the local session for Dicer Drop Tracker and for Powder Tracker. - hannibal2
++ Added more features for Ender Node Tracker and Armor Drop Tracker. - hannibal2
+    + Added session/display mode support, added a button to reset the current session, and added the commands
+      /shresetendernodetracker and /shresetarmordroptracker to reset the full data.
++ Added support for different current sessions per profile for all new trackers: Ender Node, Armor Drop, Dicer Drop,
+  Powder and Slayer Profit Tracker
++ Added the option to change the Blaze Slayer Dagger GUI positions. - hannibal2
++ Added more features to the Frozen Treasure Tracker. - hannibal2
+    + Added session/display mode support, added a button to reset the current session, and added the commands
+      /shresetfrozentreasuretracker to reset the full data.
++ Added Slayer Profit Tracker support for loot from area mini-bosses. - hannibal2
++ No longer opening the empty /shdefaultoptions GUI. - walker
++ Added the SkyHanni icon and a link to the GitHub page for MC launchers like Prism to display. - hannibal2
 
 ### Bug Fixes
 
@@ -191,6 +363,38 @@
 + SkyHanni Keybinds no longer work inside SkyHanni config. - hannibal2
 + Fixed Great Spook potion not working in Non God Pot Effect feature. - jani
 + Fixed wrong Rhys (Deep Caverns NPC) items needed for Dwarven Mines unlock in Bingo Step Helper. - ReyMaratov
++ Fixed King Talisman Helper once again. - hannibal2
++ Made the ESC -> Mod Options -> SkyHanni -> Config button not crash you. - hannibal2
++ Disabled Diana Warp key and Inquis Share key while inside any GUI. - hannibal2
++ Removed Diana warp data on world switch. - hannibal2
++ Reset mouse sensitivity back to 100% if you log off with lock mouse look enabled. - hannibal2
++ Fixed mouse sensitivity stuck after restarting by storing old sensitivity. - CalMWolfs
++ Fixed tool fortune. - CalMWolfs
++ Fixed Item Ability Cooldown display not activating for Sword of Bad Health. - hannibal2
++ Fixed the crop name gets replaced to internal name in /shwords. - hannibal2
++ Show obfuscated fish as bait instead of caught item. - cimbraien
++ Fixed Estimated Item Value that renders twice inside NEU PV, by not rendering anything when the cursor is exactly in
+  between two items. - hannibal2
++ fixed more error messages with The Great Spook data getting stored in the Reputation Helper quest config
+  accidentally. - hannibal2
++ Hopefully fixed resets of Visitor Drops stats. - hannibal2
++ Fixed typo in The Art Of Peace. - walker
++ Fixed compatibility problems with ChatTriggers that caused flickering in the Estimated Item Value while inside the NEU
+  Profile Viewer. - hannibal2
++ Fixed Quest Item Helper showing negative numbers. - hannibal2
++ Fixed YouTuber and Admin ranks getting lost in the tab list. - walker
++ Added a cooldown to the current session tracker reset button to fix the chat spam. - hannibal2
++ Changed the color of the "Slayer boss soon!" warning from red to yellow. - hannibal2
++ Fixed a bug where some items were counted twice in the Slayer Profit Tracker. - hannibal2
++ Fixed item rarity errors in the museum. - hannibal2
++ Fixed mob highlighting problems with Blaze Slayer and Skytils. - hannibal2
++ Pablo Helper: Fixed some messages not showing the "get from sack" clickable message. - hannibal2
++ Fixed scoreboard date number suffixes are missing sometimes. - Erymanthus
++ Fixed the leftStronghold area not getting detected. - hannibal2
++ Fixed error message with Ashfang Blazes. - hannibal2
++ Fixed crash with pet exp tooltip. - hannibal2
++ Fixed dungeoneering showing as 0 in the skill menu. - hannibal2
++ Fixed showing minion level as 101 in some menus. - hannibal2
 
 #### Config
 
@@ -202,7 +406,7 @@
 + Removed **Duplicate Hider**.
     + Hypixel now fixed the bug themselves and hides duplicate farming contests in the Jacob inventory.
 
-#### Internal Changes
+#### Technical Details
 
 + Add Repo TODOs to regex patterns. - walker
 + Moved many patterns from function scope to members. - hannibal2
@@ -216,6 +420,33 @@
   java config files (names, description, orderings and stuff).
 + Adding 100 lines to MobFinder.kt and making it better readable in the process. - walker
 + Making ChatFiler.kt way better, storing regex objects for reuse and preparing future repo support. - walker
++ Added command /shkingfix to reset the internal King Talisman Helper offset. - hannibal2
++ Updated dependency version of junixsocket in DiscordIPC so that antivirus websites no longer show false positives. -
+  NetheriteMiner
++ Changed wrong/missing neu version message to show NEU version 2.1.1-Pre-4 instead of beta versions. - CalMWolfs
++ Deleting the old "hidden" part of the config. - hannibal2
++ This will reset parts of the config for users with 7-month-old SkyHanni versions that want to migrate into the
+  present.
++ Added a workaround for the NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering
+  over the border between two items. - hannibal2
++ Using visitorDrops.visitorRarities directly from the config instead of accessing the local field. Hopefully this will
+  prevent partial config resets in the future. - hannibal2
++ Added a tracker API that can be used for all features in SkyHanni that currently track stuff that the user collects. -
+  hannibal2
++ Added the slayer profit tracker logic (command to reset, toggle between total view and session view, and button to
+  delete session) to powder tracker and Dicer Drop Tracker. - hannibal2
++ Added support for migrating parts of the player or session storage. - nea
++ Changed the config format for dicerRngDrops/dicerDropsTracker. - hannibal2
++ Created SkyHanniTracker, the core API for working with tracker stuff. This should be used everywhere someday in the
+  future. - hannibal2
++ Used SkyHanniTracker in FrozenTreasureTracker. - hannibal2
++ Added /shdebugwaypoint as a test/debug command. - hannibal2
++ Added debug messages to detect hot swaps. - hannibal2
++ Added /shdebugtablist
++ Set your clipboard as a fake tab list. - hannibal2
++ /shversion now copies the SkyHanni version into the clipboard as well. - hannibal2
++ Moved location fixes to the repo. - hannibal2
++ Added debug information for PetExpTooltip crash. - hannibal2
 
 ## Version 0.20
 
