@@ -62,7 +62,7 @@ object UpdateManager {
         }
     }
 
-    private fun isBetaRelease(): Boolean {
+    fun isCurrentlyBeta(): Boolean {
         return getCurrentVersion().contains("beta", ignoreCase = true)
     }
 
@@ -82,7 +82,7 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         var updateStream = config.updateStream.get()
-        if (updateStream == About.UpdateStream.RELEASES && isBetaRelease()) {
+        if (updateStream == About.UpdateStream.RELEASES && isCurrentlyBeta()) {
             updateStream = About.UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)

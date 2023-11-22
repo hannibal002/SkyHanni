@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
-import at.hannibal2.skyhanni.test.command.ErrorManager.logErrorWithData
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
@@ -366,7 +366,7 @@ object EntityOutlineRenderer {
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
         } catch (e: NoClassDefFoundError) {
-            logErrorWithData(e, "Unable to enable entity outlines, the required mixin is not loaded")
+            ErrorManager.logErrorWithData(e, "Unable to enable entity outlines, the required mixin is not loaded")
             isMissingMixin = true
             return
         }

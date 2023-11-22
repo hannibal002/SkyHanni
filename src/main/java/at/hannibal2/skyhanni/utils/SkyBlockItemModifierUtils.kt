@@ -254,7 +254,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 
-    class GemstoneSlot(val type: GemstoneType, private val quality: GemstoneQuality) {
+    class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
         fun getInternalName() = "${quality}_${type}_GEM".asInternalName()
     }
 

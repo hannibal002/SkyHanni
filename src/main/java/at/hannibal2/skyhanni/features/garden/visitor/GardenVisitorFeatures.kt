@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -80,12 +81,20 @@ class GardenVisitorFeatures {
         val visitor = event.visitor
         val offerItem = visitor.offer!!.offerItem
 
-        for (line in offerItem.getLore()) {
+        val lore = offerItem.getLore()
+        for (line in lore) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
             val pair = ItemUtils.readItemAmount(line)
             if (pair == null) {
+                ErrorManager.logErrorStateWithData(
+                    "Could not read items required in Visitor Inventory", "ItemUtils.readItemAmount returns null",
+                    "line" to line,
+                    "offerItem" to offerItem,
+                    "lore" to lore,
+                    "visitor" to visitor
+                )
                 continue
             }
             val (itemName, amount) = pair

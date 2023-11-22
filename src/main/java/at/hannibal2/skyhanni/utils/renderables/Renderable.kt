@@ -35,7 +35,7 @@ interface Renderable {
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
-            private set
+            set
 
         fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
@@ -90,7 +90,7 @@ interface Renderable {
             return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
         }
 
-        private fun clickable(
+        fun clickable(
             render: Renderable,
             onClick: () -> Unit,
             button: Int = 0,
@@ -195,7 +195,7 @@ interface Renderable {
             return result
         }
 
-        private fun underlined(renderable: Renderable) = object : Renderable {
+        fun underlined(renderable: Renderable) = object : Renderable {
             override val width: Int
                 get() = renderable.width
             override val height = 10
@@ -207,7 +207,7 @@ interface Renderable {
             }
         }
 
-        private fun hoverable(
+        fun hoverable(
             hovered: Renderable,
             unhovered: Renderable,
             bypassChecks: Boolean = false,
@@ -254,7 +254,7 @@ interface Renderable {
             }
         }
 
-        private fun placeholder(width: Int) = object : Renderable {
+        fun placeholder(width: Int) = object : Renderable {
             override val width: Int = width
             override val height = 10
 

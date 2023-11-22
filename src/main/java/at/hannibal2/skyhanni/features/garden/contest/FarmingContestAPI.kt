@@ -128,7 +128,7 @@ object FarmingContestAPI {
 
     fun getContestAtTime(time: Long) = contests[time]
 
-    private fun getContestsOfType(crop: CropType) = contests.values.filter { it.crop == crop }
+    fun getContestsOfType(crop: CropType) = contests.values.filter { it.crop == crop }
 
     fun calculateAverages(crop: CropType): Pair<Int, Map<ContestBracket, Int>> {
         var amount = 0

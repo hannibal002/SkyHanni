@@ -31,6 +31,6 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
         fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
         fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
 
-        private fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
     }
 }
