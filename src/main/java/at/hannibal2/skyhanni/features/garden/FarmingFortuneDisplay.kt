@@ -72,7 +72,7 @@ class FarmingFortuneDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
-        if (GardenAPI.cropInHand == null) return
+        if (GardenAPI.toolInHand == null) return
         config.pos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
