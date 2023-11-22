@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -66,7 +67,7 @@ object Commands {
     private val openMainMenu: (Array<String>) -> Unit = {
         if (it.isNotEmpty()) {
             if (it[0].lowercase() == "gui") {
-                GuiEditManager.openGuiPositionEditor()
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             } else {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
@@ -314,6 +315,10 @@ object Commands {
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
         ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
+        registerCommand(
+            "readcropmilestonefromclipboard",
+            "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
+        ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
     }
 
     private fun internalCommands() {

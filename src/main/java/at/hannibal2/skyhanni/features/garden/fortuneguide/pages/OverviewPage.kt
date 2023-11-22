@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentArmor
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentEquipment
@@ -243,12 +244,13 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
+        val maxGreenThumbFortune = GardenAPI.totalAmountVisitorsExisting.toDouble() / 4
         line =
             if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
             else "§7§2Total enchantment fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar(
             "§2$word Enchantment", line, equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
-            if (currentEquipment == 0) 78 else 19.5,
+            if (currentEquipment == 0) maxGreenThumbFortune * 4 else maxGreenThumbFortune,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
     }

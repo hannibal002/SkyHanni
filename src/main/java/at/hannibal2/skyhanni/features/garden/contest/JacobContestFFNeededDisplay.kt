@@ -104,16 +104,7 @@ class JacobContestFFNeededDisplay {
         }
     }
 
-    private fun formatFarmingFortune(farmingFortune: Double): String {
-        var ff = farmingFortune
-        if (!config.farmingFortunes.dropMultiplier) {
-            ff -= 100
-            if (ff < 100) {
-                ff = 0.0
-            }
-        }
-        return ceil(ff).addSeparators()
-    }
+    private fun formatFarmingFortune(farmingFortune: Double) = ceil(farmingFortune).addSeparators()
 
     private fun getLine(bracket: ContestBracket, map: Map<ContestBracket, Int>, crop: CropType): String {
         val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"

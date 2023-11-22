@@ -16,7 +16,7 @@ public class GUIConfig {
 
     @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
-    public Runnable positions = GuiEditManager::openGuiPositionEditor;
+    public Runnable positions = () -> GuiEditManager.openGuiPositionEditor(true);
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")

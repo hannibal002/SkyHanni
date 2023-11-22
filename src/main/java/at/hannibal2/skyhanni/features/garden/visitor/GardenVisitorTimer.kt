@@ -92,7 +92,7 @@ class GardenVisitorTimer {
                 queueFull = true
                 continue
             }
-            if (line == "§b§lVisitors: §r§cNot Unlocked!") {
+            if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
                 render = ""
                 return
             }
@@ -142,7 +142,10 @@ class GardenVisitorTimer {
         }
 
         if (lastMillis == Duration.INFINITE) {
-            LorenzUtils.error("Found Visitor Timer bug, reset value (lastMillis was infinite).")
+            ErrorManager.logErrorStateWithData(
+                "Found Visitor Timer bug, reset value", "lastMillis was infinite",
+                "lastMillis" to lastMillis
+            )
             lastMillis = 0.seconds
         }
 
