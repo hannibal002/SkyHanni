@@ -153,7 +153,7 @@ object VisitorAPI {
                 found = false
                 continue
             }
-            val name = VisitorAPI.fromHypixelName(line)
+            val name = fromHypixelName(line)
 
             // Hide hypixel watchdog entries
             if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
