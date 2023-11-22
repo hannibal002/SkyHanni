@@ -7,7 +7,7 @@ import net.minecraft.entity.item.EntityItemFrame
 import java.util.function.Consumer
 
 class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) :
-        LorenzEvent() {
+    LorenzEvent() {
 
     /**
      * The phase of the event (see [Type]

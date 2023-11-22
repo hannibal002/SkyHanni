@@ -98,7 +98,7 @@ object FontRendererHook {
     }
 
     @JvmStatic
-    fun forceWhiteColorCode(i1: Int) : Int {
+    fun forceWhiteColorCode(i1: Int): Int {
         if (!LorenzUtils.inSkyBlock) return i1
 
         if (!SkyHanniMod.feature.chroma.enabled) return i1
@@ -141,8 +141,16 @@ object FontRendererHook {
         return if (LorenzUtils.inSkyBlock && !SkyHanniMod.feature.chroma.enabled) constant else "0123456789abcdefklmnorz"
     }
 
+    // TODO add better parameter names
     @JvmStatic
-    fun toggleChromaCondition_shouldResetStyles(text: String, shadow: Boolean, ci: CallbackInfo, i: Int, c0: Char, i1: Int): Boolean {
+    fun toggleChromaCondition_shouldResetStyles(
+        text: String,
+        shadow: Boolean,
+        ci: CallbackInfo,
+        i: Int,
+        c0: Char,
+        i1: Int
+    ): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         if (!SkyHanniMod.feature.chroma.enabled) return false
         if (i1 == 22) {

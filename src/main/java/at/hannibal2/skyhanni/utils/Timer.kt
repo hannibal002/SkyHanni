@@ -11,7 +11,7 @@ class Timer(
     private var started: SimpleTimeMark = SimpleTimeMark.now(),
 
     startPaused: Boolean = false
-): Comparable<Timer> {
+) : Comparable<Timer> {
 
     @Expose
     private var paused: SimpleTimeMark? = null

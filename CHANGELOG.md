@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.21.1 (unreleased)
+## Version 0.21.1
 
 ### New Features
 
@@ -29,6 +29,7 @@
     + Only show the Total Crop Milestone info in crop milestone inventory when below tier 20. - hannibal2
     + Hypixel now has their own line for the same information for tier 20+
 + Make the FF Display only visible while holding a farming tool in hand. - hannibal2
++ Hide in crop milestone display the line with time remaining entirely when the milestone is maxed. - hannibal2
 
 #### Other Changes
 
@@ -59,6 +60,9 @@
 + Fixed /ff upgrade suggests updating bustling reforge even when no farming armor is found. - hannibal2
 + Fixed maxed sunder fortune in the /ff stats breakdown. - alexia
 + Fixed the farming contest summary not showing when the crop is buffed by Anita Talisman/Ring/Artifact. - hannibal2
++ Fixed Farming Fortune Display not showing for non crop-specific tools. - hannibal2
++ Fixed green thumb fortune in /ff to include Maeve. - hannibal2
++ Fixed crops per second and time remaining not using the 100 base ff in their formula. - alexia
 
 #### Other Fixes
 
@@ -71,6 +75,8 @@
 + Fixed Sack Display sometimes not formatting a million correctly. - Hize
 + Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
 + Fixed a bug with the ender chest and SkyHanni GUI editor. - hannibal2
++ Fixed crimson isle faction icon in tab list showing twice and not going away fully when enabling the "hide faction"
+  option of advanced player list. - hannibal2
 
 ### Technical Details
 

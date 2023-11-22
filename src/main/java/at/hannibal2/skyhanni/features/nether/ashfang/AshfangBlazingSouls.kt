@@ -65,5 +65,5 @@ class AshfangBlazingSouls {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+        DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
 }

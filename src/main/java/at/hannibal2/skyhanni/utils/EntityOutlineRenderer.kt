@@ -293,7 +293,7 @@ object EntityOutlineRenderer {
         // Only render the view entity when sleeping or in 3rd person mode
         if (entity === mc.renderViewEntity &&
             !(mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                    mc.gameSettings.thirdPersonView != 0)
+                mc.gameSettings.thirdPersonView != 0)
         ) {
             false
         } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (mc.renderManager.shouldRender(
