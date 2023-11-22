@@ -35,11 +35,12 @@ class DungeonCopilot {
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        val blockReason = copilot(event.message)
-        if (blockReason != "") event.blockedReason = blockReason
+        copilot(event.message)?.let {
+            event.blockedReason = it
+        }
     }
 
-    private fun copilot(message: String): String {
+    private fun copilot(message: String): String? {
         countdownPattern.matchMatcher(message) {
             changeNextStep("Ready up")
         }
@@ -77,7 +78,7 @@ class DungeonCopilot {
             changeNextStep("Enter Boss Room")
             return "dungeon_copilot"
         }
-        return ""
+        return null
     }
 
     private fun changeNextStep(step: String) {
