@@ -36,6 +36,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
+import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -165,7 +166,7 @@ class MobData {
         devTracker.data.deSpawn++
         currentEntityToMobMap[entity]?.let {
             when (it.mobType) {
-                MobType.Player -> MobEvent.DeSpawn.Summon(it)
+                MobType.Player -> MobEvent.DeSpawn.Player(it)
                 MobType.Summon -> MobEvent.DeSpawn.Summon(it)
                 MobType.Special -> MobEvent.DeSpawn.Special(it)
                 MobType.Projectile -> MobEvent.DeSpawn.Projectile(it)
@@ -205,15 +206,17 @@ class MobData {
             devTracker.data.retries++
             if (retry.times > MAX_RETRIES) {
                 LorenzDebug.log(
-                    "I (${retry.entity.name} missed. Position: ${retry.entity.getLorenzVec()} Distance: ${
+                    "I (`${retry.entity.name}`${retry.entity.entityId} missed. Position: ${retry.entity.getLorenzVec()} Distance: ${
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     } , ${
                         entity.getLorenzVec().subtract(LocationUtils.playerLocation())
                     }"
                 )
                 devTracker.data.misses++
-                iterator.remove()
-                continue
+                // Temporary Change
+                // iterator.remove()
+                retry.times = Int.MIN_VALUE
+                // continue
             }
             if (!EntitySpawn(entity)) {
                 retry.times++
@@ -239,6 +242,7 @@ class MobData {
         when (packet) {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
+            is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
         }
     }
 

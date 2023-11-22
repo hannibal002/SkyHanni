@@ -54,7 +54,7 @@ object MobFilter {
         this is EntityArmorStand -> false
         this is EntityOtherPlayerMP && this.isRealPlayer() -> false
         this.isDisplayNPC() -> false
-        this is EntityWither && (this.entityId < 0 || this.name == "Wither") -> false
+        this is EntityWither && (this.entityId < 0 || this.invulTime == 800) -> false
         this is EntityPlayerSP -> false
         else -> true
     }
