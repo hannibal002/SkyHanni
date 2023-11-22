@@ -66,7 +66,7 @@ object UpdateManager {
         return getCurrentVersion().contains("beta", ignoreCase = true)
     }
 
-    val config get() = SkyHanniMod.feature.about
+    private val config get() = SkyHanniMod.feature.about
 
     fun reset() {
         updateState = UpdateState.NONE
