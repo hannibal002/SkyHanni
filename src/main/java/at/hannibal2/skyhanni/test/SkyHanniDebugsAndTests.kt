@@ -250,6 +250,14 @@ class SkyHanniDebugsAndTests {
             LorenzUtils.chat("stopped ${modules.size} listener classes.")
         }
 
+        fun whereami() {
+            if (LorenzUtils.inSkyBlock) {
+                LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+                return
+            }
+            LorenzUtils.chat("§eYou are not in Skyblock.")
+        }
+
         fun copyLocation(args: Array<String>) {
             val location = LocationUtils.playerLocation()
             val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
