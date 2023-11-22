@@ -50,11 +50,7 @@ class DungeonHideItems {
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
         val itemStack = entity.inventory[4]
-        if (itemStack != null && itemStack.cleanName() == "Skeleton Skull") {
-            return true
-        }
-
-        return false
+        return itemStack != null && itemStack.cleanName() == "Skeleton Skull"
     }
 
     @SubscribeEvent

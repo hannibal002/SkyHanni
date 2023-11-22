@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
@@ -57,11 +58,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss): Boolean {
         val bossQuest = reputationHelper.questHelper.getQuest<MiniBossQuest>()
-        if (bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED) {
-            return true
-        }
-
-        return false
+        return bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED
     }
 
     private fun finished(miniBoss: CrimsonMiniBoss) {
@@ -84,7 +81,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
-                    lineList.add(NEUItems.getItemStack(displayItem))
+                    lineList.add(getItemStack())
                     lineList.add("§5$displayName§7: $result")
                     display.add(lineList)
                 }
