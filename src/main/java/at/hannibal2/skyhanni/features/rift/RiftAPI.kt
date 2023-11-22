@@ -29,6 +29,8 @@ object RiftAPI {
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
-    fun inStillgoreChateau() = LorenzUtils.skyBlockArea == "Stillgore Château" || LorenzUtils.skyBlockArea == "Oubliette"
+    fun inStillgoreChateau() =
+        LorenzUtils.skyBlockArea == "Stillgore Château" || LorenzUtils.skyBlockArea == "Oubliette"
+
     fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
 }

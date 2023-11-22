@@ -37,7 +37,10 @@ class PlayerDeathMessages {
         val message = event.message
         deathMessagePattern.matchMatcher(message) {
             val name = group("name")
-            if (SkyHanniMod.feature.markedPlayers.highlightInChat && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)) {
+            if (SkyHanniMod.feature.markedPlayers.highlightInChat && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(
+                    name
+                )
+            ) {
                 val reason = group("reason").removeColor()
                 LorenzUtils.chat(" §c☠ §e$name §7$reason", false)
                 event.blockedReason = "marked_player_death"
@@ -45,7 +48,11 @@ class PlayerDeathMessages {
             }
 
 
-            if (isHideFarDeathsEnabled() && System.currentTimeMillis() > lastTimePlayerSeen.getOrDefault(name, 0) + 30_000) {
+            if (isHideFarDeathsEnabled() && System.currentTimeMillis() > lastTimePlayerSeen.getOrDefault(
+                    name,
+                    0
+                ) + 30_000
+            ) {
                 event.blockedReason = "far_away_player_death"
             }
         }

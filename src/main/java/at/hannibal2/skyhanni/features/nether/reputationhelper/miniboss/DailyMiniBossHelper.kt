@@ -57,11 +57,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss): Boolean {
         val bossQuest = reputationHelper.questHelper.getQuest<MiniBossQuest>()
-        if (bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED) {
-            return true
-        }
-
-        return false
+        return bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED
     }
 
     private fun finished(miniBoss: CrimsonMiniBoss) {
