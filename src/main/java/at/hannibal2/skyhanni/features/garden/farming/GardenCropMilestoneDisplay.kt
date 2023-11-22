@@ -171,9 +171,7 @@ object GardenCropMilestoneDisplay {
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            if (crop.isMaxed()) {
-                lineMap[3] = listOf("§7In §bMaxed")
-            } else {
+            if (!crop.isMaxed()) {
                 val missing = need - have
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
