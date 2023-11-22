@@ -167,7 +167,7 @@ object GardenCropMilestoneDisplay {
 
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
-        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
+        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).round(1).toInt()
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
