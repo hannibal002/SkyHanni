@@ -80,7 +80,7 @@ object DungeonLividFinder {
         RenderLivingEntityHelper.setNoHurtTime(newLivid) { shouldHighlight() }
     }
 
-    fun shouldHighlight() = getLividAlive() != null && config.enabled
+    private fun shouldHighlight() = getLividAlive() != null && config.enabled
 
     private fun getLividAlive() = lividEntity?.let {
         if (!it.isDead && it.health > 0.5) it else null
@@ -132,7 +132,7 @@ object DungeonLividFinder {
         gotBlinded = false
     }
 
-    fun inDungeon(): Boolean {
+    private fun inDungeon(): Boolean {
         if (!LorenzUtils.inDungeons) return false
         if (!DungeonAPI.inBossRoom) return false
         if (!DungeonAPI.isOneOf("F5", "M5")) return false

@@ -49,7 +49,7 @@ class RiftWiltedBerberisHelper {
         }
     }
 
-    fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
+    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
         return list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
     }

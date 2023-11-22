@@ -6,7 +6,7 @@ import net.minecraft.util.AxisAlignedBB
 
 object LocationUtils {
 
-    fun canSee(a: LorenzVec, b: LorenzVec): Boolean {
+    private fun canSee(a: LorenzVec, b: LorenzVec): Boolean {
         return Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
     }
 
@@ -28,7 +28,7 @@ object LocationUtils {
         return vec.add(0.0, 0.0 + player.getEyeHeight(), 0.0)
     }
 
-    fun AxisAlignedBB.isVecInside(vec: LorenzVec) = isVecInside(vec.toVec3())
+    private fun AxisAlignedBB.isVecInside(vec: LorenzVec) = isVecInside(vec.toVec3())
 
     fun AxisAlignedBB.isPlayerInside() = isVecInside(playerLocation())
 

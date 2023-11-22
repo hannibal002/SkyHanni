@@ -44,7 +44,7 @@ object FontRendererHook {
      * [FontRenderer#drawString()][net.minecraft.client.gui.FontRenderer.drawString] rather than a custom font renderer
      *
      */
-    fun setupChromaFont() {
+    private fun setupChromaFont() {
         DRAW_CHROMA.startChroma()
         DRAW_CHROMA_SHADOW.startChroma()
     }
@@ -52,7 +52,7 @@ object FontRendererHook {
     /**
      * See [setupChromaFont]
      */
-    fun endChromaFont() {
+    private fun endChromaFont() {
         DRAW_CHROMA.endChroma()
         DRAW_CHROMA_SHADOW.endChroma()
     }

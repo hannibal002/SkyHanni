@@ -244,7 +244,7 @@ object RenderUtils {
     /**
      * @author Mojang
      */
-    fun drawNametag(str: String, color: Color?) {
+    private fun drawNametag(str: String, color: Color?) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         val f1 = 0.02666667f
         GlStateManager.pushMatrix()
@@ -352,7 +352,7 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.transform(): Pair<Int, Int> {
+    private fun Position.transform(): Pair<Int, Int> {
         GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
         GlStateManager.scale(effectiveScale, effectiveScale, 1F)
         val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()

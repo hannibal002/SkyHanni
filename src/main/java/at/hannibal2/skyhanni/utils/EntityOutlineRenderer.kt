@@ -339,7 +339,7 @@ object EntityOutlineRenderer {
         }
     }
 
-    fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
+    private fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
 
     private fun isXrayCacheEmpty() = entityRenderCache.xrayCache?.isEmpty() ?: true
     private fun isNoXrayCacheEmpty() = entityRenderCache.noXrayCache?.isEmpty() ?: true

@@ -59,7 +59,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.popMatrix()
     }
 
-    fun getButtonPosition(width: Int) = width - button.width
+    private fun getButtonPosition(width: Int) = width - button.width
     override fun getHeight(): Int {
         return 55
     }

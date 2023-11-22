@@ -60,7 +60,7 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
-    fun nextLexicographicallyStringWithSameLength(input: String): String {
+    private fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
         val lastChar = input[lastCharPosition]
