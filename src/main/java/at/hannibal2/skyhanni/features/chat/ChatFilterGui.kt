@@ -61,11 +61,11 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
             if (mouseX in 0..w && mouseY in 0..(size * 10) && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
-                    LorenzUtils.chat("Copied structured chat line to clipboard")
+                    LorenzUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = LorenzUtils.stripVanillaMessage(msg.message.formattedText)
                     OSUtils.copyToClipboard(message)
-                    LorenzUtils.chat("Copied chat line to clipboard")
+                    LorenzUtils.chat("Copied chat line to clipboard", false)
                 }
             }
             mouseY -= size * 10
@@ -76,7 +76,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         GlStateManager.color(1f, 1f, 1f, 1f)
     }
 
-    fun splitLine(comp: IChatComponent): List<IChatComponent> {
+    private fun splitLine(comp: IChatComponent): List<IChatComponent> {
         return GuiUtilRenderComponents.splitText(
             comp,
             w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10),
@@ -93,11 +93,11 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         }
     }
 
-    fun setScroll(newScroll: Double) {
+    private fun setScroll(newScroll: Double) {
         this.scroll = newScroll.coerceAtMost(historySize - h + 10.0).coerceAtLeast(0.0)
     }
 
-    fun drawMultiLineText(comp: IChatComponent, xPos: Int): Int {
+    private fun drawMultiLineText(comp: IChatComponent, xPos: Int): Int {
         val modifiedSplitText = splitLine(comp)
         for (line in modifiedSplitText) {
             drawString(

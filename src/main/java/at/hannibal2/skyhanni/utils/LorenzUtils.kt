@@ -64,28 +64,78 @@ object LorenzUtils {
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-    const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+    // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
+    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
+    private val ERROR_PREFIX by lazy { "§c[SkyHanni-${SkyHanniMod.version}] " }
+    private const val CHAT_PREFIX = "[SkyHanni] "
+
+    /**
+     * Sends a debug message to the chat and the console.
+     * This is only sent if the debug feature is enabled.
+     *
+     * @param message The message to be sent
+     *
+     * @see DEBUG_PREFIX
+     */
     fun debug(message: String) {
         if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
             consoleLog("[Debug] $message")
         }
     }
 
-    // TODO remove ig?
-    fun warning(message: String) {
-        internalChat("§cWarning! $message")
+    /**
+     * Sends a message to the user that they did something incorrectly.
+     * We should tell them what to do instead as well.
+     *
+     * @param message The message to be sent
+     *
+     * @see USER_ERROR_PREFIX
+     */
+    fun userError(message: String) {
+        internalChat(USER_ERROR_PREFIX + message)
     }
 
+    /**
+     * Sends a message to the user that an error occurred caused by something in the code.
+     * This should be used for errors that are not caused by the user.
+     *
+     * Why deprecate this? Even if this message is descriptive for the user and the developer,
+     * we don't want inconsitencies in errors, and we would need to search
+     * for the code line where this error gets printed any way.
+     * so it's better to use the stack trace still.
+     *
+     * @param message The message to be sent
+     * @param prefix Whether to prefix the message with the error prefix, default true
+     *
+     * @see ERROR_PREFIX
+     */
+    @Deprecated(
+        "Do not send the user a non clickable non stacktrace containing error message.",
+        ReplaceWith("ErrorManager")
+    )
     fun error(message: String) {
         println("error: '$message'")
-        internalChat("§c$message")
+        internalChat(ERROR_PREFIX + message)
     }
 
-    fun chat(message: String) {
-        internalChat(message)
+    /**
+     * Sends a message to the user
+     * @param message The message to be sent
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+        if (prefix) {
+            internalChat(prefixColor + CHAT_PREFIX + message)
+        } else {
+            internalChat(message)
+        }
     }
 
     private fun internalChat(message: String): Boolean {
@@ -133,9 +183,9 @@ object LorenzUtils {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
         val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString()
-        val b = toString()
-        return if (a.length > b.length) this else result.toFloat()
+        val a = result.toString().length
+        val b = toString().length
+        return if (a > b) this else result.toFloat()
     }
 
     // TODO replace all calls with regex
@@ -244,8 +294,18 @@ object LorenzUtils {
         lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
     }
 
-    fun clickableChat(message: String, command: String) {
-        val text = ChatComponentText(message)
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param command The command to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
         val fullCommand = "/" + command.removePrefix("/")
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
@@ -253,13 +313,30 @@ object LorenzUtils {
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
-    fun hoverableChat(message: String, hover: List<String>, command: String? = null) {
-        val text = ChatComponentText(message)
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param hover The message to be shown when the message is hovered
+     * @param command The command to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun hoverableChat(
+        message: String,
+        hover: List<String>,
+        command: String? = null,
+        prefix: Boolean = true,
+        prefixColor: String = "§e"
+    ) {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
 
-        if (command != null) {
-            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        command?.let {
+            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${it.removePrefix("/")}")
         }
 
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
@@ -412,10 +489,12 @@ object LorenzUtils {
             }
         }
 
-    fun List<String>.nextAfter(after: String, skip: Int = 1): String? {
+    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after}, skip)
+
+    fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
         var missing = -1
         for (line in this) {
-            if (line == after) {
+            if (after(line)) {
                 missing = skip - 1
                 continue
             }

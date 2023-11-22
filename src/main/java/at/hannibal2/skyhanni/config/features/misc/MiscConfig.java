@@ -204,6 +204,13 @@ public class MiscConfig {
     public boolean showTimeInLimbo = true;
 
     @Expose
+    @ConfigOption(
+        name = "Lock Mouse Message",
+        desc = "Show a message in chat when toggling the /shmouselock.")
+    @ConfigEditorBoolean
+    public boolean lockMouseLookChatMessage = true;
+
+    @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose

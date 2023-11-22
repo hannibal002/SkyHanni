@@ -54,7 +54,7 @@ class AccountUpgradeReminder {
         lastReminderSend = SimpleTimeMark.now()
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
+            "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
             "shstopaccountupgradereminder"
         )
     }

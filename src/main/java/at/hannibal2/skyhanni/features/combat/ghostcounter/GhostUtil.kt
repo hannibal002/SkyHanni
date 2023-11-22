@@ -65,7 +65,7 @@ object GhostUtil {
         val c = ProfileStorageData.profileSpecific?.ghostCounter ?: return
         if (isUsingCTGhostCounter()) {
             if (c.ctDataImported) {
-                LorenzUtils.chat("§e[SkyHanni] §cYou already imported GhostCounterV3 data!")
+                LorenzUtils.userError("You already imported GhostCounterV3 data!")
                 return
             }
             val json = ConfigManager.gson.fromJson(
@@ -83,9 +83,9 @@ object GhostUtil {
                 ?: json["TotalMF"].asDouble
             GhostData.Option.TOTALDROPS.add(json["TotalDrops"].asDouble)
             c.ctDataImported = true
-            LorenzUtils.chat("§e[SkyHanni] §aImported data successfully!")
+            LorenzUtils.chat("§aImported data successfully!")
         } else
-            LorenzUtils.chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
+            LorenzUtils.error("GhostCounterV3 ChatTriggers module not found!")
     }
 
     fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))

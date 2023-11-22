@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -30,6 +32,7 @@ object SackAPI {
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
+
     // TODO USE SH-REPO
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val numPattern =
@@ -64,7 +67,7 @@ object SackAPI {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
-        val match = sackPattern.matcher(inventoryName).matches()
+        val match = sackPattern.matches(inventoryName)
         if (!match) return
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
@@ -294,7 +297,7 @@ object SackAPI {
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
-        SkyHanniMod.configManager.saveSackData("saving-data")
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
     }
 
     data class SackGemstone(
