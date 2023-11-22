@@ -39,7 +39,7 @@ class GardenCropUpgrades {
     }
 
     companion object {
-        private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.config?.cropUpgrades
+        private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropUpgrades
 
         fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
 

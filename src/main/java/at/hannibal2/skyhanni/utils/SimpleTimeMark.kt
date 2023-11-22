@@ -7,17 +7,22 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @JvmInline
 value class SimpleTimeMark(private val millis: Long) {
+
     operator fun minus(other: SimpleTimeMark) =
         (millis - other.millis).milliseconds
 
     operator fun plus(other: Duration) =
         SimpleTimeMark(millis + other.inWholeMilliseconds)
 
-    fun passedSince() = if (millis == 0L) Duration.INFINITE else now() - this
+    operator fun minus(other: Duration) = plus(-other)
+
+    fun passedSince() = now() - this
 
     fun timeUntil() = -passedSince()
 
     fun isInPast() = timeUntil().isNegative()
+
+    fun isFarPast() = millis == 0L
 
     override fun toString(): String {
         if (millis == 0L) return "The Far Past"

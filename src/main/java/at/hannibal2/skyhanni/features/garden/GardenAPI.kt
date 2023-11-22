@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -46,15 +47,16 @@ object GardenAPI {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
-    var mushroomCowPet = false
+    val mushroomCowPet get() = PetAPI.currentPet?.contains("Mooshroom Cow") ?: false
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
-    val config get() = ProfileStorageData.profileSpecific?.garden
+    val storage get() = ProfileStorageData.profileSpecific?.garden
+    var totalAmountVisitorsExisting = 0
     var gardenExp: Long?
-        get() = config?.experience
+        get() = storage?.experience
         set(value) {
             value?.let {
-                config?.experience = it
+                storage?.experience = it
             }
         }
 
@@ -82,13 +84,6 @@ object GardenAPI {
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return
             checkItemInHand()
-        }
-    }
-
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (inGarden()) {
-            mushroomCowPet = event.tabList.any { it.startsWith(" Strength: §r§c❁") }
         }
     }
 
@@ -143,7 +138,7 @@ object GardenAPI {
         return false
     }
 
-    fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    fun inGarden() = IslandType.GARDEN.isInIsland()
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
@@ -161,13 +156,13 @@ object GardenAPI {
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
+        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
 
     fun clearCropSpeed() {
-        config?.cropsPerSecond?.clear()
+        storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
-        LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+        LorenzUtils.chat("Manually reset all crop speed data!")
     }
 
     @SubscribeEvent
@@ -245,6 +240,7 @@ object GardenAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.garden_exp
+        totalAmountVisitorsExisting = data.visitors.size
     }
 
     private var gardenExperience = listOf<Int>()

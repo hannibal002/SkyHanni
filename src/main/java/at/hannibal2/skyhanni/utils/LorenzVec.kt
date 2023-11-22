@@ -130,6 +130,8 @@ data class LorenzVec(
         return LorenzVec(scalar * x, scalar * y, scalar * z)
     }
 
+    fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
@@ -159,6 +161,7 @@ private infix fun Double.multiplyZeroSave(other: Double): Double {
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
+fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 

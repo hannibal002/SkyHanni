@@ -66,35 +66,7 @@ class VisitorListener {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        var found = false
-        val visitorsInTab = mutableListOf<String>()
-        for (line in event.tabList) {
-            if (line.startsWith("§b§lVisitors:")) {
-                found = true
-                continue
-            }
-            if (!found) continue
-
-            if (line.isEmpty()) {
-                found = false
-                continue
-            }
-            val name = VisitorAPI.fromHypixelName(line)
-
-            // Hide hypixel watchdog entries
-            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
-                logger.log("Ignore wrong red name: '$name'")
-                continue
-            }
-
-            //hide own player name
-            if (name.contains(LorenzUtils.getPlayerName())) {
-                logger.log("Ignore wrong own name: '$name'")
-                continue
-            }
-
-            visitorsInTab.add(name)
-        }
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
         VisitorAPI.getVisitors().forEach {
             val name = it.visitorName
@@ -165,15 +137,16 @@ class VisitorListener {
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
                     if (config.rewardWarning.bypassKey.isKeyHeld()) {
-                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        LorenzUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
-                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    LorenzUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                            "sh bypass"
+                            "sh bypass",
+                            false
                         )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()

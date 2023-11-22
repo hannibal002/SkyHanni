@@ -5,9 +5,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -51,21 +48,12 @@ class SharkFishCounter {
                 counter < 350 -> "Like a pro!"
                 else -> "How???"
             }
-            LorenzUtils.chat("§e[SkyHanni] You caught ${counter.addSeparators()} sharks during this fishing contest. $funnyComment")
+            LorenzUtils.chat("You caught ${counter.addSeparators()} sharks during this fishing contest. $funnyComment")
             counter = 0
         }
     }
 
-    private fun isWaterFishingRod(): Boolean {
-        val heldItem = InventoryUtils.getItemInHand() ?: return false
-        val isRod = heldItem.name?.contains("Rod") ?: return false
-        if (!isRod) return false
-
-        val isLavaRod = heldItem.getLore().any { it.contains("Lava Rod") }
-        if (isLavaRod) return false
-
-        return true
-    }
+    private fun isWaterFishingRod() = FishingAPI.hasFishingRodInHand() && !FishingAPI.isLavaRod()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

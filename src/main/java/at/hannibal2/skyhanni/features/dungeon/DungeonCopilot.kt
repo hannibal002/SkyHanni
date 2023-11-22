@@ -28,9 +28,8 @@ class DungeonCopilot {
     private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
     private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
 
-
-    var nextStep = ""
-    var searchForKey = false
+    private var nextStep = ""
+    private var searchForKey = false
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

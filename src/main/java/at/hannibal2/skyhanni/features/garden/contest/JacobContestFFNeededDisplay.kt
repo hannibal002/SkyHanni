@@ -81,10 +81,6 @@ class JacobContestFFNeededDisplay {
                 add(listOf("§cThis is too low, showing 19.9 Blocks/second instead!"))
                 blocksPerSecond = 19.9
             }
-            if (blocksPerSecond < 1) {
-                addAsSingletonList("§cLow blocks per second!")
-                addAsSingletonList("§cFarm this crop for couple more seconds!")
-            }
         }
         addAsSingletonList("")
 
@@ -96,27 +92,18 @@ class JacobContestFFNeededDisplay {
             add(listOf("§6Your ", crop.icon, "§6FF: $farmingFortune"))
         }
         addAsSingletonList("")
-       if (blocksPerSecond == null || trueFF == null) {
-           add(listOf("§cMissing data from above!"))
-       } else {
-           val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-           add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
-       }
+        if (blocksPerSecond == null || trueFF == null) {
+            add(listOf("§cMissing data from above!"))
+        } else {
+            val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
+        }
     }
 
-    private fun formatFarmingFortune(farmingFortune: Double): String {
-        var ff = farmingFortune
-        if (!config.farmingFortunes.dropMultiplier) {
-            ff -= 100
-            if (ff < 100) {
-                ff = 0.0
-            }
-        }
-        return ceil(ff).addSeparators()
-    }
+    private fun formatFarmingFortune(farmingFortune: Double) = ceil(farmingFortune).addSeparators()
 
     private fun getLine(bracket: ContestBracket, map: Map<ContestBracket, Int>, crop: CropType): String {
-        val counter = map[bracket]!!
+        val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"
         val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
         val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)

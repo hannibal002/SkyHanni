@@ -127,7 +127,7 @@ class HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                LorenzUtils.warning("No hide reason for not clickable item!")
+                LorenzUtils.error("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass) {
