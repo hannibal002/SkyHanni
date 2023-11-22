@@ -17,6 +17,9 @@ public class GardenJson {
     public Map<CropType, List<Integer>> crop_milestones;
 
     @Expose
+    public Map<String, Boolean> crop_milestone_community_help;
+
+    @Expose
     public Map<String, GardenVisitor> visitors;
 
     @Expose

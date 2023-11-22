@@ -2,10 +2,15 @@
 
 ## Version 0.21.1 (unreleased)
 
-
 ### New Features
 
 + Organised the config into sub categories. - nea & walker
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 
 ### Changes
 
@@ -16,11 +21,22 @@
 + Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
 + Added support for Sunder 6 in /ff upgrades. - hannibal2
 + Added support for mythic in Visitor Drop Statistics. - hannibal2
++ Use the crop fortune from tab in Farming Fortune HUD. - alexia
++ Shows the last saved ff value in gray while switching tools instead of the question mark. - hannibal2
++ Removed chat message that your crop milestone data is correct. - hannibal2
++ Removed the message when crop milestones look different in the menu than stored SkyHanni data. - hannibal2
+    + We already have the correct data now, and Hypixel rounds the numbers in the menu poorly.
+    + Only show the Total Crop Milestone info in crop milestone inventory when below tier 20. - hannibal2
+    + Hypixel now has their own line for the same information for tier 20+
++ Make the FF Display only visible while holding a farming tool in hand. - hannibal2
 
 #### Other Changes
 
 + Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
 + Add option to hide the chat message when toggling /shmouselock. - hannibal2
++ Reminds to use the GUI Position Editor hotkey. - hannibal2
+    + Reminds every 30 minutes after using /sh gui or clicking the GUI edit button.
++ Added Bookworm Book to the Estimated Item Value feature. - jani
 
 ### Fixes
 
@@ -36,6 +52,13 @@
 + Fixed Farming Contest Medal Icons in Inventory not showing. - hannibal2
 + Fixed /ff not detecting collection analyst fortune. - hannibal2
 + Fixed Mushroom Cow Perk display not working. - hannibal2
++ Fixed visitor timer error if the visitors aren't unlocked yet. - hannibal2
++ Fixed farming weight no longer updating on block breaking. - hannibal2
++ Added cooldown to prevent spam clicking on farming weight buttons to open many web pages. - hannibal2
++ Fixed clickable farming weight GUI no longer opens #1000 in lb website. - hannibal2
++ Fixed /ff upgrade suggests updating bustling reforge even when no farming armor is found. - hannibal2
++ Fixed maxed sunder fortune in the /ff stats breakdown. - alexia
++ Fixed the farming contest summary not showing when the crop is buffed by Anita Talisman/Ring/Artifact. - hannibal2
 
 #### Other Fixes
 
@@ -46,6 +69,8 @@
 + Fixed Archfiend Dice and High Class Archfiend Dice counting as slayer drops when rolled. - hannibal2
 + Fixed dice roll profit counting as Mob Kill Coins in Slayer Tracker. - hannibal2
 + Fixed Sack Display sometimes not formatting a million correctly. - Hize
++ Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
++ Fixed a bug with the ender chest and SkyHanni GUI editor. - hannibal2
 
 ### Technical Details
 
@@ -56,6 +81,19 @@
 + Extracted sacks, friends, known features and Jacob contests in to their separate files. - CalMWolfs
 + Add log clearing. - CalMWolfs
 + Add auto-prefix to chat message methods. - walker
++ Added support for extra data in error manager. - hannibal2
++ Added /readcropmilestonefromclipboard. - hannibal2
+    + This command reads the clipboard content, in the format of users sending crop milestone step data.
+    + The new data gets compared to the currently saved data, differences are getting replaced and the result gets put
+      into the clipboard. The clipboard context can be used to update the repo content.
+
+### Removed Features
+
++ Removed 100 Farming Fortune from "Show As Drop Multiplier" from all displays (also known as "base ff"). - hannibal2
+    + This can cause some numbers to show 100 FF too much. Simply update the values to fix it.
+    + Those "base FF" values were never really part of your farming fortune stats. They are just a result of looking at
+      the crop drop formula. SkyHanni used those values to be more comparable with other Discord Bots and spreadsheets.
+      This also caused confusion, so we have removed it entirely now.
 
 ## Version 0.21
 

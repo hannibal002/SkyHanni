@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PlayerChatFilterJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,6 +39,5 @@ class PlayerChatFilter {
             countCategories++
             countFilters += filter.count()
         }
-        LorenzUtils.debug("Loaded $countFilters filters in $countCategories categories from repo")
     }
 }

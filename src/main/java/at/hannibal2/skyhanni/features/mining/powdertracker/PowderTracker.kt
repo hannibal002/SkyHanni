@@ -325,7 +325,7 @@ object PowderTracker {
         val perMin: MutableList<Long>
     )
 
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
     fun resetCommand(args: Array<String>) {
         tracker.resetCommand(args, "shresetpowdertracker")

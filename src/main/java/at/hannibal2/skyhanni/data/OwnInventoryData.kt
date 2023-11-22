@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
@@ -30,8 +31,16 @@ class OwnInventoryData {
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (event.packet.let { it is S2FPacketSetSlot || it is S0DPacketCollectItem }) {
+        val packet = event.packet
+        if (packet is S2FPacketSetSlot || packet is S0DPacketCollectItem) {
             dirty = true
+        }
+        if (packet is S2FPacketSetSlot) {
+            val windowId = packet.func_149175_c()
+            if (windowId == 0) {
+                val item = packet.func_149174_e() ?: return
+                OwnInventoryItemUpdateEvent(item).postAndCatch()
+            }
         }
     }
 
