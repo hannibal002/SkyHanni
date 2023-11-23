@@ -93,6 +93,12 @@ public class CustomScoreboardConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
+    @ConfigOption(name = "Align to the right", desc = "Align the scoreboard to the right side of the screen.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean alignRight = false;
+
+    @Expose
     @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
     @ConfigEditorBoolean
     @FeatureToggle

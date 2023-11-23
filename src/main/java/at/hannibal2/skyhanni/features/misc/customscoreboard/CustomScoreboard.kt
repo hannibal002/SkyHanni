@@ -17,6 +17,7 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
@@ -69,6 +70,20 @@ class CustomScoreboard {
 
         val elementWidth = position.getDummySize().x
         val elementHeight = position.getDummySize().y
+
+        val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+
+        if (config.alignRight) {
+            position.set(
+                Position(
+                    scaledWidth - elementWidth - (border * 2),
+                    y,
+                    position.getScale(),
+                    position.isCenter
+                )
+            )
+        }
+
 
         GuiScreen.drawRect(
             x - border,
@@ -146,7 +161,7 @@ class CustomScoreboard {
                 }
 
                 // Does not display this line
-                if (it.any { i-> i == "<hidden>"}) {
+                if (it.any { i -> i == "<hidden>" }) {
                     continue
                 }
 
