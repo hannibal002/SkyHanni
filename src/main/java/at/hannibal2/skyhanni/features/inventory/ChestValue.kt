@@ -8,11 +8,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -190,7 +192,7 @@ class ChestValue {
                 val internalName = stack.getInternalNameOrNull() ?: continue
                 if (internalName.getItemStackOrNull() == null) continue
                 val list = mutableListOf<String>()
-                val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
+                val pair = EstimatedItemValueCalculator.calculate(stack, list)
                 var (total, _) = pair
                 val key = "$internalName+$total"
                 if (stack.item == Items.enchanted_book)
@@ -242,8 +244,7 @@ class ChestValue {
             return true
         }
 
-        val inMinion = name.contains("Minion") && !name.contains("Recipe") &&
-            LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
     }
 

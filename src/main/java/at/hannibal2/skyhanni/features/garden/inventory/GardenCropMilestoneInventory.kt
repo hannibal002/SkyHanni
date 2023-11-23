@@ -58,6 +58,8 @@ class GardenCropMilestoneInventory {
 
         val itemStack = event.itemStack ?: return
         val crop = GardenCropMilestones.getCropTypeByLore(itemStack) ?: return
+        val tier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+        if (tier > 20) return
 
         val maxTier = GardenCropMilestones.getMaxTier()
         val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop)

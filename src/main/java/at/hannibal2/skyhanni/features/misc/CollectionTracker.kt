@@ -39,32 +39,32 @@ class CollectionTracker {
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
                 if (internalName == null) {
-                    LorenzUtils.chat("§c/shtrackcollection <item name>")
+                    LorenzUtils.userError("/shtrackcollection <item name>")
                     return
                 }
-                LorenzUtils.chat("§e[SkyHanni] Stopped collection tracker.")
+                LorenzUtils.chat("Stopped collection tracker.")
                 resetData()
                 return
             }
 
             val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
-                LorenzUtils.chat("§c[SkyHanni] Gemstone collection is not supported!")
+                LorenzUtils.userError("Gemstone collection is not supported!")
                 return
             } else if (rawName == "mushroom") {
-                LorenzUtils.chat("§c[SkyHanni] Mushroom collection is not supported!")
+                LorenzUtils.userError("Mushroom collection is not supported!")
                 return
             }
 
             val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
             if (foundInternalName == null) {
-                LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
+                LorenzUtils.error("Item '$rawName' does not exist!")
                 return
             }
 
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
-                LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
+                LorenzUtils.error("Item '$rawName' does not exist!")
                 return
             }
             setNewCollection(foundInternalName, stack.name!!.removeColor())
@@ -97,7 +97,7 @@ class CollectionTracker {
         private fun setNewCollection(internalName: NEUInternalName, name: String) {
             val foundAmount = CollectionAPI.getCollectionCounter(internalName)
             if (foundAmount == null) {
-                LorenzUtils.chat("§c[SkyHanni] $name collection not found. Try to open the collection inventory!")
+                LorenzUtils.userError("$name collection not found. Try to open the collection inventory!")
                 return
             }
             this.internalName = internalName
@@ -106,7 +106,7 @@ class CollectionTracker {
 
             lastAmountInInventory = countCurrentlyInInventory()
             updateDisplay()
-            LorenzUtils.chat("§e[SkyHanni] Started tracking $itemName §ecollection.")
+            LorenzUtils.chat("Started tracking $itemName §ecollection.")
         }
 
         private fun resetData() {
@@ -170,7 +170,7 @@ class CollectionTracker {
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
         if (diff != 0 && diff > 0) {
-                gainItems(diff)
+            gainItems(diff)
         }
 
         lastAmountInInventory = currentlyInInventory

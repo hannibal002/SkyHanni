@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -55,8 +56,7 @@ class ShowFishingItemName {
                 if (name.removeColor() == "Stone") continue
 
                 val size = itemStack.stackSize
-                val isBait = name.endsWith(" Bait") && size == 1
-                val prefix = if (!isBait) {
+                val prefix = if (!itemStack.isBait()) {
                     "§a§l+"
                 } else {
                     if (!config.showBaits) continue

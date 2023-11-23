@@ -224,6 +224,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your
       screen.
 + Alerts when the player catches a Legendary Sea Creature. - Cad
++ **Fishing Bait Warnings.** - cimbraien
+    + Option to warn when no bait is used.
+    + Option to warn when used bait is changed.
+
 </details>
 <details open><summary>
 
@@ -484,6 +488,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
+
 </details>
 <details open><summary>
 
@@ -630,6 +641,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Quest Item Helper. (Crimson Isle) - NetheriteMiner
     + When you open the fetch item quest in the town board, it shows a clickable chat message that will grab the items
       needed from the sacks.
++ Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
+    + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.

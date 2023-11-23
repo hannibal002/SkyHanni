@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -46,7 +47,7 @@ open class FFGuideGUI : GuiScreen() {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
         fun FarmingItems.getItem(): ItemStack {
-            val fortune = GardenAPI.config?.fortune ?: return getFallbackItem(this)
+            val fortune = GardenAPI.storage?.fortune ?: return getFallbackItem(this)
 
             val farmingItems = fortune.farmingItems
             farmingItems[this]?.let { return it }
@@ -56,8 +57,14 @@ open class FFGuideGUI : GuiScreen() {
             return fallbackItem
         }
 
-        fun getFallbackItem(item: FarmingItems): ItemStack =
-            ItemStack(Blocks.barrier).setStackDisplayName("§cNo saved ${item.name.lowercase().replace("_", " ")}")
+        private val fallbackItems = mutableMapOf<FarmingItems, ItemStack>()
+
+        fun getFallbackItem(item: FarmingItems) = fallbackItems.getOrPut(item) {
+            val name = "§cNo saved ${item.name.lowercase().replace("_", " ")}"
+            ItemStack(Blocks.barrier).setStackDisplayName(name)
+        }
+
+        fun isFallbackItem(item: ItemStack) = item.name!!.startsWith("§cNo saved ")
     }
 
     init {
@@ -294,7 +301,8 @@ open class FFGuideGUI : GuiScreen() {
         x = guiLeft - 28
         y = guiTop + 15
         if (isMouseIn(x, y, 28, 25) &&
-            selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW) {
+            selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW
+        ) {
             SoundUtils.playClickSound()
             selectedPage = if (currentCrop == null) {
                 FortuneGuidePage.OVERVIEW

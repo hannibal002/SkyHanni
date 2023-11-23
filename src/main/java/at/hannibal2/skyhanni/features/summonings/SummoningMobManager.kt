@@ -88,7 +88,7 @@ class SummoningMobManager {
                     healthPattern.matchMatcher(name) {
                         val playerName = LorenzUtils.getPlayerName()
                         if (name.contains(playerName)) {
-                            summoningMobNametags.add(it as EntityArmorStand)
+                            summoningMobNametags.add(it)
                             if (summoningMobNametags.size == summoningsSpawned) {
                                 searchArmorStands = false
                             }
@@ -123,7 +123,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
-                LorenzUtils.chat("§e[SkyHanni] Your Summoning Mob just §cdied!")
+                LorenzUtils.chat("Your Summoning Mob just §cdied!")
                 continue
             }
 

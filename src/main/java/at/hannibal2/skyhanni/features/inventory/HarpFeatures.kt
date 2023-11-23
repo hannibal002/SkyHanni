@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 object HarpFeatures {
-    val config get() = SkyHanniMod.feature.inventory.helper.harp
+    private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
     private object KeyIterable : Iterable<Int> {

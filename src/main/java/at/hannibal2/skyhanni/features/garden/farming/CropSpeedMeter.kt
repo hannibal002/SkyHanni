@@ -118,7 +118,7 @@ class CropSpeedMeter {
 
         fun toggle() {
             enabled = !enabled
-            LorenzUtils.chat("§e[SkyHanni] Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
+            LorenzUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
             startCrops = emptyMap()
 
         }

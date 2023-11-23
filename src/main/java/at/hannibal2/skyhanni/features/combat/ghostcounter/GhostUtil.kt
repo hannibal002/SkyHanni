@@ -17,7 +17,7 @@ object GhostUtil {
             opt.set(0.0)
             opt.set(0.0, true)
         }
-        GhostCounter.hidden?.totalMF = 0.0
+        GhostCounter.storage?.totalMF = 0.0
         GhostCounter.update()
     }
 
@@ -65,7 +65,7 @@ object GhostUtil {
         val c = ProfileStorageData.profileSpecific?.ghostCounter ?: return
         if (isUsingCTGhostCounter()) {
             if (c.ctDataImported) {
-                LorenzUtils.chat("§e[SkyHanni] §cYou already imported GhostCounterV3 data!")
+                LorenzUtils.userError("You already imported GhostCounterV3 data!")
                 return
             }
             val json = ConfigManager.gson.fromJson(
@@ -79,13 +79,13 @@ object GhostUtil {
             GhostData.Option.VOLTACOUNT.add(json["VoltaCount"].asDouble)
             GhostData.Option.GHOSTLYBOOTS.add(json["GhostlyBootsCount"].asDouble)
             GhostData.Option.KILLS.add(json["ghostsKilled"].asDouble)
-            GhostCounter.hidden?.totalMF = GhostCounter.hidden?.totalMF?.plus(json["TotalMF"].asDouble)
+            GhostCounter.storage?.totalMF = GhostCounter.storage?.totalMF?.plus(json["TotalMF"].asDouble)
                 ?: json["TotalMF"].asDouble
             GhostData.Option.TOTALDROPS.add(json["TotalDrops"].asDouble)
             c.ctDataImported = true
-            LorenzUtils.chat("§e[SkyHanni] §aImported data successfully!")
+            LorenzUtils.chat("§aImported data successfully!")
         } else
-            LorenzUtils.chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
+            LorenzUtils.error("GhostCounterV3 ChatTriggers module not found!")
     }
 
     fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
@@ -120,7 +120,7 @@ object GhostUtil {
     )
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
-        val bestiaryNextLevel = GhostCounter.hidden?.bestiaryNextLevel
+        val bestiaryNextLevel = GhostCounter.storage?.bestiaryNextLevel
         val currentLevel =
             bestiaryNextLevel?.let { if (it.toInt() < 0) "25" else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
         val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "25" else "${it.toInt()}" }

@@ -47,7 +47,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val sameVersion = currentVersion.equals(nextVersion, true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
-                    if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
+                if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
             fr,
             widthRemaining / 4F,
             10F,
@@ -59,7 +59,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.popMatrix()
     }
 
-    fun getButtonPosition(width: Int) = width - button.width
+    private fun getButtonPosition(width: Int) = width - button.width
     override fun getHeight(): Int {
         return 55
     }

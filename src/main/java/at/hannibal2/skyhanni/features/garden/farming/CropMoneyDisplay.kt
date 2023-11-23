@@ -45,7 +45,7 @@ object CropMoneyDisplay {
 
     fun toggleShowCalculation() {
         showCalculation = !showCalculation
-        LorenzUtils.chat("§e[SkyHanni] Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
+        LorenzUtils.chat("Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
         update()
     }
 
@@ -54,7 +54,7 @@ object CropMoneyDisplay {
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
-    private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
+    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
@@ -155,7 +155,7 @@ object CropMoneyDisplay {
 
             if (config.armor) {
                 val amountPerHour =
-                    it.multiplier * GardenCropSpeed.getRecentBPS() * FarmingArmorDrops.getDropsPerHour(it)
+                    it.multiplier * GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
                 extraArmorCoins = amountPerHour * it.specialDropType.asInternalName().getNpcPrice()
             }
         }
@@ -276,8 +276,8 @@ object CropMoneyDisplay {
 
         val onlyNpcPrice =
             (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
-                    (config.useCustomFormat && config.customFormat.size == 1 &&
-                            config.customFormat[0] == 2)
+                (config.useCustomFormat && config.customFormat.size == 1 &&
+                    config.customFormat[0] == 2)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!
