@@ -15,19 +15,12 @@ public interface LegacyList {
     String getStr();
 
     /**
-     * Gets legacy id.
+     * Gets legacy id. This is used for legacy configs that are being migrated to enums.
+     * New elements do not need a legacyId, and should return -1
      *
      * @return the legacy id
      */
-    int getLegacyId();
-
-    /**
-     * Legacy id or default int. This is used for legacy configs that are being migrated to enums.
-     * New elements do not need a legacyId
-     *
-     * @return the int
-     */
-    default int legacyIdOrDefault() {
-        return -1; // Default value
+    default int getLegacyId() {
+        return -1;
     }
 }
