@@ -1,9 +1,12 @@
-package at.hannibal2.skyhanni.config.features.gui;
+package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
@@ -57,6 +60,23 @@ public class CustomScoreboardConfig {
         }
     )
     public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22));
+
+    @Expose
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Show a background behind the scoreboard."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean bgenabled = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Background Color",
+        desc = "The color of the background."
+    )
+    @ConfigEditorColour
+    public String color = "0:102:0:0:0";
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")

@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -38,6 +39,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
@@ -84,14 +86,15 @@ class CustomScoreboard {
             )
         }
 
-
-        GuiScreen.drawRect(
-            x - border,
-            y - border,
-            x + elementWidth + border * 2,
-            y + elementHeight + border * 2,
-            0x66000000
-        )
+        if (config.bgenabled) {
+            GuiScreen.drawRect(
+                x - border,
+                y - border,
+                x + elementWidth + border * 2,
+                y + elementHeight + border * 2,
+                SpecialColour.specialToChromaRGB(config.color)
+            )
+        }
 
         position.renderStrings(display, posLabel = "Custom Scoreboard")
     }
