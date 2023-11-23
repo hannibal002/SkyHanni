@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat.damageindicator;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.LegacyList;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -11,6 +12,21 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.ARACHNE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.DIANA_MOBS;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.DUNGEON_ALL;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.INFERNO_DEMONLORD;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.NETHER_MINI_BOSSES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.REINDRAKE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.REVENANT_HORROR;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.RIFTSTALKER_BLOODFIEND;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.SEA_CREATURES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.SVEN_PACKMASTER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.TARANTULA_BROODFATHER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.THE_RIFT_BOSSES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.VANQUISHER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.VOIDGLOOM_SERAPH;
 
 public class DamageIndicatorConfig {
 
@@ -37,38 +53,76 @@ public class DamageIndicatorConfig {
         name = "Select Boss",
         desc = "Change what type of boss you want the damage indicator be enabled for."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§bDungeon All",
-            "§bNether Mini Bosses",
-            "§bVanquisher",
-            "§bEndstone Protector (not tested)",
-            "§bEnder Dragon (not finished)",
-            "§bRevenant Horror",
-            "§bTarantula Broodfather",
-            "§bSven Packmaster",
-            "§bVoidgloom Seraph",
-            "§bInferno Demonlord",
-            "§bHeadless Horseman (bugged)",
-            "§bDungeon Floor 1",
-            "§bDungeon Floor 2",
-            "§bDungeon Floor 3",
-            "§bDungeon Floor 4",
-            "§bDungeon Floor 5",
-            "§bDungeon Floor 6",
-            "§bDungeon Floor 7",
-            "§bDiana Mobs",
-            "§bSea Creatures",
-            "Dummy",
-            "§bArachne",
-            "§bThe Rift Bosses",
-            "§bRiftstalker Bloodfiend",
-            "§6Reindrake"
-        }
-    )
+    @ConfigEditorDraggableList()
     //TODO only show currently working and tested features
-    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22, 23, 24));
+    public List<DamageIndicatorBosses> bossesToShow = new ArrayList<>(Arrays.asList(
+        DUNGEON_ALL,
+        NETHER_MINI_BOSSES,
+        VANQUISHER,
+        REVENANT_HORROR,
+        TARANTULA_BROODFATHER,
+        SVEN_PACKMASTER,
+        VOIDGLOOM_SERAPH,
+        INFERNO_DEMONLORD,
+        DIANA_MOBS,
+        SEA_CREATURES,
+        ARACHNE,
+        THE_RIFT_BOSSES,
+        RIFTSTALKER_BLOODFIEND,
+        REINDRAKE
+    ));
 
+    public enum DamageIndicatorBosses implements LegacyList {
+        DUNGEON_ALL("§bDungeon All", 0),
+        NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
+        VANQUISHER("§bVanquisher", 2),
+        ENDERSTONE_PROTECTOR("§bEndstone Protector (not tested)", 3),
+        ENDER_DRAGON("§bEnder Dragon (not finished)", 4),
+        REVENANT_HORROR("§bRevenant Horror", 5),
+        TARANTULA_BROODFATHER("§bTarantula Broodfather", 6),
+        SVEN_PACKMASTER("§bSven Packmaster", 7),
+        VOIDGLOOM_SERAPH("§bVoidgloom Seraph", 8),
+        INFERNO_DEMONLORD("§bInferno Demonlord", 9),
+        HEADLESS_HORSEMAN("§bHeadless Horseman (bugged)", 10),
+        DUNGEON_FLOOR_1("§bDungeon Floor 1", 11),
+        DUNGEON_FLOOR_2("§bDungeon Floor 2", 12),
+        DUNGEON_FLOOR_3("§bDungeon Floor 3", 13),
+        DUNGEON_FLOOR_4("§bDungeon Floor 4", 14),
+        DUNGEON_FLOOR_5("§bDungeon Floor 5", 15),
+        DUNGEON_FLOOR_6("§bDungeon Floor 6", 16),
+        DUNGEON_FLOOR_7("§bDungeon Floor 7", 17),
+        DIANA_MOBS("§bDiana Mobs", 18),
+        SEA_CREATURES("§bSea Creatures", 19),
+        DUMMY("Dummy", 20),
+        ARACHNE("§bArachne", 21),
+        THE_RIFT_BOSSES("§bThe Rift Bosses", 22),
+        RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend", 23),
+        REINDRAKE("§6Reindrake", 24),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        DamageIndicatorBosses(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        DamageIndicatorBosses(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String getStr() {
+            return str;
+        }
+    }
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
     @ConfigEditorBoolean
