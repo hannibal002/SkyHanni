@@ -111,7 +111,7 @@ object GhostCounter {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.ghostDisplayText) {
-            newList.add(map[index])
+            newList.add(map[index.ordinal])
         }
         return newList
     }
