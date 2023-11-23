@@ -48,5 +48,9 @@ public class DebugMob {
         @ConfigOption(name = "DisplayNPC Show Name", desc = "Addes Hologram to each DisplayNPC that shows there name")
         @ConfigEditorBoolean
         public boolean displayNPCShowName = false;
+        @Expose
+        @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently infront of your view (only SkyblockMob)")
+        @ConfigEditorBoolean
+        public boolean showRayHit = false;
     }
 }

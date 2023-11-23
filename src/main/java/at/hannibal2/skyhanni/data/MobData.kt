@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
+import at.hannibal2.skyhanni.utils.MobUtils.rayTraceForSkyblockMob
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -31,12 +32,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
-import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -174,6 +175,7 @@ class MobData {
                 MobType.Basic, MobType.Dungeon, MobType.Boss, MobType.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
             }.postAndCatch()
         } ?: removeRetry(entity)
+        packetEntityIds.remove(entity.entityId)
     }
 
     private fun retry(entity: EntityLivingBase) =
@@ -242,14 +244,17 @@ class MobData {
         when (packet) {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
-            is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
+            // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
         }
     }
 
+    val packetEntityIds = mutableSetOf<Int>()
+
     private fun addEntityUpdate(id: Int) {
-        EntityUtils.getEntityByID(id)?.let {
+        if (packetEntityIds.contains(id)) {
             entitiesThatRequireUpdate.put(id)
-            LorenzDebug.log("ID: $id")
+        } else {
+            packetEntityIds.add(id)
         }
     }
 
@@ -358,6 +363,11 @@ class MobData {
                 )
             }
         }
+        if (mobDebugConfig.showRayHit) {
+            rayTraceForSkyblockMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.let {
+                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+            }
+        }
     }
 
     private object devTracker {
@@ -458,6 +468,8 @@ class MobData {
     @SubscribeEvent
     fun onExit(event: IslandChangeEvent) {
         devTracker.saveToFile()
+
+        packetEntityIds.clear()
         // counter.reset()
     }
 
@@ -579,23 +591,10 @@ class MobData {
                 Mob(baseEntity = baseEntity, mobType = MobType.Slayer, armorStand = armorStand, name = it.groupValues[3], additionalEntities = extraEntityList)
             }
 
-        fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? {
-            var initStartIndex = 0
-            val nameWithoutColor = armorStand.cleanName()
-            val words = nameWithoutColor.split(" ", ignoreCase = true)
-
-            val hasStar = (words[initStartIndex] == "✯").also { if (it) initStartIndex++ }
-
-            val attribute =
-                MobFilter.dungeonAttribute.firstOrNull { it == words[initStartIndex] }?.also { initStartIndex++ } ?: ""
-
-            // For a wierd reason the Undead Skeletons (or similar)
-            // can spawn with a level if they are summoned with the 3 skulls
-            words[initStartIndex].startsWith("[").also { if (it) initStartIndex++ }
-
-            val name = words.subList(initStartIndex, words.lastIndex).joinToString(separator = " ")
-            return Mob(baseEntity, MobType.Dungeon, armorStand, name, extraEntityList, hasStar = hasStar, attribute = attribute)
-        }
+        fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? =
+            MobFilter.dungeonNameFilter.find(armorStand.cleanName())?.let {
+                Mob(baseEntity, MobType.Dungeon, armorStand, it.groupValues[3], extraEntityList, hasStar = it.groupValues[1].isNotEmpty(), attribute = it.groupValues[2])
+            }
 
         fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
             MobFilter.mobNameFilter.find(armorStand.cleanName())?.let {

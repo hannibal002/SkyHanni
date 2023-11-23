@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -49,6 +50,7 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("entity: $simpleName")
                 val displayName = entity.displayName
                 resultList.add("name: '" + entity.name + "'")
+                if (entity is EntityArmorStand) resultList.add("cleanName: '" + entity.cleanName() + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
                 resultList.add("Type of Mob: ${getType(entity)}")
