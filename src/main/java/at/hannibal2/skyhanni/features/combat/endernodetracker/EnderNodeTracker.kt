@@ -245,7 +245,7 @@ object EnderNodeTracker {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
-            newList.add(map[index])
+            newList.add(map[index.ordinal])
         }
         return newList
     }
