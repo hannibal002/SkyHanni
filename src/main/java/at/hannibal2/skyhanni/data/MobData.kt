@@ -591,7 +591,7 @@ class MobData {
 
         fun boss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
             MobFilter.bossMobNameFilter.find(armorStand.cleanName())?.let {
-                Mob(baseEntity = baseEntity, mobType = MobType.Slayer, armorStand = armorStand, name = it.groupValues[3], additionalEntities = extraEntityList)
+                Mob(baseEntity = baseEntity, mobType = MobType.Boss, armorStand = armorStand, name = it.groupValues[3], additionalEntities = extraEntityList)
             }
 
         fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? =
