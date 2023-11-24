@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.NeaTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -65,7 +66,9 @@ object MinecraftData {
         }
     }
 
+    @Deprecated("totalTicks counts twice as fast as it should", ReplaceWith("totalNonDupedTicks"))
     var totalTicks = 0
+    var totalNonDupedTicks = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -73,6 +76,10 @@ object MinecraftData {
         totalTicks++
         LorenzTickEvent(totalTicks).postAndCatch()
         DelayedRun.checkRuns()
+        if (event.phase == TickEvent.Phase.END) {
+            totalNonDupedTicks++
+            NeaTickEvent(totalNonDupedTicks).postAndCatch()
+        }
     }
 
     @SubscribeEvent
