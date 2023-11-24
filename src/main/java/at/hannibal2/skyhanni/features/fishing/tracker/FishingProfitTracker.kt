@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -35,6 +36,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+
+typealias CategoryName = String
 
 object FishingProfitTracker {
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
@@ -84,12 +87,51 @@ object FishingProfitTracker {
     private val SKYBLOCK_COIN by lazy { "SKYBLOCK_COIN".asInternalName() }
     private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
 
+    private val nameAll: CategoryName = "All"
+    private var currentCategory: CategoryName = nameAll
+
+    private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
+        val map = mutableMapOf<CategoryName, Int>()
+        map[nameAll] = data.items.size
+        for ((name, items) in itemCategories) {
+            val amount = items.count { it in data.items }
+            if (amount > 0) {
+                map[name] = amount
+            }
+        }
+
+        return map
+    }
+
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lFishing Profit Tracker")
+        val amounts = getCurrentCategories(data)
+        val list = amounts.keys.toList()
+        if (currentCategory !in list) {
+            currentCategory = nameAll
+        }
+        addButton(
+            prefix = "§7Category: ",
+            getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
+            onChange = {
+                val id = list.indexOf(currentCategory)
+                currentCategory = list[(id + 1) % list.size]
+                tracker.update()
+            }
+        )
+
+        val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
+            { true }
+        } else {
+            val items = itemCategories[currentCategory]!!
+            { it in items }
+        }
 
         var profit = 0.0
         val map = mutableMapOf<Renderable, Long>()
         for ((internalName, itemProfit) in data.items) {
+            if (!filter(internalName)) continue
+
             val amount = itemProfit.totalAmount
 
             var pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else getPrice(internalName)
@@ -257,8 +299,10 @@ object FishingProfitTracker {
         addItem(internalName, amount)
     }
 
+    private val itemCategories get() = FishingTrackerCategoryManager.itemCategories
+
     private fun isAllowedItem(internalName: NEUInternalName) =
-        FishingTrackerCategoryManager.itemCategories.any { internalName in it.value }
+        itemCategories.any { internalName in it.value }
 
     private fun getPrice(internalName: NEUInternalName) = when (config.priceFrom) {
         0 -> internalName.getBazaarData()?.sellPrice ?: internalName.getPriceOrNull() ?: 0.0
