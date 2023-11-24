@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
@@ -387,6 +388,7 @@ class SkyHanniMod {
         loadModule(EntityOutlineRenderer)
         loadModule(KeyboardManager)
         loadModule(AdvancedPlayerList)
+        loadModule(ItemAddManager())
 
         // APIs
         loadModule(BazaarApi())

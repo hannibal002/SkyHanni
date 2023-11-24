@@ -4,14 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -21,14 +19,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -36,17 +30,10 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object SlayerProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
-
-    private val diceRollChatPattern =
-        "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤".toPattern()
-
-    private val ARCHFIEND_DICE = "ARCHFIEND_DICE".asInternalName()
-    private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".asInternalName()
 
     private var itemLogCategory = ""
     private var baseSlayerType = ""
@@ -88,19 +75,19 @@ object SlayerProfitTracker {
             var hidden = false
 
             override fun toString() = "SlayerItem{" +
-                "internalName='" + internalName + '\'' +
-                ", timesDropped=" + timesDropped +
-                ", totalAmount=" + totalAmount +
-                ", hidden=" + hidden +
-                '}'
+                    "internalName='" + internalName + '\'' +
+                    ", timesDropped=" + timesDropped +
+                    ", totalAmount=" + totalAmount +
+                    ", hidden=" + hidden +
+                    '}'
         }
 
         override fun toString() = "SlayerProfitTracker.Data{" +
-            "items=" + items +
-            ", mobKillCoins=" + mobKillCoins +
-            ", slayerSpawnCost=" + slayerSpawnCost +
-            ", slayerCompletedCount=" + slayerCompletedCount +
-            '}'
+                "items=" + items +
+                ", mobKillCoins=" + mobKillCoins +
+                ", slayerSpawnCost=" + slayerSpawnCost +
+                ", slayerCompletedCount=" + slayerCompletedCount +
+                '}'
     }
 
     private fun addSlayerCosts(price: Int) {
@@ -174,46 +161,14 @@ object SlayerProfitTracker {
     }
 
     @SubscribeEvent
-    fun onSackChange(event: SackChangeEvent) {
-        if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
-        if (!SlayerAPI.hasActiveSlayerQuest()) return
-
-        for (sackChange in event.sackChanges) {
-            val change = sackChange.delta
-            if (change > 0) {
-                val internalName = sackChange.internalName
-                addItem(internalName, change)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onItemAdd(event: ItemAddInInventoryEvent) {
+    fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         val internalName = event.internalName
-        if (internalName == ARCHFIEND_DICE || internalName == HIGH_CLASS_ARCHFIEND_DICE) {
-            if (lastDiceRoll.passedSince() < 500.milliseconds) {
-                return
-            }
-        }
+        val amount = event.amount
 
-        addItem(internalName, event.amount)
-    }
-
-    private var lastDiceRoll = SimpleTimeMark.farPast()
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (diceRollChatPattern.matches(event.message)) {
-            lastDiceRoll = SimpleTimeMark.now()
-        }
-    }
-
-    private fun addItem(internalName: NEUInternalName, amount: Int) {
         if (!isAllowedItem(internalName)) {
             LorenzUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
             return
@@ -363,7 +318,7 @@ object SlayerProfitTracker {
         if (itemLogCategory == "") {
             LorenzUtils.userError(
                 "No current slayer data found! " +
-                    "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
+                        "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
             )
             return
         }

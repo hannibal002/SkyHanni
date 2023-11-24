@@ -3,9 +3,8 @@ package at.hannibal2.skyhanni.features.fishing.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.test.PriceSource
@@ -238,22 +237,8 @@ object FishingProfitTracker {
     }
 
     @SubscribeEvent
-    fun onSackChange(event: SackChangeEvent) {
+    fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
-
-        for (sackChange in event.sackChanges) {
-            val change = sackChange.delta
-            if (change > 0) {
-                val internalName = sackChange.internalName
-                maybeAddItem(internalName, change)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onItemAdd(event: ItemAddInInventoryEvent) {
-        if (!isEnabled()) return
-
         DelayedRun.runDelayed(500.milliseconds) {
             maybeAddItem(event.internalName, event.amount)
         }

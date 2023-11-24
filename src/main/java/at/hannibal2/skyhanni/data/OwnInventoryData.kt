@@ -147,6 +147,5 @@ class OwnInventoryData {
         if (internalName.startsWith("MAP-")) return
 
         ItemAddInInventoryEvent(internalName, add).postAndCatch()
-        LorenzUtils.debug("added item internalName: $internalName")
     }
 }
