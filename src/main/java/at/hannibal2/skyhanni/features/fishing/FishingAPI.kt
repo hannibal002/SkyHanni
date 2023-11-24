@@ -35,7 +35,9 @@ object FishingAPI {
         FishingBobberCastEvent(entity).postAndCatch()
     }
 
-    fun hasFishingRodInHand() = InventoryUtils.itemInHandId.asString().contains("ROD")
+    fun hasFishingRodInHand() = InventoryUtils.itemInHandId.isFishingRod()
+
+    fun NEUInternalName.isFishingRod() = contains("ROD")
 
     fun ItemStack.isBait(): Boolean {
         val name = name ?: return false
