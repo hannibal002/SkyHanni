@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -19,6 +20,8 @@ class LimboTimeTracker {
 
     private var limboJoinTime = SimpleTimeMark.farPast()
     private var inLimbo = false
+    private var shownPB = false
+    private var oldPB: Duration = 0.seconds
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -28,6 +31,15 @@ class LimboTimeTracker {
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (config.limboTimePB == limboJoinTime.passedSince().toInt(DurationUnit.SECONDS) && !shownPB && inLimbo) {
+            shownPB = true
+            oldPB = config.limboTimePB.seconds
+            LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
+            LorenzUtils.chat("§fKeep it up!")
+        }
+    }
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (!inLimbo) return
@@ -55,13 +67,14 @@ class LimboTimeTracker {
         val duration = passedSince.format()
         val userLuckMultiplier = 0.000810185
         if (passedSince.toInt(DurationUnit.SECONDS) > config.limboTimePB ) {
-            val oldPB: Duration = config.limboTimePB.seconds
+            oldPB = config.limboTimePB.seconds
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
             LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
             val userLuck = config.limboTimePB * userLuckMultiplier
             LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${String.format("%.2f", userLuck)}✴ SkyHanni User Luck§f!")
         } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
+        shownPB = false
     }
 
     fun isEnabled() = config.showTimeInLimbo
