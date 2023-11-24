@@ -16,20 +16,21 @@ import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
+// TODO in the future change something here
 object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
     fun command(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            LorenzUtils.chat(runCommand(args))
+            LorenzUtils.chat(runCommand(args), false)
         }
         lastCommand = args
     }
 
     private suspend fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
-            return "§c[SkyHanni] This is a powerful config-edit command, only use it if you know what you are doing!"
+            return "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
         }
 
         return when (args[0].lowercase()) {
@@ -181,7 +182,7 @@ object SkyHanniConfigSearchResetCommand {
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
                 if (obj !is Runnable && objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                            objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
+                        objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
                 } else {
@@ -243,8 +244,7 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Runnable) return "Runnable"
 
         // we don't use javaClass.simpleName since we want to catch edge cases
-        val name = javaClass.name
-        return when (name) {
+        return when (val name = javaClass.name) {
             "at.hannibal2.skyhanni.config.core.config.Position" -> "Position"
             "java.lang.Boolean" -> "Boolean"
             "java.lang.Integer" -> "Int"

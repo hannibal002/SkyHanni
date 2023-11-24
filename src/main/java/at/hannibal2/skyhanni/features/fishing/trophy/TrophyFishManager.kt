@@ -36,7 +36,12 @@ object TrophyFishManager {
 
     fun TrophyFishInfo.getFilletValue(rarity: TrophyRarity): Int {
         if (fillet == null) {
-            ErrorManager.logError(Error("fillet is null for '$displayName'"), "Error trying to read trophy fish info")
+            ErrorManager.logErrorStateWithData(
+                "Error trying to read trophy fish info",
+                "fillet in TrophyFishInfo is null",
+                "displayName" to displayName,
+                "TrophyFishInfo" to this,
+            )
             return -1
         }
         return fillet.getOrDefault(rarity, -1)

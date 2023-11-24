@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object TimeUtils {
     private val pattern =
@@ -73,8 +75,10 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    // TODO: use kotlin Duration
-    fun getMillis(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
+    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration()"))
+    fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
+
+    fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
     private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
@@ -90,10 +94,10 @@ object TimeUtils {
         millis += days * 24 * 60 * 60 * 1000
         millis += (years * 365.25 * 24 * 60 * 60 * 1000).toLong()
 
-        millis
+        millis.toDuration(DurationUnit.MILLISECONDS)
     } ?: tryAlternativeFormat(string)
 
-    private fun tryAlternativeFormat(string: String): Long {
+    private fun tryAlternativeFormat(string: String): Duration {
         val split = string.split(":")
         return when (split.size) {
             3 -> {
@@ -116,7 +120,7 @@ object TimeUtils {
             else -> {
                 throw RuntimeException("Invalid format: '$string'")
             }
-        }.toLong()
+        }.toLong().toDuration(DurationUnit.MILLISECONDS)
     }
 
     fun SkyBlockTime.formatted(): String {

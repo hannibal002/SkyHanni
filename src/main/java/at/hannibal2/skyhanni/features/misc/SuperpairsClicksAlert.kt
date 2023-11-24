@@ -43,17 +43,17 @@ class SuperpairsClicksAlert {
 
         if ( // checks if we have succeeded in either minigame
             (event.inventoryName.contains("Chronomatron")
-                    && ((event.inventoryItems[4]?.displayName?.removeColor()
+                && ((event.inventoryItems[4]?.displayName?.removeColor()
                 ?.let { currentRoundRegex.find(it) }
                 ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded))
 
             || (event.inventoryName.contains("Ultrasequencer")
-                    && event.inventoryItems.entries
+                && event.inventoryItems.entries
                 .filter { it.key < 45 }
                 .any { it.value.stackSize > roundsNeeded })
         ) {
             SoundUtils.playBeepSound()
-            LorenzUtils.chat("§e[SkyHanni] You have reached the maximum possible clicks!")
+            LorenzUtils.chat("You have reached the maximum possible clicks!")
             roundsNeeded = -1
         }
     }

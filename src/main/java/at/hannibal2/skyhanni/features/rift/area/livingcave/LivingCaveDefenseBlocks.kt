@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -22,7 +23,7 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LivingCaveDefenseBlocks {
-    private val config get() = RiftAPI.config.area.livingCaveConfig.defenseBlockConfig
+    private val config get() = RiftAPI.config.area.livingCave.defenseBlockConfig
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
@@ -76,9 +77,9 @@ class LivingCaveDefenseBlocks {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
                 entity = EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(compareLocation, 2.0)
-                        .filter { isCorrectMob(it.name) }
-                        .filter { !it.isAtFullHealth() }
-                        .minByOrNull { it.distanceTo(compareLocation) }
+                    .filter { isCorrectMob(it.name) }
+                    .filter { !it.isAtFullHealth() }
+                    .minByOrNull { it.distanceTo(compareLocation) }
             }
 
             val defenseBlock = entity?.let { DefenseBlock(it, location) } ?: return
@@ -172,4 +173,9 @@ class LivingCaveDefenseBlocks {
     val color get() = config.color.get().toChromaColor()
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inLivingCave()
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
+    }
 }

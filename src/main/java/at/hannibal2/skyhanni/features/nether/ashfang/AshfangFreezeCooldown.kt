@@ -51,6 +51,6 @@ class AshfangFreezeCooldown {
 
     private fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.freezeCooldown &&
-                DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

@@ -49,7 +49,8 @@ class GardenLevelDisplay {
                 LorenzUtils.clickableChat(
                     " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                             " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                    "/gardenlevels"
+                    "/gardenlevels",
+                    false
                 )
             }
         }

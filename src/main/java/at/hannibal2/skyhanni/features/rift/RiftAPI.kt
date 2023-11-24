@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.RiftConfig
+import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,6 +29,7 @@ object RiftAPI {
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
-    fun inStillgoreChateau() = LorenzUtils.skyBlockArea == "Stillgore Château" || LorenzUtils.skyBlockArea == "Oubliette"
+    fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
+
     fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
 }

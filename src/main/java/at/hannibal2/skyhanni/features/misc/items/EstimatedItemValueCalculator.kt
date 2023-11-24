@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBookwormBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -68,7 +69,7 @@ object EstimatedItemValueCalculator {
         // once
         totalPrice += addRecomb(stack, list)
         totalPrice += addArtOfWar(stack, list)
-        totalPrice += addArtOfPiece(stack, list)
+        totalPrice += addArtOfPeace(stack, list)
         totalPrice += addEtherwarp(stack, list)
         totalPrice += addPowerScrolls(stack, list)
         totalPrice += addWoodSingularity(stack, list)
@@ -84,6 +85,7 @@ object EstimatedItemValueCalculator {
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
         totalPrice += addPolarvoidBook(stack, list)
+        totalPrice += addBookwormBook(stack, list)
 
         // cosmetic
         totalPrice += addHelmetSkin(stack, list)
@@ -198,11 +200,14 @@ object EstimatedItemValueCalculator {
             itemRarity = LorenzRarity.LEGENDARY
         } else {
             if (stack.isRecombobulated()) {
-                val oneBelow = itemRarity.oneBelow()
+                val oneBelow = itemRarity.oneBelow(logError = false)
                 if (oneBelow == null) {
-                    ErrorManager.logErrorState(
+                    ErrorManager.logErrorStateWithData(
                         "Wrong item rarity detected in estimated item value for item ${stack.name}",
-                        "Recombobulated item is common: ${stack.getInternalName()}, name:${stack.name}"
+                        "Recombobulated item is common",
+                        "internal name" to stack.getInternalName(),
+                        "itemRarity" to itemRarity,
+                        "item name" to stack.name,
                     )
                     return null
                 }
@@ -212,9 +217,16 @@ object EstimatedItemValueCalculator {
         val rarityName = itemRarity.name
         if (!reforgeCosts.has(rarityName)) {
             val reforgesFound = reforgeCosts.entrySet().map { it.key }
-            ErrorManager.logErrorState(
-                "Can not calculate reforge cost for item ${stack.name}",
-                "item rarity '$itemRarity' is not in NEU repo reforge cost for reforge stone$reforgeStone ($reforgesFound)"
+            ErrorManager.logErrorStateWithData(
+                "Could not calculate reforge cost for item ${stack.name}",
+                "Item not in NEU repo reforge cost",
+                "rarityName" to rarityName,
+                "reforgeCosts" to reforgeCosts,
+                "itemRarity" to itemRarity,
+                "reforgesFound" to reforgesFound,
+                "internal name" to stack.getInternalName(),
+                "item name" to stack.name,
+                "reforgeStone" to reforgeStone,
             )
             return null
         }
@@ -273,11 +285,11 @@ object EstimatedItemValueCalculator {
     }
 
     // TODO untested
-    private fun addArtOfPiece(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addArtOfPeace(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfPeace()) return 0.0
 
         val price = "THE_ART_OF_PEACE".asInternalName().getPrice()
-        list.add("§7The Art Of Piece: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7The Art Of Peace: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 
@@ -326,6 +338,15 @@ object EstimatedItemValueCalculator {
         val broDilloMiningSoBad = "POLARVOID_BOOK".asInternalName()
         val price = broDilloMiningSoBad.getPrice() * count
         list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addBookwormBook(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getBookwormBookCount() ?: return 0.0
+
+        val tfHardcodedItemAgain = "BOOKWORM_BOOK".asInternalName()
+        val price = tfHardcodedItemAgain.getPrice() * count
+        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 
@@ -633,9 +654,12 @@ object EstimatedItemValueCalculator {
         if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return 0.0
 
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not find gemstone slot price for ${stack.name}",
-                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
+                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
+                "internal name" to internalName,
+                "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
+                "item name" to stack.name,
             )
             return 0.0
         }

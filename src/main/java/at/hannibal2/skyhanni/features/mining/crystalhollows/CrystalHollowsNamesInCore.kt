@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrystalHollowsNamesInCore {
-    val config get() = SkyHanniMod.feature.mining
+    private val config get() = SkyHanniMod.feature.mining
     private val coreLocations = mapOf(
         LorenzVec(550, 116, 550) to "§8Precursor City",
         LorenzVec(552, 116, 474) to "§bMithril Deposits",
@@ -20,7 +20,7 @@ class CrystalHollowsNamesInCore {
         LorenzVec(474, 116, 554) to "§6Goblin Hideout"
     )
 
-    var showWaypoints = false
+    private var showWaypoints = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
