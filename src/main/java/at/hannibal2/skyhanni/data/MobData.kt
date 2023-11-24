@@ -39,6 +39,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
@@ -245,6 +246,8 @@ class MobData {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
+            is S37PacketStatistics -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
+                packetEntityIds.clear()
         }
     }
 
@@ -469,7 +472,7 @@ class MobData {
     fun onExit(event: IslandChangeEvent) {
         devTracker.saveToFile()
 
-        packetEntityIds.clear()
+
         // counter.reset()
     }
 
@@ -546,8 +549,8 @@ class MobData {
         }
 
         private fun removeExtraEntitiesFromChecking() =
-            extraEntities?.count { MobData.retries.contains(MobData.RetryEntityInstancing(it, 0)) }?.also {
-                MobData.externRemoveOfRetryAmount += it
+            extraEntities?.count { retries.contains(RetryEntityInstancing(it, 0)) }?.also {
+                externRemoveOfRetryAmount += it
             }
 
         private fun makeRelativeBoundingBox() =
