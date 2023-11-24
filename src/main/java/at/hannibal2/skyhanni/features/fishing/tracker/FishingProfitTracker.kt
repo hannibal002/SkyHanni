@@ -301,8 +301,7 @@ object FishingProfitTracker {
 
     private val itemCategories get() = FishingTrackerCategoryManager.itemCategories
 
-    private fun isAllowedItem(internalName: NEUInternalName) =
-        itemCategories.any { internalName in it.value }
+    private fun isAllowedItem(internalName: NEUInternalName) = itemCategories.any { internalName in it.value }
 
     private fun getPrice(internalName: NEUInternalName) = when (config.priceFrom) {
         0 -> internalName.getBazaarData()?.sellPrice ?: internalName.getPriceOrNull() ?: 0.0
