@@ -281,7 +281,6 @@ object FishingProfitTracker {
     private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {
         if (lastFishingTime.passedSince() > 10.minutes) return
 
-
         if (!isAllowedItem(internalName)) {
             LorenzUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
@@ -324,8 +323,8 @@ object FishingProfitTracker {
                 "Fishing Festival"
             } else if (extra.contains("Spooky Festival")) {
                 "Spooky Festival"
-            } else if (extra.contains("Jerry Pond")) {
-                "Jerry Pond"
+            } else if (extra.contains("Jerry's Workshop")) {
+                "Jerry's Workshop"
             } else if (extra.contains("Oasis")) {
                 "Oasis"
             } else if (extra.contains("Magma Fields") || extra.contains("Precursor Remnants") ||
