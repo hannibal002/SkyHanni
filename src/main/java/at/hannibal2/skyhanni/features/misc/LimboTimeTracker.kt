@@ -9,6 +9,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.DurationUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+
 
 class LimboTimeTracker {
     private val config get() = SkyHanniMod.feature.misc
@@ -41,6 +45,7 @@ class LimboTimeTracker {
         }
 
         val duration = limboJoinTime.passedSince().format()
+//        config.showTimePosition.renderString("§e$limboJoinTime", posLabel = "Limbo Join Time Tracker")
         config.showTimeInLimboPosition.renderString("§eIn limbo since §b$duration", posLabel = "Limbo Time Tracker")
     }
 
@@ -49,7 +54,13 @@ class LimboTimeTracker {
         if (!isEnabled()) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
-        LorenzUtils.run { chat("You left the limbo after §b$duration") }
+        if (passedSince.toInt(DurationUnit.SECONDS) > config.limboTimePB ) {
+            val oldPB: Duration = config.limboTimePB.seconds
+            LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+            LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+00.00 ✴ SkyHanni User Luck§f!")
+            config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
+        } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
     }
 
     fun isEnabled() = config.showTimeInLimbo
