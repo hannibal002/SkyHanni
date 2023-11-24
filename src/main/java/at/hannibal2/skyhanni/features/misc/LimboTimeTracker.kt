@@ -45,7 +45,6 @@ class LimboTimeTracker {
         }
 
         val duration = limboJoinTime.passedSince().format()
-//        config.showTimePosition.renderString("§e$limboJoinTime", posLabel = "Limbo Join Time Tracker")
         config.showTimeInLimboPosition.renderString("§eIn limbo since §b$duration", posLabel = "Limbo Time Tracker")
     }
 
