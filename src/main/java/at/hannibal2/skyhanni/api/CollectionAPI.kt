@@ -70,8 +70,11 @@ class CollectionAPI {
 
     @SubscribeEvent
     fun onItemAdd(event: ItemAddInInventoryEvent) {
-        // TODO add support for replenish (higher collection than actual items in inv)
         val internalName = event.internalName
+        val (_, amount) = NEUItems.getMultiplier(internalName)
+        if (amount > 1) return
+
+        // TODO add support for replenish (higher collection than actual items in inv)
         if (internalName.getItemStackOrNull() == null) {
             LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
             return

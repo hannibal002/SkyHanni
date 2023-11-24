@@ -4,13 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isFishingRod
 import at.hannibal2.skyhanni.test.PriceSource
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,6 +40,8 @@ import com.google.gson.annotations.Expose
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object FishingProfitTracker {
@@ -43,6 +49,8 @@ object FishingProfitTracker {
 
     private val coinsChatPattern = ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.".toPattern()
     private var lastClickDelay = 0L
+
+    private var lastFishingTime = SimpleTimeMark.farPast()
 
     private val tracker =
         SkyHanniTracker("Fishing Profit Tracker", { Data() }, { it.fishing.fishingProfitTracker }) { drawDisplay(it) }
@@ -214,7 +222,9 @@ object FishingProfitTracker {
     fun onItemAdd(event: ItemAddInInventoryEvent) {
         if (!isEnabled()) return
 
-        maybeAddItem(event.internalName, event.amount)
+        DelayedRun.runDelayed(500.milliseconds) {
+            maybeAddItem(event.internalName, event.amount)
+        }
     }
 
     @SubscribeEvent
@@ -238,6 +248,28 @@ object FishingProfitTracker {
     }
 
     @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (event.oldItem.isFishingRod()) {
+            lastFishingTime = SimpleTimeMark.now()
+        }
+        if (event.newItem.isFishingRod()) {
+            DelayedRun.runDelayed(1.seconds) {
+                lastFishingTime = SimpleTimeMark.now()
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onSkillExpGain(event: SkillExpGainEvent) {
+        val skill = event.skill
+        if (isEnabled()) {
+            if (skill != "fishing") {
+                lastFishingTime = SimpleTimeMark.farPast()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!FishingAPI.hasFishingRodInHand()) return
@@ -247,6 +279,9 @@ object FishingProfitTracker {
     }
 
     private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {
+        if (lastFishingTime.passedSince() > 10.minutes) return
+
+
         if (!isAllowedItem(internalName)) {
             LorenzUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
@@ -309,7 +344,6 @@ object FishingProfitTracker {
                 if (drop !in totalDrops) {
                     totalDrops.add(drop)
                     dropCategories.getOrPut(category) { mutableListOf() }.add(drop.asInternalName())
-                    println("$drop = $category")
                 }
             }
         }
