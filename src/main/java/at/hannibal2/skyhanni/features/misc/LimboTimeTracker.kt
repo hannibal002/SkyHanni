@@ -33,7 +33,7 @@ class LimboTimeTracker {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (config.limboTimePB == limboJoinTime.passedSince().toInt(DurationUnit.SECONDS) && !shownPB && inLimbo) {
+        if (config.limboTimePB == limboJoinTime.passedSince().toInt(DurationUnit.SECONDS) && !shownPB && inLimbo && config.limboTimePB != 0) {
             shownPB = true
             oldPB = config.limboTimePB.seconds
             LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
