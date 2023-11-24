@@ -6,12 +6,12 @@
 //
 // TODO LIST
 // V2 RELEASE
-//  - icons maybe
 //  - Soulflow API
 //  - Bank API
 //  - quiver
 //  - beacon power
 //  - skyblock level
+//  - more bg options (round, blurr, outline)
 //
 
 package at.hannibal2.skyhanni.features.misc.customscoreboard
@@ -117,7 +117,6 @@ class CustomScoreboard {
                 line.startsWith(" Bank: §r§6") -> bank = line.removePrefix(" Bank: §r§6")
                 line.startsWith(" §r§fMithril Powder: §r§2") -> mithrilPowder =
                     line.removePrefix(" §r§fMithril Powder: §r§2")
-
                 line.startsWith(" §r§fGemstone Powder: §r§d") -> gemstonePowder =
                     line.removePrefix(" §r§fGemstone Powder: §r§d")
             }
@@ -193,8 +192,7 @@ class CustomScoreboard {
     }
 
     private fun isCustomScoreboardEnabled() = config.enabled && LorenzUtils.inSkyBlock
-
-    private fun isHideVanillaScoreboardEnabled() = (config.displayConfig.hideVanillaScoreboard && LorenzUtils.inSkyBlock)
+    private fun isHideVanillaScoreboardEnabled() = config.displayConfig.hideVanillaScoreboard && LorenzUtils.inSkyBlock
 
     companion object {
         fun copyScoreboard(args: Array<String>) {
