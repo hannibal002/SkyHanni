@@ -64,6 +64,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCustomScoreboardEnabled()) return
+        if (display.isEmpty()) return
         val position = config.position
         val border = 5
 
@@ -75,7 +76,7 @@ class CustomScoreboard {
 
         val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
 
-        if (config.alignRight) {
+        if (config.displayConfig.alignRight) {
             position.set(
                 Position(
                     scaledWidth - elementWidth - (border * 2),
@@ -86,13 +87,13 @@ class CustomScoreboard {
             )
         }
 
-        if (config.bgenabled) {
+        if (config.backgroundConfig.enabled) {
             GuiScreen.drawRect(
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
                 y + elementHeight + border * 2,
-                SpecialColour.specialToChromaRGB(config.color)
+                SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
             )
         }
 
@@ -153,7 +154,7 @@ class CustomScoreboard {
         for (index in config.textFormat) {
             lineMap[index]?.let {
                 // Hide consecutive empty lines
-                if (config.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull() == "") {
+                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull() == "") {
                     continue
                 }
 
@@ -193,7 +194,7 @@ class CustomScoreboard {
 
     private fun isCustomScoreboardEnabled() = config.enabled && LorenzUtils.inSkyBlock
 
-    private fun isHideVanillaScoreboardEnabled() = config.hideVanillaScoreboard && LorenzUtils.inSkyBlock
+    private fun isHideVanillaScoreboardEnabled() = (config.displayConfig.hideVanillaScoreboard && LorenzUtils.inSkyBlock)
 
     companion object {
         fun copyScoreboard(args: Array<String>) {

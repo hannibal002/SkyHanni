@@ -62,27 +62,19 @@ public class CustomScoreboardConfig {
     public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22));
 
     @Expose
-    @ConfigOption(
-        name = "Enabled",
-        desc = "Show a background behind the scoreboard."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean bgenabled = true;
+    @ConfigOption(name = "Display Options", desc = "")
+    @Accordion
+    public DisplayConfig displayConfig = new DisplayConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Background Color",
-        desc = "The color of the background."
-    )
-    @ConfigEditorColour
-    public String color = "0:102:0:0:0";
+    @ConfigOption(name = "Information Filtering", desc = "")
+    @Accordion
+    public InformationFilteringConfig informationFilteringConfig = new InformationFilteringConfig();
 
     @Expose
-    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideVanillaScoreboard = false;
+    @ConfigOption(name = "Background Options", desc = "")
+    @Accordion
+    public BackgroundConfig backgroundConfig = new BackgroundConfig();
 
     @Expose
     @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
@@ -94,51 +86,10 @@ public class CustomScoreboardConfig {
     public Property<Integer> maxPartyList = Property.of(4);
 
     @Expose
-    @ConfigOption(name = "Hide lines with no info", desc = "Hide lines that have no info to display, like hiding the party when not being in one.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideEmptyLines = true;
-
-    @Expose
-    @ConfigOption(name = "Hide Info not relevant to location", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideIrrelevantLines = true;
-
-    @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first. " +
-        "§eNote: Will not update the preview above!")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean displayNumbersFirst = false;
-
-    @Expose
-    @ConfigOption(name = "Align to the right", desc = "Align the scoreboard to the right side of the screen.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean alignRight = false;
-
-    @Expose
     @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showMayorPerks = true;
-
-    @Expose
-    @ConfigOption(name = "Hide consecutive empty lines", desc = "Hide lines that are empty and have an empty line above them.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideConsecutiveEmptyLines = true;
-
-    @Expose
-    @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard.\nUse & for colors")
-    @ConfigEditorText
-    public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
-
-    @Expose
-    @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard.\nUse & for colors")
-    @ConfigEditorText
-    public Property<String> customFooter = Property.of("&ewww.hypixel.net");
 
     @Expose
     public Position position = new Position(10, 80, false, true);

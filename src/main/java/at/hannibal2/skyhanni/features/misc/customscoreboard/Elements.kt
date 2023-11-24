@@ -31,7 +31,7 @@ enum class Elements(
 ) {
     SKYBLOCK(
         {
-            listOf(config.customTitle.get().toString().replace("&", "§"))
+            listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
         },
         listOf(),
         0,
@@ -48,8 +48,8 @@ enum class Elements(
     PURSE(
         {
             when {
-                config.hideEmptyLines && purse == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf("§6$purse Purse")
+                config.informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§6$purse Purse")
                 else -> listOf("Purse: §6$purse")
             }
         },
@@ -60,8 +60,8 @@ enum class Elements(
     MOTES(
         {
             when {
-                motes == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf("§d$motes Motes")
+                config.informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§d$motes Motes")
                 else -> listOf("Motes: §d$motes")
             }
         },
@@ -72,8 +72,8 @@ enum class Elements(
     BANK(
         {
             when {
-                bank == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf("§6$bank Bank")
+                config.informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
                 else -> listOf("Bank: §6$bank")
             }
         },
@@ -84,8 +84,8 @@ enum class Elements(
     BITS(
         {
             when {
-                bits == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf("§b$bits Bits")
+                config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§b$bits Bits")
                 else -> listOf("Bits: §b$bits")
             }
         },
@@ -96,8 +96,8 @@ enum class Elements(
     COPPER(
         {
             when {
-                copper == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf("§c$copper Copper")
+                config.informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§c$copper Copper")
                 else -> listOf("Copper: §c$copper")
             }
         },
@@ -108,8 +108,8 @@ enum class Elements(
     GEMS(
         {
             when {
-                gems == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf("§a$gems Gems")
+                config.informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
                 else -> listOf("Gems: §a$gems")
             }
         },
@@ -120,8 +120,8 @@ enum class Elements(
     HEAT(
         {
             when {
-                heat == "0" -> listOf("<hidden>")
-                config.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
+                config.informationFilteringConfig.hideEmptyLines && heat == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
                 else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
             }
         },
@@ -166,7 +166,7 @@ enum class Elements(
             when (MaxwellAPI.currentPower == null) {
                 true -> listOf("§c§lPlease visit Maxwell!")
                 false ->
-                    when (config.displayNumbersFirst) {
+                    when (config.displayConfig.displayNumbersFirst) {
                         true -> listOf("${MaxwellAPI.currentPower?.power} Power")
                         false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
                     }
@@ -186,7 +186,7 @@ enum class Elements(
     ),
     OBJECTIVE(
         {
-            when(config.hideEmptyLines){
+            when(config.informationFilteringConfig.hideEmptyLines){
                 true -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "<hidden>")
                 false -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "§cNo objective")
             }
@@ -226,7 +226,7 @@ enum class Elements(
     ),
     POWDER(
         {
-            when (config.displayNumbersFirst) {
+            when (config.displayConfig.displayNumbersFirst) {
                 true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
                 false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
             }
@@ -259,7 +259,7 @@ enum class Elements(
     ),
     PARTY(
         {
-            val partyTitle: List<String> = if (PartyAPI.partyMembers.isEmpty() && config.hideEmptyLines) {
+            val partyTitle: List<String> = if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
                 listOf("<hidden>")
             } else {
                 val title =
@@ -282,7 +282,7 @@ enum class Elements(
     ),
     WEBSITE(
         {
-            listOf(config.customFooter.get().toString().replace("&", "§"))
+            listOf(config.displayConfig.customFooter.get().toString().replace("&", "§"))
         },
         listOf(),
         0,
@@ -294,7 +294,7 @@ enum class Elements(
     }
 
     fun isVisible(): Boolean {
-        if (!config.hideIrrelevantLines) return true
+        if (!config.informationFilteringConfig.hideIrrelevantLines) return true
         if (islands.isEmpty()) return true
         return when (visibilityOption) {
             0 -> islands.contains(HypixelData.skyBlockIsland)

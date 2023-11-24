@@ -17,7 +17,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     NONE( // maybe use default state tablist: "Events: smth" idk
         {
             when {
-                config.hideEmptyLines -> listOf("<hidden>")
+                config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
                 else -> listOf("§cNo Event")
             }
         },
@@ -74,7 +74,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 }
             }
 
-            if (list.size == 0) when (config.hideEmptyLines) {
+            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
                 true -> listOf("<hidden>")
                 false -> listOf("§cNo Dungeon Data")
             } else list
@@ -117,7 +117,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.nextAfter("§fObjective:") ?: "§cNo Objective"
             }
 
-            if (list.size == 0) when (config.hideEmptyLines) {
+            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
                 true -> listOf("<hidden>")
                 false -> listOf("§cNo Kuudra Data")
             } else list
@@ -258,7 +258,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                     .removePrefix("Zone: ")
             }
 
-            if (list.size == 0) when (config.hideEmptyLines) {
+            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
                 true -> listOf("<hidden>")
                 false -> listOf("§cNo Mining Event")
             } else list
