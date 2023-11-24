@@ -77,8 +77,6 @@ class MobData {
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
 
         var externRemoveOfRetryAmount = 0
-
-        val entitiesThatRequireUpdate = LinkedBlockingQueue<Int>()
     }
 
     private fun mobDetectionReset() {
@@ -118,9 +116,17 @@ class MobData {
         }
     }
 
+    private val entitiesThatRequireUpdatePacket = LinkedBlockingQueue<Int>()
+    private val entitiesThatRequireUpdate = mutableSetOf<Int>()
+
     private fun makeEntityUpdate() {
-        while (entitiesThatRequireUpdate.isNotEmpty()) {
-            handleEntityUpdate(entitiesThatRequireUpdate.take())
+        entitiesThatRequireUpdate.iterator().let { iter ->
+            while (iter.hasNext()) {
+                if (handleEntityUpdate(iter.next())) iter.remove()
+            }
+        }
+        while (entitiesThatRequireUpdatePacket.isNotEmpty()) {
+            entitiesThatRequireUpdate.add(entitiesThatRequireUpdatePacket.take())
         }
     }
 
@@ -229,13 +235,16 @@ class MobData {
         }
     }
 
-    private fun handleEntityUpdate(entityID: Int) {
-        val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return
+    private fun handleEntityUpdate(entityID: Int): Boolean {
+        val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
         retries.firstOrNull { it.hashCode() == entity.hashCode() }?.apply { this.entity = entity }
-        currentEntityLiving.remove(entity)
-        currentEntityLiving.add(entity)
+        if (currentEntityLiving.contains(entity)) {
+            currentEntityLiving.remove(entity)
+            currentEntityLiving.add(entity)
+        }
         // update maps
         currentEntityToMobMap[entity]?.internalUpdateOfEntity(entity)
+        return true
     }
 
 
@@ -247,7 +256,9 @@ class MobData {
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
             is S37PacketStatistics -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
+            {
                 packetEntityIds.clear()
+            }
         }
     }
 
@@ -255,7 +266,7 @@ class MobData {
 
     private fun addEntityUpdate(id: Int) {
         if (packetEntityIds.contains(id)) {
-            entitiesThatRequireUpdate.put(id)
+            entitiesThatRequireUpdatePacket.put(id)
         } else {
             packetEntityIds.add(id)
         }
