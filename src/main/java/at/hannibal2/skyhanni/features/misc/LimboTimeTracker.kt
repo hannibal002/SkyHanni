@@ -53,12 +53,14 @@ class LimboTimeTracker {
         if (!isEnabled()) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
+        val userLuckMultiplier = 0.000810185
         if (passedSince.toInt(DurationUnit.SECONDS) > config.limboTimePB ) {
             val oldPB: Duration = config.limboTimePB.seconds
+            config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
             LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
-            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+00.00 ✴ SkyHanni User Luck§f!")
-            config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
+            val userLuck = config.limboTimePB * userLuckMultiplier
+            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${String.format("%.2f", userLuck)}✴ SkyHanni User Luck§f!")
         } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
     }
 
