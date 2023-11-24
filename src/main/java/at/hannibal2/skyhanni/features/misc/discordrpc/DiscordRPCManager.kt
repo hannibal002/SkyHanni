@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -58,11 +59,11 @@ object DiscordRPCManager : IPCListener {
 
                 try {
                     client?.connect()
-                    if (fromCommand) LorenzUtils.chat("§a[SkyHanni] Successfully started Rich Presence!") // confirm that /shrpcstart worked
+                    if (fromCommand) LorenzUtils.chat("Successfully started Rich Presence!", prefixColor = "§a") // confirm that /shrpcstart worked
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())
-                    LorenzUtils.clickableChat("§e[SkyHanni] Discord Rich Presence was unable to start! " +
+                    LorenzUtils.clickableChat("Discord Rich Presence was unable to start! " +
                             "This usually happens when you join SkyBlock when Discord is not started. " +
                             "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart")
                 }
@@ -183,20 +184,23 @@ object DiscordRPCManager : IPCListener {
 
     fun startCommand() {
         if (!config.enabled.get()) {
-            LorenzUtils.chat("§c[SkyHanni] Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
+            LorenzUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
         if (isActive()) {
-            LorenzUtils.chat("§e[SkyHanni] Discord Rich Presence is already active!")
+            LorenzUtils.userError("Discord Rich Presence is already active!")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Attempting to start Discord Rich Presence...")
+        LorenzUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
         } catch (e: Exception) {
-            LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.")
+            ErrorManager.logError(
+                e,
+                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer."
+            )
         }
     }
 

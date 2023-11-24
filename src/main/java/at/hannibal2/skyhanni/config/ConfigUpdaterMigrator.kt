@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = LorenzLogger("ConfigMigration")
-    val configVersion = 6
+    const val CONFIG_VERSION = 9
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -26,14 +26,21 @@ object ConfigUpdaterMigrator {
         val new: JsonObject,
         val oldVersion: Int,
         var movesPerformed: Int,
+        val dynamicPrefix: Map<String, List<String>>,
     ) : LorenzEvent() {
+        init {
+            dynamicPrefix.entries.filter { it.value.isEmpty() }.forEach {
+                logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
+            }
+        }
+
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return
             }
-            if (since > configVersion) {
-                error("Illegally new version $since > $configVersion")
+            if (since > CONFIG_VERSION) {
+                error("Illegally new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
                 logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
@@ -41,51 +48,81 @@ object ConfigUpdaterMigrator {
             }
             val op = oldPath.split(".")
             val np = newPath.split(".")
+            if (op.first().startsWith("#")) {
+                require(np.first() == op.first())
+                val realPrefixes = dynamicPrefix[op.first()]
+                if (realPrefixes == null) {
+                    logger.log("Could not resolve dynamic prefix $oldPath")
+                    return
+                }
+                for (realPrefix in realPrefixes) {
+                    move(
+                        since,
+                        "$realPrefix.${oldPath.substringAfter('.')}",
+                        "$realPrefix.${newPath.substringAfter('.')}", transform
+                    )
+                    return
+                }
+            }
             val oldElem = old.at(op, false)
             if (oldElem == null) {
                 logger.log("Skipping move from $oldPath to $newPath ($oldPath not present)")
                 return
             }
-            val x = new.at(np.dropLast(1), true)
-            if (x !is JsonObject) {
+            val newParentElement = new.at(np.dropLast(1), true)
+            if (newParentElement !is JsonObject) {
                 logger.log("Catastrophic: element at path $old could not be relocated to $new, since another element already inhabits that path")
                 return
             }
             movesPerformed++
-            x.add(np.last(), transform(oldElem))
+            newParentElement.add(np.last(), transform(oldElem))
             logger.log("Moved element from $oldPath to $newPath")
         }
     }
 
-    fun merge(a: JsonObject, b: JsonObject): Int {
-        var c = 0
-        b.entrySet().forEach {
-            val e = a.get(it.key)
-            val n = it.value
-            if (e is JsonObject && n is JsonObject) {
-                c += merge(e, n)
+    private fun merge(originalObject: JsonObject, overrideObject: JsonObject): Int {
+        var count = 0
+        overrideObject.entrySet().forEach {
+            val element = originalObject.get(it.key)
+            val newElement = it.value
+            if (element is JsonObject && newElement is JsonObject) {
+                count += merge(element, newElement)
             } else {
-                if (e != null) {
-                    logger.log("Encountered destructive merge. Erasing $e in favour of $n.")
-                    c++
+                if (element != null) {
+                    logger.log("Encountered destructive merge. Erasing $element in favour of $newElement.")
+                    count++
                 }
-                a.add(it.key, n)
+                originalObject.add(it.key, newElement)
             }
         }
-        return c
+        return count
     }
 
     fun fixConfig(config: JsonObject): JsonObject {
-        val lV = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
-        if (lV > configVersion) {
+        val lastVersion = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
+        if (lastVersion > CONFIG_VERSION) {
             error("Cannot downgrade config")
         }
-        if (lV == configVersion) return config
-        return (lV until configVersion).fold(config) { acc, i ->
+        if (lastVersion == CONFIG_VERSION) return config
+        return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
-            val migration = ConfigFixEvent(acc, JsonObject().also {
+            val storage = accumulator.get("storage")?.asJsonObject
+            val dynamicPrefix: Map<String, List<String>> = mapOf(
+                "#profile" to
+                    (storage?.get("players")?.asJsonObject?.entrySet()
+                        ?.flatMap { player ->
+                            player.value.asJsonObject.get("profiles")?.asJsonObject?.entrySet()?.map {
+                                "storage.players.${player.key}.profiles.${it.key}"
+                            } ?: listOf()
+                        }
+                        ?: listOf()),
+                "#player" to
+                    (storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }
+                        ?: listOf()),
+            )
+            val migration = ConfigFixEvent(accumulator, JsonObject().also {
                 it.add("lastVersion", JsonPrimitive(i + 1))
-            }, i, 0).also { it.postAndCatch() }
+            }, i, 0, dynamicPrefix).also { it.postAndCatch() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
             logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")
