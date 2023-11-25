@@ -62,6 +62,17 @@ object GardenAPI {
 
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
+    // TODO USE SH-REPO
+    private val otherToolsList = listOf(
+        "DAEDALUS_AXE",
+        "BASIC_GARDENING_HOE",
+        "ADVANCED_GARDENING_AXE",
+        "BASIC_GARDENING_AXE",
+        "ADVANCED_GARDENING_HOE",
+        "ROOKIE_HOE",
+        "BINGHOE"
+    )
+
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
         if (!inGarden()) return
@@ -123,19 +134,7 @@ object GardenAPI {
     }
 
     private fun isOtherTool(internalName: NEUInternalName): Boolean {
-        if (internalName.startsWith("DAEDALUS_AXE")) return true
-
-        if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
-        if (internalName.startsWith("ADVANCED_GARDENING_AXE")) return true
-
-        if (internalName.startsWith("BASIC_GARDENING_AXE")) return true
-        if (internalName.startsWith("ADVANCED_GARDENING_HOE")) return true
-
-        if (internalName.startsWith("ROOKIE_HOE")) return true
-
-        if (internalName.startsWith("BINGHOE")) return true
-
-        return false
+        return internalName.asString() in otherToolsList
     }
 
     fun inGarden() = IslandType.GARDEN.isInIsland()

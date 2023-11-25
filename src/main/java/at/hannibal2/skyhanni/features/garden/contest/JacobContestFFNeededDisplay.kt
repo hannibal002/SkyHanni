@@ -81,10 +81,6 @@ class JacobContestFFNeededDisplay {
                 add(listOf("§cThis is too low, showing 19.9 Blocks/second instead!"))
                 blocksPerSecond = 19.9
             }
-            if (blocksPerSecond < 1) {
-                addAsSingletonList("§cLow blocks per second!")
-                addAsSingletonList("§cFarm this crop for couple more seconds!")
-            }
         }
         addAsSingletonList("")
 

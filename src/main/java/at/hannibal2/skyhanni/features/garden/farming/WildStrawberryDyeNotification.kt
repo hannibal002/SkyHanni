@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class WildStrawberryDyeNotification {
-    var lastCloseTime = 0L
+    private var lastCloseTime = 0L
 
     val item by lazy { "DYE_WILD_STRAWBERRY".asInternalName() }
 

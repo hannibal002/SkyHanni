@@ -35,7 +35,7 @@ interface Renderable {
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
-            private set
+            set
 
         fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition

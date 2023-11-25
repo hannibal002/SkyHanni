@@ -339,7 +339,7 @@ object EntityOutlineRenderer {
         }
     }
 
-    fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
+    private fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
 
     private fun isXrayCacheEmpty() = entityRenderCache.xrayCache?.isEmpty() ?: true
     private fun isNoXrayCacheEmpty() = entityRenderCache.noXrayCache?.isEmpty() ?: true
@@ -366,7 +366,7 @@ object EntityOutlineRenderer {
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
         } catch (e: NoClassDefFoundError) {
-            ErrorManager.logError(e, "Unable to enable entity outlines, the required mixin is not loaded")
+            ErrorManager.logErrorWithData(e, "Unable to enable entity outlines, the required mixin is not loaded")
             isMissingMixin = true
             return
         }
