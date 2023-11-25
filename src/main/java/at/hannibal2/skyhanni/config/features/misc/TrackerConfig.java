@@ -20,7 +20,7 @@ public class TrackerConfig {
     public int priceFrom = 1;
 
     @Expose
-    @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown when starting.")
+    @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
     public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.REMEMBER_LAST);
 
