@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SpecialColour
 import net.minecraft.client.Minecraft
@@ -40,7 +39,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
 private var cache = emptyList<List<Any>>()
-var partyCount = 0
 
 // Stats / Numbers
 var purse = "0"
@@ -54,6 +52,7 @@ var lobbyCode = "None"
 var heat = "0"
 var mithrilPowder = "0"
 var gemstonePowder = "0"
+var partyCount = 0
 
 
 class CustomScoreboard {
@@ -143,15 +142,8 @@ class CustomScoreboard {
                     continue
                 }
 
-                // Multiline support
-                if (it.size > 1) {
-                    for (item in it) {
-                        newList.add(item.toString())
-                    }
-                    continue
-                }
-
-                newList.add(it[0].toString())
+                // Multiline and singular line support
+                newList.addAll(it.map { i -> i.toString() })
             }
         }
 
