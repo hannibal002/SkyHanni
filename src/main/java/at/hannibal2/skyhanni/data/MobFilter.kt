@@ -50,7 +50,7 @@ object MobFilter {
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter =
-        "^(✯)?(?:\\s?(Flaming|Stormy|Speedy|Fortified|Healthy|Healing|Boomer|Golden|Stealth))?(?:\\s?\\[[\\w\\d]+\\])?\\s?(.+)\\s[^\\s]+$".toRegex()
+        "^(?:(✯)\\s)?(?:(Flaming|Stormy|Speedy|Fortified|Healthy|Healing|Boomer|Golden|Stealth)\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
     val dungeonAttribute =
         listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing", "Boomer", "Golden", "Stealth")
     val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
