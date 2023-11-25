@@ -45,7 +45,7 @@ class ChestValue {
         if (InventoryUtils.openInventoryName() == "") return
 
         if (!config.showDuringEstimatedItemValue) {
-            if (EstimatedItemValue.currentlyShowing) return
+            if (EstimatedItemValue.isCurrentlyShowing()) return
         }
 
         if (inInventory) {
@@ -126,11 +126,11 @@ class ChestValue {
             val textAmount = " §7x$amount:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
             val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
-            val price = "§b${(total).formatPrice()}"
+            val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay)
                 "$name $price"
             else
-                "${stack.displayName} §7x$amount: §b${total.formatPrice()}"
+                "${stack.displayName} §7x$amount: §6${total.formatPrice()}"
             newDisplay.add(buildList {
                 val renderable = Renderable.hoverTips(
                     text,
@@ -144,7 +144,7 @@ class ChestValue {
             })
             rendered++
         }
-        newDisplay.addAsSingletonList("§6Total value : §b${totalPrice.formatPrice()}")
+        newDisplay.addAsSingletonList("§aTotal value: §6${totalPrice.formatPrice()} coins")
     }
 
     private fun sortedList() = when (config.sortingType) {
@@ -197,7 +197,7 @@ class ChestValue {
                 val key = "$internalName+$total"
                 if (stack.item == Items.enchanted_book)
                     total /= 2
-                list.add("§aTotal: §6§l${total.formatPrice()}")
+                list.add("§aTotal: §6§l${total.formatPrice()} coins")
                 if (total == 0.0) continue
                 val item = chestItems.getOrPut(key) {
                     Item(mutableListOf(), 0, stack, 0.0, list)

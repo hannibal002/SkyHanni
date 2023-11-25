@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
@@ -30,6 +31,7 @@ import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityPigZombie
+import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntitySpider
@@ -89,6 +91,7 @@ class MobFinder {
                      * Please take this into consideration if you are to modify this.
                     */
                 is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(entity)
+                is EntitySilverfish -> tryAddEntitySilverfish(entity)
                 is EntityIronGolem -> tryAddEntityIronGolem(entity)
                 is EntityPigZombie -> tryAddEntityPigZombie(entity)
                 is EntityMagmaCube -> tryAddEntityMagmaCube(entity)
@@ -106,6 +109,23 @@ class MobFinder {
                 else -> null
             }
         }
+    }
+
+    private fun tryAddEntitySilverfish(entity: EntitySilverfish): EntityResult? {
+        if (!GardenAPI.inGarden()) return null
+
+        if (entity.hasNameTagWith(3, "Beetle")) return EntityResult(bossType = BossType.GARDEN_PEST_BEETLE)
+        if (entity.hasNameTagWith(3, "Cricket")) return EntityResult(bossType = BossType.GARDEN_PEST_CRICKET)
+        if (entity.hasNameTagWith(3, "Fly")) return EntityResult(bossType = BossType.GARDEN_PEST_FLY)
+        if (entity.hasNameTagWith(3, "Locust")) return EntityResult(bossType = BossType.GARDEN_PEST_LOCUST)
+        if (entity.hasNameTagWith(3, "Mite")) return EntityResult(bossType = BossType.GARDEN_PEST_MITE)
+        if (entity.hasNameTagWith(3, "Mosquito")) return EntityResult(bossType = BossType.GARDEN_PEST_MOSQUITO)
+        if (entity.hasNameTagWith(3, "Moth")) return EntityResult(bossType = BossType.GARDEN_PEST_MOTH)
+        if (entity.hasNameTagWith(3, "Rat")) return EntityResult(bossType = BossType.GARDEN_PEST_RAT)
+        if (entity.hasNameTagWith(3, "Slug")) return EntityResult(bossType = BossType.GARDEN_PEST_SLUG)
+        if (entity.hasNameTagWith(3, "Earthworm")) return EntityResult(bossType = BossType.GARDEN_PEST_EARTHWORM)
+
+        return null
     }
 
     private fun tryAddDungeon(entity: EntityLivingBase) = when {

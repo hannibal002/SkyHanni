@@ -1,5 +1,32 @@
 # SkyHanni - Change Log
 
+## Version 0.22 (Unreleased)
+
+### New Features
+
+#### Garden Features
+
++ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+  + Enable via /sh vacuum.
++ Added Pests to Damage Indicator. - hannibal2
+  + Enable Damage Indicator and select Garden Pests.
+
+#### Other Features
+
++ Added Barn Fishing Timer to Jerry's Workshop and Crimson Isle. - martimavocado
++ Added Fishing Tracker and changed trackers in general. - hannibal2
+  + This tracker GUI behaves the same way as the Slayer Tracker: Allows for single item remove or hide
+  + Counts coin drops from chat.
+  + Mark the amount in green when recently gained the item.
+  + Option to hide the Fishing Tracker while moving.
+  + Option to hide all Trackers while Estimated Item Value is visible.
+  + Option to change the default display mode for all trackers.
+  + The hidden flag for items in Item Trackers is now shared between total view and session view.
+  + Option to exclude hidden items in the total price calculation.
+  + Option to change the display mode that gets shown on default: Total, Current or remember last.
+
+### Changes
+
 ## Version 0.21.1
 
 ### New Features
@@ -13,6 +40,26 @@
     + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 
 ### Changes
+
++ /shtrackcollection now supports sack messages. - hannibal2
++ Changed formatting of coin value to be more consistent over multiple features. - hannibal2
++ Made skill level as item number no longer default enabled. - hannibal2
+
+### Fixes
+
++ Fixed the wrong colouring of hidden items in Slayer Profit Tracker. - hannibal2
++ Added support for NEU Heavy Pearl TO-DO fix working without nether sacks as well. - hannibal2
++ Fixed Estimated Item Value getting shown in pet rule creation wardrobe slot pick menu. - hannibal2
+
+### Technical Details
+
++ Added /shwhereami command to show the current island. - martimavocado
++ Tons of code clean-ups over the whole project. - walker & hannibal2
+  + Added ItemAddEvent. - hannibal2
++ Gets called when the user collects an item into inventory or sacks.
++ Created SkyHanniItemTracker. - hannibal2
+  + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different price variants.
++ Migrated slayer profit data into SkyHanniTracker format. - hannibal2
 
 #### Garden Changes
 

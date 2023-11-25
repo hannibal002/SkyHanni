@@ -90,6 +90,17 @@ enum class BossType(
 
     WINTER_REINDRAKE("Reindrake", 24),//TODO fix totally
 
+    GARDEN_PEST_BEETLE("§cBeetle", 25),
+    GARDEN_PEST_CRICKET("§cCricket", 25),
+    GARDEN_PEST_FLY("§cFly", 25),
+    GARDEN_PEST_LOCUST("§cLocust", 25),
+    GARDEN_PEST_MITE("§cMite", 25),
+    GARDEN_PEST_MOSQUITO("§cMosquito", 25),
+    GARDEN_PEST_MOTH("§cMoth", 25),
+    GARDEN_PEST_RAT("§cRat", 25),
+    GARDEN_PEST_SLUG("§cSlug", 25),
+    GARDEN_PEST_EARTHWORM("§cEarthworm", 25),
+
     //TODO arachne
 
     //TODO corelone

@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -69,9 +69,12 @@ class CollectionAPI {
     }
 
     @SubscribeEvent
-    fun onItemAdd(event: ItemAddInInventoryEvent) {
-        // TODO add support for replenish (higher collection than actual items in inv)
+    fun onItemAdd(event: ItemAddEvent) {
         val internalName = event.internalName
+        val (_, amount) = NEUItems.getMultiplier(internalName)
+        if (amount > 1) return
+
+        // TODO add support for replenish (higher collection than actual items in inv)
         if (internalName.getItemStackOrNull() == null) {
             LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
             return

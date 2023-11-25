@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -174,6 +175,7 @@ object Commands {
         ) { EnderNodeTracker.resetCommand(it) }
         registerCommand("shresetarmordroptracker", "Resets the Armor Drop Tracker") { ArmorDropTracker.resetCommand(it) }
         registerCommand("shresetfrozentreasuretracker", "Resets the Frozen Treasure Tracker") { FrozenTreasureTracker.resetCommand(it) }
+        registerCommand("shresetfishingtracker", "Resets the Frozen Treasure Tracker") { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -210,6 +212,10 @@ object Commands {
             "shclearminiondata",
             "Reset data about minion profit and the name display on the private island"
         ) { MinionFeatures.clearMinionData() }
+        registerCommand(
+            "shwhereami",
+            "Print current island in chat"
+        ) { SkyHanniDebugsAndTests.whereami() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
