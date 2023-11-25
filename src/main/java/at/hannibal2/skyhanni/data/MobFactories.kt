@@ -23,7 +23,8 @@ object MobFactories {
 
     fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
         MobFilter.mobNameFilter.find(armorStand.cleanName())?.let {
-            Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = it.groupValues[4].removeCorruptedSuffix(it.groupValues[3].isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].toInt())
+            Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = it.groupValues[4].removeCorruptedSuffix(it.groupValues[3].isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].takeIf { it.isNotEmpty() }
+                ?.toInt() ?: -1)
         }
 
     fun basic(baseEntity: EntityLivingBase, name: String) =
