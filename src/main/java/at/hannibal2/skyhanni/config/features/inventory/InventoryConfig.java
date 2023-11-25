@@ -73,7 +73,7 @@ public class InventoryConfig {
             "§bDungeon Potion Level"
         }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 11, 12));
 
     @Expose
     @ConfigOption(
