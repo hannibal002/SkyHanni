@@ -322,10 +322,6 @@ object Commands {
             "Copies the actionbar to the clipboard"
         ) { CopyActionBar.command(it) }
         registerCommand(
-            "shcopycustomscoreboard",
-            "Copies the custom scoreboard to the clipboard"
-        ) { CustomScoreboard.copyScoreboard(it) }
-        registerCommand(
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
         ) { GardenCropMilestonesFix.readDataFromClipboard() }

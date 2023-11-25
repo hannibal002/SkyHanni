@@ -163,23 +163,6 @@ class CustomScoreboard {
 
     private fun isCustomScoreboardEnabled() = config.enabled && LorenzUtils.inSkyBlock
     private fun isHideVanillaScoreboardEnabled() = config.displayConfig.hideVanillaScoreboard && LorenzUtils.inSkyBlock
-
-    companion object {
-        fun copyScoreboard(args: Array<String>) {
-            var string = ""
-
-            for (index in config.textFormat) {
-                cache[index].let {
-                    for (line in it) {
-                        string = string + line + "\n"
-                    }
-                }
-            }
-
-            OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] Custom Scoreboard copied into your clipboard!")
-        }
-    }
 }
 
 fun translateMayorNameToColor(input: String): String {
