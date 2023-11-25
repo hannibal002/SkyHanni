@@ -55,7 +55,8 @@ public class StackSizeConfig {
         COMPACTOR_DELETOR("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
         ABIPHONE("§bAbiphone Tier"),
         EDITION_AUCTION_NUMBER("§bItem Edition/Auction Number (if less than 1000)"),
-        STACKING_ENCHANTMENT("§bStacking Enchantment Tier (for items without dungeon stars)");
+        STACKING_ENCHANTMENT("§bStacking Enchantment Tier (for items without dungeon stars)"),
+        VACCUM_PESTS("§bPests Stored in Vaccum (Garden)");
 
         final String str;
 

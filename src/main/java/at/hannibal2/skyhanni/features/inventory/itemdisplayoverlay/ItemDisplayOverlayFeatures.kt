@@ -33,6 +33,14 @@ class ItemDisplayOverlayFeatures {
     private val whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
     private val iReallyHateTheBottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
     private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
+    private val gardenVacuumPattern = "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?".toPattern()
+    private val garenVacuumVariants = listOf(
+        "SKYMART_VACUUM".asInternalName(),
+        "SKYMART_TURBO_VACUUM".asInternalName(),
+        "SKYMART_HYPER_VACUUM".asInternalName(),
+        "INFINI_VACUUM".asInternalName(),
+        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -375,6 +383,16 @@ class ItemDisplayOverlayFeatures {
                         if (possibleEnchantments[enchant] != null && possibleEnchantments[enchant] != -1) {
                             return "${possibleEnchantments[enchant]}"
                         }
+                    }
+                }
+            }
+        }
+
+        if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.VACCUM_PESTS)) {
+            if (item.getInternalNameOrNull() in garenVacuumVariants) {
+                for (line in item.getLore()) {
+                    gardenVacuumPatterm.matchMatcher(line) {
+                        return group("amount")
                     }
                 }
             }
