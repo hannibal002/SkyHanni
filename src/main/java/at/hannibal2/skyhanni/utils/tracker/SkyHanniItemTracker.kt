@@ -81,10 +81,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
-            val text = " $numberColor${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
-            val (displayName, lore) = if (internalName == SKYBLOCK_COIN) {
-                data.getCoinFormat(itemProfit, numberColor)
-            } else text to buildLore(data, itemProfit, hidden, newDrop)
+            var displayName = if (hidden) {
+                "§8§m" + cleanName.removeColor(keepFormatting = true).replace("§r", "")
+            } else cleanName
+            displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
+
+            val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
 
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
@@ -116,7 +118,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         data: Data,
         item: ItemTrackerData.TrackedItem,
         hidden: Boolean,
-        newDrop: Boolean
+        newDrop: Boolean,
+        internalName: NEUInternalName
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))
