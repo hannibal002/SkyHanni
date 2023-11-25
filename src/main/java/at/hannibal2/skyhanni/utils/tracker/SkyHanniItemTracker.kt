@@ -2,8 +2,20 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.test.PriceSource
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
@@ -12,8 +24,14 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     drawDisplay: (Data) -> List<List<Any>>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
+    companion object {
+        val SKYBLOCK_COIN by lazy { "SKYBLOCK_COIN".asInternalName() }
+    }
+
+    private var lastClickDelay = 0L
+
     fun addCoins(coins: Int) {
-        addItem(ItemTrackerData.SKYBLOCK_COIN, coins)
+        addItem(SKYBLOCK_COIN, coins)
     }
 
     fun addItem(internalName: NEUInternalName, stackSize: Int) {
@@ -34,6 +52,84 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 }
             )
         }
-
     }
+
+    fun drawItems(
+        data: Data,
+        filter: (NEUInternalName) -> Boolean,
+        lists: MutableList<List<Any>>
+    ): Double {
+        var profit = 0.0
+        val map = mutableMapOf<Renderable, Long>()
+        for ((internalName, itemProfit) in data.items) {
+            if (!filter(internalName)) continue
+
+            val amount = itemProfit.totalAmount
+            val pricePer =
+                if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
+            val price = (pricePer * amount).toLong()
+            val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
+            var name = if (internalName == SKYBLOCK_COIN) {
+                "§6Coins"
+            } else {
+                internalName.getItemStack().nameWithEnchantment ?: error("no name for $internalName")
+            }
+            val priceFormat = NumberUtil.format(price)
+            val hidden = itemProfit.hidden
+            val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
+            val numberColor = if (newDrop) "§a§l" else "§7"
+            if (hidden) {
+                name = "§8§m" + name.removeColor(keepFormatting = true).replace("§r", "")
+            }
+            val text = " $numberColor${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
+            val (displayName, lore) = if (internalName == SKYBLOCK_COIN) {
+                data.getCoinFormat(itemProfit, numberColor)
+            } else text to buildLore(data, itemProfit, hidden, newDrop)
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
+                if (System.currentTimeMillis() > lastClickDelay + 150) {
+                    if (KeyboardManager.isControlKeyDown()) {
+                        data.items.remove(internalName)
+                        val abc = if (internalName == SKYBLOCK_COIN) {
+                            "§6Coins"
+                        } else {
+                            internalName.getItemStack().nameWithEnchantment
+                        }
+                        LorenzUtils.chat("§e[SkyHanni] Removed $abc §efrom Fishing Frofit Tracker.")
+                        lastClickDelay = System.currentTimeMillis() + 500
+                    } else {
+                        itemProfit.hidden = !hidden
+
+                        lastClickDelay = System.currentTimeMillis()
+                    }
+                    update()
+                }
+            } else Renderable.string(displayName)
+            if (isInventoryOpen() || !hidden) {
+                map[renderable] = price
+            }
+            profit += price
+        }
+
+        for (text in map.sortedDesc().keys) {
+            lists.addAsSingletonList(text)
+        }
+        return profit
+    }
+
+    private fun buildLore(
+        data: Data,
+        item: ItemTrackerData.TrackedItem,
+        hidden: Boolean,
+        newDrop: Boolean
+    ) = buildList {
+        addAll(data.getDescription(item.timesGained))
+        add("")
+        if (newDrop) {
+            add("§aYou caught this item recently.")
+            add("")
+        }
+        add("§eClick to " + (if (hidden) "show" else "hide") + "!")
+        add("§eControl + Click to remove this item!")
+    }
+
 }

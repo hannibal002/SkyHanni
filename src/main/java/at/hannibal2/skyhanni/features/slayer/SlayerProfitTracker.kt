@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -170,23 +169,17 @@ object SlayerProfitTracker {
         val tracker = getTracker() ?: return@buildList
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
 
-        var profit = 0.0
-        val map = mutableMapOf<Renderable, Long>()
-        for ((internalName, itemProfit) in itemLog.items) {
-            profit += itemLog.drawItem(tracker, itemProfit, internalName, map)
-        }
+        var profit = tracker.drawItems(itemLog, { true }, this)
         val slayerSpawnCost = itemLog.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
             val mobKillCoinsFormat = NumberUtil.format(slayerSpawnCost)
-            map[Renderable.hoverTips(
-                " §7Slayer Spawn Costs: §c$mobKillCoinsFormat",
-                listOf("§7You paid §c$mobKillCoinsFormat §7in total", "§7for starting the slayer quests.")
-            )] = slayerSpawnCost
+            addAsSingletonList(
+                Renderable.hoverTips(
+                    " §7Slayer Spawn Costs: §c$mobKillCoinsFormat",
+                    listOf("§7You paid §c$mobKillCoinsFormat §7in total", "§7for starting the slayer quests.")
+                )
+            )
             profit += slayerSpawnCost
-        }
-
-        for (text in map.sortedDesc().keys) {
-            addAsSingletonList(text)
         }
 
         val slayerCompletedCount = itemLog.slayerCompletedCount

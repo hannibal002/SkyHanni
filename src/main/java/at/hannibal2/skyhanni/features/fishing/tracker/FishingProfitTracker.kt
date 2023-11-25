@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -121,18 +120,7 @@ object FishingProfitTracker {
             { it in items }
         }
 
-        var profit = 0.0
-        val map = mutableMapOf<Renderable, Long>()
-        for ((internalName, itemProfit) in data.items) {
-            if (!filter(internalName)) continue
-
-            val price = data.drawItem(tracker, itemProfit, internalName, map)
-            profit += price
-        }
-
-        for (text in map.sortedDesc().keys) {
-            addAsSingletonList(text)
-        }
+        val profit = tracker.drawItems(data, filter, this)
 
         val fishedCount = data.totalCatchAmount
         addAsSingletonList(
