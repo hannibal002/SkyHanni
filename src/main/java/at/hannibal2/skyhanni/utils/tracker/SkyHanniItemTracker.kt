@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
@@ -139,8 +140,10 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
         add("§eControl + Click to remove this item!")
-        add("")
-        add("§7${internalName}")
+        if (SkyHanniMod.feature.dev.debug.enabled) {
+            add("")
+            add("§7${internalName}")
+        }
     }
 
 }
