@@ -112,7 +112,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (isInventoryOpen() || !hidden) {
                 items[renderable] = price
             }
-            profit += price
+            if (!hidden || !config.excludeHiddenItemsInPrice) {
+                profit += price
+            }
         }
 
         for (text in items.sortedDesc().keys) {

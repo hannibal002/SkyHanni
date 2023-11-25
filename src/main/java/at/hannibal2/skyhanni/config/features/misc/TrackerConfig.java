@@ -28,4 +28,9 @@ public class TrackerConfig {
     @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")
     @ConfigEditorBoolean
     public boolean showRecentDrops = true;
+
+    @Expose
+    @ConfigOption(name = "Exclude Hidden", desc = "Exclude hidden items in the total price calculation.")
+    @ConfigEditorBoolean
+    public boolean excludeHiddenItemsInPrice = false;
 }
