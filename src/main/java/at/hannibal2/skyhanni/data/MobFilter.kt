@@ -49,8 +49,9 @@ object MobFilter {
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤\\?]+|█+) .$".toRegex()
     val dungeonNameFilter =
-        "^(✯)?(?:\\s?(Flaming|Stormy|Speedy|Fortified|Healthy|Healing|Boomer|Golden))?(?:\\s?\\[[\\w\\d]+\\])?\\s?(.+)\\s[^\\s]+$".toRegex()
-    val dungeonAttribute = listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing", "Boomer", "Golden")
+        "^(✯)?(?:\\s?(Flaming|Stormy|Speedy|Fortified|Healthy|Healing|Boomer|Golden|Stealth))?(?:\\s?\\[[\\w\\d]+\\])?\\s?(.+)\\s[^\\s]+$".toRegex()
+    val dungeonAttribute =
+        listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing", "Boomer", "Golden", "Stealth")
     val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
 
     fun errorNameFinding(name: String): String {
@@ -148,12 +149,14 @@ object MobFilter {
             if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(Found, MobFactories.special(baseEntity, nextEntity.cleanName(), nextEntity))
             if (baseEntity is EntityCaveSpider) return getClosedArmorStand(baseEntity, 2.0).takeNonDefault()
                 .makeMobResult { MobFactories.dungeon(baseEntity, it) }
-            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "§c§d§lShadow Assassin")
+            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin")
                 .makeMobResult { MobFactories.dungeon(baseEntity, it) }
             if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor") return MobUtils.getArmorStand(baseEntity, 9)
                 .makeMobResult { MobFactories.boss(baseEntity, it) }
-            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && nextEntity is EntityGiantZombie && baseEntity.name.endsWith("Livid")) return MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "§5﴾ §5§lLivid")
-                .makeMobResult { MobFactories.boss(baseEntity, it, mutableListOf(nextEntity), "Real Livid") }
+            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid")) return MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
+                .makeMobResult {
+                    MobFactories.boss(baseEntity, it, overriddenName = "Real Livid")
+                }
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> if (nextEntity !is EntityArmorStand) return MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
             IslandType.THE_RIFT -> {
@@ -208,7 +211,7 @@ object MobFilter {
 
     private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobData.MobResult? {
         if (DungeonAPI.inDungeon()) {
-            if (baseEntity is EntityEnderman && extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿") return MobData.MobResult(Illegal, null) // Livid Start Animation
+            if ((baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) && extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿") return MobData.MobResult(Illegal, null) // Livid Start Animation
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.CRIMSON_ISLE -> {}
             else -> {}

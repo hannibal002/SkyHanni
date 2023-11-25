@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.Mob
 import at.hannibal2.skyhanni.data.MobData
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import net.minecraft.entity.Entity
@@ -23,8 +24,8 @@ object MobUtils {
         getArmorStandByRangeAll(entity, range).sortedBy { it.distanceTo(entity) }.firstOrNull()
 
     fun getClosedArmorStandWithName(entity: Entity, range: Double, name: String) =
-        getArmorStandByRangeAll(entity, range).filter { it.name.startsWith(name) }.sortedBy { it.distanceTo(entity) }
-            .firstOrNull()
+        getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
+            .sortedBy { it.distanceTo(entity) }.firstOrNull()
 
     fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
 
