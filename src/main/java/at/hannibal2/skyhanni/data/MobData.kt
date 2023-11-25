@@ -630,8 +630,8 @@ class MobData {
         fun projectile(baseEntity: EntityLivingBase, name: String): Mob =
             Mob(baseEntity = baseEntity, mobType = MobType.Projectile, name = name)
 
-        fun special(baseEntity: EntityLivingBase, name: String) =
-            Mob(baseEntity = baseEntity, mobType = MobType.Special, name = name)
+        fun special(baseEntity: EntityLivingBase, name: String, armorStand: EntityArmorStand? = null) =
+            Mob(baseEntity = baseEntity, mobType = MobType.Special, armorStand = armorStand, name = name)
 
         private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
 

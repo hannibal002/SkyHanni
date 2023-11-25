@@ -135,7 +135,14 @@ object MobFilter {
     }
 
     private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobData.MobResult? {
-        when (LorenzUtils.skyBlockIsland) {
+        if (DungeonAPI.inDungeon()) {
+            if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, nextEntity.cleanName(), nextEntity))
+            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getArmorStandByRangeAll(baseEntity, 3.0)
+                .filter { it.name.startsWith("§c§d§lShadow Assassin") }.sortedBy { it.distanceTo(baseEntity) }
+                .firstOrNull()
+                ?.let { MobData.MobResult(MobData.Result.Found, MobData.factories.dungeon(baseEntity, it)) }
+                ?: MobData.MobResult(MobData.Result.NotYetFound, null)
+        } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> if (nextEntity !is EntityArmorStand) return MobData.MobResult(MobData.Result.Illegal, null) // TODO fix to always include Valid Mobs on Private Island
             IslandType.THE_RIFT -> if (baseEntity is EntitySlime && nextEntity is EntitySlime) return MobData.MobResult(MobData.Result.Illegal, null)// Bacte Tentacle
             IslandType.CRIMSON_ISLE -> {
@@ -160,21 +167,13 @@ object MobFilter {
                 }
             }
 
-            IslandType.CATACOMBS -> {
-                if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Watcher"))
-                if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getArmorStandByRangeAll(baseEntity, 3.0)
-                    .filter { it.name.startsWith("§c§d§lShadow Assassin") }.sortedBy { it.distanceTo(baseEntity) }
-                    .firstOrNull()
-                    ?.let { MobData.MobResult(MobData.Result.Found, MobData.factories.dungeon(baseEntity, it)) }
-                    ?: MobData.MobResult(MobData.Result.NotYetFound, null)
-            }
-
             IslandType.DWARVEN_MINES -> {
                 if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth == 1_000_000) return MobData.MobResult(MobData.Result.Found, MobData.factories.basic(baseEntity, "Ghost"))
             }
 
             else -> {}
         }
+
 
         val armorStand = nextEntity as? EntityArmorStand ?: return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
@@ -200,8 +199,8 @@ object MobFilter {
         }
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
             HellwispTentacleSkull -> return MobData.MobResult(MobData.Result.Illegal, null) // Hellwisp Tentacle
-            RiftEyeSkull1 -> return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Rift Teleport Eye"))
-            RiftEyeSkull2 -> return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Rift Teleport Eye"))
+            RiftEyeSkull1 -> return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            RiftEyeSkull2 -> return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Rift Teleport Eye", armorStand))
         }
         return null
     }
