@@ -81,6 +81,6 @@ class GardenOptimalDepthStrider {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && optimalDepthStrider != 0
 }
 

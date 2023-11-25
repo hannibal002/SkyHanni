@@ -7,62 +7,52 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class CustomDepthStriderConfig {
 
     @Expose
-    @ConfigOption(name = "Wheat", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int wheat = 1;
+    @ConfigOption(name = "Wheat", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int wheat = 0;
 
     @Expose
-    @ConfigOption(name = "Carrot", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int carrot = 1;
+    @ConfigOption(name = "Carrot", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int carrot = 0;
 
     @Expose
-    @ConfigOption(name = "Potato", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int potato = 1;
+    @ConfigOption(name = "Potato", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int potato = 0;
 
     @Expose
-    @ConfigOption(name = "Nether Wart", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int netherWart = 1;
+    @ConfigOption(name = "Nether Wart", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int netherWart = 0;
 
     @Expose
-    @ConfigOption(name = "Pumpkin", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int pumpkin = 1;
+    @ConfigOption(name = "Pumpkin", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int pumpkin = 0;
 
     @Expose
-    @ConfigOption(name = "Melon", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int melon = 1;
+    @ConfigOption(name = "Melon", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int melon = 0;
 
     @Expose
-    @ConfigOption(name = "Cocoa Beans", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int cocoaBeans = 1;
+    @ConfigOption(name = "Cocoa Beans", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int cocoaBeans = 0;
 
     @Expose
-    @ConfigOption(name = "Sugar Cane", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int sugarCane = 1;
+    @ConfigOption(name = "Sugar Cane", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int sugarCane = 0;
 
     @Expose
-    @ConfigOption(name = "Cactus", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int cactus = 1;
+    @ConfigOption(name = "Cactus", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int cactus = 0;
 
     @Expose
-    @ConfigOption(name = "Mushroom", desc = "Suggested:\n" +
-        "§eTODO: get default depth strider value")
-    @ConfigEditorSlider(minValue = 1, maxValue = 3, minStep = 1)
-    public int mushroom = 1;
+    @ConfigOption(name = "Mushroom", desc = "§eTODO: get a good description, explain 0=disabled")
+    @ConfigEditorSlider(minValue = 0, maxValue = 3, minStep = 1)
+    public int mushroom = 0;
 }

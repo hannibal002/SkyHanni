@@ -25,6 +25,6 @@ public class OptimalDepthStriderConfig {
     @Accordion
     public CustomDepthStriderConfig customDepthStrider = new CustomDepthStriderConfig();
 
-    public Position pos = new Position(5, -150, false, true);
+    public Position pos = new Position(5, -184, false, true);
 
 }
