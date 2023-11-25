@@ -49,5 +49,11 @@ object MobFactories {
         Mob(baseEntity = baseEntity, mobType = Mob.Type.Special, armorStand = armorStand, name = name)
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
+    fun dojo(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob? =
+        MobFilter.dojoFilter.find(armorStand.cleanName())?.let {
+            Mob(
+                baseEntity = baseEntity, mobType = Mob.Type.Special, armorStand = armorStand, name = if (it.groupValues[1].isNotEmpty()) "Points: " + it.groupValues[1] else it.groupValues[2]
+            )
+        }
 
 }

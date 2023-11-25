@@ -54,6 +54,7 @@ object MobFilter {
     val dungeonAttribute =
         listOf("Flaming", "Stormy", "Speedy", "Fortified", "Healthy", "Healing", "Boomer", "Golden", "Stealth")
     val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
+    val dojoFilter = "^(?:(\\d+) pts|(\\w+))$".toRegex()
 
     fun errorNameFinding(name: String): String {
         LorenzDebug.chatAndLog("Skyblock Name of Mob $name not found")
@@ -98,7 +99,8 @@ object MobFilter {
         MobFactories.summon(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
-            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(baseEntity, armorStand, extraEntityList) else MobFactories.basic(baseEntity, armorStand, extraEntityList)
+            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(baseEntity, armorStand, extraEntityList) else (MobFactories.basic(baseEntity, armorStand, extraEntityList)
+                ?: MobFactories.dojo(baseEntity, armorStand))
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: EntityLivingBase): MobData.MobResult {
