@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.countDigits
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -391,7 +392,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.VACCUM_PESTS)) {
             if (item.getInternalNameOrNull() in garenVacuumVariants) {
                 for (line in item.getLore()) {
-                    gardenVacuumPatterm.matchMatcher(line) {
+                    gardenVacuumPattern.matchMatcher(line) {
                         val pests = group("amount").formatNumber()
                         return if (pests >= 40) "§6§z40+" else "$pests"
                     }
