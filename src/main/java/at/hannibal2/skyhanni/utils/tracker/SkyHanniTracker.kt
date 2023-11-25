@@ -122,7 +122,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     )
 
-    private fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
+    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
         SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
     }
 

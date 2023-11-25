@@ -38,6 +38,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         modify {
             it.additem(internalName, stackSize)
         }
+        getSharedTracker()?.let {
+            val hidden = it.get(DisplayMode.TOTAL).items[internalName]!!.hidden
+            it.get(DisplayMode.SESSION).items[internalName]!!.hidden = hidden
+        }
+
     }
 
     fun addPriceFromButton(lists: MutableList<List<Any>>) {
@@ -95,8 +100,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                         LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom Fishing Frofit Tracker.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
-                        itemProfit.hidden = !hidden
-
+                        modify {
+                            it.items[internalName]?.hidden = !hidden
+                        }
                         lastClickDelay = System.currentTimeMillis()
                     }
                     update()
@@ -133,6 +139,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
         add("§eControl + Click to remove this item!")
+        add("")
+        add("§7${internalName}")
     }
 
 }
