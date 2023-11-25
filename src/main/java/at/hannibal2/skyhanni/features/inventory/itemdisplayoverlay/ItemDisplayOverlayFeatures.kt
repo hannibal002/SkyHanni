@@ -392,7 +392,8 @@ class ItemDisplayOverlayFeatures {
             if (item.getInternalNameOrNull() in garenVacuumVariants) {
                 for (line in item.getLore()) {
                     gardenVacuumPatterm.matchMatcher(line) {
-                        return group("amount")
+                        val pests = group("amount").formatNumber()
+                        return if (pests >= 40) "§6§z40+" else "$pests"
                     }
                 }
             }
