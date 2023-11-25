@@ -33,6 +33,12 @@ public class DisplayConfig {
     public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
 
     @Expose
+    @ConfigOption(name = "Use Hypixel's Title Animation", desc = "Will overwrite the custom title with Hypixel's title animation.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean useHypixelTitleAnimation = false;
+
+    @Expose
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard.\nUse & for colors.")
     @ConfigEditorText
     public Property<String> customFooter = Property.of("&ewww.hypixel.net");

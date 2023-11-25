@@ -23,7 +23,10 @@ enum class Elements(
 ) {
     SKYBLOCK(
         {
-            listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
+            when (config.displayConfig.useHypixelTitleAnimation){
+                true -> listOf(ScoreboardData.objectiveTitle)
+                false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
+            }
         },
         {
             true
