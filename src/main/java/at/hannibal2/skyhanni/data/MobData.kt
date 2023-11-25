@@ -85,7 +85,7 @@ class MobData {
 
     @SubscribeEvent
     fun onTickForEntityDetection(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock) mobDetectionReset().run { return }
         if (event.isMod(2)) return
 
         makeEntityUpdate()
