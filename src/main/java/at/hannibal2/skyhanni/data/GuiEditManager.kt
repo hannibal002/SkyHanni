@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.minutes
 
 class GuiEditManager {
 
-    var lastHotkeyPressed = SimpleTimeMark.farPast()
+    private var lastHotkeyPressed = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
@@ -41,7 +41,6 @@ class GuiEditManager {
         if (NEUItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
-        Minecraft.getMinecraft().thePlayer.closeScreen()
         openGuiPositionEditor(hotkeyReminder = false)
     }
 

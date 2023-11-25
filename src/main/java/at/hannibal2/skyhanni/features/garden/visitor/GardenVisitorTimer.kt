@@ -142,7 +142,10 @@ class GardenVisitorTimer {
         }
 
         if (lastMillis == Duration.INFINITE) {
-            LorenzUtils.error("Found Visitor Timer bug, reset value (lastMillis was infinite).")
+            ErrorManager.logErrorStateWithData(
+                "Found Visitor Timer bug, reset value", "lastMillis was infinite",
+                "lastMillis" to lastMillis
+            )
             lastMillis = 0.seconds
         }
 

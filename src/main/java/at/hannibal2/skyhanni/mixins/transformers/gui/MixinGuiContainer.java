@@ -52,12 +52,12 @@ public abstract class MixinGuiContainer extends GuiScreen {
     }
 
     @Inject(method = "drawScreen",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/InventoryPlayer;getItemStack()Lnet/minecraft/item/ItemStack;",
-                    shift = At.Shift.BEFORE,
-                    ordinal = 1
-            )
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/player/InventoryPlayer;getItemStack()Lnet/minecraft/item/ItemStack;",
+            shift = At.Shift.BEFORE,
+            ordinal = 1
+        )
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         skyHanni$hook.onDrawScreenAfter(mouseX, mouseY, ci);

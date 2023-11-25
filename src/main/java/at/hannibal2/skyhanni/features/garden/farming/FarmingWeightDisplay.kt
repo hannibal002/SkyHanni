@@ -254,8 +254,9 @@ class FarmingWeightDisplay {
                 listOf("§eClick here to load new data right now!"),
                 onClick = recalculate
             )
+            val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
             var nextName =
-                if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
+                if (showRankGoal) "#$rankGoal" else nextPlayer.name
 
             val totalWeight = (localWeight + weight)
             var weightUntilOvertake = nextPlayer.weight - totalWeight
@@ -298,11 +299,16 @@ class FarmingWeightDisplay {
             } else ""
 
             val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
-            return Renderable.clickAndHover(
-                "§e$weightFormat$timeFormat §7behind §b$nextName",
-                listOf("§eClick to open the Farming Profile of §b$nextName.")
-            ) {
-                openWebsite(nextName)
+            val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
+            return if (showRankGoal) {
+                Renderable.string(text)
+            } else {
+                Renderable.clickAndHover(
+                    text,
+                    listOf("§eClick to open the Farming Profile of §b$nextName.")
+                ) {
+                    openWebsite(nextName)
+                }
             }
         }
 
@@ -513,7 +519,7 @@ class FarmingWeightDisplay {
             openWebsite(name, ignoreCooldown = true)
         }
 
-        var lastName = ""
+        private var lastName = ""
 
         private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
             if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
