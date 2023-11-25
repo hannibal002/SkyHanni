@@ -98,27 +98,7 @@ object FishingProfitTracker {
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lFishing Profit Tracker")
-        val amounts = getCurrentCategories(data)
-        val list = amounts.keys.toList()
-        if (currentCategory !in list) {
-            currentCategory = nameAll
-        }
-        addButton(
-            prefix = "§7Category: ",
-            getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
-            onChange = {
-                val id = list.indexOf(currentCategory)
-                currentCategory = list[(id + 1) % list.size]
-                tracker.update()
-            }
-        )
-
-        val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
-            { true }
-        } else {
-            val items = itemCategories[currentCategory]!!
-            { it in items }
-        }
+        val filter: (NEUInternalName) -> Boolean = addCategories(data)
 
         val profit = tracker.drawItems(data, filter, this)
 
@@ -140,6 +120,31 @@ object FishingProfitTracker {
         addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per catch: $profitPrefix$profitPerCatchFormat")))
 
         tracker.addPriceFromButton(this)
+    }
+
+    private fun MutableList<List<Any>>.addCategories(data: Data): (NEUInternalName) -> Boolean {
+        val amounts = getCurrentCategories(data)
+        val list = amounts.keys.toList()
+        if (currentCategory !in list) {
+            currentCategory = nameAll
+        }
+        addButton(
+            prefix = "§7Category: ",
+            getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
+            onChange = {
+                val id = list.indexOf(currentCategory)
+                currentCategory = list[(id + 1) % list.size]
+                tracker.update()
+            }
+        )
+
+        val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
+            { true }
+        } else {
+            val items = itemCategories[currentCategory]!!
+            { it in items }
+        }
+        return filter
     }
 
     @SubscribeEvent
