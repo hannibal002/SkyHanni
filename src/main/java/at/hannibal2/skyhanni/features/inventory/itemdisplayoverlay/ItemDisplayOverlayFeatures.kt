@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.countDigits
@@ -42,6 +43,13 @@ class ItemDisplayOverlayFeatures {
         "SKYMART_HYPER_VACUUM".asInternalName(),
         "INFINI_VACUUM".asInternalName(),
         "INFINI_VACUUM_HOOVERIUS".asInternalName(),
+    )
+    private val tieredEnchants = listOf(
+        "compact",
+        "cultivating",
+        "champion",
+        "expertise",
+        "hecatomb",
     )
 
     @SubscribeEvent
@@ -378,7 +386,6 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.STACKING_ENCHANTMENT)) {
             //itemName.contains("✪")
             (("^(?:(?!✪).)*\$").toPattern()).matchMatcher(itemName) {
-                val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
                 val possibleEnchantments = item.getEnchantments()
                 if (possibleEnchantments != null) {
                     for (enchant in tieredEnchants) {
