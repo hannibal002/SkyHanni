@@ -11,21 +11,13 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
-import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.rayTraceForSkyblockMob
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
@@ -40,7 +32,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S37PacketStatistics
-import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.IOException
@@ -89,6 +80,11 @@ class MobData {
         currentRealPlayers.clear()
     }
 
+    enum class Result {
+        Found, NotYetFound, Illegal
+    }
+
+    class MobResult(val result: Result, val mob: Mob?)
 
     @SubscribeEvent
     fun onTickForEntityDetection(event: LorenzTickEvent) {
@@ -133,7 +129,7 @@ class MobData {
     private fun EntitySpawn(entity: EntityLivingBase): Boolean {
         devTracker.data.spawn++
         when {
-            entity is EntityPlayer && entity.isRealPlayer() -> MobEvent.Spawn.Player(factories.player(entity))
+            entity is EntityPlayer && entity.isRealPlayer() -> MobEvent.Spawn.Player(MobFactories.player(entity))
                 .postAndCatch()
 
             entity.isDisplayNPC() -> return createDisplayNPC(entity)
@@ -144,13 +140,13 @@ class MobData {
                 if (it.result == Result.Illegal) return true
                 if (it.mob == null) throw IllegalStateException("Mob is null even though result is Found")
                 when (it.mob.mobType) {
-                    MobType.Summon -> MobEvent.Spawn.Summon(it.mob).postAndCatch()
+                    Mob.Type.Summon -> MobEvent.Spawn.Summon(it.mob).postAndCatch()
 
-                    MobType.Basic, MobType.Dungeon, MobType.Boss, MobType.Slayer -> MobEvent.Spawn.SkyblockMob(it.mob)
+                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(it.mob)
                         .postAndCatch()
 
-                    MobType.Special -> MobEvent.Spawn.Special(it.mob).postAndCatch()
-                    MobType.Projectile -> MobEvent.Spawn.Projectile(it.mob).postAndCatch()
+                    Mob.Type.Special -> MobEvent.Spawn.Special(it.mob).postAndCatch()
+                    Mob.Type.Projectile -> MobEvent.Spawn.Projectile(it.mob).postAndCatch()
                     else -> {}
                 }
             }
@@ -160,7 +156,7 @@ class MobData {
 
     private fun createDisplayNPC(entity: EntityLivingBase): Boolean = MobUtils.getArmorStandByRangeAll(entity, 1.0)
         .firstOrNull { !it.name.startsWith("§e§lCLICK") && !it.isDefaultValue() }?.let { armorStand ->
-            MobEvent.Spawn.DisplayNPC(factories.displayNPC(entity, armorStand)).postAndCatch().also { true }
+            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch().also { true }
         } ?: false
 
 
@@ -174,12 +170,12 @@ class MobData {
         devTracker.data.deSpawn++
         currentEntityToMobMap[entity]?.let {
             when (it.mobType) {
-                MobType.Player -> MobEvent.DeSpawn.Player(it)
-                MobType.Summon -> MobEvent.DeSpawn.Summon(it)
-                MobType.Special -> MobEvent.DeSpawn.Special(it)
-                MobType.Projectile -> MobEvent.DeSpawn.Projectile(it)
-                MobType.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
-                MobType.Basic, MobType.Dungeon, MobType.Boss, MobType.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
+                Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
+                Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
+                Mob.Type.Special -> MobEvent.DeSpawn.Special(it)
+                Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(it)
+                Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
+                Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
             }.postAndCatch()
         } ?: removeRetry(entity)
         packetEntityIds.remove(entity.entityId)
@@ -344,7 +340,7 @@ class MobData {
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
         if (mobDebugConfig.skyblockMobHighlight) {
             currentSkyblockMobs.forEach {
-                val color = if (it.mobType == MobType.Boss) LorenzColor.DARK_GREEN else LorenzColor.GREEN
+                val color = if (it.mobType == Mob.Type.Boss) LorenzColor.DARK_GREEN else LorenzColor.GREEN
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.toColor(), 0.3f)
             }
         }
@@ -414,17 +410,17 @@ class MobData {
         }
 
         fun addEntityName(mob: Mob) {
-            if (mob.mobType == MobType.Player) return
+            if (mob.mobType == Mob.Type.Player) return
             val name = when (mob.mobType) {
-                MobType.DisplayNPC -> "DNPC"
-                MobType.Summon -> "SUM "
-                MobType.Basic -> "BASE"
-                MobType.Dungeon -> "DUNG"
-                MobType.Boss -> "BOSS"
-                MobType.Slayer -> "SLAY"
-                MobType.Player -> "PLAY"
-                MobType.Projectile -> "PROJ"
-                MobType.Special -> "SPEC"
+                Mob.Type.DisplayNPC -> "DNPC"
+                Mob.Type.Summon -> "SUM "
+                Mob.Type.Basic -> "BASE"
+                Mob.Type.Dungeon -> "DUNG"
+                Mob.Type.Boss -> "BOSS"
+                Mob.Type.Slayer -> "SLAY"
+                Mob.Type.Player -> "PLAY"
+                Mob.Type.Projectile -> "PROJ"
+                Mob.Type.Special -> "SPEC"
             } + " " + mob.name
             if (data.entityNames.contains(name)) return
             data.entityNames.add(name)
@@ -482,159 +478,7 @@ class MobData {
     @SubscribeEvent
     fun onExit(event: IslandChangeEvent) {
         devTracker.saveToFile()
-
-
         // counter.reset()
-    }
-
-
-    enum class Result {
-        Found, NotYetFound, Illegal
-    }
-
-    enum class MobType {
-        DisplayNPC, Summon, Basic, Dungeon, Boss, Slayer, Player, Projectile, Special;
-
-        fun isSkyblockMob() = when (this) {
-            Basic, Dungeon, Boss, Slayer -> true
-            else -> false
-        }
-    }
-
-    class MobResult(val result: Result, val mob: Mob?)
-
-    class Mob(
-        var baseEntity: EntityLivingBase,
-        val mobType: MobType,
-        val armorStand: EntityArmorStand? = null,
-        val name: String = "",
-        additionalEntities: List<EntityLivingBase>? = null,
-        ownerName: String? = null,
-        val hasStar: Boolean = false,
-        val attribute: String = "",
-        val levelOrTier: Int = -1,
-    ) {
-
-        val owner: MobUtils.OwnerShip?
-
-        val hologram1 by lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
-        val hologram2 by lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
-
-        val extraEntities: List<EntityLivingBase>? get() = extraEntitiesList
-
-        override fun hashCode(): Int {
-            return baseEntity.hashCode()
-        }
-
-        val isCorrupted get() = baseEntity.isCorrupted() // Can change
-        val isRunic = baseEntity.isRunic() // Does not Change
-
-        fun isInRender() = baseEntity.distanceToPlayer() < ENTITY_RENDER_RANGE_IN_BLOCKS
-
-        fun canBeSeen() = baseEntity.canBeSeen()
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Mob
-
-            return baseEntity == other.baseEntity
-        }
-
-        private var extraEntitiesList = additionalEntities?.toMutableList()
-        private var relativeBoundingBox: AxisAlignedBB?
-        val boundingBox: AxisAlignedBB
-            get() = (relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
-                ?: baseEntity.entityBoundingBox).expandBlock()
-
-        private val summonOwnerRegex = "Spawned by: (.*)".toRegex()
-
-        init {
-            removeExtraEntitiesFromChecking()
-            relativeBoundingBox = makeRelativeBoundingBox()
-
-            owner = (ownerName ?: if (mobType == MobType.Slayer) hologram2?.let {
-                summonOwnerRegex.find(it.cleanName())?.groupValues?.get(1)
-            } else null)?.let { MobUtils.OwnerShip(it) }
-        }
-
-        private fun removeExtraEntitiesFromChecking() =
-            extraEntities?.count { retries.contains(RetryEntityInstancing(it, 0)) }?.also {
-                externRemoveOfRetryAmount += it
-            }
-
-        private fun makeRelativeBoundingBox() =
-            (baseEntity.entityBoundingBox.union(extraEntities?.filter { it !is EntityArmorStand }
-                ?.mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
-
-        fun addEntityInFront(entity: EntityLivingBase) {
-            extraEntitiesList?.add(0, entity) ?: run { extraEntitiesList = mutableListOf(entity) }
-            relativeBoundingBox = makeRelativeBoundingBox()
-            // MobData.putSummonOrSkyblockMob(entity, this) TODO
-        }
-
-        fun addEntityInFront(entities: Collection<EntityLivingBase>) {
-            extraEntitiesList?.addAll(0, entities) ?: run { extraEntitiesList = entities.toMutableList() }
-            relativeBoundingBox = makeRelativeBoundingBox()
-            removeExtraEntitiesFromChecking()
-            // MobData.putAllSummonOrSkyblockMob(entities, this) TODO
-        }
-
-        fun internalUpdateOfEntity(entity: EntityLivingBase) {
-            if (entity == baseEntity) baseEntity = entity else {
-                extraEntitiesList?.remove(entity)
-                extraEntitiesList?.add(entity)
-            }
-        }
-
-        fun makeEntityToMobAssociation() =
-            (baseEntity.toSingletonListOrEmpty() + (extraEntities ?: emptyList())).associateWith { this }
-
-
-    }
-
-    object factories {
-        fun slayer(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-            MobFilter.slayerNameFilter.find(armorStand.cleanName())?.let {
-                Mob(baseEntity = baseEntity, mobType = MobType.Slayer, armorStand = armorStand, name = it.groupValues[1], additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].romanToDecimal())
-            }
-
-        fun boss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-            MobFilter.bossMobNameFilter.find(armorStand.cleanName())?.let {
-                Mob(baseEntity = baseEntity, mobType = MobType.Boss, armorStand = armorStand, name = it.groupValues[3], additionalEntities = extraEntityList)
-            }
-
-        fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? =
-            MobFilter.dungeonNameFilter.find(armorStand.cleanName())?.let {
-                Mob(baseEntity, MobType.Dungeon, armorStand, it.groupValues[3], extraEntityList, hasStar = it.groupValues[1].isNotEmpty(), attribute = it.groupValues[2])
-            }
-
-        fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-            MobFilter.mobNameFilter.find(armorStand.cleanName())?.let {
-                Mob(baseEntity = baseEntity, mobType = MobType.Basic, armorStand = armorStand, name = it.groupValues[4].removeCorruptedSuffix(it.groupValues[3].isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].toInt())
-            }
-
-        fun basic(baseEntity: EntityLivingBase, name: String) =
-            Mob(baseEntity = baseEntity, mobType = MobType.Basic, name = name)
-
-        fun summon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-            MobFilter.summoningRegex.find(armorStand.cleanName())?.let {
-                Mob(baseEntity = baseEntity, mobType = MobType.Summon, armorStand = armorStand, name = it.groupValues[2], additionalEntities = extraEntityList, ownerName = it.groupValues[1])
-            }
-
-        fun displayNPC(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob =
-            Mob(baseEntity = baseEntity, mobType = MobType.DisplayNPC, armorStand = armorStand, name = armorStand.cleanName())
-
-        fun player(baseEntity: EntityLivingBase): Mob = Mob(baseEntity, MobType.Player)
-        fun projectile(baseEntity: EntityLivingBase, name: String): Mob =
-            Mob(baseEntity = baseEntity, mobType = MobType.Projectile, name = name)
-
-        fun special(baseEntity: EntityLivingBase, name: String, armorStand: EntityArmorStand? = null) =
-            Mob(baseEntity = baseEntity, mobType = MobType.Special, armorStand = armorStand, name = name)
-
-        private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
-
     }
 }
 

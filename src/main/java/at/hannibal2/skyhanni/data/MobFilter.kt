@@ -84,11 +84,11 @@ object MobFilter {
         this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
 
-    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): MobData.Mob? =
-        MobData.factories.summon(baseEntity, armorStand, extraEntityList)
-            ?: MobData.factories.slayer(baseEntity, armorStand, extraEntityList)
-            ?: MobData.factories.boss(baseEntity, armorStand, extraEntityList)
-            ?: if (DungeonAPI.inDungeon()) MobData.factories.dungeon(baseEntity, armorStand, extraEntityList) else MobData.factories.basic(baseEntity, armorStand, extraEntityList)
+    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
+        MobFactories.summon(baseEntity, armorStand, extraEntityList)
+            ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
+            ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
+            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(baseEntity, armorStand, extraEntityList) else MobFactories.basic(baseEntity, armorStand, extraEntityList)
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: EntityLivingBase): MobData.MobResult {
@@ -105,7 +105,7 @@ object MobFilter {
         }
 
         // Stack up the mob
-        var caughtSkyblockMob: MobData.Mob? = null
+        var caughtSkyblockMob: Mob? = null
         val extraEntityList =
             generateSequence(nextEntity) { MobUtils.getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
                 !(entity is EntityArmorStand && !entity.isDefaultValue()) && MobData.currentEntityToMobMap[entity]?.also {
@@ -128,25 +128,24 @@ object MobFilter {
         if (baseEntity is EntityBat) return createBat(baseEntity)?.let { MobData.MobResult(MobData.Result.Found, it) }
             ?: MobData.MobResult(MobData.Result.NotYetFound, null)
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)?.let { MobData.MobResult(MobData.Result.Found, it) }
-        if (baseEntity is EntityDragon) return MobData.MobResult(MobData.Result.Found, MobData.factories.basic(baseEntity, baseEntity.cleanName()))
-        if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return MobData.MobResult(MobData.Result.Found, MobData.factories.projectile(baseEntity, "Giant Sword"))  // Will false trigger if there is another Dinnerbone Giant
+        if (baseEntity is EntityDragon) return MobData.MobResult(MobData.Result.Found, MobFactories.basic(baseEntity, baseEntity.cleanName()))
+        if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return MobData.MobResult(MobData.Result.Found, MobFactories.projectile(baseEntity, "Giant Sword"))  // Will false trigger if there is another Dinnerbone Giant
 
         return null
     }
 
     private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobData.MobResult? {
         if (DungeonAPI.inDungeon()) {
-            if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, nextEntity.cleanName(), nextEntity))
+            if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(MobData.Result.Found, MobFactories.special(baseEntity, nextEntity.cleanName(), nextEntity))
             if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getArmorStandByRangeAll(baseEntity, 3.0)
                 .filter { it.name.startsWith("§c§d§lShadow Assassin") }.sortedBy { it.distanceTo(baseEntity) }
-                .firstOrNull()
-                ?.let { MobData.MobResult(MobData.Result.Found, MobData.factories.dungeon(baseEntity, it)) }
+                .firstOrNull()?.let { MobData.MobResult(MobData.Result.Found, MobFactories.dungeon(baseEntity, it)) }
                 ?: MobData.MobResult(MobData.Result.NotYetFound, null)
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> if (nextEntity !is EntityArmorStand) return MobData.MobResult(MobData.Result.Illegal, null) // TODO fix to always include Valid Mobs on Private Island
             IslandType.THE_RIFT -> if (baseEntity is EntitySlime && nextEntity is EntitySlime) return MobData.MobResult(MobData.Result.Illegal, null)// Bacte Tentacle
             IslandType.CRIMSON_ISLE -> {
-                if (baseEntity is EntitySlime && nextEntity?.name == "§f§lCOLLECT!") return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Heavy Pearl"))
+                if (baseEntity is EntitySlime && nextEntity?.name == "§f§lCOLLECT!") return MobData.MobResult(MobData.Result.Found, MobFactories.special(baseEntity, "Heavy Pearl"))
                 if (baseEntity is EntityPig && nextEntity is EntityPig) return MobData.MobResult(MobData.Result.Illegal, null) // Matriarch Tongue
             }
 
@@ -162,13 +161,13 @@ object MobFilter {
                         it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)
                             ?.getSkullTexture() == RatSkull
                     }
-                        ?.also { return MobData.MobResult(MobData.Result.Found, MobData.Mob(baseEntity = baseEntity, mobType = MobData.MobType.Basic, armorStand = it, name = "Rat")) }
+                        ?.also { return MobData.MobResult(MobData.Result.Found, Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = it, name = "Rat")) }
                     if (nextEntity is EntityZombie) return MobData.MobResult(MobData.Result.NotYetFound, null)
                 }
             }
 
             IslandType.DWARVEN_MINES -> {
-                if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth == 1_000_000) return MobData.MobResult(MobData.Result.Found, MobData.factories.basic(baseEntity, "Ghost"))
+                if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth == 1_000_000) return MobData.MobResult(MobData.Result.Found, MobFactories.basic(baseEntity, "Ghost"))
             }
 
             else -> {}
@@ -199,8 +198,8 @@ object MobFilter {
         }
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
             HellwispTentacleSkull -> return MobData.MobResult(MobData.Result.Illegal, null) // Hellwisp Tentacle
-            RiftEyeSkull1 -> return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Rift Teleport Eye", armorStand))
-            RiftEyeSkull2 -> return MobData.MobResult(MobData.Result.Found, MobData.factories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            RiftEyeSkull1 -> return MobData.MobResult(MobData.Result.Found, MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            RiftEyeSkull2 -> return MobData.MobResult(MobData.Result.Found, MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
         }
         return null
     }
@@ -214,25 +213,25 @@ object MobFilter {
     private val RiftEyeSkull2 =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
 
-    private fun createFarmMobs(baseEntity: EntityLivingBase): MobData.Mob? = when (baseEntity) {
-        is EntityMooshroom -> MobData.factories.basic(baseEntity, "Farm Mooshroom")
-        is EntityCow -> MobData.factories.basic(baseEntity, "Farm Cow")
-        is EntityPig -> MobData.factories.basic(baseEntity, "Farm Pig")
-        is EntityChicken -> MobData.factories.basic(baseEntity, "Farm Chicken")
-        is EntityRabbit -> MobData.factories.basic(baseEntity, "Farm Rabbit")
-        is EntitySheep -> MobData.factories.basic(baseEntity, "Farm Sheep")
+    private fun createFarmMobs(baseEntity: EntityLivingBase): Mob? = when (baseEntity) {
+        is EntityMooshroom -> MobFactories.basic(baseEntity, "Farm Mooshroom")
+        is EntityCow -> MobFactories.basic(baseEntity, "Farm Cow")
+        is EntityPig -> MobFactories.basic(baseEntity, "Farm Pig")
+        is EntityChicken -> MobFactories.basic(baseEntity, "Farm Chicken")
+        is EntityRabbit -> MobFactories.basic(baseEntity, "Farm Rabbit")
+        is EntitySheep -> MobFactories.basic(baseEntity, "Farm Sheep")
         else -> null
     }
 
-    private fun createBat(baseEntity: EntityLivingBase): MobData.Mob? = when (baseEntity.maxHealth) {
+    private fun createBat(baseEntity: EntityLivingBase): Mob? = when (baseEntity.maxHealth) {
         // TODO Bat Pinata, Mega Bat
-        5_000_000f -> MobData.factories.basic(baseEntity, "Cinderbat")
-        100f -> MobData.factories.basic(
+        5_000_000f -> MobFactories.basic(baseEntity, "Cinderbat")
+        100f -> MobFactories.basic(
             baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else "Private Island Bat"
         )
 
-        20f -> MobData.factories.projectile(baseEntity, "Vampire Mask Bat")
-        6f -> MobData.factories.projectile(baseEntity, "Spirit Scepter Bat") // TODO fix false triggers
+        20f -> MobFactories.projectile(baseEntity, "Vampire Mask Bat")
+        6f -> MobFactories.projectile(baseEntity, "Spirit Scepter Bat") // TODO fix false triggers
         else -> null
     }
 }
