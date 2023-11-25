@@ -65,7 +65,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
-        if (config.hideInEstimatedItemValue && EstimatedItemValue.currentlyShowing) return
+        if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
