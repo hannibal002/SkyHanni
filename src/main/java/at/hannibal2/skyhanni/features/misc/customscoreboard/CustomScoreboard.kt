@@ -71,17 +71,22 @@ class CustomScoreboard {
         val elementHeight = position.getDummySize().y
 
         val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+        val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
 
-        if (config.displayConfig.alignRight) {
-            position.set(
-                Position(
-                    scaledWidth - elementWidth - (border * 2),
-                    y,
-                    position.getScale(),
-                    position.isCenter
-                )
+        position.set(
+            Position(
+                when (config.displayConfig.alignRight) {
+                    true -> scaledWidth - elementWidth - (border * 2)
+                    false -> x
+                },
+                when (config.displayConfig.alignCenterVertically) {
+                    true -> scaledHeight / 2 - elementHeight / 2
+                    false -> y
+                },
+                position.getScale(),
+                position.isCenter
             )
-        }
+        )
 
         if (config.backgroundConfig.enabled) {
             GuiScreen.drawRect(

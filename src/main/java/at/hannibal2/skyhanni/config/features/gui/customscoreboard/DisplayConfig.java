@@ -28,6 +28,12 @@ public class DisplayConfig {
     public boolean alignRight = false;
 
     @Expose
+    @ConfigOption(name = "Align to the center vertically", desc = "Align the scoreboard to the center of the screen vertically.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean alignCenterVertically = false;
+
+    @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard.\nUse & for colors.")
     @ConfigEditorText
     public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
