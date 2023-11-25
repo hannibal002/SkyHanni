@@ -22,7 +22,7 @@ public class TrackerConfig {
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown when starting.")
     @ConfigEditorDropdown
-    public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.TOTAL);
+    public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.REMEMBER_LAST);
 
     @Expose
     @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")
