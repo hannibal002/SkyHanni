@@ -21,7 +21,7 @@ class Mob(
     additionalEntities: List<EntityLivingBase>? = null,
     ownerName: String? = null,
     val hasStar: Boolean = false,
-    val attribute: String = "",
+    val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
 ) {
 
