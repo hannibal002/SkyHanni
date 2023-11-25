@@ -70,10 +70,11 @@ public class InventoryConfig {
             "§bCollection Level",
             "§bRancher's Boots speed",
             "§bLarva Hook",
-            "§bDungeon Potion Level"
+            "§bDungeon Potion Level",
+            "§bVacuum (Garden)"
         }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 11, 12));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 11, 12, 14));
 
     @Expose
     @ConfigOption(

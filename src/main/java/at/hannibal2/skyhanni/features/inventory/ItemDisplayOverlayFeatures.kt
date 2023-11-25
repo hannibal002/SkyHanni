@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -20,6 +22,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
+
+    private val garenVacuumVariants = listOf(
+        "SKYMART_VACUUM".asInternalName(),
+        "SKYMART_TURBO_VACUUM".asInternalName(),
+        "SKYMART_HYPER_VACUUM".asInternalName(),
+        "INFINI_VACUUM".asInternalName(),
+        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
+    )
+    private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>.*) Pests?".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -43,7 +54,10 @@ class ItemDisplayOverlayFeatures {
             return itemName.substring(itemName.length - 1)
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2) && (itemName.contains("Golden ") || itemName.contains(
+                "Diamond "
+            ))
+        ) {
             when {
                 itemName.contains("Bonzo") -> return "1"
                 itemName.contains("Scarf") -> return "2"
@@ -99,7 +113,8 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9) &&
             InventoryUtils.openInventoryName() == "Your Skills" &&
-            item.getLore().any { it.contains("Click to view!") }) {
+            item.getLore().any { it.contains("Click to view!") }
+        ) {
             if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
             val split = itemName.split(" ")
             if (!itemName.contains("Dungeon")) {
@@ -109,7 +124,9 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10) && InventoryUtils.openInventoryName().endsWith(" Collections")) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10) && InventoryUtils.openInventoryName()
+                .endsWith(" Collections")
+        ) {
             val lore = item.getLore()
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionAPI.isCollectionTier0(lore)) return "0"
@@ -143,7 +160,10 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13) && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13) && itemName.startsWith("Dungeon ") && itemName.contains(
+                " Potion"
+            )
+        ) {
             item.name?.let {
                 "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
@@ -154,6 +174,17 @@ class ItemDisplayOverlayFeatures {
                     }
                 }
             }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(14)) {
+            if (item.getInternalNameOrNull() in garenVacuumVariants) {
+                for (line in item.getLore()) {
+                    gardenVacuumPatterm.matchMatcher(line) {
+                        return group("amount")
+                    }
+                }
+            }
+
         }
 
         return ""
