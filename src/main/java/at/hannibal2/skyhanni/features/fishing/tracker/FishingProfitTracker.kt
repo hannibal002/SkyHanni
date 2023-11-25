@@ -128,15 +128,18 @@ object FishingProfitTracker {
         if (currentCategory !in list) {
             currentCategory = nameAll
         }
-        addButton(
-            prefix = "§7Category: ",
-            getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
-            onChange = {
-                val id = list.indexOf(currentCategory)
-                currentCategory = list[(id + 1) % list.size]
-                tracker.update()
-            }
-        )
+
+        if (tracker.isInventoryOpen()) {
+            addButton(
+                prefix = "§7Category: ",
+                getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
+                onChange = {
+                    val id = list.indexOf(currentCategory)
+                    currentCategory = list[(id + 1) % list.size]
+                    tracker.update()
+                }
+            )
+        }
 
         val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
             { true }
