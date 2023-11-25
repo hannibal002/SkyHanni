@@ -79,6 +79,7 @@ object MobFilter {
     }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
         || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
         || (this is EntityCow && this.entityId == 175) // Shania NPC
+        || (this is EntityCow && this.entityId == 275) // Shania NPC in Rift
         || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
 
     private val extraDisplayNPCByName = setOf(
@@ -162,6 +163,9 @@ object MobFilter {
             IslandType.PRIVATE_ISLAND -> if (nextEntity !is EntityArmorStand) return MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
             IslandType.THE_RIFT -> {
                 if (baseEntity is EntitySlime && nextEntity is EntitySlime) return MobData.MobResult(Illegal, null)// Bacte Tentacle
+                if (baseEntity is EntitySlime && nextEntity is EntityArmorStand && nextEntity.cleanName()
+                        .startsWith("﴾ [Lv10] B")
+                ) return MobData.MobResult(Found, MobFactories.boss(baseEntity, nextEntity, overriddenName = "Bacte"))
             }
 
             IslandType.CRIMSON_ISLE -> {
