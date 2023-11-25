@@ -21,7 +21,7 @@ enum class Elements(
     private val displayLine: Supplier<List<String>>?,
 
     // islands: The islands that this line is displayed on
-    private val islands: List<IslandType>,
+    private val islands: List<IslandType>, //TODO USE SUPPLIER, WORKS BETTER FOR SHOW PARTY EVERWHERE
 
     // visibilityOption: The option that is used to hide this line - use 0 to only display on the listed islands, 1 to hide on the listed islands
     private val visibilityOption: Int,
@@ -265,7 +265,7 @@ enum class Elements(
                 val title =
                     if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
                 val partyList = PartyAPI.partyMembers
-                    .takeWhile { partyCount < config.maxPartyList.get() }
+                    .takeWhile { partyCount < config.partyConfig.maxPartyList.get() }
                     .map {
                         partyCount++
                         " §7- §7$it"

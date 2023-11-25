@@ -77,13 +77,9 @@ public class CustomScoreboardConfig {
     public BackgroundConfig backgroundConfig = new BackgroundConfig();
 
     @Expose
-    @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list. (You are not included)")
-    @ConfigEditorSlider(
-        minValue = 1,
-        maxValue = 25, // why do I even set it so high
-        minStep = 1
-    )
-    public Property<Integer> maxPartyList = Property.of(4);
+    @ConfigOption(name = "Party Options", desc = "")
+    @Accordion
+    public PartyConfig partyConfig = new PartyConfig();
 
     @Expose
     @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
