@@ -156,9 +156,9 @@ object CopyNearbyEntitiesCommand {
         if (counter != 0) {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] $counter entities copied into the clipboard!")
+            LorenzUtils.chat("$counter entities copied into the clipboard!")
         } else {
-            LorenzUtils.chat("§e[SkyHanni] No entities found in a search radius of $searchRadius!")
+            LorenzUtils.chat("No entities found in a search radius of $searchRadius!")
         }
     }
 

@@ -82,13 +82,13 @@ class CaptureFarmingGear {
         fun reverseCarrotFortune() {
             val storage = GardenAPI.storage?.fortune ?: return
             storage.carrotFortune = !storage.carrotFortune
-            LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${storage.carrotFortune}")
+            LorenzUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
         }
 
         fun reversePumpkinFortune() {
             val storage = GardenAPI.storage?.fortune ?: return
             storage.pumpkinFortune = !storage.pumpkinFortune
-            LorenzUtils.chat("§2Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
+            LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
         }
     }
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
@@ -15,10 +16,12 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
@@ -118,6 +121,9 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
 import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitPlayerMoving
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -307,6 +313,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
+import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -328,7 +337,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.1.Beta.1",
+    version = "0.22.Beta.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -360,6 +369,7 @@ class SkyHanniMod {
         loadModule(TabListData())
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
+        loadModule(GardenCropMilestonesCommunityFix)
         loadModule(GardenCropUpgrades())
         loadModule(VisitorListener())
         loadModule(OwnInventoryData())
@@ -380,13 +390,14 @@ class SkyHanniMod {
         loadModule(EntityOutlineRenderer)
         loadModule(KeyboardManager)
         loadModule(AdvancedPlayerList)
+        loadModule(ItemAddManager())
 
         // APIs
         loadModule(BazaarApi())
         loadModule(GardenAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
-        loadModule(FriendAPI())
+        loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
@@ -560,6 +571,9 @@ class SkyHanniMod {
         loadModule(PlayerTabComplete)
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
+        loadModule(FishingProfitTracker)
+        loadModule(FishingTrackerCategoryManager)
+        loadModule(FishingProfitPlayerMoving)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
@@ -654,9 +668,9 @@ class SkyHanniMod {
         configManager.firstLoad()
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread {
-            configManager.saveConfig("shutdown-hook")
+            configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
         })
-        repo = RepoManager(configManager.configDirectory)
+        repo = RepoManager(ConfigManager.configDirectory)
         try {
             repo.loadRepoInformation()
         } catch (e: Exception) {
@@ -674,6 +688,7 @@ class SkyHanniMod {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
+                Minecraft.getMinecraft().thePlayer.closeScreen()
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
                 screenTicks = 0
                 screenToOpen = null
@@ -691,6 +706,10 @@ class SkyHanniMod {
         @JvmStatic
         val feature: Features get() = configManager.features
         val sackData: SackData get() = configManager.sackData
+        val friendsData: FriendsJson get() = configManager.friendsData
+        val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
+        val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
+
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -699,7 +718,7 @@ class SkyHanniMod {
         }
 
         val modules: MutableList<Any> = ArrayList()
-        val globalJob: Job = Job(null)
+        private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob)
         )

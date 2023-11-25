@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -157,7 +158,8 @@ class DamageIndicatorManager {
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
-            if (!data.ignoreBlocks && !player.canEntityBeSeen(data.entity)) continue
+
+            if (!data.ignoreBlocks && !data.entity.canBeSeen(50.0)) continue
             if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
@@ -361,7 +363,10 @@ class DamageIndicatorManager {
             entityData.timeLastTick = System.currentTimeMillis()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Error checking damage indicator entity $entity")
+            ErrorManager.logErrorWithData(
+                e, "Error checking damage indicator entity",
+                "entity" to entity,
+            )
             return null
         }
     }

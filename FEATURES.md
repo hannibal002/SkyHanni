@@ -245,6 +245,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 - Hide the vanilla nametag of damage indicator bosses.
+- Garden Pests in Damage Indicator
 - **Time to Kill**
     - Show the time it takes to kill the Slayer boss.
 
@@ -488,6 +489,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
++ Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+    + Enable via /sh vacuum.
+
 </details>
 <details open><summary>
 

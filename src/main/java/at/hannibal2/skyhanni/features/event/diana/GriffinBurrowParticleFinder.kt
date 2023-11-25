@@ -22,7 +22,7 @@ class GriffinBurrowParticleFinder {
 
     private val recentlyDugParticleBurrows = mutableListOf<LorenzVec>()
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
-    var lastDugParticleBurrow: LorenzVec? = null
+    private var lastDugParticleBurrow: LorenzVec? = null
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {

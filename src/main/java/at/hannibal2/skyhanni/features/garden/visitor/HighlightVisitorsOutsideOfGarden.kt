@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HighlightVisitorsOutsideOfGarden {
     private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
 
-    val config get() = SkyHanniMod.feature.garden.visitors
+    private val config get() = SkyHanniMod.feature.garden.visitors
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -97,7 +97,7 @@ class HighlightVisitorsOutsideOfGarden {
             event.isCanceled = true
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     "/sh block interacting with visitors"
                 )
             }
