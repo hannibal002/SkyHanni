@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
@@ -115,7 +116,6 @@ import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
-import at.hannibal2.skyhanni.features.fishing.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
@@ -123,6 +123,9 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
 import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitPlayerMoving
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -333,7 +336,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.1",
+    version = "0.22.Beta.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -385,6 +388,7 @@ class SkyHanniMod {
         loadModule(EntityOutlineRenderer)
         loadModule(KeyboardManager)
         loadModule(AdvancedPlayerList)
+        loadModule(ItemAddManager())
 
         // APIs
         loadModule(BazaarApi())
@@ -566,6 +570,8 @@ class SkyHanniMod {
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
         loadModule(FishingProfitTracker)
+        loadModule(FishingTrackerCategoryManager)
+        loadModule(FishingProfitPlayerMoving)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)

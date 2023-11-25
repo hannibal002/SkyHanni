@@ -4,9 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -14,7 +18,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
-class SkyHanniTracker<Data : TrackerData>(
+open class SkyHanniTracker<Data : TrackerData>(
     private val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
@@ -28,8 +32,15 @@ class SkyHanniTracker<Data : TrackerData>(
     private var dirty = false
 
     companion object {
-        private val config get() = SkyHanniMod.feature.misc.tracker
+        val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+
+        fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
+            0 -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
+            1 -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+
+            else -> name.getNpcPriceOrNull() ?: 0.0
+        }
     }
 
     fun isInventoryOpen() = inventoryOpen
@@ -54,7 +65,7 @@ class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
-        if (config.hideInEstimatedItemValue && EstimatedItemValue.currentlyShowing) return
+        if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
@@ -111,7 +122,7 @@ class SkyHanniTracker<Data : TrackerData>(
         }
     )
 
-    private fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
+    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
         SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
     }
 
