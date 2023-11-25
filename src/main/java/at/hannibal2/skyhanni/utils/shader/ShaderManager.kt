@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.features.chroma.ChromaShader
+import at.hannibal2.skyhanni.features.misc.customscoreboard.RoundedRectangleShader
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
@@ -15,14 +16,16 @@ object ShaderManager {
 
     /**
      * For any future shaders add the object instance in this enum and
-     * in the when expression
+     * in the when-expression
      */
     enum class Shaders(val shader: Shader) {
-        CHROMA(ChromaShader.INSTANCE);
+        CHROMA(ChromaShader.INSTANCE),
+        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
 
         companion object {
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "chroma" -> CHROMA.shader
+                "rounded_rectangle" -> ROUNDED_RECTANGLE.shader
                 else -> {
                     null
                 }

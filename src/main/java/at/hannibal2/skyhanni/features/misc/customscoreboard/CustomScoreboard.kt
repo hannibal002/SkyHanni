@@ -11,7 +11,7 @@
 //  - quiver
 //  - beacon power
 //  - skyblock level
-//  - more bg options (round, blurr, outline)
+//  - more bg options (round, blurr, outline), custom texturepack
 //
 
 package at.hannibal2.skyhanni.features.misc.customscoreboard
@@ -29,7 +29,9 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.client.GuiIngameForge
@@ -87,15 +89,15 @@ class CustomScoreboard {
             )
         )
 
-        if (config.backgroundConfig.enabled) {
-            GuiScreen.drawRect(
+        /*if (config.backgroundConfig.enabled) {
+            Gui.drawRect(
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
                 y + elementHeight + border * 2,
                 SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
             )
-        }
+        }*/
 
         position.renderStrings(display, posLabel = "Custom Scoreboard")
     }
