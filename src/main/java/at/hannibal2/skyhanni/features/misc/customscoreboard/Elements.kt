@@ -17,32 +17,26 @@ import java.util.function.Supplier
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 enum class Elements(
-    // displayLine: The line that is displayed on the scoreboard
-    private val displayLine: Supplier<List<String>>?,
-
-    // islands: The islands that this line is displayed on
-    private val islands: List<IslandType>, //TODO USE SUPPLIER, WORKS BETTER FOR SHOW PARTY EVERWHERE
-
-    // visibilityOption: The option that is used to hide this line - use 0 to only display on the listed islands, 1 to hide on the listed islands
-    private val visibilityOption: Int,
-
-    // index: The index of the line
+    private val displayLine: Supplier<List<String>>,
+    private val showWhen: () -> Boolean,
     val index: Int
 ) {
     SKYBLOCK(
         {
             listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         0
     ),
     PROFILE(
         {
             listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         1
     ),
     PURSE(
@@ -53,8 +47,9 @@ enum class Elements(
                 else -> listOf("Purse: §6$purse")
             }
         },
-        listOf(IslandType.THE_RIFT),
-        1,
+        {
+            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         2
     ),
     MOTES(
@@ -65,8 +60,9 @@ enum class Elements(
                 else -> listOf("Motes: §d$motes")
             }
         },
-        listOf(IslandType.THE_RIFT),
-        0,
+        {
+            listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         3
     ),
     BANK(
@@ -77,8 +73,9 @@ enum class Elements(
                 else -> listOf("Bank: §6$bank")
             }
         },
-        listOf(IslandType.THE_RIFT),
-        1,
+        {
+            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         4
     ),
     BITS(
@@ -89,8 +86,9 @@ enum class Elements(
                 else -> listOf("Bits: §b$bits")
             }
         },
-        listOf(IslandType.THE_RIFT),
-        1,
+        {
+            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         5
     ),
     COPPER(
@@ -101,8 +99,9 @@ enum class Elements(
                 else -> listOf("Copper: §c$copper")
             }
         },
-        listOf(IslandType.GARDEN),
-        0,
+        {
+            listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
+        },
         6
     ),
     GEMS(
@@ -113,8 +112,9 @@ enum class Elements(
                 else -> listOf("Gems: §a$gems")
             }
         },
-        listOf(IslandType.THE_RIFT),
-        1,
+        {
+            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         7
     ),
     HEAT(
@@ -125,40 +125,45 @@ enum class Elements(
                 else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
             }
         },
-        listOf(IslandType.CRYSTAL_HOLLOWS),
-        0,
+        {
+            listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
+        },
         8
     ),
     EMPTY_LINE(
         {
             listOf("<empty>")
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         9
     ),
     LOCATION(
         {
             listOf(location)
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         10
     ),
     SKYBLOCK_TIME(
         {
-            listOf(SkyBlockTime.now().formatted(yearElement = false,  hoursAndMinutesElement = false))
+            listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false))
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         11
     ),
     LOBBY_CODE(
         {
             listOf("§8$lobbyCode")
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         12
     ),
     MAXWELL(
@@ -172,27 +177,33 @@ enum class Elements(
                     }
             }
         },
-        listOf(IslandType.THE_RIFT),
-        1,
+        {
+            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         13
     ),
     EMPTY_LINE2(
         {
             listOf("<empty>")
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         14
     ),
     OBJECTIVE(
         {
-            when(config.informationFilteringConfig.hideEmptyLines){
-                true -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "<hidden>")
-                false -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "§cNo objective")
+            when (config.informationFilteringConfig.hideEmptyLines) {
+                true -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective")
+                    ?: "<hidden>")
+
+                false -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective")
+                    ?: "§cNo objective")
             }
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         15
     ),
     SLAYER(
@@ -205,23 +216,25 @@ enum class Elements(
                 " §7- §e${SlayerAPI.latestSlayerProgress.trim()}"
                 )
         },
-        listOf(
-            IslandType.HUB,
-            IslandType.SPIDER_DEN,
-            IslandType.THE_PARK,
-            IslandType.THE_END,
-            IslandType.CRIMSON_ISLE,
-            IslandType.THE_RIFT
-        ),
-        0,
+        {
+            listOf(
+                at.hannibal2.skyhanni.data.IslandType.HUB,
+                at.hannibal2.skyhanni.data.IslandType.SPIDER_DEN,
+                at.hannibal2.skyhanni.data.IslandType.THE_PARK,
+                at.hannibal2.skyhanni.data.IslandType.THE_END,
+                at.hannibal2.skyhanni.data.IslandType.CRIMSON_ISLE,
+                at.hannibal2.skyhanni.data.IslandType.THE_RIFT
+            ).contains(HypixelData.skyBlockIsland)
+        },
         16
     ),
     EMPTY_LINE3(
         {
             listOf("<empty>")
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         17
     ),
     POWDER(
@@ -231,16 +244,18 @@ enum class Elements(
                 false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
             }
         },
-        listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES),
-        0,
+        {
+            listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
+        },
         18
     ),
     CURRENT_EVENT(
         {
             Events.getFirstEvent().getLines()
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         19
     ),
     MAYOR(
@@ -253,53 +268,56 @@ enum class Elements(
                 emptyList()
             })
         },
-        listOf(IslandType.THE_RIFT),
-        1,
+        {
+            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+        },
         20
     ),
     PARTY(
         {
-            val partyTitle: List<String> = if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
-                listOf("<hidden>")
-            } else {
-                val title =
-                    if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
-                val partyList = PartyAPI.partyMembers
-                    .takeWhile { partyCount < config.partyConfig.maxPartyList.get() }
-                    .map {
-                        partyCount++
-                        " §7- §7$it"
-                    }
-                    .toTypedArray()
-                listOf(title, *partyList)
-            }
+            val partyTitle: List<String> =
+                if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
+                    listOf("<hidden>")
+                } else {
+                    val title =
+                        if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
+                    val partyList = PartyAPI.partyMembers
+                        .takeWhile { partyCount < config.partyConfig.maxPartyList.get() }
+                        .map {
+                            partyCount++
+                            " §7- §7$it"
+                        }
+                        .toTypedArray()
+                    listOf(title, *partyList)
+                }
 
             partyTitle
         },
-        listOf(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE),
-        0,
+        {
+            listOf(
+                IslandType.DUNGEON_HUB,
+                IslandType.KUUDRA_ARENA,
+                IslandType.CRIMSON_ISLE
+            ).contains(HypixelData.skyBlockIsland)
+        },
         21
     ),
     WEBSITE(
         {
             listOf(config.displayConfig.customFooter.get().toString().replace("&", "§"))
         },
-        listOf(),
-        0,
+        {
+            true
+        },
         22
     );
 
     fun getLine(): List<String> {
-        return displayLine?.get() ?: emptyList()
+        return displayLine.get()
     }
 
     fun isVisible(): Boolean {
         if (!config.informationFilteringConfig.hideIrrelevantLines) return true
-        if (islands.isEmpty()) return true
-        return when (visibilityOption) {
-            0 -> islands.contains(HypixelData.skyBlockIsland)
-            1 -> !islands.contains(HypixelData.skyBlockIsland)
-            else -> true
-        }
+        return showWhen()
     }
 }
