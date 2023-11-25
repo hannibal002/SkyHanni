@@ -249,10 +249,11 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Nearby Players:") }
             }
 
-            // Mithril
+            // Zone Events
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Event: ") }
-                    .removePrefix("Event: ") + "\n§fin " + ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Zone: ") }
+                    .removePrefix("Event: ")
+                list += "§fin " + ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Zone: ") }
                     .removePrefix("Zone: ")
             }
 
