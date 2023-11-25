@@ -100,7 +100,7 @@ object MobFilter {
 
         // Check if Late Stack
         nextEntity?.let { nextEntity ->
-            MobData.currentEntityToMobMap[nextEntity]?.apply { addEntityInFront(baseEntity) }
+            MobData.entityToMob[nextEntity]?.apply { addEntityInFront(baseEntity) }
                 ?.also { return MobData.MobResult(MobData.Result.Illegal, null) }
         }
 
@@ -108,7 +108,7 @@ object MobFilter {
         var caughtSkyblockMob: Mob? = null
         val extraEntityList =
             generateSequence(nextEntity) { MobUtils.getNextEntity(it, 1) as? EntityLivingBase }.takeWhileInclusive { entity ->
-                !(entity is EntityArmorStand && !entity.isDefaultValue()) && MobData.currentEntityToMobMap[entity]?.also {
+                !(entity is EntityArmorStand && !entity.isDefaultValue()) && MobData.entityToMob[entity]?.also {
                     caughtSkyblockMob = it
                 }?.run { false } ?: true
             }.toList()

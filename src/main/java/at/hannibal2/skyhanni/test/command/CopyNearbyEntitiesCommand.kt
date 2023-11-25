@@ -182,10 +182,10 @@ object CopyNearbyEntitiesCommand {
         if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
         if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
         if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
-        if (MobData.currentSummoningMobs.any { it.baseEntity == entity }) append("Summon, ")
+        if (MobData.summoningMobs.any { it.baseEntity == entity }) append("Summon, ")
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
-            val mob = MobData.currentSkyblockMobsMap[entity]
+            val mob = MobData.entityToMob[entity]
             append(mob?.mobType?.name ?: "None")
             if (mob?.baseEntity == entity) append("/Base")
             append(")\"")

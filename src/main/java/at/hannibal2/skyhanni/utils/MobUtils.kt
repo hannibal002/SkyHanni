@@ -26,7 +26,7 @@ object MobUtils {
 
 
     class OwnerShip(val ownerName: String) {
-        val ownerPlayer = MobData.currentRealPlayers.firstOrNull { it.name == ownerName }
+        val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
             if (other is EntityPlayer) return ownerPlayer == other || ownerName == other.name
             if (other is String) return ownerName == other
@@ -55,13 +55,16 @@ object MobUtils {
     fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        val possibleEntitys = MobData.currentSkyblockMobsMap.filterKeys {
+        val possibleEntities = MobData.skyblockMobs.entityList.filter {
             it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
                 pos, look
             )
         }
-        if (possibleEntitys.isEmpty()) return null
-        return possibleEntitys.toList().sortedBy { it.first.distanceTo(pos) }.map { it.second }
+        if (possibleEntities.isEmpty()) return null
+        return possibleEntities.toList().sortedBy { it.distanceTo(pos) }.map {
+            MobData.entityToMob[it]
+                ?: throw IllegalStateException("Entity not found even though in entity is in mob Set")
+        }
     }
 
 }

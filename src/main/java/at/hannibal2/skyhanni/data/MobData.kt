@@ -46,20 +46,20 @@ class MobData {
     private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
     private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
 
+    class MobSet() : HashSet<Mob>() {
+        val entityList get() = this.flatMap { listOf(it.baseEntity) + (it.extraEntities ?: emptyList()) }
+    }
+
     companion object {
 
-        val currentRealPlayers = mutableSetOf<Mob>()
-        val currentDisplayNPCs = mutableSetOf<Mob>()
-        val currentSkyblockMobs = mutableSetOf<Mob>()
-        val currentSummoningMobs = mutableSetOf<Mob>()
-        val currentMobs = mutableSetOf<Mob>()
+        val players = MobSet()
+        val displayNPCs = MobSet()
+        val skyblockMobs = MobSet()
+        val summoningMobs = MobSet()
+        val currentMobs = MobSet()
 
-        val currentRealPlayersMap = mutableMapOf<EntityLivingBase, Mob>()
-        val currentDisplayNPCsMap = mutableMapOf<EntityLivingBase, Mob>()
-        val currentSkyblockMobsMap = mutableMapOf<EntityLivingBase, Mob>()
-        val currentSummoningMobsMap = mutableMapOf<EntityLivingBase, Mob>()
+        val entityToMob = mutableMapOf<EntityLivingBase, Mob>()
 
-        val currentEntityToMobMap = mutableMapOf<EntityLivingBase, Mob>()
         private val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         private val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
@@ -71,13 +71,10 @@ class MobData {
     }
 
     private fun mobDetectionReset() {
-        currentSkyblockMobs.clear()
-        currentSkyblockMobsMap.clear()
-        currentDisplayNPCs.clear()
-        currentDisplayNPCsMap.clear()
-        currentSummoningMobs.clear()
-        currentSummoningMobsMap.clear()
-        currentRealPlayers.clear()
+        skyblockMobs.clear()
+        displayNPCs.clear()
+        summoningMobs.clear()
+        players.clear()
     }
 
     enum class Result {
@@ -168,7 +165,7 @@ class MobData {
 
     private fun EntityDeSpawn(entity: EntityLivingBase) {
         devTracker.data.deSpawn++
-        currentEntityToMobMap[entity]?.let {
+        entityToMob[entity]?.let {
             when (it.mobType) {
                 Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
                 Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
@@ -239,7 +236,7 @@ class MobData {
             currentEntityLiving.add(entity)
         }
         // update maps
-        currentEntityToMobMap[entity]?.internalUpdateOfEntity(entity)
+        entityToMob[entity]?.internalUpdateOfEntity(entity)
         return true
     }
 
@@ -270,104 +267,92 @@ class MobData {
 
     @SubscribeEvent
     fun onMobEventSpawn(event: MobEvent.Spawn) {
-        currentEntityToMobMap.putAll(event.mob.makeEntityToMobAssociation())
+        entityToMob.putAll(event.mob.makeEntityToMobAssociation())
         currentMobs.add(event.mob)
         devTracker.addEntityName(event.mob)
     }
 
     @SubscribeEvent
     fun onSkyblockMobSpawnEvent(event: MobEvent.Spawn.SkyblockMob) {
-        currentSkyblockMobsMap.putAll(event.mob.makeEntityToMobAssociation())
-        currentSkyblockMobs.add(event.mob)
+        skyblockMobs.add(event.mob)
     }
 
     @SubscribeEvent
     fun onSummonSpawnEvent(event: MobEvent.Spawn.Summon) {
-        currentSummoningMobsMap.putAll(event.mob.makeEntityToMobAssociation())
-        currentSummoningMobs.add(event.mob)
+        summoningMobs.add(event.mob)
     }
 
     @SubscribeEvent
     fun onDisplayNPCSpawnEvent(event: MobEvent.Spawn.DisplayNPC) {
-        currentDisplayNPCsMap.putAll(event.mob.makeEntityToMobAssociation())
-        currentDisplayNPCs.add(event.mob)
+        displayNPCs.add(event.mob)
     }
 
     @SubscribeEvent
     fun onRealPlayerSpawnEvent(event: MobEvent.Spawn.Player) {
-        currentRealPlayersMap.putAll(event.mob.makeEntityToMobAssociation())
-        currentRealPlayers.add(event.mob)
+        players.add(event.mob)
     }
 
     @SubscribeEvent
     fun onMobEventDeSpawn(event: MobEvent.DeSpawn) {
-        currentEntityToMobMap.remove(event.mob.baseEntity)
-        event.mob.extraEntities?.forEach { currentEntityToMobMap.remove(it) }
+        entityToMob.remove(event.mob.baseEntity)
+        event.mob.extraEntities?.forEach { entityToMob.remove(it) }
         currentMobs.remove(event.mob)
     }
 
 
     @SubscribeEvent
     fun onSkyblockMobDeSpawnEvent(event: MobEvent.DeSpawn.SkyblockMob) {
-        currentSkyblockMobsMap.remove(event.mob.baseEntity)
-        event.mob.extraEntities?.forEach { currentSkyblockMobsMap.remove(it) }
-        currentSkyblockMobs.remove(event.mob)
+        skyblockMobs.remove(event.mob)
 
     }
 
     @SubscribeEvent
     fun onSummonDeSpawnEvent(event: MobEvent.DeSpawn.Summon) {
-        currentSummoningMobsMap.remove(event.mob.baseEntity)
-        event.mob.extraEntities?.forEach { currentSummoningMobsMap.remove(it) }
-        currentSummoningMobs.remove(event.mob)
+        summoningMobs.remove(event.mob)
     }
 
     @SubscribeEvent
     fun onDisplayNPCSpawnDeEvent(event: MobEvent.DeSpawn.DisplayNPC) {
-        currentDisplayNPCsMap.remove(event.mob.baseEntity)
-        event.mob.extraEntities?.forEach { currentDisplayNPCsMap.remove(it) }
-        currentDisplayNPCs.remove(event.mob)
+        displayNPCs.remove(event.mob)
     }
 
     @SubscribeEvent
     fun onRealPlayerDeSpawnEvent(event: MobEvent.DeSpawn.Player) {
-        currentRealPlayersMap.remove(event.mob.baseEntity)
-        event.mob.extraEntities?.forEach { currentRealPlayersMap.remove(it) }
-        currentRealPlayers.remove(event.mob)
+        players.remove(event.mob)
     }
 
     @SubscribeEvent
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
         if (mobDebugConfig.skyblockMobHighlight) {
-            currentSkyblockMobs.forEach {
+            skyblockMobs.forEach {
                 val color = if (it.mobType == Mob.Type.Boss) LorenzColor.DARK_GREEN else LorenzColor.GREEN
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.toColor(), 0.3f)
             }
         }
         if (mobDebugConfig.displayNPCHighlight) {
-            currentDisplayNPCs.forEach {
+            displayNPCs.forEach {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.RED.toColor(), 0.3f)
             }
         }
         if (mobDebugConfig.realPlayerHighlight) {
-            currentRealPlayers.filterNot { it.baseEntity is EntityPlayerSP }.forEach {
+            players.filterNot { it.baseEntity is EntityPlayerSP }.forEach {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.BLUE.toColor(), 0.3f)
             }
         }
         if (mobDebugConfig.summonHighlight) {
-            currentSummoningMobs.forEach {
+            summoningMobs.forEach {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.3f)
             }
         }
         if (mobDebugConfig.skyblockMobShowName) {
-            currentSkyblockMobs.forEach {
+            skyblockMobs.forEach {
                 event.drawString(
                     it.baseEntity.getLorenzVec().add(y = 2.5), "§5" + it.name
                 )
             }
         }
         if (mobDebugConfig.displayNPCShowName) {
-            currentDisplayNPCs.forEach {
+            displayNPCs.forEach {
                 event.drawString(
                     it.baseEntity.getLorenzVec().add(y = 2.5), "§d" + it.name
                 )
