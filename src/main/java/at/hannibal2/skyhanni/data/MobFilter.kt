@@ -127,11 +127,12 @@ object MobFilter {
                     caughtSkyblockMob = it
                 }?.run { false } ?: true
             }.toList()
+        stackedMobsException(baseEntity, extraEntityList)?.let { return it }
+
         // If Late Stack add all entities
         caughtSkyblockMob?.apply { addEntityInFront(extraEntityList.dropLast(1)) }
             ?.also { return MobData.MobResult(Illegal, null) }
 
-        stackedMobsException(baseEntity, extraEntityList)?.let { return it }
 
         val armorStand =
             extraEntityList.lastOrNull() as? EntityArmorStand ?: return MobData.MobResult(NotYetFound, null)

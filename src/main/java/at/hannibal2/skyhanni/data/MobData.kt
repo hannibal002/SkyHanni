@@ -70,11 +70,22 @@ class MobData {
         var externRemoveOfRetryAmount = 0
     }
 
+    var gotReseted = true
+
     private fun mobDetectionReset() {
-        skyblockMobs.clear()
-        displayNPCs.clear()
-        summoningMobs.clear()
-        players.clear()
+        if (!gotReseted) {
+            currentMobs.map {
+                when (it.mobType) {
+                    Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
+                    Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
+                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
+                    Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
+                    Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(it)
+                    Mob.Type.Special -> MobEvent.DeSpawn.Special(it)
+                }
+            }.forEach { it.postAndCatch() }
+            gotReseted = true
+        }
     }
 
     enum class Result {
@@ -87,6 +98,7 @@ class MobData {
     fun onTickForEntityDetection(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) mobDetectionReset().run { return }
         if (event.isMod(2)) return
+        gotReseted = false
 
         makeEntityUpdate()
 
