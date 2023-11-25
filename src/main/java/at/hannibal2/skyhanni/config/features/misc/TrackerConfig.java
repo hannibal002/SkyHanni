@@ -15,7 +15,17 @@ public class TrackerConfig {
     public boolean hideInEstimatedItemValue = true;
 
     @Expose
+    @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+    @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
+    public int priceFrom = 1;
+
+    @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown when starting.")
     @ConfigEditorDropdown
     public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.TOTAL);
+
+    @Expose
+    @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")
+    @ConfigEditorBoolean
+    public boolean showRecentDrops = true;
 }
