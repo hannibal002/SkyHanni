@@ -190,7 +190,7 @@ object EstimatedItemValue {
         } else {
             NumberUtil.format(totalPrice)
         }
-        list.add("§aTotal: §6§l$numberFormat")
+        list.add("§aTotal: §6§l$numberFormat coins")
 
         val newDisplay = mutableListOf<List<Any>>()
         for (line in list) {

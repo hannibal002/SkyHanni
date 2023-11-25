@@ -116,7 +116,7 @@ object FishingProfitTracker {
         val profitPerCatch = profit / data.totalCatchAmount
         val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
 
-        val text = "§eTotal Profit: $profitPrefix$profitFormat"
+        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
         addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per catch: $profitPrefix$profitPerCatchFormat")))
 
         tracker.addPriceFromButton(this)

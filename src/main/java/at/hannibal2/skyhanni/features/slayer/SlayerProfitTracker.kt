@@ -196,7 +196,7 @@ object SlayerProfitTracker {
         val profitPerBoss = profit / itemLog.slayerCompletedCount
         val profitPerBossFormat = NumberUtil.format(profitPerBoss)
 
-        val text = "§eTotal Profit: $profitPrefix$profitFormat"
+        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
         addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per boss: $profitPrefix$profitPerBossFormat")))
 
         tracker.addPriceFromButton(this)
