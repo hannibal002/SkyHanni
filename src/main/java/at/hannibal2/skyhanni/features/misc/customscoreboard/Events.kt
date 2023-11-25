@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.scoreboard.Score
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
@@ -191,7 +189,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     SPOOKY( // not tested
         {
             listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§6Spooky Festival§f") }) + // Time
-                (getFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }) // Candy
+                (getTablistFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }) // Candy
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6Spooky Festival§f") }

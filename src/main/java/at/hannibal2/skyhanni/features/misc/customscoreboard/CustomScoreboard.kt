@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -31,15 +30,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
@@ -105,39 +101,13 @@ class CustomScoreboard {
         if (!isCustomScoreboardEnabled()) return
 
         // Draws the custom scoreboard
-        display = drawScoreboard()
+        display = createLines()
 
-        // Resets Party count
-        partyCount = 0
-
-        // Gets some values from the tablist
-        for (line in TabListData.getTabList()) {
-            when {
-                line.startsWith(" Gems: §r§a") -> gems = line.removePrefix(" Gems: §r§a")
-                line.startsWith(" Bank: §r§6") -> bank = line.removePrefix(" Bank: §r§6")
-                line.startsWith(" §r§fMithril Powder: §r§2") -> mithrilPowder =
-                    line.removePrefix(" §r§fMithril Powder: §r§2")
-                line.startsWith(" §r§fGemstone Powder: §r§d") -> gemstonePowder =
-                    line.removePrefix(" §r§fGemstone Powder: §r§d")
-            }
-        }
-
-        // Gets some values from the scoreboard
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            when {
-                line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
-                line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
-                extractLobbyCode(line) is String -> lobbyCode =
-                    extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
-                line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
-                line.startsWith("Bits: §b") -> bits = line.removePrefix("Bits: §b")
-                line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
-            }
-        }
-        purse = LorenzUtils.formatInteger(PurseAPI.currentPurse.toInt())
+        // Get Information
+        InformationGetter().getInformation()
     }
 
-    private fun drawScoreboard() = buildList<String> {
+    private fun createLines() = buildList<String> {
         val lineMap = HashMap<Int, List<Any>>()
         for (element in Elements.entries) {
             lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
@@ -145,10 +115,10 @@ class CustomScoreboard {
 
         cache = lineMap.values.toList()
 
-        return formatDisplay(lineMap)
+        return formatLines(lineMap)
     }
 
-    private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<String> {
+    private fun formatLines(lineMap: HashMap<Int, List<Any>>): MutableList<String> {
         val newList = mutableListOf<String>()
         for (index in config.textFormat) {
             lineMap[index]?.let {
@@ -233,7 +203,7 @@ fun translateMayorNameToColor(input: String): String {
     }
 }
 
-private fun extractLobbyCode(input: String): String? {
+fun extractLobbyCode(input: String): String? {
     val regex = Regex("§(\\d{3}/\\d{2}/\\d{2}) §([A-Za-z0-9]+)$")
     val matchResult = regex.find(input)
     return matchResult?.groupValues?.lastOrNull()
@@ -251,7 +221,7 @@ fun getProfileTypeAsSymbol(): String {
     }
 }
 
-fun getFooter(): String {
+fun getTablistFooter(): String {
     val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
     if (tabList.footer_skyhanni == null) return ""
     return tabList.footer_skyhanni.formattedText
