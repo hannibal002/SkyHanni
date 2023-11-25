@@ -43,12 +43,12 @@ class SuperpairsClicksAlert {
 
         if ( // checks if we have succeeded in either minigame
             (event.inventoryName.contains("Chronomatron")
-                    && ((event.inventoryItems[4]?.displayName?.removeColor()
+                && ((event.inventoryItems[4]?.displayName?.removeColor()
                 ?.let { currentRoundRegex.find(it) }
                 ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded))
 
             || (event.inventoryName.contains("Ultrasequencer")
-                    && event.inventoryItems.entries
+                && event.inventoryItems.entries
                 .filter { it.key < 45 }
                 .any { it.value.stackSize > roundsNeeded })
         ) {

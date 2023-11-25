@@ -26,6 +26,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
 
+    fun ItemStack.getBookwormBookCount() = getAttributeInt("bookworm_books")
+
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")

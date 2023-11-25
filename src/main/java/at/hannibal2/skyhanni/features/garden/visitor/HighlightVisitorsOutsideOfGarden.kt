@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HighlightVisitorsOutsideOfGarden {
     private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
 
-    val config get() = SkyHanniMod.feature.garden.visitors
+    private val config get() = SkyHanniMod.feature.garden.visitors
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

@@ -182,7 +182,7 @@ object SkyHanniConfigSearchResetCommand {
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
                 if (obj !is Runnable && objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                            objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
+                        objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
                 } else {
@@ -244,8 +244,7 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Runnable) return "Runnable"
 
         // we don't use javaClass.simpleName since we want to catch edge cases
-        val name = javaClass.name
-        return when (name) {
+        return when (val name = javaClass.name) {
             "at.hannibal2.skyhanni.config.core.config.Position" -> "Position"
             "java.lang.Boolean" -> "Boolean"
             "java.lang.Integer" -> "Int"

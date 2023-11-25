@@ -27,11 +27,11 @@ public class MayorJson {
         @Override
         public String toString() {
             return "Candidate{" +
-                    "key='" + key + '\'' +
-                    ", name='" + name + '\'' +
-                    ", perks=" + perks +
-                    ", votes=" + votes +
-                    '}';
+                "key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", perks=" + perks +
+                ", votes=" + votes +
+                '}';
         }
     }
 
@@ -62,9 +62,9 @@ public class MayorJson {
         @Override
         public String toString() {
             return "Perk{" +
-                    "name='" + name + '\'' +
-                    ", description='" + description + '\'' +
-                    '}';
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
         }
     }
 }

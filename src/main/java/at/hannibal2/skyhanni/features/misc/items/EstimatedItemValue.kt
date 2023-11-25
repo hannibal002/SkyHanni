@@ -38,7 +38,9 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
-    var currentlyShowing = false
+    private var currentlyShowing = false
+
+    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -190,7 +192,7 @@ object EstimatedItemValue {
         } else {
             NumberUtil.format(totalPrice)
         }
-        list.add("§aTotal: §6§l$numberFormat")
+        list.add("§aTotal: §6§l$numberFormat coins")
 
         val newDisplay = mutableListOf<List<Any>>()
         for (line in list) {

@@ -58,6 +58,7 @@ class NonGodPotEffectDisplay {
         GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
         ;
     }
+
     // TODO USE SH-REPO
     private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0

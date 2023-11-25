@@ -45,7 +45,7 @@ object InventoryUtils {
 
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage"))
-                || it.contains("Ender Chest") || it.contains("Backpack")
+            || it.contains("Ender Chest") || it.contains("Backpack")
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem

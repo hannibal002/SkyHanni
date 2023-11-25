@@ -72,6 +72,7 @@ class FarmingFortuneDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
+        if (GardenAPI.toolInHand == null) return
         config.pos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
@@ -102,9 +103,7 @@ class FarmingFortuneDisplay {
             wrongTabCrop = GardenAPI.cropInHand != null && GardenAPI.cropInHand != currentCrop
 
             if (wrongTabCrop) {
-                farmingFortune = displayCrop.getLatestTrueFarmingFortune()?.let {
-                    if (config.dropMultiplier) it else it - 100.0
-                } ?: -1.0
+                farmingFortune = displayCrop.getLatestTrueFarmingFortune() ?: -1.0
                 recentlySwitchedTool = false
             } else {
                 farmingFortune = getCurrentFarmingFortune()
@@ -118,7 +117,7 @@ class FarmingFortuneDisplay {
 
             if (GardenAPI.cropInHand == currentCrop) {
                 if (!recentlySwitchedTool) {
-                    latestFF?.put(currentCrop, getCurrentFarmingFortune(true))
+                    latestFF?.put(currentCrop, getCurrentFarmingFortune())
                 }
             }
         })
@@ -156,7 +155,6 @@ class FarmingFortuneDisplay {
 
         private var tabFortuneUniversal: Double = 0.0
         private var tabFortuneCrop: Double = 0.0
-        private val baseFortune: Double get() = if (config.dropMultiplier) 100.0 else 0.0
         private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
         private val accessoryFortune: Double?
             get() = currentCrop?.let {
@@ -269,10 +267,7 @@ class FarmingFortuneDisplay {
             }
         }
 
-        fun getCurrentFarmingFortune(alwaysBaseFortune: Boolean = false): Double {
-            val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            return baseFortune + tabFortuneUniversal + tabFortuneCrop
-        }
+        fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
     }

@@ -41,7 +41,7 @@ object GardenCropMilestones {
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
-        GardenCropMilestonesFix.openInventory(event.inventoryItems)
+        GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
