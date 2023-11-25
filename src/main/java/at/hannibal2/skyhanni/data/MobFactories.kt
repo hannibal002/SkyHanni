@@ -11,9 +11,12 @@ object MobFactories {
             Mob(baseEntity = baseEntity, mobType = Mob.Type.Slayer, armorStand = armorStand, name = it.groupValues[1], additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].romanToDecimal())
         }
 
-    fun boss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
+    fun boss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList(), overriddenName: String? = null): Mob? =
         MobFilter.bossMobNameFilter.find(armorStand.cleanName())?.let {
-            Mob(baseEntity = baseEntity, mobType = Mob.Type.Boss, armorStand = armorStand, name = it.groupValues[3], additionalEntities = extraEntityList)
+            Mob(
+                baseEntity = baseEntity, mobType = Mob.Type.Boss, armorStand = armorStand, name = overriddenName
+                    ?: it.groupValues[3], additionalEntities = extraEntityList
+            )
         }
 
     fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? =

@@ -19,10 +19,20 @@ object MobUtils {
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
 
-    fun getArmorStandByRange(entity: Entity, range: Double) =
-        getArmorStandByRangeAll(entity, range).filter { entity.rotationYaw == it.rotationYaw }.firstOrNull()
+    fun getClosedArmorStand(entity: Entity, range: Double) =
+        getArmorStandByRangeAll(entity, range).sortedBy { it.distanceTo(entity) }.firstOrNull()
+
+    fun getClosedArmorStandWithName(entity: Entity, range: Double, name: String) =
+        getArmorStandByRangeAll(entity, range).filter { it.name.startsWith(name) }.sortedBy { it.distanceTo(entity) }
+            .firstOrNull()
 
     fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
+
+    fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
+
+    fun EntityArmorStand?.makeMobResult(mob: (EntityArmorStand) -> Mob?) =
+        this?.let { MobData.MobResult(MobData.Result.Found, mob.invoke(it)) }
+            ?: MobData.MobResult(MobData.Result.NotYetFound, null)
 
 
     class OwnerShip(val ownerName: String) {
