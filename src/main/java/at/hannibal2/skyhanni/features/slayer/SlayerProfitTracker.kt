@@ -61,7 +61,7 @@ object SlayerProfitTracker {
         override fun getCoinFormat(item: TrackedItem, numberColor: String): Pair<String, List<String>> {
             val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
             val gained = item.timesGained
-            val text = "$numberColor${gained}x §6Mob Kill Coins§7: §6$mobKillCoinsFormat"
+            val text = " $numberColor${gained}x §6Mob Kill Coins§7: §6$mobKillCoinsFormat"
             val lore = listOf(
                 "§7Killing mobs gives you coins (more with scavenger)",
                 "§7You got §6$mobKillCoinsFormat coins §7in total this way"

@@ -60,7 +60,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         lists: MutableList<List<Any>>
     ): Double {
         var profit = 0.0
-        val map = mutableMapOf<Renderable, Long>()
+        val items = mutableMapOf<Renderable, Long>()
         for ((internalName, itemProfit) in data.items) {
             if (!filter(internalName)) continue
 
@@ -69,11 +69,13 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
             val price = (pricePer * amount).toLong()
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
+
             var name = if (internalName == SKYBLOCK_COIN) {
                 "§6Coins"
             } else {
                 internalName.getItemStack().nameWithEnchantment ?: error("no name for $internalName")
             }
+
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
@@ -81,10 +83,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (hidden) {
                 name = "§8§m" + name.removeColor(keepFormatting = true).replace("§r", "")
             }
+
             val text = " $numberColor${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
             val (displayName, lore) = if (internalName == SKYBLOCK_COIN) {
                 data.getCoinFormat(itemProfit, numberColor)
             } else text to buildLore(data, itemProfit, hidden, newDrop)
+
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isControlKeyDown()) {
@@ -105,12 +109,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 }
             } else Renderable.string(displayName)
             if (isInventoryOpen() || !hidden) {
-                map[renderable] = price
+                items[renderable] = price
             }
             profit += price
         }
 
-        for (text in map.sortedDesc().keys) {
+        for (text in items.sortedDesc().keys) {
             lists.addAsSingletonList(text)
         }
         return profit
