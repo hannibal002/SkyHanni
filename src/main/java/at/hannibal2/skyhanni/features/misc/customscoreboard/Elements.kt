@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -297,11 +298,19 @@ enum class Elements(
             partyTitle
         },
         {
-            listOf(
-                IslandType.DUNGEON_HUB,
-                IslandType.KUUDRA_ARENA,
-                IslandType.CRIMSON_ISLE
-            ).contains(HypixelData.skyBlockIsland)
+            if(inDungeons){
+                false // Hidden bc teammate health etc exists
+            } else {
+                if (config.partyConfig.showPartyEverywhere){
+                    true
+                } else {
+                    listOf(
+                        IslandType.DUNGEON_HUB,
+                        IslandType.KUUDRA_ARENA,
+                        IslandType.CRIMSON_ISLE
+                    ).contains(HypixelData.skyBlockIsland)
+                }
+            }
         },
         21
     ),
