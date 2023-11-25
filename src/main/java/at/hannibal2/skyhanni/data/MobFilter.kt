@@ -29,6 +29,7 @@ import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityWitch
 import net.minecraft.entity.monster.EntityZombie
@@ -47,7 +48,7 @@ import net.minecraft.entity.player.EntityPlayer
 object MobFilter {
     val mobNameFilter = "(\\[\\w+([0-9]+)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
-    val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤\\?]+|█+) .$".toRegex()
+    val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter =
         "^(✯)?(?:\\s?(Flaming|Stormy|Speedy|Fortified|Healthy|Healing|Boomer|Golden|Stealth))?(?:\\s?\\[[\\w\\d]+\\])?\\s?(.+)\\s[^\\s]+$".toRegex()
     val dungeonAttribute =
@@ -187,6 +188,10 @@ object MobFilter {
 
             IslandType.DWARVEN_MINES -> {
                 if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth == 1_000_000) return MobData.MobResult(Found, MobFactories.basic(baseEntity, "Ghost"))
+            }
+
+            IslandType.CRYSTAL_HOLLOWS -> {
+                if (baseEntity is EntityMagmaCube && nextEntity is EntityArmorStand && nextEntity.cleanName() == "[Lv100] Bal ???❤") return MobData.MobResult(Found, Mob(baseEntity, Mob.Type.Boss, nextEntity, "Bal", levelOrTier = 100))
             }
 
             else -> {}
