@@ -52,15 +52,13 @@ object FishingProfitTracker {
             )
         }
 
-        override fun getCoinFormat(item: TrackedItem, numberColor: String): Pair<String, List<String>> {
+        override fun getCoinName(item: TrackedItem) = "§6Fished Coins"
+
+        override fun getCoinDescription(item: TrackedItem): List<String> {
             val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
-            val gained = item.timesGained
-            val text = " $numberColor${gained}x §6Fished Coins§7: §6$mobKillCoinsFormat"
-            val lore = listOf(
-                "§7Killing mobs gives you coins (more with scavenger)",
-                "§7You got §e$mobKillCoinsFormat §7coins in total this way"
+            return listOf(
+                "§7You fished up §6$mobKillCoinsFormat coins §7already."
             )
-            return text to lore
         }
 
         override fun getCustomPricePer(internalName: NEUInternalName): Double {

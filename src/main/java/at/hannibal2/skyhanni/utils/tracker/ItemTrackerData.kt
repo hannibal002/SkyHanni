@@ -13,7 +13,9 @@ abstract class ItemTrackerData : TrackerData() {
 
     abstract fun getDescription(timesGained: Long): List<String>
 
-    abstract fun getCoinFormat(item: TrackedItem, numberColor: String): Pair<String, List<String>>
+    abstract fun getCoinName(item: TrackedItem): String
+
+    abstract fun getCoinDescription(item: TrackedItem): List<String>
 
     open fun getCustomPricePer(internalName: NEUInternalName) = SkyHanniTracker.getPricePer(internalName)
 

@@ -70,8 +70,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val price = (pricePer * amount).toLong()
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
-            var name = if (internalName == SKYBLOCK_COIN) {
-                "§6Coins"
+            val cleanName = if (internalName == SKYBLOCK_COIN) {
+                data.getCoinName(itemProfit)
             } else {
                 internalName.getItemStack().nameWithEnchantment ?: error("no name for $internalName")
             }
@@ -80,9 +80,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val hidden = itemProfit.hidden
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
-            if (hidden) {
-                name = "§8§m" + name.removeColor(keepFormatting = true).replace("§r", "")
-            }
 
             val text = " $numberColor${displayAmount.addSeparators()}x $name§7: §6$priceFormat"
             val (displayName, lore) = if (internalName == SKYBLOCK_COIN) {
@@ -93,12 +90,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isControlKeyDown()) {
                         data.items.remove(internalName)
-                        val abc = if (internalName == SKYBLOCK_COIN) {
-                            "§6Coins"
-                        } else {
-                            internalName.getItemStack().nameWithEnchantment
-                        }
-                        LorenzUtils.chat("§e[SkyHanni] Removed $abc §efrom Fishing Frofit Tracker.")
+                        LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom Fishing Frofit Tracker.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         itemProfit.hidden = !hidden
@@ -126,7 +118,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         hidden: Boolean,
         newDrop: Boolean
     ) = buildList {
-        addAll(data.getDescription(item.timesGained))
+        if (internalName == SKYBLOCK_COIN) {
+            addAll(data.getCoinDescription(item))
+        } else {
+            addAll(data.getDescription(item.timesGained))
+        }
         add("")
         if (newDrop) {
             add("§aYou caught this item recently.")
