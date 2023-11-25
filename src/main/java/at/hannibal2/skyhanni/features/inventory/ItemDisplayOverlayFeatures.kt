@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -23,14 +24,14 @@ class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
 
-    private val garenVacuumVariants = listOf(
+    private val gardenVacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
         "SKYMART_HYPER_VACUUM".asInternalName(),
         "INFINI_VACUUM".asInternalName(),
         "INFINI_VACUUM_HOOVERIUS".asInternalName(),
     )
-    private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>.*) Pests?".toPattern()
+    private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -178,10 +179,11 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (itemNumberAsStackSize.contains(14)) {
-            if (item.getInternalNameOrNull() in garenVacuumVariants) {
+            if (item.getInternalNameOrNull() in gardenVacuumVariants) {
                 for (line in item.getLore()) {
                     gardenVacuumPatterm.matchMatcher(line) {
-                        return group("amount")
+                        val pests = group("amount").formatNumber()
+                        return if (pests > 39) "§640" else "$pests"
                     }
                 }
             }
