@@ -55,7 +55,7 @@ class GardenWarpCommands {
 
             else -> return
         }
-        if (command != "warp garden") {
+        if (command == "tptoplot barn") {
             LockMouseLook.autoDisable()
         }
         LorenzUtils.sendCommandToServer(command)
