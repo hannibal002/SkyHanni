@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
+import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
@@ -64,13 +66,19 @@ object ChatManager {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
-        if (packet !is S02PacketChat) return
-        val messageComponent = packet.chatComponent
+        if (packet is S02PacketChat) {
+            val messageComponent = packet.chatComponent
 
-        val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
-        if (packet.type.toInt() == 2) {
-            val actionBarEvent = LorenzActionBarEvent(message)
-            actionBarEvent.postAndCatch()
+            val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
+            if (packet.type.toInt() == 2) {
+                val actionBarEvent = LorenzActionBarEvent(message)
+                actionBarEvent.postAndCatch()
+            }
+        }
+
+        if (packet is C01PacketChatMessage) {
+            val message = packet.message
+            event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
         }
     }
 
