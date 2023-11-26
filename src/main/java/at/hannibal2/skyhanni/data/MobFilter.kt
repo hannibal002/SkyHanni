@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.data.MobData.Result.Found
 import at.hannibal2.skyhanni.data.MobData.Result.Illegal
 import at.hannibal2.skyhanni.data.MobData.Result.NotYetFound
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -266,4 +267,11 @@ object MobFilter {
         // 6 -> MobFactories.projectile(baseEntity, "Spirit Scepter Bat") // moved to Packet Event because 6 is default Health of Bats
         else -> null
     }
+
+    fun createDisplayNPC(entity: EntityLivingBase): Boolean =
+        MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
+            !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
+        }?.let { armorStand ->
+            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch().also { true }
+        } ?: false
 }

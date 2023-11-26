@@ -1,33 +1,19 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MobFilter.illegalDisplayNPCArmorStandNames
 import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.features.dev.MobDevTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.MobUtils.rayTraceForSkyblockMob
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.passive.EntityBat
@@ -37,8 +23,6 @@ import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.io.File
-import java.io.IOException
 import java.util.TreeSet
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -48,7 +32,6 @@ private const val MAX_RETRIES = 100
 private const val MAX_DISTANCE_TO_PLAYER = 22.0
 
 class MobData {
-    private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
     private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
 
     class MobSet() : HashSet<Mob>() {
@@ -75,7 +58,6 @@ class MobData {
         var externRemoveOfRetryAmount = 0
     }
 
-    var gotReseted = true
     var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
@@ -99,7 +81,7 @@ class MobData {
     class MobResult(val result: Result, val mob: Mob?)
 
     @SubscribeEvent
-    fun onTickForEntityDetection(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (shouldClear.get()) {
             mobDetectionReset()
             shouldClear.set(false)
@@ -130,27 +112,13 @@ class MobData {
         }
     }
 
-    private val entitiesThatRequireUpdatePacket = LinkedBlockingQueue<Int>()
-    private val entitiesThatRequireUpdate = mutableSetOf<Int>()
-
-    private fun makeEntityUpdate() {
-        entitiesThatRequireUpdate.iterator().let { iter ->
-            while (iter.hasNext()) {
-                if (handleEntityUpdate(iter.next())) iter.remove()
-            }
-        }
-        while (entitiesThatRequireUpdatePacket.isNotEmpty()) {
-            entitiesThatRequireUpdate.add(entitiesThatRequireUpdatePacket.take())
-        }
-    }
-
     private fun EntitySpawn(entity: EntityLivingBase): Boolean {
-        devTracker.data.spawn++
+        MobDevTracker.data.spawn++
         when {
             entity is EntityPlayer && entity.isRealPlayer() -> MobEvent.Spawn.Player(MobFactories.player(entity))
                 .postAndCatch()
 
-            entity.isDisplayNPC() -> return createDisplayNPC(entity)
+            entity.isDisplayNPC() -> return MobFilter.createDisplayNPC(entity)
             entity.isSkyBlockMob() -> {
                 if (islandException()) return true
                 val it = MobFilter.createSkyblockEntity(entity)
@@ -190,13 +158,6 @@ class MobData {
         }
     }
 
-    private fun createDisplayNPC(entity: EntityLivingBase): Boolean =
-        MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
-            !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
-        }?.let { armorStand ->
-            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch().also { true }
-        } ?: false
-
 
     private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
         IslandType.GARDEN_GUEST -> true
@@ -205,7 +166,7 @@ class MobData {
     }
 
     private fun EntityDeSpawn(entity: EntityLivingBase) {
-        devTracker.data.deSpawn++
+        MobDevTracker.data.deSpawn++
         entityToMob[entity]?.let {
             when (it.mobType) {
                 Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
@@ -220,7 +181,7 @@ class MobData {
     }
 
     private fun retry(entity: EntityLivingBase) =
-        retries.add(RetryEntityInstancing(entity, 0)).also { devTracker.data.startedRetries++ }
+        retries.add(RetryEntityInstancing(entity, 0)).also { MobDevTracker.data.startedRetries++ }
 
     private fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
 
@@ -243,10 +204,10 @@ class MobData {
             if (entity.getLorenzVec()
                     .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
             ) {
-                devTracker.data.outOfRangeRetries++
+                MobDevTracker.data.outOfRangeRetries++
                 continue
             }
-            devTracker.data.retries++
+            MobDevTracker.data.retries++
             if (retry.times > MAX_RETRIES) {
                 LorenzDebug.log(
                     "I (`${retry.entity.name}`${retry.entity.entityId} missed. Position: ${retry.entity.getLorenzVec()} Distance: ${
@@ -255,7 +216,7 @@ class MobData {
                         entity.getLorenzVec().subtract(LocationUtils.playerLocation())
                     }"
                 )
-                devTracker.data.misses++
+                MobDevTracker.data.misses++
                 // Temporary Change
                 // iterator.remove()
                 retry.times = Int.MIN_VALUE
@@ -269,6 +230,21 @@ class MobData {
         }
     }
 
+    private val entityUpdatePackets = LinkedBlockingQueue<Int>()
+    private val entitiesThatRequireUpdate = mutableSetOf<Int>()
+
+    private fun makeEntityUpdate() {
+        entitiesThatRequireUpdate.iterator().let { iterator ->
+            while (iterator.hasNext()) {
+                if (handleEntityUpdate(iterator.next())) iterator.remove()
+            }
+        }
+        while (entityUpdatePackets.isNotEmpty()) {
+            entitiesThatRequireUpdate.add(entityUpdatePackets.take())
+        }
+    }
+
+
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
         retries.firstOrNull { it.hashCode() == entity.hashCode() }?.apply { this.entity = entity }
@@ -276,7 +252,7 @@ class MobData {
             currentEntityLiving.remove(entity)
             currentEntityLiving.add(entity)
         }
-        // update maps
+        // update map
         entityToMob[entity]?.internalUpdateOfEntity(entity)
         return true
     }
@@ -301,7 +277,7 @@ class MobData {
 
     private fun addEntityUpdate(id: Int) {
         if (packetEntityIds.contains(id)) {
-            entitiesThatRequireUpdatePacket.put(id)
+            entityUpdatePackets.put(id)
         } else {
             packetEntityIds.add(id)
         }
@@ -316,7 +292,7 @@ class MobData {
     fun onMobEventSpawn(event: MobEvent.Spawn) {
         entityToMob.putAll(event.mob.makeEntityToMobAssociation())
         currentMobs.add(event.mob)
-        devTracker.addEntityName(event.mob)
+        MobDevTracker.addEntityName(event.mob)
     }
 
     @SubscribeEvent
@@ -366,151 +342,6 @@ class MobData {
     @SubscribeEvent
     fun onRealPlayerDeSpawnEvent(event: MobEvent.DeSpawn.Player) {
         players.remove(event.mob)
-    }
-
-    @SubscribeEvent
-    fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
-        if (mobDebugConfig.skyblockMobHighlight) {
-            skyblockMobs.forEach {
-                val color = if (it.mobType == Mob.Type.Boss) LorenzColor.DARK_GREEN else LorenzColor.GREEN
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.toColor(), 0.3f)
-            }
-        }
-        if (mobDebugConfig.displayNPCHighlight) {
-            displayNPCs.forEach {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.RED.toColor(), 0.3f)
-            }
-        }
-        if (mobDebugConfig.realPlayerHighlight) {
-            players.filterNot { it.baseEntity is EntityPlayerSP }.forEach {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.BLUE.toColor(), 0.3f)
-            }
-        }
-        if (mobDebugConfig.summonHighlight) {
-            summoningMobs.forEach {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.YELLOW.toColor(), 0.3f)
-            }
-        }
-        if (mobDebugConfig.skyblockMobShowName) {
-            skyblockMobs.forEach {
-                event.drawString(
-                    it.baseEntity.getLorenzVec().add(y = 2.5), "§5" + it.name
-                )
-            }
-        }
-        if (mobDebugConfig.displayNPCShowName) {
-            displayNPCs.forEach {
-                event.drawString(
-                    it.baseEntity.getLorenzVec().add(y = 2.5), "§d" + it.name
-                )
-            }
-        }
-        if (mobDebugConfig.showRayHit) {
-            rayTraceForSkyblockMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.let {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
-            }
-        }
-    }
-
-    private object devTracker {
-
-        const val FILE_NAME: String = "config/skyhanni/logs/mob/Tracker.txt"
-
-        val data = Data()
-
-        class Data {
-            var retries = 0
-            var outOfRangeRetries = 0
-            var spawn = 0
-            var deSpawn = 0
-            var misses = 0
-            var startedRetries = 0
-            val retriesAvg: Int
-                get() = if (startedRetries != 0) retries / startedRetries else 0
-
-            val entityNames = sortedSetOf<String>()
-
-            fun reset() {
-                retries = 0
-                spawn = 0
-                outOfRangeRetries = 0
-                deSpawn = 0
-                misses = 0
-                startedRetries = 0
-                entityNames.clear()
-            }
-        }
-
-        fun addEntityName(mob: Mob) {
-            if (mob.mobType == Mob.Type.Player) return
-            val name = when (mob.mobType) {
-                Mob.Type.DisplayNPC -> "DNPC"
-                Mob.Type.Summon -> "SUM "
-                Mob.Type.Basic -> "BASE"
-                Mob.Type.Dungeon -> "DUNG"
-                Mob.Type.Boss -> "BOSS"
-                Mob.Type.Slayer -> "SLAY"
-                Mob.Type.Player -> "PLAY"
-                Mob.Type.Projectile -> "PROJ"
-                Mob.Type.Special -> "SPEC"
-            } + " " + mob.name
-            if (data.entityNames.contains(name)) return
-            data.entityNames.add(name)
-        }
-
-        fun saveToFile() {
-            try {
-                val gson = GsonBuilder().setPrettyPrinting().create()
-                val json = gson.toJson(data)
-
-                // Write the JSON data to the file
-                File(FILE_NAME).writeText(json)
-            } catch (e: IOException) {
-                LorenzDebug.log("Error saving data to file: ${e.message}")
-            }
-        }
-
-        fun loadFromFile() {
-            try {
-                // Create the parent directory and its ancestors recursively if they don't exist
-                val parentDir = File(FILE_NAME).parentFile
-                parentDir.mkdirs()
-
-                // Load data from the file
-                if (File(FILE_NAME).exists()) {
-                    val gson = Gson()
-                    val json = File(FILE_NAME).readText()
-                    val loadedData = gson.fromJson(json, Data::class.java)
-                    // Update the existing data with loaded data
-                    data.retries = loadedData.retries
-                    data.outOfRangeRetries = loadedData.outOfRangeRetries
-                    data.spawn = loadedData.spawn
-                    data.deSpawn = loadedData.deSpawn
-                    data.misses = loadedData.misses
-                    data.startedRetries = loadedData.startedRetries
-                    data.entityNames.clear()
-                    data.entityNames.addAll(loadedData.entityNames)
-                }
-            } catch (e: IOException) {
-                LorenzDebug.log("Error loading data from file: ${e.message}")
-            }
-        }
-
-        override fun toString(): String {
-            return "TrackerData(retries=${data.retries}, outOfRangeRetries=${data.outOfRangeRetries}, spawn=${data.spawn}, deSpawn=${data.deSpawn}, misses=${data.misses}, , startedRetries=${data.startedRetries}, retriesAvg=${data.retriesAvg}, entityNames=${data.entityNames})"
-        }
-
-    }
-
-    @SubscribeEvent
-    fun onJoin(event: HypixelJoinEvent) {
-        devTracker.loadFromFile()
-    }
-
-    @SubscribeEvent
-    fun onExit(event: IslandChangeEvent) {
-        devTracker.saveToFile()
-        // counter.reset()
     }
 }
 
