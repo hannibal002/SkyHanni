@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -44,16 +44,16 @@ class MobDebug {
             }
         }
         if (mobDebugConfig.skyblockMobShowName) {
-            MobData.skyblockMobs.forEach {
+            MobData.skyblockMobs.filter { it.canBeSeen() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
                 event.drawString(
-                    it.baseEntity.getLorenzVec().add(y = 2.5), "§5" + it.name
+                    it.first.add(y = 0.5), "§5" + it.second, seeThroughBlocks = true
                 )
             }
         }
         if (mobDebugConfig.displayNPCShowName) {
-            MobData.displayNPCs.forEach {
+            MobData.displayNPCs.filter { it.canBeSeen() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
                 event.drawString(
-                    it.baseEntity.getLorenzVec().add(y = 2.5), "§d" + it.name
+                    it.first.add(y = 0.5), "§d" + it.second, seeThroughBlocks = true
                 )
             }
         }

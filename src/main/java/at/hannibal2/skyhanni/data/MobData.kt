@@ -29,8 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 100
 
-private const val MAX_DISTANCE_TO_PLAYER = 22.0
-
 class MobData {
     private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
 
@@ -54,6 +52,7 @@ class MobData {
         val retries = TreeSet<RetryEntityInstancing>()
 
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
+        const val DETECTION_RANGE = 22.0
 
         var externRemoveOfRetryAmount = 0
     }
@@ -202,7 +201,7 @@ class MobData {
             }
             val entity = retry.entity
             if (entity.getLorenzVec()
-                    .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > MAX_DISTANCE_TO_PLAYER
+                    .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > DETECTION_RANGE
             ) {
                 MobDevTracker.data.outOfRangeRetries++
                 continue

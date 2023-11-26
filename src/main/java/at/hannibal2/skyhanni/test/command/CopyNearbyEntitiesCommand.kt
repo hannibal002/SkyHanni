@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -186,11 +187,17 @@ object CopyNearbyEntitiesCommand {
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
             val mob = MobData.entityToMob[entity]
-            append(mob?.mobType?.name ?: "None")
-            if (mob?.baseEntity == entity) append("/Base")
-            append(")\"")
-            append(mob?.name ?: "")
-            append("\", ")
+            if (mob == null) {
+                append(if (entity.distanceToPlayer() > MobData.DETECTION_RANGE) "Not in Range" else "None")
+                append(")")
+            } else {
+                append(mob.mobType.name)
+                if (mob.baseEntity == entity) append("/Base")
+                append(")\"")
+                append(mob?.name ?: "")
+                append("\"")
+            }
+            append(", ")
         }
 
         if (isNotEmpty()) {
