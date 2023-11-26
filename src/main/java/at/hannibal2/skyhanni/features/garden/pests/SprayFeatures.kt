@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -23,8 +24,15 @@ class SprayFeatures {
         if (!config.pestWhenSelector) return
 
         val type = pattern.matchMatcher(event.message) {
-            val sprayName = group("spray")
-            SprayType.getByName(sprayName) ?: error("unknown spray: '$sprayName'")
+            val sprayName = group("spray") + "d"
+            SprayType.getByName(sprayName) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Error reading spray material", "SprayType is null",
+                    "sprayName" to sprayName,
+                    "event.message" to event.message,
+                )
+                return
+            }
         } ?: return
 
         val pests = type.getPests().joinToString("§7, §6") { it.displayName }
