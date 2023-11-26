@@ -359,7 +359,7 @@ object LorenzUtils {
     }
 
     fun sendMessageToServer(message: String) {
-        if (System.currentTimeMillis() > lastMessageSent + 2_000) {
+        if (System.currentTimeMillis() > lastMessageSent + 1_000) {
             lastMessageSent = System.currentTimeMillis()
             val thePlayer = Minecraft.getMinecraft().thePlayer
             thePlayer.sendChatMessage(message)
