@@ -40,9 +40,7 @@ private fun replaceString(text: String): String? {
                 " §7(§4${pests}ൠ§7)"
             } else ""
             val name = plot?.let {
-                if (it.isBarn()) {
-                    "§aThe Barn"
-                } else "§b" + it.name
+                if (it.isBarn()) "§aThe Barn" else "§b" + it.name
             } ?: "§aGarden §cOutside"
             return " §7⏣ $name$pestSuffix"
         }
