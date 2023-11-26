@@ -65,21 +65,23 @@ object ChatManager {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet is S02PacketChat) {
-            val messageComponent = packet.chatComponent
+        val packet = event.packet as? S02PacketChat ?: return
 
-            val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
-            if (packet.type.toInt() == 2) {
-                val actionBarEvent = LorenzActionBarEvent(message)
-                actionBarEvent.postAndCatch()
-            }
+        val messageComponent = packet.chatComponent
+        val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
+        if (packet.type.toInt() == 2) {
+            val actionBarEvent = LorenzActionBarEvent(message)
+            actionBarEvent.postAndCatch()
         }
 
-        if (packet is C01PacketChatMessage) {
-            val message = packet.message
-            event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
-        }
+    }
+
+    @SubscribeEvent
+    fun onSendMessageToServerPacket(event: PacketEvent.SendEvent) {
+        val packet = event.packet as? C01PacketChatMessage ?: return
+
+        val message = packet.message
+        event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
     }
 
     @SubscribeEvent(receiveCanceled = true)
