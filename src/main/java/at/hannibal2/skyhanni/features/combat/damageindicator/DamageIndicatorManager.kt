@@ -159,7 +159,7 @@ class DamageIndicatorManager {
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
 
-            if (!data.ignoreBlocks && !data.entity.canBeSeen(50.0)) continue
+            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0)) continue
             if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
