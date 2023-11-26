@@ -16,4 +16,6 @@ object PestAPI {
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+
+    fun SprayType.getPests() = PestType.entries.filter { it.spray == this }
 }

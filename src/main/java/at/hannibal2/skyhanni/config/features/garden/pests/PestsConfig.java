@@ -15,4 +15,9 @@ public class PestsConfig {
     @ConfigOption(name = "Pest Timer", desc = "")
     @Accordion
     public PestTimerConfig pestTimer = new PestTimerConfig();
+
+    @Expose
+    @ConfigOption(name = "Spray", desc = "")
+    @Accordion
+    public SprayConfig spray = new SprayConfig();
 }
