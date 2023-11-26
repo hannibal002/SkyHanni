@@ -137,6 +137,7 @@ import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
 import at.hannibal2.skyhanni.features.garden.GardenLevelDisplay
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.GardenOptimalSpeed
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotBorders
 import at.hannibal2.skyhanni.features.garden.GardenWarpCommands
 import at.hannibal2.skyhanni.features.garden.GardenYawAndPitch
@@ -398,6 +399,7 @@ class SkyHanniMod {
         // APIs
         loadModule(BazaarApi())
         loadModule(GardenAPI)
+        loadModule(GardenPlotAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)

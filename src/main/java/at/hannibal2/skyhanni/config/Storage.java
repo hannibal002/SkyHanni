@@ -227,6 +227,9 @@ public class Storage {
             }
 
             @Expose
+            public Map<Integer, String> plotNames = new HashMap<>();
+
+            @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
 
             @Expose
