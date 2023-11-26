@@ -23,7 +23,7 @@ public class PestTimerConfig {
         desc = "Only show the time while holding vacuum in the hand."
     )
     @ConfigEditorBoolean
-    public boolean onlyWithVacuum = false;
+    public boolean onlyWithVacuum = true;
 
     @Expose
     public Position position = new Position(390, 65, false, true);
