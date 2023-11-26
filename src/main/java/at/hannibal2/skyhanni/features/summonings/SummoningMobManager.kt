@@ -36,8 +36,8 @@ class SummoningMobManager {
     private var searchMobs = false
 
     //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
-    private val spawnPatter = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
-    private val despawnPatter = "§cYou have despawned your (monster|monsters)!".toPattern()
+    private val spawnPattern = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
+    private val despawnPattern = "§cYou have despawned your (monster|monsters)!".toPattern()
 
     //§a§ohannibal2's Tank Zombie§r §a160k§c❤
     private val healthPattern = "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤".toPattern()
@@ -50,7 +50,7 @@ class SummoningMobManager {
         if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
-        spawnPatter.matchMatcher(message) {
+        spawnPattern.matchMatcher(message) {
             if (config.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
@@ -59,7 +59,7 @@ class SummoningMobManager {
             searchMobs = true
         }
 
-        if (despawnPatter.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
+        if (despawnPattern.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
             despawned()
             if (config.summoningMobDisplay && !message.contains("☠")) {
                 event.blockedReason = "summoning_soul"
