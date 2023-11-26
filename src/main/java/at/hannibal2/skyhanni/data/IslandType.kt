@@ -5,7 +5,7 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
     THE_END("The End"),
-    KUUDRA_ARENA("Instanced"),
+    KUUDRA_ARENA("Kuudra"),
     CRIMSON_ISLE("Crimson Isle"),
     DWARVEN_MINES("Dwarven Mines"),
     DUNGEON_HUB("Dungeon Hub", "dungeon_hub"),
