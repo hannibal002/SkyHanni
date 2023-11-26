@@ -24,7 +24,7 @@ class SprayFeatures {
         if (!config.pestWhenSelector) return
 
         val type = pattern.matchMatcher(event.message) {
-            val sprayName = group("spray") + "d"
+            val sprayName = group("spray")
             SprayType.getByName(sprayName) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Error reading spray material", "SprayType is null",
