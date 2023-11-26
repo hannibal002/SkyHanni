@@ -36,10 +36,12 @@ import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.io.File
 import java.io.IOException
 import java.util.TreeSet
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 100
 
@@ -74,22 +76,21 @@ class MobData {
     }
 
     var gotReseted = true
+    var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
-        if (!gotReseted) {
-            currentMobs.map {
-                when (it.mobType) {
-                    Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
-                    Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
-                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
-                    Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
-                    Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(it)
-                    Mob.Type.Special -> MobEvent.DeSpawn.Special(it)
-                }
-            }.forEach { it.postAndCatch() }
-            gotReseted = true
-        }
+        currentMobs.map {
+            when (it.mobType) {
+                Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
+                Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
+                Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
+                Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
+                Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(it)
+                Mob.Type.Special -> MobEvent.DeSpawn.Special(it)
+            }
+        }.forEach { it.postAndCatch() }
     }
+
 
     enum class Result {
         Found, NotYetFound, Illegal
@@ -99,9 +100,12 @@ class MobData {
 
     @SubscribeEvent
     fun onTickForEntityDetection(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) mobDetectionReset().run { return }
+        if (shouldClear.get()) {
+            mobDetectionReset()
+            shouldClear.set(false)
+        }
+        if (!LorenzUtils.inSkyBlock) return
         if (event.isMod(2)) return
-        gotReseted = false
 
         makeEntityUpdate()
 
@@ -195,7 +199,7 @@ class MobData {
 
 
     private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
-        IslandType.THE_RIFT -> false
+        IslandType.GARDEN_GUEST -> true
         IslandType.PRIVATE_ISLAND_GUEST -> true
         else -> false
     }
@@ -287,6 +291,7 @@ class MobData {
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
             is S37PacketStatistics -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
             {
+                shouldClear.set(true)
                 packetEntityIds.clear()
             }
         }
@@ -300,6 +305,11 @@ class MobData {
         } else {
             packetEntityIds.add(id)
         }
+    }
+
+    @SubscribeEvent
+    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        shouldClear.set(true)
     }
 
     @SubscribeEvent
