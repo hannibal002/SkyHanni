@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenCommands {
+class GardenWarpCommands {
     private val config get() = GardenAPI.config.gardenCommands
 
     // TODO repo
@@ -30,12 +31,14 @@ class GardenCommands {
         if (message == "/barn") {
             event.isCanceled = true
             LorenzUtils.sendCommandToServer("tptoplot barn")
+            LockMouseLook.autoDisable()
         }
 
         tpPlotPattern.matchMatcher(message) {
             event.isCanceled = true
             val plotName = group("plot")
             LorenzUtils.sendCommandToServer("tptoplot $plotName")
+            LockMouseLook.autoDisable()
         }
     }
 
@@ -51,6 +54,9 @@ class GardenCommands {
             config.barnHotkey -> "tptoplot barn"
 
             else -> return
+        }
+        if (command != "warp garden") {
+            LockMouseLook.autoDisable()
         }
         LorenzUtils.sendCommandToServer(command)
     }
