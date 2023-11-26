@@ -23,4 +23,13 @@ public class BackgroundConfig {
     )
     @ConfigEditorColour
     public String color = "0:102:0:0:0";
+
+    @Expose
+    @ConfigOption(
+        name = "Use Custom Background Image",
+        desc = "Put that image into a resource pack, using the path skyhanni/scoreboard.png."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean useCustomBackgroundImage = false;
 }

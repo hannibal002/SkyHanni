@@ -11,7 +11,7 @@
 //  - quiver
 //  - beacon power
 //  - skyblock level
-//  - more bg options (round, blurr, outline), custom texturepack
+//  - more bg options (round, blurr, outline)
 //
 
 package at.hannibal2.skyhanni.features.misc.customscoreboard
@@ -29,14 +29,16 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.client.config.GuiUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import io.github.moulberry.notenoughupdates.util.Utils.drawTexturedRect
+import org.lwjgl.opengl.GL11
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
@@ -94,14 +96,30 @@ class CustomScoreboard {
             ShaderManager.disableShader()
         }*/
 
+        val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
+
         if (config.backgroundConfig.enabled) {
-            Gui.drawRect(
-                x - border,
-                y - border,
-                x + elementWidth + border * 2,
-                y + elementHeight + border * 2,
-                SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
-            )
+            if (config.backgroundConfig.useCustomBackgroundImage){
+                Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
+
+                // Draw the texture at the desired position
+                //drawTexturedRect(x + width - 4, y, 4, HEIGHT, GL11.GL_NEAREST);
+                drawTexturedRect(
+                    (x - border).toFloat(),
+                    (y - border).toFloat(),
+                    (elementWidth + border * 2).toFloat(),
+                    (elementHeight + border * 2).toFloat(),
+                    GL11.GL_NEAREST
+                )
+            } else {
+                Gui.drawRect(
+                    x - border,
+                    y - border,
+                    x + elementWidth + border * 2,
+                    y + elementHeight + border * 2,
+                    SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
+                )
+            }
         }
 
         position.renderStrings(display, posLabel = "Custom Scoreboard")
