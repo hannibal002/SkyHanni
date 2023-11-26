@@ -498,6 +498,25 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
 
+### Pests
+
++ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+  + Enable via /sh vacuum.
++ Added Pests to Damage Indicator. - hannibal2
+  + Enable Damage Indicator and select Garden Pests.
++ Change how the pest spawn chat message should be formatted. - hannibal2
+  + Unchanged, compact or hide the message entirely.
++ Show a Title when a pest spawns. - hannibal2
++ Press a key to warp to the plot where the last pest has spawned. - hannibal2
++ Show the time since the last pest spawned in your garden. - hannibal2
+  + Option to only show the time while holding vacuum in the hand.
++ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
++ Show a display with all known pest locations. - hannibal2
+  + Click to warp to the plot.
+  + Option to only show the time while holding vacuum in the hand.
+
 </details>
 <details open><summary>
 

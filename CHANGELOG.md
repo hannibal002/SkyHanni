@@ -10,6 +10,18 @@
   + Enable via /sh vacuum.
 + Added Pests to Damage Indicator. - hannibal2
   + Enable Damage Indicator and select Garden Pests.
++ Change how the pest spawn chat message should be formatted. - hannibal2
+  + Unchanged, compact or hide the message entirely.
++ Show a Title when a pest spawns. - hannibal2
++ Press a key to warp to the plot where the last pest has spawned. - hannibal2
++ Show the time since the last pest spawned in your garden. - hannibal2
+  + Option to only show the time while holding vacuum in the hand.
++ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
++ Show a display with all known pest locations. - hannibal2
+  + Click to warp to the plot.
+  + Option to only show the time while holding vacuum in the hand.
 
 #### Other Features
 
@@ -26,6 +38,28 @@
   + Option to change the display mode that gets shown on default: Total, Current or remember last.
 
 ### Changes
+
+
+#### Garden Changes
+
++ Added option to enable/disable the vacuum bag item number being capped to 40. - hannibal2
++ Automatic unlocking /shmouselock when teleporting in the garden. - hannibal2
++ Don't hide messages from Jacob. - alexia
+  + This is a workaround for wrongly hidden Jakob messages.
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed pest damage indicator not working for some pests. - hannibal2
+
+### Technical Details
+
++ Code cleanup in many files. - walker & hannibal2
++ Moved the JSON object files into another package. - walker
++ Replaced SkyHanniMod.feature.garden with GardenAPI.config. - hannibal2
++ Added MessageSendToServerEvent. - hannibal2
++ Added GardenPlotAPI, support for detecting the current slot of the player. - hannibal2
 
 ## Version 0.21.1
 
