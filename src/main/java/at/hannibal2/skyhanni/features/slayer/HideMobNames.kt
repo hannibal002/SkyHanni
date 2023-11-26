@@ -19,7 +19,6 @@ class HideMobNames {
     init {
         // TODO USE SH-REPO
         addMobToHide("Zombie")
-        addMobToHide("Zombie")
         addMobToHide("Zombie Villager")
         addMobToHide("Crypt Ghoul")
 

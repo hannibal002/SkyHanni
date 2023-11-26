@@ -108,8 +108,7 @@ class ItemDisplayOverlayFeatures {
 
         if (itemNumberAsStackSize.contains(9) &&
             InventoryUtils.openInventoryName() == "Your Skills" &&
-            item.getLore()
-                .any { it.contains("Click to view!") }
+            item.getLore().any { it.contains("Click to view!") }
         ) {
             if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
             val split = itemName.split(" ")

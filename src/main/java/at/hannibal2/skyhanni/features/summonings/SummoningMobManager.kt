@@ -35,6 +35,7 @@ class SummoningMobManager {
     private var searchArmorStands = false
     private var searchMobs = false
 
+    // TODO repo
     //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
     private val spawnPattern = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
     private val despawnPattern = "§cYou have despawned your (monster|monsters)!".toPattern()

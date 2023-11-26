@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.jsonobjects.ItemsJson
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -31,7 +32,7 @@ class ItemStars {
 
         if (stars > 0) {
             var name = itemName
-            while (starFindPattern.matcher(name).matches()) {
+            while (starFindPattern.matches(name)) {
                 name = name.replaceFirst("§.✪".toRegex(), "")
             }
             name = name.trim()
