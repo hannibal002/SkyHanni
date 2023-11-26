@@ -15,19 +15,20 @@ class SprayFeatures {
     private var display: String? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
 
+    // TODO repo
+    private val pattern = "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!".toPattern()
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!config.pestWhenSelector) return
-
-        val pattern = "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!".toPattern()
 
         val type = pattern.matchMatcher(event.message) {
             val sprayName = group("spray")
             SprayType.getByName(sprayName) ?: error("unknown spray: '$sprayName'")
         } ?: return
 
-        val pests = type.getPests().joinToString("§7, ", prefix = "§6") { it.displayName }
-        display = "§a${type.displayName} §7($pests§7)"
+        val pests = type.getPests().joinToString("§7, §6") { it.displayName }
+        display = "§a${type.displayName} §7(§6$pests§7)"
 
         lastChangeTime = SimpleTimeMark.now()
 
