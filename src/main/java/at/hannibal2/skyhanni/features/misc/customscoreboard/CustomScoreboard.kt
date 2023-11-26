@@ -35,10 +35,10 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.client.config.GuiUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import io.github.moulberry.notenoughupdates.util.Utils.drawTexturedRect
 import org.lwjgl.opengl.GL11
+import kotlin.math.pow
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
@@ -57,6 +57,7 @@ var heat = "0"
 var mithrilPowder = "0"
 var gemstonePowder = "0"
 var partyCount = 0
+var cooldown = 0
 
 
 class CustomScoreboard {
@@ -97,13 +98,26 @@ class CustomScoreboard {
         }*/
 
         val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
+        val rareTextureLocation = ResourceLocation("skyhanni", "rareScoreboardBackground.png")
 
-        if (config.backgroundConfig.enabled) {
-            if (config.backgroundConfig.useCustomBackgroundImage){
-                Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
+        if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
+            if (cooldown > 0) {
+                cooldown--
 
-                // Draw the texture at the desired position
-                //drawTexturedRect(x + width - 4, y, 4, HEIGHT, GL11.GL_NEAREST);
+                // Display rare texture during cooldown
+                Minecraft.getMinecraft().textureManager.bindTexture(rareTextureLocation)
+                drawTexturedRect(
+                    (x - border).toFloat(),
+                    (y - border).toFloat(),
+                    (elementWidth + border * 3).toFloat(),
+                    (elementHeight + border * 3).toFloat(),
+                    GL11.GL_NEAREST
+                )
+            } else if (Math.random() < 1 / (1 - (1 / 86400.0).pow(1 / 20.0))) {
+                // Randomly switch to rare texture with a 1 in 86400 chance (once per day)
+                Minecraft.getMinecraft().textureManager.bindTexture(rareTextureLocation)
+                cooldown = 200
+
                 drawTexturedRect(
                     (x - border).toFloat(),
                     (y - border).toFloat(),
@@ -112,14 +126,25 @@ class CustomScoreboard {
                     GL11.GL_NEAREST
                 )
             } else {
-                Gui.drawRect(
-                    x - border,
-                    y - border,
-                    x + elementWidth + border * 2,
-                    y + elementHeight + border * 2,
-                    SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
+                // Draw the default texture
+                Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
+                drawTexturedRect(
+                    (x - border).toFloat(),
+                    (y - border).toFloat(),
+                    (elementWidth + border * 3).toFloat(),
+                    (elementHeight + border * 3).toFloat(),
+                    GL11.GL_NEAREST
                 )
             }
+        } else if (config.backgroundConfig.enabled) {
+            // Draw a solid background with a specified color
+            Gui.drawRect(
+                x - border,
+                y - border,
+                x + elementWidth + border * 2,
+                y + elementHeight + border * 2,
+                SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
+            )
         }
 
         position.renderStrings(display, posLabel = "Custom Scoreboard")
