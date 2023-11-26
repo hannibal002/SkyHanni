@@ -214,7 +214,7 @@ public class GardenConfig {
     public boolean plotBorders = true;
 
     @Expose
-    @ConfigOption(name = "Plot Name in Scoreboard", desc = "Showing a better plot name in scoreboard. Updates faster and doesnt hide when pests are spawned.")
+    @ConfigOption(name = "Plot Name in Scoreboard", desc = "Showing a more compact plot name in scoreboard. Updates faster and doesnt hide when pests are spawned.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean plotNameInScoreboard = true;

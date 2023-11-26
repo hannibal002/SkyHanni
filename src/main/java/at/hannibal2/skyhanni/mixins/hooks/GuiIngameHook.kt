@@ -21,7 +21,7 @@ fun drawString(
     instance.drawString(it, x, y, color)
 } ?: 0
 
-private fun replaceString(text: String, ): String? {
+private fun replaceString(text: String): String? {
     if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
         return null
     }
@@ -35,18 +35,16 @@ private fun replaceString(text: String, ): String? {
     if (SkyHanniMod.feature.garden.plotNameInScoreboard && GardenAPI.inGarden()) {
         if (text.contains("⏣")) {
             val plot = GardenPlotAPI.getCurrentPlot()
-            val pests = if (text.contains("ൠ")) {
-                text.last().digitToInt()
-            } else 0
-            var name = plot?.let {
+            val pestSuffix = if (text.contains("ൠ")) {
+                val pests = text.last().digitToInt()
+                " §7(§4${pests}ൠ§7)"
+            } else ""
+            val name = plot?.let {
                 if (it.isBarn()) {
-                    "§aGarden: The Barn"
-                } else "§aPlot: §b" + it.name
+                    "§aThe Barn"
+                } else "§b" + it.name
             } ?: "§aGarden §cOutside"
-            if (pests > 0) {
-                name = "$name §7(§4${pests}ൠ§7)"
-            }
-            return " §7⏣ $name"
+            return " §7⏣ $name$pestSuffix"
         }
     }
 
