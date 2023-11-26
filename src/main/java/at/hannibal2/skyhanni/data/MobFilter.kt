@@ -14,7 +14,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.getArmorStand
 import at.hannibal2.skyhanni.utils.MobUtils.getClosedArmorStand
+import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.makeMobResult
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
@@ -149,7 +151,8 @@ object MobFilter {
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)?.let { MobData.MobResult(Found, it) }
         if (baseEntity is EntityDragon) return MobData.MobResult(Found, MobFactories.basic(baseEntity, baseEntity.cleanName()))
         if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return MobData.MobResult(Found, MobFactories.projectile(baseEntity, "Giant Sword"))  // Will false trigger if there is another Dinnerbone Giant
-
+        if (baseEntity is EntityCaveSpider) getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
+            ?.let { MobData.entityToMob[getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.also { return MobData.MobResult(Illegal, null) } }
         return null
     }
 

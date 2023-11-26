@@ -126,8 +126,13 @@ class Mob(
             ?.mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun internalAddEntity(entity: EntityLivingBase) {
-        extraEntitiesList?.add(0, baseEntity) ?: run { extraEntitiesList = mutableListOf(baseEntity) }
-        baseEntity = entity
+        if (baseEntity.entityId > entity.entityId) {
+            extraEntitiesList?.add(0, baseEntity) ?: run { extraEntitiesList = mutableListOf(baseEntity) }
+            baseEntity = entity
+        } else {
+            extraEntitiesList?.apply { add(this.lastIndex + 1, entity) }
+                ?: run { extraEntitiesList = mutableListOf(entity) }
+        }
         relativeBoundingBox = makeRelativeBoundingBox()
         MobData.entityToMob[entity] = this
     }

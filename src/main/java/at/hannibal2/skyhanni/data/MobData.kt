@@ -145,7 +145,7 @@ class MobData {
     private fun handleMobsFromPacket() {
         while (batFromPacket.isNotEmpty()) {
             val entity = EntityUtils.getEntityByID(batFromPacket.take()) as? EntityLivingBase ?: continue
-            if (entityToMob[entity] != null) throw java.lang.IllegalStateException("Hypixel is Goofy with packets")
+            if (entityToMob[entity] != null) continue
             retries.remove(RetryEntityInstancing(entity, 0))
             MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
         }
