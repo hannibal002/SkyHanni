@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.MobFilter.illegalDisplayNPCArmorStandNames
 import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -29,6 +30,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
@@ -36,7 +38,7 @@ import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.IOException
-import java.util.*
+import java.util.TreeSet
 import java.util.concurrent.LinkedBlockingQueue
 
 private const val MAX_RETRIES = 100
@@ -103,6 +105,8 @@ class MobData {
 
         makeEntityUpdate()
 
+        handleMobsFromPacket()
+
         handleRetries()
 
         previousEntityLiving.clear()
@@ -162,6 +166,24 @@ class MobData {
             }
         }
         return true
+    }
+
+    private val batFromPacket = LinkedBlockingQueue<Int>(20)
+
+    private fun handleMobsFromPacket() {
+        while (batFromPacket.isNotEmpty()) {
+            val entity = EntityUtils.getEntityByID(batFromPacket.take()) as? EntityLivingBase ?: continue
+            if (entityToMob[entity] != null) throw java.lang.IllegalStateException("Hypixel is Goofy with packets")
+            retries.remove(RetryEntityInstancing(entity, 0))
+            MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
+        if (event.entity is EntityBat && event.health == 6) {
+            batFromPacket.add(event.entity.entityId)
+        }
     }
 
     private fun createDisplayNPC(entity: EntityLivingBase): Boolean =

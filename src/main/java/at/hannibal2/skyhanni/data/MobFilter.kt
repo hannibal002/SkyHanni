@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.getClosedArmorStand
@@ -188,7 +189,7 @@ object MobFilter {
             }
 
             IslandType.DWARVEN_MINES -> {
-                if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth == 1_000_000) return MobData.MobResult(Found, MobFactories.basic(baseEntity, "Ghost"))
+                if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000) return MobData.MobResult(Found, MobFactories.basic(baseEntity, "Ghost"))
             }
 
             IslandType.CRYSTAL_HOLLOWS -> {
@@ -253,16 +254,16 @@ object MobFilter {
         else -> null
     }
 
-    private fun createBat(baseEntity: EntityLivingBase): Mob? = when (baseEntity.maxHealth) {
+    private fun createBat(baseEntity: EntityLivingBase): Mob? = when (baseEntity.baseMaxHealth.derpy()) {
         // TODO Bat Pinata, Mega Bat
-        5_000_000f -> MobFactories.basic(baseEntity, "Cinderbat")
-        75_000f -> MobFactories.basic(baseEntity, "Thorn Bat")
-        100f -> MobFactories.basic(
+        5_000_000 -> MobFactories.basic(baseEntity, "Cinderbat")
+        75_000 -> MobFactories.basic(baseEntity, "Thorn Bat")
+        100 -> MobFactories.basic(
             baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else "Private Island Bat"
         )
 
-        20f -> MobFactories.projectile(baseEntity, "Vampire Mask Bat")
-        6f -> MobFactories.projectile(baseEntity, "Spirit Scepter Bat") // TODO fix false triggers
+        20 -> MobFactories.projectile(baseEntity, "Vampire Mask Bat")
+        // 6 -> MobFactories.projectile(baseEntity, "Spirit Scepter Bat") // moved to Packet Event because 6 is default Health of Bats
         else -> null
     }
 }

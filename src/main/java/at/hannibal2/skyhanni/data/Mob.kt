@@ -36,7 +36,7 @@ import net.minecraft.util.AxisAlignedBB
  * Indicates whether the Mob has a star.
  * @property attribute Valid for: [Type.Dungeon]
  *
- * The attribute of the Mob..
+ * The attribute of the Mob.
  * @property levelOrTier Valid for: [Type.Basic], [Type.Slayer]
  *
  * The level or tier of the Mob.
