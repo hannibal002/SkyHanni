@@ -17,14 +17,18 @@ fun drawString(
     x: Int,
     y: Int,
     color: Int,
-): Int {
+) = replaceString(text)?.let {
+    instance.drawString(it, x, y, color)
+} ?: 0
+
+private fun replaceString(text: String, ): String? {
     if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
-        return 0
+        return null
     }
     if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
         piggyPattern.matchMatcher(text) {
             val coins = group("coins")
-            return instance.drawString("Purse: $coins", x, y, color)
+            return "Purse: $coins"
         }
     }
 
@@ -42,9 +46,9 @@ fun drawString(
             if (pests > 0) {
                 name = "$name §7(§4${pests}ൠ§7)"
             }
-            return instance.drawString(" §7⏣ $name", x, y, color)
+            return " §7⏣ $name"
         }
     }
 
-    return instance.drawString(text, x, y, color)
+    return text
 }
