@@ -73,7 +73,6 @@ object Commands {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
-            val arr = mutableListOf<String>()
             ConfigGuiManager.openConfigGui()
         }
     }

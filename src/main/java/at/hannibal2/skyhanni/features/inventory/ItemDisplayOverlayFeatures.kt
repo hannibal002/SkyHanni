@@ -22,7 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
-
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
@@ -91,7 +90,7 @@ class ItemDisplayOverlayFeatures {
             return last.romanToDecimal().toString()
         }
 
-        if (SkyHanniMod.feature.inventory.displaySackName && ItemUtils.isSack(item)) {
+        if (config.displaySackName && ItemUtils.isSack(item)) {
             val sackName = grabSackName(itemName)
             return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
         }

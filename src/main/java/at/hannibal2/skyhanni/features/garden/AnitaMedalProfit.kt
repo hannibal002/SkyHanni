@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -24,7 +23,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
-    private val config get() = SkyHanniMod.feature.garden.anitaShop
+    private val config get() = GardenAPI.config.anitaShop
     private var display = emptyList<List<Any>>()
 
     companion object {

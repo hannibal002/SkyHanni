@@ -42,7 +42,7 @@ class EstimatedWardrobePrice {
 
             toolTip.add(index++, "  §7- $name: §6${NumberUtil.format(price)}")
         }
-        toolTip.add(index, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)}")
+        toolTip.add(index, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
     }
 
     @SubscribeEvent

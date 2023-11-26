@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -28,7 +27,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class GardenVisitorTimer {
-    private val config get() = SkyHanniMod.feature.garden.visitors.timer
+    private val config get() = GardenAPI.config.visitors.timer
     private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
     private var display = ""
     private var lastMillis = 0.seconds

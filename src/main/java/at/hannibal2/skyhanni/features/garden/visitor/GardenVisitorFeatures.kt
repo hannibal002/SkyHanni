@@ -436,6 +436,7 @@ class GardenVisitorFeatures {
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val name = group("name")
+        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 

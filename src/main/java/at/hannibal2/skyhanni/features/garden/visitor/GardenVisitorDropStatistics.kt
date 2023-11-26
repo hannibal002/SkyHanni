@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -24,7 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
-    private val config get() = SkyHanniMod.feature.garden.visitors.dropsStatistics
+    private val config get() = GardenAPI.config.visitors.dropsStatistics
     private var display = emptyList<List<Any>>()
 
     private var acceptedVisitors = 0

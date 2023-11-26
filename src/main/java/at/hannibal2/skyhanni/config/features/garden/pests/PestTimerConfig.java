@@ -11,7 +11,7 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the time since the last pest spawned on your garden."
+        desc = "Show the time since the last pest spawned in your garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -20,10 +20,10 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Only With Vacuum",
-        desc = "Only show the time while holding vacuum in the hand."
+        desc = "Only show the time while holding a vacuum in the hand."
     )
     @ConfigEditorBoolean
-    public boolean onlyWithVacuum = false;
+    public boolean onlyWithVacuum = true;
 
     @Expose
     public Position position = new Position(390, 65, false, true);
