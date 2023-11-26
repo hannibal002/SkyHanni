@@ -70,10 +70,16 @@ public class InventoryConfig {
             "§bCollection Level",
             "§bRancher's Boots speed",
             "§bLarva Hook",
-            "§bDungeon Potion Level"
+            "§bDungeon Potion Level",
+            "§bVacuum (Garden)"
         }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11, 12));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 11, 12, 14));
+
+    @Expose
+    @ConfigOption(name = " Vacuum Bag Cap", desc = "Capping the Garden Vacuum Bag item number display to 40.")
+    @ConfigEditorBoolean
+    public boolean vacuumBagCap = true;
 
     @Expose
     @ConfigOption(

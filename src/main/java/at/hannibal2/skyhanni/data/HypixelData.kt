@@ -190,6 +190,6 @@ class HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
-                scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
     }
 }

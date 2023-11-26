@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BingoCardDisplay {
 
     private var display = emptyList<String>()
+
     // TODO USE SH-REPO
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 

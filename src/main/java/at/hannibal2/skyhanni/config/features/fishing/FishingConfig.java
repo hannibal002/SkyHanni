@@ -51,6 +51,11 @@ public class FishingConfig {
     public RareCatchesConfig rareCatches = new RareCatchesConfig();
 
     @Expose
+    @ConfigOption(name = "Fishing Profit Tracker", desc = "")
+    @Accordion
+    public FishingProfitTrackerConfig fishingProfitTracker = new FishingProfitTrackerConfig();
+
+    @Expose
     @ConfigOption(
         name = "Shark Fish Counter",
         desc = "Counts how many Sharks have been caught."

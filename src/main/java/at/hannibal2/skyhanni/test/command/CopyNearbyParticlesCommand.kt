@@ -65,7 +65,7 @@ object CopyNearbyParticlesCommand {
             resultList.add("particle arguments: ${packet.particleArgs.asList()}")
             resultList.add("")
             resultList.add("")
-            counter ++
+            counter++
         }
     }
 }
