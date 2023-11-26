@@ -30,7 +30,7 @@ import kotlin.time.toDuration
 class GardenVisitorTimer {
     private val config get() = SkyHanniMod.feature.garden.visitors.timer
     private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
-    private var render = ""
+    private var display = ""
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
     private var visitorJustArrived = false
@@ -73,7 +73,7 @@ class GardenVisitorTimer {
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
-        render = ""
+        display = ""
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
@@ -93,7 +93,7 @@ class GardenVisitorTimer {
                 continue
             }
             if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
-                render = ""
+                display = ""
                 return
             }
 
@@ -173,14 +173,14 @@ class GardenVisitorTimer {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
-        render = "§b$visitorsAmount $visitorLabel §7($next§7)"
+        display = "§b$visitorsAmount $visitorLabel §7($next§7)"
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.pos.renderString(render, posLabel = "Garden Visitor Timer")
+        config.pos.renderString(display, posLabel = "Garden Visitor Timer")
     }
 
     @SubscribeEvent

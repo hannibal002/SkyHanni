@@ -36,6 +36,7 @@ import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
@@ -80,6 +81,7 @@ class MobFinder {
     internal fun tryAdd(entity: EntityLivingBase) = when {
         LorenzUtils.inDungeons -> tryAddDungeon(entity)
         RiftAPI.inRift() -> tryAddRift(entity)
+        GardenAPI.inGarden() -> tryAddGarden(entity)
         else -> {
             when (entity) {
                 /*
@@ -89,7 +91,6 @@ class MobFinder {
                      * Please take this into consideration if you are to modify this.
                     */
                 is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(entity)
-                is EntitySilverfish -> tryAddEntitySilverfish(entity)
                 is EntityIronGolem -> tryAddEntityIronGolem(entity)
                 is EntityPigZombie -> tryAddEntityPigZombie(entity)
                 is EntityMagmaCube -> tryAddEntityMagmaCube(entity)
@@ -109,7 +110,15 @@ class MobFinder {
         }
     }
 
-    private fun tryAddEntitySilverfish(entity: EntitySilverfish): EntityResult? {
+    private fun tryAddGarden(entity: EntityLivingBase): EntityResult? {
+        if (entity is EntitySilverfish || entity is EntityBat) {
+            return tryAddGardenPest(entity)
+        }
+
+        return null
+    }
+
+    private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
         if (!GardenAPI.inGarden()) return null
 
         if (entity.hasNameTagWith(3, "Beetle")) return EntityResult(bossType = BossType.GARDEN_PEST_BEETLE)
