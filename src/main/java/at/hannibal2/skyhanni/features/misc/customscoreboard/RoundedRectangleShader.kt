@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.shader.Uniform
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 /*
-    DOES NOT WORK
+    DOES NOT WORK, maybe someone can fix the rendering because I have no idea what the heck is going on ~ J10a1n15
  */
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 

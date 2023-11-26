@@ -113,7 +113,7 @@ class CustomScoreboard {
                     (elementHeight + border * 3).toFloat(),
                     GL11.GL_NEAREST
                 )
-            } else if (Math.random() < 1 / (1 - (1 / 86400.0).pow(1 / 20.0))) {
+            } else if (Math.random() * 86400.0 * 20 == 1.0) {
                 // Randomly switch to rare texture with a 1 in 86400 chance (once per day)
                 Minecraft.getMinecraft().textureManager.bindTexture(rareTextureLocation)
                 cooldown = 200
