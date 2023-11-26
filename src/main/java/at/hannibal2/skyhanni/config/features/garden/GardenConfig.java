@@ -114,6 +114,11 @@ public class GardenConfig {
     public PlotIconConfig plotIcon = new PlotIconConfig();
 
     @Expose
+    @ConfigOption(name = "Garden Commands", desc = "")
+    @Accordion
+    public GardenCommandsConfig gardenCommands = new GardenCommandsConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle

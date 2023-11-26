@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {

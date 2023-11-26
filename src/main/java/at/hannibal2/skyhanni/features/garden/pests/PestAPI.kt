@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
 object PestAPI {
-    val config get() = SkyHanniMod.feature.garden.pests
+    val config get() = GardenAPI.config.pests
 
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
@@ -16,4 +16,6 @@ object PestAPI {
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+
+    fun SprayType.getPests() = PestType.entries.filter { it.spray == this }
 }

@@ -98,7 +98,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isControlKeyDown()) {
                         data.items.remove(internalName)
-                        LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom Fishing Frofit Tracker.")
+                        LorenzUtils.chat("Removed $cleanName §efrom Fishing Frofit Tracker.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         modify {

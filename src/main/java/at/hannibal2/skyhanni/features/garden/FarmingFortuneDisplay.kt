@@ -148,7 +148,7 @@ class FarmingFortuneDisplay {
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.farmingFortunes
+        private val config get() = GardenAPI.config.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestTrueFarmingFortune
 
         private var currentCrop: CropType? = null

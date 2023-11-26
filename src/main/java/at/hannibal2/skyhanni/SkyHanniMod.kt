@@ -41,6 +41,9 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
@@ -130,6 +133,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
 import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenCommands
 import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
 import at.hannibal2.skyhanni.features.garden.GardenLevelDisplay
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -168,6 +172,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
@@ -315,9 +320,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -384,6 +386,7 @@ class SkyHanniMod {
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
+        loadModule(GardenCommands())
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
@@ -648,6 +651,7 @@ class SkyHanniMod {
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
         loadModule(HighlightPlaceableNpcs())
+        loadModule(SprayFeatures())
 
         init()
 

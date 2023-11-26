@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -20,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DicerDropTracker {
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = SkyHanniMod.feature.garden.dicerCounters
+    private val config get() = GardenAPI.config.dicerCounters
     private val tracker = SkyHanniTracker("Dicer Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
     { drawDisplay(it) }
 

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.BingoJson
-import at.hannibal2.skyhanni.utils.jsonobjects.BingoJson.BingoTip
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
