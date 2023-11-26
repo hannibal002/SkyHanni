@@ -61,7 +61,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCustomScoreboardEnabled()) return
-        if (display.isEmpty()) return
+        val display = display ?: return
         val position = config.position
         val border = 5
 
@@ -88,8 +88,13 @@ class CustomScoreboard {
                 position.isCenter
             )
         )
-
         /*if (config.backgroundConfig.enabled) {
+            ShaderManager.enableShader("rounded_rectangle")
+        } else {
+            ShaderManager.disableShader()
+        }*/
+
+        if (config.backgroundConfig.enabled) {
             Gui.drawRect(
                 x - border,
                 y - border,
@@ -97,7 +102,7 @@ class CustomScoreboard {
                 y + elementHeight + border * 2,
                 SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
             )
-        }*/
+        }
 
         position.renderStrings(display, posLabel = "Custom Scoreboard")
     }

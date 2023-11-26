@@ -1,26 +1,25 @@
-#version 330 core
+precision mediump float;
 
-uniform vec2 size;
-uniform float radius;
+varying vec2 v_texCoord;
+
+uniform float width;
+uniform float height;
+uniform float roundness;
 uniform vec4 color;
 
-void main() {
-    vec2 position = gl_FragCoord.xy;
-    vec2 halfSize = size * 0.5;
+void main()
+{
+    // Calculate the distance from the center of the rectangle
+    vec2 center = vec2(width, height) * 0.5;
+    vec2 distance = abs(v_texCoord - center);
 
-    // Calculate distance to the closest point on the rectangle
-    vec2 dist = abs(position - halfSize);
+    // Calculate the distance from the center to the corner of the rounded rectangle
+    float cornerRadius = min(roundness, min(width, height) * 0.5);
+    vec2 roundedDistance = max(distance - vec2(width, height) * 0.5 + cornerRadius, vec2(0.0));
 
-    // Calculate distance to the closest point on the rounded corners
-    float cornerDistance = max(dist.x - halfSize.x + radius, dist.y - halfSize.y + radius);
+    // Calculate the alpha value based on the distance from the center and the corner radius
+    float alpha = smoothstep(cornerRadius, cornerRadius + 0.01, length(roundedDistance));
 
-    // Use smoothstep to create a smooth transition between the rectangle and the rounded corners
-    float smoothStep = 1.0 - smoothstep(0.0, radius, cornerDistance);
-
-    // Use smoothstep to create a smooth transition between the rounded corners and the interior of the rectangle
-    float insideSmoothStep = smoothstep(radius, 0.0, cornerDistance);
-
-    // Combine the results to get the final color
-    vec4 finalColor = mix(color, vec4(0.0, 0.0, 0.0, 0.0), smoothStep);
-    gl_FragColor = mix(finalColor, color, insideSmoothStep);
+    // Output the final color with alpha blending
+    gl_FragColor = vec4(color.rgb, color.a * alpha);
 }

@@ -135,12 +135,30 @@ class ShaderHelper {
             if (USING_ARB_SHADERS) ARBShaderObjects.glUniform1fARB(location, v0) else GL20.glUniform1f(location, v0)
         }
 
+        fun glUniform2f(uniformID: Int, fl: Float, fl1: Float) {
+            if (USING_ARB_SHADERS) ARBShaderObjects.glUniform2fARB(uniformID, fl, fl1) else GL20.glUniform2f(
+                uniformID,
+                fl,
+                fl1
+            )
+        }
+
         fun glUniform3f(location: Int, v0: Float, v1: Float, v2: Float) {
             if (USING_ARB_SHADERS) ARBShaderObjects.glUniform3fARB(location, v0, v1, v2) else GL20.glUniform3f(
                 location,
                 v0,
                 v1,
                 v2
+            )
+        }
+
+        fun glUniform4f(location: Int, v0: Float, v1: Float, v2: Float, v3: Float) {
+            if (USING_ARB_SHADERS) ARBShaderObjects.glUniform4fARB(location, v0, v1, v2, v3) else GL20.glUniform4f(
+                location,
+                v0,
+                v1,
+                v2,
+                v3
             )
         }
 
