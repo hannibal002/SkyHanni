@@ -15,12 +15,12 @@ public class GardenCommandsConfig {
     public boolean warpCommands = true;
 
     @Expose
-    @ConfigOption(name = "Home Hotkey", desc = "Press this key to set your Garden home. §cOnly works while on the garden.")
+    @ConfigOption(name = "Home Hotkey", desc = "Press this key to teleport you to your Garden home. §cOnly works while on the garden.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int homeHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Sethome Hotkey", desc = "Press this key to teleport you to your Garden home. §cOnly works while on the garden.")
+    @ConfigOption(name = "Sethome Hotkey", desc = "Press this key to set your Garden home. §cOnly works while on the garden.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int sethomeHotkey = Keyboard.KEY_NONE;
 
