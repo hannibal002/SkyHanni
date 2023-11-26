@@ -53,9 +53,9 @@ public class CustomScoreboardConfig {
             "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills",
             "",
             "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234",
-            "§7Wide Range of Events\n(too much for this here)",
+            "§7Wide Range of Events\n§7(too much for this here)",
             "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff",
-            "§9§lParty (4):\n §7- §fhannibal2\n §7- §f Moulberry\n §7- §f Vahvl\n §7- §f J10a1n15",
+            "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15",
             "§ewww.hypixel.net",
         }
     )
