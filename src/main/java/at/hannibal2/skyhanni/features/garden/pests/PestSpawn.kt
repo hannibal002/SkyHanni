@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -72,6 +73,7 @@ class PestSpawn {
         lastPlotTp?.let {
             lastPlotTp = null
             LorenzUtils.sendCommandToServer("tptoplot $it")
+            LockMouseLook.autoDisable()
         }
     }
 }
