@@ -11,7 +11,7 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the time since the last pest spawned on your garden."
+        desc = "Show the time since the last pest spawned in your garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle

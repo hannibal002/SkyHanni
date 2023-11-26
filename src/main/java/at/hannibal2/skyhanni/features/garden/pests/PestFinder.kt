@@ -73,7 +73,7 @@ class PestFinder {
             return@buildList
         }
 
-        add(Renderable.string("§eTotal pests on garden: §c${totalAmount()}§7/§c8"))
+        add(Renderable.string("§eTotal pests in garden: §c${totalAmount()}§7/§c8"))
 
         for (plot in GardenPlotAPI.plots) {
             val pests = plot.pests
@@ -105,7 +105,7 @@ class PestFinder {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (event.message == "§cThere are not any Pests on your Garden right now! Keep farming!") {
+        if (event.message == "§cThere are no pests in your Garden right now! Keep farming!") {
             GardenPlotAPI.plots.forEach {
                 it.pests = 0
             }
@@ -117,7 +117,7 @@ class PestFinder {
     fun onDamageIndicatorDeath(event: DamageIndicatorDeathEvent) {
         if (!isEnabled()) return
 
-        // Check if an unknown damage indiactor mob dies in garden
+        // Check if an unknown damage indiactor mob dies in the garden
         val type = event.data.bossType
         if (!PestType.entries.any { it.damageIndicatorBoss == type }) return
 

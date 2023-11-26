@@ -40,7 +40,7 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Always On",
-        desc = "Always show the money/hour Display while on the garden.")
+        desc = "Always show the money/hour Display while in the garden.")
     @ConfigEditorBoolean
     public boolean alwaysOn = false;
 
