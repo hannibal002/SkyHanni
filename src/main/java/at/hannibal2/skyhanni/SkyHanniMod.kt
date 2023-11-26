@@ -134,12 +134,13 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
 import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenCommands
 import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
 import at.hannibal2.skyhanni.features.garden.GardenLevelDisplay
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.GardenOptimalSpeed
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotBorders
+import at.hannibal2.skyhanni.features.garden.GardenWarpCommands
 import at.hannibal2.skyhanni.features.garden.GardenYawAndPitch
 import at.hannibal2.skyhanni.features.garden.ToolTooltipTweaks
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
@@ -171,6 +172,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
@@ -342,7 +344,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.1",
+    version = "0.22.Beta.2",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -387,7 +389,7 @@ class SkyHanniMod {
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
-        loadModule(GardenCommands())
+        loadModule(GardenWarpCommands())
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
@@ -400,6 +402,7 @@ class SkyHanniMod {
         // APIs
         loadModule(BazaarApi())
         loadModule(GardenAPI)
+        loadModule(GardenPlotAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)
@@ -653,6 +656,7 @@ class SkyHanniMod {
         loadModule(CustomScoreboard())
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
+        loadModule(PestFinder())
         loadModule(SprayFeatures())
 
         init()

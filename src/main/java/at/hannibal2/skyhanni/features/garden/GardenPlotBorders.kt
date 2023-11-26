@@ -46,7 +46,7 @@ class GardenPlotBorders {
 
         val entity = Minecraft.getMinecraft().renderViewEntity
 
-        // Lowest point in garden
+        // Lowest point in the garden
         val minHeight = 66
         val maxHeight = 256
 

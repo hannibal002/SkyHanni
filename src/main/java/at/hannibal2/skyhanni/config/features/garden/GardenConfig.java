@@ -214,6 +214,12 @@ public class GardenConfig {
     public boolean plotBorders = true;
 
     @Expose
+    @ConfigOption(name = "Plot Name in Scoreboard", desc = "Showing a more compact plot name in scoreboard. Updates faster and doesnt hide when pests are spawned.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean plotNameInScoreboard = true;
+
+    @Expose
     @ConfigOption(name = "Copy Milestone Data", desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in SkyHanni discord.")
     @ConfigEditorBoolean
     @FeatureToggle

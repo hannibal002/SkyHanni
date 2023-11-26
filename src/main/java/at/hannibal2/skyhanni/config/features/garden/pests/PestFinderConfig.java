@@ -6,25 +6,25 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class PestTimerConfig {
+public class PestFinderConfig {
 
     @Expose
     @ConfigOption(
-        name = "Enabled",
-        desc = "Show the time since the last pest spawned in your garden."
+            name = "Display",
+            desc = "Show a display with all know pest locations."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean showDisplay = true;
 
     @Expose
     @ConfigOption(
-        name = "Only With Vacuum",
-        desc = "Only show the time while holding a vacuum in the hand."
+            name = "Only With Vacuum",
+            desc = "Only show the pest display while holding a vacuum in the hand."
     )
     @ConfigEditorBoolean
     public boolean onlyWithVacuum = true;
 
     @Expose
-    public Position position = new Position(390, 65, false, true);
+    public Position position = new Position(-350, 200, 1.3f);
 }
