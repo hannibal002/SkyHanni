@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -16,7 +15,7 @@ class GardenNextPlotPrice {
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.plotPrice) return
+        if (!GardenAPI.config.plotPrice) return
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 

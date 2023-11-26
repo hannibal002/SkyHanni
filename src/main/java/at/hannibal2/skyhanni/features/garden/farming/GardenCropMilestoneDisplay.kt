@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -34,7 +33,7 @@ object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
     private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
-    private val config get() = SkyHanniMod.feature.garden.cropMilestones
+    private val config get() = GardenAPI.config.cropMilestones
     private val bestCropTime = GardenBestCropTime()
 
     private var lastPlaySoundTime = 0L

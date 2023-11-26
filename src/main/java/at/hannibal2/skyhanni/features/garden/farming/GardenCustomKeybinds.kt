@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
@@ -14,24 +13,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.IdentityHashMap
 
 object GardenCustomKeybinds {
-    private val shConfig get() = SkyHanniMod.feature.garden.keyBind
+    private val config get() = GardenAPI.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
     private var lastWindowOpenTime = 0L
 
     init {
-        map[mcSettings.keyBindAttack] = { shConfig.attack }
-        map[mcSettings.keyBindUseItem] = { shConfig.useItem }
-        map[mcSettings.keyBindLeft] = { shConfig.left }
-        map[mcSettings.keyBindRight] = { shConfig.right }
-        map[mcSettings.keyBindForward] = { shConfig.forward }
-        map[mcSettings.keyBindBack] = { shConfig.back }
-        map[mcSettings.keyBindJump] = { shConfig.jump }
-        map[mcSettings.keyBindSneak] = { shConfig.sneak }
+        map[mcSettings.keyBindAttack] = { config.attack }
+        map[mcSettings.keyBindUseItem] = { config.useItem }
+        map[mcSettings.keyBindLeft] = { config.left }
+        map[mcSettings.keyBindRight] = { config.right }
+        map[mcSettings.keyBindForward] = { config.forward }
+        map[mcSettings.keyBindBack] = { config.back }
+        map[mcSettings.keyBindJump] = { config.jump }
+        map[mcSettings.keyBindSneak] = { config.sneak }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && shConfig.enabled
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
     private fun isActive(): Boolean {
         if (!isEnabled()) return false

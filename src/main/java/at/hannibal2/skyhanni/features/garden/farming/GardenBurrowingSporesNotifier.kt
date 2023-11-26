@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,7 +11,7 @@ class GardenBurrowingSporesNotifier {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.burrowingSporesNotification) return
+        if (!GardenAPI.config.burrowingSporesNotification) return
 
         if (event.message.endsWith("§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores")) {
             LorenzUtils.sendTitle("§9Burrowing Spores!", 5.seconds)

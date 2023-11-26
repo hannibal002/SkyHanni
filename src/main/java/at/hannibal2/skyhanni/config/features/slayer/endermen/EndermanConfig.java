@@ -8,7 +8,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class EndermanConfig {
     @Expose
-    @ConfigOption(name = "Yang Glyph (beacon)", desc = "")
+    @ConfigOption(name = "Yang Glyph (Beacon)", desc = "")
     @Accordion
     public EndermanBeaconConfig beacon = new EndermanBeaconConfig();
 
