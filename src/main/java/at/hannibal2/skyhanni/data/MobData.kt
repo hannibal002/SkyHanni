@@ -166,7 +166,7 @@ class MobData {
     private val illegalDisplayNPCArmorStandNames = listOf("§e§lCLICK", "§a§lSTAY SAFE!", "§6§lNEW UPDATE")
 
     private fun createDisplayNPC(entity: EntityLivingBase): Boolean =
-        MobUtils.getArmorStandByRangeAll(entity, 1.0).firstOrNull { armorStand ->
+        MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
             !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
         }?.let { armorStand ->
             MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch().also { true }

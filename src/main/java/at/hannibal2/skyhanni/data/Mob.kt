@@ -87,17 +87,20 @@ class Mob(
         (baseEntity.entityBoundingBox.union(extraEntities?.filter { it !is EntityArmorStand }
             ?.mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
-    fun addEntityInFront(entity: EntityLivingBase) {
-        extraEntitiesList?.add(0, entity) ?: run { extraEntitiesList = mutableListOf(entity) }
+    fun internalAddEntity(entity: EntityLivingBase) {
+        extraEntitiesList?.add(0, baseEntity) ?: run { extraEntitiesList = mutableListOf(baseEntity) }
+        baseEntity = entity
         relativeBoundingBox = makeRelativeBoundingBox()
-        // MobData.putSummonOrSkyblockMob(entity, this) TODO
+        MobData.entityToMob[entity] = this
     }
 
-    fun addEntityInFront(entities: Collection<EntityLivingBase>) {
-        extraEntitiesList?.addAll(0, entities) ?: run { extraEntitiesList = entities.toMutableList() }
+    fun internalAddEntity(entities: Collection<EntityLivingBase>) {
+        val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
+        extraEntitiesList?.addAll(0, list) ?: run { extraEntitiesList = list }
+        baseEntity = entities.first()
         relativeBoundingBox = makeRelativeBoundingBox()
         removeExtraEntitiesFromChecking()
-        // MobData.putAllSummonOrSkyblockMob(entities, this) TODO
+        MobData.entityToMob.putAll(entities.associateWith { this })
     }
 
     fun internalUpdateOfEntity(entity: EntityLivingBase) {

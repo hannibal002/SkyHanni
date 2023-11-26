@@ -115,7 +115,7 @@ object MobFilter {
 
         // Check if Late Stack
         nextEntity?.let { nextEntity ->
-            MobData.entityToMob[nextEntity]?.apply { addEntityInFront(baseEntity) }
+            MobData.entityToMob[nextEntity]?.apply { internalAddEntity(baseEntity) }
                 ?.also { return MobData.MobResult(Illegal, null) }
         }
 
@@ -130,7 +130,7 @@ object MobFilter {
         stackedMobsException(baseEntity, extraEntityList)?.let { return it }
 
         // If Late Stack add all entities
-        caughtSkyblockMob?.apply { addEntityInFront(extraEntityList.dropLast(1)) }
+        caughtSkyblockMob?.apply { internalAddEntity(extraEntityList.dropLast(1)) }
             ?.also { return MobData.MobResult(Illegal, null) }
 
 
