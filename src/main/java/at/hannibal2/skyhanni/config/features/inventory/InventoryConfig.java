@@ -77,6 +77,11 @@ public class InventoryConfig {
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 11, 12, 14));
 
     @Expose
+    @ConfigOption(name = " Vacuum Bag Cap", desc = "Capping the Garden Vacuum Bag item number display to 40.")
+    @ConfigEditorBoolean
+    public boolean vacuumBagCap = true;
+
+    @Expose
     @ConfigOption(
         name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +

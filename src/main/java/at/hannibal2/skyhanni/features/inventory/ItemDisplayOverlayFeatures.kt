@@ -21,6 +21,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
+    private val config get() = SkyHanniMod.feature.inventory
+
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
 
@@ -41,7 +43,7 @@ class ItemDisplayOverlayFeatures {
     private fun getStackTip(item: ItemStack): String {
         val itemName = item.cleanName()
 
-        val itemNumberAsStackSize = SkyHanniMod.feature.inventory.itemNumberAsStackSize
+        val itemNumberAsStackSize = config.itemNumberAsStackSize
         if (itemNumberAsStackSize.contains(0)) {
             when (itemName) {
                 "First Master Star" -> return "1"
@@ -183,7 +185,19 @@ class ItemDisplayOverlayFeatures {
                 for (line in item.getLore()) {
                     gardenVacuumPatterm.matchMatcher(line) {
                         val pests = group("amount").formatNumber()
-                        return if (pests > 39) "§640" else "$pests"
+                        return if (config.vacuumBagCap) {
+                            if (pests > 39) "§640" else "$pests"
+                        } else {
+                            if (pests < 40) {
+                                "$pests"
+                            } else if (pests < 1_000) {
+                                "§6$pests"
+                            } else if (pests < 100_000) {
+                                "§c${pests / 1000}k"
+                            } else {
+                                "§c${pests / 100_000 / 10.0}m"
+                            }
+                        }
                     }
                 }
             }
