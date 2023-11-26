@@ -21,7 +21,8 @@ object MobFactories {
 
     fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? =
         MobFilter.dungeonNameFilter.find(armorStand.cleanName())?.let {
-            Mob(baseEntity, Mob.Type.Dungeon, armorStand, it.groupValues[3], extraEntityList, hasStar = it.groupValues[1].isNotEmpty(), attribute = MobFilter.DungeonAttribute.valueOf(it.groupValues[2]))
+            Mob(baseEntity, Mob.Type.Dungeon, armorStand, it.groupValues[3], extraEntityList, hasStar = it.groupValues[1].isNotEmpty(), attribute = it.groupValues[2].takeIf { it.isNotEmpty() }
+                ?.let { MobFilter.DungeonAttribute.valueOf(it) })
         }
 
     fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
@@ -34,7 +35,7 @@ object MobFactories {
         Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, name = name)
 
     fun summon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-        MobFilter.summoningRegex.find(armorStand.cleanName())?.let {
+        MobFilter.summonnRegex.find(armorStand.cleanName())?.let {
             Mob(baseEntity = baseEntity, mobType = Mob.Type.Summon, armorStand = armorStand, name = it.groupValues[2], additionalEntities = extraEntityList, ownerName = it.groupValues[1])
         }
 

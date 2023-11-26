@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
@@ -46,23 +45,24 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 
 object MobFilter {
+
+    enum class DungeonAttribute {
+        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
+
+        companion object {
+            val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
+        }
+    }
+
     val mobNameFilter = "(\\[\\w+([0-9]+)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter =
-        "^(?:(✯)\\s)?(?:(Flaming|Stormy|Speedy|Fortified|Healthy|Healing|Boomer|Golden|Stealth)\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
+        "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
 
-    enum class DungeonAttribute {
-        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth
-    }
-
-    val summoningRegex = "^(\\w+)'s (.*) \\d+".toRegex()
+    val summonnRegex = "^(\\w+)'s (.*) \\d+".toRegex()
+    val summonOwnerRegex = "Spawned by: (.*)".toRegex()
     val dojoFilter = "^(?:(\\d+) pts|(\\w+))$".toRegex()
-
-    fun errorNameFinding(name: String): String {
-        LorenzDebug.chatAndLog("Skyblock Name of Mob $name not found")
-        return ""
-    }
 
     fun Entity.isSkyBlockMob(): Boolean = when {
         this !is EntityLivingBase -> false
@@ -92,7 +92,11 @@ object MobFilter {
         "BarbarianGuard ", // BarbarianGuard NPCs
         "Branchstrutter ", // Those guys in the Trees in the first area in Rift
         "vswiblxdxg", // Mayor Cole
+        "anrrtqytsl", // Weaponsmith
     )
+
+    val illegalDisplayNPCArmorStandNames =
+        listOf("§e§lCLICK", "§a§lSTAY SAFE!", "§6§lNEW UPDATE", "§6§lSkyBlock Wiki", "§6Thaumaturgist")
 
     fun EntityLivingBase.isFarmMob() =
         this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
@@ -181,7 +185,7 @@ object MobFilter {
 
             IslandType.HUB -> {
                 if (baseEntity is EntityZombie) { // Rat
-                    val from = 5
+                    val from = 3
                     val to = 9
                     generateSequence(from) { it + 1 }.take(to - from + 1).map { i ->
                         MobUtils.getArmorStand(

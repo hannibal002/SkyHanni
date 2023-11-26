@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MobFilter.illegalDisplayNPCArmorStandNames
 import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
@@ -162,8 +163,6 @@ class MobData {
         }
         return true
     }
-
-    private val illegalDisplayNPCArmorStandNames = listOf("§e§lCLICK", "§a§lSTAY SAFE!", "§6§lNEW UPDATE")
 
     private fun createDisplayNPC(entity: EntityLivingBase): Boolean =
         MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->

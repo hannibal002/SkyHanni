@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.Mob.Type
+import at.hannibal2.skyhanni.data.MobFilter.summonOwnerRegex
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -105,8 +106,6 @@ class Mob(
     val boundingBox: AxisAlignedBB
         get() = (relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox).expandBlock()
-
-    private val summonOwnerRegex = "Spawned by: (.*)".toRegex()
 
     init {
         removeExtraEntitiesFromChecking()
