@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -21,9 +23,36 @@ object GardenPlotAPI {
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB)
 
-    val Plot.name get() = GardenAPI.storage?.plotNames?.get(id) ?: "$id"
+    class PlotData(
+        @Expose
+        val id: Int,
+
+        @Expose
+        var name: String,
+
+        @Expose
+        var pests: Int
+    )
+
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0) }
+
+    var Plot.name: String
+        get() = getData()?.name ?: "$id"
+        set(value) {
+            getData()?.name = value
+        }
+
+    var Plot.pests: Int
+        get() = getData()?.pests ?: 0
+        set(value) {
+            getData()?.pests = value
+        }
 
     fun Plot.isBarn() = id == -1
+
+    fun Plot.sendTeleportTo() {
+        LorenzUtils.sendCommandToServer("tptoplot $name")
+    }
 
     init {
         val plotMap = listOf(
@@ -57,12 +86,13 @@ object GardenPlotAPI {
         if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
-        val names = GardenAPI.storage?.plotNames ?: return
         for (plot in plots) {
             val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
             pestNamePattern.matchMatcher(itemName) {
-                names[plot.id] = group("name")
+                plot.name = group("name")
             }
         }
     }
+
+    fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 }

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
@@ -227,7 +228,7 @@ public class Storage {
             }
 
             @Expose
-            public Map<Integer, String> plotNames = new HashMap<>();
+            public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
             @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();

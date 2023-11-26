@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -157,7 +159,6 @@ class DamageIndicatorManager {
             //TODO test end stone protector in hole? - maybe change eye pos
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
-
 
             if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0)) continue
             if (!data.isConfigEnabled()) continue
@@ -849,6 +850,17 @@ class DamageIndicatorManager {
                 if (name.contains("Mana Flux")) return
                 if (name.contains("Radiant")) return
                 event.isCanceled = true
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+        val data = data[event.entity.uniqueID] ?: return
+        if (event.health <= 1) {
+            if (!data.firstDeath) {
+                data.firstDeath = true
+                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
             }
         }
     }

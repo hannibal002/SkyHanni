@@ -171,6 +171,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
@@ -651,6 +652,7 @@ class SkyHanniMod {
         loadModule(FishingBaitWarnings())
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
+        loadModule(PestFinder())
         loadModule(SprayFeatures())
 
         init()
