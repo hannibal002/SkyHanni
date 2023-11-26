@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DanceRoomHelper {
 
     private var display = emptyList<String>()
-    private val config get() = RiftAPI.config.area.mirrorVerseConfig.danceRoomHelper
+    private val config get() = RiftAPI.config.area.mirrorverse.danceRoomHelper
     private var index = 0
     private var found = false
     private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
@@ -179,4 +180,9 @@ object DanceRoomHelper {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.mirrorVerseConfig", "rift.area.mirrorverse")
+    }
 }

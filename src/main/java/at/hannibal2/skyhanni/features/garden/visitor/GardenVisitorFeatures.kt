@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -79,13 +81,20 @@ class GardenVisitorFeatures {
         val visitor = event.visitor
         val offerItem = visitor.offer!!.offerItem
 
-        for (line in offerItem.getLore()) {
+        val lore = offerItem.getLore()
+        for (line in lore) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
             val pair = ItemUtils.readItemAmount(line)
             if (pair == null) {
-                LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
+                ErrorManager.logErrorStateWithData(
+                    "Could not read items required in Visitor Inventory", "ItemUtils.readItemAmount returns null",
+                    "line" to line,
+                    "offerItem" to offerItem,
+                    "lore" to lore,
+                    "visitor" to visitor
+                )
                 continue
             }
             val (itemName, amount) = pair
@@ -96,7 +105,7 @@ class GardenVisitorFeatures {
         readToolTip(visitor, offerItem)
 
         if (visitor.status == VisitorAPI.VisitorStatus.NEW) {
-            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" } == true
+            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
             if (alreadyReady) {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
@@ -269,7 +278,6 @@ class GardenVisitorFeatures {
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, event.itemStack)
-            LorenzUtils.chat("§e[SkyHanni] Reloaded the visitor data of that inventory, this should not happen.")
         }
 
         toolTip.addAll(visitor.lastLore)
@@ -310,7 +318,7 @@ class GardenVisitorFeatures {
             if (wasEmpty) {
                 visitor.hasReward()?.let { reward ->
                     if (config.rewardWarning.notifyInChat) {
-                        LorenzUtils.chat("§e[SkyHanni] Found Visitor Reward ${reward.displayName}§e!")
+                        LorenzUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
                     }
                 }
             }
@@ -400,7 +408,7 @@ class GardenVisitorFeatures {
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
-            LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
+            LorenzUtils.chat("$displayName §eis visiting your garden!")
         }
 
         if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
@@ -428,6 +436,7 @@ class GardenVisitorFeatures {
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val name = group("name")
+        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
@@ -546,7 +555,7 @@ class GardenVisitorFeatures {
     }
 
     private fun showGui(): Boolean {
-        if (config.needs.inBazaarAlley && LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+        if (config.needs.inBazaarAlley && IslandType.HUB.isInIsland() && LorenzUtils.skyBlockArea == "Bazaar Alley") {
             return true
         }
 

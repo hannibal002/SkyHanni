@@ -35,7 +35,7 @@ class QuestItemHelper {
 
             val missingAmount = need - have
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Click here to grab x$missingAmount $questItem from sacks!",
+                "Click here to grab x$missingAmount $questItem from sacks!",
                 "gfs $questItem $missingAmount"
             )
             lastSentMessage = SimpleTimeMark.now()

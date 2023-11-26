@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -33,7 +33,7 @@ object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
     private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
-    private val config get() = SkyHanniMod.feature.garden.cropMilestones
+    private val config get() = GardenAPI.config.cropMilestones
     private val bestCropTime = GardenBestCropTime()
 
     private var lastPlaySoundTime = 0L
@@ -100,6 +100,8 @@ object GardenCropMilestoneDisplay {
                 val addedCounter = (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
+                // Farming Simulator: There is a 25% chance for Mathematical Hoes and the Cultivating Enchantment to count twice.
+                // 0.8 = 1 / 1.25
                 crop.setCounter(
                     crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {
                         (addedCounter.toDouble() * 0.8).toInt()
@@ -108,8 +110,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            LorenzUtils.error("[SkyHanni] Error in OwnInventoryItemUpdateEvent")
-            e.printStackTrace()
+            ErrorManager.logError(e, "Updating crop counter by reading farming tool nbt data.")
         }
     }
 
@@ -163,15 +164,13 @@ object GardenCropMilestoneDisplay {
             Collections.singletonList("§e$haveFormat§8/§e$needFormat")
         }
 
-        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
+        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
-        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
+        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).round(1).toInt()
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            if (crop.isMaxed()) {
-                lineMap[3] = listOf("§7In §bMaxed")
-            } else {
+            if (!crop.isMaxed()) {
                 val missing = need - have
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000

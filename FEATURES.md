@@ -245,6 +245,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 - Hide the vanilla nametag of damage indicator bosses.
+- Garden Pests in Damage Indicator
 - **Time to Kill**
     - Show the time it takes to kill the Slayer boss.
 
@@ -440,7 +441,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the
   composter inventory
-+ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
++ Hide chat messages from the visitors in the garden. (Except Beth, Jacob and Spaceman)
 + Show the average crop milestone in the crop milestone inventory.
 + **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest
   inventory.
@@ -488,6 +489,34 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
++ Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+    + Enable via /sh vacuum.
+
+### Pests
+
++ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+  + Enable via /sh vacuum.
++ Added Pests to Damage Indicator. - hannibal2
+  + Enable Damage Indicator and select Garden Pests.
++ Change how the pest spawn chat message should be formatted. - hannibal2
+  + Unchanged, compact or hide the message entirely.
++ Show a Title when a pest spawns. - hannibal2
++ Press a key to warp to the plot where the last pest has spawned. - hannibal2
++ Show the time since the last pest spawned in your garden. - hannibal2
+  + Option to only show the time while holding vacuum in the hand.
++ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
++ Show a display with all known pest locations. - hannibal2
+  + Click to warp to the plot.
+  + Option to only show the time while holding vacuum in the hand.
+
 </details>
 <details open><summary>
 

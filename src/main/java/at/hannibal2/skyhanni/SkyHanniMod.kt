@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
@@ -15,10 +16,12 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
@@ -38,6 +41,9 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
@@ -117,6 +123,9 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
 import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitPlayerMoving
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -128,7 +137,9 @@ import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
 import at.hannibal2.skyhanni.features.garden.GardenLevelDisplay
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.GardenOptimalSpeed
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotBorders
+import at.hannibal2.skyhanni.features.garden.GardenWarpCommands
 import at.hannibal2.skyhanni.features.garden.GardenYawAndPitch
 import at.hannibal2.skyhanni.features.garden.ToolTooltipTweaks
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
@@ -160,6 +171,10 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
+import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
@@ -249,7 +264,6 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.area.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper
@@ -263,6 +277,7 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkou
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
 import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
@@ -327,7 +342,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.21.1.Beta.1",
+    version = "0.22.Beta.2",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -358,6 +373,7 @@ class SkyHanniMod {
         loadModule(TabListData())
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
+        loadModule(GardenCropMilestonesCommunityFix)
         loadModule(GardenCropUpgrades())
         loadModule(VisitorListener())
         loadModule(OwnInventoryData())
@@ -371,6 +387,7 @@ class SkyHanniMod {
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
+        loadModule(GardenWarpCommands())
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
@@ -378,13 +395,15 @@ class SkyHanniMod {
         loadModule(EntityOutlineRenderer)
         loadModule(KeyboardManager)
         loadModule(AdvancedPlayerList)
+        loadModule(ItemAddManager())
 
         // APIs
         loadModule(BazaarApi())
         loadModule(GardenAPI)
+        loadModule(GardenPlotAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
-        loadModule(FriendAPI())
+        loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
@@ -558,6 +577,9 @@ class SkyHanniMod {
         loadModule(PlayerTabComplete)
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
+        loadModule(FishingProfitTracker)
+        loadModule(FishingTrackerCategoryManager)
+        loadModule(FishingProfitPlayerMoving)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
@@ -628,6 +650,10 @@ class SkyHanniMod {
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
+        loadModule(PestSpawn())
+        loadModule(PestSpawnTimer)
+        loadModule(PestFinder())
+        loadModule(SprayFeatures())
 
         init()
 
@@ -652,9 +678,9 @@ class SkyHanniMod {
         configManager.firstLoad()
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread {
-            configManager.saveConfig("shutdown-hook")
+            configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
         })
-        repo = RepoManager(configManager.configDirectory)
+        repo = RepoManager(ConfigManager.configDirectory)
         try {
             repo.loadRepoInformation()
         } catch (e: Exception) {
@@ -672,6 +698,7 @@ class SkyHanniMod {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
+                Minecraft.getMinecraft().thePlayer.closeScreen()
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
                 screenTicks = 0
                 screenToOpen = null
@@ -689,6 +716,10 @@ class SkyHanniMod {
         @JvmStatic
         val feature: Features get() = configManager.features
         val sackData: SackData get() = configManager.sackData
+        val friendsData: FriendsJson get() = configManager.friendsData
+        val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
+        val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
+
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -697,7 +728,7 @@ class SkyHanniMod {
         }
 
         val modules: MutableList<Any> = ArrayList()
-        val globalJob: Job = Job(null)
+        private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob)
         )

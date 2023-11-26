@@ -45,12 +45,12 @@ object CropMoneyDisplay {
 
     fun toggleShowCalculation() {
         showCalculation = !showCalculation
-        LorenzUtils.chat("§e[SkyHanni] Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
+        LorenzUtils.chat("Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
         update()
     }
 
     private var display = emptyList<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden.moneyPerHours
+    private val config get() = GardenAPI.config.moneyPerHours
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
@@ -110,7 +110,7 @@ object CropMoneyDisplay {
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
-        if (!SkyHanniMod.feature.garden.cropMilestones.progress) {
+        if (!GardenAPI.config.cropMilestones.progress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newDisplay
         }
@@ -276,8 +276,8 @@ object CropMoneyDisplay {
 
         val onlyNpcPrice =
             (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
-                    (config.useCustomFormat && config.customFormat.size == 1 &&
-                            config.customFormat[0] == 2)
+                (config.useCustomFormat && config.customFormat.size == 1 &&
+                    config.customFormat[0] == 2)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!

@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -56,7 +55,7 @@ object ComposterOverlay {
     private var fuelFactors: Map<NEUInternalName, Double> = emptyMap()
     private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden.composters
+    private val config get() = GardenAPI.config.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 
@@ -91,11 +90,11 @@ object ComposterOverlay {
 
     fun onCommand(args: Array<String>) {
         if (args.size != 1) {
-            LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+            LorenzUtils.userError("Usage: /shtestcomposter <offset>")
             return
         }
         testOffset = args[0].toInt()
-        LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+        LorenzUtils.chat("Composter test offset set to $testOffset.")
     }
 
     @SubscribeEvent
@@ -386,7 +385,7 @@ object ComposterOverlay {
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            LorenzUtils.chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
+            LorenzUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
@@ -474,7 +473,7 @@ object ComposterOverlay {
         }
         val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
         if (having >= itemsNeeded) {
-            LorenzUtils.chat("§e[SkyHanni] $itemName §8x${itemsNeeded} §ealready found in inventory!")
+            LorenzUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
@@ -488,16 +487,16 @@ object ComposterOverlay {
             val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL")) "Mining"
             else "Enchanted Agronomy"
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
             )
             return
         } else if (amountInSacks == 0L) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks.")
+                LorenzUtils.chat("No $itemName §efound in sacks.")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
+                LorenzUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             }
             return
@@ -506,10 +505,10 @@ object ComposterOverlay {
         LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("§e[SkyHanni] You're out of $itemName §ein your sacks!")
+                LorenzUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     "bz ${itemName.removeColor()}"
                 )
             }

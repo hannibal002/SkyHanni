@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -19,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class ComposterDisplay {
-    private val config get() = SkyHanniMod.feature.garden.composters
+    private val config get() = GardenAPI.config.composters
     private val storage get() = GardenAPI.storage
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
@@ -145,7 +144,7 @@ class ComposterDisplay {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
-            LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
+            LorenzUtils.chat("§cYour Organic Matter is low!")
             storage.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
@@ -155,7 +154,7 @@ class ComposterDisplay {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
-            LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
+            LorenzUtils.chat("§cYour Fuel is low!")
             storage.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
         }
     }
@@ -202,7 +201,7 @@ class ComposterDisplay {
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
-        LorenzUtils.chat("§e[SkyHanni] $warningMessage")
+        LorenzUtils.chat(warningMessage)
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 

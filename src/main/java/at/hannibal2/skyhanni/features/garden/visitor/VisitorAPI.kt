@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 object VisitorAPI {
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
-    val config get() = SkyHanniMod.feature.garden.visitors
+    val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
 
     fun getVisitorsMap() = visitors
@@ -60,11 +60,11 @@ object VisitorAPI {
 
         if (visitor != null) return visitor
 
-        println("visitors: $visitors")
-        println("name: $name")
-        ErrorManager.logErrorState(
+        ErrorManager.logErrorStateWithData(
             "Error finding the visitor `$name§c`. Try to reopen the inventory",
-            "visitor is null! name='$name', visitors=`$visitors`"
+            "Visitor is null while opening visitor inventory",
+            "name" to name,
+            "visitors" to visitors,
         )
         return null
     }
@@ -153,7 +153,7 @@ object VisitorAPI {
                 found = false
                 continue
             }
-            val name = VisitorAPI.fromHypixelName(line)
+            val name = fromHypixelName(line)
 
             // Hide hypixel watchdog entries
             if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {

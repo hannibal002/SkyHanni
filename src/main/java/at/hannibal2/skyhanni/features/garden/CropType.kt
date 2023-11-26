@@ -17,7 +17,14 @@ enum class CropType(
     WHEAT("Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0, { ItemStack(Items.wheat) }),
     CARROT("Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0, { ItemStack(Items.carrot) }, replenish = true),
     POTATO("Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0, { ItemStack(Items.potato) }, replenish = true),
-    NETHER_WART("Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5, { ItemStack(Items.nether_wart) }, replenish = true),
+    NETHER_WART(
+        "Nether Wart",
+        "THEORETICAL_HOE_WARTS",
+        "FERMENTO",
+        2.5,
+        { ItemStack(Items.nether_wart) },
+        replenish = true
+    ),
     PUMPKIN("Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0, { ItemStack(Blocks.pumpkin) }),
     MELON("Melon", "MELON_DICER", "SQUASH", 5.0, { ItemStack(Items.melon) }),
     COCOA_BEANS(
