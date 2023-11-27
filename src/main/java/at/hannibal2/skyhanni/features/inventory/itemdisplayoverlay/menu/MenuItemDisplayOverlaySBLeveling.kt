@@ -12,6 +12,14 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling {
+    private val guideTaskChestNamePattern = ((".*(Guide |Task).*").toPattern())
+    private val progressPatternLoreLinePattern = ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
+    private val checkmarkItemNamePattern = (("✔.*").toPattern())
+    private val progressToCompleteCategoryPercentLorePattern = ((".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
+    private val rewardsSkyblockLevelingChestNamePattern = ((".*(rewards|skyblock leveling).*").toPattern())
+    private val progressToRewardsUnlockedPatternLorePattern = ((".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
+    private val greenItemNamePattern = (("^§a(\\S*)\$").toPattern())
+    private val emblemsUnlockedLorePattern = (("(§.)?(?<emblems>[\\d]+) Unlocked").toPattern())
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -25,14 +33,14 @@ class MenuItemDisplayOverlaySBLeveling {
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.GUIDE_PROGRESS)) {
-            ((".*(Guide |Task).*").toPattern()).matchMatcher(chestName) {
+            guideTaskChestNamePattern.matchMatcher(chestName) {
                 if (itemName.isNotEmpty()) {
                     for (line in item.getLore()) {
-                        (".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                        progressPatternLoreLinePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
                         }
                     }
-                    (("✔.*").toPattern()).matchMatcher(itemName) {
+                    checkmarkItemNamePattern.matchMatcher(itemName) {
                         return "§a✔"
                     }
                 }
@@ -41,7 +49,7 @@ class MenuItemDisplayOverlaySBLeveling {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
             for (line in item.getLore()) {
-                (".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                progressToCompleteCategoryPercentLorePattern.matchMatcher(line) {
                     return group("percent").replace("100", "§a✔")
                 }
             }
@@ -49,9 +57,9 @@ class MenuItemDisplayOverlaySBLeveling {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
             if ((itemName.isNotEmpty())) {
-                ((".*(rewards|skyblock leveling).*").toPattern()).matchMatcher(chestName.lowercase()) {
+                rewardsSkyblockLevelingChestNamePattern.matchMatcher(chestName.lowercase()) {
                     for (line in item.getLore()) {
-                        (".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) {
+                        progressToRewardsUnlockedPatternLorePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
                         }
                     }
@@ -62,8 +70,8 @@ class MenuItemDisplayOverlaySBLeveling {
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEMS_UNLOCKED)) {
             val nameWithColor = item.name ?: return ""
             if ((chestName == ("Emblems"))) {
-                (("^§a(\\S*)\$").toPattern()).matchMatcher(nameWithColor) {
-                    (("(§.)?(?<emblems>[\\d]+) Unlocked").toPattern()).matchMatcher(item.getLore().first()) {
+                greenItemNamePattern.matchMatcher(nameWithColor) {
+                    emblemsUnlockedLorePattern.matchMatcher(item.getLore().first()) {
                         return group("emblems")
                     }
                 }
