@@ -13,27 +13,19 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayAbiphone {
+    private val abiphoneContactsChestNameDirectory = (("(.*A.iphone.*|Contacts Directory)").toPattern())
+    private val yourContactsLoreLinePattern = (("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
+    private val isAContactItemNamePattern = ((".*§f§.*").toPattern())
+    private val upgradedAllRelaysLoreLinePattern = ("(§.)?Upgraded Relays: (§.).*ALL!.*".toPattern())
+    private val upgradedPartialRelaysLoreLinePattern = (("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
+    private val selectedRingtoneLoreLinePattern = (("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)").toPattern())
+    private val abiphoneMinigameStatsLoreLinePattern = (("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)").toPattern())
+    private val tilerSortLoreLineAbiphoneOnlyPattern = ((".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*").toPattern())
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         event.stackTip = getStackTip(event.stack)
     }
-
-    private val abiphoneContactsChestNameDirectory = (("(.*A.iphone.*|Contacts Directory)").toPattern())
-
-    private val yourContactsLoreLinePattern = (("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
-
-    private val isAContactItemNamePattern = ((".*§f§.*").toPattern())
-
-    private val upgradedAllRelaysLoreLinePattern = ("(§.)?Upgraded Relays: (§.).*ALL!.*".toPattern())
-
-    private val upgradedPartialRelaysLoreLinePattern = (("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
-
-    private val selectedRingtoneLoreLinePattern = (("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)").toPattern())
-
-    private val abiphoneMinigameStatsLoreLinePattern = (("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)").toPattern())
-
-    private val tilerSortLoreLineAbiphoneOnlyPattern = ((".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*").toPattern())
 
     private fun getStackTip(item: ItemStack): String {
         if (SkyHanniMod.feature.inventory.stackSize.menu.abiphone.isEmpty()) return ""
