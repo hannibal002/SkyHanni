@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
@@ -19,16 +18,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerTryhard {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val auctionHousePagePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
-    private val otherMenusPagePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
-    private val rngMeterPattern = "(§.)*Odds: (?<odds>(§.[\\w]){1}).*".toPattern()
+    private val auctionHousePageLoreLinePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
+    private val otherMenusPageLoreLinePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
+    private val rngMeterLoreLinePattern = "(§.)*Odds: (?<odds>(§.[\\w]){1}).*".toPattern()
     private val generalPurposeNotBoosterCookieDurationLoreLinePattern = "(§.)?(([A-z ])+): (§.)?(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?".toPattern()
-    private val totalFamePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
-    private val bitsAvailablePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
-    private val magicalPowerPattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
-    private val magicalPowerSecondPattern = ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
-    private val tuningPointsPattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
-    private val slotSourcePattern = "(§.)(?<category>(?!Buying).*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
+    private val totalFameLoreLinePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
+    private val bitsAvailableLoreLinePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
+    private val magicalPowerLoreLinePattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val otherMagicalPowerLoreLinePattern = ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
+    private val tuningPointsLoreLinePattern = "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val slotSourceLoreLinePattern = "(§.)(?<category>(?!Buying).*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots".toPattern()
     private val auctionChestNamePattern = (("Auction.*").toPattern())
     private val isNotAuctionAbiphoneContactsDirectoryChestNamePattern = (("^(?:(?!Auction|A.iphone|Contacts Directory).)*\$").toPattern())
     private val generalPurposeSelectedFilterSortLoreLinePattern = (("((?<colorCode>§.)*▶ (?<threeChars>[\\w ]{3}))([\\w ])+").toPattern())
@@ -66,7 +65,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if ((itemName == "Previous Page" || itemName == "Next Page")) {
                 val line = lore.first()
                 auctionChestNamePattern.matchMatcher(chestName) {
-                    auctionHousePagePattern.matchMatcher(line) {
+                    auctionHousePageLoreLinePattern.matchMatcher(line) {
                         var pageNum = group("pagenumber").formatNumber()
                         if (itemName == "Previous Page") {
                             pageNum--
@@ -77,7 +76,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         else return "$pageNum"
                     }
                 }
-                return otherMenusPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
+                return otherMenusPageLoreLinePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
             isNotAuctionAbiphoneContactsDirectoryChestNamePattern.matchMatcher(chestName) {
                 if (((itemName == ("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)))) || ((itemName == ("Filter") && (item.getItem() is ItemEnderEye)))) {
@@ -93,7 +92,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.RNG_METER_ODDS)) {
             rngMeterOddsChestNamePattern.matchMatcher(chestName) {
                 for (line in item.getLore()) {
-                    rngMeterPattern.matchMatcher(line) { return group("odds") }
+                    rngMeterLoreLinePattern.matchMatcher(line) { return group("odds") }
                 }
             }
         }
@@ -156,7 +155,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.FAME_RANK_BITS)) {
             if ((chestName == "Booster Cookie" && itemName == "Fame Rank")) {
                 for (line in item.getLore()) {
-                    totalFamePattern.matchMatcher(line) {
+                    totalFameLoreLinePattern.matchMatcher(line) {
                         val totalAsString = "${group("total").formatNumber()}"
                         val usefulPartAsString = group("useful")
                         val suffix = when (totalAsString.length) {
@@ -174,7 +173,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
             if ((chestName == "Booster Cookie" && itemName == "Bits")) {
                 for (line in item.getLore()) {
-                    bitsAvailablePattern.matchMatcher(line) {
+                    bitsAvailableLoreLinePattern.matchMatcher(line) {
                         val totalAsString = "${group("total").formatNumber()}"
                         val usefulPartAsString = group("useful")
                         val suffix = when (totalAsString.length) {
@@ -248,7 +247,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             val lore = item.getLore()
             if (chestName == ("Your Bags") && itemName == ("Accessory Bag")) {
                 for (line in lore) {
-                    magicalPowerPattern.matchMatcher(line) {
+                    magicalPowerLoreLinePattern.matchMatcher(line) {
                         val usefulAsString = group("useful")
                         val totalAsString = "${group("total").formatNumber()}"
                         val suffix = when (totalAsString.length) {
@@ -265,7 +264,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if (chestName == ("Accessory Bag Upgrades") && itemName == ("Accessory Bag Upgrades")) {
                 var totalSlotsResult = 0
                 for (line in lore) {
-                    slotSourcePattern.matchMatcher(line){
+                    slotSourceLoreLinePattern.matchMatcher(line){
                         totalSlotsResult += group("slots").toInt()
                     }
                 }
@@ -274,7 +273,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             accessoryBagUpgradesStatsTuningChestNamePattern.matchMatcher(chestName) {
                 if (itemName == ("Stats Tuning")) {
                     for (line in lore) {
-                        tuningPointsPattern.matchMatcher(line) {
+                        tuningPointsLoreLinePattern.matchMatcher(line) {
                             val usefulAsString = group("useful")
                             val totalAsString = "${group("total").formatNumber()}"
                             val suffix = when (totalAsString.length) {
@@ -297,7 +296,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             }
             if (chestName == ("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
                 for (line in lore) {
-                    magicalPowerSecondPattern.matchMatcher(line) {
+                    otherMagicalPowerLoreLinePattern.matchMatcher(line) {
                         val usefulString = group("useful")
                         val totalString = "${group("total").formatNumber()}"
                         val suffix = when (totalString.length) {

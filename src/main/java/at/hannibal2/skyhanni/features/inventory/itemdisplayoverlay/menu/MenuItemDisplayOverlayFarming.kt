@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayFarming {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val composterPattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
+    private val totallingCountResourceLoreLinePattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
     private val jacobFarmingContestMedalInventoryLoreLinePattern = (("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)").toPattern())
     private val nextVisitorCountdownLoreLinePattern = (("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*").toPattern())
     private val insertResourceFromLocationItemNamePattern = (("Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)").toPattern())
@@ -77,7 +77,7 @@ class MenuItemDisplayOverlayFarming {
                     //§7Totalling §2§240k Fuel§7.
                     //Totalling 40k Fuel.
                     for (line in lore) {
-                        composterPattern.matchMatcher(line) {
+                        totallingCountResourceLoreLinePattern.matchMatcher(line) {
                             return group("resourceCount")
                         }
                     }

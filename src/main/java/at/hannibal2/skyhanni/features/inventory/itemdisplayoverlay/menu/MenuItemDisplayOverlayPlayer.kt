@@ -17,35 +17,41 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayer {
-    private val museumDonationPattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
-    private val skyblockLevelPattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
-    private val skillAvgPattern = "§[0-9](?<avg>[0-9]{1,2}(\\.[0-9])?) Skill Avg\\..*".toPattern()
+    private val museumDonationLoreLinePattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
+    private val skyblockLevelLoreLinePattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
+    private val skillAvgLoreLinePattern = "§[0-9](?<avg>[0-9]{1,2}(\\.[0-9])?) Skill Avg\\..*".toPattern()
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val dungeonClassLevelPattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
-    private val dungeonEssenceRewardPattern = "(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)".toPattern()
-    private val essenceCountPattern = "(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
-    private val essenceCountOtherPattern = ".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*".toPattern()
-    private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
-    private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
+    private val dungeonClassLevelItemNamePattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
+    private val dungeonEssenceRewardItemNamePattern = "(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)".toPattern()
+    private val essenceCountLoreLinePattern = "(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
+    private val essenceCountOtherLoreLinePattern = ".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*".toPattern()
+    private val profileManagementLoreLinePattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     private val skyblockLevelingItemNamePattern = ((".* Leveling").toPattern())
     private val skillLevelItemNamePattern = (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern())
-    private val gardenLevelSkillLevelPattern = (("Garden Level (?<level>[\\w]+)").toPattern())
-    private val collectionsMultipurposePattern = ((".*Collections").toPattern())
-    private val collectionLevelPattern = ((".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)").toPattern())
-    private val collectionsPercentLorePattern = ((".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()))
-    private val craftMoreMinionsPattern = (("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*").toPattern())
-    private val clickToViewLorePattern = (("§eClick to view .*").toPattern())
-    private val minionTierCraftProgressLorePattern = ((".* Tier .*").toPattern())
-    private val minionTierNotYetCraftedPattern = ((".*§c.* Tier .*").toPattern())
+    private val gardenLevelSkillLevelItemNamePattern = (("Garden Level (?<level>[\\w]+)").toPattern())
+    private val collectionsChestNameItemNamePattern = ((".*Collections").toPattern())
+    private val collectionLevelItemNamePattern = ((".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)").toPattern())
+    private val collectionsPercentLoreLinePattern = ((".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()))
+    private val craftMoreMinionsLoreLinePattern = (("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*").toPattern())
+    private val clickToViewLoreLinePattern = (("§eClick to view .*").toPattern())
+    private val minionTierCraftProgressLoreLinePattern = ((".* Tier .*").toPattern())
+    private val minionTierNotYetCraftedLoreLinePattern = ((".*§c.* Tier .*").toPattern())
     private val petsItemNamePattern = ((".*Pets.*").toPattern())
-    private val noPetLorePattern = (("(§.)*Selected (p|P)et: (§.)*None").toPattern())
+    private val noPetLoreLinePattern = (("(§.)*Selected (p|P)et: (§.)*None").toPattern())
     private val petsChestNamePattern = (("Pets.*").toPattern())
-    private val yourPetScoreLorePattern = ((".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*").toPattern())
+    private val yourPetScoreLoreLinePattern = ((".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*").toPattern())
     private val minionMenuChestNamePattern = ((".* Minion .*").toPattern())
     private val quickUpgradeItemNamePattern = (("Quick.Upgrade Minion").toPattern())
     private val youNeedXMoreMaterialsLoreLinePattern = ((".*(§.)+You need (§.)*(?<needed>[\\w]+).*").toPattern())
     private val doesNotContainArrowsChestNamePattern = (("^((?! ➜ ).)*\$").toPattern())
-    private val canDisplayEssencePattern = ((".*Essence( Guide.*| Shop)?").toPattern())
+    private val canDisplayEssenceChestNameItemNamePattern = ((".*Essence( Guide.*| Shop)?").toPattern())
+    private val museumItemNamesList = listOf(
+        "Museum",
+        "Rarities",
+        "Armor Sets",
+        "Weapons",
+        "Special Items"
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -62,7 +68,7 @@ class MenuItemDisplayOverlayPlayer {
             //itemName.endsWith(" Leveling")
             skyblockLevelingItemNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
-                    skyblockLevelPattern.matchMatcher(line) {
+                    skyblockLevelLoreLinePattern.matchMatcher(line) {
                         return "${group("sblvl")}"
                     }
                 }
@@ -79,13 +85,13 @@ class MenuItemDisplayOverlayPlayer {
                             return "${group("level").romanToDecimalIfNeeded()}"
                         }
                     } else if (chestName == "Dungeoneering") {
-                        dungeonClassLevelPattern.matchMatcher(itemName) {
+                        dungeonClassLevelItemNamePattern.matchMatcher(itemName) {
                             return group("level")
                         }
                     }
                 }
             } else if (((chestName == "Farming Skill") || (chestName == "Desk"))) {
-               gardenLevelSkillLevelPattern.matchMatcher(itemName) {
+               gardenLevelSkillLevelItemNamePattern.matchMatcher(itemName) {
                    if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
                    return group("level")
                }
@@ -94,17 +100,17 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKILL_AVERAGE) && (chestName.lowercase() == ("skyblock menu") && (itemName == ("Your Skills")))) {
             for (line in item.getLore()) {
-                skillAvgPattern.matchMatcher(line) { return group("avg").toDouble().toInt().toString() }
+                skillAvgLoreLinePattern.matchMatcher(line) { return group("avg").toDouble().toInt().toString() }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
-            collectionsMultipurposePattern.matchMatcher(chestName) {
+            collectionsChestNameItemNamePattern.matchMatcher(chestName) {
                 val lore = item.getLore()
                 if (lore.isNotEmpty() && lore.last() == ("§eClick to view!")) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
-                        collectionLevelPattern.matchMatcher(it) {
+                        collectionLevelItemNamePattern.matchMatcher(it) {
                             return "${group("tier").romanToDecimalIfNeeded()}"
                         }
                     }
@@ -113,14 +119,14 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
-                        collectionsPercentLorePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
-            collectionsMultipurposePattern.matchMatcher(chestName) {
-                collectionsMultipurposePattern.matchMatcher(itemName) {
+            collectionsChestNameItemNamePattern.matchMatcher(chestName) {
+                collectionsChestNameItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        collectionsPercentLorePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
@@ -130,45 +136,45 @@ class MenuItemDisplayOverlayPlayer {
             val lore = item.getLore()
             if (itemName == "Information") {
                 for (line in lore) {
-                    craftMoreMinionsPattern.matchMatcher(line) {
+                    craftMoreMinionsLoreLinePattern.matchMatcher(line) {
                         return group("count")
                     }
                 }
             }
             if (lore.isNotEmpty()) {
-                clickToViewLorePattern.matchMatcher(lore.last()) {
+                clickToViewLoreLinePattern.matchMatcher(lore.last()) {
                     var tiersToSubtract = 0
                     var totalTiers = 0
                     for (line in lore) {
-                        minionTierCraftProgressLorePattern.matchMatcher(line) { totalTiers++ } //§c
-                        minionTierNotYetCraftedPattern.matchMatcher(line) { tiersToSubtract++ }
+                        minionTierCraftProgressLoreLinePattern.matchMatcher(line) { totalTiers++ } //§c
+                        minionTierNotYetCraftedLoreLinePattern.matchMatcher(line) { tiersToSubtract++ }
                     }
                     return "${totalTiers - tiersToSubtract}".replace("$totalTiers", "§a✔")
                 }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName == ("Your Museum") && hannibalInsistedOnThisList.contains(itemName)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName == ("Your Museum") && museumItemNamesList.contains(itemName)) {
             for (line in item.getLore()) {
-                museumDonationPattern.matchMatcher(line) { return group("amount").toDouble().toInt().toString().replace("100", "§a✔") }
+                museumDonationLoreLinePattern.matchMatcher(line) { return group("amount").toDouble().toInt().toString().replace("100", "§a✔") }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management")) {
-            profileManagementPattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
+            profileManagementLoreLinePattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PET_SCORE_STATUS)) {
             if ((chestName.lowercase() == "skyblock menu")) {
                 petsItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        noPetLorePattern.matchMatcher(line) { return "§c§l✖" }
+                        noPetLoreLinePattern.matchMatcher(line) { return "§c§l✖" }
                     }
                 }
             }
             petsChestNamePattern.matchMatcher(chestName) {
                 if (itemName == ("Pet Score Rewards") && item.getLore().isNotEmpty()) {
-                    yourPetScoreLorePattern.matchMatcher(item.getLore().last()) {
+                    yourPetScoreLoreLinePattern.matchMatcher(item.getLore().last()) {
                         return group("score")
                     }
                 }
@@ -196,12 +202,12 @@ class MenuItemDisplayOverlayPlayer {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.ESSENCE_COUNTS)) {
             if (item.item != Items.skull) return ""
             if (LorenzUtils.isRewardChest()) {
-                dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
+                dungeonEssenceRewardItemNamePattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
             var canDisplayEssence = false
             doesNotContainArrowsChestNamePattern.matchMatcher(chestName) {
-                canDisplayEssencePattern.matchMatcher(chestName) {
-                    canDisplayEssencePattern.matchMatcher(itemName) {
+                canDisplayEssenceChestNameItemNamePattern.matchMatcher(chestName) {
+                    canDisplayEssenceChestNameItemNamePattern.matchMatcher(itemName) {
                         canDisplayEssence = true
                     }
                 }
@@ -215,12 +221,12 @@ class MenuItemDisplayOverlayPlayer {
                 var usefulAsString: String = ""
                 var totalAsString: String = ""
                 loop@for (line in lore) {
-                    essenceCountOtherPattern.matchMatcher(line) {
+                    essenceCountOtherLoreLinePattern.matchMatcher(line) {
                         usefulAsString = group("useful")
                         totalAsString = group("total").replace(",", "")
                         break@loop
                     }
-                    essenceCountPattern.matchMatcher(line) {
+                    essenceCountLoreLinePattern.matchMatcher(line) {
                         usefulAsString = group("useful")
                         totalAsString = group("total").replace(",", "")
                         break@loop

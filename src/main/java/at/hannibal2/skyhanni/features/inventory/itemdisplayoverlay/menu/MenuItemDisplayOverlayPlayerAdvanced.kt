@@ -17,13 +17,13 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerAdvanced {
-    private val dojoTestOfGradePattern = ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*".toPattern()
+    private val dojoTestOfGradeLoreLinePattern = ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*".toPattern()
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val skyblockStatBreakdownPattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
-    private val enigmaSoulsPattern = "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?.*".toPattern()
-    private val bankBalancePattern = "(§.)?Current balance: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
-    private val amtToWithdrawPattern = "(§.)?Amount to withdraw: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
-    private val isNotBankAccountMenuPattern = (("^((?!Bank Account).)*\$").toPattern())
+    private val skyblockStatBreakdownItemNamePattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
+    private val enigmaSoulsLoreLinePattern = "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?.*".toPattern()
+    private val bankBalanceLoreLinePattern = "(§.)?Current balance: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
+    private val amtToWithdrawLoreLinePattern = "(§.)?Amount to withdraw: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
+    private val isNotBankAccountMenuChestNamePattern = (("^((?!Bank Account).)*\$").toPattern())
     private val isBankBalanceStackTipPattern = ((".*Balance: .*").toPattern())
     private val isDepositCoinsItemNamePattern = ((".*Deposit Coins.*").toPattern())
     private val mayorAatroxPerksForJerryPerkapocalypseLoreLinePattern = (("(§.)(SLASHED Pricing|Slayer XP Buff|Pathfinder)").toPattern())
@@ -84,7 +84,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             */
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        isNotBankAccountMenuPattern.matchMatcher(event.inventoryName) {
+        isNotBankAccountMenuChestNamePattern.matchMatcher(event.inventoryName) {
             return
         }
         event.stackTip = getStackTip(event.stack)
@@ -165,7 +165,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (chestName == "Rift Guide") {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        enigmaSoulsPattern.matchMatcher(line) { return group("useful") }
+                        enigmaSoulsLoreLinePattern.matchMatcher(line) { return group("useful") }
                     }
                 }
             }
@@ -188,7 +188,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             yourStatsBreakdownChestNamePattern.matchMatcher(chestName) {
                 val statName = item.name ?: return ""
                 if (statName.isNotEmpty()) {
-                    skyblockStatBreakdownPattern.matchMatcher(statName) {
+                    skyblockStatBreakdownItemNamePattern.matchMatcher(statName) {
                         val name = group("name")
                         val color = group("color")
                         val icon = group("icon")
@@ -266,7 +266,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName == ("Challenges"))) {
             dojoRankTestOfBlankItemNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
-                    dojoTestOfGradePattern.matchMatcher(line) { return group("grade") }
+                    dojoTestOfGradeLoreLinePattern.matchMatcher(line) { return group("grade") }
                 }
             }
         }
@@ -276,7 +276,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             isBankMenuChestNamePattern.matchMatcher(chestName) {
                 if (chestName == ("Bank Withdrawal") && itemName == ("Withdraw 20%")) {
                     for (line in lore) {
-                        amtToWithdrawPattern.matchMatcher(line) {
+                        amtToWithdrawLoreLinePattern.matchMatcher(line) {
                             val totalAsString = group("total").replace(",", "")
                             val usefulPartAsString = group("useful")
                             val suffix = when (totalAsString.length) {
@@ -302,7 +302,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
             bankAccountChestNamePattern.matchMatcher(chestName) {
                 isDepositCoinsItemNamePattern.matchMatcher(itemName) {
-                    bankBalancePattern.matchMatcher(lore.first()) {
+                    bankBalanceLoreLinePattern.matchMatcher(lore.first()) {
                         val totalAsString = group("total").replace(",", "")
                         val usefulPartAsString = group("useful")
                         val suffix = when (totalAsString.length) {

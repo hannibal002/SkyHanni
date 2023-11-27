@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayMining {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val xOutOfYNoColorRequiredPattern = "(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*".toPattern()
+    private val hotmPerkLevelXOutOfYLoreLinePattern = "(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*".toPattern()
     private val rightClickToEnableDisableLoreLinePattern = (("(§.)*Right.?click to (§.)*disable(§.)*!").toPattern())
     private val skyMallCurrentEffectLoreLinePattern = ((".*(§.)*Your Current Effect.*").toPattern())
     private val theSkymallCurrentEffectInQuestionLoreLinePattern = (("(§.)*.*■ (§.)*(?<thePerk>.+)").toPattern())
@@ -89,7 +89,7 @@ class MenuItemDisplayOverlayMining {
                     }
                 }
                 lockedHOTMPerkLoreLinePattern.matchMatcher(lore.last()) { return "" }
-                xOutOfYNoColorRequiredPattern.matchMatcher(lore.first()) {
+                hotmPerkLevelXOutOfYLoreLinePattern.matchMatcher(lore.first()) {
                     //§7Level 64/§8100
                     var colorCode = ""
                     var level = group("useful")
