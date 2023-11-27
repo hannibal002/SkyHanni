@@ -50,7 +50,7 @@ object CropMoneyDisplay {
     }
 
     private var display = emptyList<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden.moneyPerHours
+    private val config get() = GardenAPI.config.moneyPerHours
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
@@ -110,7 +110,7 @@ object CropMoneyDisplay {
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
-        if (!SkyHanniMod.feature.garden.cropMilestones.progress) {
+        if (!GardenAPI.config.cropMilestones.progress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newDisplay
         }

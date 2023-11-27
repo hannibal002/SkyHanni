@@ -16,6 +16,7 @@ import java.util.List;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.ARACHNE;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.DIANA_MOBS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.DUNGEON_ALL;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.GARDEN_PESTS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.INFERNO_DEMONLORD;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.NETHER_MINI_BOSSES;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.REINDRAKE;
@@ -27,6 +28,7 @@ import static at.hannibal2.skyhanni.config.features.combat.damageindicator.Damag
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.THE_RIFT_BOSSES;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.VANQUISHER;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.VOIDGLOOM_SERAPH;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.GARDEN_PESTS;
 
 public class DamageIndicatorConfig {
 
@@ -69,7 +71,9 @@ public class DamageIndicatorConfig {
         ARACHNE,
         THE_RIFT_BOSSES,
         RIFTSTALKER_BLOODFIEND,
-        REINDRAKE
+        REINDRAKE,
+        GARDEN_PESTS
+
     ));
 
     public enum DamageIndicatorBosses implements LegacyList {
@@ -98,6 +102,7 @@ public class DamageIndicatorConfig {
         THE_RIFT_BOSSES("§bThe Rift Bosses", 22),
         RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend", 23),
         REINDRAKE("§6Reindrake", 24),
+        GARDEN_PESTS("§aGarden Pests", 25),
         ;
 
         private final String str;

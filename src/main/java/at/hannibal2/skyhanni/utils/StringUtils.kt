@@ -36,14 +36,18 @@ object StringUtils {
         return first + lowercase.substring(1)
     }
 
-    fun String.removeColor(): String {
+    private val formattingChars by lazy { "kmolnr".toCharArray() + "kmolnr".uppercase().toCharArray() }
+
+    fun String.removeColor(keepFormatting: Boolean = false): String {
         val builder = StringBuilder(this.length)
 
         var counter = 0
         while (counter < this.length) {
             if (this[counter] == '§') {
-                counter += 2
-                continue
+                if (!keepFormatting || this[counter + 1] !in formattingChars) {
+                    counter += 2
+                    continue
+                }
             }
             builder.append(this[counter])
             counter++
@@ -131,7 +135,6 @@ object StringUtils {
             "$format$text"
         }
     }
-
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 

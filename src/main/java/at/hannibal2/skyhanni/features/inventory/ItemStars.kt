@@ -5,32 +5,34 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.ItemsJson
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemStars {
 
+    private val config get() = SkyHanniMod.feature.inventory
+
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
-    private val STAR_FIND_PATCHER = "(.*)§.✪(.*)".toPattern()
+    private val starFindPattern = "(.*)§.✪(.*)".toPattern()
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+        if (!isEnabled()) return
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
-        if (!SkyHanniMod.feature.inventory.itemStars) return
+
 
         val itemName = stack.name ?: return
         val stars = getStars(itemName)
 
         if (stars > 0) {
             var name = itemName
-            while (STAR_FIND_PATCHER.matcher(name).matches()) {
+            while (starFindPattern.matches(name)) {
                 name = name.replaceFirst("§.✪".toRegex(), "")
             }
             name = name.trim()
@@ -51,7 +53,7 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(6)) return
+        if (!config.itemNumberAsStackSize.contains(6)) return
         val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
         if (number != -1) {
@@ -120,4 +122,6 @@ class ItemStars {
 
         return -1
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars
 }

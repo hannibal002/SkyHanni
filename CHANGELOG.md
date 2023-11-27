@@ -1,5 +1,66 @@
 # SkyHanni - Change Log
 
+## Version 0.22 (Unreleased)
+
+### New Features
+
+#### Garden Features
+
++ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+  + Enable via /sh vacuum.
++ Added Pests to Damage Indicator. - hannibal2
+  + Enable Damage Indicator and select Garden Pests.
++ Change how the pest spawn chat message should be formatted. - hannibal2
+  + Unchanged, compact or hide the message entirely.
++ Show a Title when a pest spawns. - hannibal2
++ Press a key to warp to the plot where the last pest has spawned. - hannibal2
++ Show the time since the last pest spawned in your garden. - hannibal2
+  + Option to only show the time while holding vacuum in the hand.
++ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
++ Show a display with all known pest locations. - hannibal2
+  + Click to warp to the plot.
+  + Option to only show the time while holding vacuum in the hand.
+
+#### Other Features
+
++ Added Barn Fishing Timer to Jerry's Workshop and Crimson Isle. - martimavocado
++ Added Fishing Tracker and changed trackers in general. - hannibal2
+  + This tracker GUI behaves the same way as the Slayer Tracker: Allows for single item remove or hide
+  + Counts coin drops from chat.
+  + Mark the amount in green when recently gained the item.
+  + Option to hide the Fishing Tracker while moving.
+  + Option to hide all Trackers while Estimated Item Value is visible.
+  + Option to change the default display mode for all trackers.
+  + The hidden flag for items in Item Trackers is now shared between total view and session view.
+  + Option to exclude hidden items in the total price calculation.
+  + Option to change the display mode that gets shown on default: Total, Current or remember last.
+
+### Changes
+
+
+#### Garden Changes
+
++ Added option to enable/disable the vacuum bag item number being capped to 40. - hannibal2
++ Automatic unlocking /shmouselock when teleporting in the garden. - hannibal2
++ Don't hide messages from Jacob. - alexia
+  + This is a workaround for wrongly hidden Jakob messages.
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed pest damage indicator not working for some pests. - hannibal2
+
+### Technical Details
+
++ Code cleanup in many files. - walker & hannibal2
++ Moved the JSON object files into another package. - walker
++ Replaced SkyHanniMod.feature.garden with GardenAPI.config. - hannibal2
++ Added MessageSendToServerEvent. - hannibal2
++ Added GardenPlotAPI, support for detecting the current slot of the player. - hannibal2
+
 ## Version 0.21.1
 
 ### New Features
@@ -13,6 +74,26 @@
     + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 
 ### Changes
+
++ /shtrackcollection now supports sack messages. - hannibal2
++ Changed formatting of coin value to be more consistent over multiple features. - hannibal2
++ Made skill level as item number no longer default enabled. - hannibal2
+
+### Fixes
+
++ Fixed the wrong colouring of hidden items in Slayer Profit Tracker. - hannibal2
++ Added support for NEU Heavy Pearl TO-DO fix working without nether sacks as well. - hannibal2
++ Fixed Estimated Item Value getting shown in pet rule creation wardrobe slot pick menu. - hannibal2
+
+### Technical Details
+
++ Added /shwhereami command to show the current island. - martimavocado
++ Tons of code clean-ups over the whole project. - walker & hannibal2
+  + Added ItemAddEvent. - hannibal2
++ Gets called when the user collects an item into inventory or sacks.
++ Created SkyHanniItemTracker. - hannibal2
+  + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different price variants.
++ Migrated slayer profit data into SkyHanniTracker format. - hannibal2
 
 #### Garden Changes
 
@@ -926,7 +1007,7 @@
 ### Fixes
 
 + Fixed Pocket Sack-In-A-Sack Replace in lore
-+ Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
++ Fixed possible crash with broken neu repo when opening the desk inventory in the garden (Contributed by CalMWolfs)
 + Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
 + Fixed bug with ghost counter sometimes not detecting new kills (Contributed by CalMWolfs)
 + Fixed **Ghost Counter** - HiZe & ksipli
@@ -1239,7 +1320,7 @@
       and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the
   composter inventory
-+ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
++ Hide chat messages from the visitors in the garden. (Except Beth and Spaceman)
 + Introduced a new command '/shcroptime <amount> <item>' that displays the estimated time it will take to gather the
   requested quantity of a particular item based on the current crop speed.
 + Show the average crop milestone in the crop milestone inventory.
