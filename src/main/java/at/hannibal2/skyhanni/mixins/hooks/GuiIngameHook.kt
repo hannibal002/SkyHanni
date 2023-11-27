@@ -21,7 +21,7 @@ fun drawString(
     instance.drawString(it, x, y, color)
 } ?: 0
 
-private fun replaceString(text: String): String? {
+fun replaceString(text: String): String? {
     if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
         return null
     }
