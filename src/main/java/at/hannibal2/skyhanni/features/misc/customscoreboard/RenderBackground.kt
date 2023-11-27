@@ -10,6 +10,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 
@@ -51,6 +52,8 @@ class RenderBackground {
 
         val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
         val rareTextureLocation = ResourceLocation("skyhanni", "rareScoreboardBackground.png")
+
+        GlStateManager.color(1f,1f,1f, 1f)
 
         if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
             if (cooldown > 0) {
