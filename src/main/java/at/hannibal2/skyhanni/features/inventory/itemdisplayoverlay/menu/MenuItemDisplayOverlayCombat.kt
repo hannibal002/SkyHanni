@@ -15,9 +15,9 @@ class MenuItemDisplayOverlayCombat {
     private val bestiaryChestNamePattern = (("Bestiary.*").toPattern())
     private val bestiaryMilestoneItemNamePattern = (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern())
     private val familiesCompletedOverallProgressPercentLoreLinePattern = ((".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
-    private val slayerLevelPattern = (("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)").toPattern())
-    private val slayerLevelOtherPattern = (("(§.)*Current LVL: (§.)*(?<level>[\\w]+)").toPattern())
-    private val combatWisdomBuffPattern = (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern())
+    private val slayerLevelLoreLinePattern = (("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)").toPattern())
+    private val slayerLevelOtherLoreLinePattern = (("(§.)*Current LVL: (§.)*(?<level>[\\w]+)").toPattern())
+    private val combatWisdomBuffLoreLinePattern = (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern())
     private val rngMeterProgressPercentLoreLinePattern = ((".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
     private val unlockedSlayerRecipesLoreLinePattern = ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern())
 
@@ -58,7 +58,7 @@ class MenuItemDisplayOverlayCombat {
             if (chestName == ("Slayer")) {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        slayerLevelPattern.matchMatcher(line) {
+                        slayerLevelLoreLinePattern.matchMatcher(line) {
                             return group("level")
                         }
                     }
@@ -66,7 +66,7 @@ class MenuItemDisplayOverlayCombat {
             }
             if (itemName == ("Boss Leveling Rewards")) {
                 for (line in lore) {
-                    slayerLevelOtherPattern.matchMatcher(line) {
+                    slayerLevelOtherLoreLinePattern.matchMatcher(line) {
                         return group("level")
                     }
                 }
@@ -75,7 +75,7 @@ class MenuItemDisplayOverlayCombat {
 
         if ((stackSizeConfig.contains(StackSizeMenuConfig.Combat.SLAYER_COMBAT_WISDOM_BUFF)) && (itemName == ("Global Combat Wisdom Buff"))) {
             for (line in item.getLore()) {
-                combatWisdomBuffPattern.matchMatcher(line) {
+                combatWisdomBuffLoreLinePattern.matchMatcher(line) {
                     return group("combatWise")
                 }
             }
