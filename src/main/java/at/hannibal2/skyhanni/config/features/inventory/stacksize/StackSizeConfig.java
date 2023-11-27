@@ -50,7 +50,6 @@ public class StackSizeConfig {
         SHREDDER("§bShredder Bonus Damage"),
         JYRRE("§bBottle of Jyrre Intelligence Bonus"),
         SOULFLOW("§bInternalized Soulflow Count\n§b(Abbv, won't show in the Auction House)"),
-        CRUX("§bCrux Accessory Kill Overall Progress\n§b(%, out of all mob types)"),
         STORAGE_TIER("§bMinion Storage Tier (#)"),
         COMPACTOR_DELETOR("§bCompactor/Deletor Enabled Status (§a✔§b/§c§l✖§b) + Tier (Abbv)"),
         ABIPHONE("§bAbiphone Tier"),

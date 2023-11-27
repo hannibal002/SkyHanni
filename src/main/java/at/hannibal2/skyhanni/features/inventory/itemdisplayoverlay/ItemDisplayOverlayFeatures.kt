@@ -33,10 +33,36 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
-    private val iReallyHateTheBottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
+    private val shredderBonusDamagePattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
+    private val bottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
     private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
     private val gardenVacuumPattern = "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?".toPattern()
+    private val masterSkullPattern = (("(.*)Master Skull - Tier (?<tier>.+)").toPattern())
+    private val dungeonBossHeadPattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
+    private val newYearCakeSpookyPieYearPattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
+    private val minionNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
+    private val enchantedSackPattern = (("Enchanted .*").toPattern())
+    private val kuudraKeyItemNamePattern = (("([\\w ]+)?Kuudra Key").toPattern())
+    private val kuudraKeyInternalNamePattern = (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern())
+    private val larvaHookPattern = (("§7§7You may harvest §6(?<amount>.).*").toPattern())
+    private val dungeonLevelPotionPattern = (("Dungeon (?<level>.*) Potion").toPattern())
+    private val armadilloRarityLorePattern = (("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)").toPattern())
+    private val beastmasterCrestInternalNamePattern = (("BEASTMASTER_CREST_[\\w]*").toPattern())
+    private val beastmasterCrestKillsProgressPattern = (("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)").toPattern())
+    private val campfireTalismanTierPattern = (("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)").toPattern())
+    private val auctionHouseChestNamePattern = (("^(?:(?!Auction).)*\$").toPattern())
+    private val internalizedSoulflowPattern = (("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow").toPattern())
+    private val storageChestInternalNamePattern = ((".*_ENCHANTED_CHEST").toPattern())
+    private val storageChestDisplayNamePattern = ((".* Storage").toPattern())
+    private val personalCompactorDeletorChestNamePattern = (("Personal (Compactor .*|Deletor .*)").toPattern())
+    private val personalCompactorEnabledPattern = (("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!").toPattern())
+    private val personalCompactorDeletorInternalNamePattern = (("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)").toPattern())
+    private val personalCompactorDeletorDisplayNamePattern = (("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)").toPattern())
+    private val abiphoneInternalNamePattern = (("ABIPHONE_.*").toPattern())
+    private val auctionNumberLorePattern = (("§8Auction .*").toPattern())
+    private val editionNumberLorePattern = (("§8Edition .*").toPattern())
+    private val doesNotIncludeDungeonStarsItemNamePattern = (("^(?:(?!✪).)*\$").toPattern())
+
     private val garenVacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
@@ -75,13 +101,13 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.MASTER_SKULL)) {
-            (("(.*)Master Skull - Tier (?<tier>.+)").toPattern()).matchMatcher(itemName) {
+            masterSkullPattern.matchMatcher(itemName) {
                 return group("tier")
             }
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.DUNGEON_HEAD_FLOOR_NUMBER)) {
-            (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern()).matchMatcher(internalName) {
+            dungeonBossHeadPattern.matchMatcher(internalName) {
                 return when (group("dungeonBoss")) {
                     ("BONZO") -> "1"
                     ("SCARF") -> "2"
@@ -96,7 +122,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.SKYBLOCK_YEAR)) {
-            (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern()).matchMatcher(itemName) {
+            newYearCakeSpookyPieYearPattern.matchMatcher(itemName) {
                 return "§b${group("year")}"
             }
         }
@@ -111,7 +137,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.MINION_TIER)) {
-            (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern()).matchMatcher(itemName) {
+            minionNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
                     if (line.equals("§7Place this minion and it will")) {
                         return itemName.split(" ").last().romanToDecimal().toString()
@@ -123,15 +149,15 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.displaySackName && ItemUtils.isSack(item)) {
             val sackName = grabSackName(itemName)
             //return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
-            (("Enchanted .*").toPattern()).matchMatcher(itemName) {
+            enchantedSackPattern.matchMatcher(itemName) {
                 return "§5${sackName.substring(0, 2)}"
             }
             return "${sackName.substring(0, 2)}"
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.KUUDRA)) {
-            (("([\\w ]+)?Kuudra Key").toPattern()).matchMatcher(itemName) {
-                (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern()).matchMatcher(internalName) {
+            kuudraKeyItemNamePattern.matchMatcher(itemName) {
+                kuudraKeyInternalNamePattern.matchMatcher(internalName) {
                     return when (group("tier")) {
                         "TIER" -> "§a1"
                         "HOT_TIER" -> "§22"
@@ -154,7 +180,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.LARVA_HOOK) && internalName == ("LARVA_HOOK")) {
             for (line in item.getLore()) {
-                "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
+                larvaHookPattern.matchMatcher(line) {
                     val amount = group("amount").toInt()
                     return when {
                         amount > 4 -> "§a$amount"
@@ -166,7 +192,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.DUNGEON_POTION_LEVEL)) {
-            ("Dungeon (?<level>.*) Potion".toPattern()).matchMatcher(itemName) {
+            dungeonLevelPotionPattern.matchMatcher(itemName) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"
@@ -182,7 +208,7 @@ class ItemDisplayOverlayFeatures {
             val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
             var rarity = ""
             for (line in lore) {
-                (("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)").toPattern()).matchMatcher(line) {
+                armadilloRarityLorePattern.matchMatcher(line) {
                     rarity = group("rarity")
                 }
             }
@@ -206,7 +232,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.BEASTMASTER)) {
-            (("BEASTMASTER_CREST_[\\w]*").toPattern()).matchMatcher(internalName) {
+            beastmasterCrestInternalNamePattern.matchMatcher(internalName) {
                 for (line in item.getLore()) {
                     //§7Your kills: §21,581§8/2,500
                     /* if (line.contains("Your kills: ")) {
@@ -214,7 +240,7 @@ class ItemDisplayOverlayFeatures {
                         val denom = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").last()
                         return (((num.toFloat() / denom.toFloat()) * 100).toString().take(2))
                     } */
-                    (("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)").toPattern()).matchMatcher(line) {
+                    beastmasterCrestKillsProgressPattern.matchMatcher(line) {
                         val progress = group("progress").formatNumber().toFloat()
                         val total = group("total").formatNumber().toFloat()
                         return "${((progress / total) * 100)}".take(2)
@@ -224,7 +250,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.CAMPFIRE)) {
-            (("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)").toPattern()).matchMatcher(internalName) {
+            campfireTalismanTierPattern.matchMatcher(internalName) {
                 return "${(group("tier").toInt() + 1)}"
             }
         }
@@ -243,7 +269,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.SHREDDER) && internalName == ("THE_SHREDDER")) {
             val lore = item.getLore()
             for (line in lore) {
-                whyHaventTheAdminsAddedShredderBonusDamageInfoToItemNBTDataYetPattern.matchMatcher(line) {
+                shredderBonusDamagePattern.matchMatcher(line) {
                     return group("dmgbonus")
                 }
             }
@@ -252,7 +278,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.JYRRE) && internalName == ("BOTTLE_OF_JYRRE")) {
             val lore = item.getLore()
             for (line in lore) {
-                iReallyHateTheBottleOfJerryPattern.matchMatcher(line) {
+                bottleOfJerryPattern.matchMatcher(line) {
                     return group("intelbonus")
                 }
             }
@@ -262,9 +288,9 @@ class ItemDisplayOverlayFeatures {
             //§7Internalized: §316,493⸎ Soulflow
             //Internalized: 16,493⸎ Soulflow
             //!(chestName.contains("Auction"))
-            (("^(?:(?!Auction).)*\$").toPattern()).matchMatcher(chestName) {
+            auctionHouseChestNamePattern.matchMatcher(chestName) {
                 val line = item.getLore().first()
-                (("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow").toPattern()).matchMatcher(line) {
+                internalizedSoulflowPattern.matchMatcher(line) {
                     val soulflowCount = "${group("leading")}${group("trailing")}"
                     val soulflowCountWithoutCommas = "${soulflowCount.formatNumber()}"
                     val usefulAsString =  group("leading")
@@ -283,29 +309,11 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.CRUX) && internalName.startsWith("CRUX_")) {
-            //  §21 §2Shy§7: §e14§7/§a25 §7kills
-            val lore = item.getLore()
-            var numberOfLines = 0 //"zoMG ERY WHY NOT JUST REPLACE "CRUX_TALISMAN"?!?!?" yeah i considered that too but then realized hypixel might change that one day
-            var killCount = 0
-            val currentKillThresholdPerMobFamily = 100 //change this in case hypixel increases the kill count to max a crux accessory
-            for (line in lore) {
-                ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+) (§.)?kills.*").toPattern()).matchMatcher(line) {
-                    val mobSpecificKillCount = group("useful").toIntOrNull() ?: 0
-                    killCount += mobSpecificKillCount
-                    numberOfLines++
-                }
-                val totalKillsNecessary = currentKillThresholdPerMobFamily * numberOfLines
-                val percent = (((killCount.toFloat()) / (totalKillsNecessary.toFloat())) * 100) //keep this line here for easier debugging
-                return percent.toInt().toString()
-            }
-        }
-
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.STORAGE_TIER)) {
             //internalName.endsWith("_ENCHANTED_CHEST")
             //itemName.endsWith(" Storage")
-            ((".*_ENCHANTED_CHEST").toPattern()).matchMatcher(internalName) {
-                ((".* Storage").toPattern()).matchMatcher(itemName) {
+            storageChestInternalNamePattern.matchMatcher(internalName) {
+                storageChestDisplayNamePattern.matchMatcher(itemName) {
                     var colorCode = item.name ?: return ""
                     colorCode = colorCode.take(2)
                     val numSlots = when (itemName) {
@@ -322,7 +330,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.COMPACTOR_DELETOR)) {
-            (("Personal (Compactor .*|Deletor .*)").toPattern()).matchMatcher(chestName) {
+            personalCompactorDeletorChestNamePattern.matchMatcher(chestName) {
                 //§aCompactor Currently OFF!
                 //§aCompactor Currently ON!
                 /* if (itemName.contains(" Currently ")) {
@@ -332,22 +340,22 @@ class ItemDisplayOverlayFeatures {
                         else -> ""
                     }
                 } */
-                (("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!").toPattern()).matchMatcher(itemName) {
+                personalCompactorEnabledPattern.matchMatcher(itemName) {
                     return when (group("toggle")) {
                         "N" ->"§a✔"
                         else -> "§c§l✖"
                     }
                 }
             }
-            (("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)").toPattern()).matchMatcher(internalName) {
-                (("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)").toPattern()).matchMatcher(itemName) {
+            personalCompactorDeletorInternalNamePattern.matchMatcher(internalName) {
+                personalCompactorDeletorDisplayNamePattern.matchMatcher(itemName) {
                     return "${group("thousands")}K"
                 }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.ABIPHONE)) {
-            (("ABIPHONE_.*").toPattern()).matchMatcher(internalName) {
+            abiphoneInternalNamePattern.matchMatcher(internalName) {
                 return when (internalName) {
                     "ABIPHONE_X_PLUS" -> "X"
                     "ABIPHONE_X_PLUS_SPECIAL_EDITION" -> "X§b§zSE"
@@ -371,10 +379,10 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.EDITION_AUCTION_NUMBER)) {
             var thatNumber = 0
             for (line in item.getLore()) {
-                (("§8Auction .*").toPattern()).matchMatcher(line) {
+                auctionNumberLorePattern.matchMatcher(line) {
                     thatNumber = item.getAuctionNumber() ?: 0
                 }
-                (("§8Edition .*").toPattern()).matchMatcher(line) {
+                editionNumberLorePattern.matchMatcher(line) {
                     thatNumber = item.getEdition() ?: 0
                 }
             }
@@ -385,7 +393,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.STACKING_ENCHANTMENT)) {
             //itemName.contains("✪")
-            (("^(?:(?!✪).)*\$").toPattern()).matchMatcher(itemName) {
+            doesNotIncludeDungeonStarsItemNamePattern.matchMatcher(itemName) {
                 val possibleEnchantments = item.getEnchantments()
                 if (possibleEnchantments != null) {
                     for (enchant in tieredEnchants) {
