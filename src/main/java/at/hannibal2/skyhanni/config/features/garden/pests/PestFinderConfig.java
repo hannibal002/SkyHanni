@@ -19,8 +19,17 @@ public class PestFinderConfig {
 
     @Expose
     @ConfigOption(
+            name = "Waypoint In World",
+            desc = "Mark the plots with pests on them in the world."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean waypointInWorld = true;
+
+    @Expose
+    @ConfigOption(
             name = "Only With Vacuum",
-            desc = "Only show the pest display while holding a vacuum in the hand."
+            desc = "Only show the pest display and waypoints while holding a vacuum in the hand."
     )
     @ConfigEditorBoolean
     public boolean onlyWithVacuum = true;

@@ -34,7 +34,7 @@ class GardenWarpCommands {
             LockMouseLook.autoDisable()
         }
 
-        tpPlotPattern.matchMatcher(message) {
+        tpPlotPattern.matchMatcher(event.message) {
             event.isCanceled = true
             val plotName = group("plot")
             LorenzUtils.sendCommandToServer("tptoplot $plotName")

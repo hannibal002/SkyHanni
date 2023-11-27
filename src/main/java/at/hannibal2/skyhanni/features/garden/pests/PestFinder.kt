@@ -1,19 +1,26 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -25,7 +32,10 @@ class PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
+    private val pestsInScoreboardPattern = " §7⏣ §aThe Garden §4§lൠ§7 x(?<pests>.*)".toPattern()
+
     private var display = emptyList<Renderable>()
+    private var scoreboardPests = 0
 
     @SubscribeEvent
     fun onPestSpawn(event: PestSpawnEvent) {
@@ -65,27 +75,24 @@ class PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        val totalAmount = totalAmount()
-        if (totalAmount == 0) {
-            add(Renderable.string("§cNo pests detected."))
-            add(Renderable.string("§7Open §eConfigure Plots Menu"))
-            add(Renderable.string("§7when incorrect to reload."))
+        val totalAmount = getPlotsWithPests().sumOf { it.pests }
+        if (totalAmount != scoreboardPests) {
+            add(Renderable.string("§cIncorrect pest amount!"))
+            add(Renderable.string("§eOpen Configure Plots Menu!"))
             return@buildList
         }
 
-        add(Renderable.string("§eTotal pests in garden: §c${totalAmount()}§7/§c8"))
+        add(Renderable.string("§eTotal pests in garden: §c${totalAmount}§7/§c8"))
 
-        for (plot in GardenPlotAPI.plots) {
+        for (plot in getPlotsWithPests()) {
             val pests = plot.pests
-            if (pests == 0) continue
-
-            val name = plot.name
+            val plotName = plot.name
             val pestsName = StringUtils.optionalPlural(pests, "pest", "pests")
             val renderable = Renderable.clickAndHover(
-                "§c$pestsName §7in §b$name",
+                "§c$pestsName §7in §b$plotName",
                 listOf(
                     "§7Pests Found: §e$pests",
-                    "§7In plot §b$name",
+                    "§7In plot §b$plotName",
                     "",
                     "§eClick here to warp!"
                 ),
@@ -114,27 +121,43 @@ class PestFinder {
     }
 
     @SubscribeEvent
-    fun onDamageIndicatorDeath(event: DamageIndicatorDeathEvent) {
+    fun onScoreboardChange(event: ScoreboardChangeEvent) {
         if (!isEnabled()) return
 
-        // Check if an unknown damage indiactor mob dies in the garden
-        val type = event.data.bossType
-        if (!PestType.entries.any { it.damageIndicatorBoss == type }) return
-
-        val plot = GardenPlotAPI.getCurrentPlot()?.takeIf { it.pests > 0 } ?: run {
-            LorenzUtils.userError("Could not detect the plot of the killed pest. Please Open the Configure Plots menu again.")
-            return
+        var newPests = 0
+        for (line in event.newList) {
+            pestsInScoreboardPattern.matchMatcher(line) {
+                newPests = group("pests").formatNumber().toInt()
+            }
         }
 
-        plot.pests--
+        if (newPests == scoreboardPests) return
+
+        removePests(scoreboardPests - newPests)
+        scoreboardPests = newPests
         update()
     }
 
-    private fun totalAmount() = GardenPlotAPI.plots.sumOf { it.pests }
+    private fun removePests(removedPests: Int) {
+        if (removedPests < 1) return
+        repeat(removedPests) {
+            removeNearestPest()
+        }
+    }
+
+    private fun removeNearestPest() {
+        val location = LocationUtils.playerLocation()
+        val plot = getPlotsWithPests().minByOrNull { it.middle.distanceSq(location) } ?: run {
+            LorenzUtils.error("Can not remove nearest pest: No plots with pests detected.")
+            return
+        }
+        plot.pests--
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!config.showDisplay) return
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
 
         if (GardenAPI.inGarden() && config.showDisplay) {
@@ -142,5 +165,25 @@ class PestFinder {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.showDisplay
+    private fun getPlotsWithPests() = GardenPlotAPI.plots.filter { it.pests > 0 }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+        if (!config.waypointInWorld) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+
+        val playerLocation = event.exactPlayerEyeLocation()
+        for (plot in getPlotsWithPests()) {
+            if (plot.isPlayerInside()) continue
+            val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
+            val plotName = plot.name
+            val middle = plot.middle
+            val location = playerLocation.copy(x = middle.x, z = middle.z)
+            event.drawWaypointFilled(location, LorenzColor.RED.toColor())
+            event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
+        }
+    }
+
+    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.waypointInWorld)
 }
