@@ -19,6 +19,23 @@ class MenuItemDisplayOverlayCombat {
         event.stackTip = getStackTip(event.stack)
     }
 
+    private val bestiaryChestNamePattern = (("Bestiary.*").toPattern())
+
+    private val bestiaryMilestoneItemNamePattern = (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern())
+
+    private val familiesCompletedOverallProgressPercentLoreLinePattern =
+        ((".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
+
+    private val slayerLevelPattern = (("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)").toPattern())
+
+    private val slayerLevelOtherPattern = (("(§.)*Current LVL: (§.)*(?<level>[\\w]+)").toPattern())
+
+    private val combatWisdomBuffPattern = (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern())
+
+    private val rngMeterProgressPercentLoreLinePattern = ((".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
+
+    private val unlockedSlayerRecipesLoreLinePattern = ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern())
+
     private fun getStackTip(item: ItemStack): String {
         if (SkyHanniMod.feature.inventory.stackSize.menu.combat.isEmpty()) return ""
         val itemName = item.cleanName()
@@ -26,19 +43,19 @@ class MenuItemDisplayOverlayCombat {
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_LEVEL)) {
-            (("Bestiary.*").toPattern()).matchMatcher(chestName) {
-                (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern()).matchMatcher(itemName) {
+            bestiaryChestNamePattern.matchMatcher(chestName) {
+                bestiaryMilestoneItemNamePattern.matchMatcher(itemName) {
                         return group("milestone")
                 }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_OVERALL_FAMILY_PROGRESS)) {
-            (("Bestiary.*").toPattern()).matchMatcher(chestName) {
+            bestiaryChestNamePattern.matchMatcher(chestName) {
                 if (itemName.isNotEmpty()) {
                     val lore = item.getLore()
                     for (line in lore) {
-                        ((".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern()).matchMatcher(line) {
+                        familiesCompletedOverallProgressPercentLoreLinePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
                         }
                     }
@@ -51,7 +68,7 @@ class MenuItemDisplayOverlayCombat {
             if (chestName == ("Slayer")) {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        (("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)").toPattern()).matchMatcher(line) {
+                        slayerLevelPattern.matchMatcher(line) {
                             return group("level")
                         }
                     }
@@ -59,7 +76,7 @@ class MenuItemDisplayOverlayCombat {
             }
             if (itemName == ("Boss Leveling Rewards")) {
                 for (line in lore) {
-                    (("(§.)*Current LVL: (§.)*(?<level>[\\w]+)").toPattern()).matchMatcher(line) {
+                    slayerLevelOtherPattern.matchMatcher(line) {
                         return group("level")
                     }
                 }
@@ -68,7 +85,7 @@ class MenuItemDisplayOverlayCombat {
 
         if ((stackSizeConfig.contains(StackSizeMenuConfig.Combat.SLAYER_COMBAT_WISDOM_BUFF)) && (itemName == ("Global Combat Wisdom Buff"))) {
             for (line in item.getLore()) {
-                (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern()).matchMatcher(line) {
+                combatWisdomBuffPattern.matchMatcher(line) {
                     return group("combatWise")
                 }
             }
@@ -76,7 +93,7 @@ class MenuItemDisplayOverlayCombat {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.RNG_METER_PROGRESS) && itemName == ("RNG Meter")) {
             for (line in item.getLore()) {
-                ((".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern()).matchMatcher(line) {
+                rngMeterProgressPercentLoreLinePattern.matchMatcher(line) {
                     return group("percent").replace("100", "§a✔")
                 }
             }
@@ -84,7 +101,7 @@ class MenuItemDisplayOverlayCombat {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.UNLOCKED_SLAYER_RECIPES) && itemName == ("Slayer Recipes")) {
             for (line in item.getLore()) {
-                ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern()).matchMatcher(line) {
+                unlockedSlayerRecipesLoreLinePattern.matchMatcher(line) {
                     return group("recipes")
                 }
             }
