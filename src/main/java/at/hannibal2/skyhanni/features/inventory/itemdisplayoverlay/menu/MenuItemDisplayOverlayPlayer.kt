@@ -27,6 +27,25 @@ class MenuItemDisplayOverlayPlayer {
     private val essenceCountOtherPattern = ".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*".toPattern()
     private val profileManagementPattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
     private val hannibalInsistedOnThisList = listOf("Museum", "Rarities", "Armor Sets", "Weapons", "Special Items")
+    private val skyblockLevelingItemNamePattern = ((".* Leveling").toPattern())
+    private val skillLevelItemNamePattern = (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern())
+    private val gardenLevelSkillLevelPattern = (("Garden Level (?<level>[\\w]+)").toPattern())
+    private val collectionsMultipurposePattern = ((".*Collections").toPattern())
+    private val collectionLevelPattern = ((".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)").toPattern())
+    private val collectionsPercentLorePattern = ((".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()))
+    private val craftMoreMinionsPattern = (("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*").toPattern())
+    private val clickToViewLorePattern = (("§eClick to view .*").toPattern())
+    private val minionTierCraftProgressLorePattern = ((".* Tier .*").toPattern())
+    private val minionTierNotYetCraftedPattern = ((".*§c.* Tier .*").toPattern())
+    private val petsItemNamePattern = ((".*Pets.*").toPattern())
+    private val noPetLorePattern = (("(§.)*Selected (p|P)et: (§.)*None").toPattern())
+    private val petsChestNamePattern = (("Pets.*").toPattern())
+    private val yourPetScoreLorePattern = ((".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*").toPattern())
+    private val minionMenuChestNamePattern = ((".* Minion .*").toPattern())
+    private val quickUpgradeItemNamePattern = (("Quick.Upgrade Minion").toPattern())
+    private val youNeedXMoreMaterialsLoreLinePattern = ((".*(§.)+You need (§.)*(?<needed>[\\w]+).*").toPattern())
+    private val doesNotContainArrowsChestNamePattern = (("^((?! ➜ ).)*\$").toPattern())
+    private val canDisplayEssencePattern = ((".*Essence( Guide.*| Shop)?").toPattern())
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -41,7 +60,7 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu")) {
             //itemName.endsWith(" Leveling")
-            ((".* Leveling").toPattern()).matchMatcher(itemName) {
+            skyblockLevelingItemNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
                     skyblockLevelPattern.matchMatcher(line) {
                         return "${group("sblvl")}"
@@ -56,7 +75,7 @@ class MenuItemDisplayOverlayPlayer {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore()) && (itemName != ("Dungeoneering"))) return "0"
                         if (itemName.split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
-                        (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern()).matchMatcher(itemName) {
+                        skillLevelItemNamePattern.matchMatcher(itemName) {
                             return "${group("level").romanToDecimalIfNeeded()}"
                         }
                     } else if (chestName == "Dungeoneering") {
@@ -66,7 +85,7 @@ class MenuItemDisplayOverlayPlayer {
                     }
                 }
             } else if (((chestName == "Farming Skill") || (chestName == "Desk"))) {
-               (("Garden Level (?<level>[\\w]+)").toPattern()).matchMatcher(itemName) {
+               gardenLevelSkillLevelPattern.matchMatcher(itemName) {
                    if (GardenAPI.getGardenLevel() != 0) return GardenAPI.getGardenLevel().toString()
                    return group("level")
                }
@@ -80,12 +99,12 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.COLLECTION_LEVELS_AND_PROGRESS)) {
-            ((".*Collections").toPattern()).matchMatcher(chestName) {
+            collectionsMultipurposePattern.matchMatcher(chestName) {
                 val lore = item.getLore()
                 if (lore.isNotEmpty() && lore.last() == ("§eClick to view!")) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
-                        ((".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)").toPattern()).matchMatcher(it) {
+                        collectionLevelPattern.matchMatcher(it) {
                             return "${group("tier").romanToDecimalIfNeeded()}"
                         }
                     }
@@ -94,14 +113,14 @@ class MenuItemDisplayOverlayPlayer {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
-                        ((".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern())).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLorePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
-            ((".*Collections").toPattern()).matchMatcher(chestName) {
-                ((".*Collections").toPattern()).matchMatcher(itemName) {
+            collectionsMultipurposePattern.matchMatcher(chestName) {
+                collectionsMultipurposePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        (".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()).matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLorePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
@@ -111,18 +130,18 @@ class MenuItemDisplayOverlayPlayer {
             val lore = item.getLore()
             if (itemName == "Information") {
                 for (line in lore) {
-                    (("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*").toPattern()).matchMatcher(line) {
+                    craftMoreMinionsPattern.matchMatcher(line) {
                         return group("count")
                     }
                 }
             }
             if (lore.isNotEmpty()) {
-                (("§eClick to view .*").toPattern()).matchMatcher(lore.last()) {
+                clickToViewLorePattern.matchMatcher(lore.last()) {
                     var tiersToSubtract = 0
                     var totalTiers = 0
                     for (line in lore) {
-                        ((".* Tier .*").toPattern()).matchMatcher(line) { totalTiers++ } //§c
-                        ((".*§c.* Tier .*").toPattern()).matchMatcher(line) { tiersToSubtract++ }
+                        minionTierCraftProgressLorePattern.matchMatcher(line) { totalTiers++ } //§c
+                        minionTierNotYetCraftedPattern.matchMatcher(line) { tiersToSubtract++ }
                     }
                     return "${totalTiers - tiersToSubtract}".replace("$totalTiers", "§a✔")
                 }
@@ -141,15 +160,15 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PET_SCORE_STATUS)) {
             if ((chestName.lowercase() == "skyblock menu")) {
-                ((".*Pets.*").toPattern()).matchMatcher(itemName) {
+                petsItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        (("(§.)*Selected (p|P)et: (§.)*None").toPattern()).matchMatcher(line) { return "§c§l✖" }
+                        noPetLorePattern.matchMatcher(line) { return "§c§l✖" }
                     }
                 }
             }
-            (("Pets.*").toPattern()).matchMatcher(chestName) {
+            petsChestNamePattern.matchMatcher(chestName) {
                 if (itemName == ("Pet Score Rewards") && item.getLore().isNotEmpty()) {
-                    ((".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*").toPattern()).matchMatcher(item.getLore().last()) {
+                    yourPetScoreLorePattern.matchMatcher(item.getLore().last()) {
                         return group("score")
                     }
                 }
@@ -162,11 +181,11 @@ class MenuItemDisplayOverlayPlayer {
              chestName.contains(" Minion ")
              itemName.contains("Quick") && itemName.contains("Upgrade Minion")
              */
-            ((".* Minion .*").toPattern()).matchMatcher(chestName) {
-                (("Quick.Upgrade Minion").toPattern()).matchMatcher(itemName) {
+            minionMenuChestNamePattern.matchMatcher(chestName) {
+                quickUpgradeItemNamePattern.matchMatcher(itemName) {
                     val lore = item.getLore()
                     for (line in lore) {
-                        ((".*(§.)+You need (§.)*(?<needed>[\\w]+).*").toPattern()).matchMatcher(line) {
+                        youNeedXMoreMaterialsLoreLinePattern.matchMatcher(line) {
                             return group("needed")
                         }
                     }
@@ -180,8 +199,7 @@ class MenuItemDisplayOverlayPlayer {
                 dungeonEssenceRewardPattern.matchMatcher(itemName) { return group("amount") } ?: return ""
             }
             var canDisplayEssence = false
-            (("^((?! ➜ ).)*\$").toPattern()).matchMatcher(chestName) {
-                val canDisplayEssencePattern = ((".*Essence( Guide.*| Shop)?").toPattern())
+            doesNotContainArrowsChestNamePattern.matchMatcher(chestName) {
                 canDisplayEssencePattern.matchMatcher(chestName) {
                     canDisplayEssencePattern.matchMatcher(itemName) {
                         canDisplayEssence = true
