@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.Mob.Type
-import at.hannibal2.skyhanni.data.MobFilter.summonOwnerRegex
+import at.hannibal2.skyhanni.data.mob.Mob.Type
+import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerRegex
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName

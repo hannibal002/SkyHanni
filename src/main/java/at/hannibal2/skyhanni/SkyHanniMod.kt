@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.MinecraftData
-import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -42,6 +41,8 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.MobDebug
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
@@ -83,7 +84,6 @@ import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
-import at.hannibal2.skyhanni.features.dev.MobDebug
 import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash

@@ -1,8 +1,6 @@
-package at.hannibal2.skyhanni.features.dev
+package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.Mob
-import at.hannibal2.skyhanni.data.MobData
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent

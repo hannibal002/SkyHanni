@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.data.Mob
+import at.hannibal2.skyhanni.data.mob.Mob
 
 abstract class MobEvent(val mob: Mob) : LorenzEvent() {
     open class Spawn(mob: Mob) : MobEvent(mob) {

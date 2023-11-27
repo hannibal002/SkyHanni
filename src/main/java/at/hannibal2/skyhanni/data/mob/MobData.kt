@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
-import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.features.dev.MobDevTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug

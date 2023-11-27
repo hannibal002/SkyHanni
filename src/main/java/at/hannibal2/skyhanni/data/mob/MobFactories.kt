@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -15,7 +15,7 @@ object MobFactories {
         MobFilter.bossMobNameFilter.find(armorStand.cleanName())?.let {
             Mob(
                 baseEntity = baseEntity, mobType = Mob.Type.Boss, armorStand = armorStand, name = overriddenName
-                    ?: it.groupValues[3], additionalEntities = extraEntityList
+                ?: it.groupValues[3], additionalEntities = extraEntityList
             )
         }
 

@@ -1,8 +1,9 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.MobData.Result.Found
-import at.hannibal2.skyhanni.data.MobData.Result.Illegal
-import at.hannibal2.skyhanni.data.MobData.Result.NotYetFound
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.MobData.Result.Found
+import at.hannibal2.skyhanni.data.mob.MobData.Result.Illegal
+import at.hannibal2.skyhanni.data.mob.MobData.Result.NotYetFound
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -14,9 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.MobUtils.getArmorStand
-import at.hannibal2.skyhanni.utils.MobUtils.getClosedArmorStand
-import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.makeMobResult
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
@@ -151,15 +149,15 @@ object MobFilter {
         if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)?.let { MobData.MobResult(Found, it) }
         if (baseEntity is EntityDragon) return MobData.MobResult(Found, MobFactories.basic(baseEntity, baseEntity.cleanName()))
         if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return MobData.MobResult(Found, MobFactories.projectile(baseEntity, "Giant Sword"))  // Will false trigger if there is another Dinnerbone Giant
-        if (baseEntity is EntityCaveSpider) getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
-            ?.let { MobData.entityToMob[getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.also { return MobData.MobResult(Illegal, null) } }
+        if (baseEntity is EntityCaveSpider) MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
+            ?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.also { return MobData.MobResult(Illegal, null) } }
         return null
     }
 
     private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobData.MobResult? {
         if (DungeonAPI.inDungeon()) {
             if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(Found, MobFactories.special(baseEntity, nextEntity.cleanName(), nextEntity))
-            if (baseEntity is EntityCaveSpider) return getClosedArmorStand(baseEntity, 2.0).takeNonDefault().makeMobResult { MobFactories.dungeon(baseEntity, it) }
+            if (baseEntity is EntityCaveSpider) return MobUtils.getClosedArmorStand(baseEntity, 2.0).takeNonDefault().makeMobResult { MobFactories.dungeon(baseEntity, it) }
             if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin").makeMobResult { MobFactories.dungeon(baseEntity, it) }
             if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor") return MobUtils.getArmorStand(baseEntity, 9).makeMobResult { MobFactories.boss(baseEntity, it) }
             if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid")) return MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid").makeMobResult {

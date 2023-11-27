@@ -1,6 +1,5 @@
-package at.hannibal2.skyhanni.features.dev
+package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.Mob
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder

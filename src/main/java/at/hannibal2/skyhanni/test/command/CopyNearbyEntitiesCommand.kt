@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.data.MobData
-import at.hannibal2.skyhanni.data.MobFilter.isDisplayNPC
-import at.hannibal2.skyhanni.data.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.data.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
@@ -194,7 +194,7 @@ object CopyNearbyEntitiesCommand {
                 append(mob.mobType.name)
                 if (mob.baseEntity == entity) append("/Base")
                 append(")\"")
-                append(mob?.name ?: "")
+                append(mob.name)
                 append("\"")
             }
             append(", ")
