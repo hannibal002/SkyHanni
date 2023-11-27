@@ -14,6 +14,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayMining {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val xOutOfYNoColorRequiredPattern = "(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*".toPattern()
+    private val rightClickToEnableDisableLoreLinePattern = (("(§.)*Right.?click to (§.)*disable(§.)*!").toPattern())
+    private val skyMallCurrentEffectLoreLinePattern = ((".*(§.)*Your Current Effect.*").toPattern())
+    private val theSkymallCurrentEffectInQuestionLoreLinePattern = (("(§.)*.*■ (§.)*(?<thePerk>.+)").toPattern())
+    private val hotmPerkEnabledDisabledInProgressItemNamePattern = (("§(a|e|c).*").toPattern())
+    private val isNotHOTMPerkFirstCheckLoreLinePattern = (("^((?!(§.)*Level ).)*\$").toPattern())
+    private val isNotHOTMPerkSecondCheckLoreLinePattern = (("^((?!(§.)*(Right|Left).click to ).)*\$").toPattern())
+    private val lockedHOTMPerkLoreLinePattern = ((".*(§.)*(Requires .*|.*the Mountain!).*").toPattern())
+    private val isHOTMPerkMaxedItemNamePattern = (("§a.*").toPattern())
+    private val isHOTMPerkDisabledLoreLinePattern = (("(§.)*(.*)click to (§.)*(enable).*").toPattern())
+    private val isHOTMTierItemNamePattern = (("Tier (?<tier>[\\w]+)").toPattern())
+    private val isHOTMTierUnlockedItemNamePattern = (("§aTier (?<tier>[\\w]+)").toPattern())
+    private val hotmLevelPercentProgressLoreLinePattern = ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
+    private val crystalsNotForCrystalNucleusLoreLinePattern = ((".*(Your Other Crystals|Jasper|Ruby).*").toPattern())
+    private val crystalNotPlacedLoreLinePattern = ((".* §e✖ Not Placed").toPattern())
+    private val crystalNotFoundLoreLinePattern = ((".* §c✖ Not Found").toPattern())
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -27,7 +42,7 @@ class MenuItemDisplayOverlayMining {
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.CURRENT_SKYMALL_PERK) && (item.cleanName() == ("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
-            (("(§.)*Right.?click to (§.)*disable(§.)*!").toPattern()).matchMatcher(lore.last()) {
+            rightClickToEnableDisableLoreLinePattern.matchMatcher(lore.last()) {
                 // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
                 /*
                 "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
@@ -40,11 +55,11 @@ class MenuItemDisplayOverlayMining {
                 */
                 var currentEffectLineLocated = false
                 for (line in lore) {
-                    ((".*(§.)*Your Current Effect.*").toPattern()).matchMatcher(line) {
+                    skyMallCurrentEffectLoreLinePattern.matchMatcher(line) {
                         currentEffectLineLocated = true
                     }
                     if (currentEffectLineLocated) {
-                        (("(§.)*.*■ (§.)*(?<thePerk>.+)").toPattern()).matchMatcher(line) {
+                        theSkymallCurrentEffectInQuestionLoreLinePattern.matchMatcher(line) {
                             return when (group("thePerk")) {
                                 "Gain §a+100 §6⸕ Mining Speed§7." -> return "§a+§6⸕"
                                 "Gain §a+50 §6☘ Mining Fortune§7." -> return "§a+§6☘"
@@ -62,28 +77,28 @@ class MenuItemDisplayOverlayMining {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_PERK_LEVELS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
-            (("§(a|e|c).*").toPattern()).matchMatcher(nameWithColor) {
+            hotmPerkEnabledDisabledInProgressItemNamePattern.matchMatcher(nameWithColor) {
                 //§7Level 64/§8100
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
 //                 if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
 //                 if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
-                (("^((?!(§.)*Level ).)*\$").toPattern()).matchMatcher(lore.first()) {
-                    (("^((?!(§.)*(Right|Left).click to ).)*\$").toPattern()).matchMatcher(lore.last()) {
+                isNotHOTMPerkFirstCheckLoreLinePattern.matchMatcher(lore.first()) {
+                    isNotHOTMPerkSecondCheckLoreLinePattern.matchMatcher(lore.last()) {
                         return ""
                     }
                 }
-                ((".*(§.)*(Requires .*|.*the Mountain!).*").toPattern()).matchMatcher(lore.last()) { return "" }
+                lockedHOTMPerkLoreLinePattern.matchMatcher(lore.last()) { return "" }
                 xOutOfYNoColorRequiredPattern.matchMatcher(lore.first()) {
                     //§7Level 64/§8100
                     var colorCode = ""
                     var level = group("useful")
                     if (group("total") == null) level = "✔"
-                    (("§a.*").toPattern()).matchMatcher(nameWithColor) {
+                    isHOTMPerkMaxedItemNamePattern.matchMatcher(nameWithColor) {
                         colorCode = "§a"
                     }
                     for (line in lore) {
-                        (("(§.)*(.*)click to (§.)*(enable).*").toPattern()).matchMatcher(line) {
+                        isHOTMPerkDisabledLoreLinePattern.matchMatcher(line) {
                             colorCode = "§c"
                         }
                     }
@@ -96,13 +111,13 @@ class MenuItemDisplayOverlayMining {
         //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
         //ping @erymanthus on the skyhanni discord if you find any bugs with this
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_OVERALL_TIERS) && chestName == ("Heart of the Mountain")) {
-            (("Tier (?<tier>[\\w]+)").toPattern()).matchMatcher(item.cleanName()) {
+            isHOTMTierItemNamePattern.matchMatcher(item.cleanName()) {
                 val nameWithColor = item.name ?: return ""
-                (("§aTier (?<tier>[\\w]+)").toPattern()).matchMatcher(nameWithColor) { return "" }
+                isHOTMTierUnlockedItemNamePattern.matchMatcher(nameWithColor) { return "" }
                 val lore = item.getLore()
                 if (lore != null && lore.isNotEmpty()) {
                     for (line in lore) {
-                        ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) {
+                        hotmLevelPercentProgressLoreLinePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
                         }
                     }
@@ -118,9 +133,9 @@ class MenuItemDisplayOverlayMining {
             var crystalsNotFound = 0
             val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
             for (line in lore) {
-                ((".*(Your Other Crystals|Jasper|Ruby).*").toPattern()).matchMatcher(line) { break }
-                ((".* §e✖ Not Placed").toPattern()).matchMatcher(line) { crystalsNotPlaced++ }
-                ((".* §c✖ Not Found").toPattern()).matchMatcher(line) { crystalsNotFound++ }
+                crystalsNotForCrystalNucleusLoreLinePattern.matchMatcher(line) { break }
+                crystalNotPlacedLoreLinePattern.matchMatcher(line) { crystalsNotPlaced++ }
+                crystalNotFoundLoreLinePattern.matchMatcher(line) { crystalsNotFound++ }
             }
             val crystalsPlaced = totalCrystals - crystalsNotPlaced - crystalsNotFound
             return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
