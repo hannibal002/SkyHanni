@@ -2,8 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -18,8 +17,7 @@ object GardenPlotAPI {
     var plots = listOf<Plot>()
 
     fun getCurrentPlot(): Plot? {
-        val location = LocationUtils.playerLocation()
-        return plots.firstOrNull { it.box.isInside(location) }
+        return plots.firstOrNull { it.isPlayerInside() }
     }
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
@@ -50,6 +48,8 @@ object GardenPlotAPI {
         }
 
     fun Plot.isBarn() = id == -1
+
+    fun Plot.isPlayerInside() = box.isPlayerInside()
 
     fun Plot.sendTeleportTo() {
         LorenzUtils.sendCommandToServer("tptoplot $name")
