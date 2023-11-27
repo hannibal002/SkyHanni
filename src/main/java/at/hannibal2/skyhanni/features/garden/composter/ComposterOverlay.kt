@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -52,7 +51,7 @@ object ComposterOverlay {
     private var fuelFactors: Map<String, Double> = emptyMap()
     private var organicMatter: Map<String, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden.composters
+    private val config get() = GardenAPI.config.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 

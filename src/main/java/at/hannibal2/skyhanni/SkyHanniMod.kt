@@ -41,6 +41,9 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
@@ -134,7 +137,9 @@ import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
 import at.hannibal2.skyhanni.features.garden.GardenLevelDisplay
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.GardenOptimalSpeed
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotBorders
+import at.hannibal2.skyhanni.features.garden.GardenWarpCommands
 import at.hannibal2.skyhanni.features.garden.GardenYawAndPitch
 import at.hannibal2.skyhanni.features.garden.ToolTooltipTweaks
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
@@ -166,6 +171,10 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
+import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
@@ -320,9 +329,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -344,7 +350,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.1",
+    version = "0.22.Beta.2",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -389,6 +395,7 @@ class SkyHanniMod {
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
+        loadModule(GardenWarpCommands())
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
@@ -401,6 +408,7 @@ class SkyHanniMod {
         // APIs
         loadModule(BazaarApi())
         loadModule(GardenAPI)
+        loadModule(GardenPlotAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)
@@ -658,6 +666,10 @@ class SkyHanniMod {
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
+        loadModule(PestSpawn())
+        loadModule(PestSpawnTimer)
+        loadModule(PestFinder())
+        loadModule(SprayFeatures())
 
         init()
 
