@@ -13,14 +13,14 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayAbiphone {
-    private val abiphoneContactsChestNameDirectory = (("(.*A.iphone.*|Contacts Directory)").toPattern())
+    private val abiphoneContactsDirectoryChestNamePattern = (("(.*A.iphone.*|Contacts Directory)").toPattern())
     private val yourContactsLoreLinePattern = (("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
     private val isAContactItemNamePattern = ((".*§f§.*").toPattern())
     private val upgradedAllRelaysLoreLinePattern = ("(§.)?Upgraded Relays: (§.).*ALL!.*".toPattern())
     private val upgradedPartialRelaysLoreLinePattern = (("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
     private val selectedRingtoneLoreLinePattern = (("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)").toPattern())
     private val abiphoneMinigameStatsLoreLinePattern = (("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)").toPattern())
-    private val tilerSortLoreLineAbiphoneOnlyPattern = ((".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*").toPattern())
+    private val tilerSortAbiphoneOnlyLoreLinePattern = ((".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*").toPattern())
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -33,7 +33,7 @@ class MenuItemDisplayOverlayAbiphone {
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.abiphone
         val chestName = InventoryUtils.openInventoryName()
 
-        abiphoneContactsChestNameDirectory.matchMatcher(chestName) {
+        abiphoneContactsDirectoryChestNamePattern.matchMatcher(chestName) {
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.CONTACTS_DIRECTORY)) && (itemName == ("Contacts Directory"))) {
                 for (line in item.getLore()) {
                     yourContactsLoreLinePattern.matchMatcher(line) {
@@ -108,7 +108,7 @@ class MenuItemDisplayOverlayAbiphone {
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.NAVIGATION)) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
                 for (line in item.getLore()) {
-                    tilerSortLoreLineAbiphoneOnlyPattern.matchMatcher(line) {
+                    tilerSortAbiphoneOnlyLoreLinePattern.matchMatcher(line) {
                         return when (val placeholder = group("category").replace(" ", "").lowercase()) {
                             "alphabetical" -> "ABC"
                             "donotdisturbfirst" -> "§cDND"
