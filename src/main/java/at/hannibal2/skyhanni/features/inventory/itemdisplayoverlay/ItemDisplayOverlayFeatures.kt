@@ -62,7 +62,6 @@ class ItemDisplayOverlayFeatures {
     private val auctionNumberLorePattern = (("§8Auction .*").toPattern())
     private val editionNumberLorePattern = (("§8Edition .*").toPattern())
     private val doesNotIncludeDungeonStarsItemNamePattern = (("^(?:(?!✪).)*\$").toPattern())
-
     private val garenVacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
