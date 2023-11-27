@@ -73,6 +73,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     private val isBrowsingAuctionsChestNamePattern = ((".*Auctions(:| ).*").toPattern())
     private val auctionHouseSpecificSelectedFilterLoreLinePattern = (("(§.)*▶ (?<text>[\\w ]+)").toPattern())
     private val auctionHouseSpecificSelectedRarityFilterLoreLinePattern = (("((?<colorCode>§.)*▶ (?<singleChar>[\\w ]))([\\w ])+").toPattern())
+    private val bankAccountTierLoreLinePattern = (("(§.)*Current account: (?<colorCode>§.)*(?<tier>(?<tierFirstLetter>[\\w])[\\w]+)").toPattern())
 
     /*
             see the next comment block for context of
@@ -116,6 +117,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         */
         event.stackTip = getStackTip(event.stack)
     }
+
 
     private fun getStackTip(item: ItemStack): String {
         if (SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced.isEmpty()) return ""
@@ -293,7 +295,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             }
             if ((itemName == "Bank Upgrades")) {
                 for (line in lore) {
-                    (("(§.)*Current account: (?<colorCode>§.)*(?<tier>(?<tierFirstLetter>[\\w])[\\w]+)").toPattern()).matchMatcher(line) {
+                    bankAccountTierLoreLinePattern.matchMatcher(line) {
                         return "${group("colorCode")}${group("tierFirstLetter")}"
                     }
                 }
