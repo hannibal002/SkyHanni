@@ -13,6 +13,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayFarming {
     private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val composterPattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
+    private val jacobFarmingContestMedalInventoryLoreLinePattern = (("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)").toPattern())
+    private val nextVisitorCountdownLoreLinePattern = (("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*").toPattern())
+    private val insertResourceFromLocationItemNamePattern = (("Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)").toPattern())
+    private val visitorLogbookNPCRarityLoreLinePattern = (("§.§(L|l)(UNCOMMON|RARE|LEGENDARY|SPECIAL|MYTHIC)").toPattern())
+    private val visitorMilestonePercentProgressLoreLinePattern = (("(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -28,7 +33,7 @@ class MenuItemDisplayOverlayFarming {
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.JACOBS_MEDALS) && ((chestName == "Jacob's Farming Contests") && itemName == ("Claim your rewards!"))) {
             var result = ""
             for (line in item.getLore()) {
-                (("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)").toPattern()).matchMatcher(line) {
+                jacobFarmingContestMedalInventoryLoreLinePattern.matchMatcher(line) {
                     result = "$result${group("colorCode")}${group("count")}"
                 }
             }
@@ -37,7 +42,7 @@ class MenuItemDisplayOverlayFarming {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITORS_LOGBOOK_COUNTDOWN) && ((chestName == "Visitor's Logbook") && itemName == ("Logbook"))) {
             for (line in item.getLore()) {
-                (("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*").toPattern()).matchMatcher(line) {
+                nextVisitorCountdownLoreLinePattern.matchMatcher(line) {
                     return group("time")
                 }
             }
@@ -47,7 +52,7 @@ class MenuItemDisplayOverlayFarming {
             val lore = item.getLore()
             if (lore.isNotEmpty()) {
                 for (line in lore) {
-                    (("(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern()).matchMatcher(line) {
+                    visitorMilestonePercentProgressLoreLinePattern.matchMatcher(line) {
                         return group("percent").replace("100", "§a✔")
                     }
                 }
@@ -57,7 +62,7 @@ class MenuItemDisplayOverlayFarming {
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITOR_NPC_RARITIES) && (chestName == "Visitor's Logbook")) {
             val lore = item.getLore()
             for (line in lore) {
-                (("§.§(L|l)(UNCOMMON|RARE|LEGENDARY|SPECIAL|MYTHIC)").toPattern()).matchMatcher(line) {
+                visitorLogbookNPCRarityLoreLinePattern.matchMatcher(line) {
                     return line.take(5)
                 }
             }
@@ -67,7 +72,7 @@ class MenuItemDisplayOverlayFarming {
             //(chestName.contains("Composter"))
             //(itemName.contains("Insert ") && itemName.contains(" from "))
             if (chestName == "Composter") {
-                (("Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)").toPattern()).matchMatcher(itemName) {
+                insertResourceFromLocationItemNamePattern.matchMatcher(itemName) {
                     val lore = item.getLore()
                     //§7Totalling §2§240k Fuel§7.
                     //Totalling 40k Fuel.
