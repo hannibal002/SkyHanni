@@ -19,16 +19,32 @@ class MenuItemDisplayOverlayAbiphone {
         event.stackTip = getStackTip(event.stack)
     }
 
+    private val abiphoneContactsChestNameDirectory = (("(.*A.iphone.*|Contacts Directory)").toPattern())
+
+    private val yourContactsLoreLinePattern = (("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
+
+    private val isAContactItemNamePattern = ((".*§f§.*").toPattern())
+
+    private val upgradedAllRelaysLoreLinePattern = ("(§.)?Upgraded Relays: (§.).*ALL!.*".toPattern())
+
+    private val upgradedPartialRelaysLoreLinePattern = (("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
+
+    private val selectedRingtoneLoreLinePattern = (("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)").toPattern())
+
+    private val abiphoneMinigameStatsLoreLinePattern = (("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)").toPattern())
+
+    private val tilerSortLoreLineAbiphoneOnlyPattern = ((".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*").toPattern())
+
     private fun getStackTip(item: ItemStack): String {
         if (SkyHanniMod.feature.inventory.stackSize.menu.abiphone.isEmpty()) return ""
         val itemName = item.cleanName()
         val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.abiphone
         val chestName = InventoryUtils.openInventoryName()
 
-        (("(.*A.iphone.*|Contacts Directory)").toPattern()).matchMatcher(chestName) {
+        abiphoneContactsChestNameDirectory.matchMatcher(chestName) {
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.CONTACTS_DIRECTORY)) && (itemName == ("Contacts Directory"))) {
                 for (line in item.getLore()) {
-                    ("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()).matchMatcher(line) {
+                    yourContactsLoreLinePattern.matchMatcher(line) {
                         return group("useful")
                     }
                 }
@@ -36,7 +52,7 @@ class MenuItemDisplayOverlayAbiphone {
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.DO_NOT_DISTURB))) {
                 val nameWithColor = item.name ?: return ""
-                ((".*§f§.*").toPattern()).matchMatcher(nameWithColor) {
+                isAContactItemNamePattern.matchMatcher(nameWithColor) {
                     val lore = item.getLore()
                     for (line in lore) {
                         if (line == ("§cDo Not Disturb enabled!")) {
@@ -51,14 +67,14 @@ class MenuItemDisplayOverlayAbiphone {
                 //§7Upgraded Relays: §e1§7/§59
                 //Upgraded Relays: 1/9
                 for (line in item.getLore()) {
-                    ("(§.)?Upgraded Relays: (§.).*ALL!.*".toPattern()).matchMatcher(line) { return maxRelays }
-                    ("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()).matchMatcher(line) { return group("useful") }
+                    upgradedAllRelaysLoreLinePattern.matchMatcher(line) { return maxRelays }
+                    upgradedPartialRelaysLoreLinePattern.matchMatcher(line) { return group("useful") }
                 }
             }
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.SELECTED_RINGTONE)) && (itemName == ("Ringtones"))) {
                 for (line in item.getLore()) {
-                    (("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)").toPattern()).matchMatcher(line) {
+                    selectedRingtoneLoreLinePattern.matchMatcher(line) {
                         return when (group("ringtone").split(" ").last()) {
                             "Default" -> "Def"
                             "Entertainer" -> "Ent"
@@ -77,7 +93,7 @@ class MenuItemDisplayOverlayAbiphone {
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.TIC_TAC_TOE)) && (itemName == ("Tic Tac Toe"))) {
                 var finalString = ""
                 for (line in item.getLore()) {
-                    (("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)").toPattern()).matchMatcher(line) {
+                    abiphoneMinigameStatsLoreLinePattern.matchMatcher(line) {
                         val colorCode = when (group("type")) {
                             "Wins" -> "§a"
                             "Draws" -> "§e"
@@ -92,7 +108,7 @@ class MenuItemDisplayOverlayAbiphone {
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.SNAKE)) && (itemName == ("Snake"))) {
                 for (line in item.getLore()) {
-                    (("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)").toPattern()).matchMatcher(line) {
+                    abiphoneMinigameStatsLoreLinePattern.matchMatcher(line) {
                         return group("count")
                     }
                 }
@@ -100,7 +116,7 @@ class MenuItemDisplayOverlayAbiphone {
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.NAVIGATION)) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
                 for (line in item.getLore()) {
-                    ((".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*").toPattern()).matchMatcher(line) {
+                    tilerSortLoreLineAbiphoneOnlyPattern.matchMatcher(line) {
                         return when (val placeholder = group("category").replace(" ", "").lowercase()) {
                             "alphabetical" -> "ABC"
                             "donotdisturbfirst" -> "§cDND"
