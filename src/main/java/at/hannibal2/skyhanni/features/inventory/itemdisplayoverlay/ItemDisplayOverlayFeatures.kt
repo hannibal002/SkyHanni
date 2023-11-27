@@ -13,12 +13,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.countDigits
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAuctionNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBloodGodKills
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
@@ -31,33 +28,33 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
-    private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
-    private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val shredderBonusDamagePattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
-    private val bottleOfJerryPattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
+    private val rancherBootsSpeedCapLoreLinePattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
+    private val petLevelItemNamePattern = "\\[Lvl (?<level>.*)] .*".toPattern()
+    private val shredderBonusDamageLoreLinePattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
+    private val bottleOfJerryLoreLinePattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
     private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
-    private val gardenVacuumPattern = "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?".toPattern()
-    private val masterSkullPattern = (("(.*)Master Skull - Tier (?<tier>.+)").toPattern())
-    private val dungeonBossHeadPattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
-    private val newYearCakeSpookyPieYearPattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
-    private val minionNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
-    private val enchantedSackPattern = (("Enchanted .*").toPattern())
+    private val gardenVacuumLoreLinePattern = "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?".toPattern()
+    private val masterSkullItemNamePattern = (("(.*)Master Skull - Tier (?<tier>.+)").toPattern())
+    private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
+    private val newYearCakeSpookyPieYearItemNamePattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
+    private val minionTierItemNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
+    private val enchantedItemSackItemNamePattern = (("Enchanted .*").toPattern())
     private val kuudraKeyItemNamePattern = (("([\\w ]+)?Kuudra Key").toPattern())
     private val kuudraKeyInternalNamePattern = (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern())
-    private val larvaHookPattern = (("§7§7You may harvest §6(?<amount>.).*").toPattern())
-    private val dungeonLevelPotionPattern = (("Dungeon (?<level>.*) Potion").toPattern())
+    private val larvaHookLoreLinePattern = (("§7§7You may harvest §6(?<amount>.).*").toPattern())
+    private val dungeonLevelPotionItemNamePattern = (("Dungeon (?<level>.*) Potion").toPattern())
     private val armadilloRarityLorePattern = (("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)").toPattern())
     private val beastmasterCrestInternalNamePattern = (("BEASTMASTER_CREST_[\\w]*").toPattern())
     private val beastmasterCrestKillsProgressPattern = (("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)").toPattern())
-    private val campfireTalismanTierPattern = (("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)").toPattern())
+    private val campfireTalismanTierInternalNamePattern = (("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)").toPattern())
     private val auctionHouseChestNamePattern = (("^(?:(?!Auction).)*\$").toPattern())
-    private val internalizedSoulflowPattern = (("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow").toPattern())
+    private val internalizedSoulflowLoreLinePattern = (("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow").toPattern())
     private val storageChestInternalNamePattern = ((".*_ENCHANTED_CHEST").toPattern())
-    private val storageChestDisplayNamePattern = ((".* Storage").toPattern())
+    private val storageChestItemNamePattern = ((".* Storage").toPattern())
     private val personalCompactorDeletorChestNamePattern = (("Personal (Compactor .*|Deletor .*)").toPattern())
-    private val personalCompactorEnabledPattern = (("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!").toPattern())
+    private val personalCompactorEnabledItemNamePattern = (("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!").toPattern())
     private val personalCompactorDeletorInternalNamePattern = (("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)").toPattern())
-    private val personalCompactorDeletorDisplayNamePattern = (("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)").toPattern())
+    private val personalCompactorDeletorItemNamePattern = (("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)").toPattern())
     private val abiphoneInternalNamePattern = (("ABIPHONE_.*").toPattern())
     private val auctionNumberLorePattern = (("§8Auction .*").toPattern())
     private val editionNumberLorePattern = (("§8Edition .*").toPattern())
@@ -100,13 +97,13 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.MASTER_SKULL)) {
-            masterSkullPattern.matchMatcher(itemName) {
+            masterSkullItemNamePattern.matchMatcher(itemName) {
                 return group("tier")
             }
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.DUNGEON_HEAD_FLOOR_NUMBER)) {
-            dungeonBossHeadPattern.matchMatcher(internalName) {
+            dungeonBossHeadInternalNamePattern.matchMatcher(internalName) {
                 return when (group("dungeonBoss")) {
                     ("BONZO") -> "1"
                     ("SCARF") -> "2"
@@ -121,13 +118,13 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.SKYBLOCK_YEAR)) {
-            newYearCakeSpookyPieYearPattern.matchMatcher(itemName) {
+            newYearCakeSpookyPieYearItemNamePattern.matchMatcher(itemName) {
                 return "§b${group("year")}"
             }
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.PET_LVL) && (!chestName.endsWith("Sea Creature Guide")) && (ItemUtils.isPet(itemName))) {
-            petLevelPattern.matchMatcher(itemName) {
+            petLevelItemNamePattern.matchMatcher(itemName) {
                 val level = group("level").toInt()
                 if (level != ItemUtils.maxPetLevel(itemName)) {
                     return "$level"
@@ -136,7 +133,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.MINION_TIER)) {
-            minionNamePattern.matchMatcher(itemName) {
+            minionTierItemNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
                     if (line.equals("§7Place this minion and it will")) {
                         return itemName.split(" ").last().romanToDecimal().toString()
@@ -148,7 +145,7 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.displaySackName && ItemUtils.isSack(item)) {
             val sackName = grabSackName(itemName)
             //return (if (itemName.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
-            enchantedSackPattern.matchMatcher(itemName) {
+            enchantedItemSackItemNamePattern.matchMatcher(itemName) {
                 return "§5${sackName.substring(0, 2)}"
             }
             return "${sackName.substring(0, 2)}"
@@ -171,7 +168,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.RANCHER_SPEED) && internalName == ("RANCHERS_BOOTS")) {
             for (line in item.getLore()) {
-                rancherBootsSpeedCapPattern.matchMatcher(line) {
+                rancherBootsSpeedCapLoreLinePattern.matchMatcher(line) {
                     return group("cap")
                 }
             }
@@ -179,7 +176,7 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.LARVA_HOOK) && internalName == ("LARVA_HOOK")) {
             for (line in item.getLore()) {
-                larvaHookPattern.matchMatcher(line) {
+                larvaHookLoreLinePattern.matchMatcher(line) {
                     val amount = group("amount").toInt()
                     return when {
                         amount > 4 -> "§a$amount"
@@ -191,7 +188,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.DUNGEON_POTION_LEVEL)) {
-            dungeonLevelPotionPattern.matchMatcher(itemName) {
+            dungeonLevelPotionItemNamePattern.matchMatcher(itemName) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"
@@ -249,7 +246,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.CAMPFIRE)) {
-            campfireTalismanTierPattern.matchMatcher(internalName) {
+            campfireTalismanTierInternalNamePattern.matchMatcher(internalName) {
                 return "${(group("tier").toInt() + 1)}"
             }
         }
@@ -268,7 +265,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.SHREDDER) && internalName == ("THE_SHREDDER")) {
             val lore = item.getLore()
             for (line in lore) {
-                shredderBonusDamagePattern.matchMatcher(line) {
+                shredderBonusDamageLoreLinePattern.matchMatcher(line) {
                     return group("dmgbonus")
                 }
             }
@@ -277,7 +274,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.JYRRE) && internalName == ("BOTTLE_OF_JYRRE")) {
             val lore = item.getLore()
             for (line in lore) {
-                bottleOfJerryPattern.matchMatcher(line) {
+                bottleOfJerryLoreLinePattern.matchMatcher(line) {
                     return group("intelbonus")
                 }
             }
@@ -289,7 +286,7 @@ class ItemDisplayOverlayFeatures {
             //!(chestName.contains("Auction"))
             auctionHouseChestNamePattern.matchMatcher(chestName) {
                 val line = item.getLore().first()
-                internalizedSoulflowPattern.matchMatcher(line) {
+                internalizedSoulflowLoreLinePattern.matchMatcher(line) {
                     val soulflowCount = "${group("leading")}${group("trailing")}"
                     val soulflowCountWithoutCommas = "${soulflowCount.formatNumber()}"
                     val usefulAsString =  group("leading")
@@ -312,7 +309,7 @@ class ItemDisplayOverlayFeatures {
             //internalName.endsWith("_ENCHANTED_CHEST")
             //itemName.endsWith(" Storage")
             storageChestInternalNamePattern.matchMatcher(internalName) {
-                storageChestDisplayNamePattern.matchMatcher(itemName) {
+                storageChestItemNamePattern.matchMatcher(itemName) {
                     var colorCode = item.name ?: return ""
                     colorCode = colorCode.take(2)
                     val numSlots = when (itemName) {
@@ -339,7 +336,7 @@ class ItemDisplayOverlayFeatures {
                         else -> ""
                     }
                 } */
-                personalCompactorEnabledPattern.matchMatcher(itemName) {
+                personalCompactorEnabledItemNamePattern.matchMatcher(itemName) {
                     return when (group("toggle")) {
                         "N" ->"§a✔"
                         else -> "§c§l✖"
@@ -347,7 +344,7 @@ class ItemDisplayOverlayFeatures {
                 }
             }
             personalCompactorDeletorInternalNamePattern.matchMatcher(internalName) {
-                personalCompactorDeletorDisplayNamePattern.matchMatcher(itemName) {
+                personalCompactorDeletorItemNamePattern.matchMatcher(itemName) {
                     return "${group("thousands")}K"
                 }
             }
@@ -407,7 +404,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.VACCUM_PESTS)) {
             if (item.getInternalNameOrNull() in garenVacuumVariants) {
                 for (line in item.getLore()) {
-                    gardenVacuumPattern.matchMatcher(line) {
+                    gardenVacuumLoreLinePattern.matchMatcher(line) {
                         val pests = group("amount").formatNumber()
                         return if (pests >= 40) "§6§z40+" else "$pests"
                     }
