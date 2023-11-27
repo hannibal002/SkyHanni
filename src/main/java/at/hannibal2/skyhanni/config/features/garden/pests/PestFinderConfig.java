@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class PestFinderConfig {
 
@@ -36,4 +38,9 @@ public class PestFinderConfig {
 
     @Expose
     public Position position = new Position(-350, 200, 1.3f);
+
+    @Expose
+    @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int teleportHotkey = Keyboard.KEY_NONE;
 }
