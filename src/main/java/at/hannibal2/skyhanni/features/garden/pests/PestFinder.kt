@@ -5,15 +5,21 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -79,13 +85,13 @@ class PestFinder {
             val pests = plot.pests
             if (pests == 0) continue
 
-            val name = plot.name
+            val plotName = plot.name
             val pestsName = StringUtils.optionalPlural(pests, "pest", "pests")
             val renderable = Renderable.clickAndHover(
-                "§c$pestsName §7in §b$name",
+                "§c$pestsName §7in §b$plotName",
                 listOf(
                     "§7Pests Found: §e$pests",
-                    "§7In plot §b$name",
+                    "§7In plot §b$plotName",
                     "",
                     "§eClick here to warp!"
                 ),
@@ -135,6 +141,7 @@ class PestFinder {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!config.showDisplay) return
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
 
         if (GardenAPI.inGarden() && config.showDisplay) {
@@ -142,5 +149,23 @@ class PestFinder {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.showDisplay
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+        if (!config.waypointInWorld) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+
+        val playerLocation = event.exactPlayerEyeLocation()
+        GardenPlotAPI.plots.filter { it.pests > 0 }.forEach { plot ->
+            val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
+            val plotName = plot.name
+            val middle = plot.middle
+            val location = playerLocation.copy(x = middle.x, z = middle.z)
+            if (location.distanceToPlayer() < 15) return@forEach
+            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+            event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
+        }
+    }
+
+    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.waypointInWorld)
 }
