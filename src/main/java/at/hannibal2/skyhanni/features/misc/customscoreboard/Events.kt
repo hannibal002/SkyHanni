@@ -57,12 +57,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 .trim().removePrefix("§r§b§lParty §r§f(").removeSuffix(")").toInt()
 
             if (dungeonPlayers != 0 && list.any { it.startsWith("Cleared: ") }) {
-                list += ""
-
                 if (dungeonPlayers == 1) {
                     list += "§3§lSolo"
                 } else {
-                    for (i in 2..dungeonPlayers) {
+                    for (i in 1..dungeonPlayers) {
                         list += ScoreboardData.sidebarLinesFormatted.nextAfter(
                             "§r" + list.first { it.startsWith("Cleared: ") }.replace("%§", "%"),
                             i
