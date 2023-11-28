@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -226,7 +227,7 @@ object GardenCropMilestoneDisplay {
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.text) {
-            lineMap[index]?.let {
+            lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
         }
@@ -311,6 +312,13 @@ object GardenCropMilestoneDisplay {
             "garden.cropMilestones.highestTimeFormat"
         ) { element ->
             ConfigUtils.migrateIntToEnum(element, TimeFormatEntry::class.java)
+        }
+        event.move(
+            11,
+            "garden.cropMilestones.text",
+            "garden.cropMilestones.text"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MilestoneTextEntry::class.java)
         }
     }
 }
