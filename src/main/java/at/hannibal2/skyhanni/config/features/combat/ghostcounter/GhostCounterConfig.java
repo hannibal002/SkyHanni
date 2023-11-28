@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.LegacyList;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
@@ -53,7 +53,7 @@ public class GhostCounterConfig {
         HIGHEST_KILL_COMBO
     ));
 
-    public enum GhostDisplayEntry implements LegacyList {
+    public enum GhostDisplayEntry implements HasLegacyId {
         TITLE("§6Ghosts Counter", 0),
         GHOSTS_KILLED("  §bGhost Killed: 42", 1),
         SORROW("  §bSorrow: 6", 2),

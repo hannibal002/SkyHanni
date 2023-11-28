@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat.damageindicator;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.LegacyList;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -75,7 +75,7 @@ public class DamageIndicatorConfig {
 
     ));
 
-    public enum DamageIndicatorBossEntry implements LegacyList {
+    public enum DamageIndicatorBossEntry implements HasLegacyId {
         DUNGEON_ALL("§bDungeon All", 0),
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
         VANQUISHER("§bVanquisher", 2),

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.config;
 
 /**
- * The interface LegacyList.
+ * The interface HasLegacyId.
  * To be used for config elements that are being migrated from ArrayLists to Enums.
  * A legacyId is not needed for new elements.
  */
-public interface LegacyList {
+public interface HasLegacyId {
 
     /**
      * Gets display string.

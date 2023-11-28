@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.winter;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.LegacyList;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -60,7 +60,7 @@ public class FrozenTreasureConfig {
         GLACIAL_TALISMAN
     ));
 
-    public enum FrozenTreasureDisplayEntry implements LegacyList {
+    public enum FrozenTreasureDisplayEntry implements HasLegacyId {
         TITLE("§1§lFrozen Treasure Tracker", 0),
         TREASURES_MINED("§61,636 Treasures Mined", 1),
         TOTAL_ICE("§33.2m Total Ice", 2),

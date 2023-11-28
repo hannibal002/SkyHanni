@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.LegacyList;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -66,7 +66,7 @@ public class EnderNodeConfig {
         ENDERMAN_PET)
     ));
 
-    public enum EnderNodeDisplayEntry implements LegacyList {
+    public enum EnderNodeDisplayEntry implements HasLegacyId {
         TITLE("§5§lEnder Node Tracker", 0),
         NODES_MINED("§d1,303 Ender Nodes Mined", 1),
         COINS_MADE("§615.3M Coins Made", 2),

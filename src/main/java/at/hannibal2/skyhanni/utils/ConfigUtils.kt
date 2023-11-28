@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.LegacyList
+import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -15,7 +15,7 @@ object ConfigUtils {
      * @return The migrated JsonElement
      */
     fun <T> migrateArrayListToJsonEnumArray(element: JsonElement, enumClass: Class<T>): JsonElement
-        where T : Enum<T>, T : LegacyList {
+        where T : Enum<T>, T : HasLegacyId {
         require(element is JsonArray) { "Expected a JsonArray but got ${element.javaClass.simpleName}" }
 
         // An array of enum constants that are to be migrated
@@ -39,7 +39,7 @@ object ConfigUtils {
     private fun <T> getEnumConstantFromLegacyId(
         legacyId: Int,
         enumClass: Class<T>
-    ): T? where T : Enum<T>, T : LegacyList {
+    ): T? where T : Enum<T>, T : HasLegacyId {
         for (enumConstant in enumClass.getEnumConstants()) {
             if (enumConstant.legacyId == legacyId) return enumConstant
         }
