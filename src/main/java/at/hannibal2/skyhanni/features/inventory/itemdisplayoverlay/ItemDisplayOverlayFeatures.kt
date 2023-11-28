@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -149,7 +150,7 @@ class ItemDisplayOverlayFeatures {
             enchantedItemSackItemNamePattern.matchMatcher(itemName) {
                 return "§5${sackName.substring(0, 2)}"
             }
-            return "${sackName.substring(0, 2)}"
+            return sackName.substring(0, 2)
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.KUUDRA)) {
@@ -260,7 +261,7 @@ class ItemDisplayOverlayFeatures {
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.YETI_ROD) && internalName == ("YETI_ROD")) {
             val kills = "${item.getYetiRodFishesCaught()}"
             if (kills == "null") { return "" }
-            if (kills.length >= 4){ return "100" }
+            if (kills.length >= 4) { return "100" }
             else { return (kills.dropLast(1)) }
         }
 
@@ -289,20 +290,7 @@ class ItemDisplayOverlayFeatures {
             auctionHouseChestNamePattern.matchMatcher(chestName) {
                 val line = item.getLore().first()
                 internalizedSoulflowLoreLinePattern.matchMatcher(line) {
-                    val soulflowCount = "${group("leading")}${group("trailing")}"
-                    val soulflowCountWithoutCommas = "${soulflowCount.formatNumber()}"
-                    val usefulAsString =  group("leading")
-                    val suffix = when (soulflowCountWithoutCommas.length) {
-                        in 1..3 -> ""
-                        in 4..6 -> "k"
-                        in 7..9 -> "M"
-                        in 10..12 -> "B"
-                        in 13..15 -> "T"
-                        else -> "§b§z:)"
-                    }
-                    if (usefulAsString.isEmpty()) return ""
-                    if (suffix == "§b§z:)") return suffix
-                    else return "$usefulAsString$suffix"
+                    return NumberUtil.format("${group("leading")}${group("trailing")}".formatNumber())
                 }
             }
         }

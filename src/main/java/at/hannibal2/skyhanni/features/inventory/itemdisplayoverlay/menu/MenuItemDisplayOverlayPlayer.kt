@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.init.Items
@@ -218,30 +220,18 @@ class MenuItemDisplayOverlayPlayer {
             // (chestName.endsWith(" Essence"))
             if (canDisplayEssence) {
                 val lore = item.getLore()
-                var usefulAsString: String = ""
-                var totalAsString: String = ""
+                var total = 0L
                 loop@for (line in lore) {
                     essenceCountOtherLoreLinePattern.matchMatcher(line) {
-                        usefulAsString = group("useful")
-                        totalAsString = group("total").replace(",", "")
+                        total = group("total").formatNumber()
                         break@loop
                     }
                     essenceCountLoreLinePattern.matchMatcher(line) {
-                        usefulAsString = group("useful")
-                        totalAsString = group("total").replace(",", "")
+                        total = group("total").formatNumber()
                         break@loop
                     }
                 }
-                val suffix = when (totalAsString.length) {
-                        in 1..3 -> ""
-                        in 4..6 -> "k"
-                        in 7..9 -> "M"
-                        in 10..12 -> "B"
-                        in 13..15 -> "T"
-                        else -> "§b§z:)"
-                    }
-                    if (suffix == "§b§z:)") return suffix
-                    else return "" + usefulAsString + suffix
+                return NumberUtil.format(total)
             }
         }
 

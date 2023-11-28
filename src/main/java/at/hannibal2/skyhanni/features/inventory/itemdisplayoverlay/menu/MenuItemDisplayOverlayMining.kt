@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayMining {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
+    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val hotmPerkLevelXOutOfYLoreLinePattern = "(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*".toPattern()
     private val rightClickToEnableDisableLoreLinePattern = (("(§.)*Right.?click to (§.)*disable(§.)*!").toPattern())
     private val skyMallCurrentEffectLoreLinePattern = ((".*(§.)*Your Current Effect.*").toPattern())
@@ -115,7 +115,7 @@ class MenuItemDisplayOverlayMining {
                 val nameWithColor = item.name ?: return ""
                 isHOTMTierUnlockedItemNamePattern.matchMatcher(nameWithColor) { return "" }
                 val lore = item.getLore()
-                if (lore != null && lore.isNotEmpty()) {
+                if (lore.isNotEmpty()) {
                     for (line in lore) {
                         hotmLevelPercentProgressLoreLinePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
@@ -132,8 +132,8 @@ class MenuItemDisplayOverlayMining {
             var crystalsNotPlaced = 0
             var crystalsNotFound = 0
             val totalCrystals = 5 //change "5" to whatever new value Hypixel does if this value ever changes
-            for (line in lore) {
-                crystalsNotForCrystalNucleusLoreLinePattern.matchMatcher(line) { break }
+            loop@ for (line in lore) {
+                crystalsNotForCrystalNucleusLoreLinePattern.matchMatcher(line) { break@loop }
                 crystalNotPlacedLoreLinePattern.matchMatcher(line) { crystalsNotPlaced++ }
                 crystalNotFoundLoreLinePattern.matchMatcher(line) { crystalsNotFound++ }
             }

@@ -6,9 +6,12 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
@@ -17,11 +20,11 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerTryhard {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
+    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val auctionHousePageLoreLinePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPageLoreLinePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
     private val rngMeterLoreLinePattern = "(§.)*Odds: (?<odds>(§.[\\w]){1}).*".toPattern()
-    private val generalPurposeNotBoosterCookieDurationLoreLinePattern = "(§.)?(([A-z ])+): (§.)?(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?".toPattern()
+    private val generalPurposeNotBoosterCookieDurationLoreLinePattern = "(§.)?(([A-z ])+): (§.)?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)".toPattern()
     private val totalFameLoreLinePattern = "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame".toPattern()
     private val bitsAvailableLoreLinePattern = "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*".toPattern()
     private val magicalPowerLoreLinePattern = "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
@@ -41,7 +44,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
     private val currentlySelectedBrowsingViewingTabLoreLinePattern = (("§aCurrently .*").toPattern())
     private val isAuctionOrBazaarChestNamePattern = (("(Auction.*|Bazaar.*)").toPattern())
     private val fameRankLoreLinePattern = (("(§.)*Fame Rank: (§.)*(?<fameRank>[\\w ]+)").toPattern())
-    private val boosterCookieDurationLoreLinePattern = (("(§.)*Duration: (§.)*(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?").toPattern())
+    private val boosterCookieDurationLoreLinePattern = (("(§.)*Duration: (§.)*(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)").toPattern())
     private val currentlyActiveEffectsLoreLinePattern = (("(§.)*Currently Active: (§.)*(?<effects>[\\w]+)").toPattern())
     private val accessoryBagUpgradesStatsTuningChestNamePattern = (("(Accessory Bag Upgrades|Stats Tuning)").toPattern())
     private val powerStoneLearnedStatusLoreLinePattern = (("(§.)*Learned: (?<colorCode>§.)*(?<status>[\\w ]+) (?<icon>.)").toPattern())
@@ -156,36 +159,14 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if ((chestName == "Booster Cookie" && itemName == "Fame Rank")) {
                 for (line in item.getLore()) {
                     totalFameLoreLinePattern.matchMatcher(line) {
-                        val totalAsString = "${group("total").formatNumber()}"
-                        val usefulPartAsString = group("useful")
-                        val suffix = when (totalAsString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            in 10..12 -> "B"
-                            in 13..15 -> "T"
-                            else -> "§b§z:)"
-                        }
-                        if (suffix == "§b§z:)") return suffix
-                        else return "" + usefulPartAsString + suffix
+                        return NumberUtil.format(group("total").formatNumber())
                     }
                 }
             }
             if ((chestName == "Booster Cookie" && itemName == "Bits")) {
                 for (line in item.getLore()) {
                     bitsAvailableLoreLinePattern.matchMatcher(line) {
-                        val totalAsString = "${group("total").formatNumber()}"
-                        val usefulPartAsString = group("useful")
-                        val suffix = when (totalAsString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            in 10..12 -> "B"
-                            in 13..15 -> "T"
-                            else -> "§b§z:)"
-                        }
-                        if (suffix == "§b§z:)") return suffix
-                        else return "" + usefulPartAsString + suffix
+                        return NumberUtil.format(group("total").formatNumber())
                     }
                 }
             }
@@ -220,17 +201,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.BOOSTER_COOKIE_DURATION) && (item.getLore().isNotEmpty() && ((itemName == ("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
             for (line in item.getLore()) {
                 boosterCookieDurationLoreLinePattern.matchMatcher(line) {
-                    val yString = group("years") ?: ""
-                    val dString = group("days") ?: ""
-                    val hString = group("hours") ?: ""
-                    val mString = group("minutes") ?: ""
-                    val sString = group("seconds") ?: ""
-                    if (yString.length > 3 || dString.length > 3 || hString.length > 3 || mString.length > 3 || sString.length > 3) return "§b§z:)"
-                    if (yString.isNotEmpty() && !(yString.startsWith("0"))) return yString
-                    if (dString.isNotEmpty() && !(dString.startsWith("0"))) return dString
-                    if (hString.isNotEmpty() && !(hString.startsWith("0"))) return hString
-                    if (mString.isNotEmpty() && !(mString.startsWith("0"))) return mString
-                    if (sString.isNotEmpty() && !(sString.startsWith("0"))) return sString
+                    TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
                 }
             }
         }
@@ -248,16 +219,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if (chestName == ("Your Bags") && itemName == ("Accessory Bag")) {
                 for (line in lore) {
                     magicalPowerLoreLinePattern.matchMatcher(line) {
-                        val usefulAsString = group("useful")
-                        val totalAsString = "${group("total").formatNumber()}"
-                        val suffix = when (totalAsString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            else -> "§b§z:)"
-                        }
-                        if (suffix == "§b§z:)") return suffix
-                        else return "" + usefulAsString + suffix
+                        return NumberUtil.format(group("total").formatNumber())
                     }
                 }
             }
@@ -274,15 +236,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 if (itemName == ("Stats Tuning")) {
                     for (line in lore) {
                         tuningPointsLoreLinePattern.matchMatcher(line) {
-                            val usefulAsString = group("useful")
-                            val totalAsString = "${group("total").formatNumber()}"
-                            val suffix = when (totalAsString.length) {
-                                in 1..3 -> ""
-                                in 4..6 -> "k"
-                                else -> "§b§z:)"
-                            }
-                            if (suffix == "§b§z:)") return suffix
-                            else return "$usefulAsString$suffix"
+                            return NumberUtil.format(group("total").formatNumber())
                         }
                     }
                 }
@@ -297,16 +251,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             if (chestName == ("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
                 for (line in lore) {
                     otherMagicalPowerLoreLinePattern.matchMatcher(line) {
-                        val usefulString = group("useful")
-                        val totalString = "${group("total").formatNumber()}"
-                        val suffix = when (totalString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            else -> "§b§z:)"
-                        }
-                        if (suffix == "§b§z:)") return suffix
-                        else return "$usefulString$suffix"
+                        return NumberUtil.format(group("total").formatNumber())
                     }
                 }
             }
@@ -328,17 +273,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
             }
             generalPurposeNotBoosterCookieDurationLoreLinePattern.matchMatcher(theStringToUse) {
-                val yString = group("years") ?: ""
-                val dString = group("days") ?: ""
-                val hString = group("hours") ?: ""
-                val mString = group("minutes") ?: ""
-                val sString = group("seconds") ?: ""
-                if (yString.length > 3 || dString.length > 3 || hString.length > 3 || mString.length > 3 || sString.length > 3) return "§b§z:)"
-                if (yString.isNotEmpty() && !(yString.startsWith("0"))) return yString
-                if (dString.isNotEmpty() && !(dString.startsWith("0"))) return dString
-                if (hString.isNotEmpty() && !(hString.startsWith("0"))) return hString
-                if (mString.isNotEmpty() && !(mString.startsWith("0"))) return mString
-                if (sString.isNotEmpty() && !(sString.startsWith("0"))) return sString
+                TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
             }
         }
 

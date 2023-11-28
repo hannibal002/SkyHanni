@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.init.Blocks
@@ -277,18 +279,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (chestName == ("Bank Withdrawal") && itemName == ("Withdraw 20%")) {
                     for (line in lore) {
                         amtToWithdrawLoreLinePattern.matchMatcher(line) {
-                            val totalAsString = group("total").replace(",", "")
-                            val usefulPartAsString = group("useful")
-                            val suffix = when (totalAsString.length) {
-                                in 1..3 -> ""
-                                in 4..6 -> "k"
-                                in 7..9 -> "M"
-                                in 10..12 -> "B"
-                                in 13..15 -> "T"
-                                else -> "§b§z:)"
-                            }
-                            if (suffix == "§b§z:)") return suffix
-                            else return "§6$usefulPartAsString$suffix"
+                            return NumberUtil.format(group("total").formatNumber())
                         }
                     }
                 }

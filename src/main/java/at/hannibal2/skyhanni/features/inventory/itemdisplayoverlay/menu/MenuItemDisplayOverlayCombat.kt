@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayCombat {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
+    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val bestiaryChestNamePattern = (("Bestiary.*").toPattern())
     private val bestiaryMilestoneItemNamePattern = (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern())
     private val familiesCompletedOverallProgressPercentLoreLinePattern = ((".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())

@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayFarming {
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
+    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val totallingCountResourceLoreLinePattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
     private val jacobFarmingContestMedalInventoryLoreLinePattern = (("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)").toPattern())
     private val nextVisitorCountdownLoreLinePattern = (("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*").toPattern())
