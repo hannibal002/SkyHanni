@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry
+import at.hannibal2.skyhanni.config.features.event.winter.frozentreasure.FrozenTreasureDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData

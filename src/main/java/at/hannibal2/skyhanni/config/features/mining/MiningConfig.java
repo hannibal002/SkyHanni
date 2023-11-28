@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.features.mining.powdertracker.PowderTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;

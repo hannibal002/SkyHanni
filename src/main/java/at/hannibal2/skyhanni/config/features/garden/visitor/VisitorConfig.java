@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.features.garden.visitor.dropstatistics.DropsStatisticsConfig;
+import at.hannibal2.skyhanni.config.features.garden.visitor.rewardwarning.RewardWarningConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -99,20 +101,5 @@ public class VisitorConfig {
     )
     @ConfigEditorDropdown
     public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.ONLY_ON_BINGO;
-
-    public enum VisitorBlockBehaviour {
-        DONT("Don't"), ALWAYS("Always"), ONLY_ON_BINGO("Only on Bingo");
-
-        final String str;
-
-        VisitorBlockBehaviour(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
 
 }

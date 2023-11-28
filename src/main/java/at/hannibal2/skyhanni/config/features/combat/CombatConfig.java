@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
+import at.hannibal2.skyhanni.config.features.combat.endernode.EnderNodeConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;

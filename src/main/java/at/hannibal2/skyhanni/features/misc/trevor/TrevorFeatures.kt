@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
+import at.hannibal2.skyhanni.config.features.misc.trevortracker.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent

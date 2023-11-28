@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorBossEntry
 
 enum class BossType(
     val fullName: String,

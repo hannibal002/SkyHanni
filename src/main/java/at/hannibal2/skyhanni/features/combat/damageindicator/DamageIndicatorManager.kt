@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorBossEntry
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent

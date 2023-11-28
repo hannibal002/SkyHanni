@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.visitor.RewardWarningConfig.ItemWarnEntry
+import at.hannibal2.skyhanni.config.features.garden.visitor.rewardwarning.ItemWarnEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent

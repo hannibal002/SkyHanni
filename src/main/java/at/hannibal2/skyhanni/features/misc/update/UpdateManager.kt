@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.About
+import at.hannibal2.skyhanni.config.features.about.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -82,8 +82,8 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         var updateStream = config.updateStream.get()
-        if (updateStream == About.UpdateStream.RELEASES && isCurrentlyBeta()) {
-            updateStream = About.UpdateStream.BETA
+        if (updateStream == UpdateStream.RELEASES && isCurrentlyBeta()) {
+            updateStream = UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)
             .thenAcceptAsync({
