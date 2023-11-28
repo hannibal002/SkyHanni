@@ -14,7 +14,7 @@ private val config get() = SkyHanniMod.feature.gui.customScoreboard
 enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
     SERVER_CLOSE(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§cServer closing: ") })
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§cServer closing: ") } ?: "<hidden>")
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cServer closing: ") }
@@ -25,25 +25,25 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             val list = mutableListOf<String>()
 
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Auto-closing in:") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Auto-closing in:") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Auto-closing in:") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Starting in:") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Starting in:") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Starting in:") } ?: "<hidden>"
             }
 
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Keys: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Keys: ") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Keys: ") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Elapsed: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Time Elapsed: ") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Time Elapsed: ") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§rCleared: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§rCleared: ") }.toString()
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§rCleared: ") }.toString()
                     .replace("§r", "").replace("%", "%§") // for some reason this is broken
             }
 
-            val dungeonPlayers = TabListData.getTabList().first { it.trim().startsWith("§r§b§lParty §r§f(") }
-                .trim().removePrefix("§r§b§lParty §r§f(").removeSuffix(")").toInt()
+            val dungeonPlayers = TabListData.getTabList().firstOrNull{ it.trim().startsWith("§r§b§lParty §r§f(") }
+                ?.trim()?.removePrefix("§r§b§lParty §r§f(")?.removeSuffix(")")?.toInt() ?: 1
 
             if (dungeonPlayers != 0 && list.any { it.startsWith("Cleared: ") }) {
                 if (dungeonPlayers == 1) {
@@ -51,7 +51,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 } else {
                     for (i in 1..dungeonPlayers) {
                         list += ScoreboardData.sidebarLinesFormatted.nextAfter(
-                            "§r" + list.first { it.startsWith("Cleared: ") }.replace("%§", "%"),
+                            "§r" + (list.firstOrNull{ it.startsWith("Cleared: ") }?.replace("%§", "%") ?: "§cNo Dungeon Data"),
                             i
                         )
                             ?: "§cNo Player found"
@@ -73,28 +73,28 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             val list = mutableListOf<String>()
 
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Auto-closing in:") }) {
-                ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Auto-closing in:") }
+                ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Auto-closing in:") }
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Starting in:") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Starting in:") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Starting in:") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Instance ShutdowIn:") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Instance ShutdowIn:") }
-                    .replace("Instance ShutdowIn:", "Instance Shutdown In:") // for some reason this is broken
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Instance ShutdowIn:") }
+                    ?.replace("Instance ShutdowIn:", "Instance Shutdown In:") ?: "<hidden>"// for some reason this is broken
             }
 
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Elapsed: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Time Elapsed: ") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Time Elapsed: ") } ?: "<hidden>"
             }
             list += ""
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§f§lWave: §c§l") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§f§lWave: §c§l") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§f§lWave: §c§l") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§fTokens: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§fTokens: ") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§fTokens: ") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Submerges In: §e") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Submerges In: §e") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Submerges In: §e") } ?: "<hidden>"
             }
             list += ""
             if (ScoreboardData.sidebarLinesFormatted.any { it == "§fObjective:" }) {
@@ -130,9 +130,9 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         {
             val list = mutableListOf<String>()
 
-            list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§6§lGOLD §fmedals") }
-            list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§f§lSILVER §fmedals") }
-            list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§c§lBRONZE §fmedals") }
+            list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§6§lGOLD §fmedals") } ?: "<hidden>"
+            list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§f§lSILVER §fmedals") } ?: "<hidden>"
+            list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§c§lBRONZE §fmedals") } ?: "<hidden>"
 
             list
         },
@@ -145,27 +145,27 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             val list = mutableListOf<String>()
 
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("North Stars: §d") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("North Stars: §d") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("North Stars: §d") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event Start: §a") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Event Start: §a") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Event Start: §a") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Next Wave: §a") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Next Wave: §a") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Next Wave: §a") } ?: "<hidden>"
             }
             list += ""
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cWave ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§cWave ") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§cWave ") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left§c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Magma Cubes Left§c") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Magma Cubes Left§c") } ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Damag §c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Total Damag §c") }
-                    .replace("Damag", "Damage")
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Your Total Damag §c") }
+                    ?.replace("Damag", "Damage") ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage§c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Cube Damage§c") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Your Cube Damage§c") } ?: "<hidden>"
             }
 
             list
@@ -176,10 +176,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     SPOOKY(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§6Spooky Festival§f") }) + // Time
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§6Spooky Festival§f") } ?: "<hidden>") + // Time
                 ("§r§r§7Your Candy: ") +
-                (getTablistFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }
-                    .removePrefix("§r§r§7Your Candy:") ?: "§cCandy not found") // Candy
+                (getTablistFooter().split("\n").firstOrNull{ it.startsWith("§r§r§7Your Candy:") }
+                    ?.removePrefix("§r§r§7Your Candy:") ?: "§cCandy not found") // Candy
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6Spooky Festival§f") }
@@ -200,7 +200,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     NEW_YEAR(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§dNew Year Event") })
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§dNew Year Event") } ?: "<hidden>")
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§dNew Year Event") }
@@ -208,7 +208,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     ORINGO(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§aTraveling Zoo") })
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§aTraveling Zoo") } ?: "<hidden>")
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§aTraveling Zoo") }
@@ -236,15 +236,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             // Better Together
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Nearby Players:") }) {
                 list += "§9Better Together"
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Nearby Players:") }
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Nearby Players:") } ?: "<hidden>"
             }
 
             // Zone Events
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Event: ") }
-                    .removePrefix("Event: ")
-                list += "§fin " + ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Zone: ") }
-                    .removePrefix("Zone: ")
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Event: ") }
+                    ?.removePrefix("Event: ") ?: "<hidden>"
+                list += "§fin " + (ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Zone: ") }
+                    ?.removePrefix("Zone: ") ?: "<hidden>" )
             }
 
             if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
@@ -258,8 +258,8 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     DAMAGE(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Protector HP: §a") || it.startsWith("Dragon HP: §a") }) +
-                (ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Damage: §c") })
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Protector HP: §a") || it.startsWith("Dragon HP: §a") } ?: "<hidden>" ) +
+                (ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Your Damage: §c") } ?: "<hidden>")
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Damage: §c") }
@@ -267,7 +267,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     ESSENCE(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Essence: ") })
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Essence: ") } ?: "<hidden>")
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Essence: ") }
