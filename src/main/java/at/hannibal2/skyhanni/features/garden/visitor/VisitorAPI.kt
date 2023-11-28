@@ -122,7 +122,7 @@ object VisitorAPI {
             for (internalName in allRewards) {
                 val reward = VisitorReward.getByInternalName(internalName) ?: continue
 
-                if (config.rewardWarning.drops.contains(reward.ordinal)) {
+                if (config.rewardWarning.drops.elementAtOrNull(reward.ordinal) != null) {
                     return reward
                 }
             }
