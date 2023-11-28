@@ -17,15 +17,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.AVG_MAGIC_FIND;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.GHOSTS_KILLED;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.GHOST_PER_SORROW;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.GHOST_SINCE_SORROW;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.HIGHEST_KILL_COMBO;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.KILL_COMBO;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.SCAVENGER_COINS;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.SORROW;
-import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay.TITLE;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.AVG_MAGIC_FIND;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOSTS_KILLED;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOST_PER_SORROW;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOST_SINCE_SORROW;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.HIGHEST_KILL_COMBO;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.KILL_COMBO;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.SCAVENGER_COINS;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.SORROW;
+import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.TITLE;
 
 public class GhostCounterConfig {
 
@@ -41,7 +41,7 @@ public class GhostCounterConfig {
         desc = "Drag text to change the appearance of the overlay."
     )
     @ConfigEditorDraggableList()
-    public List<GhostDisplay> ghostDisplayText = new ArrayList<>(Arrays.asList(
+    public List<GhostDisplayEntry> ghostDisplayText = new ArrayList<>(Arrays.asList(
         TITLE,
         GHOSTS_KILLED,
         SORROW,
@@ -53,7 +53,7 @@ public class GhostCounterConfig {
         HIGHEST_KILL_COMBO
     ));
 
-    public enum GhostDisplay implements LegacyList {
+    public enum GhostDisplayEntry implements LegacyList {
         TITLE("§6Ghosts Counter", 0),
         GHOSTS_KILLED("  §bGhost Killed: 42", 1),
         SORROW("  §bSorrow: 6", 2),
@@ -79,13 +79,13 @@ public class GhostCounterConfig {
         private final String str;
         private final int legacyId;
 
-        GhostDisplay(String str, int legacyId) {
+        GhostDisplayEntry(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        GhostDisplay(String str) {
+        GhostDisplayEntry(String str) {
             this(str, -1);
         }
 

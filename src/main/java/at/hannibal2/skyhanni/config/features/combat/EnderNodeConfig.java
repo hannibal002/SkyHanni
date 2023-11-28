@@ -13,22 +13,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.COINS_MADE;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.ENCHANTED_ENDER_PEARL;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.ENCHANTED_END_STONE;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.ENCHANTED_OBSIDIAN;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.ENDERMAN_PET;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.ENDERMITE_NEST;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.ENDER_ARMOR;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.GRAND_XP_BOTTLE;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.MAGICAL_RUNE_I;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.MITE_GEL;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.NODES_MINED;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.SHRIMP_THE_FISH;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.SPACER_1;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.SPACER_2;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.TITANIC_XP_BOTTLE;
-import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay.TITLE;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.COINS_MADE;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.ENCHANTED_ENDER_PEARL;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.ENCHANTED_END_STONE;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.ENCHANTED_OBSIDIAN;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.ENDERMAN_PET;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.ENDERMITE_NEST;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.ENDER_ARMOR;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.GRAND_XP_BOTTLE;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.MAGICAL_RUNE_I;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.MITE_GEL;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.NODES_MINED;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.SHRIMP_THE_FISH;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.SPACER_1;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.SPACER_2;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.TITANIC_XP_BOTTLE;
+import static at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry.TITLE;
 
 public class EnderNodeConfig {
     @Expose
@@ -47,7 +47,7 @@ public class EnderNodeConfig {
         desc = "Drag text to change the appearance of the overlay."
     )
     @ConfigEditorDraggableList()
-    public Property<List<EnderNodeDisplay>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
+    public Property<List<EnderNodeDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
         TITLE,
         NODES_MINED,
         COINS_MADE,
@@ -66,7 +66,7 @@ public class EnderNodeConfig {
         ENDERMAN_PET)
     ));
 
-    public enum EnderNodeDisplay implements LegacyList {
+    public enum EnderNodeDisplayEntry implements LegacyList {
         TITLE("§5§lEnder Node Tracker", 0),
         NODES_MINED("§d1,303 Ender Nodes Mined", 1),
         COINS_MADE("§615.3M Coins Made", 2),
@@ -96,13 +96,13 @@ public class EnderNodeConfig {
         private final String str;
         private final int legacyId;
 
-        EnderNodeDisplay(String str, int legacyId) {
+        EnderNodeDisplayEntry(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        EnderNodeDisplay(String str) {
+        EnderNodeDisplayEntry(String str) {
             this(str, -1);
         }
 

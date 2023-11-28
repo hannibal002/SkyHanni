@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat.endernodetracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplay
+import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -164,7 +164,7 @@ object EnderNodeTracker {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
         event.move(11, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
-            ConfigUtils.migrateArrayListToJsonEnumArray(element, EnderNodeDisplay::class.java)
+            ConfigUtils.migrateArrayListToJsonEnumArray(element, EnderNodeDisplayEntry::class.java)
         }
     }
 

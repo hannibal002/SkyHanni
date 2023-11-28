@@ -13,22 +13,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.ARACHNE;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.DIANA_MOBS;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.DUNGEON_ALL;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.GARDEN_PESTS;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.INFERNO_DEMONLORD;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.NETHER_MINI_BOSSES;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.REINDRAKE;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.REVENANT_HORROR;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.RIFTSTALKER_BLOODFIEND;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.SEA_CREATURES;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.SVEN_PACKMASTER;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.TARANTULA_BROODFATHER;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.THE_RIFT_BOSSES;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.VANQUISHER;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.VOIDGLOOM_SERAPH;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses.GARDEN_PESTS;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.ARACHNE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.DIANA_MOBS;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.DUNGEON_ALL;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.GARDEN_PESTS;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.INFERNO_DEMONLORD;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.NETHER_MINI_BOSSES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.REINDRAKE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.REVENANT_HORROR;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.RIFTSTALKER_BLOODFIEND;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.SEA_CREATURES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.SVEN_PACKMASTER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.TARANTULA_BROODFATHER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.THE_RIFT_BOSSES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.VANQUISHER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.VOIDGLOOM_SERAPH;
 
 public class DamageIndicatorConfig {
 
@@ -57,7 +56,7 @@ public class DamageIndicatorConfig {
     )
     @ConfigEditorDraggableList()
     //TODO only show currently working and tested features
-    public List<DamageIndicatorBosses> bossesToShow = new ArrayList<>(Arrays.asList(
+    public List<DamageIndicatorBossEntry> bossesToShow = new ArrayList<>(Arrays.asList(
         DUNGEON_ALL,
         NETHER_MINI_BOSSES,
         VANQUISHER,
@@ -76,7 +75,7 @@ public class DamageIndicatorConfig {
 
     ));
 
-    public enum DamageIndicatorBosses implements LegacyList {
+    public enum DamageIndicatorBossEntry implements LegacyList {
         DUNGEON_ALL("§bDungeon All", 0),
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
         VANQUISHER("§bVanquisher", 2),
@@ -108,13 +107,13 @@ public class DamageIndicatorConfig {
         private final String str;
         private final int legacyId;
 
-        DamageIndicatorBosses(String str, int legacyId) {
+        DamageIndicatorBossEntry(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DamageIndicatorBosses(String str) {
+        DamageIndicatorBossEntry(String str) {
             this(str, -1);
         }
 

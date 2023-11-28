@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplay
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -491,7 +491,7 @@ object GhostCounter {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
         event.move(11, "combat.ghostCounter.ghostDisplayText", "combat.ghostCounter.ghostDisplayText") { element ->
-            ConfigUtils.migrateArrayListToJsonEnumArray(element, GhostDisplay::class.java)
+            ConfigUtils.migrateArrayListToJsonEnumArray(element, GhostDisplayEntry::class.java)
         }
     }
 

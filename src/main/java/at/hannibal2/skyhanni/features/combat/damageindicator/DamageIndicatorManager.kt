@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBosses
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
@@ -873,7 +873,7 @@ class DamageIndicatorManager {
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
         event.move(11, "slayer.blazes.bossesToShow", "slayer.blazes.bossesToShow") { element ->
-            ConfigUtils.migrateArrayListToJsonEnumArray(element, DamageIndicatorBosses::class.java)
+            ConfigUtils.migrateArrayListToJsonEnumArray(element, DamageIndicatorBossEntry::class.java)
         }
     }
 
