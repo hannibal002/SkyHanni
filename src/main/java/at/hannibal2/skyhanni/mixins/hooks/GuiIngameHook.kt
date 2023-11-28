@@ -35,13 +35,17 @@ private fun replaceString(text: String): String? {
     if (SkyHanniMod.feature.garden.plotNameInScoreboard && GardenAPI.inGarden()) {
         if (text.contains("⏣")) {
             val plot = GardenPlotAPI.getCurrentPlot()
-            val pestSuffix = if (text.contains("ൠ")) {
+            val hasPests = text.contains("ൠ")
+            val pestSuffix = if (hasPests) {
                 val pests = text.last().digitToInt()
                 " §7(§4${pests}ൠ§7)"
             } else ""
             val name = plot?.let {
-                if (it.isBarn()) "§aThe Barn" else "§b" + it.name
-            } ?: "§aGarden §cOutside"
+                if (it.isBarn()) "§aThe Barn" else {
+                    val namePrefix = if (hasPests) "" else "§aPlot §7- "
+                    "$namePrefix§b" + it.name
+                }
+            } ?: "§aGarden §coutside"
             return " §7⏣ $name$pestSuffix"
         }
     }

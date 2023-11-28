@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -199,7 +200,11 @@ class GardenVisitorTimer {
     fun onBlockBreak(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
-        lastTimerUpdate -= 100.milliseconds
+
+        // We only need manually retracting the time when hypixel shows 6 minutes or above
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 100.milliseconds
+        }
     }
 
     private fun updateSixthVisitorArrivalTime() {

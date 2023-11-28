@@ -27,8 +27,10 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class Storage {
@@ -77,6 +79,19 @@ public class Storage {
 
         @Expose
         public List<String> guildMembers = new ArrayList<>();
+
+        @Expose
+        public WinterConfig winter = new WinterConfig();
+
+        public static class WinterConfig {
+
+            @Expose
+            public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+
+            @Expose
+            public int amountGifted = 0;
+        }
+
     }
 
     public static class ProfileSpecific {
