@@ -175,7 +175,7 @@ object FrozenTreasureTracker {
             "event.winter.frozenTreasureTracker.textFormat",
             "event.winter.frozenTreasureTracker.textFormat"
         ) { element ->
-            ConfigUtils.migrateArrayListToJsonEnumArray(element, FrozenTreasureDisplayEntry::class.java)
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, FrozenTreasureDisplayEntry::class.java)
         }
     }
 

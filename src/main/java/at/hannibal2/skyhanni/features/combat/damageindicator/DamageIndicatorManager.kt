@@ -873,7 +873,7 @@ class DamageIndicatorManager {
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
         event.move(11, "slayer.blazes.bossesToShow", "slayer.blazes.bossesToShow") { element ->
-            ConfigUtils.migrateArrayListToJsonEnumArray(element, DamageIndicatorBossEntry::class.java)
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, DamageIndicatorBossEntry::class.java)
         }
     }
 

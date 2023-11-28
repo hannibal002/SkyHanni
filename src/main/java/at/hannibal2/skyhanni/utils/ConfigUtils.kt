@@ -8,13 +8,13 @@ import com.google.gson.JsonPrimitive
 object ConfigUtils {
 
     /**
-     * Migrates an ArrayList of enums to a JsonArray of enum names. The new enum class should implement LegacyList and have a getter for LegacyId
+     * Migrates an Int ArrayList to a Enum ArrayList. The new enum class should implement HasLegacyId and have a getter for LegacyId
      *
      * @param element The JsonElement to migrate
      * @param enumClass The enum class to migrate to
      * @return The migrated JsonElement
      */
-    fun <T> migrateArrayListToJsonEnumArray(element: JsonElement, enumClass: Class<T>): JsonElement
+    fun <T> migrateIntArrayListToEnumArrayList(element: JsonElement, enumClass: Class<T>): JsonElement
         where T : Enum<T>, T : HasLegacyId {
         require(element is JsonArray) { "Expected a JsonArray but got ${element.javaClass.simpleName}" }
 
