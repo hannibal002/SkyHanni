@@ -19,8 +19,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerAdvanced {
+    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val dojoTestOfGradeLoreLinePattern = ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*".toPattern()
-    private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val skyblockStatBreakdownItemNamePattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
     private val enigmaSoulsLoreLinePattern = "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?.*".toPattern()
     private val bankBalanceLoreLinePattern = "(§.)?Current balance: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*".toPattern()
@@ -149,7 +149,6 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (chestName == "Quest Log") {
                 if (itemName == "Find all Fairy Souls") {
                     for (line in lore) {
-                        val newLine = line.removeColor()
                         val totalFairySouls = "242" //change this whenever hypixel adds more fairy souls
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
                         // ✔ Found: 242/242
@@ -294,18 +293,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             bankAccountChestNamePattern.matchMatcher(chestName) {
                 isDepositCoinsItemNamePattern.matchMatcher(itemName) {
                     bankBalanceLoreLinePattern.matchMatcher(lore.first()) {
-                        val totalAsString = group("total").replace(",", "")
-                        val usefulPartAsString = group("useful")
-                        val suffix = when (totalAsString.length) {
-                            in 1..3 -> ""
-                            in 4..6 -> "k"
-                            in 7..9 -> "M"
-                            in 10..12 -> "B"
-                            in 13..15 -> "T"
-                            else -> "§b§z:)"
-                        }
-                        if (suffix == "§b§z:)") return "§6Balance: $suffix"
-                        else return "§6Balance: $usefulPartAsString$suffix"
+                        val totalAsString = NumberUtil.format(group("total").formatNumber())
+                        return "§6Balance: $totalAsString"
                     }
                 }
             }
