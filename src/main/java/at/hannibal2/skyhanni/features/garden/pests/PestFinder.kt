@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -15,9 +16,10 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -26,7 +28,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class PestFinder {
 
@@ -145,10 +149,11 @@ class PestFinder {
         }
     }
 
+    private fun getNearestInfectedPest() = getPlotsWithPests().minByOrNull { it.middle.distanceSqToPlayer() }
+
     private fun removeNearestPest() {
-        val location = LocationUtils.playerLocation()
-        val plot = getPlotsWithPests().minByOrNull { it.middle.distanceSq(location) } ?: run {
-            LorenzUtils.error("Can not remove nearest pest: No plots with pests detected.")
+        val plot = getNearestInfectedPest() ?: run {
+            LorenzUtils.error("Can not remove nearest pest: No infected plots detected.")
             return
         }
         plot.pests--
@@ -183,6 +188,31 @@ class PestFinder {
             event.drawWaypointFilled(location, LorenzColor.RED.toColor())
             event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
         }
+    }
+
+    private var lastKeyPress =  SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onKeyClick(event: LorenzKeyPressEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (NEUItems.neuHasFocus()) return
+
+        if (event.keyCode != config.teleportHotkey) return
+        if (lastKeyPress.passedSince() < 2.seconds) return
+        lastKeyPress = SimpleTimeMark.now()
+
+        val plot = getNearestInfectedPest() ?: run {
+            LorenzUtils.userError("No infected plots detected to warp to!")
+            return
+        }
+
+        if (plot.isPlayerInside()) {
+            LorenzUtils.userError("You stand already on the infected plot!")
+            return
+        }
+
+        plot.sendTeleportTo()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.waypointInWorld)

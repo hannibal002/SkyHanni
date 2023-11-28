@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -53,6 +54,7 @@ object GardenPlotAPI {
 
     fun Plot.sendTeleportTo() {
         LorenzUtils.sendCommandToServer("tptoplot $name")
+        LockMouseLook.autoDisable()
     }
 
     init {
