@@ -490,7 +490,7 @@ object GhostCounter {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
-        event.move(10, "combat.ghostCounter.ghostDisplayText", "combat.ghostCounter.ghostDisplayText") { element ->
+        event.move(11, "combat.ghostCounter.ghostDisplayText", "combat.ghostCounter.ghostDisplayText") { element ->
             ConfigUtils.migrateArrayListToJsonEnumArray(element, GhostDisplay::class.java)
         }
     }

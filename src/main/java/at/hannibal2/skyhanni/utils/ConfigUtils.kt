@@ -39,9 +39,9 @@ object ConfigUtils {
     private fun <T> getEnumConstantFromLegacyId(
         legacyId: Int,
         enumClass: Class<T>
-    ): T? where T : Enum<T>?, T : LegacyList? {
+    ): T? where T : Enum<T>, T : LegacyList {
         for (enumConstant in enumClass.getEnumConstants()) {
-            if (enumConstant?.legacyId == legacyId) return enumConstant
+            if (enumConstant.legacyId == legacyId) return enumConstant
         }
         return null
     }
