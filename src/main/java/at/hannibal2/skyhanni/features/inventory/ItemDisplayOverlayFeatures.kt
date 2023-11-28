@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -196,13 +197,20 @@ class ItemDisplayOverlayFeatures {
                     }
                 }
             }
-
         }
 
         if (itemNumberAsStackSize.contains(15)) {
             if (item.getInternalNameOrNull() == bottleOfJyrre) {
                 val seconds = item.getBottleOfJyrreSeconds() ?: 0
                 return "§a${(seconds / 3600)}"
+            }
+        }
+
+        if (itemNumberAsStackSize.contains(16)) {
+            item.getEdition()?.let { edition ->
+                if (edition < 1_000) {
+                    return "§6$edition"
+                }
             }
         }
 
