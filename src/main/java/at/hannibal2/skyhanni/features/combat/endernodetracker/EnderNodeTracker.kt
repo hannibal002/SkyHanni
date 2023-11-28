@@ -164,7 +164,7 @@ object EnderNodeTracker {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
         event.move(10, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
-            ConfigUtils.migrateArrayListToJsonEnumArray(element, EnderNodeDisplay::class.java.kotlin)
+            ConfigUtils.migrateArrayListToJsonEnumArray(element, EnderNodeDisplay::class.java)
         }
     }
 
