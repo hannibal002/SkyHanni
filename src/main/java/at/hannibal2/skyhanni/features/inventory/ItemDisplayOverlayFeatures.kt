@@ -15,9 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -199,10 +197,10 @@ class ItemDisplayOverlayFeatures {
 
         }
 
-        if (itemNumberAsStackSize.contains(15)){
-            if (item.getInternalNameOrNull() == "NEW_BOTTLE_OF_JYRRE".asInternalName()){
+        if (itemNumberAsStackSize.contains(15)) {
+            if (item.getInternalNameOrNull() == "NEW_BOTTLE_OF_JYRRE".asInternalName()) {
                 val seconds = item.getBottleOfJyrreSeconds() ?: 0
-                return "§a${(seconds/3600)}"
+                return "§a${(seconds / 3600)}"
             }
         }
 
