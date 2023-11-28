@@ -15,6 +15,7 @@ public class TabCompleteConfig {
 
     @Expose
     @ConfigOption(name = "Island Players", desc = "Tab complete other players on the same island.")
+    @ConfigEditorBoolean
     public boolean islandPlayers = true;
 
     @Expose
