@@ -12,17 +12,6 @@ import java.util.function.Supplier
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
-    NONE( // maybe use default state tablist: "Events: smth" idk
-        {
-            when {
-                config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
-                else -> listOf("§cNo Event")
-            }
-        },
-        {
-            false
-        }
-    ),
     SERVER_CLOSE(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§cServer closing: ") })
@@ -79,7 +68,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             IslandType.CATACOMBS.isInIsland() || inDungeons
         }
     ),
-    KUUDRA( // I really need more kuudra scoreboard data, I dont play kuudra
+    KUUDRA(
         {
             val list = mutableListOf<String>()
 
@@ -98,17 +87,17 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Time Elapsed: ") }
             }
             list += ""
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§f§lWave: §c§l")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§f§lWave: §c§l") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§f§lWave: §c§l") }
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§fTokens: ")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§fTokens: ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§fTokens: ") }
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Submerges In: §e")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Submerges In: §e") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Submerges In: §e") }
             }
             list += ""
-            if (ScoreboardData.sidebarLinesFormatted.any { it == "§fObjective:"}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§fObjective:" }) {
                 list += "§fObjective:"
                 list += ScoreboardData.sidebarLinesFormatted.nextAfter("§fObjective:") ?: "§cNo Objective"
             }
@@ -155,26 +144,27 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         {
             val list = mutableListOf<String>()
 
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("North Stars: §d")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("North Stars: §d") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("North Stars: §d") }
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event Start: §a")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event Start: §a") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Event Start: §a") }
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Next Wave: §a")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Next Wave: §a") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Next Wave: §a") }
             }
             list += ""
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cWave ")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cWave ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§cWave ") }
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left§c")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left§c") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Magma Cubes Left§c") }
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Damag §c")}){
-                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Total Damag §c") }.replace("Damag", "Damage")
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Damag §c") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Total Damag §c") }
+                    .replace("Damag", "Damage")
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage§c")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage§c") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Your Cube Damage§c") }
             }
 
@@ -184,16 +174,18 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             IslandType.WINTER.isInIsland()
         }
     ),
-    SPOOKY( // not tested
+    SPOOKY(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.first { it.startsWith("§6Spooky Festival§f") }) + // Time
-                (getTablistFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }) // Candy
+                ("§r§r§7Your Candy: ") +
+                (getTablistFooter().split("\n").first { it.startsWith("§r§r§7Your Candy:") }
+                    .removePrefix("§r§r§7Your Candy:") ?: "§cCandy not found") // Candy
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6Spooky Festival§f") }
         }
     ),
-    MARINA( // not tested, should work
+    MARINA(
         {
             listOf(
                 "§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")
@@ -280,6 +272,17 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Essence: ") }
         }
+    ),
+    NONE( // maybe use default state tablist: "Events: smth" idk
+        {
+            when {
+                config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
+                else -> listOf("§cNo Event")
+            }
+        },
+        {
+            true
+        }
     );
 
     fun getLines(): List<String> {
@@ -288,7 +291,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
 
     companion object {
         fun getFirstEvent(): Events {
-            return entries.firstOrNull { it.showWhen() } ?: NONE
+            return entries.first { it.showWhen() }
         }
     }
 }
