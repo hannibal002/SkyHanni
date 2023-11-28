@@ -194,6 +194,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
+    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+
     fun ItemStack.getPrehistoricEggBlocksWalked() = getAttributeInt("blocks_walked")
 
     fun ItemStack.getNecronHandlesFound() = getAttributeInt("handles_found")

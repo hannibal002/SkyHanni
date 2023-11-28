@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAuctionNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBloodGodKills
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFruitBowlNames
@@ -274,12 +275,17 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.JYRRE) && internalName == ("BOTTLE_OF_JYRRE")) {
-            val lore = item.getLore()
-            for (line in lore) {
-                bottleOfJerryLoreLinePattern.matchMatcher(line) {
-                    return group("intelbonus")
+        if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.JYRRE) && (internalName == ("BOTTLE_OF_JYRRE") || internalName == ("NEW_BOTTLE_OF_JYRRE"))) {
+            if (internalName == "BOTTLE_OF_JYRRE") {
+                val lore = item.getLore()
+                for (line in lore) {
+                    bottleOfJerryLoreLinePattern.matchMatcher(line) {
+                        return group("intelbonus")
+                    }
                 }
+            } else if (internalName == "NEW_BOTTLE_OF_JYRRE") {
+                val seconds = item.getBottleOfJyrreSeconds() ?: 0
+                return "§a${(seconds / 3600)}"
             }
         }
 
