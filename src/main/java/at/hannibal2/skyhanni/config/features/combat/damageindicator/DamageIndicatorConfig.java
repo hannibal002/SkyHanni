@@ -123,7 +123,7 @@ public class DamageIndicatorConfig {
         }
 
         @Override
-        public String getStr() {
+        public String toString() {
             return str;
         }
     }

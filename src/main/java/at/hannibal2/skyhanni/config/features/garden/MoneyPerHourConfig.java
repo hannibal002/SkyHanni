@@ -108,7 +108,7 @@ public class MoneyPerHourConfig {
         }
 
         @Override
-        public String getStr() {
+        public String toString() {
             return str;
         }
     }

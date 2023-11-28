@@ -112,7 +112,7 @@ public class EnderNodeConfig {
         }
 
         @Override
-        public String getStr() {
+        public String toString() {
             return str;
         }
     }

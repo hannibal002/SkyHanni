@@ -12,7 +12,7 @@ public interface HasLegacyId {
      *
      * @return the display string
      */
-    String getStr();
+    String toString();
 
     /**
      * Gets legacy id. This is used for legacy configs that are being migrated to enums.
