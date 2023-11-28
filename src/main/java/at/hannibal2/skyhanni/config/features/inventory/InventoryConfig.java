@@ -61,27 +61,7 @@ public class InventoryConfig {
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§bMaster Star Tier",
-            "§bMaster Skull Tier",
-            "§bDungeon Head Floor Number",
-            "§bNew Year Cake",
-            "§bPet Level",
-            "§bMinion Tier",
-            "§bCrimson Armor",
-            "§7(Removed)",
-            "§bKuudra Key",
-            "§bSkill Level",
-            "§bCollection Level",
-            "§bRancher's Boots speed",
-            "§bLarva Hook",
-            "§bDungeon Potion Level",
-            "§bVacuum (Garden)",
-            "§bBottle Of Jyrre",
-            "§bEdition Number"
-        }
-    )
+    @ConfigEditorDraggableList()
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
@@ -105,6 +85,8 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
+        BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
+        EDITION_NUMBER("§bEdition Number", 16),
         ;
 
         private final String str;

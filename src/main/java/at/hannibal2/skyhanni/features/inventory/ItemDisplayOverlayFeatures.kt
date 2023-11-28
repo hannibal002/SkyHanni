@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -209,14 +211,12 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (itemNumberAsStackSize.contains(15)) {
-            if (item.getInternalNameOrNull() == bottleOfJyrre) {
-                val seconds = item.getBottleOfJyrreSeconds() ?: 0
-                return "§a${(seconds / 3600)}"
-            }
+        if (BOTTLE_OF_JYRRE.isSelected() && item.getInternalNameOrNull() == bottleOfJyrre) {
+            val seconds = item.getBottleOfJyrreSeconds() ?: 0
+            return "§a${(seconds / 3600)}"
         }
 
-        if (itemNumberAsStackSize.contains(16)) {
+        if (EDITION_NUMBER.isSelected()) {
             item.getEdition()?.let { edition ->
                 if (edition < 1_000) {
                     return "§6$edition"
