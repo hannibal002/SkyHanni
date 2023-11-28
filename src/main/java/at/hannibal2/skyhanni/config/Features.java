@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.features.about.About;
+import at.hannibal2.skyhanni.config.features.About;
 import at.hannibal2.skyhanni.config.features.bazaar.BazaarConfig;
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
