@@ -8,7 +8,8 @@ import com.google.gson.JsonPrimitive
 object ConfigUtils {
 
     /**
-     * Migrates an Int ArrayList to a Enum ArrayList. The new enum class should implement HasLegacyId and have a getter for LegacyId
+     * Migrates an Int ArrayList to an Enum ArrayList.
+     * The new enum class should implement HasLegacyId and have a getter for LegacyId
      *
      * @param element The JsonElement to migrate
      * @param enumClass The enum class to migrate to
@@ -28,6 +29,20 @@ object ConfigUtils {
         return JsonArray().apply {
             migratedArray.forEach { add(it) }
         }
+    }
+
+    /**
+     * Migrates an Int to an Enum Constant.
+     * The new enum class should implement HasLegacyId and have a getter for LegacyId
+     *
+     * @param element The JsonElement to migrate
+     * @param enumClass The enum class to migrate to
+     * @return The migrated JsonElement
+     */
+    fun <T> migrateIntToEnum(element: JsonElement, enumClass: Class<T>): JsonElement
+        where T : Enum<T>, T : HasLegacyId {
+        require(element is JsonPrimitive) { "Expected a JsonPrimitive but got ${element.javaClass.simpleName}" }
+        return JsonPrimitive(getEnumConstantFromLegacyId(element.asInt, enumClass)?.name)
     }
 
     /**
