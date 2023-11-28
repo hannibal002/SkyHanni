@@ -23,7 +23,7 @@ public class WinterConfig {
     @Accordion
     @Expose
     @ConfigOption(name = "Unique Gifting Opportunities", desc = "Highlight players who you haven't given gifts to yet")
-    public GiftingOpportunities giftingOpportunities = new GiftingOpportunities();
+    public GiftingOpportunitiesConfig giftingOpportunities = new GiftingOpportunitiesConfig();
 
     @Expose
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
