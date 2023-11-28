@@ -59,7 +59,7 @@ class RenderBackground {
 
         GlStateManager.color(1f, 1f, 1f, 1f)
 
-        if (config.backgroundConfig.enabled) {
+        if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
             // Draw the default texture
             Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
             Utils.drawTexturedRect(
