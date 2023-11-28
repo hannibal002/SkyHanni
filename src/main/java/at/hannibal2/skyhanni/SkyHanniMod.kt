@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.DataWatcherAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -101,6 +102,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
+import at.hannibal2.skyhanni.features.event.SkyhanniPlayersWhenTheySeeUngiftedPlayers
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
@@ -401,6 +403,7 @@ class SkyHanniMod {
         loadModule(BazaarApi())
         loadModule(GardenAPI)
         loadModule(GardenPlotAPI)
+        loadModule(DataWatcherAPI())
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)
@@ -432,6 +435,7 @@ class SkyHanniMod {
         loadModule(DungeonCleanEnd())
         loadModule(DungeonBossMessages())
         loadModule(DungeonBossHideDamageSplash())
+        loadModule(SkyhanniPlayersWhenTheySeeUngiftedPlayers)
         loadModule(TrophyFishManager)
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
