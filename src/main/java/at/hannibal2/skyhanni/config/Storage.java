@@ -81,9 +81,9 @@ public class Storage {
         public List<String> guildMembers = new ArrayList<>();
 
         @Expose
-        public WinterConfig winter = new WinterConfig();
+        public WinterStorage winter = new WinterStorage();
 
-        public static class WinterConfig {
+        public static class WinterStorage {
 
             @Expose
             public Set<String> playersThatHaveBeenGifted = new HashSet<>();
