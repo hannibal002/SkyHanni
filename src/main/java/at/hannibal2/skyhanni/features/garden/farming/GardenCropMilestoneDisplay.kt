@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
@@ -282,7 +283,7 @@ object GardenCropMilestoneDisplay {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.mushroomPetPerk.text) {
-            lineMap[index]?.let {
+            lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
         }
@@ -319,6 +320,13 @@ object GardenCropMilestoneDisplay {
             "garden.cropMilestones.text"
         ) { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, MilestoneTextEntry::class.java)
+        }
+        event.move(
+            11,
+            "garden.cropMilestones.mushroomPetPerk.text",
+            "garden.cropMilestones.mushroomPetPerk.text"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MushroomTextEntry::class.java)
         }
     }
 }
