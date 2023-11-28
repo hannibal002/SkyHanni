@@ -36,7 +36,7 @@ class PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
-    private val pestsInScoreboardPattern = " §7⏣ §aThe Garden §4§lൠ§7 x(?<pests>.*)".toPattern()
+    private val pestsInScoreboardPattern = " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)".toPattern()
 
     private var display = emptyList<Renderable>()
     private var scoreboardPests = 0
