@@ -157,16 +157,16 @@ enum class BossType(
 
     WINTER_REINDRAKE("Reindrake", DamageIndicatorBosses.REINDRAKE),//TODO fix totally
 
-    GARDEN_PEST_BEETLE("§cBeetle", 25),
-    GARDEN_PEST_CRICKET("§cCricket", 25),
-    GARDEN_PEST_FLY("§cFly", 25),
-    GARDEN_PEST_LOCUST("§cLocust", 25),
-    GARDEN_PEST_MITE("§cMite", 25),
-    GARDEN_PEST_MOSQUITO("§cMosquito", 25),
-    GARDEN_PEST_MOTH("§cMoth", 25),
-    GARDEN_PEST_RAT("§cRat", 25),
-    GARDEN_PEST_SLUG("§cSlug", 25),
-    GARDEN_PEST_EARTHWORM("§cEarthworm", 25),
+    GARDEN_PEST_BEETLE("§cBeetle", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_CRICKET("§cCricket", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_FLY("§cFly", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_LOCUST("§cLocust", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_MITE("§cMite", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_MOSQUITO("§cMosquito", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_MOTH("§cMoth", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_RAT("§cRat", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_SLUG("§cSlug", DamageIndicatorBosses.GARDEN_PESTS),
+    GARDEN_PEST_EARTHWORM("§cEarthworm", DamageIndicatorBosses.GARDEN_PESTS),
 
     //TODO arachne
 
