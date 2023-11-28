@@ -21,7 +21,7 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show a custom scoreboard instead of the default one."
+        desc = "Show a custom scoreboard instead of the vanilla one."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -30,7 +30,7 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(
         name = "Text Format",
-        desc = "Drag text to change the appearance of the overlay."
+        desc = "Drag text to change the appearance of the scoreboard."
     )
     @ConfigEditorDraggableList(
         exampleText = {
