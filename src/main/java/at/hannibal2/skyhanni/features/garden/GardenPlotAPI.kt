@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -17,11 +18,10 @@ object GardenPlotAPI {
     var plots = listOf<Plot>()
 
     fun getCurrentPlot(): Plot? {
-        val location = LocationUtils.playerLocation()
-        return plots.firstOrNull { it.box.isInside(location) }
+        return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB)
+    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     class PlotData(
         @Expose
@@ -50,8 +50,11 @@ object GardenPlotAPI {
 
     fun Plot.isBarn() = id == -1
 
+    fun Plot.isPlayerInside() = box.isPlayerInside()
+
     fun Plot.sendTeleportTo() {
         LorenzUtils.sendCommandToServer("tptoplot $name")
+        LockMouseLook.autoDisable()
     }
 
     init {
@@ -70,10 +73,11 @@ object GardenPlotAPI {
                 val minY = ((y - 2) * 96 - 48).toDouble()
                 val maxX = ((x - 2) * 96 + 48).toDouble()
                 val maxY = ((y - 2) * 96 + 48).toDouble()
-                val box = AxisAlignedBB(minX, 0.0, minY, maxX, 256.0, maxY)
-                list.add(
-                    Plot(id, slot, box)
-                )
+                val a = LorenzVec(minX, 0.0, minY)
+                val b = LorenzVec(maxX, 256.0, maxY)
+                val middle = a.interpolate(b, 0.5).copy(y = 10.0)
+                val box = a.axisAlignedTo(b)
+                list.add(Plot(id, slot, box, middle))
                 slot++
             }
             slot += 4

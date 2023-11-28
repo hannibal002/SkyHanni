@@ -19,7 +19,7 @@ public class EndermanConfig {
     public boolean highlightNukekebi = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indcator.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indicator.")
     @ConfigEditorBoolean
     public boolean phaseDisplay = false;
 

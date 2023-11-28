@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class PestFinderConfig {
 
@@ -19,12 +21,26 @@ public class PestFinderConfig {
 
     @Expose
     @ConfigOption(
+            name = "Waypoint In World",
+            desc = "Mark the plots with pests on them in the world."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean waypointInWorld = true;
+
+    @Expose
+    @ConfigOption(
             name = "Only With Vacuum",
-            desc = "Only show the pest display while holding a vacuum in the hand."
+            desc = "Only show the pest display and waypoints while holding a vacuum in the hand."
     )
     @ConfigEditorBoolean
     public boolean onlyWithVacuum = true;
 
     @Expose
     public Position position = new Position(-350, 200, 1.3f);
+
+    @Expose
+    @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int teleportHotkey = Keyboard.KEY_NONE;
 }

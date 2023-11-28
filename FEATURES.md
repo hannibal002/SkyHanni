@@ -507,7 +507,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Change how the pest spawn chat message should be formatted. - hannibal2
   + Unchanged, compact or hide the message entirely.
 + Show a Title when a pest spawns. - hannibal2
-+ Press a key to warp to the plot where the last pest has spawned. - hannibal2
 + Show the time since the last pest spawned in your garden. - hannibal2
   + Option to only show the time while holding vacuum in the hand.
 + Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
@@ -516,6 +515,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show a display with all known pest locations. - hannibal2
   + Click to warp to the plot.
   + Option to only show the time while holding vacuum in the hand.
++ Mark the plots with pests on them in the world. - hannibal2
++ Press the key to warp to the nearest plot with pests on it. - hannibal2
 
 </details>
 <details open><summary>

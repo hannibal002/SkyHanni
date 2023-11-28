@@ -13,7 +13,6 @@
 + Change how the pest spawn chat message should be formatted. - hannibal2
   + Unchanged, compact or hide the message entirely.
 + Show a Title when a pest spawns. - hannibal2
-+ Press a key to warp to the plot where the last pest has spawned. - hannibal2
 + Show the time since the last pest spawned in your garden. - hannibal2
   + Option to only show the time while holding vacuum in the hand.
 + Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
@@ -22,8 +21,10 @@
 + Show a display with all known pest locations. - hannibal2
   + Click to warp to the plot.
   + Option to only show the time while holding vacuum in the hand.
++ Mark the plots with pests on them in the world. - hannibal2
++ Press the key to warp to the nearest plot with pests on it. - hannibal2
 
-#### Other Features
+#### Fishing Features
 
 + Added Barn Fishing Timer to Jerry's Workshop and Crimson Isle. - martimavocado
 + Added Fishing Tracker and changed trackers in general. - hannibal2
@@ -46,12 +47,32 @@
 + Automatic unlocking /shmouselock when teleporting in the garden. - hannibal2
 + Don't hide messages from Jacob. - alexia
   + This is a workaround for wrongly hidden Jakob messages.
++ Show the hint to open Configure Plot only if the pest display is incorrect. - hannibal2
++ Added the "plot" word to the sidebar again (only if there are no pests in garden). - hannibal2
++ Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
+
+#### Fishing Changes
+
++ Show the fishing tracker for a couple of seconds after catching something even while moving. - hannibal2
 
 ### Fixes
 
 #### Garden Fixes
 
 + Fixed pest damage indicator not working for some pests. - hannibal2
++ Fixed pest kill detection. - hannibal2
++ Fixed /tp <plot name> not working with uppercase characters. - hannibal2
++ Fixed total equipment fortune in /ff. - alexia
++ Fixed Locust pest not getting detected in damage indicator. - hannibal2
++ Fixed Pest Spray Display showing outside the garden. - hannibal2
+
+#### Misc Fixes
+
++ Fixed Item Tracker not ignoring manual sack movements. - hannibal2
+
+#### Config Fixes
+
++ Fixed a typo in config. - walker
 
 ### Technical Details
 
@@ -60,6 +81,7 @@
 + Replaced SkyHanniMod.feature.garden with GardenAPI.config. - hannibal2
 + Added MessageSendToServerEvent. - hannibal2
 + Added GardenPlotAPI, support for detecting the current slot of the player. - hannibal2
++ Updated .editorconfig file to better support imports. - Thunderblade73
 
 ## Version 0.21.1
 
