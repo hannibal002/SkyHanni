@@ -28,6 +28,8 @@ class ItemDisplayOverlayFeatures {
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
 
+    private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
+
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         event.stackTip = getStackTip(event.stack)
@@ -198,7 +200,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (itemNumberAsStackSize.contains(15)) {
-            if (item.getInternalNameOrNull() == "NEW_BOTTLE_OF_JYRRE".asInternalName()) {
+            if (item.getInternalNameOrNull() == bottleOfJyrre) {
                 val seconds = item.getBottleOfJyrreSeconds() ?: 0
                 return "§a${(seconds / 3600)}"
             }
