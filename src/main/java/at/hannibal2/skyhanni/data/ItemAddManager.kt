@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ItemAddManager {
     enum class Source {
@@ -25,9 +28,29 @@ class ItemAddManager {
     private val diceRollChatPattern =
         "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤".toPattern()
 
+    private var inSackInventory = false
+    private var lastSackInventoryLeave = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (event.inventoryName.contains("Sack")) {
+            inSackInventory = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+        if (inSackInventory) {
+            inSackInventory = false
+            lastSackInventoryLeave = SimpleTimeMark.now()
+        }
+    }
+
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (inSackInventory || lastSackInventoryLeave.passedSince() < 10.seconds) return
 
         for (sackChange in event.sackChanges) {
             val change = sackChange.delta

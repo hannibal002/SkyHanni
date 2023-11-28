@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -92,9 +90,7 @@ class OwnInventoryData {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (BazaarApi.inBazaarInventory) {
-            ignoreItem(500.milliseconds) { it.isBazaarItem() }
-        }
+        ignoreItem(500.milliseconds) { true }
     }
 
     private fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
