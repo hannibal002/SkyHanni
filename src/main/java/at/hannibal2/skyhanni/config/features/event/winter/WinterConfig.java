@@ -20,6 +20,11 @@ public class WinterConfig {
     @FeatureToggle
     public boolean islandCloseTime = true;
 
+    @Accordion
+    @Expose
+    @ConfigOption(name = "Unique Gifting Opportunities", desc = "Highlight players who you haven't given gifts to yet")
+    public GiftingOpportunitiesConfig giftingOpportunities = new GiftingOpportunitiesConfig();
+
     @Expose
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
 
