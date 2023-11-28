@@ -76,7 +76,7 @@ object GardenPlotAPI {
                 val a = LorenzVec(minX, 0.0, minY)
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
-                val box = a.axisAlignedTo(b)
+                val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
                 slot++
             }

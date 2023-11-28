@@ -622,6 +622,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
 + Play warning sound when the next Primal Fear can spawn. - thunderblade73
++ Unique Gifting Opportunities. - nea
+  + Highlight players who you haven't given gifts to yet.
+  + Only highlight ungifted players while holding a gift.
+  + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
++ Unique Gifted users counter. - hannibal2
+  + Show in a display how many unique players you have given gifts to in the winter 2023 event.
+  + Run command /opengenerowmenu to sync up.
 </details>
 <details open><summary>
 
