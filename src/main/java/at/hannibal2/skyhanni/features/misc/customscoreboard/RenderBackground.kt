@@ -54,6 +54,10 @@ class RenderBackground {
         val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
         val rareTextureLocation = ResourceLocation("skyhanni", "rareScoreboardBackground.png")
 
+        // Save the current color state
+        GlStateManager.pushMatrix();
+        GlStateManager.pushAttrib();
+
         GlStateManager.color(1f,1f,1f, 1f)
 
         if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
@@ -103,6 +107,8 @@ class RenderBackground {
             )
         }
 
-        GlStateManager.resetColor()
+        // Restore the original color state
+        GlStateManager.popMatrix();
+        GlStateManager.popAttrib();
     }
 }
