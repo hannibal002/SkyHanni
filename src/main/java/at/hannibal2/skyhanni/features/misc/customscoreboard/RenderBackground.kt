@@ -102,5 +102,7 @@ class RenderBackground {
                 SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
             )
         }
+
+        GlStateManager.resetColor()
     }
 }
