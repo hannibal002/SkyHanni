@@ -18,7 +18,7 @@ private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var cooldown = 0
 
 class RenderBackground {
-    fun renderBackground(){
+    fun renderBackground() {
         val position = config.position
         val border = 5
 
@@ -52,50 +52,23 @@ class RenderBackground {
         }*/
 
         val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
-        val rareTextureLocation = ResourceLocation("skyhanni", "rareScoreboardBackground.png")
 
         // Save the current color state
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
 
-        GlStateManager.color(1f,1f,1f, 1f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
 
-        if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
-            if (cooldown > 0) {
-                cooldown--
-
-                // Display rare texture during cooldown
-                Minecraft.getMinecraft().textureManager.bindTexture(rareTextureLocation)
-                Utils.drawTexturedRect(
-                    (x - border).toFloat(),
-                    (y - border).toFloat(),
-                    (elementWidth + border * 3).toFloat(),
-                    (elementHeight + border * 3).toFloat(),
-                    GL11.GL_NEAREST
-                )
-            } else if (Math.random() * 86400.0 * 20 == 1.0) {
-                // Randomly switch to rare texture with a 1 in 86400 chance (once per day)
-                Minecraft.getMinecraft().textureManager.bindTexture(rareTextureLocation)
-                cooldown = 200
-
-                Utils.drawTexturedRect(
-                    (x - border).toFloat(),
-                    (y - border).toFloat(),
-                    (elementWidth + border * 2).toFloat(),
-                    (elementHeight + border * 2).toFloat(),
-                    GL11.GL_NEAREST
-                )
-            } else {
-                // Draw the default texture
-                Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
-                Utils.drawTexturedRect(
-                    (x - border).toFloat(),
-                    (y - border).toFloat(),
-                    (elementWidth + border * 3).toFloat(),
-                    (elementHeight + border * 3).toFloat(),
-                    GL11.GL_NEAREST
-                )
-            }
+        if (config.backgroundConfig.enabled) {
+            // Draw the default texture
+            Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
+            Utils.drawTexturedRect(
+                (x - border).toFloat(),
+                (y - border).toFloat(),
+                (elementWidth + border * 3).toFloat(),
+                (elementHeight + border * 3).toFloat(),
+                GL11.GL_NEAREST
+            )
         } else if (config.backgroundConfig.enabled) {
             // Draw a solid background with a specified color
             Gui.drawRect(
