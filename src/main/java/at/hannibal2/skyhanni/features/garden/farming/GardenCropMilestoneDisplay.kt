@@ -175,7 +175,7 @@ object GardenCropMilestoneDisplay {
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
                 val duration = TimeUtils.formatDuration(millis, biggestUnit)
                 tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
                 val speedText = "§7In §b$duration"
@@ -269,7 +269,7 @@ object GardenCropMilestoneDisplay {
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
             lineMap[3] = Collections.singletonList("§7In §b$duration")
         }
