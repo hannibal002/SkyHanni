@@ -225,5 +225,5 @@ class ItemDisplayOverlayFeatures {
         }
     }
 
-    fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)
+    private fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)
 }

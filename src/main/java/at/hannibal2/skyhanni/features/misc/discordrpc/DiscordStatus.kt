@@ -258,7 +258,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     AUTO({
         var autoReturn = ""
         for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
-            val autoStatus = AutoStatus.entries[statusID]
+            val autoStatus = AutoStatus.entries[statusID.ordinal]
             val result =
                 autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
             if (result != autoStatus.placeholderText) { // if that value is useful, display it
@@ -269,7 +269,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         if (autoReturn == "") { // if we didn't find any useful information, display the fallback
             val statusNoAuto = DiscordStatus.entries.toMutableList()
             statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get().ordinal].getDisplayString()
         }
         autoReturn
     }),

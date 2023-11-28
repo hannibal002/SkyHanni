@@ -5,11 +5,15 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -51,8 +55,8 @@ object DiscordRPCManager : IPCListener {
                 }
                 consoleLog("Starting Discord RPC...")
 
-                firstLine = getStatusByConfigId(config.firstLine.get())
-                secondLine = getStatusByConfigId(config.secondLine.get())
+                firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
+                secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(applicationID)
                 client?.setListener(this@DiscordRPCManager)
@@ -107,8 +111,8 @@ object DiscordRPCManager : IPCListener {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
 
-        secondLine = getStatusByConfigId(config.secondLine.get())
-        firstLine = getStatusByConfigId(config.firstLine.get())
+        secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
+        firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
         val presence: RichPresence = RichPresence.Builder()
             .setDetails(firstLine.getDisplayString())
             .setState(secondLine.getDisplayString())
@@ -207,7 +211,25 @@ object DiscordRPCManager : IPCListener {
     // Events that change things in DiscordStatus
     @SubscribeEvent
     fun onKeybind(event: LorenzKeyPressEvent) {
-        if (!isEnabled() || !feature.misc.discordRPC.autoPriority.contains(4)) return // autoPriority 4 is dynamic afk
+        if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(11, "misc.discordRPC.firstLine", "misc.discordRPC.firstLine") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.move(11, "misc.discordRPC.secondLine", "misc.discordRPC.secondLine") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.move(11, "misc.discordRPC.auto", "misc.discordRPC.auto") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.move(11, "misc.discordRPC.autoPriority", "misc.discordRPC.secondLine") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
+        }
+    }
+
+    private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)
 }
