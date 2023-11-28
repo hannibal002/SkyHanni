@@ -49,7 +49,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCustomScoreboardEnabled()) return
-        val display = display ?: return
+        if (display.isEmpty()) return
         val position = config.position
 
         RenderBackground().renderBackground()
