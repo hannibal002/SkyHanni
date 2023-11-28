@@ -77,7 +77,9 @@ public class InventoryConfig {
             "§bRancher's Boots speed",
             "§bLarva Hook",
             "§bDungeon Potion Level",
-            "§bVacuum (Garden)"
+            "§bVacuum (Garden)",
+            "§bBottle Of Jyrre",
+            "§bEdition Number"
         }
     )
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(

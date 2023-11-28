@@ -81,7 +81,16 @@ public class Storage {
         public List<String> guildMembers = new ArrayList<>();
 
         @Expose
-        public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+        public WinterConfig winter = new WinterConfig();
+
+        public static class WinterConfig {
+
+            @Expose
+            public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+
+            @Expose
+            public int amountGifted = 0;
+        }
 
     }
 

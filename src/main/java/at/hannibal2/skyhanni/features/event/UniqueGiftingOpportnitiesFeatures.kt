@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object UniqueGiftingOpportnitiesFeatures {
     private val playerList: MutableSet<String>?
-        get() = ProfileStorageData.playerSpecific?.playersThatHaveBeenGifted
+        get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
     private val pattern = "§6\\+1 Unique Gift given! To ([^§]+)§r§6!".toPattern()
 
@@ -73,6 +74,7 @@ object UniqueGiftingOpportnitiesFeatures {
     fun onChat(event: LorenzChatEvent) {
         pattern.matchMatcher(event.message) {
             addGiftedPlayer(group(1))
+            UniqueGiftCounter.addUniqueGift()
         }
     }
 

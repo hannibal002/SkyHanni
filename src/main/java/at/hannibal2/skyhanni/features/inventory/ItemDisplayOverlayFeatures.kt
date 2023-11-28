@@ -27,9 +27,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -41,6 +44,8 @@ class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
+
+    private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -200,6 +205,21 @@ class ItemDisplayOverlayFeatures {
                             else -> "§c${pests / 100_000 / 10.0}m"
                         }
                     }
+                }
+            }
+        }
+
+        if (itemNumberAsStackSize.contains(15)) {
+            if (item.getInternalNameOrNull() == bottleOfJyrre) {
+                val seconds = item.getBottleOfJyrreSeconds() ?: 0
+                return "§a${(seconds / 3600)}"
+            }
+        }
+
+        if (itemNumberAsStackSize.contains(16)) {
+            item.getEdition()?.let { edition ->
+                if (edition < 1_000) {
+                    return "§6$edition"
                 }
             }
         }
