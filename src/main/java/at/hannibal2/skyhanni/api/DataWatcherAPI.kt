@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DataWatcherAPI {
 
-    val DATA_VALUE_CUSTOM_NAME = 2
+    private val DATA_VALUE_CUSTOM_NAME = 2
 
     @SubscribeEvent
     fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent) {
@@ -16,4 +16,6 @@ class DataWatcherAPI {
             }
         }
     }
+
+    // TODO move EntityHealthUpdateEvent logic from EntityData in here
 }
