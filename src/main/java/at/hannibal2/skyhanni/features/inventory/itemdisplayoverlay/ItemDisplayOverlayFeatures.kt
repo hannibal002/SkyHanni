@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.countDigits
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -26,6 +25,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBl
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getYetiRodFishesCaught
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.floor
+import kotlin.math.log10
 
 class ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapLoreLinePattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
@@ -252,7 +253,8 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.BLOOD_GOD) && internalName == ("BLOOD_GOD_CREST")) {
-            return ("${item.getBloodGodKills()?.let { countDigits(it) }}")
+            val kills = item.getBloodGodKills() ?: return ""
+            return ("${floor(log10(kills.toDouble())) + 1}")
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.YETI_ROD) && internalName == ("YETI_ROD")) {

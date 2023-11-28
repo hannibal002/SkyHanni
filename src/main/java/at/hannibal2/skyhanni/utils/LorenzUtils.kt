@@ -624,8 +624,6 @@ object LorenzUtils {
     @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
     fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 
-    fun countDigits(number: Int) = number.toString().length
-
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
         return enums.firstOrNull { it.name == name }
