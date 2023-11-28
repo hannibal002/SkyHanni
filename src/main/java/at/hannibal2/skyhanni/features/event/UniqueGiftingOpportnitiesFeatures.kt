@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -66,6 +67,7 @@ object UniqueGiftingOpportnitiesFeatures {
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!isEnabled()) return
         val entity = event.entity
+        if (entity is EntityPlayerSP) return
         if (entity is EntityPlayer && !entity.isNPC() && !hasGiftedPlayer(entity))
             event.color = LorenzColor.DARK_GREEN.toColor().withAlpha(127)
     }
