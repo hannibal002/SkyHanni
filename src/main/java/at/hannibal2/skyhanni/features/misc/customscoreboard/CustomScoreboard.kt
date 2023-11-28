@@ -44,21 +44,6 @@ private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
 private var cache = emptyList<List<Any>>()
 
-// Stats / Numbers
-var purse = "0"
-var motes = "0"
-var bank = "0"
-var bits = "0"
-var copper = "0"
-var gems = "0"
-var location = "None"
-var lobbyCode = "None"
-var heat = "0"
-var mithrilPowder = "0"
-var gemstonePowder = "0"
-var partyCount = 0
-var cooldown = 0
-
 
 class CustomScoreboard {
     @SubscribeEvent

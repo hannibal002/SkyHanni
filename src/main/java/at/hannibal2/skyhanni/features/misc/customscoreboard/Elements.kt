@@ -18,6 +18,20 @@ import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
+// Stats / Numbers
+var purse = "0"
+var motes = "0"
+var bank = "0"
+var bits = "0"
+var copper = "0"
+var gems = "0"
+var location = "None"
+var lobbyCode = "None"
+var heat = "0"
+var mithrilPowder = "0"
+var gemstonePowder = "0"
+var partyCount = 0
+
 enum class Elements(
     private val displayLine: Supplier<List<String>>,
     private val showWhen: () -> Boolean,

@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
+private var cooldown = 0
 
 class RenderBackground {
     fun renderBackground(){
