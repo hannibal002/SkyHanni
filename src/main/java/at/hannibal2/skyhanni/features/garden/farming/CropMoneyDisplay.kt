@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -235,6 +236,7 @@ object CropMoneyDisplay {
         return if (config.hideTitle) newDisplay.drop(1) else newDisplay
     }
 
+    // TODO : Rewrite to not be index-reliant
     private fun fullTitle(title: String): String {
         val titleText: String
         val nameList = mutableListOf<String>()
@@ -246,7 +248,7 @@ object CropMoneyDisplay {
             )
             val list = mutableListOf<String>()
             for (index in config.customFormat) {
-                map[index]?.let {
+                map[index.ordinal]?.let {
                     list.add(it)
                 }
             }
@@ -276,8 +278,7 @@ object CropMoneyDisplay {
 
         val onlyNpcPrice =
             (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
-                (config.useCustomFormat && config.customFormat.size == 1 &&
-                    config.customFormat[0] == 2)
+                (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!
@@ -364,6 +365,7 @@ object CropMoneyDisplay {
     private fun isSeeds(internalName: NEUInternalName) =
         internalName.equals("ENCHANTED_SEEDS") || internalName.equals("SEEDS")
 
+    // TODO : Rewrite to not be index-reliant
     private fun formatNumbers(sellOffer: Double, instantSell: Double, npcPrice: Double): Array<Double> {
         return if (config.useCustomFormat) {
             val map = mapOf(
@@ -373,7 +375,7 @@ object CropMoneyDisplay {
             )
             val newList = mutableListOf<Double>()
             for (index in config.customFormat) {
-                map[index]?.let {
+                map[index.ordinal]?.let {
                     newList.add(it)
                 }
             }
