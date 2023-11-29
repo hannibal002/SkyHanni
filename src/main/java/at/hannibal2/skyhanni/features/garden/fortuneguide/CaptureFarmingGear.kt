@@ -178,18 +178,13 @@ class CaptureFarmingGear {
     }
 
     private fun getCommunityShopInfo(event: InventoryFullyOpenedEvent) {
-        for ((_, item) in event.inventoryItems) {
-            if (item.displayName.contains("Garden Farming Fortune")) {
-                if (item.getLore().contains("§aMaxed out!")) {
-                    ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                        item.displayName.split(" ").last().romanToDecimal()
-                } else {
-                    ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                        item.displayName.split(" ").last().romanToDecimal() - 1
-                }
-            }
+        event.inventoryItems.values.firstOrNull { it.displayName.contains("Garden Farming Fortune") }?.let { item ->
+            val upgradeLevel = item.displayName.split(" ").last().romanToDecimal()
+            ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
+                if (item.getLore().contains("§aMaxed out!")) upgradeLevel else upgradeLevel - 1
         }
     }
+
 
     private fun getPlotInfo(
         event: InventoryFullyOpenedEvent,
