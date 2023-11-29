@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
@@ -17,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -175,7 +179,8 @@ object GardenCropMilestoneDisplay {
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+                // TODO, change functionality to use enum rather than ordinals
+                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
                 val duration = TimeUtils.formatDuration(millis, biggestUnit)
                 tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
                 val speedText = "§7In §b$duration"
@@ -224,7 +229,8 @@ object GardenCropMilestoneDisplay {
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.text) {
-            lineMap[index]?.let {
+            // TODO, change functionality to use enum rather than ordinals
+            lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
         }
@@ -269,7 +275,8 @@ object GardenCropMilestoneDisplay {
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+            // TODO, change functionality to use enum rather than ordinals
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
             lineMap[3] = Collections.singletonList("§7In §b$duration")
         }
@@ -279,7 +286,8 @@ object GardenCropMilestoneDisplay {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.mushroomPetPerk.text) {
-            lineMap[index]?.let {
+            // TODO, change functionality to use enum rather than ordinals
+            lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
         }
@@ -303,5 +311,26 @@ object GardenCropMilestoneDisplay {
         event.move(3, "garden.cropMilestoneMushroomPetPerkEnabled", "garden.cropMilestones.mushroomPetPerk.enabled")
         event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropMilestones.mushroomPetPerk.text")
         event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropMilestones.mushroomPetPerk.pos")
+        event.move(
+            11,
+            "garden.cropMilestones.highestTimeFormat",
+            "garden.cropMilestones.highestTimeFormat"
+        ) { element ->
+            ConfigUtils.migrateIntToEnum(element, TimeFormatEntry::class.java)
+        }
+        event.move(
+            11,
+            "garden.cropMilestones.text",
+            "garden.cropMilestones.text"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MilestoneTextEntry::class.java)
+        }
+        event.move(
+            11,
+            "garden.cropMilestones.mushroomPetPerk.text",
+            "garden.cropMilestones.mushroomPetPerk.text"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MushroomTextEntry::class.java)
+        }
     }
 }

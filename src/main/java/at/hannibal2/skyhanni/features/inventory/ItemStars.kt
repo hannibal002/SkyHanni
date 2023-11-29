@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -53,7 +55,7 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!config.itemNumberAsStackSize.contains(6)) return
+        if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
         if (number != -1) {
