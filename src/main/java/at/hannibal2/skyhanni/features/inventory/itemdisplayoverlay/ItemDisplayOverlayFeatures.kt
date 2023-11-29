@@ -393,8 +393,10 @@ class ItemDisplayOverlayFeatures {
             if (isVacuum(item)) {
                 for (line in item.getLore()) {
                     gardenVacuumLoreLinePattern.matchMatcher(line) {
-                        val pests = group("amount").formatNumber()
-                        return if (pests >= 40) "§6§z40+" else "$pests"
+                        return when (val pests = group("amount").formatNumber()) {
+                            in 1..40 -> "$pests"
+                            else -> "§6§z${NumberUtil.format(pests)}"
+                        }
                     }
                 }
             }
