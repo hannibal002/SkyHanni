@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
 import net.minecraft.init.Blocks
@@ -201,7 +201,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.BOOSTER_COOKIE_DURATION) && (item.getLore().isNotEmpty() && ((itemName == ("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
             for (line in item.getLore()) {
                 boosterCookieDurationLoreLinePattern.matchMatcher(line) {
-                    TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
+                    return getDuration(group("fullDuration")).format(maxUnits = 1)
                 }
             }
         }
@@ -273,7 +273,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 }
             }
             generalPurposeNotBoosterCookieDurationLoreLinePattern.matchMatcher(theStringToUse) {
-                TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
+                return getDuration(group("fullDuration")).format(maxUnits = 1)
             }
         }
 
