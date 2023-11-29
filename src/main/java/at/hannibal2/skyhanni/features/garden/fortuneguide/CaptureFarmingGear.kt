@@ -109,7 +109,7 @@ class CaptureFarmingGear {
         when {
             invName == "Your Equipment and Stats" -> getEquipmentAndStatInfo(event, farmingItems, outdatedItems)
             invName.contains("Pets") -> getPetInfo(farmingItems, event, outdatedItems)
-            invName.contains("Your Skills") -> getSkillsInfo(event, storage)
+            invName.contains("Your Skills") -> getSkillInfo(event, storage)
             invName.contains("Community Shop") -> getCommunityShopInfo(event)
             invName.contains("Configure Plots") -> getPlotInfo(event, storage)
             invName.contains("Anita") -> getAnitaInfo(event, storage)
@@ -168,15 +168,13 @@ class CaptureFarmingGear {
         }
     }
 
-    private fun getSkillsInfo(
+    private fun getSkillInfo(
         event: InventoryFullyOpenedEvent,
         storage: Storage.ProfileSpecific.GardenStorage.Fortune
     ) {
-        for ((_, item) in event.inventoryItems) {
-            if (item.displayName.contains("Farming ")) {
-                storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
-            }
-        }
+        event.inventoryItems.values.firstOrNull { item ->
+            item.displayName.contains("Farming ")
+        }?.displayName?.split(" ")?.last()?.romanToDecimalIfNeeded()?.let { storage.farmingLevel = it }
     }
 
     private fun getCommunityShopInfo(event: InventoryFullyOpenedEvent) {
