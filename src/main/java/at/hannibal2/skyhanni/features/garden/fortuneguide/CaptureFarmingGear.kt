@@ -143,48 +143,27 @@ class CaptureFarmingGear {
         event: InventoryFullyOpenedEvent,
         outdatedItems: MutableMap<FarmingItems, Boolean>
     ) {
-        // If they've 2 of same pet, one will be overwritten
-        // optimize
+        val pets = listOf(FarmingItems.ELEPHANT, FarmingItems.MOOSHROOM_COW, FarmingItems.RABBIT, FarmingItems.BEE)
 
-        for (pet in listOf(
-            FarmingItems.ELEPHANT,
-            FarmingItems.MOOSHROOM_COW,
-            FarmingItems.RABBIT,
-            FarmingItems.BEE
-        )) {
-            if (farmingItems[pet] == null) {
-                farmingItems[pet] = FFGuideGUI.getFallbackItem(pet)
-            }
-        }
+        // Initialize or update pets with fallback if they're null
+        pets.forEach { pet -> farmingItems.putIfAbsent(pet, FFGuideGUI.getFallbackItem(pet)) }
 
-        // setting to current saved level -1 to stop later pages saving low rarity pets
-        var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestMooshroomRarity =
-            (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
+        // Map to keep track of the highest rarity per pet,
+        // setting current lvl to -1 to stop later pages saving low-rarity pets
+        val highestRarityMap = pets.associateWith {
+            (farmingItems[it]?.getItemRarityOrNull()?.id ?: -1) - 1
+        }.toMutableMap()
 
-        for ((_, item) in event.inventoryItems) {
-            val split = item.getInternalName().asString().split(";")
-            if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
-                farmingItems[FarmingItems.ELEPHANT] = item
-                outdatedItems[FarmingItems.ELEPHANT] = false
-                highestElephantRarity = split.last().toInt()
-            }
-            if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
-                farmingItems[FarmingItems.MOOSHROOM_COW] = item
-                outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                highestMooshroomRarity = split.last().toInt()
-            }
-            if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
-                farmingItems[FarmingItems.RABBIT] = item
-                outdatedItems[FarmingItems.RABBIT] = false
-                highestRabbitRarity = split.last().toInt()
-            }
-            if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
-                farmingItems[FarmingItems.BEE] = item
-                outdatedItems[FarmingItems.BEE] = false
-                highestBeeRarity = split.last().toInt()
+        event.inventoryItems.values.forEach { item ->
+            val (petType, rarityStr) = item.getInternalName().asString().split(";").let { it[0] to it[1].toInt() }
+            val pet = FarmingItems.valueOf(petType)
+
+            highestRarityMap[pet]?.let { highestRarity ->
+                if (pet in pets && rarityStr > highestRarity) {
+                    farmingItems[pet] = item
+                    outdatedItems[pet] = false
+                    highestRarityMap[pet] = rarityStr
+                }
             }
         }
     }
