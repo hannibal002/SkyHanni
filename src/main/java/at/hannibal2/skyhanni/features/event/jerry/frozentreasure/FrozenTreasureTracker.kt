@@ -98,6 +98,7 @@ object FrozenTreasureTracker {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
+            // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
         }
         return newList

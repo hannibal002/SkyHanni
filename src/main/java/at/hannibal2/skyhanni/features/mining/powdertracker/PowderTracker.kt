@@ -186,6 +186,7 @@ object PowderTracker {
     private fun formatDisplay(map: List<List<Any>>) = buildList {
         if (map.isEmpty()) return@buildList
         for (index in config.textFormat.get()) {
+            // TODO, change functionality to use enum rather than ordinals
             add(map[index.ordinal])
         }
     }

@@ -248,6 +248,7 @@ object CropMoneyDisplay {
             )
             val list = mutableListOf<String>()
             for (index in config.customFormat) {
+                // TODO, change functionality to use enum rather than ordinals
                 map[index.ordinal]?.let {
                     list.add(it)
                 }
@@ -375,6 +376,7 @@ object CropMoneyDisplay {
             )
             val newList = mutableListOf<Double>()
             for (index in config.customFormat) {
+                // TODO, change functionality to use enum rather than ordinals
                 map[index.ordinal]?.let {
                     newList.add(it)
                 }

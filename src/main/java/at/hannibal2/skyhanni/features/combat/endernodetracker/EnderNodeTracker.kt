@@ -250,6 +250,7 @@ object EnderNodeTracker {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
+            // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
         }
         return newList
