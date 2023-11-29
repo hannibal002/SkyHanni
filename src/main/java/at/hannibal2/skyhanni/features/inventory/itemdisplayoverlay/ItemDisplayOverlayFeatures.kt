@@ -394,6 +394,7 @@ class ItemDisplayOverlayFeatures {
                 for (line in item.getLore()) {
                     gardenVacuumLoreLinePattern.matchMatcher(line) {
                         return when (val pests = group("amount").formatNumber()) {
+                            in Long.MIN_VALUE..0 -> ""
                             in 1..40 -> "$pests"
                             else -> "§6§z${NumberUtil.format(pests)}"
                         }
