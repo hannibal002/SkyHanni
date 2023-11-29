@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI.vacuumVariants
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI.isVacuum
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -390,7 +390,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.VACCUM_PESTS)) {
-            if (vacuumVariants.any{ it.asString() == internalName }) {
+            if (isVacuum(item)) {
                 for (line in item.getLore()) {
                     gardenVacuumLoreLinePattern.matchMatcher(line) {
                         val pests = group("amount").formatNumber()
