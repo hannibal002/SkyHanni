@@ -81,8 +81,8 @@ class MenuItemDisplayOverlayMining {
                 //§7Level 64/§8100
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
-//                 if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
-//                 if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
+                // if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
+                // if (lore.last().contains("the Mountain!") || lore.last().contains("Requires ")) return ""
                 isNotHOTMPerkFirstCheckLoreLinePattern.matchMatcher(lore.first()) {
                     isNotHOTMPerkSecondCheckLoreLinePattern.matchMatcher(lore.last()) {
                         return ""

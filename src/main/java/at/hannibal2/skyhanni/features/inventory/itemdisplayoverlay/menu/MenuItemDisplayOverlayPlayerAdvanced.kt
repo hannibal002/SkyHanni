@@ -82,7 +82,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             DO NOT CHANGE THE BELOW RenderInventoryItemTipEvent FUNCTION
             UNLESS IF YOU KNOW WHAT YOU'RE DOING!!
             - ery
-            */
+    */
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         isNotBankAccountMenuChestNamePattern.matchMatcher(event.inventoryName) {
@@ -311,7 +311,8 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         return "$colorCode${candidate.perks.size}"
                     }
                 }
-/*          if (lore.isNotEmpty()) {
+                /*
+                if (lore.isNotEmpty()) {
                     (("(§8)+.*Candidate").toPattern()).matchMatcher(lore.first()) {
                         val colorCode = nameWithColor.take(2)
                         var numPerks = 0
@@ -329,7 +330,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         return "$colorCode$numPerks"
                     }
                  }
- */
+                */
             }
             calendarAndEventsOrMayorBlankChestNamePattern.matchMatcher(chestName) {
                 val nameWithColor = item.name ?: return ""
@@ -459,15 +460,15 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     }
 
     private fun grabPerkpocalypseMayor(lore: List<String>): String {
-//         if (lore.any { it == ("SLASHED Pricing") } || lore.any { it == ("Slayer XP Buff") } || lore.any { it == ("Pathfinder") }) return "§bAtx"
-//         if (lore.any { it == ("Prospection") } || lore.any { it == ("Mining XP Buff") } || lore.any { it == ("Mining Fiesta") }) return "§bCle"
-//         if (lore.any { it == ("Lucky!") } || lore.any { it == ("Pet XP Buff") } || lore.any { it == ("Mythological Ritual") }) return "§bDna"
-//         if (lore.any { it == ("Farming Simulator") } || lore.any { it == ("Pelt-pocalypse") } || lore.any { it == ("GOATed") }) return "§bFng"
-//         if (lore.any { it == ("Sweet Tooth") } || lore.any { it == ("Benevolence") } || lore.any { it == ("Extra Event") }) return "§bFxy"
-//         if (lore.any { it == ("Luck of the Sea 2.0") } || lore.any { it == ("Fishing XP Buff") } || lore.any { it == ("Fishing Festival") }) return "§bMrn"
-//         if (lore.any { it == ("Marauder") } || lore.any { it == ("EZPZ") } || lore.any { it == ("Benediction") }) return "§bPul"
-//         if (lore.any { it == ("Barrier Street") } || lore.any { it == ("Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
-//         else return "§c?"
+        // if (lore.any { it == ("SLASHED Pricing") } || lore.any { it == ("Slayer XP Buff") } || lore.any { it == ("Pathfinder") }) return "§bAtx"
+        // if (lore.any { it == ("Prospection") } || lore.any { it == ("Mining XP Buff") } || lore.any { it == ("Mining Fiesta") }) return "§bCle"
+        // if (lore.any { it == ("Lucky!") } || lore.any { it == ("Pet XP Buff") } || lore.any { it == ("Mythological Ritual") }) return "§bDna"
+        // if (lore.any { it == ("Farming Simulator") } || lore.any { it == ("Pelt-pocalypse") } || lore.any { it == ("GOATed") }) return "§bFng"
+        // if (lore.any { it == ("Sweet Tooth") } || lore.any { it == ("Benevolence") } || lore.any { it == ("Extra Event") }) return "§bFxy"
+        // if (lore.any { it == ("Luck of the Sea 2.0") } || lore.any { it == ("Fishing XP Buff") } || lore.any { it == ("Fishing Festival") }) return "§bMrn"
+        // if (lore.any { it == ("Marauder") } || lore.any { it == ("EZPZ") } || lore.any { it == ("Benediction") }) return "§bPul"
+        // if (lore.any { it == ("Barrier Street") } || lore.any { it == ("Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
+        // else return "§c?"
         for (line in lore) {
             mayorAatroxPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bAtx" }
             mayorColePerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bCle" }

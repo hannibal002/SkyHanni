@@ -200,7 +200,7 @@ class MenuItemDisplayOverlayPlayer {
                 }
             }
         }
-        //friendly note to future contribs: if you want to add more stack sizes you have to do it above this line or else it wont work. look, i don't make the rules, aight? -ery
+        // friendly note to future contribs: if you want to add more stack sizes to this category, you have to do it above this line or else it wont work. look, i don't make the rules, aight? -ery
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.ESSENCE_COUNTS)) {
             if (item.item != Items.skull) return ""
             if (LorenzUtils.isRewardChest()) {
@@ -214,7 +214,7 @@ class MenuItemDisplayOverlayPlayer {
                     }
                 }
             }
-            //!(chestName.contains(" ➜ ")) &&
+            // !(chestName.contains(" ➜ ")) &&
             // (chestName.contains("Essence Shop") && itemName.contains("Essence Shop")) ||
             // (chestName.contains("Essence Guide") && itemName.endsWith(" Essence")) ||
             // (chestName.endsWith(" Essence"))
