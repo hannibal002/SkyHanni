@@ -107,7 +107,7 @@ class CaptureFarmingGear {
         val outdatedItems = outdatedItems ?: return
         val invName = event.inventoryName
         when {
-            invName == "Your Equipment and Stats" -> getEquipmentAndStatsInfo(event, farmingItems, outdatedItems)
+            invName == "Your Equipment and Stats" -> getEquipmentAndStatInfo(event, farmingItems, outdatedItems)
             invName.contains("Pets") -> getPetInfo(farmingItems, event, outdatedItems)
             invName.contains("Your Skills") -> getSkillsInfo(event, storage)
             invName.contains("Community Shop") -> getCommunityShopInfo(event)
@@ -116,25 +116,24 @@ class CaptureFarmingGear {
         }
     }
 
-    private fun getEquipmentAndStatsInfo(
+    private fun getEquipmentAndStatInfo(
         event: InventoryFullyOpenedEvent,
         farmingItems: MutableMap<FarmingItems, ItemStack>,
         outdatedItems: MutableMap<FarmingItems, Boolean>
     ) {
-        for ((_, slot) in event.inventoryItems) {
+        event.inventoryItems.values.forEach { slot ->
             val split = slot.getInternalName().asString().split("_")
             if (split.first() == "LOTUS") {
-                for (item in FarmingItems.entries) {
-                    if (item.name == split.last()) {
-                        farmingItems[item] = slot
-                        outdatedItems[item] = false
+                FarmingItems.entries.find { it.name == split.last() }?.let { item ->
+                    farmingItems[item] = slot
+                    outdatedItems[item] = false
+
+                    FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
+                    slot.getEnchantments()?.get("green_thumb")?.let { greenThumbLvl ->
+                        val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
+                        GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
                     }
                 }
-                FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
-                val enchantments = slot.getEnchantments() ?: emptyMap()
-                val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
-                val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
-                GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
             }
         }
     }
