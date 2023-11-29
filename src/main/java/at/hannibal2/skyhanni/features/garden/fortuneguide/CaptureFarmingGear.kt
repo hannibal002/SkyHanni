@@ -45,8 +45,7 @@ class CaptureFarmingGear {
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
         private val farmingSets = arrayListOf(
-            "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
-            "RANCHERS", "FARMER", "RABBIT"
+            "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM", "RANCHERS", "FARMER", "RABBIT"
         )
         private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
 
@@ -233,8 +232,7 @@ class CaptureFarmingGear {
     private fun String.isLotusUpgrade(outdatedItems: MutableMap<FarmingItems, Boolean>): Boolean {
         return lotusUpgradePattern.matchMatcher(this) {
             updateOutdatedItems(
-                group("piece").uppercase(),
-                outdatedItems
+                group("piece").uppercase(), outdatedItems
             )
         } != null
     }
@@ -242,9 +240,7 @@ class CaptureFarmingGear {
     private fun String.isPetLevelUp(outdatedItems: MutableMap<FarmingItems, Boolean>): Boolean {
         return petLevelUpPattern.matchMatcher(this) {
             updateOutdatedItems(
-                group("pet").uppercase(),
-                outdatedItems,
-                true
+                group("pet").uppercase(), outdatedItems, true
             )
         } != null
     }
@@ -264,9 +260,7 @@ class CaptureFarmingGear {
     }
 
     private fun updateOutdatedItems(
-        itemName: String,
-        outdatedItems: MutableMap<FarmingItems, Boolean>,
-        containsCheck: Boolean = false
+        itemName: String, outdatedItems: MutableMap<FarmingItems, Boolean>, containsCheck: Boolean = false
     ) {
         FarmingItems.entries.forEach { item ->
             if ((containsCheck && item.name.contains(itemName)) || (!containsCheck && item.name == itemName)) {
