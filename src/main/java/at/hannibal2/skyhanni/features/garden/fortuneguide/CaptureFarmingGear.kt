@@ -52,29 +52,21 @@ class CaptureFarmingGear {
             val itemStack = InventoryUtils.getItemInHand() ?: return
 
             val currentCrop = itemStack.getCropType()
+            // todo better fall back items
+            // todo Daedalus axe
+            currentCrop?.let { cropType ->
+                FarmingItems.entries.firstOrNull { it.name == cropType.name }?.also { farmingItems[it] = itemStack }
+            }
 
-            if (currentCrop == null) {
-                //todo better fall back items
-                //todo Daedalus axe
-            } else {
-                for (item in FarmingItems.entries) {
-                    if (item.name == currentCrop.name) {
-                        farmingItems[item] = itemStack
+            InventoryUtils.getArmor().forEach { armor ->
+                armor?.getInternalName()?.asString()?.split("_")?.let { split ->
+                    if (split.first() in farmingSets) {
+                        FarmingItems.entries.firstOrNull { it.name == split.last() }?.also { farmingItems[it] = armor }
                     }
                 }
             }
-            for (armor in InventoryUtils.getArmor()) {
-                if (armor == null) continue
-                val split = armor.getInternalName().asString().split("_")
-                if (split.first() in farmingSets) {
-                    for (item in FarmingItems.entries) {
-                        if (item.name == split.last()) {
-                            farmingItems[item] = armor
-                        }
-                    }
-                }
-            }
-            for (line in TabListData.getTabList()) {
+
+            TabListData.getTabList().forEach { line ->
                 strengthPattern.matchMatcher(line) {
                     GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
                 }
@@ -116,6 +108,7 @@ class CaptureFarmingGear {
         }
     }
 
+    // <editor-fold> desc="onInventoryOpen Helper Functions"
     private fun getEquipmentAndStatInfo(
         event: InventoryFullyOpenedEvent,
         farmingItems: MutableMap<FarmingItems, ItemStack>,
@@ -191,13 +184,13 @@ class CaptureFarmingGear {
         val extraFarmingFortune = event.inventoryItems.values.firstOrNull {
             it.displayName.contains("Extra Farming Fortune")
         }
-
         val level = extraFarmingFortune?.getLore()?.firstNotNullOfOrNull { line ->
             anitaMenuPattern.matchMatcher(line) { group("level").toInt() / 4 }
         } ?: 15 // Default 15 if null
 
         storage.anitaUpgrade = level
     }
+    // </editor-fold>
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
