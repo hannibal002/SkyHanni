@@ -32,20 +32,6 @@ object ConfigUtils {
     }
 
     /**
-     * Migrates an Int to an Enum Constant.
-     * The new enum class should implement HasLegacyId and have a getter for LegacyId
-     *
-     * @param element The JsonElement to migrate
-     * @param enumClass The enum class to migrate to
-     * @return The migrated JsonElement
-     */
-    fun <T> migrateIntToEnum(element: JsonElement, enumClass: Class<T>): JsonElement
-        where T : Enum<T>, T : HasLegacyId {
-        require(element is JsonPrimitive) { "Expected a JsonPrimitive but got ${element.javaClass.simpleName}" }
-        return JsonPrimitive(getEnumConstantFromLegacyId(element.asInt, enumClass)?.name)
-    }
-
-    /**
      * Gets an enum constant from a legacy id
      * @param legacyId The legacy id to get the enum constant from
      * @param enumClass The enum class to get the enum constant from
@@ -59,5 +45,19 @@ object ConfigUtils {
             if (enumConstant.legacyId == legacyId) return enumConstant
         }
         return null
+    }
+
+    /**
+     * Migrates an Int to an Enum Constant.
+     * The new enum class should implement HasLegacyId and have a getter for LegacyId
+     *
+     * @param element The JsonElement to migrate
+     * @param enumClass The enum class to migrate to
+     * @return The migrated JsonElement
+     */
+    fun <T> migrateIntToEnum(element: JsonElement, enumClass: Class<T>): JsonElement
+        where T : Enum<T>, T : HasLegacyId {
+        require(element is JsonPrimitive) { "Expected a JsonPrimitive but got ${element.javaClass.simpleName}" }
+        return JsonPrimitive(getEnumConstantFromLegacyId(element.asInt, enumClass)?.name)
     }
 }
