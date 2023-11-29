@@ -39,6 +39,9 @@ class CaptureFarmingGear {
 
     private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
 
+    private val carrotExportationPattern = "CARROTS EXPORTATION COMPLETE!".toPattern()
+    private val pumpkinExportationPattern = "PUMPKINS EXPORTATION COMPLETE!".toPattern()
+
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
         private val farmingSets = arrayListOf(
@@ -198,39 +201,79 @@ class CaptureFarmingGear {
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()
-        fortuneUpgradePattern.matchMatcher(msg) {
-            ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
-        }
-        farmingLevelUpPattern.matchMatcher(msg) {
-            storage.farmingLevel = group("level").romanToDecimalIfNeeded()
-        }
-        anitaBuffPattern.matchMatcher(msg) {
-            storage.anitaUpgrade = group("level").toInt() / 4
-        }
-        lotusUpgradePattern.matchMatcher(msg) {
-            val piece = group("piece").uppercase()
-            for (item in FarmingItems.entries) {
-                if (item.name == piece) {
-                    outdatedItems[item] = true
-                }
-            }
-        }
-        petLevelUpPattern.matchMatcher(msg) {
-            val pet = group("pet").uppercase()
-            for (item in FarmingItems.entries) {
-                if (item.name.contains(pet)) {
-                    outdatedItems[item] = true
-                }
-            }
-        }
-        cakePattern.matchMatcher(msg) {
-            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
-        }
-        if (msg == "CARROTS EXPORTATION COMPLETE!") {
-            storage.carrotFortune = true
-        }
-        if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
-            storage.pumpkinFortune = true
+        when {
+            msg.isFortuneUpgrade() -> return
+            msg.isFarmingLevelUp(storage) -> return
+            msg.isAnitaBuff(storage) -> return
+            msg.isLotusUpgrade(outdatedItems) -> return
+            msg.isPetLevelUp(outdatedItems) -> return
+            msg.isCake(storage) -> return
+            msg.isCarrotExport(storage) -> return
+            msg.isPumpkinExport(storage) -> return
         }
     }
+
+    // <editor-fold desc="onChat Matcher Functions">
+    private fun String.isFortuneUpgrade(): Boolean {
+        return fortuneUpgradePattern.matchMatcher(this) {
+            ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
+        } != null
+    }
+
+    private fun String.isFarmingLevelUp(storage: Storage.ProfileSpecific.GardenStorage.Fortune): Boolean {
+        return farmingLevelUpPattern.matchMatcher(this) {
+            storage.farmingLevel = group("level").romanToDecimalIfNeeded()
+        } != null
+    }
+
+    private fun String.isAnitaBuff(storage: Storage.ProfileSpecific.GardenStorage.Fortune): Boolean {
+        return anitaBuffPattern.matchMatcher(this) { storage.anitaUpgrade = group("level").toInt() / 4 } != null
+    }
+
+    private fun String.isLotusUpgrade(outdatedItems: MutableMap<FarmingItems, Boolean>): Boolean {
+        return lotusUpgradePattern.matchMatcher(this) {
+            updateOutdatedItems(
+                group("piece").uppercase(),
+                outdatedItems
+            )
+        } != null
+    }
+
+    private fun String.isPetLevelUp(outdatedItems: MutableMap<FarmingItems, Boolean>): Boolean {
+        return petLevelUpPattern.matchMatcher(this) {
+            updateOutdatedItems(
+                group("pet").uppercase(),
+                outdatedItems,
+                true
+            )
+        } != null
+    }
+
+    private fun String.isCake(storage: Storage.ProfileSpecific.GardenStorage.Fortune): Boolean {
+        return cakePattern.matchMatcher(this) {
+            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
+        } != null
+    }
+
+    private fun String.isCarrotExport(storage: Storage.ProfileSpecific.GardenStorage.Fortune): Boolean {
+        return carrotExportationPattern.matchMatcher(this) { storage.carrotFortune = true } != null
+    }
+
+    private fun String.isPumpkinExport(storage: Storage.ProfileSpecific.GardenStorage.Fortune): Boolean {
+        return pumpkinExportationPattern.matchMatcher(this) { storage.pumpkinFortune = true } != null
+    }
+
+    private fun updateOutdatedItems(
+        itemName: String,
+        outdatedItems: MutableMap<FarmingItems, Boolean>,
+        containsCheck: Boolean = false
+    ) {
+        FarmingItems.entries.forEach { item ->
+            if ((containsCheck && item.name.contains(itemName)) || (!containsCheck && item.name == itemName)) {
+                outdatedItems[item] = true
+            }
+        }
+    }
+
+    // </editor-fold>
 }
