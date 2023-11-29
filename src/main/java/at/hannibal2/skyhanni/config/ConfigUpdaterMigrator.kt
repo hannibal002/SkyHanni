@@ -34,7 +34,7 @@ object ConfigUpdaterMigrator {
             }
         }
 
-        fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
+        fun move(since: Int, oldPath: String, newPath: String = oldPath, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return

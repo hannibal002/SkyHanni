@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ItemDisplayOverlayFeatures {
+object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
@@ -71,10 +71,7 @@ class ItemDisplayOverlayFeatures {
             return itemName.substring(itemName.length - 1)
         }
 
-        if (DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && (itemName.contains("Golden ") || itemName.contains(
-                "Diamond "
-            ))
-        ) {
+        if (DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
             when {
                 itemName.contains("Bonzo") -> return "1"
                 itemName.contains("Scarf") -> return "2"
@@ -141,9 +138,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName()
-                .endsWith(" Collections")
-        ) {
+        if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             val lore = item.getLore()
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionAPI.isCollectionTier0(lore)) return "0"
@@ -177,10 +172,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(
-                " Potion"
-            )
-        ) {
+        if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
             item.name?.let {
                 "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
@@ -245,5 +237,5 @@ class ItemDisplayOverlayFeatures {
         }
     }
 
-    private fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)
+    fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)
 }

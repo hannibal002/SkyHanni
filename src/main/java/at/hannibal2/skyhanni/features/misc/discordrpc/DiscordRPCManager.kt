@@ -226,7 +226,7 @@ object DiscordRPCManager : IPCListener {
         event.move(11, "misc.discordRPC.auto", "misc.discordRPC.auto") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
         }
-        event.move(11, "misc.discordRPC.autoPriority", "misc.discordRPC.secondLine") { element ->
+        event.move(11, "misc.discordRPC.autoPriority", "misc.discordRPC.autoPriority") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
         }
     }
