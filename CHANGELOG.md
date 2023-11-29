@@ -38,6 +38,21 @@
   + Option to exclude hidden items in the total price calculation.
   + Option to change the display mode that gets shown on default: Total, Current or remember last.
 
+#### Winter Features
+
++ Added Unique Gifting Opportunities. - nea
+  + Highlight players who you haven't given gifts to yet.
+  + Only highlight ungifted players while holding a gift.
+  + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
++ Added Unique Gifted users counter. - hannibal2
+  + Show in a display how many unique players you have given gifts to in the winter 2023 event.
+  + Run command /opengenerowmenu to sync up.
+
+#### Inventory Features
+
++ Added bottle of Jyrre time overlay in stack size feature. - HiZe
++ Added show special edition number as stack size when below 1k. - hannibal2
+
 ### Changes
 
 
@@ -65,6 +80,9 @@
 + Fixed total equipment fortune in /ff. - alexia
 + Fixed Locust pest not getting detected in damage indicator. - hannibal2
 + Fixed Pest Spray Display showing outside the garden. - hannibal2
++ Fixed pest detection when more than 3 pests are spawned at once. - hannibal2
++ Fixed showing on the scoreboard  "garden outside" immediately after teleporting to a plot. - hannibal2
++ Fixed visitor timer counting down too fast sometimes. - hannibal2
 
 #### Misc Fixes
 
