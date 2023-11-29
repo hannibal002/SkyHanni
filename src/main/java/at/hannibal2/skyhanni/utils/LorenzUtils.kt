@@ -23,6 +23,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import java.awt.Color
 import java.lang.reflect.Field
@@ -625,4 +626,6 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name)
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+
+    fun isInDevEnviromen() = Launch.blackboard.get("fml.deobfuscatedEnvironment") as Boolean
 }
