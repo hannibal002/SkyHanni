@@ -4,14 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI.vacuumVariants
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -31,11 +30,11 @@ import kotlin.math.floor
 import kotlin.math.log10
 
 class ItemDisplayOverlayFeatures {
+    // private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
     private val rancherBootsSpeedCapLoreLinePattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelItemNamePattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val shredderBonusDamageLoreLinePattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
     private val bottleOfJerryLoreLinePattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
-    private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
     private val gardenVacuumLoreLinePattern = "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?".toPattern()
     private val masterSkullItemNamePattern = (("(.*)Master Skull - Tier (?<tier>.+)").toPattern())
     private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
@@ -62,13 +61,6 @@ class ItemDisplayOverlayFeatures {
     private val auctionNumberLorePattern = (("§8Auction .*").toPattern())
     private val editionNumberLorePattern = (("§8Edition .*").toPattern())
     private val doesNotIncludeDungeonStarsItemNamePattern = (("^(?:(?!✪).)*\$").toPattern())
-    private val garenVacuumVariants = listOf(
-        "SKYMART_VACUUM".asInternalName(),
-        "SKYMART_TURBO_VACUUM".asInternalName(),
-        "SKYMART_HYPER_VACUUM".asInternalName(),
-        "INFINI_VACUUM".asInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
-    )
     private val tieredEnchants = listOf(
         "compact",
         "cultivating",
@@ -398,7 +390,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.VACCUM_PESTS)) {
-            if (item.getInternalNameOrNull() in garenVacuumVariants) {
+            if (vacuumVariants.any{ it.asString() == internalName }) {
                 for (line in item.getLore()) {
                     gardenVacuumLoreLinePattern.matchMatcher(line) {
                         val pests = group("amount").formatNumber()
