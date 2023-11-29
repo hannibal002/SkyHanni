@@ -168,10 +168,7 @@ class CaptureFarmingGear {
         }
     }
 
-    private fun getSkillInfo(
-        event: InventoryFullyOpenedEvent,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune
-    ) {
+    private fun getSkillInfo(event: InventoryFullyOpenedEvent, storage: Storage.ProfileSpecific.GardenStorage.Fortune) {
         event.inventoryItems.values.firstOrNull { item ->
             item.displayName.contains("Farming ")
         }?.displayName?.split(" ")?.last()?.romanToDecimalIfNeeded()?.let { storage.farmingLevel = it }
@@ -185,18 +182,9 @@ class CaptureFarmingGear {
         }
     }
 
-
-    private fun getPlotInfo(
-        event: InventoryFullyOpenedEvent,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune
-    ) {
-        var plotsUnlocked = 24
-        for (slot in event.inventoryItems) {
-            if (slot.value.getLore().contains("§7Cost:")) {
-                plotsUnlocked -= 1
-            }
-        }
-        storage.plotsUnlocked = plotsUnlocked
+    private fun getPlotInfo(event: InventoryFullyOpenedEvent, storage: Storage.ProfileSpecific.GardenStorage.Fortune) {
+        val plotsWithCost = event.inventoryItems.count { it.value.getLore().contains("§7Cost:") }
+        storage.plotsUnlocked = 24 - plotsWithCost
     }
 
     private fun getAnitaInfo(
