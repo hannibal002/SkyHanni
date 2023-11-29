@@ -103,115 +103,122 @@ class CaptureFarmingGear {
         val storage = GardenAPI.storage?.fortune ?: return
         val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
-        if (event.inventoryName == "Your Equipment and Stats") {
-            for ((_, slot) in event.inventoryItems) {
-                val split = slot.getInternalName().asString().split("_")
-                if (split.first() == "LOTUS") {
-                    for (item in FarmingItems.entries) {
-                        if (item.name == split.last()) {
-                            farmingItems[item] = slot
-                            outdatedItems[item] = false
+        when {
+            event.inventoryName == "Your Equipment and Stats" -> {
+                for ((_, slot) in event.inventoryItems) {
+                    val split = slot.getInternalName().asString().split("_")
+                    if (split.first() == "LOTUS") {
+                        for (item in FarmingItems.entries) {
+                            if (item.name == split.last()) {
+                                farmingItems[item] = slot
+                                outdatedItems[item] = false
+                            }
                         }
-                    }
-                    FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
-                    val enchantments = slot.getEnchantments() ?: emptyMap()
-                    val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
-                    val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
-                    GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
-                }
-            }
-        }
-        if (event.inventoryName.contains("Pets")) {
-            // If they've 2 of same pet, one will be overwritten
-            // optimize
-
-            for (pet in listOf(
-                FarmingItems.ELEPHANT,
-                FarmingItems.MOOSHROOM_COW,
-                FarmingItems.RABBIT,
-                FarmingItems.BEE
-            )) {
-                if (farmingItems[pet] == null) {
-                    farmingItems[pet] = FFGuideGUI.getFallbackItem(pet)
-                }
-            }
-
-            // setting to current saved level -1 to stop later pages saving low rarity pets
-            var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
-            var highestMooshroomRarity = (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
-            var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
-            var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
-
-            for ((_, item) in event.inventoryItems) {
-                val split = item.getInternalName().asString().split(";")
-                if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
-                    farmingItems[FarmingItems.ELEPHANT] = item
-                    outdatedItems[FarmingItems.ELEPHANT] = false
-                    highestElephantRarity = split.last().toInt()
-                }
-                if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
-                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
-                    outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                    highestMooshroomRarity = split.last().toInt()
-                }
-                if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
-                    farmingItems[FarmingItems.RABBIT] = item
-                    outdatedItems[FarmingItems.RABBIT] = false
-                    highestRabbitRarity = split.last().toInt()
-                }
-                if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
-                    farmingItems[FarmingItems.BEE] = item
-                    outdatedItems[FarmingItems.BEE] = false
-                    highestBeeRarity = split.last().toInt()
-                }
-            }
-        }
-
-        if (event.inventoryName.contains("Your Skills")) {
-            for ((_, item) in event.inventoryItems) {
-                if (item.displayName.contains("Farming ")) {
-                    storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
-                }
-            }
-        }
-        if (event.inventoryName.contains("Community Shop")) {
-            for ((_, item) in event.inventoryItems) {
-                if (item.displayName.contains("Garden Farming Fortune")) {
-                    if (item.getLore().contains("§aMaxed out!")) {
-                        ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                            item.displayName.split(" ").last().romanToDecimal()
-                    } else {
-                        ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                            item.displayName.split(" ").last().romanToDecimal() - 1
+                        FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
+                        val enchantments = slot.getEnchantments() ?: emptyMap()
+                        val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
+                        val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
+                        GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
                     }
                 }
             }
-        }
-        if (event.inventoryName.contains("Configure Plots")) {
-            var plotsUnlocked = 24
-            for (slot in event.inventoryItems) {
-                if (slot.value.getLore().contains("§7Cost:")) {
-                    plotsUnlocked -= 1
+
+            event.inventoryName.contains("Pets") -> {
+                // If they've 2 of same pet, one will be overwritten
+                // optimize
+
+                for (pet in listOf(
+                    FarmingItems.ELEPHANT,
+                    FarmingItems.MOOSHROOM_COW,
+                    FarmingItems.RABBIT,
+                    FarmingItems.BEE
+                )) {
+                    if (farmingItems[pet] == null) {
+                        farmingItems[pet] = FFGuideGUI.getFallbackItem(pet)
+                    }
+                }
+
+                // setting to current saved level -1 to stop later pages saving low rarity pets
+                var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
+                var highestMooshroomRarity =
+                    (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
+                var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
+                var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
+
+                for ((_, item) in event.inventoryItems) {
+                    val split = item.getInternalName().asString().split(";")
+                    if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
+                        farmingItems[FarmingItems.ELEPHANT] = item
+                        outdatedItems[FarmingItems.ELEPHANT] = false
+                        highestElephantRarity = split.last().toInt()
+                    }
+                    if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
+                        farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                        outdatedItems[FarmingItems.MOOSHROOM_COW] = false
+                        highestMooshroomRarity = split.last().toInt()
+                    }
+                    if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
+                        farmingItems[FarmingItems.RABBIT] = item
+                        outdatedItems[FarmingItems.RABBIT] = false
+                        highestRabbitRarity = split.last().toInt()
+                    }
+                    if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
+                        farmingItems[FarmingItems.BEE] = item
+                        outdatedItems[FarmingItems.BEE] = false
+                        highestBeeRarity = split.last().toInt()
+                    }
                 }
             }
-            storage.plotsUnlocked = plotsUnlocked
-        }
-        if (event.inventoryName.contains("Anita")) {
-            var level = -1
-            for ((_, item) in event.inventoryItems) {
-                if (item.displayName.contains("Extra Farming Fortune")) {
-                    level = 0
-                    for (line in item.getLore()) {
-                        anitaMenuPattern.matchMatcher(line) {
-                            level = group("level").toInt() / 4
+
+            event.inventoryName.contains("Your Skills") -> {
+                for ((_, item) in event.inventoryItems) {
+                    if (item.displayName.contains("Farming ")) {
+                        storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
+                    }
+                }
+            }
+
+            event.inventoryName.contains("Community Shop") -> {
+                for ((_, item) in event.inventoryItems) {
+                    if (item.displayName.contains("Garden Farming Fortune")) {
+                        if (item.getLore().contains("§aMaxed out!")) {
+                            ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
+                                item.displayName.split(" ").last().romanToDecimal()
+                        } else {
+                            ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
+                                item.displayName.split(" ").last().romanToDecimal() - 1
                         }
                     }
                 }
             }
-            if (level == -1) {
-                storage.anitaUpgrade = 15
-            } else {
-                storage.anitaUpgrade = level
+
+            event.inventoryName.contains("Configure Plots") -> {
+                var plotsUnlocked = 24
+                for (slot in event.inventoryItems) {
+                    if (slot.value.getLore().contains("§7Cost:")) {
+                        plotsUnlocked -= 1
+                    }
+                }
+                storage.plotsUnlocked = plotsUnlocked
+            }
+
+            event.inventoryName.contains("Anita") -> {
+                var level = -1
+                for ((_, item) in event.inventoryItems) {
+                    if (item.displayName.contains("Extra Farming Fortune")) {
+                        level = 0
+                        for (line in item.getLore()) {
+                            anitaMenuPattern.matchMatcher(line) {
+                                level = group("level").toInt() / 4
+                            }
+                        }
+                    }
+                }
+                if (level == -1) {
+                    storage.anitaUpgrade = 15
+                } else {
+                    storage.anitaUpgrade = level
+                }
             }
         }
     }
