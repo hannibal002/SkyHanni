@@ -54,7 +54,7 @@ object DiscordRPCManager : IPCListener {
                     return@launch
                 }
                 consoleLog("Starting Discord RPC...")
-
+                // TODO, change functionality to use enum rather than ordinals
                 firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
                 secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
                 startTimestamp = System.currentTimeMillis()
@@ -110,7 +110,7 @@ object DiscordRPCManager : IPCListener {
     fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
-
+        // TODO, change functionality to use enum rather than ordinals
         secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
         firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
         val presence: RichPresence = RichPresence.Builder()

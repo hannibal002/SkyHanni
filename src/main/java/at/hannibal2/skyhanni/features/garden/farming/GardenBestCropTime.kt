@@ -95,6 +95,7 @@ class GardenBestCropTime {
         for (crop in sorted.keys) {
             if (crop.isMaxed()) continue
             val millis = timeTillNextCrop[crop]!!
+            // TODO, change functionality to use enum rather than ordinals
             val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis, biggestUnit, maxUnits = 2)
             val isCurrent = crop == currentCrop

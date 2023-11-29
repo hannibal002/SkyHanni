@@ -121,7 +121,7 @@ object VisitorAPI {
         fun hasReward(): VisitorReward? {
             for (internalName in allRewards) {
                 val reward = VisitorReward.getByInternalName(internalName) ?: continue
-
+                // TODO, change functionality to use enum rather than ordinals
                 if (config.rewardWarning.drops.elementAtOrNull(reward.ordinal) != null) {
                     return reward
                 }

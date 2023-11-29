@@ -258,6 +258,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     AUTO({
         var autoReturn = ""
         for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
+            // TODO, change functionality to use enum rather than ordinals
             val autoStatus = AutoStatus.entries[statusID.ordinal]
             val result =
                 autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it

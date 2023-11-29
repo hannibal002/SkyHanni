@@ -179,6 +179,7 @@ object GardenCropMilestoneDisplay {
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
+                // TODO, change functionality to use enum rather than ordinals
                 val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
                 val duration = TimeUtils.formatDuration(millis, biggestUnit)
                 tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
@@ -228,6 +229,7 @@ object GardenCropMilestoneDisplay {
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.text) {
+            // TODO, change functionality to use enum rather than ordinals
             lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
@@ -273,6 +275,7 @@ object GardenCropMilestoneDisplay {
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
+            // TODO, change functionality to use enum rather than ordinals
             val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
             lineMap[3] = Collections.singletonList("§7In §b$duration")
@@ -283,6 +286,7 @@ object GardenCropMilestoneDisplay {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.mushroomPetPerk.text) {
+            // TODO, change functionality to use enum rather than ordinals
             lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
