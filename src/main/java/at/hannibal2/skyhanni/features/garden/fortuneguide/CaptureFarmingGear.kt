@@ -187,22 +187,16 @@ class CaptureFarmingGear {
         storage.plotsUnlocked = 24 - plotsWithCost
     }
 
-    private fun getAnitaInfo(
-        event: InventoryFullyOpenedEvent,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune
-    ) {
-        var level = -1
-        for ((_, item) in event.inventoryItems) {
-            if (item.displayName.contains("Extra Farming Fortune")) {
-                level = 0
-                for (line in item.getLore()) {
-                    anitaMenuPattern.matchMatcher(line) {
-                        level = group("level").toInt() / 4
-                    }
-                }
-            }
+    private fun getAnitaInfo(event: InventoryFullyOpenedEvent, storage: Storage.ProfileSpecific.GardenStorage.Fortune) {
+        val extraFarmingFortune = event.inventoryItems.values.firstOrNull {
+            it.displayName.contains("Extra Farming Fortune")
         }
-        storage.anitaUpgrade = if (level == -1) 15 else level
+
+        val level = extraFarmingFortune?.getLore()?.firstNotNullOfOrNull { line ->
+            anitaMenuPattern.matchMatcher(line) { group("level").toInt() / 4 }
+        } ?: 15 // Default 15 if null
+
+        storage.anitaUpgrade = level
     }
 
     @SubscribeEvent
