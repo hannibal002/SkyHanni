@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
@@ -19,13 +21,16 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class Storage {
@@ -50,6 +55,9 @@ public class Storage {
     public Boolean contestSendingAsked = false;
 
     @Expose
+    public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
+
+    @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
     public static class PlayerSpecific {
@@ -71,6 +79,19 @@ public class Storage {
 
         @Expose
         public List<String> guildMembers = new ArrayList<>();
+
+        @Expose
+        public WinterStorage winter = new WinterStorage();
+
+        public static class WinterStorage {
+
+            @Expose
+            public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+
+            @Expose
+            public int amountGifted = 0;
+        }
+
     }
 
     public static class ProfileSpecific {
@@ -220,6 +241,9 @@ public class Storage {
                 @Expose
                 public Map<Integer, NEUInternalName> plotList = new HashMap<>();
             }
+
+            @Expose
+            public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
             @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
@@ -388,6 +412,16 @@ public class Storage {
 
             @Expose
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
+        }
+
+        @Expose
+        public FishingStorage fishing = new FishingStorage();
+
+        public static class FishingStorage {
+
+            @Expose
+            public FishingProfitTracker.Data fishingProfitTracker = new FishingProfitTracker.Data();
+
         }
     }
 }

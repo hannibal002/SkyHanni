@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -41,7 +41,7 @@ object GardenCropMilestones {
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
-        GardenCropMilestonesFix.openInventory(event.inventoryItems)
+        GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()

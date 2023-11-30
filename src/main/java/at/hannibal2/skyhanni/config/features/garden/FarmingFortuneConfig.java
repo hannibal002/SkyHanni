@@ -18,15 +18,6 @@ public class FarmingFortuneConfig {
     @FeatureToggle
     public boolean display = true;
 
-    @Expose
-    @ConfigOption(
-        name = "Show As Drop Multiplier",
-        desc = "Adds 100 to the displayed Farming Fortune so that it represents a drop multiplier rather than" +
-            " the chance for bonus drops. "
-    )
-    @ConfigEditorBoolean
-    public boolean dropMultiplier = true;
-
     @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable open = Commands::openFortuneGuide;

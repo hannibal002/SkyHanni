@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -15,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class WildStrawberryDyeNotification {
-    var lastCloseTime = 0L
+    private var lastCloseTime = 0L
 
     val item by lazy { "DYE_WILD_STRAWBERRY".asInternalName() }
 
@@ -27,7 +26,7 @@ class WildStrawberryDyeNotification {
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.wildStrawberryDyeNotification) return
+        if (!GardenAPI.config.wildStrawberryDyeNotification) return
 
         val itemStack = event.itemStack
         MinecraftExecutor.OnThread.execute {

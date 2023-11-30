@@ -156,7 +156,7 @@ class ShowMotesNpcSellPrice {
                     add("§6Value per: §d$valuePer Motes")
                     add("§6Total in chest: §d${(value / valuePer).toInt()}")
                     add("")
-                    add("§6Total value: §d$price")
+                    add("§6Total value: §d$price coins")
                 }
                 add(Renderable.hoverTips("§6${stack.displayName}: §b$price", tips, indexes = index, stack = stack))
             })

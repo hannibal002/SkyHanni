@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -232,7 +235,9 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
-                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else TrevorSolver.currentMob!!.mobName
+                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else {
+                    TrevorSolver.currentMob!!.mobName
+                }
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), displayName, 1.5)
@@ -300,4 +305,11 @@ object TrevorFeatures {
     fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 
     fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(11, "misc.trevorTheTrapper.textFormat", "misc.trevorTheTrapper.textFormat") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)
+        }
+    }
 }

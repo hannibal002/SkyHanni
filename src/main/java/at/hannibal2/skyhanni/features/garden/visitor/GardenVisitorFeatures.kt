@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.visitor.RewardWarningConfig.ItemWarnEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -19,6 +20,8 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -80,13 +83,20 @@ class GardenVisitorFeatures {
         val visitor = event.visitor
         val offerItem = visitor.offer!!.offerItem
 
-        for (line in offerItem.getLore()) {
+        val lore = offerItem.getLore()
+        for (line in lore) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
             val pair = ItemUtils.readItemAmount(line)
             if (pair == null) {
-                LorenzUtils.error("Could not read item '$line'")
+                ErrorManager.logErrorStateWithData(
+                    "Could not read items required in Visitor Inventory", "ItemUtils.readItemAmount returns null",
+                    "line" to line,
+                    "offerItem" to offerItem,
+                    "lore" to lore,
+                    "visitor" to visitor
+                )
                 continue
             }
             val (itemName, amount) = pair
@@ -97,7 +107,7 @@ class GardenVisitorFeatures {
         readToolTip(visitor, offerItem)
 
         if (visitor.status == VisitorAPI.VisitorStatus.NEW) {
-            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" } == true
+            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
             if (alreadyReady) {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
@@ -270,7 +280,6 @@ class GardenVisitorFeatures {
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, event.itemStack)
-            LorenzUtils.error("Reloaded the visitor data of that inventory, this should not happen.")
         }
 
         toolTip.addAll(visitor.lastLore)
@@ -429,6 +438,7 @@ class GardenVisitorFeatures {
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val name = group("name")
+        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
@@ -599,6 +609,9 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
+        event.move(11, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemWarnEntry::class.java)
+        }
     }
 
 }

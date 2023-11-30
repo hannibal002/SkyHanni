@@ -204,6 +204,6 @@ object NumberUtil {
     }
 
     val Int.milion get() = this * 1_000_000.0
-    val Int.bilion get() = this * 1_000_000_000.0
+    private val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
 }

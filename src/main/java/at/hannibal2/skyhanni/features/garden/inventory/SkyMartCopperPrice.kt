@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -21,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class SkyMartCopperPrice {
     private val pattern = "§c(?<amount>.*) Copper".toPattern()
     private var display = emptyList<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden.skyMart
+    private val config get() = GardenAPI.config.skyMart
 
     companion object {
         var inInventory = false

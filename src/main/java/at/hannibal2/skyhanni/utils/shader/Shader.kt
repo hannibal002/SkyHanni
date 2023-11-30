@@ -30,7 +30,7 @@ abstract class Shader(vertex: String, fragment: String) {
         if (linkStatus == GL11.GL_FALSE) {
             LorenzUtils.consoleLog(
                 "Error occurred when linking program with Vertex Shader: $vertex and Fragment Shader: $fragment : " +
-                        StringUtils.trim(ShaderHelper.glGetProgramInfoLog(shaderProgram, 1024))
+                    StringUtils.trim(ShaderHelper.glGetProgramInfoLog(shaderProgram, 1024))
             )
         }
 

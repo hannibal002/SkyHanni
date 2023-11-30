@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
@@ -32,7 +33,6 @@ import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,6 +51,8 @@ object GardenAPI {
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
+    val config get() = SkyHanniMod.feature.garden
+    var totalAmountVisitorsExisting = 0
     var gardenExp: Long?
         get() = storage?.experience
         set(value) {
@@ -60,6 +62,17 @@ object GardenAPI {
         }
 
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
+
+    // TODO USE SH-REPO
+    private val otherToolsList = listOf(
+        "DAEDALUS_AXE",
+        "BASIC_GARDENING_HOE",
+        "ADVANCED_GARDENING_AXE",
+        "BASIC_GARDENING_AXE",
+        "ADVANCED_GARDENING_HOE",
+        "ROOKIE_HOE",
+        "BINGHOE"
+    )
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
@@ -122,19 +135,7 @@ object GardenAPI {
     }
 
     private fun isOtherTool(internalName: NEUInternalName): Boolean {
-        if (internalName.startsWith("DAEDALUS_AXE")) return true
-
-        if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
-        if (internalName.startsWith("ADVANCED_GARDENING_AXE")) return true
-
-        if (internalName.startsWith("BASIC_GARDENING_AXE")) return true
-        if (internalName.startsWith("ADVANCED_GARDENING_HOE")) return true
-
-        if (internalName.startsWith("ROOKIE_HOE")) return true
-
-        if (internalName.startsWith("BINGHOE")) return true
-
-        return false
+        return internalName.asString() in otherToolsList
     }
 
     fun inGarden() = IslandType.GARDEN.isInIsland()
@@ -155,7 +156,7 @@ object GardenAPI {
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
+        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
 
     fun clearCropSpeed() {
         storage?.cropsPerSecond?.clear()
@@ -239,6 +240,7 @@ object GardenAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.garden_exp
+        totalAmountVisitorsExisting = data.visitors.size
     }
 
     private var gardenExperience = listOf<Int>()

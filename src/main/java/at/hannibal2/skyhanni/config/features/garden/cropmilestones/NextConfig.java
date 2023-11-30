@@ -43,7 +43,7 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Always On",
-        desc = "Show the Best Display always while on the garden.")
+        desc = "Show the Best Display always while in the garden.")
     @ConfigEditorBoolean
     public boolean bestAlwaysOn = false;
 
