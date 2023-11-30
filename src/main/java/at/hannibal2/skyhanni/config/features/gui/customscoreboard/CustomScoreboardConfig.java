@@ -32,35 +32,46 @@ public class CustomScoreboardConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the scoreboard."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§6§lSKYBLOCK",
-            "§7♲ Blueberry",
-            "Purse: §652,763,737",
-            "Motes: §d64,647",
-            "Bank: §6249M",
-            "Bits: §b59,264",
-            "Copper: §c23,495",
-            "Gems: §a57,873",
-            "Heat: §c♨ 0",
-            "",
-            "§7⏣ §bVillage",
-            "Late Summer 11th",
-            "§710:40pm",
-            "§8m77CK",
-            "Power: Sighted",
-            "",
-            "Objective:\n§eUpdate SkyHanni",
-            "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills",
-            "",
-            "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234",
-            "§7Wide Range of Events\n§7(too much for this here)",
-            "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff",
-            "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15",
-            "§ewww.hypixel.net",
+    @ConfigEditorDraggableList()
+
+    public List<ScoreboardEntry> textFormat = new ArrayList<>(Arrays.asList(ScoreboardEntry.values()));
+    public enum ScoreboardEntry {
+        TITLE("§6§lSKYBLOCK"),
+        PROFILE("§7♲ Blueberry"),
+        PURSE("Purse: §652,763,737"),
+        MOTES("Motes: §d64,647"),
+        BANK("Bank: §6249M"),
+        BITS("Bits: §b59,264"),
+        COPPER("Copper: §c23,495"),
+        GEMS("Gems: §a57,873"),
+        HEAT("Heat: §c♨ 0"),
+        EMPTY_LINE(""),
+        LOCATION("§7⏣ §bVillage"),
+        DATE("Late Summer 11th"),
+        TIME("§710:40pm"),
+        LOBBY_CODE("§8m77CK"),
+        POWER("Power: Sighted"),
+        EMPTY_LINE2(""),
+        OBJECTIVE("Objective:\n§eUpdate SkyHanni"),
+        SLAYER("§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"),
+        EMPTY_LINE3(""),
+        POWDER("§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234"),
+        EVENTS("§7Wide Range of Events\n§7(too much for this here)"),
+        MAYOR("§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"),
+        PARTY("§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"),
+        FOOTER("§ewww.hypixel.net");
+
+        private final String str;
+
+        ScoreboardEntry(String str) {
+            this.str = str;
         }
-    )
-    public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23));
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

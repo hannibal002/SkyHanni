@@ -82,7 +82,7 @@ class CustomScoreboard {
     private fun formatLines(lineMap: HashMap<Int, List<Any>>): MutableList<String> {
         val newList = mutableListOf<String>()
         for (index in config.textFormat) {
-            lineMap[index]?.let {
+            lineMap[index.ordinal]?.let {
                 // Hide consecutive empty lines
                 if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull() == "") {
                     continue
