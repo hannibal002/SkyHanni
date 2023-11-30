@@ -135,7 +135,7 @@ class MinionFeatures {
             }
         }
 
-        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()//TODO
+        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()
         minionStorageInventoryOpen = true
     }
 

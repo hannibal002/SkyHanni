@@ -32,11 +32,14 @@ class MinionXp {
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
 
+    // TODO move to some other spot. This can be used at other features as well
     private data class PrimitiveItemStack(val name: NEUInternalName, val stackSize: Int)
 
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
 
+    // TODO use upper case names, created a function to get type by lowercase name
+    // TODO maybe: rename to SkillType, move somewhere else
     enum class XpType {
         Farming,
         Mining,
