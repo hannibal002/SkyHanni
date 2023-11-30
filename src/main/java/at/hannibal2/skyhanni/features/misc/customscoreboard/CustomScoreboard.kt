@@ -1,6 +1,7 @@
 //
 // Requested by alpaka8123 (https://discord.com/channels/997079228510117908/1162844830360146080)
-// Done by J10a1n15, with lots of help from hanni, and snippets from item tracker features <3
+// Done by J10a1n15, with lots of help from hanni and more contribs <3
+// Also big thanks to the people that tested it before it released, saved me some time <3
 //
 
 //
