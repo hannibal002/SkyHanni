@@ -42,7 +42,6 @@ import kotlin.math.pow
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()
-private var cache = emptyList<List<Any>>()
 
 
 class CustomScoreboard {
@@ -73,8 +72,6 @@ class CustomScoreboard {
         for (element in Elements.entries) {
             lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
         }
-
-        cache = lineMap.values.toList()
 
         return formatLines(lineMap)
     }
