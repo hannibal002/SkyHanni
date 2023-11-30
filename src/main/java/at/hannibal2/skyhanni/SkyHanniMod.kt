@@ -217,6 +217,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesI
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+import at.hannibal2.skyhanni.features.minion.MinionXp
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -536,6 +537,7 @@ class SkyHanniMod {
         loadModule(GardenVisitorFeatures())
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())
+        loadModule(MinionXp())
         loadModule(GardenNextPlotPrice())
         loadModule(GardenCropMilestoneDisplay)
         loadModule(GardenCustomKeybinds)
@@ -649,7 +651,7 @@ class SkyHanniMod {
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
-        loadModule(GardenPlotBorders())
+        loadModule(GardenPlotBorders)
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker)

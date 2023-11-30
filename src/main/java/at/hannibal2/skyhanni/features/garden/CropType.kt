@@ -59,8 +59,7 @@ enum class CropType(
                 Blocks.melon_block -> MELON
                 Blocks.cactus -> CACTUS
                 Blocks.cocoa -> COCOA_BEANS
-                Blocks.red_mushroom -> MUSHROOM
-                Blocks.brown_mushroom -> MUSHROOM
+                Blocks.red_mushroom, Blocks.brown_mushroom -> MUSHROOM
                 Blocks.nether_wart -> NETHER_WART
                 else -> null
             }

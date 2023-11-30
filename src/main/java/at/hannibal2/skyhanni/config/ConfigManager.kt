@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -180,7 +181,20 @@ class ConfigManager {
                 output = if (fileType == ConfigFileType.FEATURES) {
                     val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                    gson.fromJson(newJsonObject, defaultValue.javaClass)
+                    val run = { gson.fromJson(newJsonObject, defaultValue.javaClass) }
+                    if (LorenzUtils.isInDevEnviromen()) {
+                        try {
+                            run()
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                            println("This is a crash.")
+                            while (true) {
+                                // If you know the forge method to shut down correctly, please quietly pr it.
+                            }
+                        }
+                    } else {
+                        run()
+                    }
                 } else {
                     gson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
                 }

@@ -6,19 +6,17 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.milliseconds
 
-class GardenPlotBorders {
+object GardenPlotBorders {
 
     private val config get() = GardenAPI.config.plotBorders
     private var timeLastSaved = SimpleTimeMark.farPast()
     private var showBorders = false
-    private val LINE_COLOR = LorenzColor.YELLOW.toColor()
 
     private fun LorenzVec.addX(x: Int) = add(x, 0, 0)
     private fun LorenzVec.addZ(z: Int) = add(0, 0, z)
@@ -43,26 +41,30 @@ class GardenPlotBorders {
     fun render(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
+        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        event.render(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
+    }
 
-        val entity = Minecraft.getMinecraft().renderViewEntity
+    fun LorenzRenderWorldEvent.render(plot: GardenPlotAPI.Plot, LINE_COLOR: Color, cornerColor: Color) {
+        val event = this
+
+        // These don't refer to Minecraft chunks but rather garden plots, but I use
+        // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
+        val chunkX = floor((plot.middle.x + 48) / 96).toInt()
+        val chunkZ = floor((plot.middle.z + 48) / 96).toInt()
+        val chunkMinX = (chunkX * 96) - 48
+        val chunkMinZ = (chunkZ * 96) - 48
 
         // Lowest point in the garden
         val minHeight = 66
         val maxHeight = 256
-
-        // These don't refer to Minecraft chunks but rather garden plots, but I use
-        // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
-        val chunkX = floor((entity.posX + 48) / 96).toInt()
-        val chunkZ = floor((entity.posZ + 48) / 96).toInt()
-        val chunkMinX = (chunkX * 96) - 48
-        val chunkMinZ = (chunkZ * 96) - 48
 
         // Render 4 vertical corners
         for (i in 0..96 step 96) {
             for (j in 0..96 step 96) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
-                event.tryDraw3DLine(start, end, LorenzColor.DARK_BLUE.toColor(), 2, true)
+                event.tryDraw3DLine(start, end, cornerColor, 2, true)
             }
         }
 
@@ -111,7 +113,6 @@ class GardenPlotBorders {
         if (isOutOfBorders(p2)) return
         draw3DLine(p1, p2, color, lineWidth, depth)
     }
-
 
     private fun isOutOfBorders(location: LorenzVec) = when {
         location.x > 240 -> true
