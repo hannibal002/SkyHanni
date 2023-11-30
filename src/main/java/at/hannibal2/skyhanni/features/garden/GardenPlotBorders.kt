@@ -45,60 +45,60 @@ object GardenPlotBorders {
         event.render(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }
 
-    fun LorenzRenderWorldEvent.render(plot: GardenPlotAPI.Plot, LINE_COLOR: Color, cornerColor: Color) {
-        val event = this
+    fun LorenzRenderWorldEvent.render(plot: GardenPlotAPI.Plot, lineColor: Color, cornerColor: Color) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
         // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
-        val chunkX = floor((plot.middle.x + 48) / 96).toInt()
-        val chunkZ = floor((plot.middle.z + 48) / 96).toInt()
-        val chunkMinX = (chunkX * 96) - 48
-        val chunkMinZ = (chunkZ * 96) - 48
+        val plotSize = 96
+        val chunkX = floor((plot.middle.x + 48) / plotSize).toInt()
+        val chunkZ = floor((plot.middle.z + 48) / plotSize).toInt()
+        val chunkMinX = (chunkX * plotSize) - 48
+        val chunkMinZ = (chunkZ * plotSize) - 48
 
         // Lowest point in the garden
         val minHeight = 66
         val maxHeight = 256
 
         // Render 4 vertical corners
-        for (i in 0..96 step 96) {
-            for (j in 0..96 step 96) {
+        for (i in 0..plotSize step plotSize) {
+            for (j in 0..plotSize step plotSize) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
-                event.tryDraw3DLine(start, end, cornerColor, 2, true)
+                tryDraw3DLine(start, end, cornerColor, 2, true)
             }
         }
 
         // Render vertical on X-Axis
-        for (x in 4..<96 step 4) {
+        for (x in 4..<plotSize step 4) {
             val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
             val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
-            event.tryDraw3DLine(start, end, LINE_COLOR, 1, true)
+            tryDraw3DLine(start, end, lineColor, 1, true)
             // Back lines
-            event.tryDraw3DLine(start.addZ(96), end.addZ(96), LINE_COLOR, 1, true)
+            tryDraw3DLine(start.addZ(plotSize), end.addZ(plotSize), lineColor, 1, true)
         }
 
         // Render vertical on Z-Axis
-        for (z in 4..<96 step 4) {
+        for (z in 4..<plotSize step 4) {
             val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
             val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
-            event.tryDraw3DLine(start, end, LINE_COLOR, 1, true)
+            tryDraw3DLine(start, end, lineColor, 1, true)
             // Right lines
-            event.tryDraw3DLine(start.addX(96), end.addX(96), LINE_COLOR, 1, true)
+            tryDraw3DLine(start.addX(plotSize), end.addX(plotSize), lineColor, 1, true)
         }
 
         // Render horizontal
         for (y in minHeight..maxHeight step 4) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             // (minX, minZ) -> (minX, minZ + 96)
-            event.tryDraw3DLine(start, start.addZ(96), LINE_COLOR, 1, true)
+            tryDraw3DLine(start, start.addZ(plotSize), lineColor, 1, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
-            event.tryDraw3DLine(start.addZ(96), start.addXZ(96, 96), LINE_COLOR, 1, true)
+            tryDraw3DLine(start.addZ(plotSize), start.addXZ(plotSize, plotSize), lineColor, 1, true)
             // (minX + 96, minZ + 96) -> (minX + 96, minZ)
-            event.tryDraw3DLine(start.addXZ(96, 96), start.addX(96), LINE_COLOR, 1, true)
+            tryDraw3DLine(start.addXZ(plotSize, plotSize), start.addX(plotSize), lineColor, 1, true)
             // (minX + 96, minZ) -> (minX, minZ)
-            event.tryDraw3DLine(start.addX(96), start, LINE_COLOR, 1, true)
+            tryDraw3DLine(start.addX(plotSize), start, lineColor, 1, true)
         }
     }
 
