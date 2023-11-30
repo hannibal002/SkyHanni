@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
@@ -12,16 +11,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropTimeCommand {
-    private val config get() = SkyHanniMod.feature.garden.moneyPerHours
+    private val config get() = GardenAPI.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
-            LorenzUtils.chat("§c[SkyHanni] §cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            LorenzUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
         if (args.size < 2) {
-            LorenzUtils.chat("§cUsage: /shcroptime <amount> <item>")
+            LorenzUtils.userError("Usage: /shcroptime <amount> <item>")
             return
         }
 
@@ -29,7 +28,7 @@ object GardenCropTimeCommand {
         val amount = try {
             rawAmount.toInt()
         } catch (e: NumberFormatException) {
-            LorenzUtils.chat("§cNot a valid number: '$rawAmount'")
+            LorenzUtils.userError("Not a valid number: '$rawAmount'")
             return
         }
 
@@ -64,10 +63,10 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.chat("§c[SkyHanni] §cNo crop item found for '$rawSearchName'")
+            LorenzUtils.error("No crop item found for '$rawSearchName'.")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+        LorenzUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
     }
 }

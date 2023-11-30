@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
@@ -17,25 +18,30 @@ object DefaultConfigFeatures {
         Minecraft.getMinecraft().thePlayer ?: return
         didNotifyOnce = true
 
-        val knownToggles = SkyHanniMod.feature.storage.knownFeatureToggles
+        val oldToggles = SkyHanniMod.feature.storage.knownFeatureToggles
+        if (oldToggles.isNotEmpty()) {
+            SkyHanniMod.knownFeaturesData.knownFeatures = oldToggles
+            SkyHanniMod.feature.storage.knownFeatureToggles = emptyMap()
+        }
+
+        val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.version !in knownToggles
         val processor = FeatureToggleProcessor()
         ConfigProcessorDriver.processConfig(SkyHanniMod.feature.javaClass, SkyHanniMod.feature, processor)
         knownToggles[SkyHanniMod.version] = processor.allOptions.map { it.path }
-        SkyHanniMod.configManager.saveConfig("Updated known feature flags")
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
             SkyHanniMod.feature.storage.hasPlayedBefore = true
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Looks like this is the first time you are using SkyHanni. " +
-                        "Click here to configure default options, or run /shdefaultoptions.",
+                "Looks like this is the first time you are using SkyHanni. " +
+                    "Click here to configure default options, or run /shdefaultoptions.",
                 "shdefaultoptions"
             )
         } else if (updated) {
-            val mostFeatureFulOldVersion =
-                knownToggles.maxByOrNull { if (it.key != SkyHanniMod.version) it.value.size else -1 }
-            val command = "/shdefaultoptions ${mostFeatureFulOldVersion?.key} ${SkyHanniMod.version}"
+            val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
+            val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.version}"
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Looks like you updated SkyHanni. " +
+                "Looks like you updated SkyHanni. " +
                         "Click here to configure the newly introduced options, or run $command.",
                 command
             )
@@ -46,15 +52,15 @@ object DefaultConfigFeatures {
         val processor = FeatureToggleProcessor()
         ConfigProcessorDriver.processConfig(SkyHanniMod.feature.javaClass, SkyHanniMod.feature, processor)
         var optionList = processor.orderedOptions
-        val knownToggles = SkyHanniMod.feature.storage.knownFeatureToggles
+        val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val togglesInNewVersion = knownToggles[new]
         if (new != "null" && togglesInNewVersion == null) {
-            LorenzUtils.chat("§e[SkyHanni] Unknown version $new")
+            LorenzUtils.chat("Unknown version $new")
             return
         }
         val togglesInOldVersion = knownToggles[old]
         if (old != "null" && togglesInOldVersion == null) {
-            LorenzUtils.chat("§e[SkyHanni] Unknown version $old")
+            LorenzUtils.chat("Unknown version $old")
             return
         }
         optionList = optionList
@@ -95,7 +101,7 @@ object DefaultConfigFeatures {
         if (strings.size <= 2)
             return CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkyHanniMod.feature.storage.knownFeatureToggles.keys + listOf("null")
+                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
             )
         return listOf()
     }

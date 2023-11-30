@@ -39,7 +39,7 @@ class SimpleCommand : CommandBase {
         try {
             runnable.processCommand(sender, args)
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Error while running command /$commandName")
+            ErrorManager.logErrorWithData(e, "Error while running command /$commandName")
         }
     }
 

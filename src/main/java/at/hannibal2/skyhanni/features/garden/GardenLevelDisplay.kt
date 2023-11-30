@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -18,7 +17,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
-    private val config get() = SkyHanniMod.feature.garden.gardenLevels
+    private val config get() = GardenAPI.config.gardenLevels
     private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
@@ -49,7 +48,8 @@ class GardenLevelDisplay {
                 LorenzUtils.clickableChat(
                     " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                             " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                    "/gardenlevels"
+                    "/gardenlevels",
+                    false
                 )
             }
         }

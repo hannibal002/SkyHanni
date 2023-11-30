@@ -9,18 +9,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBestiaryChatMessage {
 
-    var inBestiary = false
-    var bestiaryDescription = mutableListOf<String>()
-    var acceptMoreDescription = true
+    private var inBestiary = false
+    private var bestiaryDescription = mutableListOf<String>()
+    private var acceptMoreDescription = true
     var command = ""
     private var blockedLines = 0
 
-    var lastBorder: IChatComponent? = null
-    var lastEmpty: IChatComponent? = null
+    private var lastBorder: IChatComponent? = null
+    private var lastEmpty: IChatComponent? = null
 
-    var milestoneMessage: String? = null
+    private var milestoneMessage: String? = null
 
-    val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
+    private val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -66,13 +66,13 @@ class CompactBestiaryChatMessage {
                 inBestiary = false
 
                 val title = bestiaryDescription[1]
-                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", bestiaryDescription.dropLast(1), command)
+                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", bestiaryDescription.dropLast(1), command, false)
                 bestiaryDescription.clear()
                 acceptMoreDescription = true
 
             } else {
                 milestoneMessage?.let {
-                    LorenzUtils.chat("§6§lBESTIARY MILESTONE $it")
+                    LorenzUtils.chat("§6§lBESTIARY MILESTONE $it", false)
                     milestoneMessage = null
                 }
                 milestonePattern.matchEntire(message)?.let {

@@ -7,6 +7,7 @@ import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -17,6 +18,11 @@ public class DevConfig {
         "§cOnly disable this if you know what you are doing!")
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
+
+    @Expose
+    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+    public int logExpiryTime = 14;
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")

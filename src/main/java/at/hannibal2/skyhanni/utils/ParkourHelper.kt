@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson.ShortCut
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson.ShortCut
 import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -53,7 +53,9 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        if (location.offsetCenter().distanceToPlayer() < detectionRange && Minecraft.getMinecraft().thePlayer.onGround) {
+                        val onGround = Minecraft.getMinecraft().thePlayer.onGround
+                        val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
+                        if (closeEnough && onGround) {
                             current = index
                         }
                     }

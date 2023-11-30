@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.ContributorListJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -73,8 +73,7 @@ object AdvancedPlayerList {
                     playerData.levelText = levelText
                     index++
                     if (name.size > index) {
-                        val nameSuffix = name.drop(index).joinToString(" ")
-                        playerData.nameSuffix = nameSuffix
+                        var nameSuffix = name.drop(index).joinToString(" ")
                         if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
                         } else {
@@ -82,13 +81,16 @@ object AdvancedPlayerList {
                         }
                         if (IslandType.CRIMSON_ISLE.isInIsland()) {
                             playerData.faction = if (line.contains("§c⚒")) {
+                                nameSuffix = nameSuffix.replace("§c⚒", "")
                                 CrimsonIsleFaction.BARBARIAN
                             } else if (line.contains("§5ቾ")) {
+                                nameSuffix = nameSuffix.replace("§5ቾ", "")
                                 CrimsonIsleFaction.MAGE
                             } else {
                                 CrimsonIsleFaction.NONE
                             }
                         }
+                        playerData.nameSuffix = nameSuffix
                     } else {
                         playerData.nameSuffix = ""
                     }

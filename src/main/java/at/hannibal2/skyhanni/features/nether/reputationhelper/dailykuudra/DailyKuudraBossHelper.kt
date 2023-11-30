@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -46,8 +46,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
 
         for (line in ScoreboardData.sidebarLines) {
-            if(line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")){
-                val tier = line.substringAfter("(T").substring(0,1).toInt()
+            if (line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")) {
+                val tier = line.substringAfter("(T").substring(0, 1).toInt()
                 val kuudraTier = getByTier(tier)!!
                 finished(kuudraTier)
                 return

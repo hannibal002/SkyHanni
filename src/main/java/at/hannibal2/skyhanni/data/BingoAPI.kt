@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.jsonobjects.BingoRanksJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BingoAPI {

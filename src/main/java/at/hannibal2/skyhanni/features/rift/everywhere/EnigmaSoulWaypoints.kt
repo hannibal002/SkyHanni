@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.EnigmaSoulsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -98,11 +98,11 @@ object EnigmaSoulWaypoints {
             event.usePickblockInstead()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {
-                    LorenzUtils.chat("§5Tracking the ${split.last()} Enigma Soul!")
+                    LorenzUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
                     trackedSouls.add(split.last())
                 } else {
                     trackedSouls.remove(split.last())
-                    LorenzUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!")
+                    LorenzUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
                 }
             }
         }
@@ -176,7 +176,7 @@ object EnigmaSoulWaypoints {
         }
         if (closestSoul in trackedSouls) {
             trackedSouls.remove(closestSoul)
-            LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!")
+            LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
         }
     }
 

@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
+import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
@@ -30,10 +32,12 @@ import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityPigZombie
+import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
@@ -78,6 +82,7 @@ class MobFinder {
     internal fun tryAdd(entity: EntityLivingBase) = when {
         LorenzUtils.inDungeons -> tryAddDungeon(entity)
         RiftAPI.inRift() -> tryAddRift(entity)
+        GardenAPI.inGarden() -> tryAddGarden(entity)
         else -> {
             when (entity) {
                 /*
@@ -104,6 +109,22 @@ class MobFinder {
                 else -> null
             }
         }
+    }
+
+    private fun tryAddGarden(entity: EntityLivingBase): EntityResult? {
+        if (entity is EntitySilverfish || entity is EntityBat) {
+            return tryAddGardenPest(entity)
+        }
+
+        return null
+    }
+
+    private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
+        if (!GardenAPI.inGarden()) return null
+
+        return PestType.entries
+            .firstOrNull { entity.hasNameTagWith(3, it.displayName) }
+            ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 
     private fun tryAddDungeon(entity: EntityLivingBase) = when {

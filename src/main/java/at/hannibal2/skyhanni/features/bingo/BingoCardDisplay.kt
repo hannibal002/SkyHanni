@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BingoCardDisplay {
 
     private var display = emptyList<String>()
+
     // TODO USE SH-REPO
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
@@ -51,11 +52,11 @@ class BingoCardDisplay {
 
         fun toggleCommand() {
             if (!LorenzUtils.isBingoProfile) {
-                LorenzUtils.chat("§cThis command only works on a bingo profile!")
+                LorenzUtils.userError("This command only works on a bingo profile!")
                 return
             }
             if (!config.enabled) {
-                LorenzUtils.chat("§cBingo Card is disabled in the config!")
+                LorenzUtils.userError("Bingo Card is disabled in the config!")
                 return
             }
             toggleMode()
