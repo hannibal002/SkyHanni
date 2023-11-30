@@ -26,6 +26,7 @@ class InformationGetter {
         for (line in ScoreboardData.sidebarLinesFormatted) {
             when {
                 line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
+                line.startsWith("Purse: §6") || line.startsWith("Piggy: §6") -> purse = line.removePrefix("Purse: §6").removePrefix("Piggy: §6")
                 line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
                 extractLobbyCode(line) is String -> lobbyCode =
                     extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
@@ -34,6 +35,5 @@ class InformationGetter {
                 line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
             }
         }
-        purse = LorenzUtils.formatInteger(PurseAPI.currentPurse.toInt())
     }
 }
