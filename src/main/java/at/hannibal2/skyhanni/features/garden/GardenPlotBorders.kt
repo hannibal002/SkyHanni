@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -16,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class GardenPlotBorders {
 
-    private val config get() = SkyHanniMod.feature.garden.plotBorders
+    private val config get() = GardenAPI.config.plotBorders
     private var timeLastSaved = SimpleTimeMark.farPast()
     private var showBorders = false
     private val LINE_COLOR = LorenzColor.YELLOW.toColor()
@@ -47,7 +46,7 @@ class GardenPlotBorders {
 
         val entity = Minecraft.getMinecraft().renderViewEntity
 
-        // Lowest point in garden
+        // Lowest point in the garden
         val minHeight = 66
         val maxHeight = 256
 

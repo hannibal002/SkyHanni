@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -23,12 +22,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class GardenVisitorTimer {
-    private val config get() = SkyHanniMod.feature.garden.visitors.timer
+    private val config get() = GardenAPI.config.visitors.timer
     private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
     private var display = ""
     private var lastMillis = 0.seconds
@@ -200,7 +200,11 @@ class GardenVisitorTimer {
     fun onBlockBreak(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
-        lastTimerUpdate -= 100.milliseconds
+
+        // We only need manually retracting the time when hypixel shows 6 minutes or above
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 100.milliseconds
+        }
     }
 
     private fun updateSixthVisitorArrivalTime() {

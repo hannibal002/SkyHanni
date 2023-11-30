@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
@@ -12,7 +11,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropTimeCommand {
-    private val config get() = SkyHanniMod.feature.garden.moneyPerHours
+    private val config get() = GardenAPI.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {

@@ -2,17 +2,18 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.JacobContestsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.KnownFeaturesJson
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -180,7 +181,20 @@ class ConfigManager {
                 output = if (fileType == ConfigFileType.FEATURES) {
                     val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                    gson.fromJson(newJsonObject, defaultValue.javaClass)
+                    val run = { gson.fromJson(newJsonObject, defaultValue.javaClass) }
+                    if (LorenzUtils.isInDevEnviromen()) {
+                        try {
+                            run()
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                            println("This is a crash.")
+                            while (true) {
+                                // If you know the forge method to shut down correctly, please quietly pr it.
+                            }
+                        }
+                    } else {
+                        run()
+                    }
                 } else {
                     gson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
                 }

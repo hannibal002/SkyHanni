@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
@@ -26,8 +27,10 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class Storage {
@@ -76,6 +79,19 @@ public class Storage {
 
         @Expose
         public List<String> guildMembers = new ArrayList<>();
+
+        @Expose
+        public WinterStorage winter = new WinterStorage();
+
+        public static class WinterStorage {
+
+            @Expose
+            public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+
+            @Expose
+            public int amountGifted = 0;
+        }
+
     }
 
     public static class ProfileSpecific {
@@ -225,6 +241,9 @@ public class Storage {
                 @Expose
                 public Map<Integer, NEUInternalName> plotList = new HashMap<>();
             }
+
+            @Expose
+            public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
             @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();

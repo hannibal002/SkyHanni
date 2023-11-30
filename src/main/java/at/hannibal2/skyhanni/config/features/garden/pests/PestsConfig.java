@@ -12,7 +12,17 @@ public class PestsConfig {
     public PestSpawnConfig pestSpawn = new PestSpawnConfig();
 
     @Expose
+    @ConfigOption(name = "Pest Finder", desc = "")
+    @Accordion
+    public PestFinderConfig pestFinder = new PestFinderConfig();
+
+    @Expose
     @ConfigOption(name = "Pest Timer", desc = "")
     @Accordion
     public PestTimerConfig pestTimer = new PestTimerConfig();
+
+    @Expose
+    @ConfigOption(name = "Spray", desc = "")
+    @Accordion
+    public SprayConfig spray = new SprayConfig();
 }

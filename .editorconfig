@@ -23,8 +23,10 @@ max_line_length = 120
 # Java files should not use wildcard imports
 ij_java_names_count_to_use_import_on_demand = 999
 ij_java_class_count_to_use_import_on_demand = 999
+ij_java_packages_to_use_import_on_demand =
 
 [*.kt]
 # Kotlin files should not use wildcard imports
 ij_kotlin_name_count_to_use_star_import = 999
 ij_kotlin_name_count_to_use_star_import_for_members = 999
+ij_kotlin_packages_to_use_import_on_demand =
