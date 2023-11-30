@@ -45,13 +45,13 @@ class MenuItemDisplayOverlayMining {
             rightClickToEnableDisableLoreLinePattern.matchMatcher(lore.last()) {
                 // §8 ? §7Gain §a+100 §6? Mining Speed§7.§r
                 /*
-                "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
-                "§8 ■ §7Gain §a+50 §6☘ Mining Fortune§7." --> " ■ Gain +50 ☘ Mining Fortune."
-                "§8 ■ §7Gain §a+15% §7more Powder while" --> " ■ Gain +15% more Powder while"
-                "§8 ■ §7Reduce Pickaxe Ability cooldown" --> " ■ Reduce Pickaxe Ability cooldown"
-                "§8 ■ §7§a10x §7chance to find Goblins" --> " ■ 10x chance to find Goblins"
-                "§8 ■ §7Gain §a5x §9Titanium §7drops." --> " ■ Gain 5x Titanium drops."
-                "§aYour Current Effect" --> "Your Current Effect"
+                    "§8 ■ §7Gain §a+100 §6⸕ Mining Speed§7." --> " ■ Gain +100 ⸕ Mining Speed."
+                    "§8 ■ §7Gain §a+50 §6☘ Mining Fortune§7." --> " ■ Gain +50 ☘ Mining Fortune."
+                    "§8 ■ §7Gain §a+15% §7more Powder while" --> " ■ Gain +15% more Powder while"
+                    "§8 ■ §7Reduce Pickaxe Ability cooldown" --> " ■ Reduce Pickaxe Ability cooldown"
+                    "§8 ■ §7§a10x §7chance to find Goblins" --> " ■ 10x chance to find Goblins"
+                    "§8 ■ §7Gain §a5x §9Titanium §7drops." --> " ■ Gain 5x Titanium drops."
+                    "§aYour Current Effect" --> "Your Current Effect"
                 */
                 var currentEffectLineLocated = false
                 for (line in lore) {
@@ -78,7 +78,7 @@ class MenuItemDisplayOverlayMining {
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_PERK_LEVELS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
             hotmPerkEnabledDisabledInProgressItemNamePattern.matchMatcher(nameWithColor) {
-                //§7Level 64/§8100
+                // §7Level 64/§8100
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
                 // if (!lore.first().contains("Level ") && !lore.last().contains("Right click to ")) return ""
@@ -107,9 +107,10 @@ class MenuItemDisplayOverlayMining {
             }
         }
 
-        //the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
-        //https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
-        //ping @erymanthus on the skyhanni discord if you find any bugs with this
+        // the basis of all of this code was from technoblade's skycrypt profile so this might be WAY off, please have mercy
+        // https://sky.shiiyu.moe/stats/Technoblade/Blueberry#Skills
+        // o7
+        // ping @erymanthus on the skyhanni discord if you find any bugs with this
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_OVERALL_TIERS) && chestName == ("Heart of the Mountain")) {
             isHOTMTierItemNamePattern.matchMatcher(item.cleanName()) {
                 val nameWithColor = item.name ?: return ""

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -67,7 +67,7 @@ class MenuItemDisplayOverlayPlayer {
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu")) {
-            //itemName.endsWith(" Leveling")
+            // itemName.endsWith(" Leveling")
             skyblockLevelingItemNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
                     skyblockLevelLoreLinePattern.matchMatcher(line) {
@@ -84,7 +84,7 @@ class MenuItemDisplayOverlayPlayer {
                         if (CollectionAPI.isCollectionTier0(item.getLore()) && (itemName != ("Dungeoneering"))) return "0"
                         if (itemName.split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
                         skillLevelItemNamePattern.matchMatcher(itemName) {
-                            return "${group("level").romanToDecimalIfNeeded()}"
+                            return "${group("level").romanToDecimalIfNecessary()}"
                         }
                     } else if (chestName == "Dungeoneering") {
                         dungeonClassLevelItemNamePattern.matchMatcher(itemName) {
@@ -113,7 +113,7 @@ class MenuItemDisplayOverlayPlayer {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
                     item.name?.let {
                         collectionLevelItemNamePattern.matchMatcher(it) {
-                            return "${group("tier").romanToDecimalIfNeeded()}"
+                            return "${group("tier").romanToDecimalIfNecessary()}"
                         }
                     }
                 }
@@ -184,10 +184,10 @@ class MenuItemDisplayOverlayPlayer {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MINION_QUICK_UPGRADE)) {
-            //one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
+            // one day admins are going to remove that damn hyphen in "Quick-Upgrade" and it's going to break this feature
             /*
-             chestName.contains(" Minion ")
-             itemName.contains("Quick") && itemName.contains("Upgrade Minion")
+                chestName.contains(" Minion ")
+                itemName.contains("Quick") && itemName.contains("Upgrade Minion")
              */
             minionMenuChestNamePattern.matchMatcher(chestName) {
                 quickUpgradeItemNamePattern.matchMatcher(itemName) {

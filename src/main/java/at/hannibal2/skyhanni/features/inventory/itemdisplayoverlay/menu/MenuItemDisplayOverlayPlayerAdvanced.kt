@@ -148,7 +148,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             if (chestName == "Quest Log") {
                 if (itemName == "Find all Fairy Souls") {
                     for (line in lore) {
-                        val totalFairySouls = "242" //change this whenever hypixel adds more fairy souls
+                        val totalFairySouls = "242" // change this whenever hypixel adds more fairy souls
                         // §a✔ §eFound: §d242§7/§d242 (TY COBBLE8 FOR THIS SAMPLE)
                         // ✔ Found: 242/242
                         fairySoulsFoundLoreLinePattern.matchMatcher(line) {
@@ -312,24 +312,24 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                     }
                 }
                 /*
-                if (lore.isNotEmpty()) {
-                    (("(§8)+.*Candidate").toPattern()).matchMatcher(lore.first()) {
-                        val colorCode = nameWithColor.take(2)
-                        var numPerks = 0
-                        for (line in lore) {
-                            //line.startsWith(colorCode) &&
-                            //line != "${colorCode}You voted for this candidate!" &&
-                            //line != "${colorCode}Leading in votes!" &&
-                            //!(line.startsWith("${colorCode}Click to vote for ")) &&
-                            //line != "${colorCode}This is a SPECIAL candidate!" &&
-                            //!(line.startsWith("$colorCode§"))
-                            (("^${colorCode}(?:(?!\\b(This is a SPECIAL candidate|Click to vote for|You voted for this candidate|Leading in votes)\\b)\\S)*\$").toPattern()).matchMatcher((line)) {
-                                numPerks++
+                    if (lore.isNotEmpty()) {
+                        (("(§8)+.*Candidate").toPattern()).matchMatcher(lore.first()) {
+                            val colorCode = nameWithColor.take(2)
+                            var numPerks = 0
+                            for (line in lore) {
+                                line.startsWith(colorCode) &&
+                                line != "${colorCode}You voted for this candidate!" &&
+                                line != "${colorCode}Leading in votes!" &&
+                                !(line.startsWith("${colorCode}Click to vote for ")) &&
+                                line != "${colorCode}This is a SPECIAL candidate!" &&
+                                !(line.startsWith("$colorCode§"))
+                                (("^${colorCode}(?:(?!\\b(This is a SPECIAL candidate|Click to vote for|You voted for this candidate|Leading in votes)\\b)\\S)*\$").toPattern()).matchMatcher((line)) {
+                                    numPerks++
+                                }
                             }
+                            return "$colorCode$numPerks"
                         }
-                        return "$colorCode$numPerks"
                     }
-                 }
                 */
             }
             calendarAndEventsOrMayorBlankChestNamePattern.matchMatcher(chestName) {
@@ -347,12 +347,12 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                         thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumLoreLinePattern.matchMatcher(line) {
                             isNotMayorJerryItemNamePattern.matchMatcher(itemName) {
                                 /*
-                                var numPerks = 0
-                                for (line in lore) {
-                                    if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
-                                        numPerks++
+                                    var numPerks = 0
+                                    for (line in lore) {
+                                        if (line.startsWith(colorCode) && !(line.startsWith("$colorCode§"))) {
+                                            numPerks++
+                                        }
                                     }
-                                }
                                 */
                                 val numPerks = MayorElection.currentCandidate?.perks?.size ?: -1
                                 return "$colorCode$numPerks"
@@ -467,7 +467,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
         // if (lore.any { it == ("Sweet Tooth") } || lore.any { it == ("Benevolence") } || lore.any { it == ("Extra Event") }) return "§bFxy"
         // if (lore.any { it == ("Luck of the Sea 2.0") } || lore.any { it == ("Fishing XP Buff") } || lore.any { it == ("Fishing Festival") }) return "§bMrn"
         // if (lore.any { it == ("Marauder") } || lore.any { it == ("EZPZ") } || lore.any { it == ("Benediction") }) return "§bPul"
-        // if (lore.any { it == ("Barrier Street") } || lore.any { it == ("Shopping Spree") }) return "§c§l✖" //diaz gets an automatic X.
+        // if (lore.any { it == ("Barrier Street") } || lore.any { it == ("Shopping Spree") }) return "§c§l✖"
         // else return "§c?"
         for (line in lore) {
             mayorAatroxPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bAtx" }
@@ -477,7 +477,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
             mayorFoxyPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bFxy" }
             mayorMarinaPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bMrn" }
             mayorPaulPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bPul" }
-            mayorDiazPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§c§l✖" }
+            mayorDiazPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§c§l✖" } //diaz gets an automatic X.
         }
         return "§c?"
     }

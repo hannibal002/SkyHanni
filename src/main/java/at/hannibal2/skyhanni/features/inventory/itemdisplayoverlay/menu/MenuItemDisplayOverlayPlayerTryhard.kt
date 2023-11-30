@@ -85,7 +85,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                 if (((itemName == ("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)))) || ((itemName == ("Filter") && (item.getItem() is ItemEnderEye)))) {
                     for (line in lore) {
                         generalPurposeSelectedFilterSortLoreLinePattern.matchMatcher(line) {
-                            return group("threeChars").trim() //trim() to remove spaces. removing the space from the regex causes some filter options to get skipped
+                            return group("threeChars").trim() // trim() to remove spaces. removing the space from the regex causes some filter options to get skipped
                         }
                     }
                 }
@@ -104,7 +104,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
             also {
                 val lore = item.getLore()
                 var canDisplayTier = false
-                //(("Community Shop")) || ((" Essence Shop"))
+                // (("Community Shop")) || ((" Essence Shop"))
                 communityShopEssenceShopChestNamePattern.matchMatcher(chestName) {
                     if (lore.isNotEmpty()) {
                         communityShopIsUpgradeLoreLinePattern.matchMatcher(lore.last()) { canDisplayTier = true }
@@ -117,10 +117,10 @@ class MenuItemDisplayOverlayPlayerTryhard {
                         ((chestName.contains(" Essence Shop")) &&
                                 (lore.last().lowercase().contains("unlock")))) */
                             if (canDisplayTier) {
-                                //the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
+                                // the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
                                 val lastWord = itemName.split(" ").last()
                                 for (char in lastWord) {
-                                //if (!(("IVXLCDM").contains(char))) {
+                                // if (!(("IVXLCDM").contains(char))) {
                                     isNotRomanNumeralGeneralPattern.matchMatcher("$char") {
                                         return@also
                                     }
@@ -133,8 +133,8 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.SELECTED_TAB)) {
-            //("(Auction.*|Bazaar.*)")
-            //(("(Auction.*|Bazaar.*)")).toPattern()).matchMatcher(chestName) {
+            // ("(Auction.*|Bazaar.*)")
+            // (("(Auction.*|Bazaar.*)")).toPattern()).matchMatcher(chestName) {
             val lore = item.getLore()
             auctionBazaarCommunityShopIsValidForSelectedTabStackSizeChestNamePattern.matchMatcher(chestName) {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
@@ -278,7 +278,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.SKYBLOCK_ACHIEVEMENT_POINTS) && (chestName == ("Your Equipment and Stats") && itemName.lowercase() == ("skyblock achievements"))) {
-            //§7Points: §e1,995§7/§e2,835 §8(70%§8)
+            // §7Points: §e1,995§7/§e2,835 §8(70%§8)
             for (line in item.getLore()) {
                 achievementPointsLoreLinePattern.matchMatcher(line) {
                     return group("percent")

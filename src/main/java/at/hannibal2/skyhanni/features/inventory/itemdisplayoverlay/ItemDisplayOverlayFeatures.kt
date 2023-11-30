@@ -274,19 +274,19 @@ class ItemDisplayOverlayFeatures {
                 val lore = item.getLore()
                 for (line in lore) {
                     bottleOfJerryLoreLinePattern.matchMatcher(line) {
-                        return group("intelbonus")
+                        return group("intelbonus") //for legacy bottle of jyrre
                     }
                 }
             } else if (internalName == "NEW_BOTTLE_OF_JYRRE") {
                 val seconds = item.getBottleOfJyrreSeconds() ?: 0
-                return "§a${(seconds / 3600)}"
+                return "§a${(seconds / 3600)}" // for new bottle of jyrre
             }
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.SOULFLOW) && internalName.startsWith("SOULFLOW_")) {
-            //§7Internalized: §316,493⸎ Soulflow
-            //Internalized: 16,493⸎ Soulflow
-            //!(chestName.contains("Auction"))
+            // §7Internalized: §316,493⸎ Soulflow
+            // Internalized: 16,493⸎ Soulflow
+            // !(chestName.contains("Auction"))
             auctionHouseChestNamePattern.matchMatcher(chestName) {
                 val line = item.getLore().first()
                 internalizedSoulflowLoreLinePattern.matchMatcher(line) {
@@ -296,8 +296,8 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.STORAGE_TIER)) {
-            //internalName.endsWith("_ENCHANTED_CHEST")
-            //itemName.endsWith(" Storage")
+            // internalName.endsWith("_ENCHANTED_CHEST")
+            // itemName.endsWith(" Storage")
             storageChestInternalNamePattern.matchMatcher(internalName) {
                 storageChestItemNamePattern.matchMatcher(itemName) {
                     var colorCode = item.name ?: return ""
@@ -317,8 +317,8 @@ class ItemDisplayOverlayFeatures {
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.COMPACTOR_DELETOR)) {
             personalCompactorDeletorChestNamePattern.matchMatcher(chestName) {
-                //§aCompactor Currently OFF!
-                //§aCompactor Currently ON!
+                // §aCompactor Currently OFF!
+                // §aCompactor Currently ON!
                 /* if (itemName.contains(" Currently ")) {
                     return when (itemName.replace("Compactor ", "").replace("Deletor ", "")) {
                         "Currently OFF!" -> "§c§l✖"
@@ -378,7 +378,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (stackSizeConfig.contains(StackSizeConfig.ItemNumber.STACKING_ENCHANTMENT)) {
-            //itemName.contains("✪")
+            // itemName.contains("✪")
             doesNotIncludeDungeonStarsItemNamePattern.matchMatcher(itemName) {
                 val possibleEnchantments = item.getEnchantments()
                 if (possibleEnchantments != null) {

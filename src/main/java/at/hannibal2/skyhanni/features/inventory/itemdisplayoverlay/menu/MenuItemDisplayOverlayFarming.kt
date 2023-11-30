@@ -69,13 +69,13 @@ class MenuItemDisplayOverlayFarming {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.COMPOSTER_INSERT_ABBV)) {
-            //(chestName.contains("Composter"))
-            //(itemName.contains("Insert ") && itemName.contains(" from "))
+            // (chestName.contains("Composter"))
+            // (itemName.contains("Insert ") && itemName.contains(" from "))
             if (chestName == "Composter") {
                 insertResourceFromLocationItemNamePattern.matchMatcher(itemName) {
                     val lore = item.getLore()
-                    //§7Totalling §2§240k Fuel§7.
-                    //Totalling 40k Fuel.
+                    // §7Totalling §2§240k Fuel§7.
+                    // Totalling 40k Fuel.
                     for (line in lore) {
                         totallingCountResourceLoreLinePattern.matchMatcher(line) {
                             return group("resourceCount")
