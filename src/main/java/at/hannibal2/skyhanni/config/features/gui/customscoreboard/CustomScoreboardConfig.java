@@ -46,6 +46,7 @@ public class CustomScoreboardConfig {
             "",
             "§7⏣ §bVillage",
             "Late Summer 11th",
+            "§710:40pm",
             "§8m77CK",
             "Power: Sighted",
             "",
@@ -59,7 +60,7 @@ public class CustomScoreboardConfig {
             "§ewww.hypixel.net",
         }
     )
-    public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22));
+    public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23));
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

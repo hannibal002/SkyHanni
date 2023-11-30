@@ -167,7 +167,7 @@ enum class Elements(
         },
         10
     ),
-    SKYBLOCK_TIME(
+    SKYBLOCK_TIME_DAY(
         {
             listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false))
         },
@@ -176,6 +176,15 @@ enum class Elements(
         },
         11
     ),
+    SKYBLOCK_TIME_MINUTE(
+        {
+            listOf("§7" + SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false))
+        },
+        {
+            true
+        },
+        12
+    ),
     LOBBY_CODE(
         {
             listOf("§8$lobbyCode")
@@ -183,7 +192,7 @@ enum class Elements(
         {
             true
         },
-        12
+        13
     ),
     MAXWELL(
         {
@@ -199,7 +208,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        13
+        14
     ),
     EMPTY_LINE2(
         {
@@ -208,7 +217,7 @@ enum class Elements(
         {
             true
         },
-        14
+        15
     ),
     OBJECTIVE(
         {
@@ -223,7 +232,7 @@ enum class Elements(
         {
             true
         },
-        15
+        16
     ),
     SLAYER(
         {
@@ -245,7 +254,7 @@ enum class Elements(
                 at.hannibal2.skyhanni.data.IslandType.THE_RIFT
             ).contains(HypixelData.skyBlockIsland)
         },
-        16
+        17
     ),
     EMPTY_LINE3(
         {
@@ -254,7 +263,7 @@ enum class Elements(
         {
             true
         },
-        17
+        18
     ),
     POWDER(
         {
@@ -266,7 +275,7 @@ enum class Elements(
         {
             listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
         },
-        18
+        19
     ),
     CURRENT_EVENT(
         {
@@ -275,7 +284,7 @@ enum class Elements(
         {
             true
         },
-        19
+        20
     ),
     MAYOR(
         {
@@ -290,7 +299,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        20
+        21
     ),
     PARTY(
         {
@@ -327,7 +336,7 @@ enum class Elements(
                 }
             }
         },
-        21
+        22
     ),
     WEBSITE(
         {
@@ -336,7 +345,7 @@ enum class Elements(
         {
             true
         },
-        22
+        23
     );
 
     fun getLine(): List<String> {

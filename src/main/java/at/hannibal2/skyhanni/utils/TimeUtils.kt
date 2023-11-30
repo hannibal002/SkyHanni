@@ -123,24 +123,31 @@ object TimeUtils {
         }.toLong().toDuration(DurationUnit.MILLISECONDS)
     }
 
-    fun SkyBlockTime.formatted(yearElement: Boolean = true, hoursAndMinutesElement : Boolean = true): String {
+    fun SkyBlockTime.formatted(
+        dayAndMonthElement: Boolean = true,
+        yearElement: Boolean = true,
+        hoursAndMinutesElement: Boolean = true
+    ): String {
         val hour = if (this.hour > 12) this.hour - 12 else this.hour
-        val timeOfDay = if (this.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        var minute = this.minute.toString()
-        if (minute.length != 2) {
-            minute = minute.padStart(2, '0')
-        }
-
+        val timeOfDay = if (this.hour > 11) "pm" else "am"
+        val minute = this.minute.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)
         val year = this.year
 
-        if (!hoursAndMinutesElement && !yearElement) return "$month $day$daySuffix" // Early Winter 1st
-        if (!hoursAndMinutesElement) return "$month $day$daySuffix, Year $year" // Early Winter 1st Year 300
-        if (!yearElement) return "$month $day$daySuffix, $hour:${minute}$timeOfDay" // Early Winter 1st, 12:03pm
+        val datePart = when {
+            !dayAndMonthElement && !yearElement -> ""
+            !yearElement -> "$month $day$daySuffix"
+            else -> "$month $day$daySuffix, Year $year"
+        }
+        val timePart = if (hoursAndMinutesElement) "$hour:$minute$timeOfDay" else ""
 
-        return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
+        return if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
+            "$datePart, $timePart"
+        } else {
+            "$datePart$timePart".trim()
+        }
     }
 }
 
