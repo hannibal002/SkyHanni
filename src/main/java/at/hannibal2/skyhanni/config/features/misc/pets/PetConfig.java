@@ -21,4 +21,11 @@ public class PetConfig {
     @ConfigOption(name = "Pet Experience Tooltip", desc = "")
     @Accordion
     public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
+
+    @Expose
+    @ConfigOption(name = "Hide Autopet Messages", desc = "Hides the autopet messages from chat. §eRequires the " +
+        "display to be enabled.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideAutopet = false;
 }
