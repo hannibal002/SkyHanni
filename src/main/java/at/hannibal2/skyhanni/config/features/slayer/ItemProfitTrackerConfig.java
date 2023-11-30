@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
@@ -26,11 +25,6 @@ public class ItemProfitTrackerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean priceInChat = false;
-
-    @Expose
-    @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
-    @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
-    public int priceFrom = 1;
 
     @Expose
     @ConfigOption(name = "Minimum Price", desc = "Items below this price will not show up in chat.")

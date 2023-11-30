@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 

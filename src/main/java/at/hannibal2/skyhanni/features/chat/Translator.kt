@@ -25,7 +25,7 @@ class Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onGuiChat(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message

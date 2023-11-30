@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
@@ -22,20 +23,16 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -51,6 +48,7 @@ object GardenAPI {
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
+    val config get() = SkyHanniMod.feature.garden
     var totalAmountVisitorsExisting = 0
     var gardenExp: Long?
         get() = storage?.experience
@@ -98,14 +96,12 @@ object GardenAPI {
         }
     }
 
+    // TODO use IslandChangeEvent
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        SkyHanniMod.coroutineScope.launch {
-            delay(2.seconds)
-            withContext(MinecraftDispatcher) {
-                if (inGarden()) {
-                    checkItemInHand()
-                }
+        DelayedRun.runDelayed(2.seconds) {
+            if (inGarden()) {
+                checkItemInHand()
             }
         }
     }
@@ -183,7 +179,6 @@ object GardenAPI {
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
-
 
         val position = event.position
         if (lastLocation == position) {

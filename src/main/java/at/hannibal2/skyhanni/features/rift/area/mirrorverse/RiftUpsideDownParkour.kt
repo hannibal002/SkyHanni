@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftUpsideDownParkour {

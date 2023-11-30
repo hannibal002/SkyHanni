@@ -236,6 +236,10 @@ object StringUtils {
         }
         if (username == "") return null
 
+        if (username.contains("[NPC]")) {
+            return null
+        }
+
         if (username.contains(">")) {
             username = username.substring(username.indexOf('>') + 1).trim()
         }

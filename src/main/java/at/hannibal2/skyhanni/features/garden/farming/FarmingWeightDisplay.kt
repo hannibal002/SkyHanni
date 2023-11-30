@@ -90,7 +90,7 @@ class FarmingWeightDisplay {
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
+        private val config get() = GardenAPI.config.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
         private var dispatcher = Dispatchers.IO
 

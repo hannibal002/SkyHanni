@@ -141,6 +141,16 @@ data class LorenzVec(
         return copy(y = y + offset)
     }
 
+    fun interpolate(other: LorenzVec, factor: Double): LorenzVec {
+        require(factor in 0.0..1.0) { "Percentage must be between 0 and 1: $factor" }
+
+        val x = (1 - factor) * this.x + factor * other.x
+        val y = (1 - factor) * this.y + factor * other.y
+        val z = (1 - factor) * this.z + factor * other.z
+
+        return LorenzVec(x, y, z)
+    }
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180

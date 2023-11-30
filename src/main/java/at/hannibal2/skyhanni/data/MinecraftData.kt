@@ -84,6 +84,7 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        DelayedRun.checkRuns()
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NEUInternalName.NONE

@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
@@ -45,7 +47,7 @@ object InventoryUtils {
 
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage"))
-            || it.contains("Ender Chest") || it.contains("Backpack")
+                || it.contains("Ender Chest") || it.contains("Backpack")
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
@@ -65,5 +67,10 @@ object InventoryUtils {
             ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
             false
         }
+    }
+
+    fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
+        val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
+        return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
     }
 }

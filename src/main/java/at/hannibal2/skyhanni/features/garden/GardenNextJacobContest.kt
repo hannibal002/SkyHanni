@@ -494,7 +494,7 @@ object GardenNextJacobContest {
         null
     }
 
-    private val config get() = SkyHanniMod.feature.garden.nextJacobContests
+    private val config get() = GardenAPI.config.nextJacobContests
     private val nextContestCrops = mutableListOf<CropType>()
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
