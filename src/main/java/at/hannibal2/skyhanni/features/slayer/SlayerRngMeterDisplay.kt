@@ -70,7 +70,7 @@ class SlayerRngMeterDisplay {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
-                LorenzUtils.warning("§c[SkyHanni] No Slayer RNG Meter Item selected!")
+                LorenzUtils.userError("No Slayer RNG Meter Item selected!")
                 LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
@@ -86,7 +86,7 @@ class SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                LorenzUtils.chat("§e[SkyHanni] §dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                LorenzUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
                 lastItemDroppedTime = System.currentTimeMillis()
             }
             if (blockChat) {
@@ -116,7 +116,8 @@ class SlayerRngMeterDisplay {
 
         val storage = getStorage() ?: return
 
-        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
+        val selectedItem =
+            event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         if (selectedItem == null) {
             storage.itemGoal = ""
             storage.goalNeeded = -1

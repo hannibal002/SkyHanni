@@ -28,5 +28,5 @@ class AshfangHideDamageIndicator {
 
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && SkyHanniMod.feature.crimsonIsle.ashfang.hide.damageSplash &&
-                DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
 }

@@ -144,15 +144,15 @@ class Translator {
 
             coroutineScope.launch {
                 val translation = getTranslationToEnglish(message)
-                if (translation == "Unable to translate!") LorenzUtils.chat("§c[SkyHanni] Unable to translate message :( (is it in English?)")
-                else LorenzUtils.chat("§e[SkyHanni] Found translation: §f$translation")
+                if (translation == "Unable to translate!") LorenzUtils.userError("Unable to translate message :( (is it in English?)")
+                else LorenzUtils.chat("Found translation: §f$translation")
             }
         }
 
         fun fromEnglish(args: Array<String>) {
             if (!isEnabled()) return
             if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
-                LorenzUtils.chat("§cUsage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
+                LorenzUtils.userError("Usage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
                 return
             }
             val language = args[0]
@@ -163,7 +163,7 @@ class Translator {
 
             coroutineScope.launch {
                 val translation = getTranslationFromEnglish(message, language)
-                LorenzUtils.chat("§e[SkyHanni] Copied translation to clipboard: $translation")
+                LorenzUtils.chat("Copied translation to clipboard: $translation")
                 OSUtils.copyToClipboard(translation)
             }
         }

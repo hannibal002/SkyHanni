@@ -32,7 +32,8 @@ class TimeFeatures {
         if (!LorenzUtils.inSkyBlock) return
 
         if (config.realTime) {
-            val currentTime = (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
+            val currentTime =
+                (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
             config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
 

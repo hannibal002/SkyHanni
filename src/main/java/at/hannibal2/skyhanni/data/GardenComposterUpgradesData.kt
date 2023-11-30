@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenComposterUpgradesData {
@@ -16,12 +17,9 @@ class GardenComposterUpgradesData {
         if (event.inventoryName != "Composter Upgrades") return
         for (item in event.inventoryItems.values) {
             val itemName = item.name ?: continue
-            val matcher = ComposterUpgrade.regex.matcher(itemName)
-            if (!matcher.matches()) continue
-
-            if (matcher.groupCount() != 0) {
-                val name = matcher.group("name")
-                val level = matcher.group("level")?.romanToDecimalIfNeeded() ?: 0
+            ComposterUpgrade.regex.matchMatcher(itemName) {
+                val name = group("name")
+                val level = group("level")?.romanToDecimalIfNeeded() ?: 0
                 val composterUpgrade = ComposterUpgrade.getByName(name)!!
                 ComposterAPI.composterUpgrades?.put(composterUpgrade, level)
             }

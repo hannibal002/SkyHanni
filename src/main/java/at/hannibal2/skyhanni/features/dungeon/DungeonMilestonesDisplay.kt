@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class DungeonMilestonesDisplay {
+    private val config get() = SkyHanniMod.feature.dungeon
 
     companion object {
         private var display = ""
@@ -83,10 +84,8 @@ class DungeonMilestonesDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + display, posLabel = "Dungeon Milestone")
+        config.showMileStonesDisplayPos.renderString(color + display, posLabel = "Dungeon Milestone")
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.showMilestonesDisplay
-    }
+    private fun isEnabled() = LorenzUtils.inDungeons && config.showMilestonesDisplay
 }

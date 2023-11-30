@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -33,23 +35,38 @@ class PetExpTooltip {
         val itemStack = event.itemStack ?: return
         val petExperience = itemStack.getPetExp()?.round(1) ?: return
         val name = itemStack.name ?: return
+        try {
 
-        val index = findIndex(event.toolTip) ?: return
+            val index = findIndex(event.toolTip) ?: return
 
-        val (maxLevel, maxXp) = getMaxValues(name, petExperience)
+            val (maxLevel, maxXp) = getMaxValues(name, petExperience)
 
-        val percentage = petExperience / maxXp
-        val percentageFormat = LorenzUtils.formatPercentage(percentage)
+            val percentage = petExperience / maxXp
+            val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
-        event.toolTip.add(index, " ")
-        if (percentage >= 1) {
-            event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
-        } else {
-            val progressBar = StringUtils.progressBar(percentage)
-            val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
-            val addLegendaryColor = if (isBelowLegendary) "§6" else ""
-            event.toolTip.add(index, "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}")
-            event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
+            event.toolTip.add(index, " ")
+            if (percentage >= 1) {
+                event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
+            } else {
+                val progressBar = StringUtils.progressBar(percentage)
+                val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
+                val addLegendaryColor = if (isBelowLegendary) "§6" else ""
+                event.toolTip.add(
+                    index,
+                    "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}"
+                )
+                event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
+            }
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Could not add pet exp tooltip",
+                "itemStack" to itemStack,
+                "item name" to name,
+                "petExperience" to petExperience,
+                "toolTip" to event.toolTip,
+                "index" to findIndex(event.toolTip),
+                "getLore" to itemStack.getLore(),
+            )
         }
     }
 
@@ -100,6 +117,10 @@ class PetExpTooltip {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pets.petExperienceToolTip.petDisplay")
         event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pets.petExperienceToolTip.showAlways")
-        event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showGoldenDragonEgg")
+        event.move(
+            3,
+            "misc.petExperienceToolTip.showGoldenDragonEgg",
+            "misc.pets.petExperienceToolTip.showGoldenDragonEgg"
+        )
     }
 }

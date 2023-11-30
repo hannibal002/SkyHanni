@@ -21,6 +21,7 @@ class EntityData(
     var nameSuffix: String = "",
     var nameAbove: String = "",
     var dead: Boolean = false,
+    var firstDeath: Boolean = false, // TODO this defines if hp is very low, replace dead with this later
     var deathLocation: LorenzVec? = null,
 ) {
     val timeToKill by lazy {

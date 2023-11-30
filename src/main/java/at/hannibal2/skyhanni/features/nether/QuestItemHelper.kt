@@ -33,9 +33,9 @@ class QuestItemHelper {
             val have = InventoryUtils.countItemsInLowerInventory { it.name?.contains(questItem) == true }
             if (have >= need) break
 
-            val missingAmount = have - need
+            val missingAmount = need - have
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Click here to grab x$missingAmount $questItem from sacks!",
+                "Click here to grab x$missingAmount $questItem from sacks!",
                 "gfs $questItem $missingAmount"
             )
             lastSentMessage = SimpleTimeMark.now()

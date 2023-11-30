@@ -93,7 +93,7 @@ class CompactBingoChat {
             if (message.contains("Trade") || message.contains("Recipe")) {
                 val text = message.removeColor().replace(" ", "")
                 if (text == "Trade" || text == "Recipe") {
-                    collectionLevelUpLastLine?.let { LorenzUtils.chat(it) }
+                    collectionLevelUpLastLine?.let { LorenzUtils.chat(it, false) }
                 }
             } else {
                 collectionLevelUpLastLine = message
