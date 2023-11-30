@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -130,18 +129,16 @@ object EnderNodeTracker {
         if (!isInTheEnd()) return
         if (!ProfileStorageData.loaded) return
 
-        DelayedRun.runNow {
-            val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-                .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-                .sumOf { it.stackSize }
-            val change = newMiteGelInInventory - miteGelInInventory
-            if (change > 0) {
-                tracker.modify { storage ->
-                    storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
-                }
+        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
+            .sumOf { it.stackSize }
+        val change = newMiteGelInInventory - miteGelInInventory
+        if (change > 0) {
+            tracker.modify { storage ->
+                storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
             }
-            miteGelInInventory = newMiteGelInInventory
         }
+        miteGelInInventory = newMiteGelInInventory
     }
 
     @SubscribeEvent

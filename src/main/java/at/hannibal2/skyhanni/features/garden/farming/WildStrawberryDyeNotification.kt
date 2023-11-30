@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -30,19 +29,17 @@ class WildStrawberryDyeNotification {
 
         val itemStack = event.itemStack
 
-        DelayedRun.runNow {
-            // Prevent false positives when buying the item in ah or moving it from a storage
-            val diff = System.currentTimeMillis() - lastCloseTime
-            if (diff < 1_000) return@runNow
+        // Prevent false positives when buying the item in ah or moving it from a storage
+        val diff = System.currentTimeMillis() - lastCloseTime
+        if (diff < 1_000) return
 
-            val internalName = itemStack.getInternalName()
-            if (internalName == item) {
-                val name = itemStack.name!!
-                LorenzUtils.sendTitle(name, 5.seconds)
-                LorenzUtils.chat("You found a $name§e!")
-                SoundUtils.playBeepSound()
-                ItemBlink.setBlink(itemStack, 5_000)
-            }
+        val internalName = itemStack.getInternalName()
+        if (internalName == item) {
+            val name = itemStack.name!!
+            LorenzUtils.sendTitle(name, 5.seconds)
+            LorenzUtils.chat("You found a $name§e!")
+            SoundUtils.playBeepSound()
+            ItemBlink.setBlink(itemStack, 5_000)
         }
     }
 }

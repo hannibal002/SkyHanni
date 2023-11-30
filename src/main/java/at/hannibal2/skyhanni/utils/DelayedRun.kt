@@ -9,7 +9,7 @@ object DelayedRun {
         map[run] = SimpleTimeMark.now() + duration
     }
 
-    fun runNow(run: () -> Unit) {
+    fun runNextTick(run: () -> Unit) {
         map[run] = SimpleTimeMark.now()
     }
 
