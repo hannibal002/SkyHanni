@@ -174,6 +174,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 </details>
 <details open><summary>
 
