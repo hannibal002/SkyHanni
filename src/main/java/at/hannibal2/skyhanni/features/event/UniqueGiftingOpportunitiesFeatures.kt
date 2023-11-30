@@ -70,15 +70,15 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity is EntityPlayerSP) return
-        if (entity is EntityPlayer && !entity.isNPC() && excludeIronman(entity) && excludeBingo(entity) && !hasGiftedPlayer(entity))
+        if (entity is EntityPlayer && !entity.isNPC() && !isIronman(entity) && !isBingo(entity) && !hasGiftedPlayer(entity))
             event.color = LorenzColor.DARK_GREEN.toColor().withAlpha(127)
     }
 
-    private fun excludeBingo(entity: EntityLivingBase) =
-        HypixelData.bingo || !entity.displayName.formattedText.endsWith("Ⓑ§r")
+    private fun isBingo(entity: EntityLivingBase) =
+        !HypixelData.bingo && entity.displayName.formattedText.endsWith("Ⓑ§r")
 
-    private fun excludeIronman(entity: EntityLivingBase) =
-        HypixelData.bingo || HypixelData.ironman || !entity.displayName.formattedText.endsWith("♲§r")
+    private fun isIronman(entity: EntityLivingBase) =
+        !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
