@@ -1,24 +1,29 @@
 package at.hannibal2.skyhanni.utils
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
 object DelayedRun {
-    val map = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
-    private val inMap = LinkedBlockingQueue<Pair<() -> Any, SimpleTimeMark>>()
+    private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
+    private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 
     fun runDelayed(duration: Duration, run: () -> Unit) {
-        inMap.put(Pair(run, SimpleTimeMark.now() + duration))
+        futureTasks.add(Pair(run, SimpleTimeMark.now() + duration))
     }
 
     fun runNextTick(run: () -> Unit) {
-        inMap.put(Pair(run, SimpleTimeMark.farPast()))
+        futureTasks.add(Pair(run, SimpleTimeMark.farPast()))
     }
 
     fun checkRuns() {
-        inMap.drainTo(map)
-        map.removeIf { (runnable, time) ->
-            time.isInPast().also { if (it) runnable() }
+        tasks.removeIf { (runnable, time) ->
+            val inPast = time.isInPast()
+            if (inPast) {
+                runnable()
+            }
+            inPast
         }
+        while (true)
+            tasks.add(futureTasks.poll() ?: break)
     }
 }
