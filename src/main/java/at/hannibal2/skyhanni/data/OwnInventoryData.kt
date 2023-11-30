@@ -1,30 +1,37 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.api.CollectionAPI
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class OwnInventoryData {
-
-    private var itemNames = mutableMapOf<Int, String>()
-    private var itemAmount = mutableMapOf<Int, Int>()
+    private var itemAmounts = mapOf<NEUInternalName, Int>()
+    private var dirty = false
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val packet = event.packet
+        if (packet is S2FPacketSetSlot || packet is S0DPacketCollectItem) {
+            dirty = true
+        }
         if (packet is S2FPacketSetSlot) {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
@@ -32,70 +39,77 @@ class OwnInventoryData {
                 OwnInventoryItemUpdateEvent(item).postAndCatch()
             }
         }
-        if (packet is S2FPacketSetSlot) {
-            val windowId = packet.func_149175_c()
-            val item = packet.func_149174_e()
-            val slot = packet.func_149173_d()
-            if (windowId != 0) return
-            val name = item?.name ?: "null"
+    }
 
-            val oldItem = itemNames.getOrDefault(slot, "null")
-            val oldAmount = itemAmount.getOrDefault(slot, 0)
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (itemAmounts.isEmpty()) {
+            itemAmounts = getCurrentItems()
+        }
 
-            val amount = item?.stackSize ?: 0
-            if (name == oldItem) {
-                val diff = amount - oldAmount
-                if (amount > oldAmount) {
-                    add(item, diff)
-                }
-            } else {
-                if (name != "null") {
-                    add(item, amount)
-                }
-            }
-            itemNames[slot] = name
-            itemAmount[slot] = amount
+        if (!dirty) return
+        dirty = false
+
+        val map = getCurrentItems()
+        for ((internalName, amount) in map) {
+            calculateDifference(internalName, amount)
+        }
+        itemAmounts = map
+    }
+
+    private fun getCurrentItems(): MutableMap<NEUInternalName, Int> {
+        val map = mutableMapOf<NEUInternalName, Int>()
+        for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
+            val internalName = itemStack.getInternalNameOrNull() ?: continue
+            map.addOrPut(internalName, itemStack.stackSize)
+        }
+        return map
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        itemAmounts = emptyMap()
+    }
+
+    private fun calculateDifference(internalName: NEUInternalName, newAmount: Int) {
+        val oldAmount = itemAmounts[internalName] ?: 0
+
+        val diff = newAmount - oldAmount
+        if (diff > 0) {
+            addItem(internalName, diff)
         }
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        BazaarApi.inBazaarInventory = false
-        lastClose = System.currentTimeMillis()
+    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+        val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
+        val internalNameOrNull = item.getInternalNameOrNull() ?: return
+        ignoreItem(500.milliseconds) { it == internalNameOrNull }
     }
 
-    private var lastClose = 0L
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        ignoreItem(500.milliseconds) { true }
+    }
 
-    private fun add(item: ItemStack?, add: Int) {
-        if (item == null) return
+    private fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
+        ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
+    }
 
-        val diffClose = System.currentTimeMillis() - lastClose
-        if (diffClose < 500) return
+    private val ignoredItemsUntil = mutableListOf<IgnoredItem>()
 
+    class IgnoredItem(val condition: (NEUInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
+
+    private fun addItem(internalName: NEUInternalName, add: Int) {
         val diffWorld = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
         if (diffWorld < 3_000) return
 
-        val internalName = item.getInternalNameOrNull()
+        ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
+        if (ignoredItemsUntil.any { it.condition(internalName) }) return
 
-        item.name?.let {
-            if (it == "§8Quiver Arrow") {
-                return
-            }
-        }
-
-        if (internalName == null) {
-            LorenzUtils.debug("OwnInventoryData add is empty for: '${item.name}'")
-            return
-        }
         if (internalName.startsWith("MAP-")) return
 
-        val (_, amount) = NEUItems.getMultiplier(internalName)
-        if (amount > 1) return
-
-        addMultiplier(internalName, add)
-    }
-
-    private fun addMultiplier(internalName: NEUInternalName, amount: Int) {
-        CollectionAPI.addFromInventory(internalName, amount)
+        ItemAddInInventoryEvent(internalName, add).postAndCatch()
     }
 }

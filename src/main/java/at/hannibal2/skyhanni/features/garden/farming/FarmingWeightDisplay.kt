@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -25,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class FarmingWeightDisplay {
 
@@ -89,7 +91,7 @@ class FarmingWeightDisplay {
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.eliteFarmingWeights
+        private val config get() = GardenAPI.config.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
         private var dispatcher = Dispatchers.IO
 
@@ -136,6 +138,8 @@ class FarmingWeightDisplay {
                 )
             )
         }
+
+        private var lastOpenWebsite = SimpleTimeMark.farPast()
 
         private fun update() {
             if (!isEnabled()) return
@@ -221,8 +225,11 @@ class FarmingWeightDisplay {
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
-                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
+                LorenzUtils.error("Invalid Farming Weight Overtake Goal!")
+                LorenzUtils.chat(
+                    "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!",
+                    false
+                )
                 config.ETAGoalRank = goal.toString()
             } else {
                 goal = parsed
@@ -244,15 +251,16 @@ class FarmingWeightDisplay {
                 listOf("§eClick here to load new data right now!"),
                 onClick = recalculate
             )
+            val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
             var nextName =
-                if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
+                if (showRankGoal) "#$rankGoal" else nextPlayer.name
 
             val totalWeight = (localWeight + weight)
             var weightUntilOvertake = nextPlayer.weight - totalWeight
 
             if (weightUntilOvertake < 0) {
                 if (weightPerSecond > 0) {
-                    farmingChatMessage("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                    farmingChatMessage("You passed §b$nextName §ein the Farming Weight Leaderboard!")
                 }
 
                 // Lower leaderboard position
@@ -288,11 +296,16 @@ class FarmingWeightDisplay {
             } else ""
 
             val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
-            return Renderable.clickAndHover(
-                "§e$weightFormat$timeFormat §7behind §b$nextName",
-                listOf("§eClick to open the Farming Profile of §b$nextName.")
-            ) {
-                openWebsite(nextName)
+            val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
+            return if (showRankGoal) {
+                Renderable.string(text)
+            } else {
+                Renderable.clickAndHover(
+                    text,
+                    listOf("§eClick to open the Farming Profile of §b$nextName.")
+                ) {
+                    openWebsite(nextName)
+                }
             }
         }
 
@@ -377,15 +390,15 @@ class FarmingWeightDisplay {
             if (diff == 0) return
 
             if (diff > 0) {
-                chatOffScreenChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
+                showLbChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
             } else {
-                chatOffScreenChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
+                showLbChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
             }
         }
 
-        private fun chatOffScreenChange(direction: String, oldPosition: Int) {
+        private fun showLbChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
-                "§e[SkyHanni] §7Since your last visit to the §aGarden§7, " +
+                "§7Since your last visit to the §aGarden§7, " +
                         "you have $direction §7on the §dFarming Leaderboard§7. " +
                         "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
@@ -462,8 +475,11 @@ class FarmingWeightDisplay {
 
         private fun error() {
             apiError = true
-            LorenzUtils.error("[SkyHanni] Loading the farming weight data from elitebot.dev failed!")
-            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!")
+            LorenzUtils.error(
+                "Loading the farming weight data from elitebot.dev failed!\n"
+                        + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                        "§cIf this message repeats, please report it on Discord!",
+            )
         }
 
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
@@ -499,12 +515,18 @@ class FarmingWeightDisplay {
 
         fun lookUpCommand(it: Array<String>) {
             val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
-            openWebsite(name)
+            openWebsite(name, ignoreCooldown = true)
         }
 
-        private fun openWebsite(name: String?) {
+        private var lastName = ""
+
+        private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
+            if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
+            lastOpenWebsite = SimpleTimeMark.now()
+            lastName = name
+
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
-            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile of player §b$name")
+            LorenzUtils.chat("Opening Farming Profile of player §b$name")
         }
 
         private val factorPerCrop = mutableMapOf<CropType, Double>()

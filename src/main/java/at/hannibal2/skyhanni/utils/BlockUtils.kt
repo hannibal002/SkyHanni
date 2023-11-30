@@ -48,9 +48,9 @@ object BlockUtils {
         return result?.blockPos?.toLorenzVec()
     }
 
-    fun getBlockLookingAt(duration: Double = 10.0) = rayTrace(
+    fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
         LocationUtils.playerEyeLocation(),
         Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec(),
-        duration
+        distance
     )
 }

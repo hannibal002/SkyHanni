@@ -20,7 +20,7 @@ class GriffinPetWarning {
         if (!DianaAPI.hasGriffinPet() && lastWarnTime.passedSince() > 30.seconds) {
             lastWarnTime = SimpleTimeMark.now()
             LorenzUtils.sendTitle("§cGriffin Pet!", 3.seconds)
-            LorenzUtils.chat("§e[SkyHanni] Reminder to use a Griffin pet for Mythological Ritual!")
+            LorenzUtils.chat("Reminder to use a Griffin pet for Mythological Ritual!")
         }
     }
 }

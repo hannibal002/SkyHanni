@@ -10,14 +10,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import at.hannibal2.skyhanni.utils.jsonobjects.TabListJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TabListJson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDate
     private val monthAndDatePattern =
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st).*".toPattern()
+        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*".toPattern()
     private var display = ""
 
     // sun, moon, spooky
@@ -43,7 +43,10 @@ class InGameDateDisplay {
         if (config.useScoreboard) {
             val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            val monthAndDate = list.find { monthAndDatePattern.matches(it) } ?: "??"
+            var monthAndDate = (list.find { monthAndDatePattern.matches(it) } ?: "??").trim()
+            if (monthAndDate.last().isDigit()) {
+                monthAndDate = "${monthAndDate}${SkyBlockTime.daySuffix(monthAndDate.takeLast(2).trim().toInt())}"
+            }
             val time = list.find { it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) {
@@ -56,8 +59,11 @@ class InGameDateDisplay {
                 else "$theBaseString ☽"
             }
         }
+        if (!config.includeOrdinal) theBaseString = theBaseString.removeOrdinal()
         display = theBaseString
     }
+
+    private fun String.removeOrdinal() = replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

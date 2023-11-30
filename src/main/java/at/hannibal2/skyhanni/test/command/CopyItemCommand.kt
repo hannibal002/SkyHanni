@@ -14,7 +14,7 @@ object CopyItemCommand {
     fun command() {
         val itemStack = InventoryUtils.getItemInHand()
         if (itemStack == null) {
-            LorenzUtils.chat("§c[SkyHanni] No item in hand!")
+            LorenzUtils.userError("No item in hand!")
             return
         }
         copyItemToClipboard(itemStack)
@@ -53,6 +53,6 @@ object CopyItemCommand {
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
-        LorenzUtils.chat("§e[SkyHanni] Item info copied into the clipboard!")
+        LorenzUtils.chat("Item info copied into the clipboard!")
     }
 }

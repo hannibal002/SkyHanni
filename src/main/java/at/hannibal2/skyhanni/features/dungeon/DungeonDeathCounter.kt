@@ -53,7 +53,7 @@ class DungeonDeathCounter {
 
         if (isDeathMessage(event.message)) {
             deaths++
-            LorenzUtils.chat("§c§l$deaths. DEATH!")
+            LorenzUtils.chat("§c§l$deaths. DEATH!", false)
             update()
         }
     }
@@ -88,7 +88,10 @@ class DungeonDeathCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + display, posLabel = "Dungeon Death Counter")
+        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(
+            DungeonMilestonesDisplay.color + display,
+            posLabel = "Dungeon Death Counter"
+        )
     }
 
     private fun isEnabled(): Boolean {

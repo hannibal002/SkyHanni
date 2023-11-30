@@ -26,7 +26,8 @@ class DungeonFinderFeatures {
     private val pricePattern = "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?mil)".toRegex(RegexOption.IGNORE_CASE)
     private val carryPattern = "(carry|cary|carries|caries|comp|to cata [0-9]{2})".toRegex(RegexOption.IGNORE_CASE)
     private val memberPattern = "^ §.*?§.: §.([A-Z]+)§. \\(§.([0-9]+)§.\\)".toRegex(RegexOption.IGNORE_CASE)
-    private val ineligiblePattern = "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)".toRegex()
+    private val ineligiblePattern =
+        "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)".toRegex()
     private val classLevelPattern = " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)".toPattern()
     private val notePattern = "^(§7§7Note: |§f[^§])".toRegex()
 
@@ -81,7 +82,7 @@ class DungeonFinderFeatures {
         if (!LorenzUtils.inSkyBlock || LorenzUtils.skyBlockArea != "Dungeon Hub") return
         if (event.inventoryName != "Catacombs Gate") return
 
-        val lore =  event.inventoryItems[45]?.getLore() ?: return
+        val lore = event.inventoryItems[45]?.getLore() ?: return
 
         if (lore[0] == "§7View and select a dungeon class.") {
             selectedClass = lore[2].split(" ").last().removeColor()
@@ -111,7 +112,7 @@ class DungeonFinderFeatures {
             }
 
             if (config.markPaidCarries) {
-                val note = slot.stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ") ?: ""
+                val note = slot.stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
 
                 if (pricePattern.containsMatchIn(note) && carryPattern.containsMatchIn(note)) {
                     slot highlight LorenzColor.RED
