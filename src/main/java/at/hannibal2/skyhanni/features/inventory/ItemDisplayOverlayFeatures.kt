@@ -43,9 +43,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
+
+    // TODO repo
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
+    private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
+    private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -161,7 +165,7 @@ object ItemDisplayOverlayFeatures {
 
         if (LARVA_HOOK.isSelected() && itemName.contains("Larva Hook")) {
             for (line in item.getLore()) {
-                "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
+                harvestPattern.matchMatcher(line) {
                     val amount = group("amount").toInt()
                     return when {
                         amount > 4 -> "§a$amount"
@@ -174,7 +178,7 @@ object ItemDisplayOverlayFeatures {
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
             item.name?.let {
-                "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
+                dungeonPotionPattern.matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
                         in 1..2 -> "§f$level"
                         in 3..4 -> "§a$level"
