@@ -1,34 +1,24 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import java.util.concurrent.LinkedBlockingQueue
 import kotlin.time.Duration
 
-// TODO find better sync bug fix than creating a new map for each use
 object DelayedRun {
-    var map = mapOf<() -> Any, SimpleTimeMark>()
+    val map = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
+    private val inMap = LinkedBlockingQueue<Pair<() -> Any, SimpleTimeMark>>()
 
     fun runDelayed(duration: Duration, run: () -> Unit) {
-        map = map.editCopy {
-            this[run] = SimpleTimeMark.now() + duration
-        }
+        inMap.put(Pair(run, SimpleTimeMark.now() + duration))
     }
 
     fun runNextTick(run: () -> Unit) {
-        map = map.editCopy {
-            this[run] = SimpleTimeMark.now()
-        }
+        inMap.put(Pair(run, SimpleTimeMark.farPast()))
     }
 
     fun checkRuns() {
-        if (map.isEmpty()) return
-        map = map.editCopy {
-            entries.removeIf { (runnable, time) ->
-                val inPast = time.isInPast()
-                if (inPast) {
-                    runnable()
-                }
-                inPast
-            }
+        inMap.drainTo(map)
+        map.removeIf { (runnable, time) ->
+            time.isInPast().also { if (it) runnable() }
         }
     }
 }
