@@ -180,7 +180,6 @@ class MinionFeatures {
         if (location !in minions) {
             minions[location]!!.lastClicked = 0
         }
-        MinionXp.onMinionClose()
     }
 
     @SubscribeEvent

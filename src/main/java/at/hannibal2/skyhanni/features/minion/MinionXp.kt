@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
@@ -26,6 +27,15 @@ class MinionXp {
 
     private val config get() = SkyHanniMod.feature.minions
 
+    private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
+    private val collectItemXpList: MutableList<String> = mutableListOf()
+
+    private var collectItem: Item? = null
+
+    private val minionStorages = mutableListOf<MinionStorage>()
+
+    private var xpInfoMap: Map<NEUInternalName, XpInfo> = hashMapOf()
+
     data class XpInfo(val type: XpType, val amount: Double)
 
     private data class MinionStorage(val position: LorenzVec, val xpList: EnumMap<XpType, Double>) {
@@ -48,10 +58,6 @@ class MinionXp {
         Fishing,
         Alchemy
     }
-
-    private var collectItem: Item? = null
-
-    private val minionStorages = mutableListOf<MinionStorage>()
 
     @SubscribeEvent
     fun onMinionOpen(event: MinionOpenEvent) {
@@ -174,13 +180,10 @@ class MinionXp {
         collectItemXpList.clear()
     }
 
-    companion object {
-        private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
-        private val collectItemXpList: MutableList<String> = mutableListOf()
-        fun onMinionClose() {
-            xpItemMap.clear()
-            collectItemXpList.clear()
-        }
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        xpItemMap.clear()
+        collectItemXpList.clear()
     }
 
     @SubscribeEvent
@@ -189,9 +192,4 @@ class MinionXp {
             xpType.value.mapNotNull { it.key.asInternalName() to XpInfo(XpType.valueOf(xpType.key), it.value) }
         }.flatten().toMap()
     }
-
-    private var xpInfoMap: Map<NEUInternalName, XpInfo> = hashMapOf()
 }
-
-/* it.key.asInternalName() to
-                XpInfo(XpType.valueOf(it.value.type), it.value.value) */
