@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -125,7 +125,7 @@ class MenuItemDisplayOverlayPlayerTryhard {
                                         return@also
                                     }
                                 }
-                                return lastWord.romanToDecimalIfNeeded().toString()
+                                return lastWord.romanToDecimalIfNecessary().toString()
                             }
                     }
                 }
