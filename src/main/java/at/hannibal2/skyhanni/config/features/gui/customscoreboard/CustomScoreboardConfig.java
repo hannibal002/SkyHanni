@@ -33,8 +33,8 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the scoreboard."
     )
     @ConfigEditorDraggableList()
-
     public List<ScoreboardEntry> textFormat = new ArrayList<>(Arrays.asList(ScoreboardEntry.values()));
+
     public enum ScoreboardEntry {
         TITLE("§6§lSKYBLOCK"),
         PROFILE("§7♲ Blueberry"),
