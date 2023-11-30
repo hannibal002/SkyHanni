@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.22.Beta.3"
+version = "0.22.Beta.4"
 
 // Toolchains:
 java {
@@ -87,8 +87,6 @@ dependencies {
     }
 
     shadowModImpl(libs.moulconfig)
-    devenvMod(variantOf(libs.moulconfig) { classifier("test") })
-
     shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
@@ -124,6 +122,7 @@ loom {
             property("mixin.debug", "true")
             property("asmhelper.verbose", "true")
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }

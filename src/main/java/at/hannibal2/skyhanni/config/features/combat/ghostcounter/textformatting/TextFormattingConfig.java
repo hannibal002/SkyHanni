@@ -35,11 +35,11 @@ public class TextFormattingConfig {
     public String titleFormat = "&6Ghost Counter";
 
     @Expose
-    @ConfigOption(name = "Ghost Killed", desc = "Ghost Killed line.\n§e%value% §ris replaced with\n" +
-        "Ghost Killed.\n" +
-        "§e%session% §7is replaced with Ghost killed")
+    @ConfigOption(name = "Ghosts Killed", desc = "Ghosts Killed line.\n§e%value% §ris replaced with\n" +
+        "Ghosts Killed.\n" +
+        "§e%session% §7is replaced with Ghosts killed")
     @ConfigEditorText
-    public String ghostKilledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
+    public String ghostKilledFormat = "  &6Ghosts Killed: &b%value% &7(%session%)";
 
     @Expose
     @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n" +

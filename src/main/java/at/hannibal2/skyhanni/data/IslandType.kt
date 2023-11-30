@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-enum class IslandType(val displayName: String, val apiName: String = "null") {
+enum class IslandType(val displayName: String, val modeName: String = "null") {
     // TODO USE SH-REPO (for displayName only)
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -11,6 +12,26 @@ import io.github.moulberry.moulconfig.observer.Property;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.AMBER;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.AMETHYST;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DIAMOND_ESSENCE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DISPLAY_MODE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DOUBLE_POWDER;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ELECTRON;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.FTX;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GEMSTONE_POWDER;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GOLD_ESSENCE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.JADE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.MITHRIL_POWDER;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ROBOTRON;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.RUBY;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SAPPHIRE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_1;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_2;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TITLE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOPAZ;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOTAL_CHESTS;
 
 public class PowderTrackerConfig {
 
@@ -35,48 +56,88 @@ public class PowderTrackerConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§b§lPowder Tracker",
-            "§7Display Mode: §a[Total] §e[This Session]",
-            "§d852 Total chests Picked §7(950/h)",
-            "§bx2 Powder: §aActive!",
-            "§b250,420 §aMithril Powder §7(350,000/h)",
-            "§b250,420 §dGemstone Powder §7(350,000/h)",
-            "",
-            "§b129 §bDiamond Essence §7(600/h)",
-            "§b234 §6Gold Essence §7(700/h)",
-            "",
-            "§50§7-§90§7-§a0§f-0 §cRuby Gemstone",
-            "§50§7-§90§7-§a0§f-0 §bSapphire Gemstone",
-            "§50§7-§90§7-§a0§f-0 §6Amber Gemstone",
-            "§50§7-§90§7-§a0§f-0 §5Amethyst Gemstone",
-            "§50§7-§90§7-§a0§f-0 §aJade Gemstone",
-            "§50§7-§90§7-§a0§f-0 §eTopaz Gemstone",
+    @ConfigEditorDraggableList()
+    public Property<List<PowderDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
+        TITLE,
+        DISPLAY_MODE,
+        TOTAL_CHESTS,
+        DOUBLE_POWDER,
+        MITHRIL_POWDER,
+        GEMSTONE_POWDER,
+        SPACER_1,
+        DIAMOND_ESSENCE,
+        GOLD_ESSENCE,
+        SPACER_2,
+        RUBY,
+        SAPPHIRE,
+        AMBER,
+        AMETHYST,
+        JADE,
+        TOPAZ,
+        FTX,
+        ELECTRON,
+        ROBOTRON
+    )));
 
-            "§b14 §9FTX 3070",
-            "§b14 §9Electron Transmitter",
-            "§b14 §9Robotron Reflector",
-            "§b14 §9Superlite Motor",
-            "§b14 §9Control Switch",
-            "§b14 §9Synthetic Heart",
-            "§b14 §9Total Robot Parts",
+    public enum PowderDisplayEntry implements HasLegacyId {
+        TITLE("§b§lPowder Tracker", 0),
+        DISPLAY_MODE("§7Display Mode: §a[Total] §e[This Session]", 1),
+        TOTAL_CHESTS("§d852 Total chests Picked §7(950/h)", 2),
+        DOUBLE_POWDER("§bx2 Powder: §aActive!", 3),
+        MITHRIL_POWDER("§b250,420 §aMithril Powder §7(350,000/h)", 4),
+        GEMSTONE_POWDER("§b250,420 §dGemstone Powder §7(350,000/h)", 5),
+        SPACER_1("", 6),
+        DIAMOND_ESSENCE("§b129 §bDiamond Essence §7(600/h)", 7),
+        GOLD_ESSENCE("§b234 §6Gold Essence §7(700/h)", 8),
+        SPACER_2("", 9),
+        RUBY("§50§7-§90§7-§a0§f-0 §cRuby Gemstone", 10),
+        SAPPHIRE("§50§7-§90§7-§a0§f-0 §bSapphire Gemstone", 11),
+        AMBER("§50§7-§90§7-§a0§f-0 §6Amber Gemstone", 12),
+        AMETHYST("§50§7-§90§7-§a0§f-0 §5Amethyst Gemstone", 13),
+        JADE("§50§7-§90§7-§a0§f-0 §aJade Gemstone", 14),
+        TOPAZ("§50§7-§90§7-§a0§f-0 §eTopaz Gemstone", 15),
+        FTX("§b14 §9FTX 3070", 16),
+        ELECTRON("§b14 §9Electron Transmitter", 17),
+        ROBOTRON("§b14 §9Robotron Reflector", 18),
+        SUPERLITE("§b14 §9Superlite Motor", 19),
+        CONTROL_SWITCH("§b14 §9Control Switch", 20),
+        SYNTHETIC_HEART("§b14 §9Synthetic Heart", 21),
+        TOTAL_ROBOT_PARTS("§b14 §9Total Robot Parts", 22),
+        GOBLIN_EGGS("§90§7-§a0§7-§c0§f-§e0§f-§30 §fGoblin Egg", 23),
+        WISHING_COMPASS("§b12 §aWishing Compass", 24),
+        SLUDGE_JUICE("§b320 §aSludge Juice", 25),
+        ASCENSION_ROPE("§b2 §9Ascension Rope", 26),
+        TREASURITE("§b6 §5Treasurite", 27),
+        JUNGLE_HEART("§b4 §6Jungle Heart", 28),
+        PICKONIMBUS("§b1 §5Pickonimbus 2000", 29),
+        YOGGIE("§b14 §aYoggie", 30),
+        PREHISTORIC_EGG("§b9 §fPrehistoric Egg", 31),
+        OIL_BARREL("§b25 §aOil Barrel", 32),
+        ;
 
-            "§90§7-§a0§7-§c0§f-§e0§f-§30 §fGoblin Egg",
+        private final String str;
+        private final int legacyId;
 
-            "§b12 §aWishing Compass",
-
-            "§b320 §aSludge Juice",
-            "§b2 §9Ascension Rope",
-            "§b6 §5Treasurite",
-            "§b4 §6Jungle Heart",
-            "§b1 §5Pickonimbus 2000",
-            "§b14 §aYoggie",
-            "§b9 §fPrehistoric Egg",
-            "§b25 §aOil Barrel"
+        PowderDisplayEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
         }
-    )
-    public Property<List<Integer>> textFormat = Property.of(new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)));
+
+        // Constructor if new enum elements are added post-migration
+        PowderDisplayEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     public Position position = new Position(-274, 0, false, true);
