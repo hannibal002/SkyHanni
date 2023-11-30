@@ -45,7 +45,7 @@ public class StackSizeConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACCUM_PESTS("§bPests Stored in Vaccum (Garden)", 14),
-        JYRRE("§bBottle of Jyrre Intelligence Bonus", 15),
+        JYRRE("§bBottle of Jyrre (#, Intelligence Bonus on Legacy Bottles and Time on New Bottles)", 15),
         EDITION_AUCTION_NUMBER("§bItem Edition/Auction Number (if less than 1000)", 16),
         ARMADILLO("§bArmadillo Blocks Walked Progress (%)"),
         NECRONS_LADDER("§bNecron's Ladder Progress"),
