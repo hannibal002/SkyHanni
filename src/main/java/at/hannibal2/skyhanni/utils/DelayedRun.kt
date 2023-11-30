@@ -9,6 +9,10 @@ object DelayedRun {
         map[run] = SimpleTimeMark.now() + duration
     }
 
+    fun runNow(run: () -> Unit) {
+        map[run] = SimpleTimeMark.now()
+    }
+
     fun checkRuns() {
         map.entries.removeIf { (runnable, time) ->
             val inPast = time.isInPast()
