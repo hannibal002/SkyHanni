@@ -58,6 +58,7 @@ class RenderBackground {
         GlStateManager.pushAttrib();
 
         GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.enableDepth()
 
         if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
             // Draw the default texture
