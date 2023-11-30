@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -166,7 +166,7 @@ class CaptureFarmingGear {
     private fun getSkillInfo(event: InventoryFullyOpenedEvent, storage: Storage.ProfileSpecific.GardenStorage.Fortune) {
         event.inventoryItems.values.firstOrNull { item ->
             item.displayName.contains("Farming ")
-        }?.displayName?.split(" ")?.last()?.romanToDecimalIfNeeded()?.let { storage.farmingLevel = it }
+        }?.displayName?.split(" ")?.last()?.romanToDecimalIfNecessary()?.let { storage.farmingLevel = it }
     }
 
     private fun getCommunityShopInfo(event: InventoryFullyOpenedEvent) {
@@ -221,7 +221,7 @@ class CaptureFarmingGear {
 
     private fun String.isFarmingLevelUp(storage: Storage.ProfileSpecific.GardenStorage.Fortune): Boolean {
         return farmingLevelUpPattern.matchMatcher(this) {
-            storage.farmingLevel = group("level").romanToDecimalIfNeeded()
+            storage.farmingLevel = group("level").romanToDecimalIfNecessary()
         } != null
     }
 
