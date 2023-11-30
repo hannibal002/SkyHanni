@@ -67,7 +67,7 @@ class RenderBackground {
                 (x - border).toFloat(),
                 (y - border).toFloat(),
                 (elementWidth + border * 3).toFloat(),
-                (elementHeight + border * 3).toFloat(),
+                (elementHeight + border * 2).toFloat(),
                 GL11.GL_NEAREST
             )
         } else if (config.backgroundConfig.enabled) {
@@ -76,7 +76,7 @@ class RenderBackground {
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
-                y + elementHeight + border * 2,
+                y + elementHeight + border,
                 SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
             )
         }
