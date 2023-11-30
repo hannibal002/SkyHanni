@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumber
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI.isVacuum
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -417,6 +419,9 @@ class ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(9, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumber")
+        event.move(11, "inventory.itemNumberAsStackSize", "inventory.itemNumberAsStackSize") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumber::class.java)
+        }
+        event.move(12, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumber")
     }
 }
