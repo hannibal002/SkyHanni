@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -138,7 +138,7 @@ object ItemDisplayOverlayFeatures {
             if (!itemName.contains("Dungeon")) {
                 val text = split.last()
                 if (split.size < 2) return "0"
-                return "" + text.romanToDecimalIfNeeded()
+                return "" + text.romanToDecimalIfNecessary()
             }
         }
 
@@ -149,7 +149,7 @@ object ItemDisplayOverlayFeatures {
                 item.name?.let {
                     if (it.startsWith("§e")) {
                         val text = it.split(" ").last()
-                        return "" + text.romanToDecimalIfNeeded()
+                        return "" + text.romanToDecimalIfNecessary()
                     }
                 }
             }

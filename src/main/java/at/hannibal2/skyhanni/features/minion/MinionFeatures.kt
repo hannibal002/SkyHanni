@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SpecialColour
@@ -265,7 +265,7 @@ class MinionFeatures {
         }
 
         minionUpgradePattern.matchMatcher(message) {
-            val newTier = group("tier").romanToDecimalIfNeeded()
+            val newTier = group("tier").romanToDecimalIfNecessary()
             minions?.get(lastMinion)?.let {
                 val minionName = getMinionName(it.displayName, newTier)
                 it.displayName = minionName
