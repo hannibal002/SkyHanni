@@ -104,7 +104,7 @@ object NumberUtil {
 
     fun Number.addSeparators() = NumberFormat.getNumberInstance().format(this)
 
-    fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
+    fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()
 
     /**
      * This code was converted to Kotlin and taken under CC BY-SA 3.0 license

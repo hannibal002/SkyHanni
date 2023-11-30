@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -44,7 +45,7 @@ class SprayFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.pestWhenSelector) return
+        if (!isEnabled()) return
 
         val display = display ?: return
 
@@ -55,4 +56,6 @@ class SprayFeatures {
 
         config.position.renderString(display, posLabel = "Pest Spray Selector")
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.pestWhenSelector
 }

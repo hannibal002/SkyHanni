@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.DataWatcherAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -101,6 +102,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
+import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportnitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
@@ -110,6 +112,7 @@ import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
+import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
@@ -206,6 +209,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesI
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+import at.hannibal2.skyhanni.features.minion.MinionXp
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -342,7 +346,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.2",
+    version = "0.22.Beta.4",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -401,6 +405,7 @@ class SkyHanniMod {
         loadModule(BazaarApi())
         loadModule(GardenAPI)
         loadModule(GardenPlotAPI)
+        loadModule(DataWatcherAPI())
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)
@@ -420,7 +425,7 @@ class SkyHanniMod {
         loadModule(PlayerChatModifier())
         loadModule(DungeonChatFilter())
         loadModule(HideNotClickableItems())
-        loadModule(ItemDisplayOverlayFeatures())
+        loadModule(ItemDisplayOverlayFeatures)
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(FandomWikiFromMenus())
@@ -432,6 +437,8 @@ class SkyHanniMod {
         loadModule(DungeonCleanEnd())
         loadModule(DungeonBossMessages())
         loadModule(DungeonBossHideDamageSplash())
+        loadModule(UniqueGiftingOpportnitiesFeatures)
+        loadModule(UniqueGiftCounter)
         loadModule(TrophyFishManager)
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
@@ -514,6 +521,7 @@ class SkyHanniMod {
         loadModule(GardenVisitorFeatures())
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())
+        loadModule(MinionXp())
         loadModule(GardenNextPlotPrice())
         loadModule(GardenCropMilestoneDisplay)
         loadModule(GardenCustomKeybinds)

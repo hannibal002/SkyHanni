@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -31,7 +32,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -138,7 +139,7 @@ object ComposterOverlay {
             event.itemStack?.name?.let {
                 if (it.contains(upgrade.displayName)) {
                     maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
-                        group("level")?.romanToDecimalIfNeeded() ?: 0
+                            group("level")?.romanToDecimalIfNecessary() ?: 0
                     } == 25
                     extraComposterUpgrade = upgrade
                     update()
@@ -573,6 +574,8 @@ object ComposterOverlay {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (EstimatedItemValue.isCurrentlyShowing()) return
+
         if (inInventory) {
             config.overlayOrganicMatterPos.renderStringsAndItems(
                 organicMatterDisplay,
