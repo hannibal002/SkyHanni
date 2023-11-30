@@ -32,12 +32,12 @@ import kotlin.math.floor
 import kotlin.math.log10
 
 class ItemDisplayOverlayFeatures {
-    // private val xOutOfYNoColorRequiredPattern = ".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*".toPattern()
-    private val rancherBootsSpeedCapLoreLinePattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
-    private val petLevelItemNamePattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val shredderBonusDamageLoreLinePattern = "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)".toPattern()
-    private val bottleOfJerryLoreLinePattern = "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)".toPattern()
-    private val gardenVacuumLoreLinePattern = "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?".toPattern()
+    // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
+    private val rancherBootsSpeedCapLoreLinePattern = (("§7Current Speed Cap: §a(?<cap>.*)").toPattern())
+    private val petLevelItemNamePattern = (("\\[Lvl (?<level>.*)] .*").toPattern())
+    private val shredderBonusDamageLoreLinePattern = (("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)").toPattern())
+    private val bottleOfJerryLoreLinePattern = (("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)").toPattern())
+    private val gardenVacuumLoreLinePattern = (("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?").toPattern())
     private val masterSkullItemNamePattern = (("(.*)Master Skull - Tier (?<tier>.+)").toPattern())
     private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
     private val newYearCakeSpookyPieYearItemNamePattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
