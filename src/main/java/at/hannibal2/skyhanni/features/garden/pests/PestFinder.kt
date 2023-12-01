@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
-import at.hannibal2.skyhanni.features.garden.GardenPlotBorders.render
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -182,10 +182,10 @@ class PestFinder {
         val playerLocation = event.exactPlayerEyeLocation()
         for (plot in getPlotsWithPests()) {
             if (plot.isPlayerInside()) {
-                event.render(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
                 continue
             }
-            event.render(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
+            event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
 
             val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
             val plotName = plot.name

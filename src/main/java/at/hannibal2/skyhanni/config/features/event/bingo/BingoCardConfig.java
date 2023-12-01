@@ -42,4 +42,9 @@ public class BingoCardConfig {
 
     @Expose
     public Position bingoCardPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Next Tip Duration", desc = "Show the duration until the next hidden personal goal gets a tip revealed.")
+    @ConfigEditorBoolean
+    public Property<Boolean> nextTipDuration = Property.of(true);
 }
