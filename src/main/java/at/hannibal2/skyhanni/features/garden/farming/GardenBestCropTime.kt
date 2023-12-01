@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -19,7 +19,7 @@ class GardenBestCropTime {
     var display = emptyList<List<Any>>()
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.cropMilestones
+        private val config get() = GardenAPI.config.cropMilestones
         val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
         fun reset() {
@@ -95,7 +95,8 @@ class GardenBestCropTime {
         for (crop in sorted.keys) {
             if (crop.isMaxed()) continue
             val millis = timeTillNextCrop[crop]!!
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+            // TODO, change functionality to use enum rather than ordinals
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis, biggestUnit, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++

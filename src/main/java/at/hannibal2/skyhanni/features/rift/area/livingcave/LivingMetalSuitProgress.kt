@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LivingMetalSuitProgress {
 
-    private val config get() = RiftAPI.config.area.livingCaveConfig.livingMetalSuitProgress
+    private val config get() = RiftAPI.config.area.livingCave.livingMetalSuitProgress
     private var display = emptyList<List<Any>>()
     private var progressMap = mapOf<ItemStack, Double?>()
 

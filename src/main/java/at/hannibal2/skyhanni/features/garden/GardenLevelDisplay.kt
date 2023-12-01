@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -9,7 +8,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -18,7 +17,7 @@ import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
-    private val config get() = SkyHanniMod.feature.garden.gardenLevels
+    private val config get() = GardenAPI.config.gardenLevels
     private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
@@ -49,7 +48,8 @@ class GardenLevelDisplay {
                 LorenzUtils.clickableChat(
                     " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                             " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                    "/gardenlevels"
+                    "/gardenlevels",
+                    false
                 )
             }
         }
@@ -63,7 +63,7 @@ class GardenLevelDisplay {
         val item = event.inventoryItems[4]!!
 
         namePattern.matchMatcher(item.name!!.removeColor()) {
-            val currentLevel = group("currentLevel").romanToDecimalIfNeeded()
+            val currentLevel = group("currentLevel").romanToDecimalIfNecessary()
             var nextLevelExp = 0L
             for (line in item.getLore()) {
                 expToNextLevelPattern.matchMatcher(line) {

@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -52,7 +53,7 @@ object InquisitorWaypointShare {
 
     fun test() {
         test = !test
-        LorenzUtils.chat("§e[SkyHanni] Inquisitor Test " + if (test) "Enabled" else "Disabled")
+        LorenzUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
     @SubscribeEvent
@@ -143,7 +144,7 @@ object InquisitorWaypointShare {
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
             val message =
-                "§e[SkyHanni] §l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+                "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
             LorenzUtils.clickableChat(message, "shshareinquis")
         }
     }
@@ -165,6 +166,7 @@ object InquisitorWaypointShare {
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
         if (event.keyCode == config.keyBindShare) sendInquisitor()
     }
 
@@ -187,7 +189,7 @@ object InquisitorWaypointShare {
         lastShareTime = System.currentTimeMillis()
 
         if (inquisitor == -1) {
-            LorenzUtils.chat("§c[SkyHanni] No Inquisitor Found!")
+            LorenzUtils.error("No Inquisitor Found!")
             return
         }
 
@@ -198,7 +200,7 @@ object InquisitorWaypointShare {
         }
 
         if (inquisitor.isDead) {
-            LorenzUtils.chat("§cInquisitor is ded")
+            LorenzUtils.chat("§cInquisitor is dead")
             return
         }
         val location = inquisitor.getLorenzVec()
@@ -227,7 +229,7 @@ object InquisitorWaypointShare {
 
             val cleanName = playerName.cleanPlayerName()
             if (!waypoints.containsKey(cleanName)) {
-                LorenzUtils.chat("§e[SkyHanni] $playerName §l§efound an inquisitor at §l§c$x $y $z!")
+                LorenzUtils.chat("$playerName §l§efound an inquisitor at §l§c$x $y $z!")
                 if (cleanName != LorenzUtils.getPlayerName()) {
                     LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5.seconds)
                     SoundUtils.playBeepSound()
@@ -236,7 +238,7 @@ object InquisitorWaypointShare {
             val inquis = SharedInquisitor(cleanName, location, SimpleTimeMark.now())
             waypoints = waypoints.editCopy { this[cleanName] = inquis }
             if (config.focusInquisitor) {
-                GriffinBurrowHelper.setTargetLocation(location.add(0, 1, 0))
+                GriffinBurrowHelper.setTargetLocation(location.add(y = 1))
                 GriffinBurrowHelper.animationLocation = LocationUtils.playerLocation()
             }
 
@@ -254,7 +256,7 @@ object InquisitorWaypointShare {
     fun maybeRemove(playerName: String) {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(playerName) }
-            LorenzUtils.chat("§e[SkyHanni] Inquisitor from $playerName not found, deleting.")
+            LorenzUtils.chat("Inquisitor from $playerName not found, deleting.")
         }
     }
 }

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
@@ -33,17 +32,17 @@ object PartyAPI {
     fun listMembers() {
         val size = partyMembers.size
         if (size == 0) {
-            LorenzUtils.chat("§e[SkyHanni] No tracked party members!")
+            LorenzUtils.chat("No tracked party members!")
             return
         }
-        LorenzUtils.chat("§a[SkyHanni] Tracked party members §7($size) §f:")
+        LorenzUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
         for (member in partyMembers) {
-            LorenzUtils.chat(" §a- §7$member")
+            LorenzUtils.chat(" §a- §7$member", false)
         }
 
         if (Random.nextDouble() < 0.1) {
             OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
-            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"))
+            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"), prefix = false)
         }
     }
 
@@ -112,7 +111,7 @@ object PartyAPI {
         partyMemberListPattern.matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
-                if (playerName == Minecraft.getMinecraft().thePlayer.name) continue
+                if (playerName == LorenzUtils.getPlayerName()) continue
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
             }
         }

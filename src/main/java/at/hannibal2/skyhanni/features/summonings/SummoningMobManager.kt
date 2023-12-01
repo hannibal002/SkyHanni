@@ -35,9 +35,10 @@ class SummoningMobManager {
     private var searchArmorStands = false
     private var searchMobs = false
 
+    // TODO repo
     //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
-    private val spawnPatter = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
-    private val despawnPatter = "§cYou have despawned your (monster|monsters)!".toPattern()
+    private val spawnPattern = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
+    private val despawnPattern = "§cYou have despawned your (monster|monsters)!".toPattern()
 
     //§a§ohannibal2's Tank Zombie§r §a160k§c❤
     private val healthPattern = "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤".toPattern()
@@ -50,7 +51,7 @@ class SummoningMobManager {
         if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
-        spawnPatter.matchMatcher(message) {
+        spawnPattern.matchMatcher(message) {
             if (config.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
@@ -59,7 +60,7 @@ class SummoningMobManager {
             searchMobs = true
         }
 
-        if (despawnPatter.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
+        if (despawnPattern.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
             despawned()
             if (config.summoningMobDisplay && !message.contains("☠")) {
                 event.blockedReason = "summoning_soul"
@@ -88,7 +89,7 @@ class SummoningMobManager {
                     healthPattern.matchMatcher(name) {
                         val playerName = LorenzUtils.getPlayerName()
                         if (name.contains(playerName)) {
-                            summoningMobNametags.add(it as EntityArmorStand)
+                            summoningMobNametags.add(it)
                             if (summoningMobNametags.size == summoningsSpawned) {
                                 searchArmorStands = false
                             }
@@ -123,7 +124,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
-                LorenzUtils.chat("§e[SkyHanni] Your Summoning Mob just §cdied!")
+                LorenzUtils.chat("Your Summoning Mob just §cdied!")
                 continue
             }
 

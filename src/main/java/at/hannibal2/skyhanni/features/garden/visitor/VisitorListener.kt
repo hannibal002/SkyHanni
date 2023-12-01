@@ -69,35 +69,7 @@ class VisitorListener {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        var found = false
-        val visitorsInTab = mutableListOf<String>()
-        for (line in event.tabList) {
-            if (line.startsWith("§b§lVisitors:")) {
-                found = true
-                continue
-            }
-            if (!found) continue
-
-            if (line.isEmpty()) {
-                found = false
-                continue
-            }
-            val name = VisitorAPI.fromHypixelName(line)
-
-            // Hide hypixel watchdog entries
-            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
-                logger.log("Ignore wrong red name: '$name'")
-                continue
-            }
-
-            //hide own player name
-            if (name.contains(LorenzUtils.getPlayerName())) {
-                logger.log("Ignore wrong own name: '$name'")
-                continue
-            }
-
-            visitorsInTab.add(name)
-        }
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
         VisitorAPI.getVisitors().forEach {
             val name = it.visitorName

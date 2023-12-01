@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -23,6 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
     private val config get() = SkyHanniMod.feature.event.bingo
+
     // TODO USE SH-REPO
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var display = emptyList<String>()
@@ -75,7 +76,7 @@ class MinionCraftHelper {
         for ((minionName, minionId) in minions) {
             minionNamePattern.matchMatcher(minionName) {
                 val cleanName = group("name").removeColor()
-                val number = group("number").romanToDecimalIfNeeded()
+                val number = group("number").romanToDecimalIfNecessary()
                 addMinion(cleanName, number, minionId, otherItems, newDisplay)
             }
         }

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -23,8 +23,8 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
 class CaptureFarmingGear {
-    private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
-    private val outdatedItems get() = GardenAPI.config?.fortune?.outdatedItems
+    private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
+    private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
     // TODO USE SH-REPO
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
@@ -43,7 +43,7 @@ class CaptureFarmingGear {
             "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
             "RANCHERS", "FARMER", "RABBIT"
         )
-        private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
+        private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
 
         fun captureFarmingGear() {
             val farmingItems = farmingItems ?: return
@@ -74,15 +74,21 @@ class CaptureFarmingGear {
             }
             for (line in TabListData.getTabList()) {
                 strengthPattern.matchMatcher(line) {
-                    GardenAPI.config?.fortune?.farmingStrength = group("strength").toInt()
+                    GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
                 }
             }
         }
 
         fun reverseCarrotFortune() {
-            val hidden = GardenAPI.config?.fortune ?: return
-            hidden.carrotFortune = !hidden.carrotFortune
-            LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${hidden.carrotFortune}")
+            val storage = GardenAPI.storage?.fortune ?: return
+            storage.carrotFortune = !storage.carrotFortune
+            LorenzUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
+        }
+
+        fun reversePumpkinFortune() {
+            val storage = GardenAPI.storage?.fortune ?: return
+            storage.pumpkinFortune = !storage.pumpkinFortune
+            LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
         }
     }
 
@@ -94,7 +100,7 @@ class CaptureFarmingGear {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val hidden = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
@@ -111,7 +117,7 @@ class CaptureFarmingGear {
                     val enchantments = slot.getEnchantments() ?: emptyMap()
                     val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
                     val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
-                    GardenAPI.config?.uniqueVisitors = round(visitors).toInt()
+                    GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
                 }
             }
         }
@@ -164,7 +170,7 @@ class CaptureFarmingGear {
         if (event.inventoryName.contains("Your Skills")) {
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("Farming ")) {
-                    hidden.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
+                    storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNecessary()
                 }
             }
         }
@@ -188,7 +194,7 @@ class CaptureFarmingGear {
                     plotsUnlocked -= 1
                 }
             }
-            hidden.plotsUnlocked = plotsUnlocked
+            storage.plotsUnlocked = plotsUnlocked
         }
         if (event.inventoryName.contains("Anita")) {
             var level = -1
@@ -203,9 +209,9 @@ class CaptureFarmingGear {
                 }
             }
             if (level == -1) {
-                hidden.anitaUpgrade = 15
+                storage.anitaUpgrade = 15
             } else {
-                hidden.anitaUpgrade = level
+                storage.anitaUpgrade = level
             }
         }
     }
@@ -213,17 +219,17 @@ class CaptureFarmingGear {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val hidden = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
         }
         farmingLevelUpPattern.matchMatcher(msg) {
-            hidden.farmingLevel = group("level").romanToDecimalIfNeeded()
+            storage.farmingLevel = group("level").romanToDecimalIfNecessary()
         }
         anitaBuffPattern.matchMatcher(msg) {
-            hidden.anitaUpgrade = group("level").toInt() / 4
+            storage.anitaUpgrade = group("level").toInt() / 4
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
@@ -242,10 +248,13 @@ class CaptureFarmingGear {
             }
         }
         cakePattern.matchMatcher(msg) {
-            hidden.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
+            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
         }
         if (msg == "CARROTS EXPORTATION COMPLETE!") {
-            hidden.carrotFortune = true
+            storage.carrotFortune = true
+        }
+        if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
+            storage.pumpkinFortune = true
         }
     }
 }
