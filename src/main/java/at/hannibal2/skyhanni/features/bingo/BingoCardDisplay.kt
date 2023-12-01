@@ -126,9 +126,6 @@ class BingoCardDisplay {
         lastBingoCardOpenTime = SimpleTimeMark.now()
 
         update()
-        for (goal in personalGoals) {
-            println("goal.displayName: '${goal.displayName}' - ${goal.description}")
-        }
     }
 
     private fun getPersonalGoal(
