@@ -47,7 +47,10 @@ class BingoCardTips {
         toolTip.add(index++, "")
         toolTip.add(index++, "§eGuide:")
         for (line in bingoTip.note) {
-            toolTip.add(index++, line)
+            toolTip.add(index++, " $line")
+        }
+        bingoTip.found?.let {
+            toolTip.add(index++, "§7Found by: §e$it")
         }
     }
 
