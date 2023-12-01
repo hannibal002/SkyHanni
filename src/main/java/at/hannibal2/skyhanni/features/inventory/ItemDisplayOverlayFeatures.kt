@@ -227,7 +227,8 @@ object ItemDisplayOverlayFeatures {
         if (SECRET_BINGO_DISCOVERY.isSelected() && chestName == "Bingo Card" && item.getLore().last() == "§aGOAL REACHED") {
             for (line in item.getLore()) {
                 secretBingoDiscoveryPattern.matchMatcher(line) {
-                    return "${NumberUtil.format(group("nth").formatNumber())}"
+                    val nth = group("nth").formatNumber()
+                    if (nth < 10000) return "${NumberUtil.format(nth)}"
                 }
             }
         }
