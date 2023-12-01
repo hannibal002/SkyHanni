@@ -146,57 +146,64 @@ class BingoCardDisplay {
             newList.add("§cOpen the §e/bingo §ccard.")
         } else {
             if (!config.hideCommunityGoals.get()) {
-                newList.add("§6Community Goals:")
-                val goals = communityGoals.toMutableList()
-                var hiddenGoals = 0
-                for (goal in goals.toList()) {
-                    if (goal.description == "§7This goal will be revealed §7when it hits Tier IV.") {
-                        hiddenGoals++
-                        goals.remove(goal)
-                    }
-                }
-
-                goals.mapTo(newList) { "  " + it.description + if (it.done) " §aDONE" else "" }
-                if (hiddenGoals > 0) {
-                    newList.add("§7+ $hiddenGoals hidden community goals.")
-                }
-                newList.add(" ")
+                newList.addCommunityGoals()
             }
+            newList.addPersonalGoals()
+        }
+        return newList
+    }
 
-            val todo = personalGoals.filter { !it.done }.toMutableList()
-            val done = MAX_PERSONAL_GOALS - todo.size
-            newList.add("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
-
-            var hiddenGoals = 0
-            var nextTip = 7.days
-            for (goal in todo.toList()) {
-                personalHiddenGoalPattern.matchMatcher(goal.description) {
-                    hiddenGoals++
-                    todo.remove(goal)
-                    val time = TimeUtils.getDuration(group("time").removeColor())
-                    if (time < nextTip) {
-                        nextTip = time
-                    }
-                }
+    private fun MutableList<String>.addCommunityGoals() {
+        add("§6Community Goals:")
+        val goals = communityGoals.toMutableList()
+        var hiddenGoals = 0
+        for (goal in goals.toList()) {
+            if (goal.description == "§7This goal will be revealed §7when it hits Tier IV.") {
+                hiddenGoals++
+                goals.remove(goal)
             }
+        }
 
-            todo.mapTo(newList) { "  " + it.description }
-            if (hiddenGoals > 0) {
-                newList.add("§7+ $hiddenGoals hidden personal goals.")
-            }
-            hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 7.days
-            if (hasHiddenPersonalGoals) {
-                val nextTipTime = lastBingoCardOpenTime + nextTip
-                if (nextTipTime.isInPast()) {
-                    newList.add("§eThe next hint got unlocked already!")
-                    newList.add("§eOpen the bingo card to update!")
-                } else {
-                    val until = nextTipTime.timeUntil()
-                    newList.add("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}")
+        goals.mapTo(this) { "  " + it.description + if (it.done) " §aDONE" else "" }
+        if (hiddenGoals > 0) {
+            add("§7+ $hiddenGoals hidden community goals.")
+        }
+        add(" ")
+    }
+
+    private fun MutableList<String>.addPersonalGoals() {
+        val todo = personalGoals.filter { !it.done }.toMutableList()
+        val done = MAX_PERSONAL_GOALS - todo.size
+        add("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
+
+        var hiddenGoals = 0
+        var nextTip = 7.days
+        for (goal in todo.toList()) {
+            personalHiddenGoalPattern.matchMatcher(goal.description) {
+                hiddenGoals++
+                todo.remove(goal)
+                val time = TimeUtils.getDuration(group("time").removeColor())
+                if (time < nextTip) {
+                    nextTip = time
                 }
             }
         }
-        return newList
+
+        todo.mapTo(this) { "  " + it.description }
+        if (hiddenGoals > 0) {
+            add("§7+ $hiddenGoals hidden personal goals.")
+        }
+        hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 7.days
+        if (hasHiddenPersonalGoals) {
+            val nextTipTime = lastBingoCardOpenTime + nextTip
+            if (nextTipTime.isInPast()) {
+                add("§eThe next hint got unlocked already!")
+                add("§eOpen the bingo card to update!")
+            } else {
+                val until = nextTipTime.timeUntil()
+                add("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}")
+            }
+        }
     }
 
     private var lastSneak = false
