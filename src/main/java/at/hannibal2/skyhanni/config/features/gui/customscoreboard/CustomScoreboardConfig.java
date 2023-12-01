@@ -59,7 +59,9 @@ public class CustomScoreboardConfig {
         EVENTS("§7Wide Range of Events\n§7(too much for this here)"),
         MAYOR("§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"),
         PARTY("§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"),
-        FOOTER("§ewww.hypixel.net");
+        FOOTER("§ewww.hypixel.net"),
+        EXTRA("§7Extra lines the mod is not detecting")
+        ;
 
         private final String str;
 

@@ -31,6 +31,7 @@ var heat = "0"
 var mithrilPowder = "0"
 var gemstonePowder = "0"
 var partyCount = 0
+var extraLines = listOf<String>()
 
 enum class Elements(
     private val displayLine: Supplier<List<String>>,
@@ -303,8 +304,8 @@ enum class Elements(
     ),
     PARTY(
         {
-						// Resets Party count
-		        partyCount = 0
+			// Resets Party count
+            partyCount = 0
 
             val partyTitle: List<String> =
                 if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
@@ -349,7 +350,17 @@ enum class Elements(
             true
         },
         23
-    );
+    ),
+    EXTRA_LINES(
+        {
+            listOf("Undetected Lines (pls report):") + extraLines
+        },
+        {
+            extraLines.isNotEmpty()
+        },
+        24
+    ),
+    ;
 
     fun getLine(): List<String> {
         return displayLine.get()
