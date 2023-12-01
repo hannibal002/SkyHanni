@@ -21,12 +21,12 @@ public class PestFinderConfig {
 
     @Expose
     @ConfigOption(
-            name = "Waypoint In World",
-            desc = "Mark the plots with pests on them in the world."
+            name = "Show Plot in World",
+            desc = "Mark infected plot names and world border in the world."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean waypointInWorld = true;
+    public boolean showPlotInWorld = true;
 
     @Expose
     @ConfigOption(

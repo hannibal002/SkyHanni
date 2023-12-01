@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -47,11 +47,11 @@ class DungeonFinderFeatures {
             } else if (itemName == "Entrance") {
                 event.stackTip = "E"
             } else if (itemName.startsWith("Floor ")) {
-                event.stackTip = itemName.split(' ').last().romanToDecimalIfNeeded().toString()
+                event.stackTip = itemName.split(' ').last().romanToDecimalIfNecessary().toString()
             }
         } else if (itemName.startsWith("The Catacombs - ") || itemName.startsWith("MM Catacombs -")) {
             val floor = itemName.split(" - ").last().removeColor()
-            val floorNum = floor.split(' ').last().romanToDecimalIfNeeded().toString()
+            val floorNum = floor.split(' ').last().romanToDecimalIfNecessary().toString()
             val isMasterMode = itemName.contains("MM ")
 
             event.stackTip = if (floor.contains("Entrance")) {
@@ -64,7 +64,7 @@ class DungeonFinderFeatures {
         } else if (itemName.endsWith("'s Party")) {
             val floor = event.stack.getLore().find { it.startsWith("§7Floor: ") } ?: return
             val dungeon = event.stack.getLore().find { it.startsWith("§7Dungeon: ") } ?: return
-            val floorNum = floor.split(' ').last().romanToDecimalIfNeeded().toString()
+            val floorNum = floor.split(' ').last().romanToDecimalIfNecessary().toString()
             val isMasterMode = dungeon.contains("Master Mode")
 
             event.stackTip = if (floor.contains("Entrance")) {

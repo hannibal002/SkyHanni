@@ -24,7 +24,7 @@ object PestSpawnTimer {
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
 
         val display = if (lastSpawnTime.isFarPast()) {
-            "§cNo pest spawned yet."
+            "§cNo pest spawned since joining."
         } else {
             val timeSinceLastPest = lastSpawnTime.passedSince().format()
             "§eLast pest spawned §b$timeSinceLastPest ago"

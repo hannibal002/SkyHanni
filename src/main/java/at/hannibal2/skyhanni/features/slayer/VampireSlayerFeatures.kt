@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -36,7 +36,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -136,21 +135,18 @@ object VampireSlayerFeatures {
                         else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsSound
 
                     if (shouldSendTitle || shouldSendSound) {
-                        SkyHanniMod.coroutineScope.launch {
-                            delay(config.twinclawsDelay.milliseconds)
-                            withContext(MinecraftDispatcher) {
-                                if (nextClawSend < System.currentTimeMillis()) {
-                                    if (shouldSendSound)
-                                        playTwinclawsSound()
-                                    if (shouldSendTitle) {
-                                        LorenzUtils.sendTitle(
-                                            "§6§lTWINCLAWS",
-                                            (1750 - config.twinclawsDelay).milliseconds,
-                                            2.6
-                                        )
-                                    }
-                                    nextClawSend = System.currentTimeMillis() + 5_000
+                        DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
+                            if (nextClawSend < System.currentTimeMillis()) {
+                                if (shouldSendSound)
+                                    playTwinclawsSound()
+                                if (shouldSendTitle) {
+                                    LorenzUtils.sendTitle(
+                                        "§6§lTWINCLAWS",
+                                        (1750 - config.twinclawsDelay).milliseconds,
+                                        2.6
+                                    )
                                 }
+                                nextClawSend = System.currentTimeMillis() + 5_000
                             }
                         }
                     }

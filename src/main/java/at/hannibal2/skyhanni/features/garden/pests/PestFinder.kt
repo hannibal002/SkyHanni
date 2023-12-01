@@ -9,11 +9,13 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
+import at.hannibal2.skyhanni.features.garden.GardenPlotBorders.render
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -175,18 +177,24 @@ class PestFinder {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (!config.waypointInWorld) return
+        if (!config.showPlotInWorld) return
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         for (plot in getPlotsWithPests()) {
-            if (plot.isPlayerInside()) continue
+            if (plot.isPlayerInside()) {
+                event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                continue
+            }
+            event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
+
             val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
             val plotName = plot.name
             val middle = plot.middle
             val location = playerLocation.copy(x = middle.x, z = middle.z)
             event.drawWaypointFilled(location, LorenzColor.RED.toColor())
             event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
+
         }
     }
 
@@ -215,5 +223,5 @@ class PestFinder {
         plot.sendTeleportTo()
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.waypointInWorld)
+    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)
 }

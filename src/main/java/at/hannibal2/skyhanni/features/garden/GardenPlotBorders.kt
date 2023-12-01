@@ -2,19 +2,14 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI.drawPlotBorder
+import at.hannibal2.skyhanni.features.garden.GardenAPI.renderPlot
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
-import java.awt.Color
-import kotlin.math.floor
 import kotlin.time.Duration.Companion.milliseconds
 
-class GardenPlotBorders {
+object GardenPlotBorders {
 
     private val config get() = GardenAPI.config.plotBorders
     private var timeLastSaved = SimpleTimeMark.farPast()
@@ -39,9 +34,10 @@ class GardenPlotBorders {
     fun render(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
-
-        event.drawPlotBorder()
+        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }
+
 
     fun isEnabled() = GardenAPI.inGarden() && config
 }
