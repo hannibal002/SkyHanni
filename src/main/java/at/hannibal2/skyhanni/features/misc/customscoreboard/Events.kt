@@ -37,8 +37,8 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Elapsed: ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Time Elapsed: ") } ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§rCleared: ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§rCleared: ") }.toString()
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§rCleared: ") || it.startsWith("Cleared: ") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§rCleared: ") || it.startsWith("Cleared:") }.toString()
                     .replace("§r", "").replace("%", "%§") // for some reason this is broken
             }
 
@@ -50,11 +50,14 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                     list += "§3§lSolo"
                 } else {
                     for (i in 1..dungeonPlayers) {
-                        list += ScoreboardData.sidebarLinesFormatted.nextAfter(
+                        list += ScoreboardData.sidebarLinesFormatted.nextAfter( // Bettermap Style
                             "§r" + (list.firstOrNull{ it.startsWith("Cleared: ") }?.replace("%§", "%") ?: "§cNo Dungeon Data"),
                             i
                         )
-                            ?: "§cNo Player found"
+                            ?: ScoreboardData.sidebarLinesFormatted.nextAfter( // Hypixel Style
+                                list.firstOrNull{ it.startsWith("Cleared: ") }?.replace("%§", "%") ?: "§cNo Dungeon Data",
+                                i
+                            ) ?: "§cTeammate not found"
                     }
                 }
             }
