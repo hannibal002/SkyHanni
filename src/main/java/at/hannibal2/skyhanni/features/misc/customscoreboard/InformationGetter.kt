@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InformationGetter {
     fun getInformation(){
@@ -35,5 +38,11 @@ class InformationGetter {
                 line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onProfileSwitch(event: ProfileJoinEvent) {
+        // Reset Bits - We need this bc if another profile has 0 bits, it won't show the bits line
+        bits = "0"
     }
 }
