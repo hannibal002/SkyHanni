@@ -303,6 +303,9 @@ enum class Elements(
     ),
     PARTY(
         {
+						// Resets Party count
+		        partyCount = 0
+
             val partyTitle: List<String> =
                 if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
                     listOf("<hidden>")
