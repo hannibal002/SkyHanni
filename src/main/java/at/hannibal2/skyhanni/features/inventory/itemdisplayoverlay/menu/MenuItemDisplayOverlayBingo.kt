@@ -35,6 +35,18 @@ class MenuItemDisplayOverlayBingo {
         val itemName = item.cleanName()
 
         if (lore.isNotEmpty() && itemName.isNotEmpty() && (chestName == "Bingo Card")) { // only for items in bingo card menu and have item lore at all
+            if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_HINT_COUNTDOWN)) {
+                communityPersonalGoalLoreLinePattern.matchMatcher(lore.first()) {
+                    if ((group("goalType") == "Personal") && (lore.last() == "§cgoal!")) {
+                        for (line in lore) {
+                            secretBingoHintCountdownLoreLinePattern.matchMatcher(line) {
+                                return TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
+                            }
+                        }
+                    }
+                }
+            }
+
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_DISCOVERY) && (lore.last() == "§aGOAL REACHED")) {
                 for (line in lore) {
                     secretBingoDiscoveryLoreLinePattern.matchMatcher(line) {
@@ -60,18 +72,6 @@ class MenuItemDisplayOverlayBingo {
                     if (group("goalType") == "Community") {
                         topBlankPercentContribLoreLinePattern.matchMatcher(lore.last()) {
                             return group("toUse")
-                        }
-                    }
-                }
-            }
-
-            if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_HINT_COUNTDOWN)) {
-                communityPersonalGoalLoreLinePattern.matchMatcher(lore.first()) {
-                    if (group("goalType") == "Personal") {
-                        for (line in lore) {
-                            secretBingoHintCountdownLoreLinePattern.matchMatcher(line) {
-                                return TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
-                            }
                         }
                     }
                 }
