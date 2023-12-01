@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -41,9 +42,9 @@ public class RewardWarningConfig {
     public boolean preventRefusing = true;
 
     @Expose
-    @ConfigOption(name = "Bypass Key", desc = "Hold that key to bypass the Prevent Refusing feature.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int bypassKey = Keyboard.KEY_NONE;
+    @ConfigOption(name = "Bypass Key", desc = "Hold this key to bypass the Prevent Refusing feature.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LCONTROL)
+    public int bypassKey = Keyboard.KEY_LCONTROL;
 
 
     /**
@@ -109,4 +110,22 @@ public class RewardWarningConfig {
             return str;
         }
     }
+
+
+    @Expose
+    @ConfigOption(name = "Coins Per Copper", desc = "The price to use for the below options.\nRequires one of the below options to be on.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 50_000, minStep = 250)
+    public int coinsPerCopperPrice = 1;
+
+    @Expose
+    @ConfigOption(name = "Prevent Refusing", desc = "Prevent refusing a visitor with a coins per copper lower than the set value.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventRefusingCopper = false;
+
+    @Expose
+    @ConfigOption(name = "Prevent Accepting", desc = "Prevent accepting a visitor with a coins per copper higher than the set value.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventAcceptingCopper = false;
 }

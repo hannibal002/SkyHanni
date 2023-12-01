@@ -187,19 +187,19 @@ class VisitorListener {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
+        val isRefuseSlot = event.itemStack.toString() == "1xtile.clayHardenedStained@14"
+        val isAcceptSlot = event.itemStack.toString() == "1xtile.clayHardenedStained@13"
         VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
 
         if (config.rewardWarning.bypassKey.isKeyHeld()) return
         if (((!(visitor.hasReward() != null && config.rewardWarning.preventRefusing) &&
-            !(visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper)) ||
-            event.itemStack.toString() != "1xtile.clayHardenedStained@14") &&
-            (!(visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper) ||
-            event.itemStack.toString() != "1xtile.clayHardenedStained@13")) return
+            !(visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper)) || !isRefuseSlot) &&
+            (!(visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper) || !isAcceptSlot)) return
 
         val blockReason = when {
-            visitor.hasReward() != null && config.rewardWarning.preventRefusing -> "§aRare visitor reward found"
-            visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper -> "§cCheap copper"
-            visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper -> "§cExpensive copper"
+            visitor.hasReward() != null && config.rewardWarning.preventRefusing && isRefuseSlot -> "§aRare visitor reward found"
+            visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && isRefuseSlot -> "§cCheap copper"
+            visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && isAcceptSlot -> "§cExpensive copper"
             else -> "Error"
         }
 
