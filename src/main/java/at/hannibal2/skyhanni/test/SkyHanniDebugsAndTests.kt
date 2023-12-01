@@ -344,13 +344,13 @@ class SkyHanniDebugsAndTests {
         fun copyItemInternalName() {
             val hand = InventoryUtils.getItemInHand()
             if (hand == null) {
-                LorenzUtils.chat("§cNo item in hand!")
+                LorenzUtils.userError("No item in hand!")
                 return
             }
 
             val internalName = hand.getInternalNameOrNull()
             if (internalName == null) {
-                LorenzUtils.chat("§cInternal name is null for item ${hand.name}")
+                LorenzUtils.error("§cInternal name is null for item ${hand.name}")
                 return
             }
 
