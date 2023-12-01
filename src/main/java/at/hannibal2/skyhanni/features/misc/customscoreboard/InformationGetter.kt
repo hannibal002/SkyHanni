@@ -7,9 +7,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 
 class InformationGetter {
     fun getInformation(){
-        // Resets Party count
-        partyCount = 0
-
         // Gets some values from the tablist
         for (line in TabListData.getTabList()) {
             when {
