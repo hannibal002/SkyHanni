@@ -238,7 +238,7 @@ object InquisitorWaypointShare {
             val inquis = SharedInquisitor(cleanName, location, SimpleTimeMark.now())
             waypoints = waypoints.editCopy { this[cleanName] = inquis }
             if (config.focusInquisitor) {
-                GriffinBurrowHelper.setTargetLocation(location.add(0, 1, 0))
+                GriffinBurrowHelper.setTargetLocation(location.add(y = 1))
                 GriffinBurrowHelper.animationLocation = LocationUtils.playerLocation()
             }
 

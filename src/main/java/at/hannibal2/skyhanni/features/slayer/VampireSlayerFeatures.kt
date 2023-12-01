@@ -291,7 +291,7 @@ object VampireSlayerFeatures {
                     if (distance <= 15) {
                         event.draw3DLine(
                             event.exactPlayerEyeLocation(),
-                            vec.add(0.0, 1.54, 0.0),
+                            vec.add(y = 1.54),
                             config.lineColor.toChromaColor(),
                             config.lineWidth,
                             true
@@ -319,7 +319,7 @@ object VampireSlayerFeatures {
                             (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
                         event.drawColor(
-                            stand.position.toLorenzVec().add(0.0, 2.0, 0.0),
+                            stand.position.toLorenzVec().add(y = 2.0),
                             LorenzColor.DARK_RED,
                             alpha = 1f
                         )
@@ -332,8 +332,8 @@ object VampireSlayerFeatures {
                         for ((player, stand2) in standList) {
                             if ((configBloodIcor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
                                 event.draw3DLine(
-                                    event.exactLocation(player).add(0.0, 1.5, 0.0),
-                                    event.exactLocation(stand2).add(0.0, 1.5, 0.0),
+                                    event.exactLocation(player).add(y = 1.5),
+                                    event.exactLocation(stand2).add(y = 1.5),
                                     // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
                                     linesColorStart,
                                     3,
@@ -343,7 +343,7 @@ object VampireSlayerFeatures {
                     }
                     if (configBloodIcor.renderBeam && isIchor && stand.isEntityAlive) {
                         event.drawWaypointFilled(
-                            event.exactLocation(stand).add(0, -2, 0),
+                            event.exactLocation(stand).add(0, y = -2, 0),
                             configBloodIcor.color.toChromaColor(),
                             beacon = true
                         )

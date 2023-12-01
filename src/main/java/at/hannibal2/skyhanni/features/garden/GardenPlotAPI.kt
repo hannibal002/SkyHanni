@@ -134,7 +134,7 @@ object GardenPlotAPI {
             // Front lines
             tryDraw3DLine(start, end, lineColor, 1, true)
             // Back lines
-            tryDraw3DLine(start.addZ(plotSize), end.addZ(plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 1, true)
         }
 
         // Render vertical on Z-Axis
@@ -144,20 +144,20 @@ object GardenPlotAPI {
             // Left lines
             tryDraw3DLine(start, end, lineColor, 1, true)
             // Right lines
-            tryDraw3DLine(start.addX(plotSize), end.addX(plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 1, true)
         }
 
         // Render horizontal
         for (y in minHeight..maxHeight step 4) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             // (minX, minZ) -> (minX, minZ + 96)
-            tryDraw3DLine(start, start.addZ(plotSize), lineColor, 1, true)
+            tryDraw3DLine(start, start.add(z = plotSize), lineColor, 1, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
-            tryDraw3DLine(start.addZ(plotSize), start.addXZ(plotSize, plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), start.add(x = plotSize, z = plotSize), lineColor, 1, true)
             // (minX + 96, minZ + 96) -> (minX + 96, minZ)
-            tryDraw3DLine(start.addXZ(plotSize, plotSize), start.addX(plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize, z = plotSize), start.add(x = plotSize), lineColor, 1, true)
             // (minX + 96, minZ) -> (minX, minZ)
-            tryDraw3DLine(start.addX(plotSize), start, lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), start, lineColor, 1, true)
         }
     }
 
@@ -182,7 +182,4 @@ object GardenPlotAPI {
         else -> false
     }
 
-    private fun LorenzVec.addX(x: Int) = add(x, 0, 0)
-    private fun LorenzVec.addZ(z: Int) = add(0, 0, z)
-    private fun LorenzVec.addXZ(x: Int, z: Int) = add(x, 0, z)
 }
