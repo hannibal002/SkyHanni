@@ -19,4 +19,8 @@ object BingoAPI {
 
     fun getIcon(searchRank: Int) = ranks.entries.find { it.value == searchRank }?.key
 
+    // We added the suffix (Community Goal) so that older skyhanni versions don't crash with the new repo data.
+    fun getCommunityTip(itemName: String) =
+        tips.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
+
 }

@@ -27,8 +27,7 @@ class BingoCardTips {
         val toolTip = event.toolTip
         val communityGoal = toolTip.getOrNull(1) == "§5§o§8Community Goal"
         val bingoTip: BingoTip = if (communityGoal) {
-        // We added the suffix (Community Goal) so that older skyhanni versions don't crash with the new repo data.
-            BingoAPI.tips.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull() ?: return
+            BingoAPI.getCommunityTip(itemName) ?: return
         } else {
             BingoAPI.tips[itemName] ?: return
         }
