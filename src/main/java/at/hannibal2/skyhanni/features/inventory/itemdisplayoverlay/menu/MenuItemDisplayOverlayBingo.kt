@@ -51,7 +51,7 @@ class MenuItemDisplayOverlayBingo {
                 for (line in lore) {
                     secretBingoDiscoveryLoreLinePattern.matchMatcher(line) {
                         val nth = group("nth").formatNumber()
-                        if (nth < 10000) return "${NumberUtil.format(nth)}"
+                        if (nth < 10000) return NumberUtil.format(nth)
                     }
                 }
             }
