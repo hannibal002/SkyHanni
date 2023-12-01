@@ -291,6 +291,9 @@ class ChatFilter {
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
         "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence".toPattern(),
     )
+    private val fireSalePatterns = listOf(
+        "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
+    )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
         "§aYou received §r§f1 §r§aWishing Compass§r§a.",
@@ -299,6 +302,9 @@ class ChatFilter {
         "§aYou received §r§f1 §r§aOil Barrel§r§a.",
         // Useful, maybe in another chat
         "§6You have successfully picked the lock on this chest!",
+    )
+    private val fireSaleMessages = listOf(
+        "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -315,6 +321,7 @@ class ChatFilter {
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
         "powder_mining" to powderMiningPatterns,
+        "fire_sale" to fireSalePatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -331,6 +338,7 @@ class ChatFilter {
         "useless_warning" to uselessWarningMessages,
         "annoying_spam" to annoyingSpamMessages,
         "powder_mining" to powderMiningMessages,
+        "fire_sale" to fireSaleMessages,
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
@@ -367,6 +375,8 @@ class ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
+        config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
+
         else -> ""
     }
 
