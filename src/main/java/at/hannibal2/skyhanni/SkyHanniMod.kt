@@ -346,7 +346,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.5",
+    version = "0.22.Beta.6",
 )
 class SkyHanniMod {
     @Mod.EventHandler

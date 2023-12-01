@@ -23,6 +23,7 @@
   + Option to only show the time while holding vacuum in the hand.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe
 
 #### Fishing Features
 
@@ -48,6 +49,12 @@
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
 
+#### Bingo Features
+
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Added support for tips in hidden bingo card display. - hannibal2
++ Added support for 'found by' info in bingo card. - hannibal2
+
 #### Inventory Features
 
 + Added bottle of Jyrre time overlay in stack size feature. - HiZe
@@ -56,6 +63,10 @@
 #### Minion Features
 
 + Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
+
+#### Chat Features
+
++ Hide the repeating fire sale reminder chat messages. - hannibal2
 
 ### Changes
 
