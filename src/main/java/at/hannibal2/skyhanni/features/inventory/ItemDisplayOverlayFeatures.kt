@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SECRET_BINGO_DISCOVERY
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -50,6 +51,7 @@ object ItemDisplayOverlayFeatures {
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
     private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
     private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
+    private val secretBingoDiscoveryPattern = "(§.)*You were the (§.)*(?<nth>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -60,6 +62,7 @@ object ItemDisplayOverlayFeatures {
 
     private fun getStackTip(item: ItemStack): String {
         val itemName = item.cleanName()
+        val chestName = InventoryUtils.openInventoryName()
 
         if (MASTER_STAR_TIER.isSelected()) {
             when (itemName) {
@@ -216,6 +219,14 @@ object ItemDisplayOverlayFeatures {
             item.getEdition()?.let { edition ->
                 if (edition < 1_000) {
                     return "§6$edition"
+                }
+            }
+        }
+
+        if (SECRET_BINGO_DISCOVERY.isSelected() && chestName == "Bingo Card" && item.getLore().last() == "§aGOAL REACHED") {
+            for (line in item.getLore()) {
+                secretBingoDiscoveryPattern.matchMatcher(line) {
+                    return "${group("nth").formatNumber()}"
                 }
             }
         }
