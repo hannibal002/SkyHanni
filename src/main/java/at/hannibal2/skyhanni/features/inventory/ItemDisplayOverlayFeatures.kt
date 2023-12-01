@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -226,7 +227,7 @@ object ItemDisplayOverlayFeatures {
         if (SECRET_BINGO_DISCOVERY.isSelected() && chestName == "Bingo Card" && item.getLore().last() == "§aGOAL REACHED") {
             for (line in item.getLore()) {
                 secretBingoDiscoveryPattern.matchMatcher(line) {
-                    return "${group("nth").formatNumber()}"
+                    return "${NumberUtil.format(group("nth").formatNumber())}"
                 }
             }
         }
