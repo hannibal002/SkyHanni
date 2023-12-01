@@ -18,5 +18,11 @@ public class SprayConfig {
     public boolean pestWhenSelector = true;
 
     @Expose
+    @ConfigOption(name = "Draw Plot Border", desc = "Draw plots border when holding the Sprayanator in hands.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean drawPlotsBorderWhenInHands = true;
+
+    @Expose
     public Position position = new Position(315, -200, 2.3f);
 }

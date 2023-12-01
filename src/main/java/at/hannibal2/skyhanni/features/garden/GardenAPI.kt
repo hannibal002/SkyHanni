@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -26,11 +27,13 @@ import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import kotlinx.coroutines.delay
@@ -41,6 +44,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
@@ -73,6 +78,7 @@ object GardenAPI {
         "ROOKIE_HOE",
         "BINGHOE"
     )
+    private val LINE_COLOR = LorenzColor.YELLOW.toColor()
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
@@ -235,6 +241,87 @@ object GardenAPI {
         }
         return tier
     }
+
+    fun LorenzRenderWorldEvent.drawPlotBorder(){
+        val entity = Minecraft.getMinecraft().renderViewEntity
+        // Lowest point in the garden
+        val minHeight = 66
+        val maxHeight = 256
+
+        // These don't refer to Minecraft chunks but rather garden plots, but I use
+        // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
+        val chunkX = floor((entity.posX + 48) / 96).toInt()
+        val chunkZ = floor((entity.posZ + 48) / 96).toInt()
+        val chunkMinX = (chunkX * 96) - 48
+        val chunkMinZ = (chunkZ * 96) - 48
+
+        // Render 4 vertical corners
+        for (i in 0..96 step 96) {
+            for (j in 0..96 step 96) {
+                val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
+                val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
+                tryDraw3DLine(start, end, LorenzColor.DARK_BLUE.toColor(), 2, true)
+            }
+        }
+
+        // Render vertical on X-Axis
+        for (x in 4..<96 step 4) {
+            val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
+            val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
+            // Front lines
+            tryDraw3DLine(start, end, LINE_COLOR, 1, true)
+            // Back lines
+            tryDraw3DLine(start.addZ(96), end.addZ(96), LINE_COLOR, 1, true)
+        }
+
+        // Render vertical on Z-Axis
+        for (z in 4..<96 step 4) {
+            val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
+            val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
+            // Left lines
+            tryDraw3DLine(start, end, LINE_COLOR, 1, true)
+            // Right lines
+            tryDraw3DLine(start.addX(96), end.addX(96), LINE_COLOR, 1, true)
+        }
+
+        // Render horizontal
+        for (y in minHeight..maxHeight step 4) {
+            val start = LorenzVec(chunkMinX, y, chunkMinZ)
+            // (minX, minZ) -> (minX, minZ + 96)
+            tryDraw3DLine(start, start.addZ(96), LINE_COLOR, 1, true)
+            // (minX, minZ + 96) -> (minX + 96, minZ + 96)
+            tryDraw3DLine(start.addZ(96), start.addXZ(96, 96), LINE_COLOR, 1, true)
+            // (minX + 96, minZ + 96) -> (minX + 96, minZ)
+            tryDraw3DLine(start.addXZ(96, 96), start.addX(96), LINE_COLOR, 1, true)
+            // (minX + 96, minZ) -> (minX, minZ)
+            tryDraw3DLine(start.addX(96), start, LINE_COLOR, 1, true)
+        }
+    }
+
+    private fun LorenzRenderWorldEvent.tryDraw3DLine(
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean
+    ) {
+        if (isOutOfBorders(p1)) return
+        if (isOutOfBorders(p2)) return
+        draw3DLine(p1, p2, color, lineWidth, depth)
+    }
+
+    private fun isOutOfBorders(location: LorenzVec) = when {
+        location.x > 240 -> true
+        location.x < -240 -> true
+        location.z > 240 -> true
+        location.z < -240 -> true
+
+        else -> false
+    }
+
+    private fun LorenzVec.addX(x: Int) = add(x, 0, 0)
+    private fun LorenzVec.addZ(z: Int) = add(0, 0, z)
+    private fun LorenzVec.addXZ(x: Int, z: Int) = add(x, 0, z)
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

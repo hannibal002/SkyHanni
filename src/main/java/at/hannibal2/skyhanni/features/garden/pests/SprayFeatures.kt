@@ -2,8 +2,12 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI.drawPlotBorder
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -55,6 +59,13 @@ class SprayFeatures {
         }
 
         config.position.renderString(display, posLabel = "Pest Spray Selector")
+    }
+
+    @SubscribeEvent
+    fun onWorldRender(event: LorenzRenderWorldEvent){
+        if (!config.drawPlotsBorderWhenInHands) return
+        if (InventoryUtils.getItemInHand()?.getInternalName()?.asString() != "SPRAYONATOR") return
+        event.drawPlotBorder()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.pestWhenSelector
