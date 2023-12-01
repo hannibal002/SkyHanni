@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -29,4 +30,13 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;
+
+    @Expose
+    @ConfigOption(name = "Sky Mall Display", desc = "Shows an overlay with the current skymall perk.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skymallDisplay = false;
+
+    @Expose
+    public Position skymallDisplayPosition = new Position(400, 200, 1.3f);
 }

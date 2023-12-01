@@ -203,6 +203,7 @@ import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mainlobby.halloweenwaypoints.BasketWaypoints
+import at.hannibal2.skyhanni.features.mining.SkymallDisplay
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
@@ -662,6 +663,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(SprayFeatures())
+        loadModule(SkymallDisplay())
 
         init()
 
