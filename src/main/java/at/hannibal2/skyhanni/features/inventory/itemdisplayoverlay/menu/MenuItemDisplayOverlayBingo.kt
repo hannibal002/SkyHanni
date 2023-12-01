@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayBingo {
 
-    private val secretBingoDiscoveryLoreLinePattern = (("(§.)*You were the (§.)*(?<nth>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to").toPattern())
+    private val secretBingoDiscoveryLoreLinePattern = (("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to").toPattern())
     private val secretBingoHintCountdownLoreLinePattern = (("(§.)+(The next hint will unlock in )?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)").toPattern())
     private val rowColumnDiagonalItemNamePattern = (("§e((Community )?Diagonal|Row #.|Column #.)").toPattern())
     private val topBlankPercentContribLoreLinePattern = (("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%").toPattern())
@@ -37,7 +37,7 @@ class MenuItemDisplayOverlayBingo {
         if (lore.isNotEmpty() && itemName.isNotEmpty() && (chestName == "Bingo Card")) { // only for items in bingo card menu and have item lore at all
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_HINT_COUNTDOWN)) {
                 communityPersonalGoalLoreLinePattern.matchMatcher(lore.first()) {
-                    if ((group("goalType") == "Personal") && (lore.last() == "§cgoal!")) {
+                    if ((group("goalType") == "Personal") && (lore.lastOrNull() == "§cgoal!")) {
                         for (line in lore) {
                             secretBingoHintCountdownLoreLinePattern.matchMatcher(line) {
                                 return TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
@@ -47,21 +47,21 @@ class MenuItemDisplayOverlayBingo {
                 }
             }
 
-            if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_DISCOVERY) && (lore.last() == "§aGOAL REACHED")) {
+            if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_DISCOVERY) && (lore.lastOrNull() == "§aGOAL REACHED")) {
                 for (line in lore) {
                     secretBingoDiscoveryLoreLinePattern.matchMatcher(line) {
-                        val nth = group("nth").formatNumber()
-                        if (nth < 10000) return NumberUtil.format(nth)
+                        val nth = group("rank").formatNumber()
+                        if (nth < 10000) return "§6${NumberUtil.format(nth)}"
                     }
                 }
             }
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.ROW_COLUMN_DIAGONAL_PROGRESS)) {
                 rowColumnDiagonalItemNamePattern.matchMatcher(itemName) {
-                    if (lore.last() == "§aBINGO!") {
+                    if (lore.lastOrNull() == "§aBINGO!") {
                         return "§a§z✔"
                     }
-                    else if (lore.last() == "§cINCOMPLETE") {
+                    else if (lore.lastOrNull() == "§cINCOMPLETE") {
                         return "§c§l✖"
                     }
                 }
