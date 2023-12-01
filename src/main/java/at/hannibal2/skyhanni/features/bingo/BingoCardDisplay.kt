@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
 import at.hannibal2.skyhanni.features.bingo.card.PersonalGoal
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,11 +16,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.days
 
 class BingoCardDisplay {
 
@@ -28,6 +33,9 @@ class BingoCardDisplay {
     // TODO USE SH-REPO
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
+    private var lastBingoCardOpenTime = SimpleTimeMark.farPast()
+    private var hasHiddenPersonalGoals = false
+
     init {
         update()
     }
@@ -35,6 +43,9 @@ class BingoCardDisplay {
     companion object {
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
+
+        val personalHiddenGoalPattern = ("§7This goal is currently §7§chidden§7! " +
+            "It will be revealed §7to you when you complete it. §7 §7§eThe next hint will unlock in (?<time>.*)").toPattern()
 
         private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
         private var displayMode = 0
@@ -109,8 +120,18 @@ class BingoCardDisplay {
                 communityGoals.add(CommunityGoal(name, description, done))
             }
         }
+        lastBingoCardOpenTime = SimpleTimeMark.now()
 
         update()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (event.repeatSeconds(1)) {
+            if (hasHiddenPersonalGoals) {
+                update()
+            }
+        }
     }
 
     private fun update() {
@@ -126,14 +147,54 @@ class BingoCardDisplay {
         } else {
             if (!config.hideCommunityGoals.get()) {
                 newList.add("§6Community Goals:")
-                communityGoals.mapTo(newList) { "  " + it.description + if (it.done) " §aDONE" else "" }
+                val goals = communityGoals.toMutableList()
+                var hiddenGoals = 0
+                for (goal in goals.toList()) {
+                    if (goal.description == "§7This goal will be revealed §7when it hits Tier IV.") {
+                        hiddenGoals++
+                        goals.remove(goal)
+                    }
+                }
+
+                goals.mapTo(newList) { "  " + it.description + if (it.done) " §aDONE" else "" }
+                if (hiddenGoals > 0) {
+                    newList.add("§7+ $hiddenGoals hidden community goals.")
+                }
                 newList.add(" ")
             }
 
-            val todo = personalGoals.filter { !it.done }
+            val todo = personalGoals.filter { !it.done }.toMutableList()
             val done = MAX_PERSONAL_GOALS - todo.size
             newList.add("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
+
+            var hiddenGoals = 0
+            var nextTip = 7.days
+            for (goal in todo.toList()) {
+                personalHiddenGoalPattern.matchMatcher(goal.description) {
+                    hiddenGoals++
+                    todo.remove(goal)
+                    val time = TimeUtils.getDuration(group("time").removeColor())
+                    if (time < nextTip) {
+                        nextTip = time
+                    }
+                }
+            }
+
             todo.mapTo(newList) { "  " + it.description }
+            if (hiddenGoals > 0) {
+                newList.add("§7+ $hiddenGoals hidden personal goals.")
+            }
+            hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 7.days
+            if (hasHiddenPersonalGoals) {
+                val nextTipTime = lastBingoCardOpenTime + nextTip
+                if (nextTipTime.isInPast()) {
+                    newList.add("§eThe next hint got unlocked already!")
+                    newList.add("§eOpen the bingo card to update!")
+                } else {
+                    val until = nextTipTime.timeUntil()
+                    newList.add("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}")
+                }
+            }
         }
         return newList
     }
@@ -184,6 +245,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideCommunityGoals.onToggle { update() }
+        config.nextTipDuration.onToggle { update() }
     }
 
     @SubscribeEvent
