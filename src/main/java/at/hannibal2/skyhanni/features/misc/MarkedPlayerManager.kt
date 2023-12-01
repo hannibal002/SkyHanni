@@ -18,8 +18,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MarkedPlayerManager {
     private val config get() = SkyHanniMod.feature.markedPlayers
 
-    private val config get() = SkyHanniMod.feature.markedPlayers
-
     companion object {
         val playerNamesToMark = mutableListOf<String>()
         private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
@@ -108,8 +106,7 @@ class MarkedPlayerManager {
         }
     }
 
-    private fun isEnabled() = config.highlightInWorld &&
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
+    private fun isEnabled() = config.highlightInWorld && (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -123,6 +120,4 @@ class MarkedPlayerManager {
             }
         }
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.highlightInWorld
 }

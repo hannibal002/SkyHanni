@@ -50,7 +50,7 @@ public class YawPitchDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the Garden.")
     @ConfigEditorBoolean
-    public boolean showEverywhere = false;
+    public boolean showOutsideGarden = false;
 
     @Expose
     @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")

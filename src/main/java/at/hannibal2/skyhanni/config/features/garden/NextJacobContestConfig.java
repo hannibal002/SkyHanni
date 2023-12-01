@@ -18,7 +18,7 @@ public class NextJacobContestConfig {
     @Expose
     @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in the Garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
-    public boolean everywhere = false;
+    public boolean showOutsideGarden = false;
 
     @Expose
     @ConfigOption(name = "In Other Guis", desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.")

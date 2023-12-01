@@ -51,4 +51,9 @@ public class EliteFarmingWeightConfig {
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
     @ConfigEditorBoolean
     public boolean ignoreLow = false;
+
+    @Expose
+    @ConfigOption(name = "Show Outside Garden", desc = "Show the farming weight outside of the garden.")
+    @ConfigEditorBoolean
+    public boolean showOutsideGarden = false;
 }
