@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI.renderPlot
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
