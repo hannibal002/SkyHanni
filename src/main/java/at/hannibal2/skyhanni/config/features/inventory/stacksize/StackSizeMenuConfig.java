@@ -294,6 +294,7 @@ public class StackSizeMenuConfig {
 
     public enum Bingo {
         SECRET_BINGO_DISCOVERY("§bSecret Bingo Goal Discovery (#, caps at 10k)"),
+        ROW_COLUMN_DIAGONAL_PROGRESS("§bRow/Diagonal/Column Progress"),
         ;
 
         final String str;
