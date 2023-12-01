@@ -301,6 +301,15 @@ class ChatFilter {
         "§6You have successfully picked the lock on this chest!"
     )
 
+    private val skymallPatterns = listOf(
+        "§r§eNew buff§r§r§r: (.*).§r".toPattern(),
+    )
+
+    private val skymallMessages = listOf(
+        "§r§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!§r",
+        "§r§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!§r",
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -314,7 +323,8 @@ class ChatFilter {
         "winter_island" to winterIslandPatterns,
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
-        "powder_mining" to powderMiningPatterns
+        "powder_mining" to powderMiningPatterns,
+        "skymall" to skymallPatterns
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -330,7 +340,8 @@ class ChatFilter {
         "money" to auctionHouseMessages,
         "useless_warning" to uselessWarningMessages,
         "annoying_spam" to annoyingSpamMessages,
-        "powder_mining" to powderMiningMessages
+        "powder_mining" to powderMiningMessages,
+        "skymall" to skymallMessages
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
@@ -367,6 +378,7 @@ class ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
+        config.skymall && message.isPresent("skymall") -> "skymall"
         else -> ""
     }
 

@@ -57,6 +57,12 @@ public class FilterTypesConfig {
     public boolean powderMining = true;
 
     @Expose
+    @ConfigOption(name = "Sky Mall", desc = "Hide daily Sky Mall messages for when the perk updates.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skymall = true;
+
+    @Expose
     @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current Kill Combo from the Grandma Wolf Pet.")
     @ConfigEditorBoolean
     @FeatureToggle
