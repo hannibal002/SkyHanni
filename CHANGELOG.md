@@ -69,7 +69,7 @@
 + Added the "plot" word to the sidebar again (only if there are no pests in garden). - hannibal2
 + Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
 + Made the wording of "no pest spawned yet" message more clear. - hannibal2
-+ Not only show the waypoint for infected plots, also show their waypoints in the world. - hannibal2
++ Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
 
 #### Fishing Changes
 
@@ -98,7 +98,7 @@
 
 + Fixed Item Tracker not ignoring manual sack movements. - hannibal2
 + Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
-+ Fixed NPC messages getting detected as player messages. - walker
++ Fixed NPC messages getting detected as player messages. - CalMWolfs
 
 #### Config Fixes
 
