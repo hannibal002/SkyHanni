@@ -45,8 +45,7 @@ class BingoCardDisplay {
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
 
-        val personalHiddenGoalPattern = ("§7This goal is currently §7§chidden§7! " +
-            "It will be revealed §7to you when you complete it. §7 §7§eThe next hint will unlock in (?<time>.*)").toPattern()
+        val personalHiddenGoalPattern = ".*§7§eThe next hint will unlock in (?<time>.*)".toPattern()
 
         private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
         private var displayMode = 0
