@@ -149,11 +149,9 @@ class BingoCardDisplay {
         description: String,
         done: Boolean
     ): CommunityGoal {
-        if (!done) {
-            if (description == "§7This goal will be revealed §7when it hits Tier IV.") {
-                BingoAPI.tips[name]?.let {
-                    return CommunityGoal(name, it.getDescriptionLine(), false)
-                }
+        if (description == "§7This goal will be revealed §7when it hits Tier IV.") {
+            BingoAPI.getCommunityTip(name)?.let {
+                return CommunityGoal(name, it.getDescriptionLine(), done)
             }
         }
         return CommunityGoal(name, description, done)
