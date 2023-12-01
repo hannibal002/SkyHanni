@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SECRET_BINGO_DISCOVERY
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -52,7 +52,7 @@ object ItemDisplayOverlayFeatures {
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
     private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
     private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
-    private val secretBingoDiscoveryPattern = "(§.)*You were the (§.)*(?<nth>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
+    private val bingoGoalRankPattern = "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -224,11 +224,11 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SECRET_BINGO_DISCOVERY.isSelected() && chestName == "Bingo Card" && item.getLore().last() == "§aGOAL REACHED") {
+        if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && item.getLore().lastOrNull() == "§aGOAL REACHED") {
             for (line in item.getLore()) {
-                secretBingoDiscoveryPattern.matchMatcher(line) {
-                    val nth = group("nth").formatNumber()
-                    if (nth < 10000) return "${NumberUtil.format(nth)}"
+                bingoGoalRankPattern.matchMatcher(line) {
+                    val rank = group("rank").formatNumber()
+                    if (rank < 10000) return "§6${NumberUtil.format(rank)}"
                 }
             }
         }
