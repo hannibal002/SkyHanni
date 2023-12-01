@@ -192,13 +192,13 @@ class ChatFilter {
 
     // Party
     private val partyMessages = listOf(
-        "§9§m-----------------------------------------------------"
+        "§9§m-----------------------------------------------------",
     )
 
     // MONEY
     // Auction House
     private val auctionHouseMessages = listOf(
-        "§b-----------------------------------------------------", "§eVisit the Auction House to collect your item!"
+        "§b-----------------------------------------------------", "§eVisit the Auction House to collect your item!",
     )
 
     // Bazaar
@@ -206,12 +206,12 @@ class ChatFilter {
         "§eBuy Order Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.".toPattern(),
         "§eSell Offer Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.".toPattern(),
         "§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling buy order!".toPattern(),
-        "§cCancelled! §r§7Refunded §r§a(.*)§r§7x (.*) §r§7from cancelling sell offer!".toPattern()
+        "§cCancelled! §r§7Refunded §r§a(.*)§r§7x (.*) §r§7from cancelling sell offer!".toPattern(),
     )
 
     // Winter Island
     private val winterIslandPatterns = listOf(
-        "§r§f☃ §r§7§r(.*) §r§7mounted a §r§fSnow Cannon§r§7!".toPattern()
+        "§r§f☃ §r§7§r(.*) §r§7mounted a §r§fSnow Cannon§r§7!".toPattern(),
     )
 
     // Useless Warning
@@ -224,13 +224,13 @@ class ChatFilter {
         "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!",
         "§cWhoa! Slow down there!",
         "§cWait a moment before confirming!",
-        "§cYou cannot open the SkyBlock menu while in combat!"
+        "§cYou cannot open the SkyBlock menu while in combat!",
     )
 
     // Annoying Spam
     private val annoyingSpamPatterns = listOf(
         "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern()
+        "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
     )
     private val annoyingSpamMessages = listOf(
         "§cThere are blocks in the way!",
@@ -242,7 +242,7 @@ class ChatFilter {
         "§6§lGOOD CATCH! §r§bYou found a §r§fDark Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b."
+        "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
     )
 
     // Winter Gift
@@ -275,7 +275,7 @@ class ChatFilter {
         "§e§lSWEET! §r§5Snow Suit .* §r§egift with §r.*§r§e!".toPattern(),
 
         // winter gifts not your gifts
-        "§cThis gift is for §r.*§r§c, sorry!".toPattern()
+        "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
     )
 
     // Powder Mining
@@ -289,7 +289,10 @@ class ChatFilter {
 
         // Useful, maybe in another chat
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
-        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence".toPattern()
+        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence".toPattern(),
+    )
+    private val fireSalePatterns = listOf(
+        "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -298,7 +301,10 @@ class ChatFilter {
         // Jungle
         "§aYou received §r§f1 §r§aOil Barrel§r§a.",
         // Useful, maybe in another chat
-        "§6You have successfully picked the lock on this chest!"
+        "§6You have successfully picked the lock on this chest!",
+    )
+    private val fireSaleMessages = listOf(
+        "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
     )
 
     private val skymallPatterns = listOf(
@@ -324,7 +330,8 @@ class ChatFilter {
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
         "powder_mining" to powderMiningPatterns,
-        "skymall" to skymallPatterns
+        "skymall" to skymallPatterns,
+        "fire_sale" to fireSalePatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -341,14 +348,15 @@ class ChatFilter {
         "useless_warning" to uselessWarningMessages,
         "annoying_spam" to annoyingSpamMessages,
         "powder_mining" to powderMiningMessages,
-        "skymall" to skymallMessages
+        "skymall" to skymallMessages,
+        "fire_sale" to fireSaleMessages,
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
     )
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
-        "profile_join" to profileJoinMessageStartsWith
+        "profile_join" to profileJoinMessageStartsWith,
     )
     /// </editor-fold>
 
@@ -379,6 +387,7 @@ class ChatFilter {
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         config.skymall && message.isPresent("skymall") -> "skymall"
+        config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
         else -> ""
     }
 
