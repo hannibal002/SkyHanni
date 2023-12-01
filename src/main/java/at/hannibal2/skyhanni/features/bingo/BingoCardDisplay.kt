@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -81,6 +82,8 @@ class BingoCardDisplay {
         }
     }
 
+    private fun BingoTip.getDescriptionLine() = "§7" + note.joinToString(" ")
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.isBingoProfile) return
@@ -90,9 +93,9 @@ class BingoCardDisplay {
         personalGoals.clear()
         communityGoals.clear()
         for (stack in event.inventoryItems.values) {
-            val personalGoal = stack.getLore().any { it.endsWith("Personal Goal") }
-            val communityGoal = stack.getLore().any { it.endsWith("Community Goal") }
-            if (!personalGoal && !communityGoal) continue
+            val isPersonalGoal = stack.getLore().any { it.endsWith("Personal Goal") }
+            val isCommunityGoal = stack.getLore().any { it.endsWith("Community Goal") }
+            if (!isPersonalGoal && !isCommunityGoal) continue
             val name = stack.name?.removeColor() ?: continue
             val lore = stack.getLore()
             var index = 0
@@ -114,15 +117,49 @@ class BingoCardDisplay {
             }
 
             val done = stack.getLore().any { it.contains("GOAL REACHED") }
-            if (personalGoal) {
-                personalGoals.add(PersonalGoal(name, description, done))
+            if (isPersonalGoal) {
+                personalGoals.add(getPersonalGoal(name, description, done))
             } else {
-                communityGoals.add(CommunityGoal(name, description, done))
+                communityGoals.add(getCommunityGoal(name, description, done))
             }
         }
         lastBingoCardOpenTime = SimpleTimeMark.now()
 
         update()
+        for (goal in personalGoals) {
+            println("goal.displayName: '${goal.displayName}' - ${goal.description}")
+        }
+    }
+
+    private fun getPersonalGoal(
+        name: String,
+        description: String,
+        done: Boolean
+    ): PersonalGoal {
+        var personalGoal = PersonalGoal(name, description, done)
+        if (!done) {
+            personalHiddenGoalPattern.matchMatcher(description) {
+                BingoAPI.tips[name]?.let {
+                    personalGoal = PersonalGoal(name, it.getDescriptionLine(), false)
+                }
+            }
+        }
+        return personalGoal
+    }
+
+    private fun getCommunityGoal(
+        name: String,
+        description: String,
+        done: Boolean
+    ): CommunityGoal {
+        if (!done) {
+            if (description == "§7This goal will be revealed §7when it hits Tier IV.") {
+                BingoAPI.tips[name]?.let {
+                    return CommunityGoal(name, it.getDescriptionLine(), false)
+                }
+            }
+        }
+        return CommunityGoal(name, description, done)
     }
 
     @SubscribeEvent

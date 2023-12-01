@@ -1,44 +1,52 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.getOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardTips {
-    private var tips: Map<String, BingoTip> = emptyMap()
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        tips = event.getConstant<BingoJson>("Bingo").bingo_tips
-    }
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Bingo Card") return
 
-        val itemName = event.itemStack?.name ?: return
-        tips[itemName.removeColor()]?.let {
-            val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
-            event.toolTip[0] = event.toolTip[0] + " §7(" + difficulty.displayName + "§7)"
+        val itemName = event.itemStack?.name?.removeColor() ?: return
 
-            var index = event.toolTip.indexOf("§5§o§7Reward") - 1
-            event.toolTip.add(index++, "")
-            event.toolTip.add(index++, "§eGuide:")
-            for (line in it.note) {
-                event.toolTip.add(index++, line)
-            }
+        val toolTip = event.toolTip
+        val communityGoal = toolTip.getOrNull(1) == "§5§o§8Community Goal"
+        val bingoTip: BingoTip = if (communityGoal) {
+            BingoAPI.tips.filter { itemName.startsWith(it.key) }.values.firstOrNull() ?: return
+        } else {
+            BingoAPI.tips[itemName] ?: return
+        }
+
+        if (!communityGoal) {
+            val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
+            toolTip[0] = toolTip[0] + " §7(" + difficulty.displayName + "§7)"
+        }
+
+        var index = if (!communityGoal) {
+            toolTip.indexOf("§5§o§7Reward")
+        } else {
+            toolTip.indexOfFirst { it.startsWith("§5§o§7Contribution Rewards") }
+        } - 1
+
+        toolTip.add(index++, "")
+        toolTip.add(index++, "§eGuide:")
+        for (line in bingoTip.note) {
+            toolTip.add(index++, line)
         }
     }
 
@@ -53,11 +61,13 @@ class BingoCardTips {
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
             if (slot.slotNumber != slot.slotIndex) continue
-            if (slot.stack == null) continue
+            val stack = slot.stack ?: continue
 
-            val itemName = slot.stack.name ?: continue
+            val itemName = stack.name ?: continue
+            val communityGoal = stack.getLore().getOrNull(1) == "§8Community Goal"
+            if (communityGoal) continue
 
-            tips[itemName.removeColor()]?.let {
+            BingoAPI.tips[itemName.removeColor()]?.let {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
                 slot highlight difficulty.color.addOpacity(120)
             }
