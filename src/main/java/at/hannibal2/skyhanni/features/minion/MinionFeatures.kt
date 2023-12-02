@@ -175,6 +175,8 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (event.reopenSameName) return
+
         minionStorageInventoryOpen = false
         if (!minionInventoryOpen) return
         val minions = minions ?: return
