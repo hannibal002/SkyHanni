@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -30,7 +30,7 @@ class DungeonMilestonesDisplay {
         var timeReached = 0L
 
         fun isMilestoneMessage(message: String): Boolean =
-            milestonePatternList.any { it.matchMatcher(message) { } != null }
+            milestonePatternList.any { it.matches(message) }
     }
 
     init {
