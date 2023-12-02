@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -13,8 +15,10 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -45,12 +49,12 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
-import at.hannibal2.skyhanni.test.command.CopyTabListCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -64,12 +68,11 @@ object Commands {
     private val openMainMenu: (Array<String>) -> Unit = {
         if (it.isNotEmpty()) {
             if (it[0].lowercase() == "gui") {
-                GuiEditManager.openGuiPositionEditor()
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             } else {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
-            val arr = mutableListOf<String>()
             ConfigGuiManager.openConfigGui()
         }
     }
@@ -169,10 +172,9 @@ object Commands {
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
         ) { EnderNodeTracker.resetCommand(it) }
-        registerCommand(
-            "shresetarmordroptracker",
-            "Resets the Armor Drop Tracker"
-        ) { ArmorDropTracker.resetCommand(it) }
+        registerCommand("shresetarmordroptracker", "Resets the Armor Drop Tracker") { ArmorDropTracker.resetCommand(it) }
+        registerCommand("shresetfrozentreasuretracker", "Resets the Frozen Treasure Tracker") { FrozenTreasureTracker.resetCommand(it) }
+        registerCommand("shresetfishingtracker", "Resets the Frozen Treasure Tracker") { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -209,6 +211,10 @@ object Commands {
             "shclearminiondata",
             "Reset data about minion profit and the name display on the private island"
         ) { MinionFeatures.clearMinionData() }
+        registerCommand(
+            "shwhereami",
+            "Print current island in chat"
+        ) { SkyHanniDebugsAndTests.whereami() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
@@ -255,11 +261,13 @@ object Commands {
         registerCommand(
             "shconfigsave",
             "Manually saving the config"
-        ) { SkyHanniMod.configManager.saveConfig("manual-command") }
+        ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
     }
 
     private fun developersCodingHelp() {
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
+        registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
+        registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
@@ -278,7 +286,7 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
-        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { CopyTabListCommand.command(it) }
+        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { TabListData.copyCommand(it) }
         registerCommand(
             "shcopyscoreboard",
             "Copies the scoreboard data to the clipboard"
@@ -312,6 +320,10 @@ object Commands {
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
         ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
+        registerCommand(
+            "readcropmilestonefromclipboard",
+            "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
+        ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
     }
 
     private fun internalCommands() {
@@ -374,7 +386,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!")
+            LorenzUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -384,7 +396,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!")
+            LorenzUtils.userError("You need to join Hypixel to use this feature!")
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
@@ -393,7 +405,7 @@ object Commands {
 
     private fun clearFarmingItems() {
         val storage = GardenAPI.storage?.fortune ?: return
-        LorenzUtils.chat("§e[SkyHanni] clearing farming items")
+        LorenzUtils.chat("clearing farming items")
         storage.farmingItems.clear()
         storage.outdatedItems.clear()
     }

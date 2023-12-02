@@ -15,7 +15,6 @@ class PetCandyUsedDisplay {
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
         if (!SkyHanniMod.feature.misc.petCandyUsed) return
 
-
         val petCandyUsed = stack.getPetCandyUsed() ?: return
         if (petCandyUsed == 0) return
 

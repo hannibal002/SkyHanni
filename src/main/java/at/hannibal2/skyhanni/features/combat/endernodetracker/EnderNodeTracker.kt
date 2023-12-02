@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.endernodetracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -22,7 +24,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -30,13 +31,15 @@ object EnderNodeTracker {
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
 
     private var miteGelInInventory = 0
-    private var display = emptyList<List<Any>>()
-    private var lootProfit = mapOf<EnderNode, Double>()
 
     private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) { update() }
+    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
+        formatDisplay(
+            drawDisplay(it)
+        )
+    }
 
     class Data : TrackerData() {
 
@@ -94,7 +97,6 @@ object EnderNodeTracker {
                 storage.lootCount.addOrPut(it, amount)
             }
         }
-        update()
     }
 
     @SubscribeEvent
@@ -119,8 +121,6 @@ object EnderNodeTracker {
         tracker.modify { storage ->
             storage.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
         }
-
-        update()
     }
 
     @SubscribeEvent
@@ -129,19 +129,16 @@ object EnderNodeTracker {
         if (!isInTheEnd()) return
         if (!ProfileStorageData.loaded) return
 
-        MinecraftExecutor.OnThread.execute {
-            val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-                .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-                .sumOf { it.stackSize }
-            val change = newMiteGelInInventory - miteGelInInventory
-            if (change > 0) {
-                tracker.modify { storage ->
-                    storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
-                }
-                update()
+        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
+            .sumOf { it.stackSize }
+        val change = newMiteGelInInventory - miteGelInInventory
+        if (change > 0) {
+            tracker.modify { storage ->
+                storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
             }
-            miteGelInInventory = newMiteGelInInventory
         }
+        miteGelInInventory = newMiteGelInInventory
     }
 
     @SubscribeEvent
@@ -149,20 +146,23 @@ object EnderNodeTracker {
         if (!config.enabled) return
         if (!isInTheEnd()) return
 
-        tracker.renderDisplay(config.position, display)
+        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange {
-            update()
+            tracker.update()
         }
-        update()
+        tracker.update()
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
+        event.move(11, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
+        }
     }
 
     private fun calculateProfit(storage: Data): Map<EnderNode, Double> {
@@ -181,12 +181,6 @@ object EnderNodeTracker {
             newProfit[item] = price * amount
         }
         return newProfit
-    }
-
-    private fun update() {
-        val storage = tracker.currentDisplay() ?: return
-        lootProfit = calculateProfit(storage)
-        display = formatDisplay(drawDisplay(storage))
     }
 
     private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
@@ -212,12 +206,9 @@ object EnderNodeTracker {
     }
 
     private fun drawDisplay(storage: Data) = buildList<List<Any>> {
-        if (!ProfileStorageData.loaded) return emptyList<List<Any>>()
+        val lootProfit = calculateProfit(storage)
 
         addAsSingletonList("§5§lEnder Node Tracker")
-
-        tracker.addDisplayModeToggle(this)
-
         addAsSingletonList("§d${storage.totalNodesMined.addSeparators()} Ender Nodes mined")
         addAsSingletonList("§6${format(lootProfit.values.sum())} Coins made")
         addAsSingletonList(" ")
@@ -244,8 +235,6 @@ object EnderNodeTracker {
         val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (storage.lootCount[it] ?: 0).addSeparators() }
         val profit = format(EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 })
         addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
-
-        tracker.addSessionResetButton(this)
     }
 
     private fun calculateEnderArmor(storage: Data) =
@@ -258,7 +247,8 @@ object EnderNodeTracker {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }

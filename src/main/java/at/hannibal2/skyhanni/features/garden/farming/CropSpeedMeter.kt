@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
@@ -118,7 +117,7 @@ class CropSpeedMeter {
 
         fun toggle() {
             enabled = !enabled
-            LorenzUtils.chat("§e[SkyHanni] Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
+            LorenzUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
             startCrops = emptyMap()
 
         }
@@ -128,7 +127,7 @@ class CropSpeedMeter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
+        GardenAPI.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
     }
 
     fun isEnabled() = enabled && GardenAPI.inGarden()

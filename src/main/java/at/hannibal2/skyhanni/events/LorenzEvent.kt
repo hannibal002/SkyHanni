@@ -40,7 +40,7 @@ abstract class LorenzEvent : Event() {
         }
         if (errors > visibleErrors) {
             val hiddenErrors = errors - visibleErrors
-            LorenzUtils.chat("§c[SkyHanni] $hiddenErrors more errors in $eventName are hidden!")
+            LorenzUtils.error("$hiddenErrors more errors in $eventName are hidden!")
         }
         return if (isCancelable) isCanceled else false
     }

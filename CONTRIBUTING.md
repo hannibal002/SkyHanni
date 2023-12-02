@@ -56,7 +56,7 @@ You can write in the description of the pr the wording for the changelog as well
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-    - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
+  - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
@@ -125,7 +125,8 @@ SkyHanni uses a repo system to easily change static variables without the need f
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
 A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
-If you add stuff to the repo make sure it gets serialised. See the [jsonobjects](src/main/java/at/hannibal2/skyhanni/utils/jsonobjects)
+If you add stuff to the repo make sure it gets serialised. See
+the [jsonobjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
 
 ### Discord IPC

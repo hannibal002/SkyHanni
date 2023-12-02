@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.ContributorListJson
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -24,7 +24,7 @@ object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
     // TODO USE SH-REPO
-    private val pattern = ".*\\[(?<level>.*)] (?<name>.*)".toPattern()
+    private val pattern = ".*\\[(?<level>.*)] §r(?<name>.*)".toPattern()
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
@@ -59,15 +59,21 @@ object AdvancedPlayerList {
                     val playerData = PlayerData(removeColor.toInt())
                     currentData[line] = playerData
 
+                    var index = 0
                     val fullName = group("name")
+                    if (fullName.contains("[")) index++
                     val name = fullName.split(" ")
-                    val coloredName = name[0]
-                    playerData.coloredName = coloredName
+                    val coloredName = name[index]
+                    if (index == 1) {
+                        playerData.coloredName = name[0] + " " + coloredName
+                    } else {
+                        playerData.coloredName = coloredName
+                    }
                     playerData.name = coloredName.removeColor()
                     playerData.levelText = levelText
-                    if (name.size > 1) {
-                        val nameSuffix = name.drop(1).joinToString(" ")
-                        playerData.nameSuffix = nameSuffix
+                    index++
+                    if (name.size > index) {
+                        var nameSuffix = name.drop(index).joinToString(" ")
                         if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
                         } else {
@@ -75,13 +81,16 @@ object AdvancedPlayerList {
                         }
                         if (IslandType.CRIMSON_ISLE.isInIsland()) {
                             playerData.faction = if (line.contains("§c⚒")) {
+                                nameSuffix = nameSuffix.replace("§c⚒", "")
                                 CrimsonIsleFaction.BARBARIAN
                             } else if (line.contains("§5ቾ")) {
+                                nameSuffix = nameSuffix.replace("§5ቾ", "")
                                 CrimsonIsleFaction.MAGE
                             } else {
                                 CrimsonIsleFaction.NONE
                             }
                         }
+                        playerData.nameSuffix = nameSuffix
                     } else {
                         playerData.nameSuffix = ""
                     }
@@ -161,7 +170,7 @@ object AdvancedPlayerList {
             suffix += " " + getSocialScoreIcon(score)
         }
         if (config.markSkyHanniContributors && data.name in contributors) {
-            suffix += " §c:O"
+            suffix += "§c:O"
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {

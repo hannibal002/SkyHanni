@@ -1,103 +1,152 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
+import kotlin.time.Duration.Companion.seconds
 
-class SkyHanniTracker<Data : TrackerData>(
+open class SkyHanniTracker<Data : TrackerData>(
     private val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
-    private val update: () -> Unit,
+    private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
     private var inventoryOpen = false
-    private var displayMode = DisplayMode.TOTAL
+    private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
+    private var display = emptyList<List<Any>>()
+    private var sessionResetTime = SimpleTimeMark.farPast()
+    private var dirty = false
+
+    companion object {
+        val config get() = SkyHanniMod.feature.misc.tracker
+        private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+
+        fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
+            0 -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
+            1 -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+
+            else -> name.getNpcPriceOrNull() ?: 0.0
+        }
+    }
 
     fun isInventoryOpen() = inventoryOpen
 
-    private fun getSharedTracker(): SharedTracker<Data>? {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return null
-        return SharedTracker(getStorage(profileSpecific), getCurrentSession(profileSpecific))
-    }
-
-    private fun getCurrentSession(profileSpecific: Storage.ProfileSpecific) =
-        currentSessions.getOrPut(profileSpecific) { createNewSession() }
-
-    fun addSessionResetButton(list: MutableList<List<Any>>) {
-        if (!inventoryOpen || displayMode != DisplayMode.SESSION) return
-
-        list.addAsSingletonList(
-            Renderable.clickAndHover(
-                "§cReset session!",
-                listOf(
-                    "§cThis will reset your",
-                    "§ccurrent session of",
-                    "§c$name"
-                ),
-            ) {
-                reset(DisplayMode.SESSION, "§e[SkyHanni] Reset this session of $name!")
-            })
-    }
-
-    fun addDisplayModeToggle(list: MutableList<List<Any>>) {
-        if (!inventoryOpen) return
-
-        list.addSelector<DisplayMode>(
-            "§7Display Mode: ",
-            getName = { type -> type.displayName },
-            isCurrent = { it == displayMode },
-            onChange = {
-                displayMode = it
-                update()
-            }
-        )
-    }
-
-    fun currentDisplay() = getSharedTracker()?.get(displayMode)
-
     fun resetCommand(args: Array<String>, command: String) {
         if (args.size == 1 && args[0].lowercase() == "confirm") {
-            reset(DisplayMode.TOTAL, "§e[SkyHanni] Reset total $name!")
+            reset(DisplayMode.TOTAL, "Reset total $name!")
             return
         }
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Are you sure you want to reset your total $name? Click here to confirm.",
+            "Are you sure you want to reset your total $name? Click here to confirm.",
             "$command confirm"
         )
     }
 
     fun modify(modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.modify(modifyFunction)
+        getSharedTracker()?.let {
+            it.modify(modifyFunction)
+            update()
+        }
     }
 
-    fun renderDisplay(position: Position, display: List<List<Any>>) {
+    fun renderDisplay(position: Position) {
+        if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
+
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()
         }
 
+        if (dirty) {
+            display = getSharedTracker()?.let {
+                buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
+            } ?: emptyList()
+            dirty = false
+        }
+
         position.renderStringsAndItems(display, posLabel = name)
     }
 
+    fun update() {
+        dirty = true
+    }
+
+    private fun buildFinalDisplay(rawList: List<List<Any>>) = rawList.toMutableList().also {
+        if (it.isEmpty()) return@also
+        if (inventoryOpen) {
+            it.add(1, buildDisplayModeView())
+        }
+        if (inventoryOpen && getDisplayMode() == DisplayMode.SESSION) {
+            it.addAsSingletonList(buildSessionResetButton())
+        }
+    }
+
+    private fun buildSessionResetButton() = Renderable.clickAndHover(
+        "§cReset session!",
+        listOf(
+            "§cThis will reset your",
+            "§ccurrent session of",
+            "§c$name"
+        ),
+    ) {
+        if (sessionResetTime.passedSince() > 3.seconds) {
+            reset(DisplayMode.SESSION, "Reset this session of $name!")
+            sessionResetTime = SimpleTimeMark.now()
+        }
+    }
+
+    private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
+        "§7Display Mode: ",
+        getName = { type -> type.displayName },
+        isCurrent = { it == getDisplayMode() },
+        onChange = {
+            displayMode = it
+            storedTrackers[name] = it
+            update()
+        }
+    )
+
+    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
+        SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
+    }
+
     private fun reset(displayMode: DisplayMode, message: String) {
-        getSharedTracker()?.get(displayMode)?.let {
-            it.reset()
+        getSharedTracker()?.let {
+            it.get(displayMode).reset()
             LorenzUtils.chat(message)
             update()
         }
     }
 
-    class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data, ) {
+    private fun getDisplayMode() = displayMode ?: run {
+        val newValue = config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
+        displayMode = newValue
+        newValue
+    }
+
+    fun firstUpdate() {
+        if (display.isEmpty()) {
+            update()
+        }
+    }
+
+    class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data) {
         fun modify(modifyFunction: (Data) -> Unit) {
             modifyFunction(total)
             modifyFunction(currentSession)
@@ -115,4 +164,12 @@ class SkyHanniTracker<Data : TrackerData>(
         ;
     }
 
+    enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {
+        TOTAL("Total", DisplayMode.TOTAL),
+        SESSION("This Session", DisplayMode.SESSION),
+        REMEMBER_LAST("Remember Last", null),
+        ;
+
+        override fun toString() = display
+    }
 }

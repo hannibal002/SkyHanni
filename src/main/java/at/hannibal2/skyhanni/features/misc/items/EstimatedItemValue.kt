@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -35,7 +38,9 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
-    var currentlyShowing = false
+    private var currentlyShowing = false
+
+    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -49,7 +54,7 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
@@ -130,6 +135,12 @@ object EstimatedItemValue {
             return
         }
 
+        if (InventoryUtils.openInventoryName().startsWith("Museum ")) {
+            if (item.getLore().any { it.contains("Armor Set") }) {
+                return
+            }
+        }
+
         val newDisplay = try {
             draw(item)
         } catch (e: Exception) {
@@ -145,6 +156,16 @@ object EstimatedItemValue {
 
     private fun draw(stack: ItemStack): List<List<Any>> {
         val internalName = stack.getInternalNameOrNull() ?: return listOf()
+
+        // Stats Breakdown
+        val name = stack.name ?: return listOf()
+        if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
+        if (name.contains("Salesperson")) return listOf()
+
+        // Autopet rule > Create Rule
+        if (!InventoryUtils.isSlotInPlayerInventory(stack)) {
+            if (InventoryUtils.openInventoryName() == "Choose a wardrobe slot") return listOf()
+        }
 
         // FIX neu item list
         if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
@@ -176,7 +197,7 @@ object EstimatedItemValue {
         } else {
             NumberUtil.format(totalPrice)
         }
-        list.add("§aTotal: §6§l$numberFormat")
+        list.add("§aTotal: §6§l$numberFormat coins")
 
         val newDisplay = mutableListOf<List<Any>>()
         for (line in list) {

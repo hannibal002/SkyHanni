@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -22,10 +20,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 object DicerDropTracker {
-    private var display = emptyList<List<Any>>()
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = SkyHanniMod.feature.garden.dicerCounters
-    private val tracker = SkyHanniTracker("Dicer Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) { update() }
+    private val config get() = GardenAPI.config.dicerCounters
+    private val tracker = SkyHanniTracker("Dicer Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
+    { drawDisplay(it) }
 
     class Data : TrackerData() {
         override fun reset() {
@@ -75,11 +73,6 @@ object DicerDropTracker {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
-        display = emptyList()
-    }
-
-    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.hideChat && !config.display) return
@@ -96,23 +89,15 @@ object DicerDropTracker {
         }
     }
 
-    private fun update() {
-        tracker.currentDisplay()?.let {
-            display = drawDisplay(it)
-        }
-    }
-
     private fun drawDisplay(storage: Data) = buildList<List<Any>> {
         val cropInHand = cropInHand ?: return@buildList
         val items = storage.drops.getOrPut(cropInHand) { mutableMapOf() }
         addAsSingletonList("§7Dicer Drop Tracker for $toolName§7:")
-        tracker.addDisplayModeToggle(this)
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
             addAsSingletonList(" §7- §e${amount.addSeparators()}x $displayName")
         }
 
-        tracker.addSessionResetButton(this)
     }
 
     private var cropInHand: CropType? = null
@@ -125,7 +110,7 @@ object DicerDropTracker {
         if (cropInHand != null) {
             toolName = event.toolItem!!.name!!
         }
-        update()
+        tracker.update()
     }
 
     private fun addDrop(crop: CropType, rarity: DropRarity) {
@@ -133,14 +118,13 @@ object DicerDropTracker {
             val map = it.drops.getOrPut(crop) { mutableMapOf() }
             map.addOrPut(rarity, 1)
         }
-        update()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        tracker.renderDisplay(config.pos, display)
+        tracker.renderDisplay(config.pos)
     }
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Pattern)

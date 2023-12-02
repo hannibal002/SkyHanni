@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.jsonobjects.TrophyFishJson
-import at.hannibal2.skyhanni.utils.jsonobjects.TrophyFishJson.TrophyFishInfo
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -36,7 +36,12 @@ object TrophyFishManager {
 
     fun TrophyFishInfo.getFilletValue(rarity: TrophyRarity): Int {
         if (fillet == null) {
-            ErrorManager.logError(Error("fillet is null for '$displayName'"), "Error trying to read trophy fish info")
+            ErrorManager.logErrorStateWithData(
+                "Error trying to read trophy fish info",
+                "fillet in TrophyFishInfo is null",
+                "displayName" to displayName,
+                "TrophyFishInfo" to this,
+            )
             return -1
         }
         return fillet.getOrDefault(rarity, -1)

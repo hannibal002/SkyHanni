@@ -11,73 +11,74 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonCopilot {
 
-    var nextStep = ""
-    var searchForKey = false
+    private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
+
+    private val countdownPattern =
+        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern()
+    private val keyPatternsList = listOf(
+        "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
+        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
+    )
+    private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
+    private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
+
+    private var nextStep = ""
+    private var searchForKey = false
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        val message = event.message
+        copilot(event.message)?.let {
+            event.blockedReason = it
+        }
+    }
 
-        if (message.matchRegex("(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.")) {
+    private fun copilot(message: String): String? {
+        countdownPattern.matchMatcher(message) {
             changeNextStep("Ready up")
         }
-        if (message.endsWith("§a is now ready!")) {
-            var name = LorenzUtils.getPlayerName()
-            if (message.contains(name)) {
-                changeNextStep("Wait for the dungeon to start!")
-            }
+
+        if (message.endsWith("§a is now ready!") && message.contains(LorenzUtils.getPlayerName())) {
+            changeNextStep("Wait for the dungeon to start!")
         }
 
+        // Key Pickup
         var foundKeyOrDoor = false
-
-        //key pickup
-        if (message.matchRegex("(.*) §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!") ||
-            message == "§eA §r§a§r§6§r§8Wither Key§r§e was picked up!"
-        ) {
-            changeNextStep("Open Wither Door")
-            foundKeyOrDoor = true
-
-        }
-        if (message.matchRegex("(.*) §r§ehas obtained §r§a§r§c§r§cBlood Key§r§e!") ||
-            message == "§eA §r§a§r§c§r§cBlood Key§r§e was picked up!"
-        ) {
-            changeNextStep("Open Blood Door")
-            foundKeyOrDoor = true
+        keyPatternsList.any {
+            it.matchMatcher(message) {
+                val key = group("key")
+                changeNextStep("Open $key Door")
+                foundKeyOrDoor = true
+            } != null
         }
 
-
-        if (message.matchRegex("(.*) opened a §r§8§lWITHER §r§adoor!")) {
+        witherDoorPattern.matchMatcher(message) {
             changeNextStep("Clear next room")
             searchForKey = true
             foundKeyOrDoor = true
         }
 
-        if (message == "§cThe §r§c§lBLOOD DOOR§r§c has been opened!") {
+        bloodDoorPattern.matchMatcher(message) {
             changeNextStep("Wait for Blood Room to fully spawn")
             foundKeyOrDoor = true
         }
 
-        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) {
-            event.blockedReason = "dungeon_keys_and_doors"
-        }
+        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) return "dungeon_keys_and_doors"
 
-
-        if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") {
-            changeNextStep("Clear Blood Room")
-        }
+        if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
-            event.blockedReason = "dungeon copilot"
             changeNextStep("Enter Boss Room")
+            return "dungeon_copilot"
         }
+        return null
     }
 
     private fun changeNextStep(step: String) {
@@ -126,14 +127,14 @@ class DungeonCopilot {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.dungeonCopilot.enabled
+        return LorenzUtils.inDungeons && config.enabled
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.dungeonCopilot.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @SubscribeEvent

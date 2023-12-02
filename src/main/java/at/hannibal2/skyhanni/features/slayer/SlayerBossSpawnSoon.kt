@@ -14,13 +14,14 @@ import kotlin.time.Duration.Companion.seconds
 class SlayerBossSpawnSoon {
 
     private val config get() = SkyHanniMod.feature.slayer.slayerBossWarning
-    private val pattern = " \\(?(?<progress>[0-9.,k]+)\\/(?<total>[0-9.,k]+)\\)?.*".toPattern()
+    private val pattern = " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*".toPattern()
     private var lastCompletion = 0f
     private var warned = false
 
     @SubscribeEvent
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
+        if (!SlayerAPI.isInCorrectArea) return
 
         val completion = pattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()
@@ -29,7 +30,7 @@ class SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                LorenzUtils.sendTitle("§cSlayer boss soon!", 2.seconds)
+                LorenzUtils.sendTitle("§eSlayer boss soon!", 2.seconds)
                 warned = true
             }
         } else {

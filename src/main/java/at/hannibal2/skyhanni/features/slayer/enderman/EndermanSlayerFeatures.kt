@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class EndermanSlayerFeatures {
     private val config get() = SkyHanniMod.feature.slayer.endermen
-    private val beaconConfig get() = config.endermanBeaconConfig
+    private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private var flyingBeacons = listOf<EntityArmorStand>()
     private val nukekubiSkulls = mutableListOf<EntityArmorStand>()
@@ -129,14 +129,14 @@ class EndermanSlayerFeatures {
                 val durationFormat = duration.format(showMilliSeconds = true)
                 event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
                 event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), "§4Beacon §b$durationFormat", 1.8)
+                event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }
         }
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
                 val beaconLocation = event.exactLocation(beacon)
-                event.drawDynamicText(beaconLocation.add(0, 1, 0), "§4Beacon", 1.8)
+                event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
             }
 
             if (beaconConfig.showLine) {
@@ -227,5 +227,6 @@ class EndermanSlayerFeatures {
         event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
         event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
         event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
+        event.move(9, "slayer.enderman.endermanBeaconConfig", "slayer.endermen.beacon")
     }
 }
