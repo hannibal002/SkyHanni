@@ -25,11 +25,14 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -110,6 +113,14 @@ class CustomScoreboard {
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
             GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+        }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        // Reset Bits - We need this bc if another profile has 0 bits, it won't show the bits line
+        if (event.message.startsWith("§aYour profile was changed to:")) {
+            bits = "0"
         }
     }
 

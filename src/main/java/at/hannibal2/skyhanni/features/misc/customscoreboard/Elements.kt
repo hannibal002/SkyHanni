@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -107,7 +108,7 @@ enum class Elements(
             }
         },
         {
-            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+            !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
         },
         5
     ),
@@ -133,7 +134,7 @@ enum class Elements(
             }
         },
         {
-            !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+            !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
         },
         7
     ),
@@ -353,7 +354,7 @@ enum class Elements(
     ),
     EXTRA_LINES(
         {
-            listOf("Undetected Lines (pls report):") + extraLines
+            listOf("§cUndetected Lines (pls report):") + extraLines
         },
         {
             extraLines.isNotEmpty()

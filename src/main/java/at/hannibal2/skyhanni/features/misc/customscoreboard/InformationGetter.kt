@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.scoreboard.Score
@@ -10,6 +13,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InformationGetter {
     fun getInformation() {
+        val sidebarLines = ScoreboardData.sidebarLinesFormatted
+
         // Gets some values from the tablist
         for (line in TabListData.getTabList()) {
             when {
@@ -24,7 +29,7 @@ class InformationGetter {
         }
 
         // Gets some values from the scoreboard
-        for (line in ScoreboardData.sidebarLinesFormatted) {
+        for (line in sidebarLines) {
             when {
                 line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
                 line.startsWith("Purse: §6") || line.startsWith("Piggy: §6") -> purse =
@@ -38,16 +43,7 @@ class InformationGetter {
                 line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
             }
         }
-    }
 
-    @SubscribeEvent
-    fun onProfileSwitch(event: ProfileJoinEvent) {
-        // Reset Bits - We need this bc if another profile has 0 bits, it won't show the bits line
-        bits = "0"
-    }
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
         val knownLines = listOf(
             "§7⏣ ",
             "§5ф ",
@@ -57,6 +53,8 @@ class InformationGetter {
             "Heat: ",
             "Bits: §b",
             "Copper: §c",
+            "Late",
+            "Early",
             lobbyCode ?: "",
             "§ewww.hyp",
             "§ealpha.hyp",
@@ -94,36 +92,46 @@ class InformationGetter {
             "Protector HP: §a",
             "Dragon HP: §a",
             "Your Damage: §c",
-            "Essence: "
-            )
+            "Essence: ",
+            "§e☀",
+            "§b☽",
+            "Ⓑ",
+            "§a☀",
+            "§7♲",
+            "Slayer Quest"
+        )
 
-        extraLines = ScoreboardData.sidebarLinesFormatted.filter { line -> !knownLines.any { line.startsWith(it) } }
+        extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
 
         // filter empty lines
-        extraLines.filter { it.trim() == "" }
+        extraLines = extraLines.filter { it.isNotBlank() }
 
         // remove objectives
-        extraLines.filter { ScoreboardData.sidebarLinesFormatted.nextAfter("§fObjective:") == it }
-        extraLines.filter { ScoreboardData.sidebarLinesFormatted.nextAfter("Objective:") == it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective:") != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Objective:") != it }
 
         // remove wind compass
-        extraLines.filter { ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass") == it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
 
         // Remove dungeon teammates
         val dungeonPlayers = TabListData.getTabList().firstOrNull { it.trim().startsWith("§r§b§lParty §r§f(") }
             ?.trim()?.removePrefix("§r§b§lParty §r§f(")?.removeSuffix(")")?.toInt() ?: 1
-        val clearedLine = ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§rCleared: ") }.toString()
+        val clearedLine = sidebarLines.firstOrNull { it.startsWith("§rCleared: ") }.toString()
 
         if (dungeonPlayers != 0) {
             if (dungeonPlayers > 1) {
                 for (i in 1..dungeonPlayers) {
-                    extraLines.filter { ScoreboardData.sidebarLinesFormatted.nextAfter(clearedLine, i) == it }
+                    extraLines = extraLines.filter { sidebarLines.nextAfter(clearedLine, i) != it }
                 }
             }
         }
 
         // Remove jacobs contest
         for (i in 1..3)
-        extraLines.filter { ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest", i) == it }
+            extraLines = extraLines.filter { sidebarLines.nextAfter("§eJacob's Contest", i) != it }
+
+        // Remove slayer
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
     }
 }
