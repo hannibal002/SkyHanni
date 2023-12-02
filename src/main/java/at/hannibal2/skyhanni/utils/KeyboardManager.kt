@@ -16,8 +16,8 @@ object KeyboardManager {
     private var lastClickedMouseButton = -1
 
     // A mac-only key, represents Windows key on windows (but different key code)
-    fun isCommandKeyDown() = Keyboard.KEY_LMETA.isKeyHeld() || Keyboard.KEY_RMETA.isKeyHeld()
-    fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
+    private fun isCommandKeyDown() = Keyboard.KEY_LMETA.isKeyHeld() || Keyboard.KEY_RMETA.isKeyHeld()
+    private fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
     fun isShiftKeyDown() = Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()
 
     fun isPastingKeysDown() = isModifierKeyDown() && Keyboard.KEY_V.isKeyHeld()
@@ -25,7 +25,7 @@ object KeyboardManager {
     fun isCopyingKeysDown() = isModifierKeyDown() && Keyboard.KEY_C.isKeyHeld()
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
-    fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "CMD" else "CTRL"
+    fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
