@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class NEUInternalName private constructor(private val internalName: String) {
@@ -45,3 +47,6 @@ class NEUInternalName private constructor(private val internalName: String) {
 }
 
 fun Pattern.matches(internalName: NEUInternalName): Boolean = this.matches(internalName.asString())
+inline fun <T : Any> Pattern.matchMatcher(internalName: NEUInternalName, consumer: Matcher.() -> T): T? {
+    return this.matchMatcher(internalName.asString(), consumer)
+}
