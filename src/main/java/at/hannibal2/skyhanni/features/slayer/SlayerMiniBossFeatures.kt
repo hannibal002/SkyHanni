@@ -60,7 +60,7 @@ class SlayerMiniBossFeatures {
 
             event.draw3DLine(
                 event.exactPlayerEyeLocation(),
-                mob.getLorenzVec().add(0, 1, 0),
+                mob.getLorenzVec().add(y = 1),
                 LorenzColor.AQUA.toColor(),
                 3,
                 true
