@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -14,7 +17,9 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -56,7 +61,7 @@ class DamageIndicatorManager {
     private val maxHealth = mutableMapOf<UUID, Long>()
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
-    private val enderSlayerHitsNumberPattern = "§c☠ §bVoidgloom Seraph \\w+ §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
+    private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
     companion object {
         private var data = mapOf<UUID, EntityData>()
@@ -157,8 +162,8 @@ class DamageIndicatorManager {
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
-            if (!data.ignoreBlocks && !player.canEntityBeSeen(data.entity)) continue
-            if (data.bossType.bossTypeToggle !in config.bossesToShow) continue
+            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0)) continue
+            if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
 
@@ -253,6 +258,8 @@ class DamageIndicatorManager {
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
     }
+
+    private fun EntityData.isConfigEnabled() = bossType.bossTypeToggle in config.bossesToShow
 
     private fun noDeathDisplay(bossType: BossType): Boolean {
         return when (bossType) {
@@ -359,7 +366,10 @@ class DamageIndicatorManager {
             entityData.timeLastTick = System.currentTimeMillis()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Error checking damage indicator entity $entity")
+            ErrorManager.logErrorWithData(
+                e, "Error checking damage indicator entity",
+                "entity" to entity,
+            )
             return null
         }
     }
@@ -835,7 +845,7 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            if (entityData != null && isEnabled() && config.hideVanillaNametag) {
+            if (entityData != null && isEnabled() && config.hideVanillaNametag && entityData.isConfigEnabled()) {
                 val name = entity.name
                 if (name.contains("Plaesmaflux")) return
                 if (name.contains("Overflux")) return
@@ -847,10 +857,24 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+        val data = data[event.entity.uniqueID] ?: return
+        if (event.health <= 1) {
+            if (!data.firstDeath) {
+                data.firstDeath = true
+                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
+        event.move(11, "combat.damageIndicator.bossesToShow", "combat.damageIndicator.bossesToShow") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, DamageIndicatorBossEntry::class.java)
+        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

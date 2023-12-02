@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class VoltHighlighter {
 
-    private val config get() = RiftAPI.config.area.dreadfarmConfig.voltCrux
+    private val config get() = RiftAPI.config.area.dreadfarm.voltCrux
 
     private val LIGHTNING_DISTANCE = 7F
     private val ARMOR_SLOT_HEAD = 3
@@ -75,7 +75,7 @@ class VoltHighlighter {
                 val dischargeTimeLeft = CHARGE_TIME - dischargingSince.passedSince()
                 if (dischargeTimeLeft > Duration.ZERO) {
                     event.drawDynamicText(
-                        event.exactLocation(entity).add(0.0, 2.5, 0.0),
+                        event.exactLocation(entity).add(y = 2.5),
                         "§eLightning: ${dischargeTimeLeft.format(showMilliSeconds = true)}",
                         2.5
                     )

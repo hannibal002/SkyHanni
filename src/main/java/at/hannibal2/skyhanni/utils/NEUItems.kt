@@ -47,6 +47,7 @@ object NEUItems {
     }
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
     fun getRawInternalName(itemName: String): String {
         return getInternalNameFromItemName(itemName).asString()
     }
@@ -174,6 +175,7 @@ object NEUItems {
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
     fun getItemStack(internalName: String): ItemStack =
         internalName.asInternalName().getItemStack()
 
@@ -183,8 +185,8 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
@@ -226,9 +228,11 @@ object NEUItems {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$internalName'"
-            Error(message).printStackTrace()
-            LorenzUtils.error(message)
+            ErrorManager.logErrorStateWithData(
+                "Cound not load recipe data.",
+                "Failed to find item multiplier",
+                "internalName" to internalName
+            )
             return Pair(internalName, 1)
         }
         for (recipe in getRecipes(internalName)) {
@@ -309,8 +313,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU

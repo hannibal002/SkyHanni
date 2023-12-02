@@ -17,7 +17,8 @@ object TrevorTracker {
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     // TODO USE SH-REPO
-    private val selfKillMobPattern = "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
+    private val selfKillMobPattern =
+        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
     private val killMobPattern = "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.".toPattern()
 
     private var display = emptyList<List<Any>>()
@@ -64,7 +65,8 @@ object TrevorTracker {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }
@@ -78,7 +80,7 @@ object TrevorTracker {
         if (matcher.matches()) {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
-            storage.selfKillingAnimals +=  1
+            storage.selfKillingAnimals += 1
             saveAndUpdate()
         }
         matcher = killMobPattern.matcher(event.message)
@@ -94,7 +96,7 @@ object TrevorTracker {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         storage.questsDone += 1
         val rarity = matcher.group("rarity")
-        val foundRarity = TrapperMobRarity.values().firstOrNull { it.formattedName == rarity } ?: return
+        val foundRarity = TrapperMobRarity.entries.firstOrNull { it.formattedName == rarity } ?: return
         val old = storage.animalRarities[foundRarity] ?: 0
         storage.animalRarities = storage.animalRarities.editCopy { this[foundRarity] = old + 1 }
         saveAndUpdate()

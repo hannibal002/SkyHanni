@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.getOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -49,21 +49,20 @@ class DungeonAPI {
 
         fun inDungeon() = dungeonFloor != null
 
-        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(floors) == true
+        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
 
         fun handleBossMessage(rawMessage: String) {
             if (!inDungeon()) return
             val message = rawMessage.removeColor()
             val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
-            if (bossName != "The Watcher" && dungeonFloor != null && checkBossName(dungeonFloor!!, bossName) &&
-                !inBossRoom) {
-                    DungeonBossRoomEnterEvent().postAndCatch()
-                    inBossRoom = true
+            if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
+                DungeonBossRoomEnterEvent().postAndCatch()
+                inBossRoom = true
             }
         }
 
-        private fun checkBossName(floor: String, bossName: String): Boolean {
-            val correctBoss = when (floor) {
+        private fun checkBossName(bossName: String): Boolean {
+            val correctBoss = when (dungeonFloor!!) {
                 "E" -> "The Watcher"
                 "F1", "M1" -> "Bonzo"
                 "F2", "M2" -> "Scarf"
@@ -116,7 +115,7 @@ class DungeonAPI {
 
             DungeonClass.entries.forEach {
                 if (playerTeam.contains("(${it.scoreboardName} ")) {
-                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNeeded()
+                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
                     playerClass = it
                     playerClassLevel = level
                 }

@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -26,6 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
     private val config get() = SkyHanniMod.feature.event.bingo
+
     // TODO USE SH-REPO
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var display = emptyList<String>()
@@ -78,7 +80,7 @@ class MinionCraftHelper {
         for ((minionName, minionId) in minions) {
             minionNamePattern.matchMatcher(minionName) {
                 val cleanName = group("name").removeColor()
-                val number = group("number").romanToDecimalIfNeeded()
+                val number = group("number").romanToDecimalIfNecessary()
                 addMinion(cleanName, number, minionId, otherItems, newDisplay)
             }
         }
@@ -109,6 +111,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
+            if (item.hasEnchantments()) continue
             val rawId = item.getInternalName()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
@@ -226,11 +229,16 @@ class MinionCraftHelper {
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
                 val itemName = rawId.getItemName()
+                val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
-                    val color = if (itemId.startsWith("WOOD_")) "§7" else "§a"
+                    val color = if (isTool) "§7" else "§a"
                     newDisplay.add("  $itemName§8: ${color}DONE")
                     otherItems[itemId] = have - needAmount
                 } else {
+                    if (!config.minionCraftHelperProgressFirst && !isTool && minionId.endsWith("_0")) {
+                        newDisplay.removeLast()
+                        return
+                    }
                     val format = LorenzUtils.formatPercentage(percentage)
                     val haveFormat = LorenzUtils.formatInteger(have)
                     val needFormat = LorenzUtils.formatInteger(needAmount)

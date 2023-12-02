@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.config.features.GardenConfig
+import at.hannibal2.skyhanni.config.features.garden.GardenConfig
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorTooltipParser
 import org.junit.jupiter.api.Test
 
@@ -22,18 +22,22 @@ class VisitorToolTipParserTest {
 
     @Test
     fun testParseItemsNeeded() {
-        val parsedData = VisitorTooltipParser.parse(lore, GardenConfig())
+        val parsedData = VisitorTooltipParser.parse(lore,
+            GardenConfig()
+        )
         assert(parsedData.itemsNeeded.isNotEmpty()) {
             "Visitor items needed is ${parsedData.itemsNeeded.count()} instead of 1"
         }
-        assert(parsedData.itemsNeeded.get("§aEnchanted Hay Bale") == 28) {
+        assert(parsedData.itemsNeeded["§aEnchanted Hay Bale"] == 28) {
             "Visitor items needed does not contain '§aEnchanted Hay Bale'"
         }
     }
 
     @Test
     fun testParseRewards() {
-        val parsedData = VisitorTooltipParser.parse(lore, GardenConfig())
+        val parsedData = VisitorTooltipParser.parse(lore,
+            GardenConfig()
+        )
         assert(parsedData.rewards.isNotEmpty()) {
             "Visitor rewards is ${parsedData.rewards.count()} instead of 6"
         }
@@ -48,7 +52,7 @@ class VisitorToolTipParserTest {
         )
 
         for ((itemName, amount) in assertions) {
-            assert(parsedData.rewards.get(itemName) == amount) {
+            assert(parsedData.rewards[itemName] == amount) {
                 "Visitor rewards does not contain '$itemName' with amount '$amount'"
             }
         }
@@ -56,8 +60,10 @@ class VisitorToolTipParserTest {
 
     @Test
     fun testParseCopper() {
-        val parsedData = VisitorTooltipParser.parse(lore, GardenConfig())
-        val copper = parsedData.rewards.get("Copper")
+        val parsedData = VisitorTooltipParser.parse(lore,
+            GardenConfig()
+        )
+        val copper = parsedData.rewards["Copper"]
         assert(copper == 23) {
             "Visitor rewards does not contain 'Copper' with amount '23'"
         }

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.U
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
@@ -30,6 +30,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     fun loadFromTabList() {
         var i = -1
+        dailyQuestHelper.greatSpook = false
         for (line in TabListData.getTabList()) {
             if (line.contains("Faction Quests:")) {
                 i = 0
@@ -39,6 +40,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
             i++
             readQuest(line)
+            if (dailyQuestHelper.greatSpook) return
             if (i == 5) {
                 break
             }
@@ -46,6 +48,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (line.contains("The Great Spook")) {
+            dailyQuestHelper.greatSpook = true
+            dailyQuestHelper.update()
+            return
+        }
         var text = line.substring(3)
         val green = text.startsWith("§a")
         text = text.substring(2)
@@ -115,7 +122,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 "DOJO" -> return DojoQuest(questName, location, displayItem, dojoGoal, state)
             }
         }
-        LorenzUtils.chat("§c[SkyHanni] Unknown Crimson Isle quest: '$name'")
+        LorenzUtils.error("Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 
@@ -149,6 +156,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (dailyQuestHelper.greatSpook) return
+        if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
+            dailyQuestHelper.greatSpook = true
+            return
+        }
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
@@ -166,6 +178,15 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             }
             addQuest(quest)
         }
+    }
+
+    private fun hasGreatSpookLine(text: String) = when {
+        text.contains("The Great Spook") -> true
+        text.contains(" Days") -> true
+        text.contains("Fear: §r") -> true
+        text.contains("Primal Fears") -> true
+
+        else -> false
     }
 
     private fun addQuest(element: Quest) {

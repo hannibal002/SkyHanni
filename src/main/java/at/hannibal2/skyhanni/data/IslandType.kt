@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-enum class IslandType(val displayName: String, val apiName: String = "null") {
+enum class IslandType(val displayName: String, val modeName: String = "null") {
     // TODO USE SH-REPO (for displayName only)
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
@@ -28,8 +28,9 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     ;
 
     companion object {
-        fun getBySidebarName(name: String): IslandType {
-            return entries.firstOrNull { it.displayName == name } ?: UNKNOWN
-        }
+        fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
+        fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
+
+        fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
     }
 }
