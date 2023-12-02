@@ -22,9 +22,9 @@ object OtherInventoryData {
         close()
     }
 
-    fun close() {
+    fun close(reopenSameName: Boolean = false) {
         currentInventory?.let {
-            InventoryCloseEvent(it).postAndCatch()
+            InventoryCloseEvent(it, reopenSameName).postAndCatch()
             currentInventory = null
         }
     }
@@ -49,7 +49,8 @@ object OtherInventoryData {
             val windowId = packet.windowId
             val title = packet.windowTitle.unformattedText
             val slotCount = packet.slotCount
-            close()
+            val reopenSameName = title == currentInventory?.title
+            close(reopenSameName)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true

@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -83,7 +83,7 @@ class MinionXp {
 
     private fun getStorageXpAndUpdateTotal(
         minionPosition: LorenzVec,
-        xpTotal: EnumMap<XpType, Double>
+        xpTotal: EnumMap<XpType, Double>,
     ): Boolean {
         if (!getHasStorage(minionPosition)) return false
         val storage = minionStorages.firstOrNull {
@@ -110,7 +110,7 @@ class MinionXp {
             val name = item.name
             val xp = xpInfoMap[name] ?: return@forEach
 
-            //TODO add wisdom and Derpy to calculation and random extra Exp Events
+            // TODO add wisdom and Derpy to calculation and random extra Exp Events
             val xpAmount = xp.amount * item.stackSize
 
             xpItemMap[item] = collectMessage(xp.type, xpAmount)
@@ -181,7 +181,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onMinionClose(event: MinionCloseEvent) {
         xpItemMap.clear()
         collectItemXpList.clear()
     }

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -107,6 +108,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
+            if (item.hasEnchantments()) continue
             val rawId = item.getInternalName_old()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
@@ -223,11 +225,16 @@ class MinionCraftHelper {
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
                 val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
+                val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
-                    val color = if (itemId.startsWith("WOOD_")) "§7" else "§a"
+                    val color = if (isTool) "§7" else "§a"
                     newDisplay.add("  $itemName§8: ${color}DONE")
                     otherItems[itemId] = have - needAmount
                 } else {
+                    if (!config.minionCraftHelperProgressFirst && !isTool && minionId.endsWith("_0")) {
+                        newDisplay.removeLast()
+                        return
+                    }
                     val format = LorenzUtils.formatPercentage(percentage)
                     val haveFormat = LorenzUtils.formatInteger(have)
                     val needFormat = LorenzUtils.formatInteger(needAmount)

@@ -38,7 +38,8 @@ fun replaceString(text: String): String? {
             val hasPests = text.contains("ൠ")
             val pestSuffix = if (hasPests) {
                 val pests = text.last().digitToInt()
-                " §7(§4${pests}ൠ§7)"
+                val color = if (pests >= 4) "§c" else "§6"
+                " §7(${color}${pests}ൠ§7)"
             } else ""
             val name = plot?.let {
                 if (it.isBarn()) "§aThe Barn" else {
