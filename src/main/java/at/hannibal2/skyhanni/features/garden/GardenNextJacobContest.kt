@@ -307,11 +307,7 @@ object GardenNextJacobContest {
         }
 
         var duration = nextContest.endTime - System.currentTimeMillis()
-        for (crop in nextContest.crops) {
-            list.add(" ")
-            list.addCropIcon(crop)
-            nextContestCrops.add(crop)
-        }
+
         if (duration < contestDuration) {
             list.add("§aActive: ")
         } else {
