@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
+import net.minecraft.scoreboard.Score
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
@@ -201,6 +202,14 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 .nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
         }
     ),
+    BROODMOTHER(
+        {
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§4Broodmother§7:") } ?: "<hidden>")
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§4Broodmother§7:") }
+        }
+    ),
     NEW_YEAR(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("§dNew Year Event") } ?: "<hidden>")
@@ -244,8 +253,14 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
 
             // Zone Events
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") }) {
+                val fixName = listOf(
+                    "GLOBIRAID" to "GOBLIN RAID",
+                    "MITHR GOURMAND" to "MITHRIL GOURMAND",
+                )
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Event: ") }
-                    ?.removePrefix("Event: ")?.replace("GLOBIRAID", "GOBLIN RAID") ?: "<hidden>"
+                    ?.removePrefix("Event: ")?.let { name ->
+                        fixName.firstOrNull { it.first == name }?.second ?: name
+                    } ?: "<hidden>"
                 list += "§fin " + (ScoreboardData.sidebarLinesFormatted.firstOrNull{ it.startsWith("Zone: ") }
                     ?.removePrefix("Zone: ") ?: "<hidden>" )
             }

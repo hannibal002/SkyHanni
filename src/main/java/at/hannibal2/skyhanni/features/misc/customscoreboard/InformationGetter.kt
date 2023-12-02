@@ -98,7 +98,8 @@ class InformationGetter {
             "Ⓑ",
             "§a☀",
             "§7♲",
-            "Slayer Quest"
+            "Slayer Quest",
+            "§4Broodmother§7:"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
