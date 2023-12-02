@@ -138,10 +138,10 @@ public class MiscConfig {
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into signs when you press Ctrl + V.")
+    @ConfigOption(name = "Better Sign Editing", desc = "Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean pasteIntoSigns = true;
+    public boolean betterSignEditing = true;
 
     @Expose
     @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
