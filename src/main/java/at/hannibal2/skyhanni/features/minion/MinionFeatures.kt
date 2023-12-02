@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -138,6 +139,13 @@ class MinionFeatures {
 
         MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()
         minionStorageInventoryOpen = true
+    }
+
+    @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (minionInventoryOpen) {
+            MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+        }
     }
 
     @SubscribeEvent
