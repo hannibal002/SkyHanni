@@ -541,6 +541,7 @@ object EstimatedItemValueCalculator {
 
     private val hasAlwaysReplenish = listOf(
         "ADVANCED_GARDENING_HOE".asInternalName(),
+        "ADVANCED_GARDENING_AXE".asInternalName(),
     )
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
