@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -43,7 +42,7 @@ class FandomWikiFromMenus {
         val inWikiInventory = // TODO better name for this inventory
             event.slotId == 11 && itemClickedName.contains("Wiki Command") && chestName.contains("Wiki")
         if ((itemInHandName == "") || inWikiInventory) {
-            LorenzUtils.clickableChat("§e[SkyHanni] Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
+            LorenzUtils.clickableChat("Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
             return
         }
 
@@ -56,8 +55,8 @@ class FandomWikiFromMenus {
         } else {
             //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
             val inThirdWikiInventory = // TODO better name for this inventory
-                (itemClickedStack.getLore().anyContains("Wiki") || itemClickedStack.getLore().anyContains("wiki"))
-                    && !itemClickedStack.getLore().anyContains("wikipedia")
+                (itemClickedStack.getLore()
+                    .let { it.any { line -> line == "§7§eClick to view on the SkyBlock" } && it.last() == "§eWiki!" })
             if (inThirdWikiInventory) {
                 wikiDisplayName = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
                 wikiInternalName = wikiDisplayName
@@ -66,11 +65,11 @@ class FandomWikiFromMenus {
 
         if (!config.skipWikiChat) {
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
+                "Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
                 "wiki $wikiInternalName"
             )
         } else {
-            LorenzUtils.chat("§e[SkyHanni] Searching the Fandom Wiki for §a$wikiDisplayName")
+            LorenzUtils.chat("Searching the Fandom Wiki for §a$wikiDisplayName")
             val wikiUrlCustom = "${WikiManager.urlSearchPrefix}$wikiInternalName&scope=internal"
             OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
         }

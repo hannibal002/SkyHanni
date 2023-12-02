@@ -21,7 +21,7 @@ object ShaderManager {
         CHROMA(ChromaShader.INSTANCE);
 
         companion object {
-            fun getShaderInstance(shaderName: String) : Shader? = when (shaderName) {
+            fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "chroma" -> CHROMA.shader
                 else -> {
                     null
@@ -58,7 +58,7 @@ object ShaderManager {
         activeShader = null
     }
 
-    fun loadShader(type: ShaderType, fileName: String) : Int {
+    fun loadShader(type: ShaderType, fileName: String): Int {
         val resourceLocation = ResourceLocation("skyhanni:shaders/$fileName${type.extension}")
 
         val source = StringBuilder()
@@ -73,8 +73,10 @@ object ShaderManager {
         ShaderHelper.glCompileShader(shaderID)
 
         if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
-            LorenzUtils.consoleLog("Error occurred when compiling shader $fileName${type.extension} : " +
-                    StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024)))
+            LorenzUtils.consoleLog(
+                "Error occurred when compiling shader $fileName${type.extension} : " +
+                    StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
+            )
         }
 
         return shaderID

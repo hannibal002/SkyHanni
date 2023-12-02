@@ -60,6 +60,6 @@ class AshfangNextResetCooldown {
 
     private fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.nextResetCooldown &&
-                DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

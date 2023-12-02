@@ -15,10 +15,11 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMini
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -66,8 +67,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!config.enabled) return
         if (!dirty && display.isEmpty()) {
             dirty = true
@@ -111,9 +111,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
         if (config.useHotkey && !config.hotkey.isKeyHeld()) {
             return
@@ -145,7 +143,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun reset() {
-        LorenzUtils.chat("§e[SkyHanni] Reset Reputation Helper.")
+        LorenzUtils.chat("Reset Reputation Helper.")
 
         questHelper.reset()
         miniBossHelper.reset()

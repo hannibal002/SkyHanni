@@ -41,9 +41,13 @@ object APIUtil {
             .useSystemProperties()
 
     fun getJSONResponse(urlString: String, silentError: Boolean = false) =
-            getJSONResponseAsElement(urlString, silentError) as JsonObject
+        getJSONResponseAsElement(urlString, silentError) as JsonObject
 
-    fun getJSONResponseAsElement(urlString: String, silentError: Boolean = false, apiName: String = "Hypixel API"): JsonElement {
+    fun getJSONResponseAsElement(
+        urlString: String,
+        silentError: Boolean = false,
+        apiName: String = "Hypixel API"
+    ): JsonElement {
         val client = builder.build()
         try {
             client.execute(HttpGet(urlString)).use { response ->
@@ -60,7 +64,7 @@ object APIUtil {
                         } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             if (showApiErrors && apiName == "Hypixel API") {
                                 LorenzUtils.clickableChat(
-                                    "[SkyHanni] Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
+                                    "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
                                     "shtogglehypixelapierrors"
                                 )
                             }
@@ -128,6 +132,6 @@ object APIUtil {
 
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
-        LorenzUtils.chat("§e[SkyHanni] Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+        LorenzUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 }

@@ -29,9 +29,10 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal - 1)
         if (rarityBelow == null && logError) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
-                "Trying to get an item rarity below common"
+                "Trying to get an item rarity below common",
+                "ordinal" to ordinal
             )
         }
         return rarityBelow
@@ -40,9 +41,10 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     fun oneAbove(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal + 1)
         if (rarityBelow == null && logError) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
-                "Trying to get an item rarity above special"
+                "Trying to get an item rarity above special",
+                "ordinal" to ordinal
             )
         }
         return rarityBelow
