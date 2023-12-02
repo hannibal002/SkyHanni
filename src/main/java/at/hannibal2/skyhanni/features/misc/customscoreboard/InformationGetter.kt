@@ -102,7 +102,8 @@ class InformationGetter {
             "§4Broodmother§7:",
             "§7Give Tasty Mithril to Don!",
             "Remaining: §a",
-            "Your Tasty Mithr: §c"
+            "Your Tasty Mithr: §c",
+            "§3§lSolo"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
