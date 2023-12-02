@@ -139,7 +139,7 @@ class MobData {
         return true
     }
 
-    private val batFromPacket = LinkedBlockingQueue<Int>(20)
+    private val batFromPacket = LinkedBlockingQueue<Int>()
 
     private fun handleMobsFromPacket() {
         while (batFromPacket.isNotEmpty()) {
