@@ -126,6 +126,8 @@ object FortuneUpgrades {
             val item = piece.getItem()
             //todo skip if it doesnt exist -> tell them to buy it later
 
+            if (FFGuideGUI.isFallbackItem(item)) return
+
             recombobulateItem(item, genericUpgrades)
             when (item.getReforgeName()) {
                 "mossy" -> {}

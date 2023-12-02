@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -17,7 +18,8 @@ import java.util.regex.Pattern
 object StringUtils {
     // TODO USE SH-REPO
     private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
-    private val chatUsernamePattern = "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
+    private val chatUsernamePattern =
+        "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
@@ -34,14 +36,18 @@ object StringUtils {
         return first + lowercase.substring(1)
     }
 
-    fun String.removeColor(): String {
+    private val formattingChars by lazy { "kmolnr".toCharArray() + "kmolnr".uppercase().toCharArray() }
+
+    fun String.removeColor(keepFormatting: Boolean = false): String {
         val builder = StringBuilder(this.length)
 
         var counter = 0
         while (counter < this.length) {
             if (this[counter] == '§') {
-                counter += 2
-                continue
+                if (!keepFormatting || this[counter + 1] !in formattingChars) {
+                    counter += 2
+                    continue
+                }
             }
             builder.append(this[counter])
             counter++
@@ -130,7 +136,6 @@ object StringUtils {
         }
     }
 
-
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
     fun String.splitLines(width: Int): String {
@@ -148,7 +153,7 @@ object StringUtils {
     }
 
     fun optionalPlural(number: Int, singular: String, plural: String) =
-        "$number " + if (number == 1) singular else plural
+        "${number.addSeparators()} " + if (number == 1) singular else plural
 
     fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
@@ -230,6 +235,10 @@ object StringUtils {
             username = matcher.group("important").removeResets()
         }
         if (username == "") return null
+
+        if (username.contains("[NPC]")) {
+            return null
+        }
 
         if (username.contains(">")) {
             username = username.substring(username.indexOf('>') + 1).trim()

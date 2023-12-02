@@ -41,9 +41,13 @@ object APIUtil {
             .useSystemProperties()
 
     fun getJSONResponse(urlString: String, silentError: Boolean = false) =
-            getJSONResponseAsElement(urlString, silentError) as JsonObject
+        getJSONResponseAsElement(urlString, silentError) as JsonObject
 
-    fun getJSONResponseAsElement(urlString: String, silentError: Boolean = false, apiName: String = "Hypixel API"): JsonElement {
+    fun getJSONResponseAsElement(
+        urlString: String,
+        silentError: Boolean = false,
+        apiName: String = "Hypixel API"
+    ): JsonElement {
         val client = builder.build()
         try {
             client.execute(HttpGet(urlString)).use { response ->

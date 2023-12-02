@@ -62,11 +62,11 @@ class SkyHanniDebugsAndTests {
 
         val debugLogger = LorenzLogger("debug/test")
 
-        fun runn(compound: NBTTagCompound, text: String) {
+        private fun run(compound: NBTTagCompound, text: String) {
             print("$text'$compound'")
             for (s in compound.keySet) {
                 val element = compound.getCompoundTag(s)
-                runn(element, "$text  ")
+                run(element, "$text  ")
             }
         }
 
@@ -250,6 +250,14 @@ class SkyHanniDebugsAndTests {
             LorenzUtils.chat("stopped ${modules.size} listener classes.")
         }
 
+        fun whereami() {
+            if (LorenzUtils.inSkyBlock) {
+                LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+                return
+            }
+            LorenzUtils.chat("§eYou are not in Skyblock.")
+        }
+
         fun copyLocation(args: Array<String>) {
             val location = LocationUtils.playerLocation()
             val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
@@ -336,13 +344,13 @@ class SkyHanniDebugsAndTests {
         fun copyItemInternalName() {
             val hand = InventoryUtils.getItemInHand()
             if (hand == null) {
-                LorenzUtils.chat("§cNo item in hand!")
+                LorenzUtils.userError("No item in hand!")
                 return
             }
 
             val internalName = hand.getInternalNameOrNull()
             if (internalName == null) {
-                LorenzUtils.chat("§cInternal name is null for item ${hand.name}")
+                LorenzUtils.error("§cInternal name is null for item ${hand.name}")
                 return
             }
 

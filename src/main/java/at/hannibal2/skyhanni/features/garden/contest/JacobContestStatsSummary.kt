@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.FarmingContestEvent
@@ -12,7 +11,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class JacobContestStatsSummary {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = GardenAPI.config
     private var blocksBroken = 0
     private var startTime = 0L
 

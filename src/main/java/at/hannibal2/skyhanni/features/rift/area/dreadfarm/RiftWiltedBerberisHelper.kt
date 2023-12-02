@@ -43,15 +43,15 @@ class RiftWiltedBerberisHelper {
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
-            val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
+            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt().toString()
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
         }
     }
 
-    fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
+    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
         return list.filter { it.currentParticles.distanceSq(location) < 8 }
-            .sortedBy { it.currentParticles.distanceSq(location) }.firstOrNull()
+            .minByOrNull { it.currentParticles.distanceSq(location) }
     }
 
     @SubscribeEvent
@@ -115,7 +115,7 @@ class RiftWiltedBerberisHelper {
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
                     event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.YELLOW, 0.7f)
-                    event.drawDynamicText(location.add(0, 1, 0), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+                    event.drawDynamicText(location.add(y = 1), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
                     event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {

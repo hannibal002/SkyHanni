@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -32,7 +33,14 @@ class SkillExperience {
             val neededForNextLevel = group("needed").formatNumber()
             val nextLevel = getLevelForExpExactly(neededForNextLevel)
             val baseExp = getExpForLevel(nextLevel - 1)
-            skillExp[skill] = baseExp + overflow
+            val totalExp = baseExp + overflow
+            skillExp[skill] = totalExp
+            SkillExpGainEvent(skill).postAndCatch()
+        }
+        val pattern = ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*".toPattern()
+        pattern.matchMatcher(event.message) {
+            val skill = group("skill").lowercase()
+            SkillExpGainEvent(skill).postAndCatch()
         }
     }
 

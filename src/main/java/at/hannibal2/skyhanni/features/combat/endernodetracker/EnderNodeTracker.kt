@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.endernodetracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -22,7 +24,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -128,18 +129,16 @@ object EnderNodeTracker {
         if (!isInTheEnd()) return
         if (!ProfileStorageData.loaded) return
 
-        MinecraftExecutor.OnThread.execute {
-            val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-                .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-                .sumOf { it.stackSize }
-            val change = newMiteGelInInventory - miteGelInInventory
-            if (change > 0) {
-                tracker.modify { storage ->
-                    storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
-                }
+        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
+            .sumOf { it.stackSize }
+        val change = newMiteGelInInventory - miteGelInInventory
+        if (change > 0) {
+            tracker.modify { storage ->
+                storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
             }
-            miteGelInInventory = newMiteGelInInventory
         }
+        miteGelInInventory = newMiteGelInInventory
     }
 
     @SubscribeEvent
@@ -161,6 +160,9 @@ object EnderNodeTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
+        event.move(11, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
+        }
     }
 
     private fun calculateProfit(storage: Data): Map<EnderNode, Double> {
@@ -245,7 +247,8 @@ object EnderNodeTracker {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }

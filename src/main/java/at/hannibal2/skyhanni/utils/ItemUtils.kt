@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -133,7 +134,11 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
 
+    // Checks for the enchantment glint as part of the minecraft enchantments
     fun ItemStack.isEnchanted() = isItemEnchanted
+
+    // Checks for hypixel enchantments in the attributes
+    fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
@@ -220,9 +225,13 @@ object ItemUtils {
         val rarity = LorenzRarity.readItemRarity(this)
         data.itemRarity = rarity
         if (rarity == null && logError) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not read rarity for item $name",
-                "getItemRarityOrNull not found for: $internalName, name:'$name''"
+                "Failed to read rarity from item rarity via item lore",
+                "internal name" to internalName,
+                "item name" to name,
+                "inventory name" to InventoryUtils.openInventoryName(),
+                "lore" to getLore(),
             )
         }
         return rarity
@@ -302,15 +311,18 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
-
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
-                "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
+                "Failed to read rarity from pet item via internal name",
+                "internal name" to pet.getInternalName(),
+                "item name" to name,
+                "rarity id" to rarityId,
+                "inventory name" to InventoryUtils.openInventoryName()
             )
         }
         return rarity

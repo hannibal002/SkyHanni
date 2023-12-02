@@ -374,14 +374,11 @@ object RenderUtils {
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
 
-        val x = offsetX
-        val y = offsetY
-
-        GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
+        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
             val strLen: Int = renderer.getStringWidth(string)
-            val x2 = x - strLen / 2f
+            val x2 = offsetX - strLen / 2f
             GL11.glTranslatef(x2, 0f, 0f)
             renderer.drawStringWithShadow(display, 0f, 0f, 0)
             GL11.glTranslatef(-x2, 0f, 0f)

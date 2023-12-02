@@ -185,8 +185,8 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
@@ -233,9 +233,10 @@ object NEUItems {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            ErrorManager.logErrorState(
-                "Error grabbing recipe data",
-                "Error reading getMultiplier for item '$internalName'"
+            ErrorManager.logErrorStateWithData(
+                "Cound not load recipe data.",
+                "Failed to find item multiplier",
+                "internalName" to internalName
             )
             return Pair(internalName, 1)
         }

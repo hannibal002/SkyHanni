@@ -104,7 +104,7 @@ object NumberUtil {
 
     fun Number.addSeparators() = NumberFormat.getNumberInstance().format(this)
 
-    fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
+    fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()
 
     /**
      * This code was converted to Kotlin and taken under CC BY-SA 3.0 license
@@ -204,6 +204,6 @@ object NumberUtil {
     }
 
     val Int.milion get() = this * 1_000_000.0
-    val Int.bilion get() = this * 1_000_000_000.0
+    private val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
 }
