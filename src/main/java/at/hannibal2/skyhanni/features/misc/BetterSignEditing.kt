@@ -30,7 +30,7 @@ class BetterSignEditing {
         if (!pasteLastClicked && pasteClicked) {
             SkyHanniMod.coroutineScope.launch {
                 OSUtils.readFromClipboard()?.let {
-                    LorenzUtils.addTextIntoSign(it.take(50)) //
+                    LorenzUtils.addTextIntoSign(it)
                 }
             }
         }
