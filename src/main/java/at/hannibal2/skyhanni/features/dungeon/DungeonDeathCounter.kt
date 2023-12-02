@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonDeathCounter {
@@ -47,7 +47,7 @@ class DungeonDeathCounter {
     )
 
     private fun isDeathMessage(message: String): Boolean =
-        deathPatternsList.any { it.matchMatcher(message) { } != null }
+        deathPatternsList.any { it.matches(message) }
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatPacket(event: LorenzChatEvent) {
