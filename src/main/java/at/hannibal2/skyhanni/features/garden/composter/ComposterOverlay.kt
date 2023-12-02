@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -135,7 +135,7 @@ object ComposterOverlay {
                 event.itemStack?.name?.let {
                     if (it.contains(upgrade.displayName)) {
                         maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
-                            group("level")?.romanToDecimalIfNeeded() ?: 0
+                            group("level")?.romanToDecimalIfNecessary() ?: 0
                         } == 25
                         extraComposterUpgrade = upgrade
                         update()

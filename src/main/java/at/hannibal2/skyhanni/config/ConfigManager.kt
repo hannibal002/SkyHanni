@@ -187,10 +187,7 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             e.printStackTrace()
-                            println("This is a crash.")
-                            while (true) {
-                                // If you know the forge method to shut down correctly, please quietly pr it.
-                            }
+                            LorenzUtils.shutdownMinecraft("Config is corrupt inside developement enviroment.")
                         }
                     } else {
                         run()

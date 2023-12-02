@@ -48,7 +48,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
@@ -234,9 +233,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
-            MinecraftExecutor.OnThread.execute {
-                update()
-            }
+            update()
         }
     }
 
@@ -260,12 +257,12 @@ class GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        event.parent.drawString(location.add(0.0, 2.23, 0.0), text)
+        event.parent.drawString(location.add(y = 2.23), text)
         if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                event.parent.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
+                event.parent.drawString(location.add(y = 2.73), "§c!$name§c!")
             }
         }
     }

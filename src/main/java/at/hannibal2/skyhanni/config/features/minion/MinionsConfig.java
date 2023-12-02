@@ -36,6 +36,12 @@ public class MinionsConfig {
     public boolean hopperProfitDisplay = true;
 
     @Expose
+    @ConfigOption(name = "Show Xp", desc = "Shows how much skill experience you will get when picking up items from the minion storage.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpDisplay = true;
+
+    @Expose
     public Position hopperProfitPos = new Position(360, 90, false, true);
 
     @Expose

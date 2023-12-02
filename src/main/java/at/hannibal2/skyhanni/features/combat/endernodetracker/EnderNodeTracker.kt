@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -130,18 +129,16 @@ object EnderNodeTracker {
         if (!isInTheEnd()) return
         if (!ProfileStorageData.loaded) return
 
-        MinecraftExecutor.OnThread.execute {
-            val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-                .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-                .sumOf { it.stackSize }
-            val change = newMiteGelInInventory - miteGelInInventory
-            if (change > 0) {
-                tracker.modify { storage ->
-                    storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
-                }
+        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
+            .sumOf { it.stackSize }
+        val change = newMiteGelInInventory - miteGelInInventory
+        if (change > 0) {
+            tracker.modify { storage ->
+                storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
             }
-            miteGelInInventory = newMiteGelInInventory
         }
+        miteGelInInventory = newMiteGelInInventory
     }
 
     @SubscribeEvent

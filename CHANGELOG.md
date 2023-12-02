@@ -23,6 +23,7 @@
   + Option to only show the time while holding vacuum in the hand.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe
 
 #### Fishing Features
 
@@ -48,13 +49,26 @@
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
 
+#### Bingo Features
+
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Added support for tips in hidden bingo card display. - hannibal2
++ Added support for 'found by' info in bingo card. - hannibal2
+
 #### Inventory Features
 
 + Added bottle of Jyrre time overlay in stack size feature. - HiZe
 + Added show special edition number as stack size when below 1k. - hannibal2
 
-### Changes
+#### Minion Features
 
++ Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
+
+#### Chat Features
+
++ Hide the repeating fire sale reminder chat messages. - hannibal2
+
+### Changes
 
 #### Garden Changes
 
@@ -65,10 +79,16 @@
 + Show the hint to open Configure Plot only if the pest display is incorrect. - hannibal2
 + Added the "plot" word to the sidebar again (only if there are no pests in garden). - hannibal2
 + Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
++ Made the wording of "no pest spawned yet" message more clear. - hannibal2
++ Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
 
 #### Fishing Changes
 
 + Show the fishing tracker for a couple of seconds after catching something even while moving. - hannibal2
+
+#### Winter Changes
+
++ Hiding Unique Gifted Players Highlighting for ironman and bingo while not on those modes. - Thunderblade73
 
 ### Fixes
 
@@ -83,10 +103,13 @@
 + Fixed pest detection when more than 3 pests are spawned at once. - hannibal2
 + Fixed showing on the scoreboard  "garden outside" immediately after teleporting to a plot. - hannibal2
 + Fixed visitor timer counting down too fast sometimes. - hannibal2
++ Fixed Mooshroom cow Perk display not showing when maxed. - hannibal2
 
 #### Misc Fixes
 
 + Fixed Item Tracker not ignoring manual sack movements. - hannibal2
++ Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
++ Fixed NPC messages getting detected as player messages. - CalMWolfs
 
 #### Config Fixes
 
@@ -100,6 +123,12 @@
 + Added MessageSendToServerEvent. - hannibal2
 + Added GardenPlotAPI, support for detecting the current slot of the player. - hannibal2
 + Updated .editorconfig file to better support imports. - Thunderblade73
++ Migrate Integer to Enums in Config. - walker
++ Using a broken config no longer resets the config in dev env. - hannibal2
++ Auto-removing all labels of PRs on merging/closing. - hannibal2
++ Changed OwnInventoryItemUpdateEvent to be called synced to the main thread. - hannibal2
++ romanToDecimalIfNeeded -> romanToDecimalIfNecessary. - hannibal2
+  + For more context: https://chat.openai.com/share/502571b5-8851-4047-b343-3b1475ca8a88
 
 ## Version 0.21.1
 
