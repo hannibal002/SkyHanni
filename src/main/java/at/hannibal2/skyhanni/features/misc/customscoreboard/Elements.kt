@@ -32,6 +32,8 @@ var mithrilPowder = "0"
 var gemstonePowder = "0"
 var extraLines = listOf<String>()
 
+val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
+
 enum class Elements(
     private val displayLine: Supplier<List<String>>,
     private val showWhen: () -> Boolean,
@@ -232,7 +234,9 @@ enum class Elements(
 
             objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective").toString()
 
-            if (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2)?.startsWith("  §7(§e") == true) {
+            if (extraObjectiveLines.any {
+                    ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2)?.contains(it) == true
+                }) {
                 objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2).toString()
             }
 
