@@ -30,7 +30,6 @@ var lobbyCode = "None"
 var heat = "0"
 var mithrilPowder = "0"
 var gemstonePowder = "0"
-var partyCount = 0
 var extraLines = listOf<String>()
 
 enum class Elements(
@@ -304,9 +303,6 @@ enum class Elements(
     ),
     PARTY(
         {
-			// Resets Party count
-            partyCount = 0
-
             val partyTitle: List<String> =
                 if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
                     listOf("<hidden>")
@@ -314,9 +310,8 @@ enum class Elements(
                     val title =
                         if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
                     val partyList = PartyAPI.partyMembers
-                        .takeWhile { partyCount < config.partyConfig.maxPartyList.get() }
+                        .take(config.partyConfig.maxPartyList.get())
                         .map {
-                            partyCount++
                             " §7- §7$it"
                         }
                         .toTypedArray()
