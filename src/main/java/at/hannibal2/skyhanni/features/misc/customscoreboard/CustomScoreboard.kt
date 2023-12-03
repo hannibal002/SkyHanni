@@ -18,10 +18,6 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -29,20 +25,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import io.github.moulberry.notenoughupdates.util.Utils.drawTexturedRect
-import org.lwjgl.opengl.GL11
-import kotlin.math.pow
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private var display = emptyList<String>()

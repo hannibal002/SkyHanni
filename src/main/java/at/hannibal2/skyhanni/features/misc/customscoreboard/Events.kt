@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.scoreboard.Score
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
