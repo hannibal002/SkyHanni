@@ -25,14 +25,14 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsCenterSometimesInWidth
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
-private var display = emptyList<String>()
+private var display = emptyList<Pair<String, Boolean>>()
 
 
 class CustomScoreboard {
@@ -44,7 +44,7 @@ class CustomScoreboard {
 
         RenderBackground().renderBackground()
 
-        position.renderStrings(display, posLabel = "Custom Scoreboard")
+        position.renderStringsCenterSometimesInWidth(display, posLabel = "Custom Scoreboard")
     }
 
     @SubscribeEvent
@@ -58,37 +58,37 @@ class CustomScoreboard {
         InformationGetter().getInformation()
     }
 
-    private fun createLines() = buildList<String> {
-        val lineMap = HashMap<Int, List<Any>>()
+    private fun createLines() = buildList<Pair<String, Boolean>> {
+        val lineMap = HashMap<Int, List<Pair<String, Boolean>>>()
         for (element in Elements.entries) {
-            lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
+            lineMap[element.index] = if (element.isVisible()) element.getPair() else listOf("<hidden>" to false)
         }
 
         return formatLines(lineMap)
     }
 
-    private fun formatLines(lineMap: HashMap<Int, List<Any>>): MutableList<String> {
-        val newList = mutableListOf<String>()
-        for (index in config.textFormat) {
-            lineMap[index.ordinal]?.let {
+    private fun formatLines(lineMap: HashMap<Int, List<Pair<String, Boolean>>>): MutableList<Pair<String, Boolean>> {
+        val newList = mutableListOf<Pair<String, Boolean>>()
+        for (entry in config.textFormat) {
+            lineMap[entry.ordinal]?.let {
                 // Hide consecutive empty lines
-                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull() == "") {
+                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0].first == "<empty>" && newList.last().first == "") {
                     continue
                 }
 
                 // Adds empty lines
-                if (it[0] == "<empty>") {
-                    newList.add("")
+                if (it[0].first == "<empty>") {
+                    newList.add("" to false)
                     continue
                 }
 
                 // Does not display this line
-                if (it.any { i -> i == "<hidden>" }) {
+                if (it.any { i -> i.first == "<hidden>" }) {
                     continue
                 }
 
                 // Multiline and singular line support
-                newList.addAll(it.map { i -> i.toString() })
+                newList.addAll(it.map { i -> i })
             }
         }
 
