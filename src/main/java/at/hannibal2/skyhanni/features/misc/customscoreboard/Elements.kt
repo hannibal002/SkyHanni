@@ -232,7 +232,7 @@ enum class Elements(
 
             objective += "Objective:"
 
-            objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective").toString()
+            objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "<hidden>"
 
             if (extraObjectiveLines.any {
                     ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2)?.contains(it) == true
