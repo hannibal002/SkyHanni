@@ -59,7 +59,6 @@ object TrevorTracker {
         peltsPerSecond.clear()
         peltsPerHour = 0
         stoppedChecks = 0
-        saveAndUpdate()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
