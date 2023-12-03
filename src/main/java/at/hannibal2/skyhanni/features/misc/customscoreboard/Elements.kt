@@ -39,7 +39,7 @@ enum class Elements(
 ) {
     SKYBLOCK(
         {
-            when (config.displayConfig.useHypixelTitleAnimation){
+            when (config.displayConfig.useHypixelTitleAnimation) {
                 true -> listOf(ScoreboardData.objectiveTitle)
                 false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
             }
@@ -178,7 +178,12 @@ enum class Elements(
     ),
     SKYBLOCK_TIME_MINUTE(
         {
-            listOf("§7" + SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false))
+            val symbols = listOf("☔", "§e☀", "§b☽")
+            if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
+                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } })
+            } else {
+                listOf("§7" + SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false))
+            }
         },
         {
             true
@@ -321,10 +326,10 @@ enum class Elements(
             partyTitle
         },
         {
-            if(inDungeons){
+            if (inDungeons) {
                 false // Hidden bc teammate health etc exists
             } else {
-                if (config.partyConfig.showPartyEverywhere){
+                if (config.partyConfig.showPartyEverywhere) {
                     true
                 } else {
                     listOf(

@@ -94,6 +94,7 @@ class InformationGetter {
             "Essence: ",
             "§e☀",
             "§b☽",
+            "☔",
             "Ⓑ",
             "§a☀",
             "§7♲",
