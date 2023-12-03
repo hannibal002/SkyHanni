@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
 
 class InformationGetter {
     fun getInformation() {

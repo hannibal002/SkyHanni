@@ -53,7 +53,7 @@ enum class Elements(
     ),
     PROFILE(
         {
-            listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
+            listOf(CustomScoreboardUtils.getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
         },
         {
             true
@@ -302,7 +302,7 @@ enum class Elements(
     MAYOR(
         {
             listOf(
-                MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>"
+                MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.translateMayorNameToColor(it) } ?: "<hidden>"
             ) + (if (config.showMayorPerks) {
                 MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" } ?: emptyList()
             } else {

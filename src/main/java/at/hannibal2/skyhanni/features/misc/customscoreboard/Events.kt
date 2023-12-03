@@ -203,7 +203,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§6Spooky Festival§f") }
                 ?: "<hidden>") + // Time
                 ("§r§r§7Your Candy: ") +
-                (getTablistFooter().split("\n").firstOrNull { it.startsWith("§r§r§7Your Candy:") }
+                (CustomScoreboardUtils.getTablistFooter().split("\n").firstOrNull { it.startsWith("§r§r§7Your Candy:") }
                     ?.removePrefix("§r§r§7Your Candy:") ?: "§cCandy not found") // Candy
         },
         {
