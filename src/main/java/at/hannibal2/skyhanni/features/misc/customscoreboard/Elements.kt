@@ -139,9 +139,9 @@ enum class Elements(
     HEAT(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && heat == "0" -> listOf("<hidden>")
-                config.displayConfig.displayNumbersFirst -> listOf(if (heat.removePrefix("§c♨ ") == "0") "§c♨ 0 Heat" else "$heat Heat")
-                else -> listOf(if (heat.removePrefix("§c♨ ") == "0") "Heat: §c♨ 0" else "Heat: $heat")
+                config.informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
+                else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
             }
         },
         {
