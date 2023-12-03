@@ -35,18 +35,15 @@ var extraLines = listOf<String>()
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
 
 enum class Elements(
-    private val displayPair: Supplier<List<Pair<String, Boolean>>>,
+    private val displayLine: Supplier<List<String>>,
     private val showWhen: () -> Boolean,
     val index: Int
 ) {
     SKYBLOCK(
         {
             when (config.displayConfig.useHypixelTitleAnimation) {
-                true -> listOf(ScoreboardData.objectiveTitle to config.displayConfig.centerTitleAndFooter)
-                false -> listOf(
-                    config.displayConfig.customTitle.get().toString()
-                        .replace("&", "§") to config.displayConfig.centerTitleAndFooter
-                )
+                true -> listOf(ScoreboardData.objectiveTitle)
+                false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
             }
         },
         {
@@ -56,7 +53,7 @@ enum class Elements(
     ),
     PROFILE(
         {
-            listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase() to false)
+            listOf(getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
         },
         {
             true
@@ -66,9 +63,9 @@ enum class Elements(
     PURSE(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("§6$purse Purse" to false)
-                else -> listOf("Purse: §6$purse" to false)
+                config.informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§6$purse Purse")
+                else -> listOf("Purse: §6$purse")
             }
         },
         {
@@ -79,9 +76,9 @@ enum class Elements(
     MOTES(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("§d$motes Motes" to false)
-                else -> listOf("Motes: §d$motes" to false)
+                config.informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§d$motes Motes")
+                else -> listOf("Motes: §d$motes")
             }
         },
         {
@@ -92,9 +89,9 @@ enum class Elements(
     BANK(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("§6$bank Bank" to false)
-                else -> listOf("Bank: §6$bank" to false)
+                config.informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
+                else -> listOf("Bank: §6$bank")
             }
         },
         {
@@ -105,9 +102,9 @@ enum class Elements(
     BITS(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("§b$bits Bits" to false)
-                else -> listOf("Bits: §b$bits" to false)
+                config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§b$bits Bits")
+                else -> listOf("Bits: §b$bits")
             }
         },
         {
@@ -118,9 +115,9 @@ enum class Elements(
     COPPER(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("§c$copper Copper" to false)
-                else -> listOf("Copper: §c$copper" to false)
+                config.informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§c$copper Copper")
+                else -> listOf("Copper: §c$copper")
             }
         },
         {
@@ -131,9 +128,9 @@ enum class Elements(
     GEMS(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("§a$gems Gems" to false)
-                else -> listOf("Gems: §a$gems" to false)
+                config.informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
+                else -> listOf("Gems: §a$gems")
             }
         },
         {
@@ -144,9 +141,9 @@ enum class Elements(
     HEAT(
         {
             when {
-                config.informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>" to false)
-                config.displayConfig.displayNumbersFirst -> listOf("$heat Heat" to false)
-                else -> listOf("Heat: $heat" to false)
+                config.informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
+                config.displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
+                else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
             }
         },
         {
@@ -156,7 +153,7 @@ enum class Elements(
     ),
     EMPTY_LINE(
         {
-            listOf("<empty>" to false)
+            listOf("<empty>")
         },
         {
             true
@@ -165,7 +162,7 @@ enum class Elements(
     ),
     LOCATION(
         {
-            listOf((replaceString(location) ?: "<hidden>") to false)
+            listOf(replaceString(location) ?: "<hidden>")
         },
         {
             true
@@ -174,7 +171,7 @@ enum class Elements(
     ),
     SKYBLOCK_TIME_DAY(
         {
-            listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to false)
+            listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false))
         },
         {
             true
@@ -185,9 +182,9 @@ enum class Elements(
         {
             val symbols = listOf("☔", "§e☀", "§b☽")
             if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
-                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } } to false)
+                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } })
             } else {
-                listOf("§7" + SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false) to false)
+                listOf("§7" + SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false))
             }
         },
         {
@@ -197,7 +194,7 @@ enum class Elements(
     ),
     LOBBY_CODE(
         {
-            listOf("§8$lobbyCode" to false)
+            listOf("§8$lobbyCode")
         },
         {
             true
@@ -207,11 +204,11 @@ enum class Elements(
     MAXWELL(
         {
             when (MaxwellAPI.currentPower == null) {
-                true -> listOf("§c§lPlease visit Maxwell!" to false)
+                true -> listOf("§c§lPlease visit Maxwell!")
                 false ->
                     when (config.displayConfig.displayNumbersFirst) {
-                        true -> listOf("${MaxwellAPI.currentPower?.power} Power" to false)
-                        false -> listOf("Power: ${MaxwellAPI.currentPower?.power}" to false)
+                        true -> listOf("${MaxwellAPI.currentPower?.power} Power")
+                        false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
                     }
             }
         },
@@ -222,7 +219,7 @@ enum class Elements(
     ),
     EMPTY_LINE2(
         {
-            listOf("<empty>" to false)
+            listOf("<empty>")
         },
         {
             true
@@ -235,7 +232,7 @@ enum class Elements(
 
             objective += "Objective:"
 
-            objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "<hidden>"
+            objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective").toString()
 
             if (extraObjectiveLines.any {
                     ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2)?.contains(it) == true
@@ -243,7 +240,7 @@ enum class Elements(
                 objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2).toString()
             }
 
-            objective.map { it to false }
+            objective
         },
         {
             true
@@ -253,11 +250,11 @@ enum class Elements(
     SLAYER(
         {
             listOf(
-                (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>") to false
+                (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>")
             ) + (
-                " §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to false
+                " §7- §e${SlayerAPI.latestSlayerCategory.trim()}"
                 ) + (
-                " §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to false
+                " §7- §e${SlayerAPI.latestSlayerProgress.trim()}"
                 )
         },
         {
@@ -274,7 +271,7 @@ enum class Elements(
     ),
     EMPTY_LINE3(
         {
-            listOf("<empty>" to false)
+            listOf("<empty>")
         },
         {
             true
@@ -284,8 +281,8 @@ enum class Elements(
     POWDER(
         {
             when (config.displayConfig.displayNumbersFirst) {
-                true -> listOf("§9§lPowder" to false) + (" §7- §2$mithrilPowder Mithril" to false) + (" §7- §d$gemstonePowder Gemstone" to false)
-                false -> listOf("§9§lPowder" to false) + (" §7- §fMithril: §2$mithrilPowder" to false) + (" §7- §fGemstone: §d$gemstonePowder" to false)
+                true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
+                false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
             }
         },
         {
@@ -295,7 +292,7 @@ enum class Elements(
     ),
     CURRENT_EVENT(
         {
-            Events.getFirstEvent().getLines().map { it to false }
+            Events.getFirstEvent().getLines()
         },
         {
             true
@@ -304,15 +301,13 @@ enum class Elements(
     ),
     MAYOR(
         {
-            val mayorList: List<Pair<String, Boolean>> = listOf(
-                (MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>") to false
+            listOf(
+                MayorElection.currentCandidate?.name?.let { translateMayorNameToColor(it) } ?: "<hidden>"
             ) + (if (config.showMayorPerks) {
-                MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" to false } ?: emptyList()
+                MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" } ?: emptyList()
             } else {
                 emptyList()
             })
-
-            mayorList
         },
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
@@ -321,16 +316,16 @@ enum class Elements(
     ),
     PARTY(
         {
-            val partyTitle: List<Pair<String, Boolean>> =
+            val partyTitle: List<String> =
                 if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
-                    listOf("<hidden>" to false)
+                    listOf("<hidden>")
                 } else {
                     val title =
-                        if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" to false else "§9§lParty (${PartyAPI.partyMembers.size})" to false
+                        if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
                     val partyList = PartyAPI.partyMembers
                         .take(config.partyConfig.maxPartyList.get())
                         .map {
-                            " §7- §7$it" to false
+                            " §7- §7$it"
                         }
                         .toTypedArray()
                     listOf(title, *partyList)
@@ -357,7 +352,7 @@ enum class Elements(
     ),
     WEBSITE(
         {
-            listOf(config.displayConfig.customFooter.get().toString().replace("&", "§") to config.displayConfig.centerTitleAndFooter)
+            listOf(config.displayConfig.customFooter.get().toString().replace("&", "§"))
         },
         {
             true
@@ -366,7 +361,7 @@ enum class Elements(
     ),
     EXTRA_LINES(
         {
-            listOf("§cUndetected Lines (pls report):" to false) + extraLines.map { it to false }
+            listOf("§cUndetected Lines (pls report):") + extraLines
         },
         {
             extraLines.isNotEmpty()
@@ -375,8 +370,8 @@ enum class Elements(
     ),
     ;
 
-    fun getPair(): List<Pair<String, Boolean>> {
-        return displayPair.get()
+    fun getLine(): List<String> {
+        return displayLine.get()
     }
 
     fun isVisible(): Boolean {

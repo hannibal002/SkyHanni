@@ -407,21 +407,6 @@ object RenderUtils {
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
-    fun Position.renderStringsCenterSometimesInWidth(list: List<Pair<String, Boolean>>, extraSpace: Int = 0, posLabel: String) {
-        if (list.isEmpty()) return
-
-        var offsetY = 0
-        var longestX = 0
-        for (pair in list) {
-            val x = renderString0(pair.first, offsetY = offsetY, centered = pair.second)
-            if (x > longestX) {
-                longestX = x
-            }
-            offsetY += 10 + extraSpace
-        }
-        GuiEditManager.add(this, posLabel, longestX, offsetY)
-    }
-
     fun Position.renderRenderables(
         renderables: List<Renderable>,
         extraSpace: Int = 0,

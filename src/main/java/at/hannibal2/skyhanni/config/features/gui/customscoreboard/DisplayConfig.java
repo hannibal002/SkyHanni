@@ -48,10 +48,4 @@ public class DisplayConfig {
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard.\nUse & for colors.")
     @ConfigEditorText
     public Property<String> customFooter = Property.of("&ewww.hypixel.net");
-
-    @Expose
-    @ConfigOption(name = "Center Title and Footer", desc = "Center the title and footer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean centerTitleAndFooter = true;
 }
