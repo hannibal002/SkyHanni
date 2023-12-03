@@ -44,6 +44,10 @@ class InformationGetter {
             }
         }
 
+        if (sidebarLines.none { it.startsWith(("Heat: "))}){
+            heat = "§c♨ 0"
+        }
+
         val knownLines = listOf(
             "§7⏣ ",
             "§5ф ",
@@ -53,8 +57,10 @@ class InformationGetter {
             "Heat: ",
             "Bits: §b",
             "Copper: §c",
-            "Late",
-            "Early",
+            "Spring",
+            "Summer",
+            "Autumn",
+            "Winter",
             lobbyCode ?: "",
             "§ewww.hyp",
             "§ealpha.hyp",

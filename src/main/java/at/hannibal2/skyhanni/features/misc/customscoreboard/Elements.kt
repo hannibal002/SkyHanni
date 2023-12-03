@@ -142,8 +142,8 @@ enum class Elements(
         {
             when {
                 config.informationFilteringConfig.hideEmptyLines && heat == "0" -> listOf("<hidden>")
-                config.displayConfig.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "§c♨ $heat Heat")
-                else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
+                config.displayConfig.displayNumbersFirst -> listOf(if (heat.removePrefix("§c♨ ") == "0") "§c♨ 0 Heat" else "$heat Heat")
+                else -> listOf(if (heat.removePrefix("§c♨ ") == "0") "Heat: §c♨ 0" else "Heat: $heat")
             }
         },
         {
