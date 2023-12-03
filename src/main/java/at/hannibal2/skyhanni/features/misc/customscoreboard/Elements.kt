@@ -226,13 +226,17 @@ enum class Elements(
     ),
     OBJECTIVE(
         {
-            when (config.informationFilteringConfig.hideEmptyLines) {
-                true -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective")
-                    ?: "<hidden>")
+            val objective = mutableListOf<String>()
 
-                false -> listOf("Objective:") + (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective")
-                    ?: "§cNo objective")
+            objective += "Objective:"
+
+            objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective").toString()
+
+            if (ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2)?.startsWith("  §7(§e") == true) {
+                objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2).toString()
             }
+
+            objective
         },
         {
             true
