@@ -269,7 +269,8 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             // Better Together
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Nearby Players:") }) {
                 list += "§9Better Together"
-                list += " " + ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Nearby Players:") }
+                list += (" " + ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Nearby Players:") }
+                    ?.replace("Nearby Players: ", "Nearby Players: §a"))
             }
 
             // Zone Events
