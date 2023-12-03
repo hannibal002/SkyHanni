@@ -114,6 +114,7 @@ class InformationGetter {
         // remove objectives
         extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
         extraLines = extraLines.filter { sidebarLines.nextAfter("Objective") != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Objective", 2) != it }
 
         // remove wind compass
         extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
