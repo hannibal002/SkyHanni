@@ -68,8 +68,8 @@ class InformationGetter {
             "§f§lWave: §c§l",
             "§fTokens: ",
             "Submerges In: §e",
-            "§fObjective:",
-            "Objective:",
+            "§fObjective",
+            "Objective",
             "§eJacob's Contest",
             "§6§lGOLD §fmedals",
             "§f§lSILVER §fmedals",
@@ -111,8 +111,8 @@ class InformationGetter {
         extraLines = extraLines.filter { it.isNotBlank() }
 
         // remove objectives
-        extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective:") != it }
-        extraLines = extraLines.filter { sidebarLines.nextAfter("Objective:") != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Objective") != it }
 
         // remove wind compass
         extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
