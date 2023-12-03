@@ -17,6 +17,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
+import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -34,6 +35,7 @@ object NEUItems {
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
+    private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
@@ -239,7 +241,7 @@ object NEUItems {
             if (recipe !is CraftingRecipe) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.ingredients) {
+            for (ingredient in recipe.getCachedIngredients()) {
                 val count = ingredient.count.toInt()
                 var internalItemId = ingredient.internalItemId.asInternalName()
                 // ignore cactus green
@@ -297,6 +299,8 @@ object NEUItems {
         recipesCache[internalName] = recipes
         return recipes
     }
+
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true

@@ -64,10 +64,10 @@ class PacketTest {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        if (!enabled) return
         val packet = event.packet
         val packetName = packet.javaClass.simpleName
 
-        if (!enabled) return
 
         // Keep alive
         if (packetName == "S00PacketKeepAlive") return

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -133,7 +134,7 @@ class MinionCraftHelper {
             val recipes = NEUItems.getRecipes(minion)
 
             for (recipe in recipes) {
-                for (ingredient in recipe.ingredients) {
+                for (ingredient in recipe.getCachedIngredients()) {
                     val ingredientInternalName = ingredient.internalItemId.asInternalName()
                     if (ingredientInternalName == internalName) return true
 
@@ -165,7 +166,7 @@ class MinionCraftHelper {
                 for (recipe in NEUItems.getRecipes(internalName)) {
                     if (recipe !is CraftingRecipe) continue
 
-                    for (ingredient in recipe.ingredients) {
+                    for (ingredient in recipe.getCachedIngredients()) {
                         val id = ingredient.internalItemId.asInternalName()
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
@@ -188,7 +189,7 @@ class MinionCraftHelper {
         for (minionId in tierOneMinionsFiltered) {
             for (recipe in NEUItems.getRecipes(minionId)) {
                 if (recipe !is CraftingRecipe) continue
-                if (recipe.ingredients.any { help.contains(it.internalItemId.asInternalName()) }) {
+                if (recipe.getCachedIngredients().any { help.contains(it.internalItemId.asInternalName()) }) {
                     val name = recipe.output.itemStack.name!!.removeColor()
                     val abc = name.replace(" I", " 0")
                     minions[abc] = minionId.replace("_1", "_0")
