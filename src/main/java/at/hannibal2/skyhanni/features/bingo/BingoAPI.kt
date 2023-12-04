@@ -3,11 +3,14 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.bingo.card.BingoGoal
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BingoAPI {
     private var ranks = mapOf<String, Int>()
     var tips: Map<String, BingoJson.BingoTip> = emptyMap()
+    val personalGoals = mutableListOf<BingoGoal>()
+    val communityGoals = mutableListOf<BingoGoal>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

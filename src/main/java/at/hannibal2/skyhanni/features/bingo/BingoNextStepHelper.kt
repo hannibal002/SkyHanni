@@ -216,7 +216,7 @@ class BingoNextStepHelper {
     }
 
     private fun update() {
-        val personalGoals = BingoCardDisplay.personalGoals.filter { !it.done }
+        val personalGoals = BingoAPI.personalGoals.filter { !it.done }
         if (personalGoals.isEmpty()) {
             if (!dirty) {
                 reset()
