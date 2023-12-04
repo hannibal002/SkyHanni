@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -236,7 +236,7 @@ class DungeonChatFilter {
      */
     private fun String.isPresent(key: String): Boolean {
         return this in (messagesMap[key] ?: emptyList()) ||
-            (patternsMap[key] ?: emptyList()).any { it.matchMatcher(this) { } != null } ||
+            (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
             (messagesEndsWithMap[key] ?: emptyList()).any { this.endsWith(it) }
     }
 }
