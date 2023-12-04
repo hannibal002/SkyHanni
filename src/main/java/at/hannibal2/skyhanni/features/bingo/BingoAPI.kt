@@ -29,4 +29,10 @@ object BingoAPI {
     fun getCommunityTip(itemName: String) =
         tips.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
 
+    fun BingoGoal.getTip(): BingoJson.BingoTip? = if (type == GoalType.COMMUNITY) {
+        getCommunityTip(displayName)
+    } else {
+        tips[displayName]
+    }
+
 }

@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI.getTip
+import at.hannibal2.skyhanni.features.bingo.card.GoalType
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.getOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,20 +22,16 @@ class BingoCardTips {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Bingo Card") return
 
-        val itemName = event.itemStack?.name?.removeColor() ?: return
+        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        val slot = gui.slotUnderMouse
+        val goal = BingoAPI.bingoGoals.firstOrNull { it.slot == slot.slotNumber } ?: return
 
         val toolTip = event.toolTip
-        val communityGoal = toolTip.getOrNull(1) == "§5§o§8Community Goal"
-        val bingoTip: BingoTip = if (communityGoal) {
-            BingoAPI.getCommunityTip(itemName) ?: return
-        } else {
-            BingoAPI.tips[itemName] ?: return
-        }
+        val bingoTip = goal.getTip() ?: return
+        val communityGoal = goal.type == GoalType.COMMUNITY
 
-        if (!communityGoal) {
-            val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
-            toolTip[0] = toolTip[0] + " §7(" + difficulty.displayName + "§7)"
-        }
+        val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
+        toolTip[0] = toolTip[0] + " §7(" + difficulty.displayName + "§7) ${goal.done}"
 
         var index = if (!communityGoal) {
             toolTip.indexOf("§5§o§7Reward")
@@ -63,13 +59,14 @@ class BingoCardTips {
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
 
-            val goal = BingoAPI.personalGoals.firstOrNull { it.slot == slot.slotNumber } ?: continue
+            val goal = BingoAPI.bingoGoals.firstOrNull { it.slot == slot.slotNumber } ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
-            BingoAPI.tips[goal.displayName]?.let {
+            val color = goal.getTip()?.let {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
-                slot highlight difficulty.color.addOpacity(120)
-            }
+                difficulty.color
+            } ?: LorenzColor.GRAY
+            slot highlight color.addOpacity(120)
         }
     }
 
