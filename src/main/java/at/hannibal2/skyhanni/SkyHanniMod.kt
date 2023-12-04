@@ -192,13 +192,6 @@ import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayAbiphone
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayer
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayerAdvanced
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayerTryhard
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayCombat
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayFarming
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayMining
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlaySBLeveling
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
@@ -206,7 +199,6 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayBingo
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -438,14 +430,6 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(MenuItemDisplayOverlayAbiphone())
-        loadModule(MenuItemDisplayOverlayPlayer())
-        loadModule(MenuItemDisplayOverlayPlayerAdvanced())
-        loadModule(MenuItemDisplayOverlayPlayerTryhard())
-        loadModule(MenuItemDisplayOverlayFarming())
-        loadModule(MenuItemDisplayOverlayMining())
-        loadModule(MenuItemDisplayOverlayCombat())
-        loadModule(MenuItemDisplayOverlaySBLeveling())
-        loadModule(MenuItemDisplayOverlayBingo())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(FandomWikiFromMenus())
