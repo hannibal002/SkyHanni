@@ -117,6 +117,12 @@ object ItemDisplayOverlayFeatures {
         "expertise",
         "hecatomb",
     )
+    private val sackPrefixes = arrayOf(
+        "Large",
+        "Medium",
+        "Small",
+        "Enchanted"
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -184,7 +190,6 @@ object ItemDisplayOverlayFeatures {
 
     private fun isMasterSkull(internalName: NEUInternalName): Boolean =
         MASTER_SKULL_TIER.isSelected() && masterSkullInternalNamePattern.matches(internalName)
-
     private fun getMasterSkullTip(internalName: NEUInternalName): String {
         var tier = ""
         masterSkullInternalNamePattern.matchMatcher(internalName.asString()) { tier = group(tier) }
@@ -193,7 +198,6 @@ object ItemDisplayOverlayFeatures {
 
     private fun isDungeonHead(internalName: NEUInternalName): Boolean =
         DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalNamePattern.matches(internalName)
-
     private fun getDungeonHeadTip(internalName: NEUInternalName): String {
         var floor = ""
         dungeonBossHeadInternalNamePattern.matchMatcher(internalName.asString()) { floor = group("type") }
@@ -222,10 +226,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isPet(itemName: String, chestName: String): Boolean {
-        return PET_LEVEL.isSelected() && !chestName
-            .endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)
+        return PET_LEVEL.isSelected() && !chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)
     }
-
     private fun getPetTip(itemName: String): String {
         petLevelItemNamePattern.matchMatcher(itemName) {
             val rawLevel = group("level")
@@ -261,7 +263,7 @@ object ItemDisplayOverlayFeatures {
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
         val text = split[0]
-        for (line in arrayOf("Large", "Medium", "Small", "Enchanted")) {
+        for (line in sackPrefixes) {
             if (text == line) return grabSackName(name.substring(text.length + 1))
         }
         return text
@@ -416,11 +418,11 @@ object ItemDisplayOverlayFeatures {
             }
         }
         val threshold = when (rarity) {
-            "COMMMON" -> 4000F
-            "UNCOMMON" -> 10000F
-            "RARE" -> 20000F
-            "EPIC" -> 40000F
-            "LEGENDARY" -> 100000F
+            "COMMMON" -> 4_000F
+            "UNCOMMON" -> 10_000F
+            "RARE" -> 20_000F
+            "EPIC" -> 40_000F
+            "LEGENDARY" -> 100_000F
             else -> 1F
         }
         if (threshold != 1F) { return "${((blocksWalked.toFloat() / threshold) * 100).toInt()}" }
