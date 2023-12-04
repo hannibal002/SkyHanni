@@ -152,7 +152,6 @@ object GriffinBurrowHelper {
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
             for (inquis in InquisitorWaypointShare.waypoints.values) {
-                val playerName = inquis.fromPlayer
                 val location = inquis.location
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
@@ -163,9 +162,9 @@ object GriffinBurrowHelper {
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
                 }
                 if (distance < 5) {
-                    InquisitorWaypointShare.maybeRemove(playerName)
+                    InquisitorWaypointShare.maybeRemove(inquis)
                 }
-                event.drawDynamicText(location.add(y = 1), "§eFrom §b$playerName", 1.6, yOff = 9f)
+                event.drawDynamicText(location.add(y = 1), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = inquis.spawnTime
