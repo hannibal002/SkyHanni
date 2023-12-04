@@ -109,6 +109,7 @@ object ItemDisplayOverlayFeatures {
     private val yetiRodInternalName = (("YETI_ROD").asInternalName())
     private val shredderInternalName = (("THE_SHREDDER").asInternalName())
     private val spookyPieInternalName = (("SPOOKY_PIE").asInternalName())
+    private val potionInternalName = (("POTION").asInternalName())
 
     private val tieredEnchants = listOf(
         "compact",
@@ -255,14 +256,11 @@ object ItemDisplayOverlayFeatures {
     private fun isSack(item: ItemStack): Boolean = config.displaySackName && ItemUtils.isSack(item)
     private fun getSackTip(itemName: String): String {
         var colorCode = ""
-        enchantedItemSackItemNamePattern.matchMatcher(itemName) {
-            colorCode = "§5"
-        }
+        enchantedItemSackItemNamePattern.matchMatcher(itemName) { colorCode = "§5" }
         return "$colorCode${grabSackName(itemName).substring(0, 2)}"
     }
     private fun grabSackName(name: String): String {
-        val split = name.split(" ")
-        val text = split[0]
+        val text = name.split(" ").first()
         for (line in sackPrefixes) {
             if (text == line) return grabSackName(name.substring(text.length + 1))
         }
@@ -312,8 +310,7 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isDungeonPotion(item: ItemStack, internalName: NEUInternalName): Boolean {
-        return DUNGEON_POTION_LEVEL.isSelected() && internalName == "POTION".asInternalName() && item.getExtraAttributes()
-            ?.getString("potion_name") == "Dungeon"
+        return DUNGEON_POTION_LEVEL.isSelected() && internalName == potionInternalName && item.getExtraAttributes()?.getString("potion_name") == "Dungeon"
     }
     private fun getDungeonPotionTip(item: ItemStack): String {
         val potionLevel = item.getExtraAttributes()?.getInteger("potion_level") ?: return ""
