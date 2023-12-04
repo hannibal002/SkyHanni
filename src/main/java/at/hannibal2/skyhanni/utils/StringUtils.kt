@@ -76,9 +76,6 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
-    private fun String.removeAtBeginning(text: String): String =
-        if (this.startsWith(text)) substring(text.length) else this
-
     // TODO find better name for this method
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
