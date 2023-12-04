@@ -77,9 +77,7 @@ object EntityOutlineRenderer {
      *
      * @param camera       the current camera
      * @param partialTicks the progress to the next tick
-     * @param x            the camera x position
-     * @param y            the camera y position
-     * @param z            the camera z position
+     * @param vector       the camera position as Vector
      */
     @JvmStatic
     fun renderEntityOutlines(camera: ICamera, partialTicks: Float, vector: LorenzVec): Boolean {
@@ -284,9 +282,7 @@ object EntityOutlineRenderer {
      *
      * @param camera the current camera
      * @param entity the entity to render
-     * @param x      the camera x position
-     * @param y      the camera y position
-     * @param z      the camera z position
+     * @param vector the camera position as Vector
      * @return whether the entity should be rendered
      */
     private fun shouldRender(camera: ICamera, entity: Entity, vector: LorenzVec): Boolean =
@@ -339,7 +335,7 @@ object EntityOutlineRenderer {
         }
     }
 
-    fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
+    private fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
 
     private fun isXrayCacheEmpty() = entityRenderCache.xrayCache?.isEmpty() ?: true
     private fun isNoXrayCacheEmpty() = entityRenderCache.noXrayCache?.isEmpty() ?: true
@@ -366,7 +362,7 @@ object EntityOutlineRenderer {
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
         } catch (e: NoClassDefFoundError) {
-            ErrorManager.logError(e, "Unable to enable entity outlines, the required mixin is not loaded")
+            ErrorManager.logErrorWithData(e, "Unable to enable entity outlines, the required mixin is not loaded")
             isMissingMixin = true
             return
         }

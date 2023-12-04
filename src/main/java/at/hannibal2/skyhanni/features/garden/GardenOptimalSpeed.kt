@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
-    private val config get() = SkyHanniMod.feature.garden.optimalSpeeds
+    private val config get() = GardenAPI.config.optimalSpeeds
     private val configCustomSpeed get() = config.customSpeed
     private var currentSpeed = 100
     private var optimalSpeed = -1

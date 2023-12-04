@@ -59,13 +59,13 @@ object TrevorTracker {
         peltsPerSecond.clear()
         peltsPerHour = 0
         stoppedChecks = 0
-        saveAndUpdate()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }
@@ -80,14 +80,14 @@ object TrevorTracker {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
             storage.selfKillingAnimals += 1
-            saveAndUpdate()
+            update()
         }
         matcher = killMobPattern.matcher(event.message)
         if (matcher.matches()) {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
             storage.killedAnimals += 1
-            saveAndUpdate()
+            update()
         }
     }
 
@@ -95,13 +95,13 @@ object TrevorTracker {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         storage.questsDone += 1
         val rarity = matcher.group("rarity")
-        val foundRarity = TrapperMobRarity.values().firstOrNull { it.formattedName == rarity } ?: return
+        val foundRarity = TrapperMobRarity.entries.firstOrNull { it.formattedName == rarity } ?: return
         val old = storage.animalRarities[foundRarity] ?: 0
         storage.animalRarities = storage.animalRarities.editCopy { this[foundRarity] = old + 1 }
-        saveAndUpdate()
+        update()
     }
 
-    fun saveAndUpdate() {
+    fun update() {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         display = formatDisplay(drawTrapperDisplay(storage))
     }

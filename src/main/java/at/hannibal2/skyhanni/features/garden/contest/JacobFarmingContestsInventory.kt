@@ -52,10 +52,7 @@ class JacobFarmingContestsInventory {
 
             val name = item.name!!
 
-            if (foundEvents.contains(name)) {
-            } else {
-                foundEvents.add(name)
-            }
+            foundEvents.add(name)
             val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
             FarmingContestAPI.addContest(time, item)
             if (config.realTime) {

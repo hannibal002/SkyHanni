@@ -43,7 +43,7 @@ class SlayerQuestWarning {
         }
 
         //no auto slayer
-        if (message.matchRegex("   §r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!")) {
+        if (message.matchRegex(" {3}§r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!")) {
             needNewQuest("You have no Auto-Slayer active!")
         }
         if (message == "  §r§a§lSLAYER QUEST COMPLETE!") {

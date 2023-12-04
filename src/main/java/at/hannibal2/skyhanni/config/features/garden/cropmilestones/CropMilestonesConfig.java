@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.cropmilestones;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -14,6 +15,14 @@ import io.github.moulberry.moulconfig.observer.Property;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry.BLOCKS_PER_SECOND;
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry.CROPS_PER_MINUTE;
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry.MILESTONE_TIER;
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry.NUMBER_OUT_OF_TOTAL;
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry.TIME;
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry.TITLE;
+import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry.YEAR;
 
 public class CropMilestonesConfig {
     @Expose
@@ -38,8 +47,40 @@ public class CropMilestonesConfig {
     @ConfigOption(
         name = "Time Format",
         desc = "Change the highest time unit to show (1h30m vs 90min)")
-    @ConfigEditorDropdown(values = {"Year", "Day", "Hour", "Minute", "Second"})
-    public Property<Integer> highestTimeFormat = Property.of(0);
+    @ConfigEditorDropdown()
+    public Property<TimeFormatEntry> highestTimeFormat = Property.of(YEAR);
+
+    public enum TimeFormatEntry implements HasLegacyId {
+        YEAR("Year", 0),
+        DAY("Day", 1),
+        HOUR("Hour", 2),
+        MINUTE("Minute", 3),
+        SECOND("Second", 4),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        TimeFormatEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        TimeFormatEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(
@@ -54,18 +95,49 @@ public class CropMilestonesConfig {
         desc = "Drag text to change the appearance of the overlay.\n" +
             "Hold a farming tool to show the overlay."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§6Crop Milestones",
-            "§7Pumpkin Tier 22",
-            "§e12,300§8/§e100,000",
-            "§7In §b12m 34s",
-            "§7Crops/Minute§8: §e12,345",
-            "§7Blocks/Second§8: §e19.85",
-            "§7Percentage: §e12.34%",
+    @ConfigEditorDraggableList()
+    public List<MilestoneTextEntry> text = new ArrayList<>(Arrays.asList(
+        TITLE,
+        MILESTONE_TIER,
+        NUMBER_OUT_OF_TOTAL,
+        TIME,
+        CROPS_PER_MINUTE,
+        BLOCKS_PER_SECOND
+    ));
+
+    public enum MilestoneTextEntry implements HasLegacyId {
+        TITLE("§6Crop Milestones", 0),
+        MILESTONE_TIER("§7Pumpkin Tier 22", 1),
+        NUMBER_OUT_OF_TOTAL("§e12,300§8/§e100,000", 2),
+        TIME("§7In §b12m 34s", 3),
+        CROPS_PER_MINUTE("§7Crops/Minute§8: §e12,345", 4),
+        BLOCKS_PER_SECOND("§7Blocks/Second§8: §e19.85", 5),
+        PERCENTAGE("§7Percentage: §e12.34%", 6),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        MilestoneTextEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
         }
-    )
-    public List<Integer> text = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+        // Constructor if new enum elements are added post-migration
+        MilestoneTextEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")

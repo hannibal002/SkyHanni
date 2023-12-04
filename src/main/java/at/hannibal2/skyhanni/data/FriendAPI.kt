@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson
-import at.hannibal2.skyhanni.utils.jsonobjects.FriendsJson.PlayerFriends.Friend
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
