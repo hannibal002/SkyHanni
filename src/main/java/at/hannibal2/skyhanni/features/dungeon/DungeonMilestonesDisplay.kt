@@ -29,14 +29,14 @@ class DungeonMilestonesDisplay {
         var currentMilestone = 0
         var timeReached = 0L
 
-        fun isMilestoneMessage(message: String): Boolean =
-            milestonePatternList.any { it.matches(message) }
+        fun isMilestoneMessage(message: String): Boolean = milestonePatternList.any { it.matches(message) }
     }
 
     init {
         fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 200) {
-            if (!isEnabled()) return@fixedRateTimer
-            checkVisibility()
+            if (isEnabled()) {
+                checkVisibility()
+            }
         }
     }
 
