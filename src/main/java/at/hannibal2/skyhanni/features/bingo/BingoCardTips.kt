@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,6 +15,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardTips {
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
@@ -60,24 +60,20 @@ class BingoCardTips {
 
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
-
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            val stack = slot.stack ?: continue
 
-            val itemName = stack.name ?: continue
-            val communityGoal = stack.getLore().getOrNull(1) == "§8Community Goal"
-            if (communityGoal) continue
+            val goal = BingoAPI.personalGoals.firstOrNull { it.slot == slot.slotNumber } ?: continue
+            if (config.hideDoneDifficulty && goal.done) continue
 
-            BingoAPI.tips[itemName.removeColor()]?.let {
+            BingoAPI.tips[goal.displayName]?.let {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
                 slot highlight difficulty.color.addOpacity(120)
             }
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.event.bingo.bingoCard.bingoSplashGuide
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.bingoSplashGuide
 
     enum class Difficulty(rawName: String, val color: LorenzColor) {
         EASY("Easy", LorenzColor.GREEN),
