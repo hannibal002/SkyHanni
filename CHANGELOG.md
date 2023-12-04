@@ -54,6 +54,8 @@
 + Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
 + Added support for tips in hidden bingo card display. - hannibal2
 + Added support for 'found by' info in bingo card. - hannibal2
++ Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
 
 #### Inventory Features
 
@@ -81,6 +83,8 @@
 + Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
 + Made the wording of "no pest spawned yet" message more clear. - hannibal2
 + Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
++ Use different colors in the tab list depending on the pest count. - alexia
++ Highlight the boosted crop contest in all Jacob's Contest displays. - alexia
 
 #### Fishing Changes
 
@@ -105,11 +109,24 @@
 + Fixed visitor timer counting down too fast sometimes. - hannibal2
 + Fixed Mooshroom cow Perk display not showing when maxed. - hannibal2
 
+#### Bingo Fixes
+
++ Hide the long hint line in the Bingo Goal Display. - hannibal2
++ Show community goals in the Bingo Display correctly. - hannibal2
++ Hide enchanted tools in Minion Craft Helper. - hannibal2
+
+#### Minion Fixes
+
++ Fixed Minion XP display not showing sometimes. - Thunderblade73
++ Updating the Minion XP display when the minion picks up a new item while inside the inventory. - hannibal2
++ Fixed minion features disappear inside the minion inventory when picking up an item. - hannibal2
+
 #### Misc Fixes
 
 + Fixed Item Tracker not ignoring manual sack movements. - hannibal2
 + Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
 + Fixed NPC messages getting detected as player messages. - CalMWolfs
++ Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. - hannibal2
 
 #### Config Fixes
 
