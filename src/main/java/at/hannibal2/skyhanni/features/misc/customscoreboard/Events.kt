@@ -46,7 +46,6 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                         "Cleared:"
                     )
                 }.toString()
-                    .replace("§r", "").replace("%", "%§") // for some reason this is broken
             }
 
             val dungeonPlayers = TabListData.getTabList().firstOrNull { it.trim().startsWith("§r§b§lParty §r§f(") }
@@ -90,10 +89,9 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Starting in:") }) {
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Starting in:") } ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Instance ShutdowIn:") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Instance ShutdowIn:") }
-                    ?.replace("Instance ShutdowIn:", "Instance Shutdown In:")
-                    ?: "<hidden>"// for some reason this is broken
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Instance Shutdow") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Instance Shutdow") }
+                    ?: "<hidden>"
             }
 
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Elapsed: ") }) {
@@ -183,9 +181,9 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Magma Cubes Left§c") }
                     ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Damag §c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Total Damag §c") }
-                    ?.replace("Damag", "Damage") ?: "<hidden>"
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Dama") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Total Dama") }
+                    ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage§c") }) {
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Cube Damage§c") }

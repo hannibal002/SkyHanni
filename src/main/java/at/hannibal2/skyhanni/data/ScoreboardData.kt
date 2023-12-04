@@ -34,11 +34,11 @@ class ScoreboardData {
         fun formatLines(rawList: List<String>): List<String> {
             val list = mutableListOf<String>()
             for (line in rawList) {
-                val seperator = splitIcons.find { line.contains(it) } ?: continue
-                val split = line.split(seperator)
+                val separator = splitIcons.find { line.contains(it) } ?: continue
+                val split = line.split(separator)
                 val start = split[0]
                 var end = split[1]
-                if (end.length >= 2) {
+                if (end.length >= 2 && end[0] == '§' && (end[1] in '0'..'9' || end[1] in 'a'..'f')) {
                     end = end.substring(2)
                 }
                 list.add(start + end)
