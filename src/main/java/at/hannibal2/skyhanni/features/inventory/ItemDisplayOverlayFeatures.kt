@@ -46,6 +46,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ItemDisplayOverlayFeatures {
+    // TODO USE SH-REPO
     private val config get() = SkyHanniMod.feature.inventory
 
     // TODO Add to SH-REPO

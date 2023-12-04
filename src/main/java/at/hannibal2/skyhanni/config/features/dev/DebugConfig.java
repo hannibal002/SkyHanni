@@ -85,4 +85,10 @@ public class DebugConfig {
     @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
     @ConfigEditorBoolean
     public boolean hotSwapDetection = false;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni Event Counter", desc = "Count once per second how many skyhanni events gets triggered, " +
+        "show the total amount in console output.")
+    @ConfigEditorBoolean
+    public boolean eventCounter = false;
 }

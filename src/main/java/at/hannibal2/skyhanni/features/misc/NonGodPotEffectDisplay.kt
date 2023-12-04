@@ -63,6 +63,7 @@ class NonGodPotEffectDisplay {
     private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
 
+    // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
@@ -95,6 +96,7 @@ class NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
+
         if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
             effectDuration.remove(NonGodPotEffect.GOBLIN)
             update()
