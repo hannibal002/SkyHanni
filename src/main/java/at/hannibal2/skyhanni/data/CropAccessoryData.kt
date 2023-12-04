@@ -21,7 +21,7 @@ import java.util.Base64
 
 class CropAccessoryData {
     // TODO USE SH-REPO
-    private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toPattern()
+    private val accessoryBagNamePattern = "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)".toPattern()
     private var loadedAccessoryThisProfile = false
     private var ticks = 0
     private var accessoryInBag: CropAccessory? = null
@@ -51,8 +51,8 @@ class CropAccessoryData {
 
         accessoryBagNamePattern.matchMatcher(event.inventoryName) {
             isLoadingAccessories = true
-            accessoryBagPageCount = group(0).toInt()
-            accessoryBagPageNumber = group(1).toInt()
+            accessoryBagPageNumber = group("current").toInt()
+            accessoryBagPageCount = group("total").toInt()
         } ?: return
     }
 

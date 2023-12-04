@@ -113,6 +113,7 @@ class BazaarApi {
         if (!LorenzUtils.inSkyBlock) return
         if (!inBazaarInventory) return
         // TODO USE SH-REPO
+        // TODO remove dynamic pattern
         "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
             .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
     }
