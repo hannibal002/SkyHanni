@@ -73,7 +73,7 @@ class DungeonCleanEnd {
 
         if (event.health <= 0.5) {
             val dungeonFloor = DungeonAPI.dungeonFloor
-            LorenzUtils.chat("§eFloor $dungeonFloor done!")
+            LorenzUtils.chat("§eFloor $dungeonFloor done!", false)
             bossDone = true
         }
     }
@@ -90,7 +90,8 @@ class DungeonCleanEnd {
             && DungeonAPI.isOneOf("F3", "M3")
             && entity is EntityGuardian
             && entity.entityId != lastBossId
-            && Minecraft.getMinecraft().thePlayer.isSneaking) {
+            && Minecraft.getMinecraft().thePlayer.isSneaking
+        ) {
             return
         }
 

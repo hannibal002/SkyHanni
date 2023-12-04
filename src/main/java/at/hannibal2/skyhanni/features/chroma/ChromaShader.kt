@@ -13,31 +13,32 @@ import net.minecraft.client.Minecraft
  * Credit: [ChromaShader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/chroma/ChromaShader.java)
  */
 object ChromaShader : Shader("chroma", "chroma") {
-
+    val config get() = SkyHanniMod.feature.chroma
     val INSTANCE: ChromaShader
         get() = this
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "chromaSize") {
-            SkyHanniMod.feature.chroma.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
+            config.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
-            var ticks = (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+            var ticks =
+                (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
 
-            ticks = when (SkyHanniMod.feature.chroma.chromaDirection) {
+            ticks = when (config.chromaDirection) {
                 0, 2 -> ticks
                 1, 3 -> -ticks
                 else -> ticks
             }
 
-            val chromaSpeed = SkyHanniMod.feature.chroma.chromaSpeed / 360f
+            val chromaSpeed = config.chromaSpeed / 360f
             ticks * chromaSpeed
         }
         registerUniform(Uniform.UniformType.FLOAT, "saturation") {
-            SkyHanniMod.feature.chroma.chromaSaturation
+            config.chromaSaturation
         }
         registerUniform(Uniform.UniformType.BOOL, "forwardDirection") {
-            when (SkyHanniMod.feature.chroma.chromaDirection) {
+            when (config.chromaDirection) {
                 0, 1 -> true
                 2, 3 -> false
                 else -> true

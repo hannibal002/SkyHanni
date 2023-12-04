@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
-import at.hannibal2.skyhanni.utils.jsonobjects.VipVisitsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

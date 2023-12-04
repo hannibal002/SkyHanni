@@ -1,3 +1,5 @@
+
+
 <h1 align = "center">
 	SkyHanni: Mod for Hypixel SkyBlock
 </h1>
@@ -11,7 +13,7 @@
 
 SkyHanni is a Forge mod for Minecraft 1.8.9. It adds many features to Hypixel SkyBlock.
 The mod is filled with GUIs, extra chat messages, reminders, message hiders and entity highlighters.
-The majority of these features are centered on the Garden, Slayer, Bingo, Diana, and Rift.
+The majority of these features are centered in the Garden, Slayer, Bingo, Diana, and Rift.
 
 We have a [tutorial](https://github.com/hannibal002/SkyHanni/blob/beta/INSTALLING.md)
 for how to download and install the mod.
@@ -25,3 +27,5 @@ our [Discord](https://discord.gg/skyhanni-997079228510117908).
 
 If you are interested in the technical side of SkyHanni, read
 the [Contributing Guide](https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md).
+
+*Check out some other really cool 1.8.9 mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/)*

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -258,7 +258,8 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     AUTO({
         var autoReturn = ""
         for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
-            val autoStatus = AutoStatus.entries[statusID]
+            // TODO, change functionality to use enum rather than ordinals
+            val autoStatus = AutoStatus.entries[statusID.ordinal]
             val result =
                 autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
             if (result != autoStatus.placeholderText) { // if that value is useful, display it
@@ -269,7 +270,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         if (autoReturn == "") { // if we didn't find any useful information, display the fallback
             val statusNoAuto = DiscordStatus.entries.toMutableList()
             statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get().ordinal].getDisplayString()
         }
         autoReturn
     }),
@@ -289,7 +290,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     PETS({
-        ProfileStorageData.profileSpecific?.currentPet?.let {
+        PetAPI.currentPet?.let {
             val colorCode = it.substring(1..2).first()
             val petName = it.substring(2)
             val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
@@ -371,8 +372,10 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     AFK({
-        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince().format(maxUnits = 1, longName = true)}"
-        else AutoStatus.AFK.placeholderText
+        if (beenAfkFor.passedSince() > 5.minutes) {
+            val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            "AFK for $format"
+        } else AutoStatus.AFK.placeholderText
     })
     ;
 
