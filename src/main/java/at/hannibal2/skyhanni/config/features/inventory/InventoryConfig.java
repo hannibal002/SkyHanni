@@ -37,7 +37,6 @@ public class InventoryConfig {
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
 
-
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
