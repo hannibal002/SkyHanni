@@ -105,7 +105,9 @@ class InformationGetter {
             "Remaining: §a",
             "Your Tasty Mithr: §c",
             "§3§lSolo",
-						"§fRift Dimension"
+			"§fRift Dimension",
+            "§d᠅ §fGemstone§f: §d",
+            "§2᠅ §fMithril§f: §2"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
