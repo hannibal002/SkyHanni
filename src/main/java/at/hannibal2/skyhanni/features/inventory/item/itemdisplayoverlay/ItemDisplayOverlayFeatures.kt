@@ -47,14 +47,44 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     // TODO repo
-    private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
-    private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val masterSkullPattern = "(.*)Master Skull - Tier .".toPattern()
-    private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
-    private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
-    private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
-    private val bingoGoalRankPattern = "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
-
+    // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
+    private val rancherBootsSpeedCapLoreLinePattern = (("§7Current Speed Cap: §a(?<cap>.*)").toPattern())
+    private val petLevelItemNamePattern = (("\\[Lvl (?<level>.*)] .*").toPattern())
+    private val shredderBonusDamageLoreLinePattern = (("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)").toPattern())
+    private val bottleOfJerryLoreLinePattern = (("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)").toPattern())
+    private val gardenVacuumLoreLinePattern = (("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?").toPattern())
+    private val masterSkullItemNamePattern = (("(.*)Master Skull - Tier (?<tier>.+)").toPattern())
+    private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
+    private val newYearCakeSpookyPieYearItemNamePattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
+    private val minionTierItemNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
+    private val enchantedItemSackItemNamePattern = (("Enchanted .*").toPattern())
+    private val kuudraKeyItemNamePattern = (("([\\w ]+)?Kuudra Key").toPattern())
+    private val kuudraKeyInternalNamePattern = (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern())
+    private val larvaHookLoreLinePattern = (("§7§7You may harvest §6(?<amount>.).*").toPattern())
+    private val dungeonLevelPotionItemNamePattern = (("Dungeon (?<level>.*) Potion").toPattern())
+    private val armadilloRarityLorePattern = (("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)").toPattern())
+    private val beastmasterCrestInternalNamePattern = (("BEASTMASTER_CREST_[\\w]*").toPattern())
+    private val beastmasterCrestKillsProgressPattern = (("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)").toPattern())
+    private val campfireTalismanTierInternalNamePattern = (("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)").toPattern())
+    private val auctionHouseChestNamePattern = (("^(?:(?!Auction).)*\$").toPattern())
+    private val internalizedSoulflowLoreLinePattern = (("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow").toPattern())
+    private val storageChestInternalNamePattern = ((".*_ENCHANTED_CHEST").toPattern())
+    private val storageChestItemNamePattern = ((".* Storage").toPattern())
+    private val personalCompactorDeletorChestNamePattern = (("Personal (Compactor .*|Deletor .*)").toPattern())
+    private val personalCompactorEnabledItemNamePattern = (("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!").toPattern())
+    private val personalCompactorDeletorInternalNamePattern = (("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)").toPattern())
+    private val personalCompactorDeletorItemNamePattern = (("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)").toPattern())
+    private val abiphoneInternalNamePattern = (("ABIPHONE_.*").toPattern())
+    private val auctionNumberLorePattern = (("§8Auction .*").toPattern())
+    private val editionNumberLorePattern = (("§8Edition .*").toPattern())
+    private val doesNotIncludeDungeonStarsItemNamePattern = (("^(?:(?!✪).)*\$").toPattern())
+    private val tieredEnchants = listOf(
+        "compact",
+        "cultivating",
+        "champion",
+        "expertise",
+        "hecatomb",
+    )
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
     @SubscribeEvent
