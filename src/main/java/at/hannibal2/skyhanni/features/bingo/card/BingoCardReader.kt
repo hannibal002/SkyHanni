@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,7 +25,8 @@ class BingoCardReader {
         } ?: return
 
         val goal = BingoAPI.personalGoals.firstOrNull { it.displayName == name } ?: return
-
+        goal.done = true
         BingoGoalReachedEvent(goal).postAndCatch()
+        BingoCardUpdateEvent().postAndCatch()
     }
 }

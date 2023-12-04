@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -232,9 +231,7 @@ class BingoNextStepHelper {
             val description = goal.description
             val bingoCardStep = readDescription(description.removeColor())
             if (bingoCardStep == null) {
-                if (!BingoCardDisplay.personalHiddenGoalPattern.matches(description)) {
-                    println("Warning: Could not find bingo steps for $description")
-                }
+//                 println("Warning: Could not find bingo steps for $description")
             } else {
                 finalSteps.add(bingoCardStep)
             }
