@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig;
+package at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class InventoryConfig {
@@ -31,6 +32,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Jacob Farming Contest", desc = "")
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
+
 
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
