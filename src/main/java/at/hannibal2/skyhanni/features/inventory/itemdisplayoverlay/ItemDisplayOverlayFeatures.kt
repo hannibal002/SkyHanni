@@ -173,9 +173,7 @@ object ItemDisplayOverlayFeatures {
     }
 
     // <editor-fold desc="Stack Size Implementations">
-    private fun isMasterStar(internalName: NEUInternalName): Boolean =
-        MASTER_STAR_TIER.isSelected() && masterStarPattern.matches(internalName)
-
+    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarPattern.matches(internalName)
     private fun getMasterStarTip(internalName: NEUInternalName): String {
         var tier = ""
         masterStarPattern.matchMatcher(internalName.asString()) { tier = group("tier") }
@@ -189,16 +187,14 @@ object ItemDisplayOverlayFeatures {
         }
     }
 
-    private fun isMasterSkull(internalName: NEUInternalName): Boolean =
-        MASTER_SKULL_TIER.isSelected() && masterSkullInternalNamePattern.matches(internalName)
+    private fun isMasterSkull(internalName: NEUInternalName): Boolean = MASTER_SKULL_TIER.isSelected() && masterSkullInternalNamePattern.matches(internalName)
     private fun getMasterSkullTip(internalName: NEUInternalName): String {
         var tier = ""
         masterSkullInternalNamePattern.matchMatcher(internalName.asString()) { tier = group(tier) }
         return tier
     }
 
-    private fun isDungeonHead(internalName: NEUInternalName): Boolean =
-        DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalNamePattern.matches(internalName)
+    private fun isDungeonHead(internalName: NEUInternalName): Boolean = DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalNamePattern.matches(internalName)
     private fun getDungeonHeadTip(internalName: NEUInternalName): String {
         var floor = ""
         dungeonBossHeadInternalNamePattern.matchMatcher(internalName.asString()) { floor = group("type") }
@@ -214,9 +210,7 @@ object ItemDisplayOverlayFeatures {
         }
     }
 
-    private fun isNewYearCake(internalName: NEUInternalName): Boolean =
-        NEW_YEAR_CAKE.isSelected() && internalName == newYearCakeInternalName
-
+    private fun isNewYearCake(internalName: NEUInternalName): Boolean = NEW_YEAR_CAKE.isSelected() && internalName == newYearCakeInternalName
     private fun getNewYearCakeTip(item: ItemStack): String {
         return "§b${item.getExtraAttributes()?.getInteger("new_years_cake")}"
     }
@@ -267,8 +261,7 @@ object ItemDisplayOverlayFeatures {
         return text
     }
 
-    private fun isKuudraKey(internalName: NEUInternalName, itemName: String): Boolean =
-        KUUDRA_KEY.isSelected() && kuudraKeyInternalNamePattern.matches(internalName) && kuudraKeyItemNamePattern.matches(itemName)
+    private fun isKuudraKey(internalName: NEUInternalName, itemName: String): Boolean = KUUDRA_KEY.isSelected() && kuudraKeyInternalNamePattern.matches(internalName) && kuudraKeyItemNamePattern.matches(itemName)
     private fun getKuudraKeyTip(internalName: NEUInternalName): String {
         kuudraKeyInternalNamePattern.matchMatcher(internalName.asString()) {
             return when (group("tier")) {
@@ -283,8 +276,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isRanchersBoots(internalName: NEUInternalName): Boolean =
-        RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
+    private fun isRanchersBoots(internalName: NEUInternalName): Boolean = RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
     private fun getRanchersBootsTip(item: ItemStack): String {
         for (line in item.getLore()) {
             rancherBootsSpeedCapLoreLinePattern.matchMatcher(line) {
@@ -341,15 +333,13 @@ object ItemDisplayOverlayFeatures {
         }
         return ""
     }
-    private fun isBottleOfJyrre(internalName: NEUInternalName): Boolean =
-        BOTTLE_OF_JYRRE.isSelected() && internalName == newBottleOfJyrreInternalName
+    private fun isBottleOfJyrre(internalName: NEUInternalName): Boolean = BOTTLE_OF_JYRRE.isSelected() && internalName == newBottleOfJyrreInternalName
     private fun getBottleOfJyrreTip(item: ItemStack): String {
         val seconds = item.getBottleOfJyrreSeconds() ?: 0
         return "§a${(seconds / 3600)}"
     }
 
-    private fun isLegacyBottleOfJyrre(internalName: NEUInternalName): Boolean =
-        BOTTLE_OF_JYRRE.isSelected() && internalName == legacyBottleOfJyrreInternalName
+    private fun isLegacyBottleOfJyrre(internalName: NEUInternalName): Boolean = BOTTLE_OF_JYRRE.isSelected() && internalName == legacyBottleOfJyrreInternalName
     private fun getLegacyBottleOfJyrreTip(item: ItemStack): String {
         for (line in item.getLore()) {
             bottleOfJerryLoreLinePattern.matchMatcher(line) {
