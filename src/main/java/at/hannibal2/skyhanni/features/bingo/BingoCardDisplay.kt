@@ -117,7 +117,7 @@ class BingoCardDisplay {
         var hiddenGoals = 0
         var nextTip = 7.days
         for (goal in todo.toList()) {
-            val hiddenGoalData = goal.hiddenGoalData ?: continue
+            val hiddenGoalData = goal.hiddenGoalData
             if (hiddenGoalData.unknownTip) {
                 hiddenGoals++
                 todo.remove(goal)
