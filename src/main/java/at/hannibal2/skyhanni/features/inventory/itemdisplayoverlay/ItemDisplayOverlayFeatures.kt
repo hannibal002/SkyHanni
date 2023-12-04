@@ -220,9 +220,7 @@ object ItemDisplayOverlayFeatures {
         return "§b${(item.getExtraAttributes()?.getInteger("new_years_cake")?.plus(1))}"
     }
 
-    private fun isPet(itemName: String, chestName: String): Boolean {
-        return PET_LEVEL.isSelected() && !chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)
-    }
+    private fun isPet(itemName: String, chestName: String): Boolean = PET_LEVEL.isSelected() && !chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)
     private fun getPetTip(itemName: String): String {
         petLevelItemNamePattern.matchMatcher(itemName) {
             val rawLevel = group("level")
@@ -235,9 +233,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isMinionTier(itemName: String): Boolean {
-        return MINION_TIER.isSelected() && minionTierItemNamePattern.matches(itemName)
-    }
+    private fun isMinionTier(itemName: String): Boolean = MINION_TIER.isSelected() && minionTierItemNamePattern.matches(itemName)
     private fun getMinionTierTip(itemName: String, lore: List<String>): String {
         if (lore.any { (it == ("§7Place this minion and it will")) }) {
             return "${itemName.split(" ").last().romanToDecimal()}"
@@ -299,9 +295,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isDungeonPotion(item: ItemStack, internalName: NEUInternalName): Boolean {
-        return DUNGEON_POTION_LEVEL.isSelected() && internalName == potionInternalName && item.getExtraAttributes()?.getString("potion_name") == "Dungeon"
-    }
+    private fun isDungeonPotion(item: ItemStack, internalName: NEUInternalName): Boolean = DUNGEON_POTION_LEVEL.isSelected() && internalName == potionInternalName && item.getExtraAttributes()?.getString("potion_name") == "Dungeon"
     private fun getDungeonPotionTip(item: ItemStack): String {
         val potionLevel = item.getExtraAttributes()?.getInteger("potion_level") ?: return ""
         return when (potionLevel) {
@@ -323,8 +317,8 @@ object ItemDisplayOverlayFeatures {
                     when {
                         pests < 40 -> "$pests"
                         pests < 1_000 -> "§6$pests"
-                        pests < 100_000 -> "§c${pests / 1000}k"
-                        else -> "§c${pests / 100_000 / 10.0}m"
+                        pests < 100_000 -> "§c${pests / 1_000}k"
+                        else -> "§4${pests / 100_000 / 10.0}m" //4 is a darker shade of color code c
                     }
                 }
             }
@@ -340,30 +334,20 @@ object ItemDisplayOverlayFeatures {
     private fun isLegacyBottleOfJyrre(internalName: NEUInternalName): Boolean = BOTTLE_OF_JYRRE.isSelected() && internalName == legacyBottleOfJyrreInternalName
     private fun getLegacyBottleOfJyrreTip(lore: List<String>): String {
         for (line in lore) {
-            bottleOfJerryLoreLinePattern.matchMatcher(line) {
-                return group("intelbonus")
-            }
+            bottleOfJerryLoreLinePattern.matchMatcher(line) { return "§2${group("intelbonus")}" } //2 is a darker shade of color code a
         }
         return ""
     }
 
     private fun isEditionNumber(item: ItemStack): Boolean = EDITION_NUMBER.isSelected() && item.getEdition() != null
     private fun getEditionNumberTip(item: ItemStack): String {
-        item.getEdition()?.let { edition ->
-            if (edition < 1_000) {
-                return "§6$edition"
-            }
-        }
+        item.getEdition()?.let { if (it < 1_000) { return "§6$it" } }
         return ""
     }
 
     private fun isAuctionNumber(item: ItemStack): Boolean = EDITION_NUMBER.isSelected() && item.getAuctionNumber() != null
     private fun getAuctionNumberTip(item: ItemStack): String {
-        item.getAuctionNumber()?.let { auctionNum ->
-            if (auctionNum < 1_000) {
-                return "§6$auctionNum"
-            }
-        }
+        item.getAuctionNumber()?.let { if (it < 1_000) { return "§6$it" } }
         return ""
     }
 
@@ -379,9 +363,7 @@ object ItemDisplayOverlayFeatures {
 
     private fun isBloodGodCrest(internalName: NEUInternalName): Boolean = BLOOD_GOD.isSelected() && internalName == bloodGodCrestInternalName
     private fun getBloodGodCrestTip(item: ItemStack): String {
-        item.getBloodGodKills()?.let {
-            return ("${floor(log10(it.toDouble())) + 1}")
-        }
+        item.getBloodGodKills()?.let { return ("${floor(log10(it.toDouble())) + 1}") }
         return ""
     }
 
@@ -397,9 +379,7 @@ object ItemDisplayOverlayFeatures {
         val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
         var rarity = ""
         for (line in lore) {
-            armadilloRarityLorePattern.matchMatcher(line) {
-                rarity = group("rarity")
-            }
+            armadilloRarityLorePattern.matchMatcher(line) { rarity = group("rarity") }
         }
         val threshold = when (rarity) {
             "COMMMON" -> 4_000F
@@ -409,24 +389,18 @@ object ItemDisplayOverlayFeatures {
             "LEGENDARY" -> 100_000F
             else -> 1F
         }
-        return if (threshold != 1F) {
-            "${((blocksWalked.toFloat() / threshold) * 100).toInt()}"
-        } else ""
+        return if (threshold != 1F) { "${((blocksWalked.toFloat() / threshold) * 100).toInt()}" } else ""
     }
 
     private fun isCampfireAccessory(internalName: NEUInternalName): Boolean = CAMPFIRE.isSelected() && campfireTalismanTierInternalNamePattern.matches(internalName)
     private fun getCampfireTip(internalName: NEUInternalName): String {
-        campfireTalismanTierInternalNamePattern.matchMatcher(internalName.asString()) {
-            return "${(group("tier").toInt() + 1)}"
-        }
+        campfireTalismanTierInternalNamePattern.matchMatcher(internalName.asString()) { return "${(group("tier").toInt() + 1)}" }
         return ""
     }
 
     private fun isFruitBowl(internalName: NEUInternalName): Boolean = FRUIT_BOWL.isSelected() && internalName == fruitBowlInternalName
     private fun getFruitBowlTip(item: ItemStack): String {
-        item.getFruitBowlNames().let {
-            return "${it?.size}"
-        }
+        item.getFruitBowlNames().let { return "${it?.size}" }
     }
 
     private fun isBeastmaster(internalName: NEUInternalName): Boolean = BEASTMASTER.isSelected() && beastmasterCrestInternalNamePattern.matches(internalName)
@@ -439,9 +413,7 @@ object ItemDisplayOverlayFeatures {
                 return (((num.toFloat() / denom.toFloat()) * 100).toString().take(2))
             } */
             beastmasterCrestKillsProgressPattern.matchMatcher(line) {
-                val progress = group("progress").formatNumber().toFloat()
-                val total = group("total").formatNumber().toFloat()
-                return "${((progress / total) * 100)}".take(2)
+                return "${((group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()) * 100)}".take(2)
             }
         }
         return ""
