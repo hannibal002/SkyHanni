@@ -239,10 +239,8 @@ object ItemDisplayOverlayFeatures {
         return MINION_TIER.isSelected() && minionTierItemNamePattern.matches(itemName)
     }
     private fun getMinionTierTip(itemName: String, lore: List<String>): String {
-        for (line in lore) {
-            if (line == ("§7Place this minion and it will")) {
-                return itemName.split(" ").last().romanToDecimal().toString()
-            }
+        if (lore.any { (it == ("§7Place this minion and it will")) }) {
+            return "${itemName.split(" ").last().romanToDecimal()}"
         }
         return ""
     }
