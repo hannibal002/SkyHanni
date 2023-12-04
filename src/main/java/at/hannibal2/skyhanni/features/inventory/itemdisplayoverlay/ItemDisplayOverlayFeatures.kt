@@ -67,7 +67,6 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     // TODO repo
-    // TODO FOR ERY: PORT EVERYTHING OVER TO THIS NEW WALKER FORMAT FOR THIS SPECIFIC CATEGORY
     // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
     private val masterStarPattern = (("(?<tier>[A-Z])+_MASTER_STAR").toPattern())
     private val rancherBootsSpeedCapLoreLinePattern = (("§7Current Speed Cap: §a(?<cap>.*)").toPattern())
