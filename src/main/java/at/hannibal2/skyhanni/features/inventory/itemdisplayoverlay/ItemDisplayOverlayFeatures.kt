@@ -76,13 +76,11 @@ object ItemDisplayOverlayFeatures {
     private val gardenVacuumLoreLinePattern = (("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?").toPattern())
     private val masterSkullInternalNamePattern = (("MASTER_SKULL_TIER_(?<tier>\\d)").toPattern())
     private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
-    // private val newYearCakeSpookyPieYearItemNamePattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
     private val minionTierItemNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
-    // private val enchantedItemSackItemNamePattern = (("Enchanted .*").toPattern())
+    private val enchantedItemSackItemNamePattern = (("Enchanted .*").toPattern())
     private val kuudraKeyItemNamePattern = (("([\\w ]+)?Kuudra Key").toPattern())
     private val kuudraKeyInternalNamePattern = (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern())
     private val larvaHookLoreLinePattern = (("§7§7You may harvest §6(?<amount>.).*").toPattern())
-    // private val dungeonLevelPotionItemNamePattern = (("Dungeon (?<level>.*) Potion").toPattern())
     private val armadilloRarityLorePattern = (("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)").toPattern())
     private val beastmasterCrestInternalNamePattern = (("BEASTMASTER_CREST_[\\w]*").toPattern())
     private val beastmasterCrestKillsProgressPattern = (("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)").toPattern())
@@ -136,7 +134,7 @@ object ItemDisplayOverlayFeatures {
             isMasterSkull(internalName) -> getMasterSkullTip(internalName)
             isDungeonHead(internalName) -> getDungeonHeadTip(internalName)
             isNewYearCake(internalName) -> getNewYearCakeTip(item)
-            isPet(itemName) -> getPetTip(itemName)
+            isPet(itemName, chestName) -> getPetTip(itemName)
             isMinionTier(itemName) -> getMinionTierTip(itemName, lore)
             isSack(item) -> getSackTip(itemName)
             isKuudraKey(internalName, itemName) -> getKuudraKeyTip(internalName)
@@ -223,8 +221,8 @@ object ItemDisplayOverlayFeatures {
         return "§b${(item.getExtraAttributes()?.getInteger("new_years_cake")?.plus(1))}"
     }
 
-    private fun isPet(itemName: String): Boolean {
-        return PET_LEVEL.isSelected() && !InventoryUtils.openInventoryName()
+    private fun isPet(itemName: String, chestName: String): Boolean {
+        return PET_LEVEL.isSelected() && !chestName
             .endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)
     }
 
@@ -254,7 +252,11 @@ object ItemDisplayOverlayFeatures {
 
     private fun isSack(item: ItemStack): Boolean = config.displaySackName && ItemUtils.isSack(item)
     private fun getSackTip(itemName: String): String {
-        return (if (itemName.contains("Enchanted")) "§5" else "") + grabSackName(itemName).substring(0, 2)
+        var colorCode = ""
+        enchantedItemSackItemNamePattern.matchMatcher(itemName) {
+            colorCode = "§5"
+        }
+        return "$colorCode${grabSackName(itemName).substring(0, 2)}"
     }
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
@@ -400,7 +402,6 @@ object ItemDisplayOverlayFeatures {
     private fun isNecronsLadder(internalName: NEUInternalName): Boolean = NECRONS_LADDER.isSelected() && internalName == necronsLadderInternalName
     private fun getNecronsLadderTip(item: ItemStack): String {
         item.getNecronHandlesFound().let { return "$it" }
-        return ""
     }
 
     private fun isArmadillo(internalName: NEUInternalName) = ARMADILLO.isSelected() && internalName == prehistoricEggInternalName
@@ -439,7 +440,6 @@ object ItemDisplayOverlayFeatures {
         item.getFruitBowlNames().let {
             return "${it?.size}"
         }
-        return ""
     }
 
     private fun isBeastmaster(internalName: NEUInternalName): Boolean = BEASTMASTER.isSelected() && beastmasterCrestInternalNamePattern.matches(internalName)
