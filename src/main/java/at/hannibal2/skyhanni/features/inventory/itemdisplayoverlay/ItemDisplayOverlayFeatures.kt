@@ -145,12 +145,12 @@ object ItemDisplayOverlayFeatures {
             isMinionTier(itemName) -> getMinionTierTip(itemName, lore)
             isSack(item) -> getSackTip(itemName)
             isKuudraKey(internalName, itemName) -> getKuudraKeyTip(internalName)
-            isRanchersBoots(internalName) -> getRanchersBootsTip(item)
-            isLarvaHook(internalName) -> getLarvaHookTip(item)
+            isRanchersBoots(internalName) -> getRanchersBootsTip(lore)
+            isLarvaHook(internalName) -> getLarvaHookTip(lore)
             isDungeonPotion(item, internalName) -> getDungeonPotionTip(item)
-            isVacuumGarden(item) -> getVacuumGardenTip(item)
+            isVacuumGarden(item) -> getVacuumGardenTip(lore)
             isBottleOfJyrre(internalName) -> getBottleOfJyrreTip(item)
-            isLegacyBottleOfJyrre(internalName) -> getLegacyBottleOfJyrreTip(item)
+            isLegacyBottleOfJyrre(internalName) -> getLegacyBottleOfJyrreTip(lore)
             isEditionNumber(item) -> getEditionNumberTip(item)
             isAuctionNumber(item) -> getAuctionNumberTip(item)
             isSoulflowItem(internalName) -> getSoulflowTip(item, chestName)
@@ -159,9 +159,9 @@ object ItemDisplayOverlayFeatures {
             isArmadillo(internalName) -> getArmadilloTip(item)
             isCampfireAccessory(internalName) -> getCampfireTip(internalName)
             isFruitBowl(internalName) -> getFruitBowlTip(item)
-            isBeastmaster(internalName) -> getBeastmasterTip(item)
+            isBeastmaster(internalName) -> getBeastmasterTip(lore)
             isYetiRod(internalName) -> getYetiRodTip(item)
-            isShredder(internalName) -> getShredderTip(item)
+            isShredder(internalName) -> getShredderTip(lore)
             isMinionStorage(item) -> getMinionStorageTip(itemName)
             isCompactorOrDeletorItem(internalName, itemName) -> getCompactorOrDeletorItemTip(itemName)
             isCompactorOrDeletorChest(chestName, itemName) -> getCompactorOrDeletorStatusTip(itemName)
@@ -277,8 +277,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isRanchersBoots(internalName: NEUInternalName): Boolean = RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
-    private fun getRanchersBootsTip(item: ItemStack): String {
-        for (line in item.getLore()) {
+    private fun getRanchersBootsTip(lore: List<String>): String {
+        for (line in lore) {
             rancherBootsSpeedCapLoreLinePattern.matchMatcher(line) {
                 return group("cap")
             }
@@ -287,8 +287,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isLarvaHook(internalName: NEUInternalName): Boolean = LARVA_HOOK.isSelected() && internalName == larvaHookInternalName
-    private fun getLarvaHookTip(item: ItemStack): String {
-        for (line in item.getLore()) {
+    private fun getLarvaHookTip(lore: List<String>): String {
+        for (line in lore) {
             larvaHookLoreLinePattern.matchMatcher(line) {
                 val amount = group("amount").toInt()
                 return when {
@@ -315,8 +315,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isVacuumGarden(item: ItemStack): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants
-    private fun getVacuumGardenTip(item: ItemStack): String {
-        for (line in item.getLore()) {
+    private fun getVacuumGardenTip(lore: List<String>): String {
+        for (line in lore) {
             gardenVacuumLoreLinePattern.matchMatcher(line) {
                 val pests = group("amount").formatNumber()
                 return if (config.vacuumBagCap) {
@@ -340,8 +340,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isLegacyBottleOfJyrre(internalName: NEUInternalName): Boolean = BOTTLE_OF_JYRRE.isSelected() && internalName == legacyBottleOfJyrreInternalName
-    private fun getLegacyBottleOfJyrreTip(item: ItemStack): String {
-        for (line in item.getLore()) {
+    private fun getLegacyBottleOfJyrreTip(lore: List<String>): String {
+        for (line in lore) {
             bottleOfJerryLoreLinePattern.matchMatcher(line) {
                 return group("intelbonus")
             }
@@ -432,8 +432,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isBeastmaster(internalName: NEUInternalName): Boolean = BEASTMASTER.isSelected() && beastmasterCrestInternalNamePattern.matches(internalName)
-    private fun getBeastmasterTip(item: ItemStack): String {
-        for (line in item.getLore()) {
+    private fun getBeastmasterTip(lore: List<String>): String {
+        for (line in lore) {
             //§7Your kills: §21,581§8/2,500
             /* if (line.contains("Your kills: ")) {
                 val num = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").first()
@@ -461,8 +461,8 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isShredder(internalName: NEUInternalName): Boolean = SHREDDER.isSelected() && internalName == shredderInternalName
-    private fun getShredderTip(item: ItemStack): String {
-        for (line in item.getLore()) {
+    private fun getShredderTip(lore: List<String>): String {
+        for (line in lore) {
             shredderBonusDamageLoreLinePattern.matchMatcher(line) {
                 return group("dmgbonus")
             }
