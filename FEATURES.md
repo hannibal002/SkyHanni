@@ -345,6 +345,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
 + Support for tips in hidden bingo card display. - hannibal2
 + Support for 'found by' info in bingo card. - hannibal2
++ Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
 </details>
 <details open><summary>
 
