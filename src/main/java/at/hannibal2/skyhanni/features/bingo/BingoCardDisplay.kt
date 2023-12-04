@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoGoal
+import at.hannibal2.skyhanni.features.bingo.card.GoalType
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -54,8 +55,7 @@ class BingoCardDisplay {
         }
 
         private fun reload() {
-            BingoAPI.personalGoals.clear()
-            BingoAPI.communityGoals.clear()
+            BingoAPI.bingoGoals.clear()
         }
 
         fun toggleCommand() {
@@ -86,8 +86,7 @@ class BingoCardDisplay {
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
 
-        BingoAPI.personalGoals.clear()
-        BingoAPI.communityGoals.clear()
+        BingoAPI.bingoGoals.clear()
         for ((slot, stack) in event.inventoryItems) {
             val isPersonalGoal = stack.getLore().any { it.endsWith("Personal Goal") }
             val isCommunityGoal = stack.getLore().any { it.endsWith("Community Goal") }
@@ -114,9 +113,9 @@ class BingoCardDisplay {
 
             val done = stack.getLore().any { it.contains("GOAL REACHED") }
             if (isPersonalGoal) {
-                BingoAPI.personalGoals.add(getPersonalGoal(name, description, slot, done))
+                BingoAPI.bingoGoals.add(getPersonalGoal(name, description, slot, done))
             } else {
-                BingoAPI.communityGoals.add(getCommunityGoal(name, description, slot, done))
+                BingoAPI.bingoGoals.add(getCommunityGoal(name, description, slot, done))
             }
         }
         lastBingoCardOpenTime = SimpleTimeMark.now()
@@ -133,11 +132,11 @@ class BingoCardDisplay {
         if (!done) {
             personalHiddenGoalPattern.matchMatcher(description) {
                 BingoAPI.tips[name]?.let {
-                    return BingoGoal(name, it.getDescriptionLine(), slot, false)
+                    return BingoGoal(name, it.getDescriptionLine(), GoalType.PERSONAL, slot, false)
                 }
             }
         }
-        return BingoGoal(name, description, slot, done)
+        return BingoGoal(name, description, GoalType.PERSONAL, slot, done)
     }
 
     private fun getCommunityGoal(
@@ -148,10 +147,10 @@ class BingoCardDisplay {
     ): BingoGoal {
         if (description == "§7This goal will be revealed §7when it hits Tier IV.") {
             BingoAPI.getCommunityTip(name)?.let {
-                return BingoGoal(name, it.getDescriptionLine(), slot, done)
+                return BingoGoal(name, it.getDescriptionLine(), GoalType.COMMUNITY, slot, done)
             }
         }
-        return BingoGoal(name, description, slot, done)
+        return BingoGoal(name, description, GoalType.COMMUNITY, slot, done)
     }
 
     @SubscribeEvent
@@ -170,7 +169,7 @@ class BingoCardDisplay {
     private fun drawDisplay(): MutableList<String> {
         val newList = mutableListOf<String>()
 
-        if (BingoAPI.communityGoals.isEmpty()) {
+        if (BingoAPI.bingoGoals.isEmpty()) {
             newList.add("§6Bingo Goals:")
             newList.add("§cOpen the §e/bingo §ccard.")
         } else {

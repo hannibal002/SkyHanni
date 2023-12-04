@@ -1,0 +1,3 @@
+package at.hannibal2.skyhanni.features.bingo.card
+
+class BingoGoal(val displayName: String, val description: String, val type: GoalType, val slot: Int, var done: Boolean)

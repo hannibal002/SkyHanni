@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoGoal
+import at.hannibal2.skyhanni.features.bingo.card.GoalType
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BingoAPI {
     private var ranks = mapOf<String, Int>()
     var tips: Map<String, BingoJson.BingoTip> = emptyMap()
-    val personalGoals = mutableListOf<BingoGoal>()
-    val communityGoals = mutableListOf<BingoGoal>()
+    val bingoGoals = mutableListOf<BingoGoal>()
+    val personalGoals get() = bingoGoals.filter { it.type == GoalType.PERSONAL }
+    val communityGoals get() = bingoGoals.filter { it.type == GoalType.COMMUNITY }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
