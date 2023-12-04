@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import org.intellij.lang.annotations.Language
 import java.util.Base64
 import java.util.NavigableMap
 import java.util.UUID
@@ -76,9 +75,6 @@ object StringUtils {
     fun UUID.toDashlessUUID(): String {
         return toString().replace("-", "")
     }
-
-    @Deprecated("Do not create a regex pattern each time.", ReplaceWith("toPattern()"))
-    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     private fun String.removeAtBeginning(text: String): String =
         if (this.startsWith(text)) substring(text.length) else this
