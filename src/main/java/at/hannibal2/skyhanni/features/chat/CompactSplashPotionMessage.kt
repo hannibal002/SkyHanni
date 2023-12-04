@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -47,7 +48,7 @@ class CompactSplashPotionMessage {
             it.matchMatcher(this) {
                 val effectName = group("effectName")
                 // If splashed by a player, append their name.
-                val byPlayer = group("playerName")?.let { player -> " by $player" } ?: ""
+                val byPlayer = groupOrNull("playerName")?.let { player -> " by $player" } ?: ""
                 sendMessage("§a§lPotion Effect! §r$effectName$byPlayer")
             } != null
         }
