@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
@@ -191,7 +192,7 @@ enum class Elements(
         {
             val symbols = listOf("☔", "§e☀", "§b☽")
             if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
-                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } } to AlignmentEnum.LEFT)
+                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } }.trim() to AlignmentEnum.LEFT)
             } else {
                 listOf(
                     "§7" + SkyBlockTime.now()
@@ -390,7 +391,11 @@ enum class Elements(
     ;
 
     fun getPair(): List<Pair<String, AlignmentEnum>> {
-        return displayPair.get()
+        return try {
+            displayPair.get()
+        } catch (e: NoSuchElementException){
+            listOf("<hidden>" to AlignmentEnum.LEFT)
+        }
     }
 
     fun isVisible(): Boolean {

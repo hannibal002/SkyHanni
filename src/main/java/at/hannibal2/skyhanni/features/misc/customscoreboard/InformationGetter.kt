@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
@@ -144,5 +145,7 @@ class InformationGetter {
         // Remove slayer
         extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
         extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
+        extraLines = extraLines.filter { it != SlayerAPI.latestSlayerCategory }
+        extraLines = extraLines.filter { it != SlayerAPI.latestSlayerProgress }
     }
 }
