@@ -249,7 +249,7 @@ enum class Elements(
             if (extraObjectiveLines.any {
                     ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2)?.contains(it) == true
                 }) {
-                objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString()
+                objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString().replace(")", "§7)")
             }
 
             objective.map { it to AlignmentEnum.LEFT }
