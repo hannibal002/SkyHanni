@@ -130,15 +130,14 @@ class BingoCardDisplay {
         slot: Int,
         done: Boolean
     ): BingoGoal {
-        var personalGoal = BingoGoal(name, description, slot, done)
         if (!done) {
             personalHiddenGoalPattern.matchMatcher(description) {
                 BingoAPI.tips[name]?.let {
-                    personalGoal = BingoGoal(name, it.getDescriptionLine(), slot, false)
+                    return BingoGoal(name, it.getDescriptionLine(), slot, false)
                 }
             }
         }
-        return personalGoal
+        return BingoGoal(name, description, slot, done)
     }
 
     private fun getCommunityGoal(
