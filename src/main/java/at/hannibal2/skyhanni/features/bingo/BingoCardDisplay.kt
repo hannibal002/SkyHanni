@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -219,7 +220,8 @@ class BingoCardDisplay {
 
         todo.mapTo(this) { "  " + it.description }
         if (hiddenGoals > 0) {
-            add("§7+ $hiddenGoals hidden personal goals.")
+            val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
+            add("§7+ $hiddenGoals more unknown $name.")
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 7.days
         if (hasHiddenPersonalGoals) {

@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object BingoAPI {
     private var ranks = mapOf<String, Int>()
     var tips: Map<String, BingoJson.BingoTip> = emptyMap()
+    // TODO save into storage
     val bingoGoals = mutableListOf<BingoGoal>()
     val personalGoals get() = bingoGoals.filter { it.type == GoalType.PERSONAL }
     val communityGoals get() = bingoGoals.filter { it.type == GoalType.COMMUNITY }

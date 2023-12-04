@@ -146,7 +146,10 @@ object StringUtils {
     }
 
     fun optionalPlural(number: Int, singular: String, plural: String) =
-        "${number.addSeparators()} " + if (number == 1) singular else plural
+        "${number.addSeparators()} " + canBePlural(number, singular, plural)
+
+    fun canBePlural(number: Int, singular: String, plural: String) =
+        if (number == 1) singular else plural
 
     fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
