@@ -78,7 +78,7 @@ object ItemDisplayOverlayFeatures {
     private val masterSkullInternalNamePattern = (("MASTER_SKULL_TIER_(?<tier>\\d)").toPattern())
     private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
     // private val newYearCakeSpookyPieYearItemNamePattern = (("(New Year Cake|Spooky Pie) \\(Year (?<year>[\\w]+)\\)").toPattern())
-    // private val minionTierItemNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
+    private val minionTierItemNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
     // private val enchantedItemSackItemNamePattern = (("Enchanted .*").toPattern())
     private val kuudraKeyItemNamePattern = (("([\\w ]+)?Kuudra Key").toPattern())
     private val kuudraKeyInternalNamePattern = (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern())
@@ -130,6 +130,7 @@ object ItemDisplayOverlayFeatures {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
+        val lore = item.getLore()
 
         return when {
             isMasterStar(internalName) -> getMasterStarTip(internalName)
@@ -137,7 +138,7 @@ object ItemDisplayOverlayFeatures {
             isDungeonHead(internalName) -> getDungeonHeadTip(internalName)
             isNewYearCake(internalName) -> getNewYearCakeTip(item)
             isPet(itemName) -> getPetTip(itemName)
-            isMinionTier(itemName, item) -> getMinionTierTip(itemName)
+            isMinionTier(itemName) -> getMinionTierTip(itemName, lore)
             isSack(item) -> getSackTip(itemName)
             isKuudraKey(internalName, itemName) -> getKuudraKeyTip(internalName)
             isRanchersBoots(internalName) -> getRanchersBootsTip(item)
@@ -240,15 +241,16 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isMinionTier(itemName: String, item: ItemStack): Boolean {
-        return MINION_TIER.isSelected() && itemName.contains(" Minion ") &&
-            !itemName.contains("Recipe") && item.getLore().any { it.contains("Place this minion") }
+    private fun isMinionTier(itemName: String): Boolean {
+        return MINION_TIER.isSelected() && minionTierItemNamePattern.matches(itemName)
     }
-
-    private fun getMinionTierTip(itemName: String): String {
-        val array = itemName.split(" ")
-        val last = array[array.size - 1]
-        return last.romanToDecimal().toString()
+    private fun getMinionTierTip(itemName: String, lore: List<String>): String {
+        for (line in lore) {
+            if (line == ("§7Place this minion and it will")) {
+                return itemName.split(" ").last().romanToDecimal().toString()
+            }
+        }
+        return ""
     }
 
     private fun isSack(item: ItemStack): Boolean = config.displaySackName && ItemUtils.isSack(item)
@@ -266,7 +268,6 @@ object ItemDisplayOverlayFeatures {
 
     private fun isKuudraKey(internalName: NEUInternalName, itemName: String): Boolean =
         KUUDRA_KEY.isSelected() && kuudraKeyInternalNamePattern.matches(internalName) && kuudraKeyItemNamePattern.matches(itemName)
-
     private fun getKuudraKeyTip(internalName: NEUInternalName): String {
         kuudraKeyInternalNamePattern.matchMatcher(internalName.asString()) {
             return when (group("tier")) {
@@ -283,7 +284,6 @@ object ItemDisplayOverlayFeatures {
 
     private fun isRanchersBoots(internalName: NEUInternalName): Boolean =
         RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
-
     private fun getRanchersBootsTip(item: ItemStack): String {
         for (line in item.getLore()) {
             rancherBootsSpeedCapLoreLinePattern.matchMatcher(line) {
@@ -312,7 +312,6 @@ object ItemDisplayOverlayFeatures {
         return DUNGEON_POTION_LEVEL.isSelected() && internalName == "POTION".asInternalName() && item.getExtraAttributes()
             ?.getString("potion_name") == "Dungeon"
     }
-
     private fun getDungeonPotionTip(item: ItemStack): String {
         val potionLevel = item.getExtraAttributes()?.getInteger("potion_level") ?: return ""
         return when (potionLevel) {
@@ -325,7 +324,6 @@ object ItemDisplayOverlayFeatures {
 
     private fun isVacuumGarden(item: ItemStack) =
         VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants
-
     private fun getVacuumGardenTip(item: ItemStack): String {
         for (line in item.getLore()) {
             gardenVacuumLoreLinePattern.matchMatcher(line) {
