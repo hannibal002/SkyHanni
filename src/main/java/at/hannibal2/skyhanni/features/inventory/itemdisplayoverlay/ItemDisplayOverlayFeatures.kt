@@ -294,7 +294,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isLarvaHook(internalName: NEUInternalName) = LARVA_HOOK.isSelected() && internalName == larvaHookInternalName
+    private fun isLarvaHook(internalName: NEUInternalName): Boolean = LARVA_HOOK.isSelected() && internalName == larvaHookInternalName
     private fun getLarvaHookTip(item: ItemStack): String {
         for (line in item.getLore()) {
             larvaHookLoreLinePattern.matchMatcher(line) {
@@ -322,8 +322,7 @@ object ItemDisplayOverlayFeatures {
         }
     }
 
-    private fun isVacuumGarden(item: ItemStack) =
-        VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants
+    private fun isVacuumGarden(item: ItemStack): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants
     private fun getVacuumGardenTip(item: ItemStack): String {
         for (line in item.getLore()) {
             gardenVacuumLoreLinePattern.matchMatcher(line) {
@@ -360,7 +359,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isEditionNumber(item: ItemStack) = EDITION_NUMBER.isSelected() && item.getEdition() != null
+    private fun isEditionNumber(item: ItemStack): Boolean = EDITION_NUMBER.isSelected() && item.getEdition() != null
     private fun getEditionNumberTip(item: ItemStack): String {
         item.getEdition()?.let { edition ->
             if (edition < 1_000) {
@@ -370,7 +369,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isAuctionNumber(item: ItemStack) = EDITION_NUMBER.isSelected() && item.getAuctionNumber() != null
+    private fun isAuctionNumber(item: ItemStack): Boolean = EDITION_NUMBER.isSelected() && item.getAuctionNumber() != null
     private fun getAuctionNumberTip(item: ItemStack): String {
         item.getAuctionNumber()?.let { auctionNum ->
             if (auctionNum < 1_000) {
@@ -403,7 +402,7 @@ object ItemDisplayOverlayFeatures {
         item.getNecronHandlesFound().let { return "$it" }
     }
 
-    private fun isArmadillo(internalName: NEUInternalName) = ARMADILLO.isSelected() && internalName == prehistoricEggInternalName
+    private fun isArmadillo(internalName: NEUInternalName): Boolean = ARMADILLO.isSelected() && internalName == prehistoricEggInternalName
     private fun getArmadilloTip(item: ItemStack): String {
         val lore = item.getLore()
         if (lore.lastOrNull() == null) return ""
@@ -422,11 +421,12 @@ object ItemDisplayOverlayFeatures {
             "LEGENDARY" -> 100_000F
             else -> 1F
         }
-        if (threshold != 1F) { return "${((blocksWalked.toFloat() / threshold) * 100).toInt()}" }
-        else return ""
+        return if (threshold != 1F) {
+            "${((blocksWalked.toFloat() / threshold) * 100).toInt()}"
+        } else ""
     }
 
-    private fun isCampfireAccessory(internalName: NEUInternalName) = CAMPFIRE.isSelected() && campfireTalismanTierInternalNamePattern.matches(internalName)
+    private fun isCampfireAccessory(internalName: NEUInternalName): Boolean = CAMPFIRE.isSelected() && campfireTalismanTierInternalNamePattern.matches(internalName)
     private fun getCampfireTip(internalName: NEUInternalName): String {
         campfireTalismanTierInternalNamePattern.matchMatcher(internalName.asString()) {
             return "${(group("tier").toInt() + 1)}"
@@ -434,7 +434,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isFruitBowl(internalName: NEUInternalName) = FRUIT_BOWL.isSelected() && internalName == fruitBowlInternalName
+    private fun isFruitBowl(internalName: NEUInternalName): Boolean = FRUIT_BOWL.isSelected() && internalName == fruitBowlInternalName
     private fun getFruitBowlTip(item: ItemStack): String {
         item.getFruitBowlNames().let {
             return "${it?.size}"
@@ -459,15 +459,18 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isYetiRod(internalName: NEUInternalName) = YETI_ROD.isSelected() && internalName == yetiRodInternalName
+    private fun isYetiRod(internalName: NEUInternalName): Boolean = YETI_ROD.isSelected() && internalName == yetiRodInternalName
     private fun getYetiRodTip(item: ItemStack): String {
         val kills = "${item.getYetiRodFishesCaught()}"
         if (kills == "null") { return "" }
-        if (kills.length >= 4) { return "100" }
-        else { return (kills.dropLast(1)) }
+        return if (kills.length >= 4) {
+            "100"
+        } else {
+            (kills.dropLast(1))
+        }
     }
 
-    private fun isShredder(internalName: NEUInternalName) = SHREDDER.isSelected() && internalName == shredderInternalName
+    private fun isShredder(internalName: NEUInternalName): Boolean = SHREDDER.isSelected() && internalName == shredderInternalName
     private fun getShredderTip(item: ItemStack): String {
         for (line in item.getLore()) {
             shredderBonusDamageLoreLinePattern.matchMatcher(line) {
@@ -477,7 +480,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isMinionStorage(item: ItemStack) = STORAGE_TIER.isSelected() && storageChestInternalNamePattern.matches(item.getInternalName()) && storageChestItemNamePattern.matches(item.cleanName())
+    private fun isMinionStorage(item: ItemStack): Boolean = STORAGE_TIER.isSelected() && storageChestInternalNamePattern.matches(item.getInternalName()) && storageChestItemNamePattern.matches(item.cleanName())
     private fun getMinionStorageTip(itemName: String): String {
         val numSlots = when (itemName) {
             ("Small Storage") -> "3"
@@ -498,7 +501,7 @@ object ItemDisplayOverlayFeatures {
         return "§$colorCode$numSlots"
     }
 
-    private fun isCompactorOrDeletorItem(internalName: NEUInternalName, itemName: String) = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorInternalNamePattern.matches(internalName) && personalCompactorDeletorItemNamePattern.matches(itemName)
+    private fun isCompactorOrDeletorItem(internalName: NEUInternalName, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorInternalNamePattern.matches(internalName) && personalCompactorDeletorItemNamePattern.matches(itemName)
     private fun getCompactorOrDeletorItemTip(itemName: String): String {
         personalCompactorDeletorItemNamePattern.matchMatcher(itemName) {
             return "${group("thousands")}K"
@@ -506,7 +509,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isCompactorOrDeletorChest(chestName: String, itemName: String) = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorChestNamePattern.matches(chestName) && personalCompactorDeletorEnabledItemNamePattern.matches(itemName)
+    private fun isCompactorOrDeletorChest(chestName: String, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorChestNamePattern.matches(chestName) && personalCompactorDeletorEnabledItemNamePattern.matches(itemName)
     private fun getCompactorOrDeletorStatusTip(itemName: String): String {
         personalCompactorDeletorEnabledItemNamePattern.matchMatcher(itemName) {
             return when (group("toggle")) {
@@ -517,7 +520,7 @@ object ItemDisplayOverlayFeatures {
         return ""
     }
 
-    private fun isAbiphone(internalName: NEUInternalName) = ABIPHONE.isSelected() && abiphoneInternalNamePattern.matches(internalName)
+    private fun isAbiphone(internalName: NEUInternalName): Boolean = ABIPHONE.isSelected() && abiphoneInternalNamePattern.matches(internalName)
     private fun getAbiphoneTip(internalName: NEUInternalName): String {
         return when (internalName.asString()) {
             "ABIPHONE_X_PLUS" -> "X"
@@ -538,7 +541,7 @@ object ItemDisplayOverlayFeatures {
         }
     }
 
-    private fun isQualifiedForStacking(itemName: String) = STACKING_ENCHANTMENT.isSelected() && doesNotIncludeDungeonStarsItemNamePattern.matches(itemName)
+    private fun isQualifiedForStacking(itemName: String): Boolean = STACKING_ENCHANTMENT.isSelected() && doesNotIncludeDungeonStarsItemNamePattern.matches(itemName)
     private fun getStackingEnchantmentTierTip(item: ItemStack): String {
         val possibleEnchantments = item.getEnchantments()
         if (possibleEnchantments != null) {
@@ -558,5 +561,5 @@ object ItemDisplayOverlayFeatures {
         event.move(12, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumber")
     }
 
-    fun ItemNumberEntry.isSelected() = config.stackSize.itemNumberAsStackSize.contains(this)
+    fun ItemNumberEntry.isSelected(): Boolean = config.stackSize.itemNumberAsStackSize.contains(this)
 }
