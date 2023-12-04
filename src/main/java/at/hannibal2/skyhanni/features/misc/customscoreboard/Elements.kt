@@ -242,14 +242,14 @@ enum class Elements(
         {
             val objective = mutableListOf<String>()
 
-            objective += "Objective:"
+            objective += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Objective") }
 
-            objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective") ?: "<hidden>"
+            objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0]) ?: "<hidden>"
 
             if (extraObjectiveLines.any {
-                    ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2)?.contains(it) == true
+                    ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2)?.contains(it) == true
                 }) {
-                objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2).toString()
+                objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString()
             }
 
             objective.map { it to AlignmentEnum.LEFT }
