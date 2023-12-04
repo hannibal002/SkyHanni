@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -35,15 +36,21 @@ var extraLines = listOf<String>()
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
 
 enum class Elements(
-    private val displayLine: Supplier<List<String>>,
+    private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
     private val showWhen: () -> Boolean,
     val index: Int
 ) {
     SKYBLOCK(
         {
+            val alignment = if (config.displayConfig.centerTitleAndFooter) {
+                AlignmentEnum.CENTER
+            } else {
+                AlignmentEnum.LEFT
+            }
+
             when (config.displayConfig.useHypixelTitleAnimation) {
-                true -> listOf(ScoreboardData.objectiveTitle)
-                false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§"))
+                true -> listOf(ScoreboardData.objectiveTitle to alignment)
+                false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§") to alignment)
             }
         },
         {
@@ -53,7 +60,7 @@ enum class Elements(
     ),
     PROFILE(
         {
-            listOf(CustomScoreboardUtils.getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase())
+            listOf(CustomScoreboardUtils.getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
         },
         {
             true
@@ -66,7 +73,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf("§6$purse Purse")
                 else -> listOf("Purse: §6$purse")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
@@ -79,7 +86,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf("§d$motes Motes")
                 else -> listOf("Motes: §d$motes")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
@@ -92,7 +99,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
                 else -> listOf("Bank: §6$bank")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
@@ -105,7 +112,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf("§b$bits Bits")
                 else -> listOf("Bits: §b$bits")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
@@ -118,7 +125,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf("§c$copper Copper")
                 else -> listOf("Copper: §c$copper")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
@@ -131,7 +138,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
                 else -> listOf("Gems: §a$gems")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
@@ -144,7 +151,7 @@ enum class Elements(
                 config.informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
                 config.displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
                 else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
@@ -153,7 +160,7 @@ enum class Elements(
     ),
     EMPTY_LINE(
         {
-            listOf("<empty>")
+            listOf("<empty>" to AlignmentEnum.LEFT)
         },
         {
             true
@@ -162,7 +169,7 @@ enum class Elements(
     ),
     LOCATION(
         {
-            listOf(replaceString(location) ?: "<hidden>")
+            listOf((replaceString(location) ?: "<hidden>") to AlignmentEnum.LEFT)
         },
         {
             true
@@ -171,7 +178,9 @@ enum class Elements(
     ),
     SKYBLOCK_TIME_DAY(
         {
-            listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false))
+            listOf(
+                SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to AlignmentEnum.LEFT
+            )
         },
         {
             true
@@ -182,9 +191,12 @@ enum class Elements(
         {
             val symbols = listOf("☔", "§e☀", "§b☽")
             if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
-                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } })
+                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } } to AlignmentEnum.LEFT)
             } else {
-                listOf("§7" + SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false))
+                listOf(
+                    "§7" + SkyBlockTime.now()
+                        .formatted(dayAndMonthElement = false, yearElement = false) to AlignmentEnum.LEFT
+                )
             }
         },
         {
@@ -194,7 +206,7 @@ enum class Elements(
     ),
     LOBBY_CODE(
         {
-            listOf("§8$lobbyCode")
+            listOf("§8$lobbyCode" to AlignmentEnum.LEFT)
         },
         {
             true
@@ -204,11 +216,11 @@ enum class Elements(
     MAXWELL(
         {
             when (MaxwellAPI.currentPower == null) {
-                true -> listOf("§c§lPlease visit Maxwell!")
+                true -> listOf("§c§lPlease visit Maxwell!" to AlignmentEnum.LEFT)
                 false ->
                     when (config.displayConfig.displayNumbersFirst) {
-                        true -> listOf("${MaxwellAPI.currentPower?.power} Power")
-                        false -> listOf("Power: ${MaxwellAPI.currentPower?.power}")
+                        true -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
+                        false -> listOf("Power: ${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
                     }
             }
         },
@@ -219,7 +231,7 @@ enum class Elements(
     ),
     EMPTY_LINE2(
         {
-            listOf("<empty>")
+            listOf("<empty>" to AlignmentEnum.LEFT)
         },
         {
             true
@@ -240,7 +252,7 @@ enum class Elements(
                 objective += ScoreboardData.sidebarLinesFormatted.nextAfter("Objective", 2).toString()
             }
 
-            objective
+            objective.map { it to AlignmentEnum.LEFT }
         },
         {
             true
@@ -250,11 +262,11 @@ enum class Elements(
     SLAYER(
         {
             listOf(
-                (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>")
+                (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>") to AlignmentEnum.LEFT
             ) + (
-                " §7- §e${SlayerAPI.latestSlayerCategory.trim()}"
+                " §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to AlignmentEnum.LEFT
                 ) + (
-                " §7- §e${SlayerAPI.latestSlayerProgress.trim()}"
+                " §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to AlignmentEnum.LEFT
                 )
         },
         {
@@ -271,7 +283,7 @@ enum class Elements(
     ),
     EMPTY_LINE3(
         {
-            listOf("<empty>")
+            listOf("<empty>" to AlignmentEnum.LEFT)
         },
         {
             true
@@ -283,7 +295,7 @@ enum class Elements(
             when (config.displayConfig.displayNumbersFirst) {
                 true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
                 false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
-            }
+            }.map { it to AlignmentEnum.LEFT }
         },
         {
             listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
@@ -292,7 +304,7 @@ enum class Elements(
     ),
     CURRENT_EVENT(
         {
-            Events.getFirstEvent().getLines()
+            Events.getFirstEvent().getLines().map { it to AlignmentEnum.LEFT }
         },
         {
             true
@@ -302,9 +314,10 @@ enum class Elements(
     MAYOR(
         {
             listOf(
-                MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.translateMayorNameToColor(it) } ?: "<hidden>"
+                (MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.translateMayorNameToColor(it) }
+                    ?: "<hidden>") to AlignmentEnum.LEFT
             ) + (if (config.showMayorPerks) {
-                MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" } ?: emptyList()
+                MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" to AlignmentEnum.LEFT } ?: emptyList()
             } else {
                 emptyList()
             })
@@ -316,9 +329,9 @@ enum class Elements(
     ),
     PARTY(
         {
-            val partyTitle: List<String> =
+            val partyTitle: List<Pair<String, AlignmentEnum>> =
                 if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
-                    listOf("<hidden>")
+                    listOf("<hidden>" to AlignmentEnum.LEFT)
                 } else {
                     val title =
                         if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
@@ -328,7 +341,7 @@ enum class Elements(
                             " §7- §7$it"
                         }
                         .toTypedArray()
-                    listOf(title, *partyList)
+                    listOf(title, *partyList).map { it to AlignmentEnum.LEFT }
                 }
 
             partyTitle
@@ -352,7 +365,13 @@ enum class Elements(
     ),
     WEBSITE(
         {
-            listOf(config.displayConfig.customFooter.get().toString().replace("&", "§"))
+            val alignment = if (config.displayConfig.centerTitleAndFooter) {
+                AlignmentEnum.CENTER
+            } else {
+                AlignmentEnum.LEFT
+            }
+
+            listOf(config.displayConfig.customFooter.get().toString().replace("&", "§") to alignment)
         },
         {
             true
@@ -361,7 +380,7 @@ enum class Elements(
     ),
     EXTRA_LINES(
         {
-            listOf("§cUndetected Lines (pls report):") + extraLines
+            listOf("§cUndetected Lines (pls report):" to AlignmentEnum.CENTER) + extraLines.map { it to AlignmentEnum.LEFT }
         },
         {
             extraLines.isNotEmpty()
@@ -370,8 +389,8 @@ enum class Elements(
     ),
     ;
 
-    fun getLine(): List<String> {
-        return displayLine.get()
+    fun getPair(): List<Pair<String, AlignmentEnum>> {
+        return displayPair.get()
     }
 
     fun isVisible(): Boolean {

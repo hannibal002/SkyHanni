@@ -22,13 +22,14 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
-private var display = emptyList<String>()
+private var display = emptyList<Pair<String, AlignmentEnum>>()
 
 class CustomScoreboard {
     @SubscribeEvent
@@ -39,7 +40,7 @@ class CustomScoreboard {
 
         RenderBackground().renderBackground()
 
-        position.renderStrings(display, posLabel = "Custom Scoreboard")
+        position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
     }
 
     @SubscribeEvent
@@ -53,37 +54,37 @@ class CustomScoreboard {
         InformationGetter().getInformation()
     }
 
-    private fun createLines() = buildList<String> {
-        val lineMap = HashMap<Int, List<Any>>()
+    private fun createLines() = buildList<Pair<String, AlignmentEnum>> {
+        val lineMap = HashMap<Int, List<Pair<String, AlignmentEnum>>>()
         for (element in Elements.entries) {
-            lineMap[element.index] = if (element.isVisible()) element.getLine() else listOf("<hidden>")
+            lineMap[element.index] = if (element.isVisible()) element.getPair() else listOf("<hidden>" to AlignmentEnum.LEFT)
         }
 
         return formatLines(lineMap)
     }
 
-    private fun formatLines(lineMap: HashMap<Int, List<Any>>): MutableList<String> {
-        val newList = mutableListOf<String>()
+    private fun formatLines(lineMap: HashMap<Int, List<Pair<String, AlignmentEnum>>>): MutableList<Pair<String, AlignmentEnum>> {
+        val newList = mutableListOf<Pair<String, AlignmentEnum>>()
         for (index in config.textFormat) {
             lineMap[index.ordinal]?.let {
                 // Hide consecutive empty lines
-                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0] == "<empty>" && newList.lastOrNull() == "") {
+                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0].first == "<empty>" && newList.last().first == "") {
                     continue
                 }
 
                 // Adds empty lines
-                if (it[0] == "<empty>") {
-                    newList.add("")
+                if (it[0].first == "<empty>") {
+                    newList.add("" to AlignmentEnum.LEFT)
                     continue
                 }
 
                 // Does not display this line
-                if (it.any { i -> i == "<hidden>" }) {
+                if (it.any { i -> i.first == "<hidden>" }) {
                     continue
                 }
 
                 // Multiline and singular line support
-                newList.addAll(it.map { i -> i.toString() })
+                newList.addAll(it.map { i -> i })
             }
         }
 
