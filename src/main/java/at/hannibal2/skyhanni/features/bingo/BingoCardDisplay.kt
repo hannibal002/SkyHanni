@@ -2,32 +2,20 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
-import at.hannibal2.skyhanni.features.bingo.card.BingoGoal
-import at.hannibal2.skyhanni.features.bingo.card.GoalType
-import at.hannibal2.skyhanni.features.bingo.card.HiddenGoalData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 class BingoCardDisplay {
@@ -43,8 +31,6 @@ class BingoCardDisplay {
     companion object {
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
-
-        val personalHiddenGoalPattern = ".*§7§eThe next hint will unlock in (?<time>.*)".toPattern()
 
         private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
         private var displayMode = 0
@@ -75,83 +61,6 @@ class BingoCardDisplay {
                 displayMode = 0
             }
         }
-    }
-
-    private fun BingoJson.BingoTip.getDescriptionLine() = "§7" + note.joinToString(" ")
-
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.isBingoProfile) return
-        if (!config.enabled) return
-        if (event.inventoryName != "Bingo Card") return
-
-        BingoAPI.bingoGoals.clear()
-        for ((slot, stack) in event.inventoryItems) {
-            val isPersonalGoal = stack.getLore().any { it.endsWith("Personal Goal") }
-            val isCommunityGoal = stack.getLore().any { it.endsWith("Community Goal") }
-            if (!isPersonalGoal && !isCommunityGoal) continue
-            val name = stack.name?.removeColor() ?: continue
-            val lore = stack.getLore()
-            var index = 0
-            val builder = StringBuilder()
-            for (s in lore) {
-                if (index > 1) {
-                    if (s == "") break
-                    builder.append(s)
-                    builder.append(" ")
-                }
-                index++
-            }
-            var description = builder.toString()
-            if (description.endsWith(" ")) {
-                description = description.substring(0, description.length - 1)
-            }
-            if (description.startsWith("§7§7")) {
-                description = description.substring(2)
-            }
-
-            val done = stack.getLore().any { it.contains("GOAL REACHED") }
-
-            val goalType = if (isPersonalGoal) GoalType.PERSONAL else GoalType.COMMUNITY
-            val hiddenGoalData = getHiddenGoalData(name, description, goalType)
-            val visualDescription = hiddenGoalData.tipNote
-
-            val bingoGoal = BingoGoal(name, visualDescription, goalType, slot, done, hiddenGoalData)
-            BingoAPI.bingoGoals.add(bingoGoal)
-        }
-        BingoAPI.lastBingoCardOpenTime = SimpleTimeMark.now()
-
-        BingoCardUpdateEvent().postAndCatch()
-    }
-
-    private fun getHiddenGoalData(
-        name: String,
-        originalDescription: String,
-        goalType: GoalType,
-    ): HiddenGoalData {
-        var unknownTip = false
-        val nextHintTime: Duration? = when (goalType) {
-            GoalType.PERSONAL -> {
-                personalHiddenGoalPattern.matchMatcher(originalDescription) {
-                    unknownTip = true
-                    TimeUtils.getDuration(group("time").removeColor())
-                }
-            }
-
-            GoalType.COMMUNITY -> {
-                if (originalDescription == "§7This goal will be revealed §7when it hits Tier IV.") {
-                    unknownTip = true
-                }
-                null
-            }
-        }
-
-        val description = BingoAPI.getTip(name)?.getDescriptionLine()
-        val tipNote = description?.let {
-            unknownTip = false
-            it
-        } ?: originalDescription
-        return HiddenGoalData(unknownTip, nextHintTime, tipNote)
     }
 
     @SubscribeEvent
