@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import org.intellij.lang.annotations.Language
 import java.util.Base64
 import java.util.NavigableMap
 import java.util.UUID
@@ -76,12 +75,6 @@ object StringUtils {
     fun UUID.toDashlessUUID(): String {
         return toString().replace("-", "")
     }
-
-    @Deprecated("Do not create a regex pattern each time.", ReplaceWith("toPattern()"))
-    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
-
-    private fun String.removeAtBeginning(text: String): String =
-        if (this.startsWith(text)) substring(text.length) else this
 
     // TODO find better name for this method
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
@@ -153,7 +146,10 @@ object StringUtils {
     }
 
     fun optionalPlural(number: Int, singular: String, plural: String) =
-        "${number.addSeparators()} " + if (number == 1) singular else plural
+        "${number.addSeparators()} " + canBePlural(number, singular, plural)
+
+    fun canBePlural(number: Int, singular: String, plural: String) =
+        if (number == 1) singular else plural
 
     fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'

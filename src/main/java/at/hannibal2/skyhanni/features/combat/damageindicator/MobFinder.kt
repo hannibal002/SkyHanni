@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -71,6 +71,8 @@ class MobFinder {
     //F5
     private var floor5lividEntity: EntityOtherPlayerMP? = null
     private var floor5lividEntitySpawnTime = 0L
+    private val correctLividPattern =
+        "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
 
     //F6
     private var floor6Giants = false
@@ -587,7 +589,7 @@ class MobFinder {
             }
         }
 
-        if (message.matchRegex("§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!")) {
+            correctLividPattern.matchMatcher(message) {
             floor5lividEntity = null
         }
     }
