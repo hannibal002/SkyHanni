@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson.BingoTip
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.GoalType
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -31,9 +31,6 @@ import kotlin.time.Duration.Companion.days
 class BingoCardDisplay {
 
     private var display = emptyList<String>()
-
-    // TODO USE SH-REPO
-    private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
     private var lastBingoCardOpenTime = SimpleTimeMark.farPast()
     private var hasHiddenPersonalGoals = false
@@ -265,18 +262,10 @@ class BingoCardDisplay {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+    fun onBingoGoalReached(event: BingoGoalReachedEvent) {
         if (!config.enabled) return
-
-        goalCompletePattern.matchMatcher(event.message) {
-            val name = group("name")
-            BingoAPI.personalGoals.filter { it.displayName == name }
-                .forEach {
-                    it.done = true
-                    update()
-                }
-        }
+        event.goal.done = true
+        update()
     }
 
     @SubscribeEvent

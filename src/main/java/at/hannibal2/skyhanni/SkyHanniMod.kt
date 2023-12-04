@@ -58,6 +58,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoCardTips
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat
 import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardReader
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
@@ -400,6 +401,7 @@ class SkyHanniMod {
         loadModule(KeyboardManager)
         loadModule(AdvancedPlayerList)
         loadModule(ItemAddManager())
+        loadModule(BingoCardReader())
 
         // APIs
         loadModule(BazaarApi())
