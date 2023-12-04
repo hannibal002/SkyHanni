@@ -29,7 +29,7 @@ class InformationGetter {
                 line.startsWith("Purse: §6") || line.startsWith("Piggy: §6") -> purse =
                     line.removePrefix("Purse: §6").removePrefix("Piggy: §6")
 
-                line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
+                line.startsWith("Motes: §5") -> motes = line.removePrefix("Motes: §5")
                 extractLobbyCode(line) is String -> lobbyCode =
                     extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
                 line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
@@ -47,7 +47,7 @@ class InformationGetter {
             "§5ф ",
             "Purse: §6",
             "Piggy: §6",
-            "Motes: §d",
+            "Motes: §5",
             "Heat: ",
             "Bits: §b",
             "Copper: §c",
@@ -104,7 +104,8 @@ class InformationGetter {
             "§7Give Tasty Mithril to Don!",
             "Remaining: §a",
             "Your Tasty Mithr: §c",
-            "§3§lSolo"
+            "§3§lSolo",
+						"§fRift Dimension"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }

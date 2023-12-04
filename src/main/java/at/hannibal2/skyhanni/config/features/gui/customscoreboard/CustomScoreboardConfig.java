@@ -34,7 +34,7 @@ public class CustomScoreboardConfig {
         TITLE("§6§lSKYBLOCK"),
         PROFILE("§7♲ Blueberry"),
         PURSE("Purse: §652,763,737"),
-        MOTES("Motes: §d64,647"),
+        MOTES("Motes: §564,647"),
         BANK("Bank: §6249M"),
         BITS("Bits: §b59,264"),
         COPPER("Copper: §c23,495"),
