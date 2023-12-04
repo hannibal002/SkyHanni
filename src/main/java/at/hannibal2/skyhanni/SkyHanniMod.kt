@@ -53,12 +53,12 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.bazaar.BazaarOpenPriceWebsite
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
-import at.hannibal2.skyhanni.features.bingo.BingoCardTips
-import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat
 import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardReader
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardTips
+import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage

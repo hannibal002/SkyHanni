@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo.card
+package at.hannibal2.skyhanni.features.bingo.card.goals
 
 class BingoGoal(
     val displayName: String,

@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
+import at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils

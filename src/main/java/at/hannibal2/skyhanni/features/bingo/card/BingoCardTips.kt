@@ -1,9 +1,10 @@
-package at.hannibal2.skyhanni.features.bingo
+package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.BingoAPI.getTip
-import at.hannibal2.skyhanni.features.bingo.card.GoalType
+import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils

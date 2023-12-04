@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.bingo.card.BingoGoal
-import at.hannibal2.skyhanni.features.bingo.card.GoalType
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -31,7 +31,7 @@ object BingoAPI {
     fun getTip(itemName: String) =
         tips.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
 
-    fun BingoGoal.getTip(): BingoJson.BingoTip? = if (type == GoalType.COMMUNITY) {
+    fun BingoGoal.getTip(): BingoJson.BingoTip? = if (type == at.hannibal2.skyhanni.features.bingo.card.goals.GoalType.COMMUNITY) {
         getTip(displayName)
     } else {
         tips[displayName]
