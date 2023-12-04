@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -38,7 +38,7 @@ class BlazeSlayerDaggerHelper {
         if (!config.hideDaggerWarning) return
 
         val message = event.message
-        if (attunementPattern.matchMatcher(message) {} != null || message == "§cYour hit was reduced by Hellion Shield!") {
+        if (attunementPattern.matches(message) || message == "§cYour hit was reduced by Hellion Shield!") {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }

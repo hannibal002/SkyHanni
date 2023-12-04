@@ -50,14 +50,6 @@ object ItemDisplayOverlayFeatures {
     private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val masterSkullPattern = "(.*)Master Skull - Tier .".toPattern()
-
-    private val gardenVacuumVariants = listOf(
-        "SKYMART_VACUUM".asInternalName(),
-        "SKYMART_TURBO_VACUUM".asInternalName(),
-        "SKYMART_HYPER_VACUUM".asInternalName(),
-        "INFINI_VACUUM".asInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
-    )
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
     private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
     private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
