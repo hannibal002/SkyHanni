@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 object ItemUtils {
 
     // TODO USE SH-REPO
-    private val patternInFront = "(?: *§8(\\+§[\\d\\w])?(?<amount>[\\d\\.km,]+)(x )?)?(?<name>.*)".toPattern()
+    private val patternInFront = "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)".toPattern()
     private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
     private val petLevelPattern = "\\[Lvl (.*)] (.*)".toPattern()
 
@@ -140,7 +141,11 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
 
+    // Checks for the enchantment glint as part of the minecraft enchantments
     fun ItemStack.isEnchanted() = isItemEnchanted
+
+    // Checks for hypixel enchantments in the attributes
+    fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null

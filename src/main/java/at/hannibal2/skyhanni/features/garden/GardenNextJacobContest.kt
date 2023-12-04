@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -291,17 +292,31 @@ object GardenNextJacobContest {
         nextContest: FarmingContest,
         list: MutableList<Any>,
     ): MutableList<Any> {
+        var boostedCrop: CropType? = null
+        outer@ for (line in TabListData.getTabList()) {
+            val lineStripped = line.removeColor().trim()
+            if (lineStripped.startsWith("☘ ")) {
+                for (crop in nextContest.crops) {
+                    if (line.removeColor().trim() == "☘ ${crop.cropName}") {
+                        boostedCrop = crop
+                        break@outer
+                    }
+                }
+                break
+            }
+        }
+
         var duration = nextContest.endTime - System.currentTimeMillis()
         if (duration < contestDuration) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
-            warn(duration, nextContest.crops)
+            warn(duration, nextContest.crops, boostedCrop)
         }
         for (crop in nextContest.crops) {
             list.add(" ")
-            list.addCropIcon(crop)
+            list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         val format = TimeUtils.formatDuration(duration)
@@ -310,23 +325,24 @@ object GardenNextJacobContest {
         return list
     }
 
-    private fun warn(timeInMillis: Long, crops: List<CropType>) {
+    private fun warn(timeInMillis: Long, crops: List<CropType>, boostedCrop: CropType?) {
         if (!config.warn) return
         if (config.warnTime <= timeInMillis / 1000) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
 
-        val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
+        val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         LorenzUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
+        val cropTextNoColor = crops.joinToString(", ") { if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
-                    "Farming Contest soon!\n" +
-                        "Crops: ${cropText.removeColor()}"
+                    "<html>Farming Contest soon!<br />" +
+                        "Crops: ${cropTextNoColor}</html>"
                 )
             }
         }
