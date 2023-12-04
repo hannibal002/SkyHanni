@@ -66,9 +66,4 @@ public class StackSizeConfig {
         @Override public String toString() { return str; }
         @Override public int getLegacyId() { return legacyId; }
     }
-
-    @Expose
-    @Accordion
-    @ConfigOption(name = "Stack Size in Menus", desc = "")
-    public StackSizeMenuConfig menu = new StackSizeMenuConfig();
 }
