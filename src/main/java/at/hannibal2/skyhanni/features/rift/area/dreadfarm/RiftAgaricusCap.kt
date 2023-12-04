@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -14,7 +15,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftAgaricusCap {
-    private val config get() = RiftAPI.config.area.dreadfarmConfig
+    private val config get() = RiftAPI.config.area.dreadfarm
     private var startTime = 0L
     private var location: LorenzVec? = null
 
@@ -58,7 +59,7 @@ class RiftAgaricusCap {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val location = location?.add(0.0, 0.6, 0.0) ?: return
+        val location = location?.add(y = 0.6) ?: return
 
         if (startTime == -1L) {
             event.drawDynamicText(location, "§cClick!", 1.5)
@@ -71,4 +72,9 @@ class RiftAgaricusCap {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.agaricusCap
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.dreadfarmConfig", "rift.area.dreadfarm")
+    }
 }

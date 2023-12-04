@@ -17,7 +17,7 @@ class HideMobNames {
     private val patterns = mutableListOf<Pattern>()
 
     init {
-        addMobToHide("Zombie")
+        // TODO USE SH-REPO
         addMobToHide("Zombie")
         addMobToHide("Zombie Villager")
         addMobToHide("Crypt Ghoul")

@@ -93,5 +93,5 @@ class HighlightMiningCommissionMobs {
     }
 
     fun isEnabled() = config.highlightCommissionMobs &&
-            (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
+        (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
 }

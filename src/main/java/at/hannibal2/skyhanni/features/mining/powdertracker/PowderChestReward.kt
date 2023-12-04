@@ -145,4 +145,7 @@ enum class PowderChestReward(val displayName: String, val pattern: Pattern) {
     YOGGIE("§aYoggie", "§aYou received §r§f(?<amount>.*) §r§aYoggie§r§a.".toPattern()),
     PREHISTORIC_EGG("§fPrehistoric Egg", "§aYou received §r§f(?<amount>.*) §r§fPrehistoric Egg§r§a.".toPattern()),
     OIL_BARREL("§aOil Barrel", "§aYou received §r§f(?<amount>.*) §r§aOil Barrel§r§a.".toPattern()),
+
+    DIAMOND_ESSENCE("§bDiamond Essence", "§aYou received §r§b[+](?<amount>.*) Diamond Essence".toPattern()),
+    GOLD_ESSENCE("§6Gold Essence", "§aYou received §r§6[+](?<amount>.*) Gold Essence".toPattern()),
 }

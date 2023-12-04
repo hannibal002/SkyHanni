@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -245,7 +245,7 @@ object BestiaryData {
 
     private fun getMobHover(mob: BestiaryMob) = listOf(
         "§6Name: §b${mob.name}",
-        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNeeded()})" else ""}",
+        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNecessary()})" else ""}",
         "§6Total Kills: §b${mob.actualRealTotalKill.formatNumber()}",
         "§6Kills needed to max: §b${mob.killNeededToMax().formatNumber()}",
         "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().formatNumber()}",
@@ -459,7 +459,7 @@ object BestiaryData {
     }
 
 
-    private fun String.romanOrInt() = romanToDecimalIfNeeded().let {
+    private fun String.romanOrInt() = romanToDecimalIfNecessary().let {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
@@ -473,7 +473,7 @@ object BestiaryData {
                 if (this == "0") {
                     "I".romanOrInt()
                 } else {
-                    val intValue = romanToDecimalIfNeeded()
+                    val intValue = romanToDecimalIfNecessary()
                     (intValue + 1).toRoman().romanOrInt()
                 }
             }

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
@@ -67,6 +68,7 @@ class FishingTimer {
 
         if (inHollows && newCount >= 60 && config.wormLimitAlert) {
             SoundUtils.playBeepSound()
+            LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
         }
     }
 
@@ -89,6 +91,10 @@ class FishingTimer {
             inHollows = true
             return true
         }
+
+        if (config.crimsonIsle && IslandType.CRIMSON_ISLE.isInIsland()) return true
+
+        if (config.winterIsland && IslandType.WINTER.isInIsland()) return true
 
         if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50

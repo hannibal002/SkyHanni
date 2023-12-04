@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
@@ -22,7 +24,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -35,7 +36,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -49,7 +49,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object VampireSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
+    private val config get() = SkyHanniMod.feature.slayer.vampire
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
     private val configCoopBoss get() = config.coopBoss
@@ -135,21 +135,18 @@ object VampireSlayerFeatures {
                         else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsSound
 
                     if (shouldSendTitle || shouldSendSound) {
-                        SkyHanniMod.coroutineScope.launch {
-                            delay(config.twinclawsDelay.milliseconds)
-                            withContext(MinecraftDispatcher) {
-                                if (nextClawSend < System.currentTimeMillis()) {
-                                    if (shouldSendSound)
-                                        playTwinclawsSound()
-                                    if (shouldSendTitle) {
-                                        LorenzUtils.sendTitle(
-                                            "§6§lTWINCLAWS",
-                                            (1750 - config.twinclawsDelay).milliseconds,
-                                            2.6
-                                        )
-                                    }
-                                    nextClawSend = System.currentTimeMillis() + 5_000
+                        DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
+                            if (nextClawSend < System.currentTimeMillis()) {
+                                if (shouldSendSound)
+                                    playTwinclawsSound()
+                                if (shouldSendTitle) {
+                                    LorenzUtils.sendTitle(
+                                        "§6§lTWINCLAWS",
+                                        (1750 - config.twinclawsDelay).milliseconds,
+                                        2.6
+                                    )
                                 }
+                                nextClawSend = System.currentTimeMillis() + 5_000
                             }
                         }
                     }
@@ -294,7 +291,7 @@ object VampireSlayerFeatures {
                     if (distance <= 15) {
                         event.draw3DLine(
                             event.exactPlayerEyeLocation(),
-                            vec.add(0.0, 1.54, 0.0),
+                            vec.add(y = 1.54),
                             config.lineColor.toChromaColor(),
                             config.lineWidth,
                             true
@@ -322,7 +319,7 @@ object VampireSlayerFeatures {
                             (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
                         event.drawColor(
-                            stand.position.toLorenzVec().add(0.0, 2.0, 0.0),
+                            stand.position.toLorenzVec().add(y = 2.0),
                             LorenzColor.DARK_RED,
                             alpha = 1f
                         )
@@ -335,8 +332,8 @@ object VampireSlayerFeatures {
                         for ((player, stand2) in standList) {
                             if ((configBloodIcor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
                                 event.draw3DLine(
-                                    event.exactLocation(player).add(0.0, 1.5, 0.0),
-                                    event.exactLocation(stand2).add(0.0, 1.5, 0.0),
+                                    event.exactLocation(player).add(y = 1.5),
+                                    event.exactLocation(stand2).add(y = 1.5),
                                     // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
                                     linesColorStart,
                                     3,
@@ -346,7 +343,7 @@ object VampireSlayerFeatures {
                     }
                     if (configBloodIcor.renderBeam && isIchor && stand.isEntityAlive) {
                         event.drawWaypointFilled(
-                            event.exactLocation(stand).add(0, -2, 0),
+                            event.exactLocation(stand).add(0, y = -2, 0),
                             configBloodIcor.color.toChromaColor(),
                             beacon = true
                         )
@@ -376,6 +373,11 @@ object VampireSlayerFeatures {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
     }
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau()

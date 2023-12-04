@@ -6,16 +6,16 @@ import kotlin.math.roundToInt
 object GhostData {
 
     private var session = mutableMapOf(
-            Option.KILLS to 0.0,
-            Option.SORROWCOUNT to 0.0,
-            Option.VOLTACOUNT to 0.0,
-            Option.PLASMACOUNT to 0.0,
-            Option.GHOSTLYBOOTS to 0.0,
-            Option.BAGOFCASH to 0.0,
-            Option.TOTALDROPS to 0.0,
-            Option.SCAVENGERCOINS to 0.0,
-            Option.MAXKILLCOMBO to 0.0,
-            Option.SKILLXPGAINED to 0.0
+        Option.KILLS to 0.0,
+        Option.SORROWCOUNT to 0.0,
+        Option.VOLTACOUNT to 0.0,
+        Option.PLASMACOUNT to 0.0,
+        Option.GHOSTLYBOOTS to 0.0,
+        Option.BAGOFCASH to 0.0,
+        Option.TOTALDROPS to 0.0,
+        Option.SCAVENGERCOINS to 0.0,
+        Option.MAXKILLCOMBO to 0.0,
+        Option.SKILLXPGAINED to 0.0
     )
 
     val bestiaryData = mutableMapOf<Int, Int>().apply {
@@ -34,11 +34,11 @@ object GhostData {
                 11 -> 750
                 12 -> 1_500
                 13 -> 2_000
-                14,15,16,17 -> 2_500
+                14, 15, 16, 17 -> 2_500
                 18 -> 3_000
-                19,20 -> 3_500
+                19, 20 -> 3_500
                 21 -> 25_000
-                22,23,24,25 -> 50_000
+                22, 23, 24, 25 -> 50_000
                 else -> 0
             }
         }
@@ -63,28 +63,28 @@ object GhostData {
             if (s)
                 session[this] = session[this]?.plus(i) ?: i
             else
-                GhostCounter.hidden?.data?.set(this, GhostCounter.hidden?.data?.get(this)?.plus(i) ?: i)
+                GhostCounter.storage?.data?.set(this, GhostCounter.storage?.data?.get(this)?.plus(i) ?: i)
         }
 
         fun set(i: Double, s: Boolean = false) {
             if (s)
                 session[this] = i
             else
-                GhostCounter.hidden?.data?.set(this, i)
+                GhostCounter.storage?.data?.set(this, i)
         }
 
         fun getInt(s: Boolean = false): Int {
             return if (s)
                 session[this]?.roundToInt() ?: 0
             else
-                GhostCounter.hidden?.data?.get(this)?.roundToInt() ?: 0
+                GhostCounter.storage?.data?.get(this)?.roundToInt() ?: 0
         }
 
         fun get(s: Boolean = false): Double {
             return if (s)
                 session[this] ?: 0.0
             else
-                GhostCounter.hidden?.data?.get(this) ?: 0.0
+                GhostCounter.storage?.data?.get(this) ?: 0.0
         }
     }
 }

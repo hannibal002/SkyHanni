@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat.endernodetracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -11,31 +11,53 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EnderNodeTracker {
+object EnderNodeTracker {
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
-    private val storage get() = ProfileStorageData.profileSpecific?.enderNodeTracker
 
-    private var totalEnderArmor = 0
     private var miteGelInInventory = 0
-    private var display = emptyList<List<Any>>()
-    private var lootProfit = mapOf<EnderNode, Double>()
 
     private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
+
+    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
+        formatDisplay(
+            drawDisplay(it)
+        )
+    }
+
+    class Data : TrackerData() {
+
+        override fun reset() {
+            totalNodesMined = 0
+            totalEndermiteNests = 0
+            lootCount.clear()
+        }
+
+        @Expose
+        var totalNodesMined = 0
+
+        @Expose
+        var totalEndermiteNests = 0
+
+        @Expose
+        var lootCount: MutableMap<EnderNode, Int> = mutableMapOf()
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -47,11 +69,12 @@ class EnderNodeTracker {
         val message = event.message.trim()
         var item: String? = null
         var amount = 1
-        val storage = storage ?: return
 
         // check whether the loot is from an ender node or an enderman
         enderNodeRegex.find(message)?.let {
-            storage.totalNodesMined++
+            tracker.modify { storage ->
+                storage.totalNodesMined++
+            }
             amount = it.groups[1]?.value?.substringBefore("x")?.toIntOrNull() ?: 1
             item = it.groups[2]?.value
         } ?: endermanRegex.find(message)?.let {
@@ -61,20 +84,19 @@ class EnderNodeTracker {
 
         when {
             item == null -> return
-            isEnderArmor(item) -> totalEnderArmor++
             item == "§cEndermite Nest" -> {
-                storage.totalEndermiteNests++
+                tracker.modify { storage ->
+                    storage.totalEndermiteNests++
+                }
             }
         }
 
         // increment the count of the specific item found
         EnderNode.entries.find { it.displayName == item }?.let {
-            val old = storage.lootCount[it] ?: 0
-            storage.lootCount = storage.lootCount.editCopy {
-                this[it] = old + amount
+            tracker.modify { storage ->
+                storage.lootCount.addOrPut(it, amount)
             }
         }
-        update()
     }
 
     @SubscribeEvent
@@ -91,16 +113,14 @@ class EnderNodeTracker {
         if (!config.enabled) return
         if (!ProfileStorageData.loaded) return
         if (!isInTheEnd()) return
-        val storage = storage ?: return
 
         val change = event.sackChanges
             .firstOrNull { it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0 }
             ?: return
-        val old = storage.lootCount[EnderNode.MITE_GEL] ?: 0
-        storage.lootCount = storage.lootCount.editCopy {
-            this[EnderNode.MITE_GEL] = old + change.delta
+
+        tracker.modify { storage ->
+            storage.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
         }
-        update()
     }
 
     @SubscribeEvent
@@ -108,55 +128,49 @@ class EnderNodeTracker {
         if (!config.enabled) return
         if (!isInTheEnd()) return
         if (!ProfileStorageData.loaded) return
-        val storage = storage ?: return
 
-        MinecraftExecutor.OnThread.execute {
-            val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-                .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-                .sumOf { it.stackSize }
-            val change = newMiteGelInInventory - miteGelInInventory
-            if (change > 0) {
-                val old = storage.lootCount[EnderNode.MITE_GEL] ?: 0
-                storage.lootCount = storage.lootCount.editCopy {
-                    this[EnderNode.MITE_GEL] = old + change
-                }
-                update()
+        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
+            .sumOf { it.stackSize }
+        val change = newMiteGelInInventory - miteGelInInventory
+        if (change > 0) {
+            tracker.modify { storage ->
+                storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
             }
-            miteGelInInventory = newMiteGelInInventory
         }
+        miteGelInInventory = newMiteGelInInventory
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.enabled) return
         if (!isInTheEnd()) return
-        config.position.renderStringsAndItems(display, posLabel = "Ender Node Tracker")
+
+        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange {
-            update()
+            tracker.update()
         }
-        val storage = storage ?: return
-
-        totalEnderArmor = storage.lootCount.filter { isEnderArmor(it.key.displayName) }
-            .map { it.value }
-            .sum()
-        update()
+        tracker.update()
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
+        event.move(11, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
+        }
     }
 
-    private fun calculateProfit(storage: Storage.ProfileSpecific.EnderNodeTracker): Map<EnderNode, Double> {
+    private fun calculateProfit(storage: Data): Map<EnderNode, Double> {
         if (!ProfileStorageData.loaded) return emptyMap()
 
         val newProfit = mutableMapOf<EnderNode, Double>()
         storage.lootCount.forEach { (item, amount) ->
-            val price = if (isEnderArmor(item.displayName)) {
+            val price = if (isEnderArmor(item)) {
                 10_000.0
             } else {
                 (if (!LorenzUtils.noTradeMode) item.internalName.getPriceOrNull() else 0.0)
@@ -169,21 +183,15 @@ class EnderNodeTracker {
         return newProfit
     }
 
-    private fun update() {
-        val storage = storage ?: return
-        lootProfit = calculateProfit(storage)
-        display = formatDisplay(drawDisplay(storage))
-    }
-
     private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
 
-    private fun isEnderArmor(displayName: String?) = when (displayName) {
-        EnderNode.END_HELMET.displayName,
-        EnderNode.END_CHESTPLATE.displayName,
-        EnderNode.END_LEGGINGS.displayName,
-        EnderNode.END_BOOTS.displayName,
-        EnderNode.ENDER_NECKLACE.displayName,
-        EnderNode.ENDER_GAUNTLET.displayName -> true
+    private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
+        EnderNode.END_HELMET,
+        EnderNode.END_CHESTPLATE,
+        EnderNode.END_LEGGINGS,
+        EnderNode.END_BOOTS,
+        EnderNode.ENDER_NECKLACE,
+        EnderNode.ENDER_GAUNTLET -> true
 
         else -> false
     }
@@ -197,8 +205,8 @@ class EnderNodeTracker {
         else -> null
     }
 
-    private fun drawDisplay(storage: Storage.ProfileSpecific.EnderNodeTracker) = buildList<List<Any>> {
-        if (!ProfileStorageData.loaded) return emptyList<List<Any>>()
+    private fun drawDisplay(storage: Data) = buildList<List<Any>> {
+        val lootProfit = calculateProfit(storage)
 
         addAsSingletonList("§5§lEnder Node Tracker")
         addAsSingletonList("§d${storage.totalNodesMined.addSeparators()} Ender Nodes mined")
@@ -212,9 +220,11 @@ class EnderNodeTracker {
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
+
+        val totalEnderArmor = calculateEnderArmor(storage)
         addAsSingletonList(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                    "§7(§6${format(totalEnderArmor * 10_000)}§7)"
+                "§7(§6${format(totalEnderArmor * 10_000)}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (storage.lootCount[item] ?: 0).addSeparators()
@@ -227,13 +237,23 @@ class EnderNodeTracker {
         addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
+    private fun calculateEnderArmor(storage: Data) =
+        storage.lootCount.filter { isEnderArmor(it.key) }
+            .map { it.value }
+            .sum()
+
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         if (!ProfileStorageData.loaded) return emptyList()
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat.get()) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
+    }
+
+    fun resetCommand(args: Array<String>) {
+        tracker.resetCommand(args, "shresetendernodetracker")
     }
 }

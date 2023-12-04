@@ -17,6 +17,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
+import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -34,6 +35,7 @@ object NEUItems {
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
+    private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
@@ -47,6 +49,7 @@ object NEUItems {
     }
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
     fun getRawInternalName(itemName: String): String {
         return getInternalNameFromItemName(itemName).asString()
     }
@@ -174,6 +177,7 @@ object NEUItems {
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
     // TODO remove
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
     fun getItemStack(internalName: String): ItemStack =
         internalName.asInternalName().getItemStack()
 
@@ -183,8 +187,8 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
@@ -231,16 +235,18 @@ object NEUItems {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$internalName'"
-            Error(message).printStackTrace()
-            LorenzUtils.error(message)
+            ErrorManager.logErrorStateWithData(
+                "Cound not load recipe data.",
+                "Failed to find item multiplier",
+                "internalName" to internalName
+            )
             return Pair(internalName, 1)
         }
         for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
 
             val map = mutableMapOf<String, Int>()
-            for (ingredient in recipe.ingredients) {
+            for (ingredient in recipe.getCachedIngredients()) {
                 val count = ingredient.count.toInt()
                 var internalItemId = ingredient.internalItemId
                 // ignore cactus green
@@ -293,6 +299,8 @@ object NEUItems {
         return recipes
     }
 
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
@@ -308,8 +316,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU

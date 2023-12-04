@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -44,7 +46,7 @@ object GardenNextJacobContest {
     private var inCalendar = false
     private val patternDay = "§aDay (?<day>.*)".toPattern()
     private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§e○ §7(?<crop>.*)".toPattern()
+    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
 
     private const val maxContestsPerYear = 124
     private const val contestDuration = 1_000 * 60 * 20
@@ -146,17 +148,13 @@ object GardenNextJacobContest {
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
             val name = item.name ?: continue
-            val matcherDay = patternDay.matcher(name)
-            if (!matcherDay.matches()) continue
+            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
 
-            val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                val matcherCrop = patternCrop.matcher(line)
-                if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByName(matcherCrop.group("crop")))
+                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
@@ -171,7 +169,7 @@ object GardenNextJacobContest {
                     sendContests()
                 } else {
                     LorenzUtils.clickableChat(
-                        "§e[SkyHanni] §2Click here to submit this years farming contests, thank you for helping everyone out!",
+                        "§2Click here to submit this years farming contests, thank you for helping everyone out!",
                         "shsendcontests"
                     )
                 }
@@ -182,7 +180,7 @@ object GardenNextJacobContest {
     }
 
     private fun saveConfig() {
-        val map = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
+        val map = SkyHanniMod.jacobContestsData.contestTimes
         map.clear()
 
         val currentYear = SkyBlockTime.now().year
@@ -193,11 +191,12 @@ object GardenNextJacobContest {
 
             map[contest.endTime] = contest.crops
         }
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.JACOB_CONTESTS, "Save contests")
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val savedContests = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
+        val savedContests = SkyHanniMod.jacobContestsData.contestTimes
         val year = savedContests.firstNotNullOfOrNull {
             val endTime = it.key
 
@@ -219,7 +218,7 @@ object GardenNextJacobContest {
             if (array[0] == "enable") {
                 config.shareAutomatically = 1
                 SkyHanniMod.feature.storage.contestSendingAsked = true
-                LorenzUtils.chat("§e[SkyHanni] §2Enabled automatic sharing of future contests!")
+                LorenzUtils.chat("§2Enabled automatic sharing of future contests!")
             }
             return
         }
@@ -228,7 +227,7 @@ object GardenNextJacobContest {
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == 0) {
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] §2Click here to automatically share future contests!",
+                "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
             )
         }
@@ -293,17 +292,31 @@ object GardenNextJacobContest {
         nextContest: FarmingContest,
         list: MutableList<Any>,
     ): MutableList<Any> {
+        var boostedCrop: CropType? = null
+        outer@ for (line in TabListData.getTabList()) {
+            val lineStripped = line.removeColor().trim()
+            if (lineStripped.startsWith("☘ ")) {
+                for (crop in nextContest.crops) {
+                    if (line.removeColor().trim() == "☘ ${crop.cropName}") {
+                        boostedCrop = crop
+                        break@outer
+                    }
+                }
+                break
+            }
+        }
+
         var duration = nextContest.endTime - System.currentTimeMillis()
         if (duration < contestDuration) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
-            warn(duration, nextContest.crops)
+            warn(duration, nextContest.crops, boostedCrop)
         }
         for (crop in nextContest.crops) {
             list.add(" ")
-            list.addCropIcon(crop)
+            list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         val format = TimeUtils.formatDuration(duration)
@@ -312,23 +325,24 @@ object GardenNextJacobContest {
         return list
     }
 
-    private fun warn(timeInMillis: Long, crops: List<CropType>) {
+    private fun warn(timeInMillis: Long, crops: List<CropType>, boostedCrop: CropType?) {
         if (!config.warn) return
         if (config.warnTime <= timeInMillis / 1000) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
 
-        val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
-        LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
+        val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
+        LorenzUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
+        val cropTextNoColor = crops.joinToString(", ") { if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
-                    "Farming Contest soon!\n" +
-                            "Crops: ${cropText.removeColor()}"
+                    "<html>Farming Contest soon!<br />" +
+                        "Crops: ${cropTextNoColor}</html>"
                 )
             }
         }
@@ -397,7 +411,7 @@ object GardenNextJacobContest {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.display
-            && (GardenAPI.inGarden() || config.everywhere)
+        && (GardenAPI.inGarden() || config.everywhere)
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != 2 // 2 = Disabled
@@ -441,11 +455,11 @@ object GardenNextJacobContest {
                     newContests[timestamp + contestDuration] = FarmingContest(timestamp + contestDuration, crops)
                 }
             } else {
-                LorenzUtils.chat("§e[SkyHanni] This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
+                LorenzUtils.chat("This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
             }
 
             if (newContests.count() == maxContestsPerYear) {
-                LorenzUtils.chat("§e[SkyHanni] Successfully loaded this year's contests from elitebot.dev automatically!")
+                LorenzUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
 
                 contests = newContests
                 fetchedFromElite = true
@@ -456,7 +470,7 @@ object GardenNextJacobContest {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            LorenzUtils.error("[SkyHanni] Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+            LorenzUtils.error("Failed to fetch upcoming contests. Please report this error if it continues to occur.")
         }
     }
 
@@ -486,17 +500,17 @@ object GardenNextJacobContest {
         val result = withContext(dispatcher) { APIUtil.postJSONIsSuccessful(url, body) }
 
         if (result) {
-            LorenzUtils.chat("§e[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+            LorenzUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            LorenzUtils.error("[SkyHanni] Something went wrong submitting upcoming contests!")
+            LorenzUtils.error("Something went wrong submitting upcoming contests!")
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        LorenzUtils.error("[SkyHanni] Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        LorenzUtils.error("Failed to submit upcoming contests. Please report this error if it continues to occur.")
         null
     }
 
-    private val config get() = SkyHanniMod.feature.garden.nextJacobContests
+    private val config get() = GardenAPI.config.nextJacobContests
     private val nextContestCrops = mutableListOf<CropType>()
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
