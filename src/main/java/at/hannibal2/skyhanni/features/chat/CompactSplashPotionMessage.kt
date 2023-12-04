@@ -3,49 +3,59 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactSplashPotionMessage {
     private val config get() = SkyHanniMod.feature.chat.compactPotionMessages
 
-    private val potionEffectPattern =
-        "§a§lBUFF! §fYou have gained §r(?<name>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern()
-    private val potionSplashEffectOthersPattern =
-        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern()
-    private val potionSplashEffectPattern =
-        "§a§lBUFF! §fYou splashed yourself with §r(?<name>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern()
+    private val potionEffectPatternList = listOf(
+        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
+        "§a§lBUFF! §fYou have gained §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
+        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
+
+        // Fix for Hypixel having a different message for Poisoned Candy.
+        // Did not make the first pattern optional to prevent conflicts with Dungeon Buffs/other things
+        "§a§lBUFF! §fYou have gained §r(?<effectName>§2Poisoned Candy I)§r§f!§r".toPattern(),
+        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>§2Poisoned Candy I)§r§f!§r".toPattern(),
+        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>§2Poisoned Candy I)§r§f!§r".toPattern()
+    )
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.enabled) return
-
-        potionEffectPattern.matchMatcher(event.message) {
-            val name = group("name")
-            sendMessage("§a§lPotion Effect! §r$name")
-            event.blockedReason = "compact_potion_effect"
-        }
-
-        potionSplashEffectOthersPattern.matchMatcher(event.message) {
-            val playerName = group("playerName").removeColor()
-            val effectName = group("effectName")
-            sendMessage("§a§lPotion Effect! §r$effectName by §b$playerName")
-            event.blockedReason = "compact_potion_effect"
-        }
-
-        potionSplashEffectPattern.matchMatcher(event.message) {
-            val name = group("name")
-            sendMessage("§a§lPotion Effect! §r$name")
-            event.blockedReason = "compact_potion_effect"
-        }
+        if (!isEnabled()) return
+        if (!event.message.isPotionMessage()) return
+        event.blockedReason = "compact_potion_effect"
     }
 
     private fun sendMessage(message: String) {
         if (config.clickableChatMessage) {
-            LorenzUtils.hoverableChat(message, listOf("§eClick to view your potion effects."), "/effects")
+            LorenzUtils.hoverableChat(
+                message,
+                listOf("§eClick to view your potion effects."),
+                "/effects",
+                prefix = false
+            )
         } else {
-            LorenzUtils.chat(message)
+            LorenzUtils.chat(message, prefix = false)
         }
     }
+
+    private fun String.isPotionMessage(): Boolean {
+        return potionEffectPatternList.any {
+            it.matchMatcher(this) {
+                val effectName = group("effectName")
+                // If splashed by a player, append their name.
+                val byPlayer = groupOrNull("playerName")?.let { player ->
+                    val displayName = player.cleanPlayerName(displayName = true)
+                    " §aby $displayName"
+                } ?: ""
+                sendMessage("§a§lPotion Effect! §r$effectName$byPlayer")
+            } != null
+        }
+    }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }

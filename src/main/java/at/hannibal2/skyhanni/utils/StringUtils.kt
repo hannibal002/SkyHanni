@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -80,12 +81,22 @@ object StringUtils {
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
-    fun String.cleanPlayerName(): String {
+    private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {
             split[0].removeColor()
+        }
+    }
+
+    fun String.cleanPlayerName(displayName: Boolean = false): String {
+        return if (displayName) {
+            if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                "§b" + internalCleanPlayerName()
+            } else this
+        } else {
+            internalCleanPlayerName()
         }
     }
 
