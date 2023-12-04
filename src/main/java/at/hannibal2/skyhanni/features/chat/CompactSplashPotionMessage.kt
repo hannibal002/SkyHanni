@@ -30,7 +30,6 @@ class CompactSplashPotionMessage {
         event.blockedReason = "compact_potion_effect"
     }
 
-
     private fun sendMessage(message: String) {
         if (config.clickableChatMessage) {
             LorenzUtils.hoverableChat(
