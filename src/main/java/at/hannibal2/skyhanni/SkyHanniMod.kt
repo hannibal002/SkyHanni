@@ -191,7 +191,7 @@ import at.hannibal2.skyhanni.features.inventory.HarpFeatures
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayAbiphone
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayerTryhard
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
@@ -429,7 +429,7 @@ class SkyHanniMod {
         loadModule(DungeonChatFilter())
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures())
-        loadModule(MenuItemDisplayOverlayAbiphone())
+        loadModule(MenuItemDisplayOverlayPlayerTryhard())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(FandomWikiFromMenus())
