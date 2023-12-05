@@ -28,7 +28,7 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the advanced scoreboard." // now supporting both custom & advanced search
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardEntry> textFormat = new ArrayList<>(Arrays.asList(ScoreboardEntry.values()));
+    public List<ScoreboardEntry> scoreboardEntries = new ArrayList<>(Arrays.asList(ScoreboardEntry.values()));
 
     public enum ScoreboardEntry {
         TITLE("§6§lSKYBLOCK"),
@@ -42,6 +42,7 @@ public class CustomScoreboardConfig {
         HEAT("Heat: §c♨ 0"),
         EMPTY_LINE(""),
         LOCATION("§7⏣ §bVillage"),
+        VISITING(" §a✌ §7(§a1§7/6)"),
         DATE("Late Summer 11th"),
         TIME("§710:40pm"),
         LOBBY_CODE("§8m77CK"),

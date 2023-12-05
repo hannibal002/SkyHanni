@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
@@ -177,6 +176,15 @@ enum class Elements(
         },
         10
     ),
+    VISITING(
+        {
+            listOf((ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith(" §a✌ §")} ?: "<hidden>") to AlignmentEnum.LEFT)
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith(" §a✌ §") }
+        },
+        11
+    ),
     SKYBLOCK_TIME_DAY(
         {
             listOf(
@@ -186,7 +194,7 @@ enum class Elements(
         {
             true
         },
-        11
+        12
     ),
     SKYBLOCK_TIME_MINUTE(
         {
@@ -203,7 +211,7 @@ enum class Elements(
         {
             true
         },
-        12
+        13
     ),
     LOBBY_CODE(
         {
@@ -212,7 +220,7 @@ enum class Elements(
         {
             true
         },
-        13
+        14
     ),
     MAXWELL(
         {
@@ -228,7 +236,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        14
+        15
     ),
     EMPTY_LINE2(
         {
@@ -237,7 +245,7 @@ enum class Elements(
         {
             true
         },
-        15
+        16
     ),
     OBJECTIVE(
         {
@@ -258,7 +266,7 @@ enum class Elements(
         {
             true
         },
-        16
+        17
     ),
     SLAYER(
         {
@@ -280,7 +288,7 @@ enum class Elements(
                 at.hannibal2.skyhanni.data.IslandType.THE_RIFT
             ).contains(HypixelData.skyBlockIsland)
         },
-        17
+        18
     ),
     EMPTY_LINE3(
         {
@@ -289,7 +297,7 @@ enum class Elements(
         {
             true
         },
-        18
+        19
     ),
     POWDER(
         {
@@ -301,7 +309,7 @@ enum class Elements(
         {
             listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
         },
-        19
+        20
     ),
     CURRENT_EVENT(
         {
@@ -310,7 +318,7 @@ enum class Elements(
         {
             true
         },
-        20
+        21
     ),
     MAYOR(
         {
@@ -326,7 +334,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        21
+        22
     ),
     PARTY(
         {
@@ -349,7 +357,7 @@ enum class Elements(
         },
         {
             if (inDungeons) {
-                false // Hidden bc teammate health etc exists
+                false // Hidden bc teammate health etc. exists
             } else {
                 if (config.partyConfig.showPartyEverywhere) {
                     true
@@ -362,7 +370,7 @@ enum class Elements(
                 }
             }
         },
-        22
+        23
     ),
     WEBSITE(
         {
@@ -377,7 +385,7 @@ enum class Elements(
         {
             true
         },
-        23
+        24
     ),
     EXTRA_LINES(
         {
@@ -386,7 +394,7 @@ enum class Elements(
         {
             extraLines.isNotEmpty()
         },
-        24
+        25
     ),
     ;
 
