@@ -1,24 +1,27 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkymallDisplay {
-    private val config get() = SkyHanniMod.feature.mining
+    private val config get() = SkyHanniMod.feature.mining.skymall
     private var currentPerk = "nothing"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.skymallDisplay) return
+        if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
+        if (!(config.outsideMiningIslands || isInMiningIsland())) return
         when (currentPerk) {
             "nothing" -> config.skymallDisplayPosition.renderString("§cNo perks found! Open §b/hotm §cto refresh", posLabel = "Sky Mall Display")
             "unknown" -> {
@@ -40,7 +43,7 @@ class SkymallDisplay {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!config.skymallDisplay) return
+        if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Heart of the Mountain") return
         for((slot, item) in event.inventoryItems) {
@@ -60,5 +63,11 @@ class SkymallDisplay {
                 }
             }
         }
+    }
+
+    private fun isInMiningIsland(): Boolean {
+        return if (IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.DWARVEN_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || IslandType.GOLD_MINES.isInIsland()) {
+            true
+        } else false
     }
 }

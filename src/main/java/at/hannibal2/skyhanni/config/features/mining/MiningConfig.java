@@ -20,6 +20,11 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
+    @ConfigOption(name = "Sky Mall Display", desc = "")
+    @Accordion
+    public SkyMallConfig skymall = new SkyMallConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -30,13 +35,4 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;
-
-    @Expose
-    @ConfigOption(name = "Sky Mall Display", desc = "Shows an overlay with the current skymall perk.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean skymallDisplay = false;
-
-    @Expose
-    public Position skymallDisplayPosition = new Position(3, 140, 1.0f);
 }
