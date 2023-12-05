@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.visitor.RewardWarningConfig.ItemWarnEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -48,6 +47,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
@@ -607,7 +608,21 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
         event.move(11, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemWarnEntry::class.java)
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, VisitorReward::class.java)
+        }
+        event.move(12, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (jsonElement in element.asJsonArray) {
+                val old = jsonElement.asString
+                val new = VisitorReward.entries.firstOrNull { old.startsWith(it.name) }
+                if (new == null) {
+                    println("error with migrating old VisitorReward entity: '$old'")
+                    continue
+                }
+                drops.add(JsonPrimitive(new.name))
+            }
+
+            drops
         }
     }
 
