@@ -23,23 +23,18 @@ public class StackSizeMenuConfig {
     ));
 
     public enum Combat {
-        BESTIARY_LEVEL("§bBestiary Level (#)"),
-        BESTIARY_OVERALL_FAMILY_PROGRESS("§bBestiary Progress (%, Overall + per Family)"),
-        SLAYER_LEVELS("§bCurrent Slayer Levels (#)"),
-        SLAYER_COMBAT_WISDOM_BUFF("§bSlayer Combat Wisdom Buff (#)"),
-        RNG_METER_PROGRESS("§bSlayer/Catacombs RNG Meter Progress (%)"),
-        UNLOCKED_SLAYER_RECIPES("§bUnlocked Slayer Recipes (#)");
+        BESTIARY_LEVEL("§bBestiary Level"), //(#)
+        BESTIARY_OVERALL_FAMILY_PROGRESS("§bBestiary Progress"), // (%, Overall + per Family)
+        SLAYER_LEVELS("§bCurrent Slayer Levels"), // (#)
+        SLAYER_COMBAT_WISDOM_BUFF("§bSlayer Combat Wisdom Buff"), // (#)
+        RNG_METER_PROGRESS("§bSlayer/Catacombs RNG Meter Progress"), // (%)
+        UNLOCKED_SLAYER_RECIPES("§bUnlocked Slayer Recipes"),
+        ; // (#)
 
         final String str;
-
-        Combat(String str) {
-            this.str = str;
-        }
-
+        Combat(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() { return str; }
     }
 
 }
