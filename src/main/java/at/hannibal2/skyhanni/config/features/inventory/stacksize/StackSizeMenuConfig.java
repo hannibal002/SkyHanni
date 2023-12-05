@@ -31,7 +31,8 @@ public class StackSizeMenuConfig {
         SELECTED_RINGTONE("§bSelected Ringtone"), // (Abbv)
         TIC_TAC_TOE("§bTic Tac Toe Stats"), // (§aW§eT§cL§b)
         SNAKE("§bSnake Highest Score"), // (#)
-        NAVIGATION("§bSorting/Filtering Abbreviations");
+        NAVIGATION("§bSorting/Filtering Abbreviations"),
+        ;
 
         final String str;
 
