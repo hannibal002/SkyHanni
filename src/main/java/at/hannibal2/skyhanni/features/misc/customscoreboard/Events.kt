@@ -157,6 +157,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6§lGOLD §fmedals") }
         }
     ),
+    CLEAN_UP(
+        {
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.trim().startsWith("§fCleanup§7:") }
+                ?: "<hidden>")
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.trim().startsWith("§fCleanup§7:") }
+        }
+    ),
     FLIGHT_DURATION(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Flight Duration:") }?.replace(":a", ":§a")
