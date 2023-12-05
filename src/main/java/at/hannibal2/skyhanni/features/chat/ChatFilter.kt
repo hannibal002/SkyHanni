@@ -188,6 +188,8 @@ class ChatFilter {
         "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
         "§cYour Mining Speed Boost has expired!",
         "§a§r§6Mining Speed Boost §r§ais now available!",
+        "§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!",
+        "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
     // Party
@@ -308,12 +310,7 @@ class ChatFilter {
     )
 
     private val skymallPatterns = listOf(
-        "§r§eNew buff§r§r§r: (.*).§r".toPattern(),
-    )
-
-    private val skymallMessages = listOf(
-        "§r§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!§r",
-        "§r§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!§r",
+        "§eNew buff§r§r§r: (.*).§r§f.".toPattern(),
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -348,7 +345,6 @@ class ChatFilter {
         "useless_warning" to uselessWarningMessages,
         "annoying_spam" to annoyingSpamMessages,
         "powder_mining" to powderMiningMessages,
-        "skymall" to skymallMessages,
         "fire_sale" to fireSaleMessages,
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(

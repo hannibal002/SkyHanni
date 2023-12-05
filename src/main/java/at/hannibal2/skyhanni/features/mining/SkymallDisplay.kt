@@ -39,7 +39,7 @@ class SkymallDisplay {
     }
 
     @SubscribeEvent
-    fun onHotmOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!config.skymallDisplay) return
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Heart of the Mountain") return
@@ -53,13 +53,12 @@ class SkymallDisplay {
                     "§8 ■ §7§a10x §7chance to find Golden" -> "§f§a10x §fchance to find Golden and Diamond Goblins"
                     "§8 ■ §7Gain §a5x §9Titanium §7drops." -> "§fGain §a5x §9Titanium §fdrops"
                     else -> {
-                        // todo copy item nbt so people can paste it in support
+                        // todo replace message with an error to copy item nbt so people can paste it in support
                         LorenzUtils.chat("unknown event: ${item.getLore()[16]}")
                         "unknown"
                     }
                 }
             }
         }
-
     }
 }
