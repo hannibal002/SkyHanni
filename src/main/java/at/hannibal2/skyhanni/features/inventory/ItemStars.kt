@@ -125,5 +125,5 @@ class ItemStars {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars
-    private fun crimsonStarsIsDisabled() = !SkyHanniMod.feature.inventory.stackSize.itemNumber.contains(StackSizeConfig.ItemNumber.CRIMSON_STARS)
+    private fun crimsonStarsIsDisabled() = !SkyHanniMod.feature.inventory.stackSize.itemNumberAsStackSize.contains(StackSizeConfig.ItemNumberEntry.CRIMSON_ARMOR)
 }
