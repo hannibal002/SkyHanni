@@ -210,7 +210,7 @@ object SkyBlockItemModifierUtils {
             data.editionNumber = getAttributeInt("edition")
         }
         return data.editionNumber
-    }// = getAttributeInt("edition")
+    }
 
     fun ItemStack.getAuctionNumber(): Int? {
         val data = cachedData
@@ -218,7 +218,7 @@ object SkyBlockItemModifierUtils {
             data.auctionNumber = getAttributeInt("auction")
         }
         return data.auctionNumber
-    }// = getAttributeInt("auction")
+    }
 
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
