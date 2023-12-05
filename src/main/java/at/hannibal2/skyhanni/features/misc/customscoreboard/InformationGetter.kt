@@ -130,7 +130,7 @@ class InformationGetter {
 
         // remove objectives
         extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
-        val objectiveLines = ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Objective") }
+        val objectiveLines = ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
         extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLines) != it }
         extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLines, 2) != it && !extraObjectiveLines.contains(it)}
 
