@@ -25,26 +25,21 @@ public class StackSizeMenuConfig {
     ));
 
     public enum PlayerAdvanced {
-        UNLOCKED_RECIPES("§bUnlocked Recipes (%)"),
-        FAIRY_ENIGMA_SOULS_QUESTS("§bCollected Fairy/Enigma Souls + Completed Quests (#)"),
-        TRADES_UNLOCKED("§bTrades Unlocked (%)"),
-        WARDROBE_SLOT("§bWardrobe Slot (#)"),
-        ABBV_STATS("§bSkyblock Stat Names (Abbvs)"),
-        CUTE_NAME("§bSkyblock Profile Fruits Name (Abbvs)"),
-        AUCTION_BAZAAR_VARIOUS("§bAuction House + Bazaar (Various)"),
-        DOJO_PROGRESS("§bDojo Progress (Abbv)"),
-        BANK_UTILS("§bBank Utilities (Abbvs)"),
-        MAYOR_PERKS("§bMayor Perk Count (#)\n§b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)");
+        UNLOCKED_RECIPES("§bUnlocked Recipes"), // (%)
+        FAIRY_ENIGMA_SOULS_QUESTS("§bFairy/Enigma Souls + Completed Quests"),
+        TRADES_UNLOCKED("§bTrades Unlocked"), // (%)
+        WARDROBE_SLOT("§bWardrobe Slot #"),
+        ABBV_STATS("§bSkyblock Stat Names"),
+        CUTE_NAME("§bSkyblock Profile Fruit Name"),
+        AUCTION_BAZAAR_VARIOUS("§bAuction House + Bazaar Utils"),
+        DOJO_PROGRESS("§bDojo Progress"), // (Abbvs)
+        BANK_UTILS("§bBank Utilities"), // (Abbvs)
+        MAYOR_PERKS("§bMayor Perk Count"), // §b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)
+        ;
 
         final String str;
-
-        PlayerAdvanced(String str) {
-            this.str = str;
-        }
-
+        PlayerAdvanced(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() { return str; }
     }
 }
