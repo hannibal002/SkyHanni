@@ -293,6 +293,8 @@ class ChatFilter {
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
+        "§c {3}♨ .* Skin §e\\(.* §eleft\\)§c".toPattern(),
+        "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern()
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -305,6 +307,7 @@ class ChatFilter {
     )
     private val fireSaleMessages = listOf(
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
+        "§c♨ §eSelling multiple items for a limited time!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
