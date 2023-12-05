@@ -202,7 +202,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getBloodGodKills() = getAttributeInt("blood_god_kills")
     
-    fun ItemStack.getYetiRodFishesCaught() = getAttributeInt("fishes_caught")
+    fun ItemStack.getFishesCaught() = getAttributeInt("fishes_caught")
 
     fun ItemStack.getEdition(): Int? {
         val data = cachedData
