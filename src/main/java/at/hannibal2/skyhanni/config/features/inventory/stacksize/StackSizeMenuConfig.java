@@ -32,7 +32,6 @@ public class StackSizeMenuConfig {
 
         final String str;
         Farming(String str) { this.str = str; }
-        @Override
-        public String toString() { return str;  }
+        @Override public String toString() { return str;  }
     }
 }
