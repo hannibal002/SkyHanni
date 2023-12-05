@@ -25,8 +25,9 @@ _Frequently Asked Questions_
 > No, the barn fishing timer is not supported in the Crimson Isle in Hypixel Skyblock because it would disrupt other fishers due to competition for the maximum sea creature cap, potentially leading to conflicts and stealing of sea creatures.
 
 > **8: My Jacob Contest Display crops are wrong, how do I fix this?**
-> 1. Run the command `/shconfig reset config.storage.gardenJacobFarmingContestTimes`
-> 2. Restart the game
+> 1. Close your minecraft.
+> 2. Delete ".minecraft\config\skyhanni\jacob_contests.json".
+> 3. Open minecraft.
 
-*This FAQ was last updated on October 17th, 2023.
+*This FAQ was last updated on december 05th, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
