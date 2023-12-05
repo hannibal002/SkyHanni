@@ -25,12 +25,12 @@ public class StackSizeMenuConfig {
     ));
 
     public enum Abiphone {
-        CONTACTS_DIRECTORY("§bContacts Directory (#)"),
-        DO_NOT_DISTURB("§bDND Indicator (§c§l✖§b)"),
-        RELAYS_COMPLETED("§bRelays Finished (#)"),
-        SELECTED_RINGTONE("§bSelected Ringtone (Abbv)"),
-        TIC_TAC_TOE("§bTic Tac Toe Stats (§aW§eT§cL§b)"),
-        SNAKE("§bSnake Highest Score (#)"),
+        CONTACTS_DIRECTORY("§bContacts Directory"), // (#)
+        DO_NOT_DISTURB("§bDND Indicator"), // (§c§l✖§b)
+        RELAYS_COMPLETED("§bRelays Finished"), //(#)
+        SELECTED_RINGTONE("§bSelected Ringtone"), // (Abbv)
+        TIC_TAC_TOE("§bTic Tac Toe Stats"), // (§aW§eT§cL§b)
+        SNAKE("§bSnake Highest Score"), // (#)
         NAVIGATION("§bSorting/Filtering Abbreviations");
 
         final String str;
