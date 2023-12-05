@@ -510,7 +510,7 @@ object GardenNextJacobContest {
     }
 
     private fun sendContests() {
-        if (isSendingContests || contests.size != maxContestsPerYear) return
+        if (isSendingContests || contests.size != maxContestsPerYear || isCloseToNewYear()) return
 
         isSendingContests = true
 
