@@ -23,21 +23,16 @@ public class StackSizeMenuConfig {
     ));
 
     public enum Farming {
-        JACOBS_MEDALS("§bFarming Contests Medal Inventory (§6§lG§r§f§lS§r§c§lB§r§b)"),
-        VISITORS_LOGBOOK_COUNTDOWN("§bVisitor's Logbook Countdown (#, highest unit of time only)"),
-        VISITOR_MILESTONES("§bVisitor Milestones Progress (%)"),
-        VISITOR_NPC_RARITIES("§bGarden Visitor's Logbook NPC Rarities (Abbv)"),
-        COMPOSTER_INSERT_ABBV("§bComposter \"Insert from \" Counts (Abbv)");
+        JACOBS_MEDALS("§bFarming Contests Medal Inventory"), // (§6§lG§r§f§lS§r§c§lB§r§b)
+        VISITORS_LOGBOOK_COUNTDOWN("§bVisitor's Logbook Countdown"), // (#, highest unit of time only)
+        VISITOR_MILESTONES("§bVisitor Milestones Progress"), // (%)
+        VISITOR_NPC_RARITIES("§bGarden Visitor's Logbook NPC Rarities"), // (Abbv)
+        COMPOSTER_INSERT_ABBV("§bComposter \"Insert from \" Counts"), // (Abbv)
+        ;
 
         final String str;
-
-        Farming(String str) {
-            this.str = str;
-        }
-
+        Farming(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() { return str;  }
     }
 }
