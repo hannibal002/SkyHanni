@@ -157,6 +157,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6§lGOLD §fmedals") }
         }
     ),
+    FLIGHT_DURATION(
+        {
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Flight Duration:") }?.replace(":a", ":§a")
+                ?: "<hidden>")
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Flight Duration:") }
+        }
+    ),
     WINTER( // not tested
         {
             val list = mutableListOf<String>()
