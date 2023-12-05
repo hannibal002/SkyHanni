@@ -198,7 +198,7 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayBingo
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayPlayerTryhard
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -429,7 +429,7 @@ class SkyHanniMod {
         loadModule(DungeonChatFilter())
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures)
-        loadModule(MenuItemDisplayOverlayBingo())
+        loadModule(MenuItemDisplayOverlayPlayerTryhard())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(FandomWikiFromMenus())
