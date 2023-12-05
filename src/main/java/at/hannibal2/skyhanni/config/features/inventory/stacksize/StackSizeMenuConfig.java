@@ -25,17 +25,12 @@ public class StackSizeMenuConfig {
         CURRENT_SKYMALL_PERK("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
         HOTM_PERK_LEVELS("§bHeart of the Mountain Perk Levels"), // (#, §c#§b when disabled)
         HOTM_OVERALL_TIERS("§bHOTM Tiers Progress"), // (%)
-        CRYSTAL_HOLLOWS_NUCLEUS("§bCrystal Hollows Crystal Progress"); // (§aF§eNP§cNF§b)
+        CRYSTAL_HOLLOWS_NUCLEUS("§bCrystal Hollows Crystal Progress"),
+        ; // (§aF§eNP§cNF§b)
 
         final String str;
-
-        Mining(String str) {
-            this.str = str;
-        }
-
+        Mining(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() { return str; }
     }
 }
