@@ -521,5 +521,5 @@ object ItemDisplayOverlayFeatures {
         event.move(12, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumberAsStackSize")
     }
 
-    private fun ItemNumberEntry.isSelected(): Boolean = config.stackSize.itemNumberAsStackSize.contains(this)
+    fun ItemNumberEntry.isSelected(): Boolean = config.stackSize.itemNumberAsStackSize.contains(this)
 }
