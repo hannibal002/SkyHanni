@@ -165,7 +165,7 @@ class PestFinder {
     private fun getPlotsWithPests() = GardenPlotAPI.plots.filter { it.pests > 0 }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) { // TODO:
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
