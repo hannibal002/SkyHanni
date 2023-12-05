@@ -3,32 +3,32 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.ABIPHONE
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.ARMADILLO
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.BEASTMASTER
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.BLOOD_GOD
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.CAMPFIRE
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.COMPACTOR_DELETOR
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.EDITION_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.FRUIT_BOWL
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.MASTER_SKULL_TIER
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.MASTER_STAR_TIER
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.MINION_TIER
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.NECRONS_LADDER
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.NEW_YEAR_CAKE
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.PET_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.SOULFLOW
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.BLOOD_GOD
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.NECRONS_LADDER
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.ARMADILLO
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.CAMPFIRE
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.FRUIT_BOWL
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.BEASTMASTER
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.YETI_ROD
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.SHREDDER
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.STORAGE_TIER
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.COMPACTOR_DELETOR
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.ABIPHONE
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.SOULFLOW
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.STACKING_ENCHANTMENT
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.STORAGE_TIER
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.VACUUM_GARDEN
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.YETI_ROD
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -521,5 +521,5 @@ object ItemDisplayOverlayFeatures {
         event.move(12, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumber")
     }
 
-    fun ItemNumberEntry.isSelected(): Boolean = config.stackSize.itemNumberAsStackSize.contains(this)
+    private fun ItemNumberEntry.isSelected(): Boolean = config.stackSize.itemNumberAsStackSize.contains(this)
 }
