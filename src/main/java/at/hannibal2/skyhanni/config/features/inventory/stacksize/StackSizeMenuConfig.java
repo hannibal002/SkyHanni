@@ -28,13 +28,10 @@ public class StackSizeMenuConfig {
         ;
 
         final String str;
-
         Bingo(String str) {
             this.str = str;
         }
-
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return str;
         }
     }
