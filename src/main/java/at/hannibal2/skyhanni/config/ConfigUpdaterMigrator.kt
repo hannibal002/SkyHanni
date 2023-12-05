@@ -13,7 +13,7 @@ object ConfigUpdaterMigrator {
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
-        var obj = this.get(chain.first())
+        var obj = this[chain.first()]
         if (obj == null && init) {
             obj = JsonObject()
             this.add(chain.first(), obj)
@@ -87,7 +87,7 @@ object ConfigUpdaterMigrator {
     private fun merge(originalObject: JsonObject, overrideObject: JsonObject): Int {
         var count = 0
         overrideObject.entrySet().forEach {
-            val element = originalObject.get(it.key)
+            val element = originalObject[it.key]
             val newElement = it.value
             if (element is JsonObject && newElement is JsonObject) {
                 count += merge(element, newElement)
@@ -103,19 +103,19 @@ object ConfigUpdaterMigrator {
     }
 
     fun fixConfig(config: JsonObject): JsonObject {
-        val lastVersion = (config.get("lastVersion") as? JsonPrimitive)?.asIntOrNull ?: -1
+        val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > CONFIG_VERSION) {
             error("Cannot downgrade config")
         }
         if (lastVersion == CONFIG_VERSION) return config
         return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
-            val storage = accumulator.get("storage")?.asJsonObject
+            val storage = accumulator["storage"]?.asJsonObject
             val dynamicPrefix: Map<String, List<String>> = mapOf(
                 "#profile" to
                     (storage?.get("players")?.asJsonObject?.entrySet()
                         ?.flatMap { player ->
-                            player.value.asJsonObject.get("profiles")?.asJsonObject?.entrySet()?.map {
+                            player.value.asJsonObject["profiles"]?.asJsonObject?.entrySet()?.map {
                                 "storage.players.${player.key}.profiles.${it.key}"
                             } ?: listOf()
                         }
