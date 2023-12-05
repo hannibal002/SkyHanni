@@ -157,7 +157,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6§lGOLD §fmedals") }
         }
     ),
-    CLEAN_UP(
+    GARDEN_CLEAN_UP(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.trim().startsWith("§fCleanup§7:") }
                 ?: "<hidden>")
@@ -278,7 +278,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             // Wind
             if (ScoreboardData.sidebarLinesFormatted.any { it == "§9Wind Compass" }) {
                 list += "§9Wind Compass"
-                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass")
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass")?.replace("a", "§a")
                     ?: "§7No Wind Compass for some reason"
             }
 
