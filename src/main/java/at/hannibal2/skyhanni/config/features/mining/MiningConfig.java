@@ -38,5 +38,5 @@ public class MiningConfig {
     public boolean skymallDisplay = false;
 
     @Expose
-    public Position skymallDisplayPosition = new Position(400, 200, 1.3f);
+    public Position skymallDisplayPosition = new Position(3, 140, 1.0f);
 }
