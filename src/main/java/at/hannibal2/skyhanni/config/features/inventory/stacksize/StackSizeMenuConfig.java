@@ -28,8 +28,8 @@ public class StackSizeMenuConfig {
         SLAYER_LEVELS("§bCurrent Slayer Levels"), // (#)
         SLAYER_COMBAT_WISDOM_BUFF("§bSlayer Combat Wisdom Buff"), // (#)
         RNG_METER_PROGRESS("§bSlayer/Catacombs RNG Meter Progress"), // (%)
-        UNLOCKED_SLAYER_RECIPES("§bUnlocked Slayer Recipes"),
-        ; // (#)
+        UNLOCKED_SLAYER_RECIPES("§bUnlocked Slayer Recipes"), // (#)
+        ;
 
         final String str;
         Combat(String str) { this.str = str; }
