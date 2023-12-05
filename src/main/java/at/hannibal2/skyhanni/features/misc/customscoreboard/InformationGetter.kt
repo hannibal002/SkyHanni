@@ -31,6 +31,7 @@ class InformationGetter {
                     line.removePrefix("Purse: §6").removePrefix("Piggy: §6")
 
                 line.startsWith("Motes: §5") -> motes = line.removePrefix("Motes: §5")
+                line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
                 extractLobbyCode(line) is String -> lobbyCode =
                     extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
                 line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
@@ -52,6 +53,7 @@ class InformationGetter {
             "Purse: §6",
             "Piggy: §6",
             "Motes: §5",
+            "Motes: §d",
             "Heat: ",
             "Bits: §b",
             "Copper: §c",
