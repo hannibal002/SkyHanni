@@ -23,9 +23,9 @@ public class StackSizeMenuConfig {
 
     public enum Mining {
         CURRENT_SKYMALL_PERK("§bCurrent Sky Mall Perk (Abbv)"), //do not move this PLEASE otherwise one of the other stack size features will break
-        HOTM_PERK_LEVELS("§bHeart of the Mountain Perk Levels (#, §c#§b when disabled)"),
-        HOTM_OVERALL_TIERS("§bHOTM Tiers Progress (%)"),
-        CRYSTAL_HOLLOWS_NUCLEUS("§bCrystal Hollows Crystal Progress (§aF§eNP§cNF§b)");
+        HOTM_PERK_LEVELS("§bHeart of the Mountain Perk Levels"), // (#, §c#§b when disabled)
+        HOTM_OVERALL_TIERS("§bHOTM Tiers Progress"), // (%)
+        CRYSTAL_HOLLOWS_NUCLEUS("§bCrystal Hollows Crystal Progress"); // (§aF§eNP§cNF§b)
 
         final String str;
 
