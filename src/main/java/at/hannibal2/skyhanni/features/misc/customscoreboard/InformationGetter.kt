@@ -108,7 +108,13 @@ class InformationGetter {
             "§3§lSolo",
 			"§fRift Dimension",
             "§d᠅ §fGemstone§f: §d",
-            "§2᠅ §fMithril§f: §2"
+            "§2᠅ §fMithril§f: §2",
+            "Revenant Horror",
+            "Tarantula Broodfa",
+            "Sven Packm",
+            "Voidgloom Seraph",
+            "Inferno Demo",
+            "Combat XP",
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
