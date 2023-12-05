@@ -1,13 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
@@ -17,17 +10,13 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -49,7 +38,7 @@ class PestFinder {
         if (!isEnabled()) return
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plot = GardenPlotAPI.getPlotByName(event.plotName)
-        if (plot==null) {
+        if (plot == null) {
             LorenzUtils.userError("Open Desk to load plot names and pest locations!")
             return
         }
@@ -60,7 +49,7 @@ class PestFinder {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName!="Configure Plots") return
+        if (event.inventoryName != "Configure Plots") return
 
         val pestInventoryPattern = "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!".toPattern()
 
@@ -83,7 +72,7 @@ class PestFinder {
 
     private fun drawDisplay() = buildList {
         val totalAmount = getPlotsWithPests().sumOf { it.pests }
-        if (totalAmount!=scoreboardPests) {
+        if (totalAmount != scoreboardPests) {
             add(Renderable.string("§cIncorrect pest amount!"))
             add(Renderable.string("§eOpen Configure Plots Menu!"))
             return@buildList
@@ -119,7 +108,7 @@ class PestFinder {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (event.message=="§cThere are no pests in your Garden right now! Keep farming!") {
+        if (event.message == "§cThere are no pests in your Garden right now! Keep farming!") {
             GardenPlotAPI.plots.forEach {
                 it.pests = 0
             }
@@ -138,7 +127,7 @@ class PestFinder {
             }
         }
 
-        if (newPests==scoreboardPests) return
+        if (newPests == scoreboardPests) return
 
         removePests(scoreboardPests - newPests)
         scoreboardPests = newPests
@@ -204,10 +193,10 @@ class PestFinder {
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!GardenAPI.inGarden()) return
-        if (Minecraft.getMinecraft().currentScreen!=null) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
 
-        if (event.keyCode!=config.teleportHotkey) return
+        if (event.keyCode != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
