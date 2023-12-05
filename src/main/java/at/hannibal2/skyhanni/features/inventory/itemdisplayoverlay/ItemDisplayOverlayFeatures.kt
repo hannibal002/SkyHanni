@@ -49,10 +49,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSec
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFishesCaught
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFruitBowlNames
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getYetiRodFishesCaught
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.matches
@@ -421,7 +421,7 @@ object ItemDisplayOverlayFeatures {
 
     private fun isYetiRod(internalName: NEUInternalName): Boolean = YETI_ROD.isSelected() && internalName == yetiRodInternalName
     private fun getYetiRodTip(item: ItemStack): String {
-        val kills = "${item.getYetiRodFishesCaught()}"
+        val kills = "${item.getFishesCaught()}"
         if (kills == "null") { return "" }
         return if (kills.length >= 4) {
             "100"
