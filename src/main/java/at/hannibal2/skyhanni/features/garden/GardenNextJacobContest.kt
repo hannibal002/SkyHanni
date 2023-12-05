@@ -48,12 +48,15 @@ object GardenNextJacobContest {
     private var simpleDisplay = emptyList<String>()
     private var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
+
     private val patternDay = "§aDay (?<day>.*)".toPattern()
     private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
     private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
 
+    private val closeToNewYear = "§7Close to new SB year!"
     private const val maxContestsPerYear = 124
     private val contestDuration = 20.minutes
+
     private var lastWarningTime = 0L
     private var loadedContestsYear = -1
     private var nextContestsAvailableAt = -1L
@@ -81,10 +84,25 @@ object GardenNextJacobContest {
                 if (counter == 4) break
             }
         }
-        newList.add("§cOpen calendar for")
-        newList.add("§cmore exact data!")
+
+        if (isCloseToNewYear()) {
+            newList.add(closeToNewYear)
+        } else {
+            newList.add("§cOpen calendar for")
+            newList.add("§cmore exact data!")
+        }
 
         simpleDisplay = newList
+    }
+
+    private fun isCloseToNewYear(): Boolean {
+        val now = SkyBlockTime.now()
+        val newYear = SkyBlockTime(year = now.year)
+        val nextYear = SkyBlockTime(year = now.year + 1)
+        val diffA = now.asTimeMark() - newYear.asTimeMark()
+        val diffB = nextYear.asTimeMark() - now.asTimeMark()
+
+        return diffA < 30.minutes || diffB < 30.minutes
     }
 
     @SubscribeEvent
@@ -270,7 +288,11 @@ object GardenNextJacobContest {
         }
 
         if (contests.isEmpty()) {
-            list.add("§cOpen calendar to read jacob contest times!")
+            if (isCloseToNewYear()) {
+                list.add(closeToNewYear)
+            } else {
+                list.add("§cOpen calendar to read jacob contest times!")
+            }
             return list
         }
 
@@ -280,8 +302,8 @@ object GardenNextJacobContest {
         // Show next contest
         if (nextContest != null) return drawNextContest(nextContest, list)
 
-        if (contests.size == maxContestsPerYear) {
-            list.add("§cNew SkyBlock Year! Open calendar again!")
+        if (isCloseToNewYear()) {
+            list.add(closeToNewYear)
         } else {
             list.add("§cOpen calendar to read jacob contest times!")
         }
@@ -298,7 +320,7 @@ object GardenNextJacobContest {
     ): MutableList<Any> {
         var duration = nextContest.endTime.timeUntil()
         if (duration > 4.days) {
-            list.add("§New SB Year, wait a bit.")
+            list.add(closeToNewYear)
             return list
         }
 
