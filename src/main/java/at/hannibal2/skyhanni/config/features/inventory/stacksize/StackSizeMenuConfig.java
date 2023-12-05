@@ -21,10 +21,10 @@ public class StackSizeMenuConfig {
     ));
 
     public enum Bingo {
-        SECRET_BINGO_DISCOVERY("§bSecret Bingo Goal Discovery (#, caps at 10k)"),
-        SECRET_BINGO_HINT_COUNTDOWN(""),
-        ROW_COLUMN_DIAGONAL_PROGRESS("§bRow/Diagonal/Column Progress"),
-        TOP_BLANK_PERCENT_COMMUNITY_GOAL_CONTRIB("§bCommunity Goals Top Percent Contribution (#)"),
+        SECRET_BINGO_DISCOVERY("§bSecret Bingo Goal Discovery"), // (#, caps at 10k)
+        SECRET_BINGO_HINT_COUNTDOWN("§bSecret Bingo Goal Countdown"), // (shows largest unit of time)
+        ROW_COLUMN_DIAGONAL_PROGRESS("§bRow/Diagonal/Column Progress"), // (§a✔§b/§c§l✖§b)
+        TOP_BLANK_PERCENT_COMMUNITY_GOAL_CONTRIB("§bCommunity Goals Percent Position"), //(#)
         ;
 
         final String str;
