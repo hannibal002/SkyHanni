@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.CRIMSON_ARMOR
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures.isSelected
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -54,7 +55,7 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (crimsonStarsIsDisabled()) return
+        if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
         if (number != -1) {
@@ -125,5 +126,4 @@ class ItemStars {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars
-    private fun crimsonStarsIsDisabled() = !SkyHanniMod.feature.inventory.stackSize.itemNumberAsStackSize.contains(StackSizeConfig.ItemNumberEntry.CRIMSON_ARMOR)
 }
