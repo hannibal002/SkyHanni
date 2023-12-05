@@ -98,7 +98,7 @@ public class VisitorConfig {
         desc = "Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling"
     )
     @ConfigEditorDropdown
-    public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.ONLY_ON_BINGO;
+    public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.DONT;
 
     public enum VisitorBlockBehaviour {
         DONT("Don't"), ALWAYS("Always"), ONLY_ON_BINGO("Only on Bingo");
