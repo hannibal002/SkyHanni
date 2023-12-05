@@ -36,7 +36,10 @@ import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.UIManager
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object GardenNextJacobContest {
     private var dispatcher = Dispatchers.IO
@@ -292,21 +295,15 @@ object GardenNextJacobContest {
         nextContest: FarmingContest,
         list: MutableList<Any>,
     ): MutableList<Any> {
-        var boostedCrop: CropType? = null
-        outer@ for (line in TabListData.getTabList()) {
-            val lineStripped = line.removeColor().trim()
-            if (lineStripped.startsWith("☘ ")) {
-                for (crop in nextContest.crops) {
-                    if (line.removeColor().trim() == "☘ ${crop.cropName}") {
-                        boostedCrop = crop
-                        break@outer
-                    }
-                }
-                break
-            }
+        var duration = nextContest.endTime - System.currentTimeMillis()
+        val durationObj = duration.toDuration(DurationUnit.MILLISECONDS)
+        if (durationObj > 4.days) {
+            list.add("§New SB Year, wait a bit.")
+            return list
         }
 
-        var duration = nextContest.endTime - System.currentTimeMillis()
+        val boostedCrop = calculateBoostedCrop(nextContest)
+
         if (duration < contestDuration) {
             list.add("§aActive: ")
         } else {
@@ -323,6 +320,20 @@ object GardenNextJacobContest {
         list.add("§7(§b$format§7)")
 
         return list
+    }
+
+    private fun calculateBoostedCrop(nextContest: FarmingContest): CropType? {
+        for (line in TabListData.getTabList()) {
+            val lineStripped = line.removeColor().trim()
+            if (!lineStripped.startsWith("☘ ")) continue
+            for (crop in nextContest.crops) {
+                if (line.removeColor().trim() == "☘ ${crop.cropName}") {
+                    return crop
+                }
+            }
+        }
+
+        return null
     }
 
     private fun warn(timeInMillis: Long, crops: List<CropType>, boostedCrop: CropType?) {
