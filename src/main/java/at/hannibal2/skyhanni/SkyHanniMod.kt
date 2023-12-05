@@ -190,8 +190,6 @@ import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.HarpFeatures
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
-import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayCombat
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
@@ -199,6 +197,8 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu.MenuItemDisplayOverlayBingo
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -428,8 +428,8 @@ class SkyHanniMod {
         loadModule(PlayerChatModifier())
         loadModule(DungeonChatFilter())
         loadModule(HideNotClickableItems())
-        loadModule(ItemDisplayOverlayFeatures())
-        loadModule(MenuItemDisplayOverlayCombat())
+        loadModule(ItemDisplayOverlayFeatures)
+        loadModule(MenuItemDisplayOverlayBingo())
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(FandomWikiFromMenus())
