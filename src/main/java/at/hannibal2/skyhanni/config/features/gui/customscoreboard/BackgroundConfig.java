@@ -27,7 +27,7 @@ public class BackgroundConfig {
     @Expose
     @ConfigOption(
         name = "Use Custom Background Image",
-        desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png.\""
+        desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
     )
     @ConfigEditorBoolean
     @FeatureToggle
