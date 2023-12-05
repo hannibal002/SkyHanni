@@ -42,6 +42,9 @@ class InformationGetter {
         if (sidebarLines.none { it.startsWith(("Heat: "))}){
             heat = "§c♨ 0"
         }
+        if (sidebarLines.none { it.startsWith(("Bits: §b"))}){
+            bits = "0"
+        }
 
         val knownLines = listOf(
             "§7⏣ ",
@@ -152,7 +155,5 @@ class InformationGetter {
         // Remove slayer
         extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
         extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
-        extraLines = extraLines.filter { it != SlayerAPI.latestSlayerCategory }
-        extraLines = extraLines.filter { it != SlayerAPI.latestSlayerProgress }
     }
 }
