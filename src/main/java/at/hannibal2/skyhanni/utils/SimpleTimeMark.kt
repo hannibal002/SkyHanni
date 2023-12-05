@@ -6,7 +6,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @JvmInline
-value class SimpleTimeMark(private val millis: Long) {
+value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark> {
 
     operator fun minus(other: SimpleTimeMark) =
         (millis - other.millis).milliseconds
@@ -24,12 +24,16 @@ value class SimpleTimeMark(private val millis: Long) {
 
     fun isFarPast() = millis == 0L
 
+    override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
+
     override fun toString(): String {
         if (millis == 0L) return "The Far Past"
         return Instant.ofEpochMilli(millis).toString()
     }
 
     fun toMillis() = millis
+
+    fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
 
     companion object {
         fun now() = SimpleTimeMark(System.currentTimeMillis())
