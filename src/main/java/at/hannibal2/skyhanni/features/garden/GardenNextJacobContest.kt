@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -31,25 +33,30 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.time.Instant
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.UIManager
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object GardenNextJacobContest {
     private var dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
-    private var contests = mutableMapOf<Long, FarmingContest>()
+    private var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
+
     private val patternDay = "§aDay (?<day>.*)".toPattern()
     private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
     private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
 
+    private val closeToNewYear = "§7Close to new SB year!"
     private const val maxContestsPerYear = 124
-    private const val contestDuration = 1_000 * 60 * 20
+    private val contestDuration = 20.minutes
+
     private var lastWarningTime = 0L
     private var loadedContestsYear = -1
     private var nextContestsAvailableAt = -1L
@@ -77,10 +84,25 @@ object GardenNextJacobContest {
                 if (counter == 4) break
             }
         }
-        newList.add("§cOpen calendar for")
-        newList.add("§cmore exact data!")
+
+        if (isCloseToNewYear()) {
+            newList.add(closeToNewYear)
+        } else {
+            newList.add("§cOpen calendar for")
+            newList.add("§cmore exact data!")
+        }
 
         simpleDisplay = newList
+    }
+
+    private fun isCloseToNewYear(): Boolean {
+        val now = SkyBlockTime.now()
+        val newYear = SkyBlockTime(year = now.year)
+        val nextYear = SkyBlockTime(year = now.year + 1)
+        val diffA = now.asTimeMark() - newYear.asTimeMark()
+        val diffB = nextYear.asTimeMark() - now.asTimeMark()
+
+        return diffA < 30.minutes || diffB < 30.minutes
     }
 
     @SubscribeEvent
@@ -124,7 +146,7 @@ object GardenNextJacobContest {
     private fun readCalendar(items: Collection<ItemStack>, year: Int, month: Int) {
         if (contests.isNotEmpty() && loadedContestsYear != year) {
             val endTime = contests.values.first().endTime
-            val lastYear = SkyBlockTime.fromInstant(Instant.ofEpochMilli(endTime)).year
+            val lastYear = endTime.toSkyBlockTime().year
             if (year != lastYear) {
                 contests.clear()
             }
@@ -150,7 +172,7 @@ object GardenNextJacobContest {
             val name = item.name ?: continue
             val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
 
-            val startTime = SkyBlockTime(year, month, day).toMillis()
+            val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
@@ -185,7 +207,7 @@ object GardenNextJacobContest {
 
         val currentYear = SkyBlockTime.now().year
         for (contest in contests.values) {
-            val contestYear = (SkyBlockTime.fromInstant(Instant.ofEpochMilli(contest.endTime))).year
+            val contestYear = (contest.endTime.toSkyBlockTime()).year
             // Ensure all stored contests are really from the current year
             if (contestYear != currentYear) continue
 
@@ -200,7 +222,7 @@ object GardenNextJacobContest {
         val year = savedContests.firstNotNullOfOrNull {
             val endTime = it.key
 
-            SkyBlockTime.fromInstant(Instant.ofEpochMilli(endTime)).year
+            endTime.toSkyBlockTime().year
         }
 
         // Clear contests if from previous year
@@ -233,7 +255,7 @@ object GardenNextJacobContest {
         }
     }
 
-    class FarmingContest(val endTime: Long, val crops: List<CropType>)
+    class FarmingContest(val endTime: SimpleTimeMark, val crops: List<CropType>)
 
     private fun update() {
         nextContestCrops.clear()
@@ -266,18 +288,22 @@ object GardenNextJacobContest {
         }
 
         if (contests.isEmpty()) {
-            list.add("§cOpen calendar to read jacob contest times!")
+            if (isCloseToNewYear()) {
+                list.add(closeToNewYear)
+            } else {
+                list.add("§cOpen calendar to read jacob contest times!")
+            }
             return list
         }
 
         val nextContest =
-            contests.filter { it.value.endTime > System.currentTimeMillis() }.toSortedMap()
+            contests.filter { !it.value.endTime.isInPast() }.toSortedMap()
                 .firstNotNullOfOrNull { it.value }
         // Show next contest
         if (nextContest != null) return drawNextContest(nextContest, list)
 
-        if (contests.size == maxContestsPerYear) {
-            list.add("§cNew SkyBlock Year! Open calendar again!")
+        if (isCloseToNewYear()) {
+            list.add(closeToNewYear)
         } else {
             list.add("§cOpen calendar to read jacob contest times!")
         }
@@ -292,21 +318,14 @@ object GardenNextJacobContest {
         nextContest: FarmingContest,
         list: MutableList<Any>,
     ): MutableList<Any> {
-        var boostedCrop: CropType? = null
-        outer@ for (line in TabListData.getTabList()) {
-            val lineStripped = line.removeColor().trim()
-            if (lineStripped.startsWith("☘ ")) {
-                for (crop in nextContest.crops) {
-                    if (line.removeColor().trim() == "☘ ${crop.cropName}") {
-                        boostedCrop = crop
-                        break@outer
-                    }
-                }
-                break
-            }
+        var duration = nextContest.endTime.timeUntil()
+        if (duration > 4.days) {
+            list.add(closeToNewYear)
+            return list
         }
 
-        var duration = nextContest.endTime - System.currentTimeMillis()
+        val boostedCrop = calculateBoostedCrop(nextContest)
+
         if (duration < contestDuration) {
             list.add("§aActive: ")
         } else {
@@ -325,9 +344,23 @@ object GardenNextJacobContest {
         return list
     }
 
-    private fun warn(timeInMillis: Long, crops: List<CropType>, boostedCrop: CropType?) {
+    private fun calculateBoostedCrop(nextContest: FarmingContest): CropType? {
+        for (line in TabListData.getTabList()) {
+            val lineStripped = line.removeColor().trim()
+            if (!lineStripped.startsWith("☘ ")) continue
+            for (crop in nextContest.crops) {
+                if (line.removeColor().trim() == "☘ ${crop.cropName}") {
+                    return crop
+                }
+            }
+        }
+
+        return null
+    }
+
+    private fun warn(duration: Duration, crops: List<CropType>, boostedCrop: CropType?) {
         if (!config.warn) return
-        if (config.warnTime <= timeInMillis / 1000) return
+        if (config.warnTime.seconds <= duration) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
@@ -337,7 +370,8 @@ object GardenNextJacobContest {
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
-        val cropTextNoColor = crops.joinToString(", ") { if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
+        val cropTextNoColor =
+            crops.joinToString(", ") { if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
@@ -438,12 +472,13 @@ object GardenNextJacobContest {
             val url = "https://api.elitebot.dev/contests/at/now"
             val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject
 
-            val newContests = mutableMapOf<Long, FarmingContest>()
+            val newContests = mutableMapOf<SimpleTimeMark, FarmingContest>()
 
             val complete = result["complete"].asBoolean
             if (complete) {
                 for (entry in result["contests"].asJsonObject.entrySet()) {
                     var timestamp = entry.key.toLongOrNull() ?: continue
+                    val timeMark = (timestamp * 1000).asTimeMark()
                     timestamp *= 1_000 // Seconds to milliseconds
 
                     val crops = entry.value.asJsonArray.map {
@@ -452,7 +487,7 @@ object GardenNextJacobContest {
 
                     if (crops.size != 3) continue
 
-                    newContests[timestamp + contestDuration] = FarmingContest(timestamp + contestDuration, crops)
+                    newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
                 LorenzUtils.chat("This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
@@ -475,7 +510,7 @@ object GardenNextJacobContest {
     }
 
     private fun sendContests() {
-        if (isSendingContests || contests.size != maxContestsPerYear) return
+        if (isSendingContests || contests.size != maxContestsPerYear || isCloseToNewYear()) return
 
         isSendingContests = true
 
@@ -489,7 +524,7 @@ object GardenNextJacobContest {
         val formatted = mutableMapOf<Long, List<String>>()
 
         for ((endTime, contest) in contests) {
-            formatted[endTime / 1000] = contest.crops.map {
+            formatted[endTime.toMillis() / 1000] = contest.crops.map {
                 it.cropName
             }
         }
