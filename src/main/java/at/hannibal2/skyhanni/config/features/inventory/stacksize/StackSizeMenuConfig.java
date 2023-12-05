@@ -23,20 +23,15 @@ public class StackSizeMenuConfig {
     ));
 
     public enum SBLeveling {
-        GUIDE_PROGRESS("§bSkyblock Guide Progress (%)"),
-        WAYS_TO_LEVEL_UP_PROGRESS("§bSkyblock Ways To Level Up Tasks (%)"),
-        SB_LEVELING_REWARDS("§bSkyblock Leveling Rewards Progress (%)"),
-        EMBLEMS_UNLOCKED("§bEmblems Unlocked (#)");
+        GUIDE_PROGRESS("§bSkyblock Guide Progress"), //(%)
+        WAYS_TO_LEVEL_UP_PROGRESS("§bSkyblock Ways To Level Up Tasks"), //(%)
+        SB_LEVELING_REWARDS("§bSkyblock Leveling Rewards Progress"), //(%)
+        EMBLEMS_UNLOCKED("§bEmblems Unlocked"), // (#)
+        ;
 
         final String str;
-
-        SBLeveling(String str) {
-            this.str = str;
-        }
-
+        SBLeveling(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() { return str; }
     }
 }
