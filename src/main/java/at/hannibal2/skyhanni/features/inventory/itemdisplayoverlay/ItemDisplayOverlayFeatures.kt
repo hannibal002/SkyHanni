@@ -518,7 +518,7 @@ object ItemDisplayOverlayFeatures {
         event.move(11, "inventory.itemNumberAsStackSize", "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
         }
-        event.move(12, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumber")
+        event.move(12, "inventory.itemNumberAsStackSize", "inventory.stackSize.itemNumberAsStackSize")
     }
 
     fun ItemNumberEntry.isSelected(): Boolean = config.stackSize.itemNumberAsStackSize.contains(this)
