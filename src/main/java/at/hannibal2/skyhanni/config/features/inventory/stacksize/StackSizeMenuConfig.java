@@ -28,26 +28,21 @@ public class StackSizeMenuConfig {
     ));
 
     public enum PlayerGeneral {
-        SKYBLOCK_LEVEL("§bSkyblock Level (#, won't work in Rift)"),
-        SKILL_GARDEN_DUNGEON_LEVELS("§bSkill + Garden + Dungeoneering Levels (#)"),
-        SKILL_AVERAGE("§bSkill Average (#)"),
-        COLLECTION_LEVELS_AND_PROGRESS("§bCollection Level + Progress (%)"),
-        CRAFTED_MINIONS("§bHighest Crafted Minion Tier + Progress to Next Minion Slot (#)"),
-        MUSEUM_PROGRESS("§bMuseum Donation Progress (%, # for Special Items)"),
-        PROFILE_ICON("§bSkyblock Profile Type\n§b(Classic/Ironman/Stranded/Bingo)"),
-        PET_SCORE_STATUS("§bPet Score (#) + \"None\" Pet Status Indicator (c§l✖§b)"),
-        ESSENCE_COUNTS("§bEssence Counts\n§b(# in Rewards Chests, Abbv in Essence Shops)"),
-        MINION_QUICK_UPGRADE("§bQuick Upgrade Missing Count (#)");
+        SKYBLOCK_LEVEL("§bSkyblock Level"), //(#, won't work in Rift)
+        SKILL_GARDEN_DUNGEON_LEVELS("§bSkill + Garden + Dungeoneering Levels"),
+        SKILL_AVERAGE("§bSkill Average"),
+        COLLECTION_LEVELS_AND_PROGRESS("§bCollection Level + Progress"), // (%)
+        CRAFTED_MINIONS("§bHighest Crafted Minion + Next Minion Progress"),
+        MUSEUM_PROGRESS("§bMuseum Donation Progress"), // (%, # for Special Items)
+        PROFILE_ICON("§bSkyblock Profile Type Icon"),
+        PET_SCORE_STATUS("§bPet Score + No Pet Indicator"), // (c§l✖§b)
+        ESSENCE_COUNTS("§bEssence Counts"), // §b(# in Rewards Chests, Abbv in Essence Shops)
+        MINION_QUICK_UPGRADE("§bQuick Upgrade Missing Count"),
+        ;
 
         final String str;
-
-        PlayerGeneral(String str) {
-            this.str = str;
-        }
-
+        PlayerGeneral(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() {return str; }
     }
 }
