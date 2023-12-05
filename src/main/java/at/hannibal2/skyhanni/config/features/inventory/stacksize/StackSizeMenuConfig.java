@@ -23,26 +23,21 @@ public class StackSizeMenuConfig {
     ));
 
     public enum PlayerTryhard {
-        MENU_NAVIGATION("§bMenu Pagination (#) + Sorting/Filtering Abbreviations\n§b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)"),
-        RNG_METER_ODDS("§bRNG Meter Drop Odds (Abbvs)"),
-        COMMUNITY_ESSENCE_UPGRADES("§bCommunity Shop + Essence Shop Upgrade Tiers (#)"),
-        SELECTED_TAB("§bSelected Tab\n§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)"),
-        FAME_RANK_BITS("§bFame Rank, Abbv'd Fame Count, Bits Available (Abbvs)"),
-        BOOSTER_COOKIE_DURATION("§bBooster Cookie Duration (highest unit of time only)\n§b[Xy ➡ Xd ➡ Xh ➡ etc...]"),
-        ACTIVE_POTION_COUNT("§bCurrently Active Potion Effects Count (#)"),
-        ACCESSORY_BAG_UTILS("§bAccessory Bag Utilities (Various)"),
-        EVENT_COUNTDOWN_ABBV("§bEvents \"Start(ing) in\" Countdowns (Abbvs)\n§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]"),
-        SKYBLOCK_ACHIEVEMENT_POINTS("§bSkyBlock Achievements Points (%)");
+        MENU_NAVIGATION("§bMenu Pagination + Sorting/Filtering Abbvs"), // §b(Note: AH/Abiphones have their seperate sorting/filtering abbv configs.)
+        RNG_METER_ODDS("§bRNG Meter Drop Odds"), // (Abbvs)
+        COMMUNITY_ESSENCE_UPGRADES("§bCommunity + Essence Shops Upgrade Tiers"), // (#)
+        SELECTED_TAB("§bSelected Tab"), //§b(§a⬇§bs in Community Shop, §a➡§bs in Auction + Bazaar)
+        FAME_RANK_BITS("§bFame Rank, Fame Count, Bits Available"), // (Abbvs)
+        BOOSTER_COOKIE_DURATION("§bBooster Cookie Duration"), //§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]
+        ACTIVE_POTION_COUNT("§bActive Potion Effects"), // (#)
+        ACCESSORY_BAG_UTILS("§bAccessory Bag Utils"),
+        EVENT_COUNTDOWN_ABBV("§bEvents \"Start(ing) in\" Countdowns"), //§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]
+        SKYBLOCK_ACHIEVEMENT_POINTS("§bSkyBlock Achievements Points"), // (%)
+        ;
 
         final String str;
-
-        PlayerTryhard(String str) {
-            this.str = str;
-        }
-
+        PlayerTryhard(String str) { this.str = str; }
         @Override
-        public String toString() {
-            return str;
-        }
+        public String toString() { return str; }
     }
 }
