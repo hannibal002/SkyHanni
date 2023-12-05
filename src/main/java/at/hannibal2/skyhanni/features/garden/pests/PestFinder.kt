@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -41,13 +42,14 @@ class PestFinder {
 
     private var display = emptyList<Renderable>()
     private var scoreboardPests = 0
+    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onPestSpawn(event: PestSpawnEvent) {
         if (!isEnabled()) return
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plot = GardenPlotAPI.getPlotByName(event.plotName)
-        if (plot == null) {
+        if (plot==null) {
             LorenzUtils.userError("Open Desk to load plot names and pest locations!")
             return
         }
@@ -58,7 +60,7 @@ class PestFinder {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName != "Configure Plots") return
+        if (event.inventoryName!="Configure Plots") return
 
         val pestInventoryPattern = "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!".toPattern()
 
@@ -81,7 +83,7 @@ class PestFinder {
 
     private fun drawDisplay() = buildList {
         val totalAmount = getPlotsWithPests().sumOf { it.pests }
-        if (totalAmount != scoreboardPests) {
+        if (totalAmount!=scoreboardPests) {
             add(Renderable.string("§cIncorrect pest amount!"))
             add(Renderable.string("§eOpen Configure Plots Menu!"))
             return@buildList
@@ -117,7 +119,7 @@ class PestFinder {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (event.message == "§cThere are no pests in your Garden right now! Keep farming!") {
+        if (event.message=="§cThere are no pests in your Garden right now! Keep farming!") {
             GardenPlotAPI.plots.forEach {
                 it.pests = 0
             }
@@ -136,7 +138,7 @@ class PestFinder {
             }
         }
 
-        if (newPests == scoreboardPests) return
+        if (newPests==scoreboardPests) return
 
         removePests(scoreboardPests - newPests)
         scoreboardPests = newPests
@@ -174,10 +176,10 @@ class PestFinder {
     private fun getPlotsWithPests() = GardenPlotAPI.plots.filter { it.pests > 0 }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) { // TODO:
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         for (plot in getPlotsWithPests()) {
@@ -197,15 +199,15 @@ class PestFinder {
         }
     }
 
-    private var lastKeyPress =  SimpleTimeMark.farPast()
+    private var lastKeyPress = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!GardenAPI.inGarden()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getMinecraft().currentScreen!=null) return
         if (NEUItems.neuHasFocus()) return
 
-        if (event.keyCode != config.teleportHotkey) return
+        if (event.keyCode!=config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
@@ -220,6 +222,14 @@ class PestFinder {
         }
 
         plot.sendTeleportTo()
+    }
+
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (!isEnabled()) return
+        if (!config.showPlotInWorld) return
+        if (event.oldItem !in PestAPI.vacuumVariants) return
+        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)
