@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event;
+package at.hannibal2.skyhanni.config.features.event.waypoints;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
