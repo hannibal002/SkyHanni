@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
@@ -44,6 +45,9 @@ class RenderBackground {
                 position.isCenter
             )
         )
+
+        if (GuiEditManager.isInGui()) return
+
         /*if (config.backgroundConfig.enabled) {
             ShaderManager.enableShader("rounded_rectangle")
         } else {
