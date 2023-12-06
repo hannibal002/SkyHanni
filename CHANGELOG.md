@@ -56,6 +56,8 @@
 + Added support for 'found by' info in bingo card. - hannibal2
 + Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
 + Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
 
 #### Inventory Features
 
@@ -85,6 +87,8 @@
 + Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
 + Use different colors in the tab list depending on the pest count. - alexia
 + Highlight the boosted crop contest in all Jacob's Contest displays. - alexia
++ Added Delicate 5 to visitor drop counter and visitor block refuse and highlighter. - hannibal2
++ Block visitor interaction for dedication cycling is now disabled by default. - hannibal2
 
 #### Fishing Changes
 
@@ -93,6 +97,17 @@
 #### Winter Changes
 
 + Hiding Unique Gifted Players Highlighting for ironman and bingo while not on those modes. - Thunderblade73
+
+#### Chat Changes
+
++ Added fire sale messages in the hub to the chat message filter. - hannibal2
++ Added compact potion message support for splash messages and for Poisoned Candy I. - walker
+
+#### Bingo Changes
+
++ Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
++ Mark the background difficulty gray for unknown goals. - hannibal2
+  + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
 
 ### Fixes
 
