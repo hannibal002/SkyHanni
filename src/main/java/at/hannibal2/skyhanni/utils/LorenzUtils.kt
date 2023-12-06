@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -636,5 +637,13 @@ object LorenzUtils {
             System.err.println("Reason: $it")
         }
         FMLCommonHandler.instance().handleExit(-1)
+    }
+
+    /**
+     * Get the group, otherwise, return null
+     * @param groupName The group name in the pattern
+     */
+    fun Matcher.groupOrNull(groupName: String): String? {
+        return runCatching { this.group(groupName) }.getOrNull()
     }
 }
