@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.misc.customscoreboard.Elements;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -25,51 +26,10 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(
         name = "Appearance",
-        desc = "Drag text to change the appearance of the advanced scoreboard." // now supporting both custom & advanced search
+        desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardEntry> scoreboardEntries = new ArrayList<>(Arrays.asList(ScoreboardEntry.values()));
-
-    public enum ScoreboardEntry {
-        TITLE("§6§lSKYBLOCK"),
-        PROFILE("§7♲ Blueberry"),
-        PURSE("Purse: §652,763,737"),
-        MOTES("Motes: §564,647"),
-        BANK("Bank: §6249M"),
-        BITS("Bits: §b59,264"),
-        COPPER("Copper: §c23,495"),
-        GEMS("Gems: §a57,873"),
-        HEAT("Heat: §c♨ 0"),
-        EMPTY_LINE(""),
-        LOCATION("§7⏣ §bVillage"),
-        VISITING(" §a✌ §7(§a1§7/6)"),
-        DATE("Late Summer 11th"),
-        TIME("§710:40pm"),
-        LOBBY_CODE("§8m77CK"),
-        POWER("Power: Sighted"),
-        EMPTY_LINE2(""),
-        OBJECTIVE("Objective:\n§eUpdate SkyHanni"),
-        SLAYER("§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"),
-        EMPTY_LINE3(""),
-        POWDER("§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234"),
-        EVENTS("§7Wide Range of Events\n§7(too much for this here)"),
-        MAYOR("§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"),
-        PARTY("§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"),
-        FOOTER("§ewww.hypixel.net"),
-        EXTRA("§7Extra lines the mod is not detecting")
-        ;
-
-        private final String str;
-
-        ScoreboardEntry(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    public List<Elements> scoreboardEntries = new ArrayList<>(Arrays.asList(Elements.values()));
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

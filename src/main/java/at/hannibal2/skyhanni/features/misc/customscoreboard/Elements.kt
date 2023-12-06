@@ -38,9 +38,9 @@ val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
 enum class Elements(
     private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
     private val showWhen: () -> Boolean,
-    val index: Int
+    private val configLine : String
 ) {
-    SKYBLOCK(
+    TITLE(
         {
             val alignment = if (config.displayConfig.centerTitleAndFooter) {
                 AlignmentEnum.CENTER
@@ -56,7 +56,7 @@ enum class Elements(
         {
             true
         },
-        0
+        "§6§lSKYBLOCK"
     ),
     PROFILE(
         {
@@ -65,7 +65,7 @@ enum class Elements(
         {
             true
         },
-        1
+        "§7♲ Blueberry"
     ),
     PURSE(
         {
@@ -78,7 +78,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        2
+        "Purse: §652,763,737"
     ),
     MOTES(
         {
@@ -91,7 +91,7 @@ enum class Elements(
         {
             listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        3
+        "Motes: §d64,647"
     ),
     BANK(
         {
@@ -104,7 +104,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        4
+        "Bank: §6249M"
     ),
     BITS(
         {
@@ -117,7 +117,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
         },
-        5
+        "Bits: §b59,264"
     ),
     COPPER(
         {
@@ -130,7 +130,7 @@ enum class Elements(
         {
             listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
         },
-        6
+        "Copper: §c23,495"
     ),
     GEMS(
         {
@@ -143,7 +143,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
         },
-        7
+        "Gems: §a57,873"
     ),
     HEAT(
         {
@@ -156,7 +156,7 @@ enum class Elements(
         {
             listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
         },
-        8
+        "Heat: §c♨ 0"
     ),
     EMPTY_LINE(
         {
@@ -165,7 +165,7 @@ enum class Elements(
         {
             true
         },
-        9
+        ""
     ),
     LOCATION(
         {
@@ -174,7 +174,7 @@ enum class Elements(
         {
             true
         },
-        10
+        "§7⏣ §bVillage"
     ),
     VISITING(
         {
@@ -183,9 +183,9 @@ enum class Elements(
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith(" §a✌ §") }
         },
-        11
+        " §a✌ §7(§a1§7/6)"
     ),
-    SKYBLOCK_TIME_DAY(
+    DATE(
         {
             listOf(
                 SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to AlignmentEnum.LEFT
@@ -194,9 +194,9 @@ enum class Elements(
         {
             true
         },
-        12
+        "Late Summer 11th"
     ),
-    SKYBLOCK_TIME_MINUTE(
+    TIME(
         {
             val symbols = listOf("☔", "§e☀", "§b☽")
             if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
@@ -211,7 +211,7 @@ enum class Elements(
         {
             true
         },
-        13
+        "§710:40pm"
     ),
     LOBBY_CODE(
         {
@@ -220,9 +220,9 @@ enum class Elements(
         {
             true
         },
-        14
+        "§8m77CK"
     ),
-    MAXWELL(
+    POWER(
         {
             when (MaxwellAPI.currentPower == null) {
                 true -> listOf("§c§lPlease visit Maxwell!" to AlignmentEnum.LEFT)
@@ -236,7 +236,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        15
+        "Power: Sighted"
     ),
     EMPTY_LINE2(
         {
@@ -245,7 +245,7 @@ enum class Elements(
         {
             true
         },
-        16
+        ""
     ),
     OBJECTIVE(
         {
@@ -266,7 +266,7 @@ enum class Elements(
         {
             true
         },
-        17
+        "Objective:\n§eUpdate SkyHanni"
     ),
     SLAYER(
         {
@@ -288,7 +288,7 @@ enum class Elements(
                 at.hannibal2.skyhanni.data.IslandType.THE_RIFT
             ).contains(HypixelData.skyBlockIsland)
         },
-        18
+        "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
     ),
     EMPTY_LINE3(
         {
@@ -297,7 +297,7 @@ enum class Elements(
         {
             true
         },
-        19
+        ""
     ),
     POWDER(
         {
@@ -309,16 +309,16 @@ enum class Elements(
         {
             listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
         },
-        20
+        "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234"
     ),
-    CURRENT_EVENT(
+    EVENTS(
         {
             Events.getFirstEvent().getLines().map { it to AlignmentEnum.LEFT }
         },
         {
             true
         },
-        21
+        "§7Wide Range of Events\n§7(too much for this here)"
     ),
     MAYOR(
         {
@@ -334,7 +334,7 @@ enum class Elements(
         {
             !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
         },
-        22
+        "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
     ),
     PARTY(
         {
@@ -370,9 +370,9 @@ enum class Elements(
                 }
             }
         },
-        23
+        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"
     ),
-    WEBSITE(
+    FOOTER(
         {
             val alignment = if (config.displayConfig.centerTitleAndFooter) {
                 AlignmentEnum.CENTER
@@ -385,18 +385,22 @@ enum class Elements(
         {
             true
         },
-        24
+        "§ewww.hypixel.net"
     ),
-    EXTRA_LINES(
+    EXTRA(
         {
             listOf("§cUndetected Lines (pls report):" to AlignmentEnum.CENTER) + extraLines.map { it to AlignmentEnum.LEFT }
         },
         {
             extraLines.isNotEmpty()
         },
-        25
+        "§7Extra lines the mod is not detecting"
     ),
     ;
+
+    override fun toString() : String {
+        return configLine
+    }
 
     fun getPair(): List<Pair<String, AlignmentEnum>> {
         return try {
