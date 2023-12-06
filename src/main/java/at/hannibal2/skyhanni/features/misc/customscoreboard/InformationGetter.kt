@@ -40,10 +40,10 @@ class InformationGetter {
             }
         }
 
-        if (sidebarLines.none { it.startsWith(("Heat: "))}){
+        if (sidebarLines.none { it.startsWith(("Heat: ")) }) {
             heat = "§c♨ 0"
         }
-        if (sidebarLines.none { it.startsWith(("Bits: §b"))}){
+        if (sidebarLines.none { it.startsWith(("Bits: §b")) }) {
             bits = "0"
         }
 
@@ -61,7 +61,7 @@ class InformationGetter {
             "Summer",
             "Autumn",
             "Winter",
-            lobbyCode ?: "",
+            lobbyCode,
             "§ewww.hyp",
             "§ealpha.hyp",
             "§cServer closing: ",
@@ -111,7 +111,7 @@ class InformationGetter {
             "Remaining: §a",
             "Your Tasty Mithr",
             "§3§lSolo",
-			"§fRift Dimension",
+            "§fRift Dimension",
             "§d᠅ §fGemstone§f: §d",
             "§2᠅ §fMithril§f: §2",
             "Revenant Horror",
@@ -130,9 +130,11 @@ class InformationGetter {
 
         // remove objectives
         extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
-        val objectiveLines = ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
+        val objectiveLines =
+            ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
         extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLines) != it }
-        extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLines, 2) != it && !extraObjectiveLines.contains(it)}
+        extraLines =
+            extraLines.filter { sidebarLines.nextAfter(objectiveLines, 2) != it && !extraObjectiveLines.contains(it) }
 
         // remove wind compass
         extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }

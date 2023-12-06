@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import net.minecraft.client.Minecraft
 
 object CustomScoreboardUtils {
-    fun translateMayorNameToColor(input: String): String {
+    fun mayorNameToColorCode(input: String): String {
         return when (input) {
             // Normal Mayors
             "Aatrox" -> "§3$input"
@@ -33,7 +33,7 @@ object CustomScoreboardUtils {
         return matchResult?.groupValues?.lastOrNull()
     }
 
-    fun getProfileTypeAsSymbol(): String {
+    fun getProfileTypeSymbol(): String {
         return when {
             HypixelData.ironman -> "§7♲ " // Ironman
             HypixelData.stranded -> "§a☀ " // Stranded

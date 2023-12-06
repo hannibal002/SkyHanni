@@ -38,7 +38,7 @@ val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
 enum class Elements(
     private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
     private val showWhen: () -> Boolean,
-    private val configLine : String
+    private val configLine: String
 ) {
     TITLE(
         {
@@ -60,7 +60,7 @@ enum class Elements(
     ),
     PROFILE(
         {
-            listOf(CustomScoreboardUtils.getProfileTypeAsSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
+            listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
         },
         {
             true
@@ -178,7 +178,8 @@ enum class Elements(
     ),
     VISITING(
         {
-            listOf((ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith(" §a✌ §")} ?: "<hidden>") to AlignmentEnum.LEFT)
+            listOf((ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith(" §a✌ §") }
+                ?: "<hidden>") to AlignmentEnum.LEFT)
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith(" §a✌ §") }
@@ -200,7 +201,8 @@ enum class Elements(
         {
             val symbols = listOf("☔", "§e☀", "§b☽")
             if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
-                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } }.trim() to AlignmentEnum.LEFT)
+                listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } }
+                    .trim() to AlignmentEnum.LEFT)
             } else {
                 listOf(
                     "§7" + SkyBlockTime.now()
@@ -258,7 +260,8 @@ enum class Elements(
             if (extraObjectiveLines.any {
                     ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2)?.contains(it) == true
                 }) {
-                objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString().replace(")", "§7)")
+                objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString()
+                    .replace(")", "§7)")
             }
 
             objective.map { it to AlignmentEnum.LEFT }
@@ -323,7 +326,7 @@ enum class Elements(
     MAYOR(
         {
             listOf(
-                (MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.translateMayorNameToColor(it) }
+                (MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.mayorNameToColorCode(it) }
                     ?: "<hidden>") to AlignmentEnum.LEFT
             ) + (if (config.showMayorPerks) {
                 MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" to AlignmentEnum.LEFT } ?: emptyList()
@@ -398,14 +401,14 @@ enum class Elements(
     ),
     ;
 
-    override fun toString() : String {
+    override fun toString(): String {
         return configLine
     }
 
     fun getPair(): List<Pair<String, AlignmentEnum>> {
         return try {
             displayPair.get()
-        } catch (e: NoSuchElementException){
+        } catch (e: NoSuchElementException) {
             listOf("<hidden>" to AlignmentEnum.LEFT)
         }
     }
