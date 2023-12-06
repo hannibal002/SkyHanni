@@ -7,22 +7,29 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
 class BingoCardDisplay {
 
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
 
     private var hasHiddenPersonalGoals = false
 
@@ -78,12 +85,17 @@ class BingoCardDisplay {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): MutableList<String> {
-        val newList = mutableListOf<String>()
+    private fun drawDisplay(): MutableList<Renderable> {
+        val newList = mutableListOf<Renderable>()
 
         if (BingoAPI.bingoGoals.isEmpty()) {
-            newList.add("§6Bingo Goals:")
-            newList.add("§cOpen the §e/bingo §ccard.")
+            newList.add(Renderable.string("§6Bingo Goals:"))
+            newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
+                listOf("Click to run §e/bingo"),
+                onClick = {
+                    LorenzUtils.sendCommandToServer("bingo")
+                }
+            ))
         } else {
             if (!config.hideCommunityGoals.get()) {
                 newList.addCommunityGoals()
@@ -93,8 +105,10 @@ class BingoCardDisplay {
         return newList
     }
 
-    private fun MutableList<String>.addCommunityGoals() {
-        add("§6Community Goals:")
+    private var lastClick = SimpleTimeMark.farPast()
+
+    private fun MutableList<Renderable>.addCommunityGoals() {
+        add(Renderable.string("§6Community Goals:"))
         val goals = BingoAPI.communityGoals.toMutableList()
         var hiddenGoals = 0
         for (goal in goals.toList()) {
@@ -104,58 +118,116 @@ class BingoCardDisplay {
             }
         }
 
-        goals.mapTo(this) { "  " + it.description + if (it.done) " §aDONE" else "" }
+        addGoals(goals) { it.description.removeColor() + if (it.done) " §aDONE" else " " }
+
         if (hiddenGoals > 0) {
-            add("§7+ $hiddenGoals hidden community goals.")
+            val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
+            add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
-        add(" ")
+        add(Renderable.string(" "))
     }
 
-    private fun MutableList<String>.addPersonalGoals() {
+    private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()
         val done = MAX_PERSONAL_GOALS - todo.size
-        add("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
+        add(Renderable.string("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
 
         var hiddenGoals = 0
-        var nextTip = 7.days
+        var nextTip = 14.days
         for (goal in todo.toList()) {
             val hiddenGoalData = goal.hiddenGoalData
             if (hiddenGoalData.unknownTip) {
                 hiddenGoals++
                 todo.remove(goal)
-            }
-
-            hiddenGoalData.nextHintTime?.let {
-                if (it < nextTip) {
-                    nextTip = it
+                hiddenGoalData.nextHintTime?.let {
+                    if (it < nextTip) {
+                        nextTip = it
+                    }
                 }
             }
         }
 
-        todo.mapTo(this) { "  " + it.description }
+        addGoals(todo) { it.description.removeColor() }
+
         if (hiddenGoals > 0) {
             val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
-            add("§7+ $hiddenGoals more unknown $name.")
+            add(Renderable.string("§7+ $hiddenGoals more §cunknown §7$name."))
         }
-        hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 7.days
+        hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
         if (hasHiddenPersonalGoals) {
             val nextTipTime = BingoAPI.lastBingoCardOpenTime + nextTip
             if (nextTipTime.isInPast()) {
-                add("§eThe next hint got unlocked already!")
-                add("§eOpen the bingo card to update!")
+                add(Renderable.string("§eThe next hint got unlocked already!"))
+                add(Renderable.string("§eOpen the bingo card to update!"))
             } else {
                 val until = nextTipTime.timeUntil()
-                add("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}")
+                add(Renderable.string("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}"))
             }
         }
     }
 
+    private fun MutableList<Renderable>.addGoals(goals: MutableList<BingoGoal>, format: (BingoGoal) -> String) {
+        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val showOnlyHighlighted = goals.count { it.highlight } > 0
+
+        val filter = showOnlyHighlighted && !currentlyOpen
+        val finalGoal = if (filter) {
+            goals.filter { it.highlight }
+        } else goals
+
+        finalGoal.mapTo(this) {
+            val currentlyHighlighted = it.highlight
+            val highlightColor = if (currentlyHighlighted && currentlyOpen) "§e" else "§7"
+            val display = "  $highlightColor" + format(it)
+
+            if (currentlyOpen) {
+                val clickName = if (currentlyHighlighted) "remove" else "add"
+                Renderable.clickAndHover(
+                    display,
+                    listOf(
+                        "§a" + it.displayName,
+                        "",
+                        "§eClick to $clickName this goal as highlight!",
+                    ),
+                    onClick = {
+                        if (lastClick.passedSince() < 300.milliseconds) return@clickAndHover
+                        lastClick = SimpleTimeMark.now()
+
+                        it.highlight = !currentlyHighlighted
+                        update()
+                    }
+                )
+            } else {
+                Renderable.string(display)
+            }
+        }
+        if (filter) {
+            val missing = goals.size - finalGoal.size
+            add(Renderable.string("  §8+ $missing not highlighted goals."))
+        }
+    }
+
+    private var highlightedMaps = mutableMapOf<String, Boolean>()
+
+    var BingoGoal.highlight: Boolean
+        get() = highlightedMaps[displayName] ?: false
+        set(value) {
+            highlightedMaps[displayName] = value
+        }
+
     private var lastSneak = false
+    private var inventoryOpen = false
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
+
+        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (inventoryOpen != currentlyOpen) {
+            inventoryOpen = currentlyOpen
+            update()
+        }
 
         if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
             val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
@@ -171,7 +243,7 @@ class BingoCardDisplay {
         }
         if (displayMode == 0) {
             if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                config.bingoCardPos.renderStrings(display, posLabel = "Bingo Card")
+                config.bingoCardPos.renderRenderables(display, posLabel = "Bingo Card")
             }
         } else if (displayMode == 1) {
             config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
