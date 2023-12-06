@@ -112,6 +112,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
+import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween.BasketWaypoints
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
@@ -664,6 +665,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(SprayFeatures())
+        loadModule(PresentWaypoints())
 
         init()
 
