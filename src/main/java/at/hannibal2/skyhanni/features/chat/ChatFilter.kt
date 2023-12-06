@@ -310,7 +310,7 @@ class ChatFilter {
     )
 
     private val skymallPatterns = listOf(
-        "§eNew buff§r§r§r: (.*).§r§f.".toPattern(),
+        "§eNew buff§r§r§r: (.*)".toPattern(),
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
