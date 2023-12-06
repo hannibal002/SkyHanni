@@ -167,20 +167,20 @@ class BingoCardDisplay {
     }
 
     private fun MutableList<Renderable>.addGoals(goals: MutableList<BingoGoal>, format: (BingoGoal) -> String) {
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val editDisplay = canEditDisplay()
         val showOnlyHighlighted = goals.count { it.highlight } > 0
 
-        val filter = showOnlyHighlighted && !currentlyOpen
+        val filter = showOnlyHighlighted && !editDisplay
         val finalGoal = if (filter) {
             goals.filter { it.highlight }
         } else goals
 
         finalGoal.mapTo(this) {
             val currentlyHighlighted = it.highlight
-            val highlightColor = if (currentlyHighlighted && currentlyOpen) "§e" else "§7"
+            val highlightColor = if (currentlyHighlighted && editDisplay) "§e" else "§7"
             val display = "  $highlightColor" + format(it)
 
-            if (currentlyOpen) {
+            if (editDisplay) {
                 val clickName = if (currentlyHighlighted) "remove" else "add"
                 Renderable.clickAndHover(
                     display,
@@ -223,7 +223,7 @@ class BingoCardDisplay {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val currentlyOpen = canEditDisplay()
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()
@@ -249,6 +249,9 @@ class BingoCardDisplay {
             config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
         }
     }
+
+    private fun canEditDisplay() =
+        Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
 
     @SubscribeEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
