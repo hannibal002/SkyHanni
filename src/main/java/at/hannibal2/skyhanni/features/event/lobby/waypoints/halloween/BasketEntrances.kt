@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mainlobby.waypoints.halloween
+package at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 
