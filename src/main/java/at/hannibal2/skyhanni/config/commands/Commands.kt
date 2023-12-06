@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
-import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
+import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil

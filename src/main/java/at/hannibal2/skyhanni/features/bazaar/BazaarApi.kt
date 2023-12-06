@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -109,11 +110,12 @@ class BazaarApi {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if ("\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toRegex()
-                .matches(event.message.removeColor())
-        ) {
-            currentSearchedItem = ""
-        }
+        if (!LorenzUtils.inSkyBlock) return
+        if (!inBazaarInventory) return
+        // TODO USE SH-REPO
+        // TODO remove dynamic pattern
+        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
+            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {

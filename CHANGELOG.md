@@ -56,6 +56,8 @@
 + Added support for 'found by' info in bingo card. - hannibal2
 + Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
 + Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
 
 #### Inventory Features
 
@@ -85,6 +87,8 @@
 + Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
 + Use different colors in the tab list depending on the pest count. - alexia
 + Highlight the boosted crop contest in all Jacob's Contest displays. - alexia
++ Added Delicate 5 to visitor drop counter and visitor block refuse and highlighter. - hannibal2
++ Block visitor interaction for dedication cycling is now disabled by default. - hannibal2
 
 #### Fishing Changes
 
@@ -93,6 +97,17 @@
 #### Winter Changes
 
 + Hiding Unique Gifted Players Highlighting for ironman and bingo while not on those modes. - Thunderblade73
+
+#### Chat Changes
+
++ Added fire sale messages in the hub to the chat message filter. - hannibal2
++ Added compact potion message support for splash messages and for Poisoned Candy I. - walker
+
+#### Bingo Changes
+
++ Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
++ Mark the background difficulty gray for unknown goals. - hannibal2
+  + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
 
 ### Fixes
 
@@ -108,6 +123,8 @@
 + Fixed showing on the scoreboard  "garden outside" immediately after teleporting to a plot. - hannibal2
 + Fixed visitor timer counting down too fast sometimes. - hannibal2
 + Fixed Mooshroom cow Perk display not showing when maxed. - hannibal2
++ Show a text around the new year that the calendar is not loaded for the next Jacob Contest. - hannibal2
++ Fixed visitor reward item refuse inconsistencies. - hannibal2
 
 #### Bingo Fixes
 
@@ -127,6 +144,7 @@
 + Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
 + Fixed NPC messages getting detected as player messages. - CalMWolfs
 + Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. - hannibal2
++ Fixed an error when the king talisman helper does not find the king in range. - hannibal2
 
 #### Config Fixes
 
@@ -146,6 +164,20 @@
 + Changed OwnInventoryItemUpdateEvent to be called synced to the main thread. - hannibal2
 + romanToDecimalIfNeeded -> romanToDecimalIfNecessary. - hannibal2
   + For more context: https://chat.openai.com/share/502571b5-8851-4047-b343-3b1475ca8a88
++ Added the debug feature SkyHanni Event Counter. - hannibal2
++ Fix Consecutive Spaces in RegEx. - walker
++ No longer creating new regex pattern elements each time in DungeonDeathCounter. - walker
++ Changed DungeonChatFilter to use lists of patterns. - walker
++ Code cleanup in DungeonMilestoneDisplay. - walker
++ Code cleanup and removed .matchRegex() - walker
++ Misc pattern optimizations. - walker
++ Moving the bingo goal list into BingoAPI. - hannibal2
++ Created BingoGoalReachedEvent. - hannibal2
++ Created Matcher.groupOrNull. - walker
++ cleanPlayerName respects playerRankHider option now. - hannibal2
++ Replaced ItemWarnEntry with VisitorReward. This should fix some errors. - hannibal2
++ GardenNextJacobContest now uses SimpleTimeMark. SimpleTimeMark is storable in the config and comparable - hannibal2
++ No longer sending contest data to elite close to new year. - hannibal2
 
 ## Version 0.21.1
 

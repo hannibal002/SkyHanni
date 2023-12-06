@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
+    private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
 
     private var clientSideClicked = false
     private var textTop = ""
@@ -34,12 +35,10 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.hideDaggerWarning) return
+        if (!config.hideDaggerWarning) return
 
         val message = event.message
-        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
-            message == "§cYour hit was reduced by Hellion Shield!"
-        ) {
+        if (attunementPattern.matches(message) || message == "§cYour hit was reduced by Hellion Shield!") {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }
@@ -63,7 +62,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazes.hellion.firstDagger]
+        val first = Dagger.entries[config.firstDagger]
         val second = first.other()
 
         textTop = format(holding, true, first) + " " + format(holding, true, second)
@@ -71,7 +70,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun findNearest(): HellionShield? {
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.markRightHellionShield) return null
+        if (!config.markRightHellionShield) return null
 
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()

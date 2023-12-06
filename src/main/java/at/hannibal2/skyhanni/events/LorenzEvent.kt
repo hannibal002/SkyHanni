@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.data.EventCounter
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -10,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.IEventListener
 abstract class LorenzEvent : Event() {
 
     private val eventName by lazy {
-        this::class.simpleName
+        this::class.simpleName!!
     }
 
     fun postAndCatch() = postAndCatchAndBlock {}
@@ -21,6 +22,7 @@ abstract class LorenzEvent : Event() {
         ignoreErrorCache: Boolean = false,
         onError: (Throwable) -> Unit,
     ): Boolean {
+        EventCounter.count(eventName)
         val visibleErrors = 3
         var errors = 0
         for (listener in getListeners()) {
