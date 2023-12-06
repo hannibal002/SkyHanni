@@ -40,78 +40,75 @@ class PresentWaypoints {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        val message = event.message
+        processChatMessage(event.message)
+    }
 
-        if (presentFoundPattern.matches(message) || presentAlreadyFoundPattern.matches(message)) {
-            val present = presentSet?.minByOrNull() { it.position.distanceSqToPlayer() } ?: return
+    private fun processChatMessage(message: String) {
+        when {
+            presentFoundPattern.matches(message) || presentAlreadyFoundPattern.matches(message) -> handlePresentFound()
+            allFoundPattern.matches(message) -> handleAllPresentsFound()
+        }
+    }
+
+    private fun handlePresentFound() {
+
+        presentSet?.minByOrNull { it.position.distanceSqToPlayer() }?.let { present ->
             present.isFound = true
-            presentEntranceSet?.find { present.name == it.name }?.let {
-                it.isFound = true
-            }
-            if (closest == present) {
-                closest = null
-            }
-            return
+            markEntranceAsFound(present)
+            if (closest == present) closest = null
         }
+    }
 
+    private fun markEntranceAsFound(present: EventWaypoint) {
+        presentEntranceSet?.find { present.name == it.name }?.let { it.isFound = true }
+    }
+
+    private fun handleAllPresentsFound() {
         // If all presents are found, disable the feature
-        if (allFoundPattern.matches(message)) {
-            LorenzUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
-            config.allWaypoints = false
-            config.allEntranceWaypoints = false
-            return
-        }
-
+        LorenzUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
+        config.allWaypoints = false
+        config.allEntranceWaypoints = false
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-
-        if (config.onlyClosest && HypixelData.locrawData != null && closest == null) {
-            val notFoundPresents = presentSet?.filter { !it.isFound }
-            if (notFoundPresents?.isEmpty() == true) return
-            closest = notFoundPresents?.minByOrNull { it.position.distanceSqToPlayer() } ?: return
-        }
+        if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
+        val notFoundPresents = presentSet?.filterNot { it.isFound }
+        if (notFoundPresents?.isEmpty() == true) return
+        closest = notFoundPresents?.minByOrNull { it.position.distanceSqToPlayer() } ?: return
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        val presentSetTemp = presentSet ?: return
+        presentSet?.let { event.drawWaypoints(it, config.allWaypoints, LorenzColor.GOLD, "§6") }
+        presentEntranceSet?.let { event.drawWaypoints(it, config.allEntranceWaypoints, LorenzColor.YELLOW, "§e") }
+    }
 
-        if (config.allWaypoints) {
-            presentSetTemp.forEach {
-                if (!it.shouldShow()) return@forEach
-                event.drawWaypointFilled(it.position, LorenzColor.GOLD.toColor())
-                event.drawDynamicText(it.position, "§6" + it.name, 1.5)
-            }
-        }
-
-        if (config.allEntranceWaypoints) {
-            presentEntranceSet?.forEach {
-                if (!it.shouldShow()) return@forEach
-                event.drawWaypointFilled(it.position, LorenzColor.YELLOW.toColor())
-                event.drawDynamicText(it.position, "§e" + it.name, 1.5)
-            }
+    private fun LorenzRenderWorldEvent.drawWaypoints(
+        waypoints: Set<EventWaypoint>,
+        shouldDraw: Boolean,
+        color: LorenzColor,
+        prefix: String
+    ) {
+        if (!shouldDraw) return
+        waypoints.forEach { waypoint ->
+            if (!waypoint.shouldShow()) return@forEach
+            this.drawWaypointFilled(waypoint.position, color.toColor())
+            this.drawDynamicText(waypoint.position, "$prefix${waypoint.name}", 1.5)
         }
     }
 
-    private fun EventWaypoint.shouldShow(): Boolean {
-        return !isFound && (!config.onlyClosest || closest == this)
-    }
+    private fun EventWaypoint.shouldShow(): Boolean = !isFound && (!config.onlyClosest || closest == this)
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventWaypointsJson>("EventWaypoints")
-        val presents = data.presents ?: error("'presents' is null in EventWaypoints!")
-        presentLocations = loadEventWaypoints(presents)
-
-        val presentEntrances = data.presents_entrances ?: error("'presents_entrances' is null in EventWaypoints!")
-        presentEntranceLocations = loadEventWaypoints(presentEntrances)
+        presentLocations = loadEventWaypoints(data.presents ?: error("'presents' is null in EventWaypoints!"))
+        presentEntranceLocations =
+            loadEventWaypoints(data.presents_entrances ?: error("'presents_entrances' is null in EventWaypoints!"))
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.onHypixel && HypixelData.inLobby && (config.allWaypoints || config.allEntranceWaypoints)
-    }
+    private fun isEnabled(): Boolean =
+        LorenzUtils.onHypixel && HypixelData.inLobby && (config.allWaypoints || config.allEntranceWaypoints)
 }
