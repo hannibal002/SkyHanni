@@ -14,6 +14,7 @@ enum class VisitorReward(private val rawInternalName: String, val displayName: S
     SPACE_HELMET("DCTR_SPACE_HELM", "§cSpace Helmet", legacyId = 5),
     CULTIVATING("CULTIVATING;1", "§9Cultivating I", legacyId = 6),
     REPLENISH("REPLENISH;1", "§9Replenish I", legacyId = 7),
+    DELICATE("DELICATE;5", "§9Delicate V"),
     ;
 
     private val internalName by lazy { rawInternalName.asInternalName() }

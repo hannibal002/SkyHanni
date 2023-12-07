@@ -27,7 +27,7 @@ class BingoCardTips {
         val slot = gui.slotUnderMouse
         val goal = BingoAPI.bingoGoals.firstOrNull { it.slot == slot.slotNumber } ?: return
 
-        val toolTip = event.toolTip
+        val toolTip = event.toolTip ?: return
         val bingoTip = goal.getTip() ?: return
         val communityGoal = goal.type == GoalType.COMMUNITY
 

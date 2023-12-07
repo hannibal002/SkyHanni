@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -119,6 +121,15 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): TrackerDisplayMode {
                     return TrackerDisplayMode.valueOf(reader.nextString())
+                }
+            }.nullSafe())
+            .registerTypeAdapter(SimpleTimeMark::class.java, object : TypeAdapter<SimpleTimeMark>() {
+                override fun write(out: JsonWriter, value: SimpleTimeMark) {
+                    out.value(value.toMillis())
+                }
+
+                override fun read(reader: JsonReader): SimpleTimeMark {
+                    return reader.nextString().toLong().asTimeMark()
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()

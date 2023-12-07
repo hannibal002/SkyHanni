@@ -39,13 +39,10 @@ public class RewardWarningConfig {
     public int bypassKey = Keyboard.KEY_NONE;
 
 
-    /**
-     * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
-     */
     @Expose
     @ConfigOption(
         name = "Items",
-        desc = "Warn for these reward items."
+        desc = "Warn for these reward item visitor drops."
     )
     @ConfigEditorDraggableList
     public List<VisitorReward> drops = new ArrayList<>(Arrays.asList(
