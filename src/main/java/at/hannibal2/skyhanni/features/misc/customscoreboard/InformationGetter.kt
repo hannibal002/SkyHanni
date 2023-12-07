@@ -102,6 +102,7 @@ class InformationGetter {
             "§e☀",
             "§b☽",
             "☔",
+            "⚡",
             "Ⓑ",
             "§a☀",
             "§7♲",

@@ -201,7 +201,7 @@ enum class ScoreboardElements(
     ),
     TIME(
         {
-            val symbols = listOf("☔", "§e☀", "§b☽")
+            val symbols = listOf("☔", "⚡", "§e☀", "§b☽")
             if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
                 listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } }
                     .trim() to AlignmentEnum.LEFT)
