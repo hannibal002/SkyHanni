@@ -58,5 +58,11 @@ public class CustomScoreboardConfig {
     public boolean showMayorPerks = true;
 
     @Expose
+    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean unknownLinesWarning = true;
+
+    @Expose
     public Position position = new Position(10, 80, false, true);
 }

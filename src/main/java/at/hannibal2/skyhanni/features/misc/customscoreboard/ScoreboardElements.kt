@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
 
@@ -34,6 +35,7 @@ var gemstonePowder = "0"
 var extraLines = listOf<String>()
 
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
+var amountOfExtraLines = 0
 
 enum class ScoreboardElements(
     private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
@@ -392,7 +394,16 @@ enum class ScoreboardElements(
     ),
     EXTRA(
         {
-            listOf("§cUndetected Lines (pls report):" to AlignmentEnum.CENTER) + extraLines.map { it to AlignmentEnum.LEFT }
+            if (amountOfExtraLines != extraLines.size && config.unknownLinesWarning) {
+                ErrorManager.logErrorWithData(
+                    CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected unknown lines"),
+                    "CustomScoreboard detected unknown lines",
+                    "extraLines" to extraLines
+                )
+                amountOfExtraLines = extraLines.size
+            }
+
+            listOf("§cUndetected Lines:" to AlignmentEnum.LEFT) + extraLines.map { it to AlignmentEnum.LEFT }
         },
         {
             extraLines.isNotEmpty()

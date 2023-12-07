@@ -50,4 +50,6 @@ object CustomScoreboardUtils {
         if (tabList.footer_skyhanni == null) return ""
         return tabList.footer_skyhanni.formattedText
     }
+
+    class UndetectedScoreboardLines(message: String) : Exception(message)
 }
