@@ -35,9 +35,7 @@ var extraLines = listOf<String>()
 
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
 
-// elements -> scoreboardElements
-
-enum class Elements(
+enum class ScoreboardElements(
     private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
     private val showWhen: () -> Boolean,
     private val configLine: String

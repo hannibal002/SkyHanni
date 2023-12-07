@@ -56,7 +56,7 @@ class CustomScoreboard {
 
     private fun createLines() = buildList<Pair<String, AlignmentEnum>> {
         val lineMap = HashMap<Int, List<Pair<String, AlignmentEnum>>>()
-        for (element in Elements.entries) {
+        for (element in ScoreboardElements.entries) {
             lineMap[element.ordinal] =
                 if (element.isVisible()) element.getPair() else listOf("<hidden>" to AlignmentEnum.LEFT)
         }
