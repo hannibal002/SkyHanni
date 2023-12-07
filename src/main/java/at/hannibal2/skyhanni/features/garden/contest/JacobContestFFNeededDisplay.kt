@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
+import kotlin.math.max
 
 class JacobContestFFNeededDisplay {
     private val config get() = GardenAPI.config
@@ -95,7 +96,7 @@ class JacobContestFFNeededDisplay {
         if (blocksPerSecond == null || trueFF == null) {
             add(listOf("§cMissing data from above!"))
         } else {
-            val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            val predictedScore = ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
             add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
         }
     }
@@ -106,7 +107,7 @@ class JacobContestFFNeededDisplay {
         val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"
         val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
-        val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
+        val farmingFortune = formatFarmingFortune(max(0.0, (cropsPerSecond * 100 / 20 / crop.baseDrops) - 100))
         return " ${bracket.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
     }
 
