@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class BackgroundConfig {
@@ -32,4 +33,12 @@ public class BackgroundConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean useCustomBackgroundImage = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Custom Background",
+        desc = "Add an image named \"scoreboard.png\" to your texture pack at \"\\assets\\skyhanni\\scoreboard.png.\" Activate the texture pack in Minecraft, then reload the game."
+    )
+    @ConfigEditorInfoText
+    public String useless;
 }
