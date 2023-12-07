@@ -29,5 +29,11 @@ _Frequently Asked Questions_
 > 2. Delete ".minecraft\config\skyhanni\jacob_contests.json".
 > 3. Open minecraft.
 
+> **9: How do I add a custom background for the Scoreboard?**
+> 1. Obtain a background image and name it "scoreboard.png".
+> 2. Put the image into a texturepack, with the path ".minecraft\resourcepacks\<your texturepack>\assets\skyhanni\scoreboard.png".
+> 3. Enable the texturepack in minecraft, then reload your game.
+> 4. Do `/sh scoreboard background`, and toggle the Enable button.
+
 *This FAQ was last updated on december 05th, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
