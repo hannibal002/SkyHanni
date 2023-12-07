@@ -318,7 +318,7 @@ enum class ScoreboardElements(
     ),
     EVENTS(
         {
-            Events.getFirstEvent().getLines().map { it to AlignmentEnum.LEFT }
+            Events.getEvent().flatMap { it.getLines().map { i -> i to AlignmentEnum.LEFT } }
         },
         {
             true

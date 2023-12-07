@@ -347,7 +347,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             }
         },
         {
-            true
+            false
         }
     );
 
@@ -356,8 +356,11 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     }
 
     companion object {
-        fun getFirstEvent(): Events {
-            return entries.first { it.showWhen() }
+        fun getEvent(): List<Events> {
+            if (config.displayConfig.showAllActiveEvents) {
+                return entries.filter { it.showWhen() }
+            }
+            return listOf(entries.firstOrNull { it.showWhen() } ?: NONE)
         }
     }
 }

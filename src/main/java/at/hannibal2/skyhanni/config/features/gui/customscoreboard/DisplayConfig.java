@@ -28,6 +28,12 @@ public class DisplayConfig {
     public boolean alignRight = false;
 
     @Expose
+    @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showAllActiveEvents = false;
+
+    @Expose
     @ConfigOption(name = "Align to the center vertically", desc = "Align the scoreboard to the center of the screen vertically.")
     @ConfigEditorBoolean
     @FeatureToggle
