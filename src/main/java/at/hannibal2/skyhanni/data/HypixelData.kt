@@ -115,8 +115,10 @@ class HypixelData {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             // Modified from NEU.
-            // NEU does not send locraw when not in Skyblock.
-            // Remove then when NEU dependency is removed
+            // NEU does not send locraw when not in SkyBlock.
+            // So, as requested by Hannibal, use locraw from
+            // NEU and have NEU send it.
+            // Remove this when NEU dependency is removed
             val currentTime = System.currentTimeMillis()
             if (Minecraft.getMinecraft().thePlayer != null &&
                 Minecraft.getMinecraft().theWorld != null &&

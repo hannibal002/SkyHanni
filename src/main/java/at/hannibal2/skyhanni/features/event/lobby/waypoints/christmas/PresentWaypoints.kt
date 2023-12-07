@@ -44,6 +44,7 @@ class PresentWaypoints {
         processChatMessage(event.message)
     }
 
+    // <editor-fold desc = "Chat Message Processing">
     private fun processChatMessage(message: String) {
         when {
             presentFoundPattern.matches(message) || presentAlreadyFoundPattern.matches(message) -> handlePresentFound()
@@ -69,6 +70,8 @@ class PresentWaypoints {
         config.allWaypoints = false
         config.allEntranceWaypoints = false
     }
+
+    // </editor-fold>
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
