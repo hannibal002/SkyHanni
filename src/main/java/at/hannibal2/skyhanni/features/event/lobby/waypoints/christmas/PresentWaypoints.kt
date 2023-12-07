@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// todo: create abstract class for this and BasketWaypoints
 class PresentWaypoints {
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.christmasPresent
     private var presentLocations = mapOf<String, MutableSet<EventWaypoint>>()
@@ -51,7 +52,6 @@ class PresentWaypoints {
     }
 
     private fun handlePresentFound() {
-
         presentSet?.minByOrNull { it.position.distanceSqToPlayer() }?.let { present ->
             present.isFound = true
             markEntranceAsFound(present)
@@ -86,10 +86,7 @@ class PresentWaypoints {
     }
 
     private fun LorenzRenderWorldEvent.drawWaypoints(
-        waypoints: Set<EventWaypoint>,
-        shouldDraw: Boolean,
-        color: LorenzColor,
-        prefix: String
+        waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String
     ) {
         if (!shouldDraw) return
         waypoints.forEach { waypoint ->
