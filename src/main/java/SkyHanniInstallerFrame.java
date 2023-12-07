@@ -430,7 +430,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         if (e.getSource() == getForgeTextArea()) {
             try {
                 Desktop.getDesktop().browse(new URI(
-                    "http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
+                    "https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
             } catch (IOException | URISyntaxException ex) {
                 showErrorPopup(ex);
             }
