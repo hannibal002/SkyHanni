@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayCombat {
+class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val bestiaryChestNamePattern = (("Bestiary.*").toPattern())
     private val bestiaryMilestoneItemNamePattern = (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern())
@@ -26,10 +26,10 @@ class MenuItemDisplayOverlayCombat {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.combat.isEmpty()) return ""
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.combat.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.combat
+        val stackSizeConfig = configMenuStackSize.combat
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_LEVEL)) {
