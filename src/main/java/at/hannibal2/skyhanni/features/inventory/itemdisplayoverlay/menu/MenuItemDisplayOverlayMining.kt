@@ -31,8 +31,8 @@ class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
     private val crystalNotFoundLoreLinePattern = ((".* §c✖ Not Found").toPattern())
 
     @SubscribeEvent
-    fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack)
+    override fun onRenderItemTip(event: RenderItemTipEvent) {
+        super.onRenderItemTip(event)
     }
 
     override fun getStackTip(item: ItemStack): String {
