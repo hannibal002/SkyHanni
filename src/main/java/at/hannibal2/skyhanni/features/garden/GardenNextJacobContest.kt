@@ -361,6 +361,7 @@ object GardenNextJacobContest {
     private fun warn(duration: Duration, crops: List<CropType>, boostedCrop: CropType?) {
         if (!config.warn) return
         if (config.warnTime.seconds <= duration) return
+        if (!warnForCrop()) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
@@ -370,8 +371,8 @@ object GardenNextJacobContest {
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
-        val cropTextNoColor =
-            crops.joinToString(", ") { if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
+        val cropTextNoColor = crops.joinToString(", ") {
+            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
@@ -418,6 +419,13 @@ object GardenNextJacobContest {
             allOptions,
             allOptions[0]
         )
+    }
+
+    private fun warnForCrop(): Boolean {
+        for(crop in nextContestCrops) {
+            if (config.warnFor.contains(crop.ordinal)) return true
+        }
+        return false
     }
 
     @SubscribeEvent
