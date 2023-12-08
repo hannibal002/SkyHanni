@@ -52,7 +52,9 @@ class SeaCreatureFeatures {
             { config.highlight }
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlight }
 
-            if (creatureType == RareSeaCreatureType.WATER_HYDRA && entity.health == (entity.baseMaxHealth.toFloat() / 2)) continue; // Water hydra splitting in two
+            // Water hydra splitting in two
+            if (creatureType == RareSeaCreatureType.WATER_HYDRA && entity.health == (entity.baseMaxHealth.toFloat() / 2)) continue
+
             if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
                 TitleManager.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7.0)

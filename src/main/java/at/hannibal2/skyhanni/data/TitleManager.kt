@@ -29,14 +29,14 @@ class TitleManager {
 
         fun command(args: Array<String>) {
             if (args.size < 4) {
-                LorenzUtils.userError("Specify title text to test")
+                LorenzUtils.userError("Usage: /shsendtitle <duration> <height> <fontSize> <text ..>")
                 return
             }
 
             val duration = args[0].toInt().seconds
             val height = args[1].toDouble()
             val fontSize = args[2].toDouble()
-            val title = "§6" + args.drop(3).joinToString(" ")
+            val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
             sendTitle(title, duration, height, fontSize)
         }
