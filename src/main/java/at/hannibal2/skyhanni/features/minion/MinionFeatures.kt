@@ -161,8 +161,10 @@ class MinionFeatures {
                 }
             }
         } else {
-            if (minions[entity]!!.displayName != name) {
-                minions[entity]!!.displayName = name
+            minions[entity]?.let {
+                if (it.displayName != name) {
+                    it.displayName = name
+                }
             }
         }
         lastMinion = entity
