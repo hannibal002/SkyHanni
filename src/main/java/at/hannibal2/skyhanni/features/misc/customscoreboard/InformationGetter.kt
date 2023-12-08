@@ -150,7 +150,8 @@ class InformationGetter {
             "§fCleanup§7:",
             "§6Year ",
             "§7Waiting for",
-            "§7your vote..."
+            "§7your vote...",
+            "e: §e§b0%"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
