@@ -25,7 +25,7 @@ class BingoCardTips {
 
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
         val slot = gui.slotUnderMouse
-        val goal = BingoAPI.bingoGoals.firstOrNull { it.slot == slot.slotNumber } ?: return
+        val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip
         val bingoTip = goal.getTip() ?: return
@@ -60,7 +60,7 @@ class BingoCardTips {
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
 
-            val goal = BingoAPI.bingoGoals.firstOrNull { it.slot == slot.slotNumber } ?: continue
+            val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
             val color = goal.getTip()?.let {

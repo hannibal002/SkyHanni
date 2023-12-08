@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
+import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoProfile
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -7,14 +9,19 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 object BingoAPI {
     private var ranks = mapOf<String, Int>()
-    var tips: Map<String, BingoJson.BingoTip> = emptyMap()
-    // TODO save into storage
-    val bingoGoals = mutableListOf<BingoGoal>()
-    val personalGoals get() = bingoGoals.filter { it.type == GoalType.PERSONAL }
-    val communityGoals get() = bingoGoals.filter { it.type == GoalType.COMMUNITY }
+    private var tips: Map<String, BingoJson.BingoTip> = emptyMap()
+
+    val bingoGoals get() = bingoStorage.goals
+    val personalGoals get() = bingoGoals.values.filter { it.type == GoalType.PERSONAL }
+    val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -31,10 +38,19 @@ object BingoAPI {
     fun getTip(itemName: String) =
         tips.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
 
-    fun BingoGoal.getTip(): BingoJson.BingoTip? = if (type == at.hannibal2.skyhanni.features.bingo.card.goals.GoalType.COMMUNITY) {
+    fun BingoGoal.getTip(): BingoJson.BingoTip? = if (type == GoalType.COMMUNITY) {
         getTip(displayName)
     } else {
         tips[displayName]
     }
 
+    private val bingoStorage: BingoProfile by lazy {
+        val playerSpecific = ProfileStorageData.playerSpecific ?: error("playerSpecific is null")
+        playerSpecific.bingoProfiles.getOrPut(getStartOfMonthInMillis()) { BingoProfile() }
+    }
+
+    private fun getStartOfMonthInMillis() = OffsetDateTime.of(
+        LocalDate.now(ZoneId.of("UTC")).plusDays(5).withDayOfMonth(1),
+        LocalTime.MIDNIGHT, ZoneOffset.UTC
+    ).toEpochSecond()
 }
