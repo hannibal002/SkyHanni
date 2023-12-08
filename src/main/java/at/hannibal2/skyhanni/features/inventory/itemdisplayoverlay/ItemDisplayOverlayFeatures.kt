@@ -188,9 +188,8 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     private fun isMasterSkull(internalName: NEUInternalName): Boolean = MASTER_SKULL_TIER.isSelected() && masterSkullInternalNamePattern.matches(internalName)
     private fun getMasterSkullTip(internalName: NEUInternalName): String {
-        var tier = ""
-        masterSkullInternalNamePattern.matchMatcher(internalName.asString()) { tier = group(tier) }
-        return tier
+        masterSkullInternalNamePattern.matchMatcher(internalName.asString()) { return group("tier") }
+        return ""
     }
 
     private fun isDungeonHead(internalName: NEUInternalName): Boolean = DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalNamePattern.matches(internalName)
