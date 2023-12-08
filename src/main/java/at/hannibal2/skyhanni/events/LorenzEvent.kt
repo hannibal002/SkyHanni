@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.EventCounter
+import at.hannibal2.skyhanni.mixins.hooks.getValue
+import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,6 +18,15 @@ abstract class LorenzEvent : Event() {
 
     fun postAndCatch() = postAndCatchAndBlock {}
 
+    companion object {
+        var eventHandlerDepth by object : ThreadLocal<Int>() {
+            override fun initialValue(): Int {
+                return 0
+            }
+        }
+        val isInGuardedEventHandler get() = eventHandlerDepth > 0
+    }
+
     fun postAndCatchAndBlock(
         printError: Boolean = true,
         stopOnFirstError: Boolean = false,
@@ -25,6 +36,7 @@ abstract class LorenzEvent : Event() {
         EventCounter.count(eventName)
         val visibleErrors = 3
         var errors = 0
+        eventHandlerDepth++
         for (listener in getListeners()) {
             try {
                 listener.invoke(this)
@@ -40,6 +52,7 @@ abstract class LorenzEvent : Event() {
                 if (stopOnFirstError) break
             }
         }
+        eventHandlerDepth--
         if (errors > visibleErrors) {
             val hiddenErrors = errors - visibleErrors
             LorenzUtils.error("$hiddenErrors more errors in $eventName are hidden!")
