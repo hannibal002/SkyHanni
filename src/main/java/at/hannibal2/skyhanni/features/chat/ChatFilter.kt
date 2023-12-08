@@ -294,7 +294,8 @@ class ChatFilter {
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
         "§c {3}♨ .* Skin §e\\(.* §eleft\\)§c".toPattern(),
-        "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern()
+        "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
+        "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -431,8 +432,8 @@ class ChatFilter {
      */
     private fun String.isPresent(key: String) = this in (messagesMap[key] ?: emptyList()) ||
         (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-            (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
-            (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
+        (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
+        (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
