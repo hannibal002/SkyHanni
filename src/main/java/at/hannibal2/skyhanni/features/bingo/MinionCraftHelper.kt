@@ -277,7 +277,8 @@ class MinionCraftHelper {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
-            val internalName = NEUItems.getRawInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
+            val internalName = NEUItems.getRawInternalName("$name I")
+                .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }
