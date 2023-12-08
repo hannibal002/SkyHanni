@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.ABIPHONE
@@ -61,10 +60,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.log10
 
-object ItemDisplayOverlayFeatures {
+object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     // TODO USE SH-REPO
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = configItemStackSize
 
     // TODO repo
     // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
@@ -130,7 +129,7 @@ object ItemDisplayOverlayFeatures {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
+    override fun getStackTip(item: ItemStack): String {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
