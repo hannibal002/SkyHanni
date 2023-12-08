@@ -564,6 +564,6 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
 
-        event.move(11, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
+        event.move(13, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
     }
 }
