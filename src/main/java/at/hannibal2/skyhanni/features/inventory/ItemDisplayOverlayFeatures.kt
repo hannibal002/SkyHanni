@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DOJO_RANKING
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -55,7 +54,6 @@ object ItemDisplayOverlayFeatures {
     private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
     private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
     private val bingoGoalRankPattern = "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
-    private val dojoRankPattern = "(?:§\\w)+Your Rank: (?<rank>§\\w.) .*".toPattern()
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -234,14 +232,6 @@ object ItemDisplayOverlayFeatures {
                 bingoGoalRankPattern.matchMatcher(line) {
                     val rank = group("rank").formatNumber()
                     if (rank < 10000) return "§6${NumberUtil.format(rank)}"
-                }
-            }
-        }
-
-        if (DOJO_RANKING.isSelected() && chestName == "Challenges" && itemName.startsWith("Test of")){
-            for (line in item.getLore()){
-                dojoRankPattern.matchMatcher(line){
-                    return group("rank")
                 }
             }
         }

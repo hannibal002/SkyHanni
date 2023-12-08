@@ -89,7 +89,6 @@ public class InventoryConfig {
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
-        DOJO_RANKING("§bDojo Ranking")
         ;
 
         private final String str;
