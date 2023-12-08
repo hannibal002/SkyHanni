@@ -145,7 +145,8 @@ class InformationGetter {
             "§a✌ §",
             "Points: ",
             "Challenge:",
-            *dungeonClassList.toTypedArray()
+            *dungeonClassList.toTypedArray(),
+            "§cLocked"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
