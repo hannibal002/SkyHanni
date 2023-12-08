@@ -20,8 +20,8 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
     private val visitorMilestonePercentProgressLoreLinePattern = (("(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
 
     @SubscribeEvent
-    fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack)
+    override fun onRenderItemTip(event: RenderItemTipEvent) {
+        super.onRenderItemTip(event)
     }
 
     override fun getStackTip(item: ItemStack): String {
