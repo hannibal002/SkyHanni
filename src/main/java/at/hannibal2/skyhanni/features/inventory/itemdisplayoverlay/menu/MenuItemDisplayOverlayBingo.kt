@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayBingo {
+class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
 
     private val secretBingoDiscoveryLoreLinePattern = (("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to").toPattern())
     private val secretBingoHintCountdownLoreLinePattern = (("(§.)+(The next hint will unlock in )?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)").toPattern())
@@ -27,9 +27,9 @@ class MenuItemDisplayOverlayBingo {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.bingo.isEmpty()) return ""
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.bingo
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.bingo.isEmpty()) return ""
+        val stackSizeConfig = configMenuStackSize.bingo
         val lore = item.getLore()
         val chestName = InventoryUtils.openInventoryName()
         val itemName = item.cleanName()
