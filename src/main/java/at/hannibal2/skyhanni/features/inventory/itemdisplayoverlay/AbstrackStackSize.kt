@@ -9,7 +9,3 @@ abstract class AbstractStackSize {
 
     abstract fun getStackTip(item: ItemStack): String
 }
-
-abstract class AbstractMenuStackSize : AbstractStackSize()  {
-    val configMenuStackSize get() = SkyHanniMod.feature.inventory.stackSize.menu
-}
