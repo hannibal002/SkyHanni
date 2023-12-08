@@ -254,6 +254,30 @@ enum class ScoreboardElements(
         },
         "Power: Sighted"
     ),
+    COOKIE(
+        {
+            val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
+                .nextAfter("§d§lCookie Buff") ?: "<hidden>"
+
+            listOf(
+                "§d§lCookie Buff" to AlignmentEnum.LEFT
+            ) + when (timeLine.contains("Not active")){
+                true -> listOf(" §7- §cNot active" to AlignmentEnum.LEFT)
+                false -> listOf(" §7- §e${timeLine.substringAfter("§d§lCookie Buff").trim()}" to AlignmentEnum.LEFT)
+            }
+        },
+        {
+            if (config.informationFilteringConfig.hideEmptyLines){
+                CustomScoreboardUtils.getTablistFooter().split("\n").any {
+                    CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
+                        ?: false
+                }
+            } else {
+                true
+            }
+        },
+        "§d§lCookie Buff\n §f3days, 17hours"
+    ),
     EMPTY_LINE2(
         {
             listOf("<empty>" to AlignmentEnum.LEFT)

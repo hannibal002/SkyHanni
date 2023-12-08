@@ -48,7 +48,7 @@ object CustomScoreboardUtils {
     fun getTablistFooter(): String {
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
         if (tabList.footer_skyhanni == null) return ""
-        return tabList.footer_skyhanni.formattedText
+        return tabList.footer_skyhanni.formattedText.replace("§r", "")
     }
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
