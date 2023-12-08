@@ -180,6 +180,7 @@ enum class ScoreboardElements(
     ),
     LOCATION(
         {
+            // replaceString() adds back the garden plots
             listOf((replaceString(location) ?: "<hidden>") to AlignmentEnum.LEFT)
         },
         {
