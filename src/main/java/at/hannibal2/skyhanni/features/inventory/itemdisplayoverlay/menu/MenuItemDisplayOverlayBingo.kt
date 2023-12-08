@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
 
     private val secretBingoDiscoveryLoreLinePattern = (("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to").toPattern())
-    private val rowColumnDiagonalItemNamePattern = (("§e((Community )?Diagonal|Row #.|Column #.)").toPattern())
+    private val rowColumnDiagonalItemNamePattern = (("(§.)*((Community )?Diagonal|Row #.|Column #.)").toPattern())
     private val topBlankPercentContribLoreLinePattern = (("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%").toPattern())
     private val communityPersonalGoalLoreLinePattern = (("(§.)*(?<goalType>Community|Personal) Goal").toPattern())
 
