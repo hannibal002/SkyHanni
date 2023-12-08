@@ -118,13 +118,31 @@ class BingoCardDisplay {
             }
         }
 
-        addGoals(goals) { it.description.removeColor() + if (it.done) " §aDONE" else " " }
+        addGoals(goals) {
+            val percentageFormat = percentageFormat(it)
+            val name = it.description.removeColor()
+            "$name$percentageFormat"
+        }
 
         if (hiddenGoals > 0) {
             val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
         add(Renderable.string(" "))
+    }
+
+    private fun percentageFormat(it: BingoGoal): String {
+        val percentage = it.communtyGoalPercentage ?: return ""
+
+        val percentageColor = when {
+            percentage < 0.01 -> "§a"
+            percentage < 0.05 -> "§e"
+            percentage < 0.1 -> "§6"
+            percentage < 0.25 -> "§6"
+
+            else -> "§c"
+        }
+        return " " + percentageColor + LorenzUtils.formatPercentage(percentage)
     }
 
     private fun MutableList<Renderable>.addPersonalGoals() {
