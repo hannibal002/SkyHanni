@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
-import at.hannibal2.skyhanni.events.PreInitFinished
+import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -74,7 +75,7 @@ object RepoPatternManager {
 
     @SubscribeEvent
     fun onConfigInit(event: ConfigLoadEvent) {
-        config.forceLocal.whenChanged { b, b2 -> reloadPatterns() }
+        config.forceLocal.afterChange { reloadPatterns() }
     }
 
     /**
@@ -127,7 +128,7 @@ object RepoPatternManager {
     }
 
     @SubscribeEvent
-    fun onPreInitFinished(event: PreInitFinished) {
+    fun onPreInitFinished(event: PreInitFinishedEvent) {
         wasPreinitialized = true
         val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
         if (dumpDirective.isNullOrBlank()) return
