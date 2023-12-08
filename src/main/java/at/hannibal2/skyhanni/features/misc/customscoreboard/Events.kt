@@ -45,27 +45,17 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                     it.startsWith("§rCleared: ") || it.startsWith(
                         "Cleared:"
                     )
-                }.toString()
+                }.toString().replace("§r", "")
             }
 
-            val dungeonPlayers = TabListData.getTabList().firstOrNull { it.trim().startsWith("§r§b§lParty §r§f(") }
-                ?.trim()?.removePrefix("§r§b§lParty §r§f(")?.removeSuffix(")")?.toInt() ?: 1
-
-            if (dungeonPlayers != 0 && list.any { it.startsWith("Cleared: ") }) {
-                if (dungeonPlayers == 1) {
-                    list += "§3§lSolo"
-                } else {
-                    for (i in 1..dungeonPlayers) {
-                        list += ScoreboardData.sidebarLinesFormatted.nextAfter( // Bettermap Style
-                            "§r" + (list.firstOrNull { it.startsWith("Cleared: ") }?.replace("%§", "%")
-                                ?: "§cNo Dungeon Data"),
-                            i
-                        )
-                            ?: ScoreboardData.sidebarLinesFormatted.nextAfter( // Hypixel Style
-                                list.firstOrNull { it.startsWith("Cleared: ") }?.replace("%§", "%")
-                                    ?: "§cNo Dungeon Data",
-                                i
-                            ) ?: "§cTeammate not found"
+            if (ScoreboardData.sidebarLinesFormatted.any { lines ->
+                    InformationGetter.dungeonClassList.any {
+                        lines.startsWith(it)
+                    }
+                }) {
+                list += ScoreboardData.sidebarLinesFormatted.filter {
+                    InformationGetter.dungeonClassList.any { lines ->
+                        it.startsWith(lines)
                     }
                 }
             }
@@ -133,7 +123,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Challenge: ") }
             }
 
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Points: ")}) {
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Points: ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Points: ") }
             }
 
@@ -143,7 +133,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             } else list
         },
         {
-            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Challenge: ")}
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Challenge: ") }
         }
     ),
     JACOB_CONTEST(
@@ -189,8 +179,11 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     FLIGHT_DURATION(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Flight Duration:") }?.replace(":a", ":§a")
-                ?: "<hidden>")
+            listOf(
+                ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Flight Duration:") }
+                    ?.replace(":a", ":§a")
+                    ?: "<hidden>"
+            )
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Flight Duration:") }
@@ -325,8 +318,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                         ?.removePrefix("Zone: ") ?: "<hidden>")
                 }
                 if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") }) {
-                    list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Remaining: §a") } ?: "<hidden>"
-                    list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Tasty Mithr: §c") } ?: "<hidden>"
+                    list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Remaining: §a") }
+                        ?: "<hidden>"
+                    list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Tasty Mithr: §c") }
+                        ?: "<hidden>"
                 }
             }
 

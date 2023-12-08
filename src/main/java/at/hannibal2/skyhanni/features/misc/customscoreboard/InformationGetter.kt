@@ -7,6 +7,25 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
 
 class InformationGetter {
+    companion object {
+        val dungeonClassList = listOf(
+            "§e[M] ",
+            "§a[M] ",
+            "§c[M] ",
+            "§e[A] ",
+            "§a[A] ",
+            "§c[A] ",
+            "§e[B] ",
+            "§a[B] ",
+            "§c[B] ",
+            "§e[H] ",
+            "§a[H] ",
+            "§c[H] ",
+            "§e[T] ",
+            "§a[T] ",
+            "§c[T] ",
+        )
+    }
     fun getInformation() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
@@ -47,7 +66,7 @@ class InformationGetter {
             bits = "0"
         }
 
-        val knownLines = listOf(
+        val knownLines = listOf<String>(
             "§7⏣ ",
             "§5ф ",
             "Purse: §6",
@@ -70,6 +89,7 @@ class InformationGetter {
             "Keys: ",
             "Time Elapsed:",
             "§rCleared: ",
+            "Cleared: ",
             "Instance Shutdow",
             "Time Elapsed: ",
             "§f§lWave: §c§l",
@@ -124,7 +144,8 @@ class InformationGetter {
             "Flight Duration:",
             "§a✌ §",
             "Points: ",
-            "Challenge:"
+            "Challenge:",
+            *dungeonClassList.toTypedArray()
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -142,19 +163,6 @@ class InformationGetter {
 
         // remove wind compass
         extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
-
-        // Remove dungeon teammates
-        val dungeonPlayers = TabListData.getTabList().firstOrNull { it.trim().startsWith("§r§b§lParty §r§f(") }
-            ?.trim()?.removePrefix("§r§b§lParty §r§f(")?.removeSuffix(")")?.toInt() ?: 1
-        val clearedLine = sidebarLines.firstOrNull { it.startsWith("§rCleared: ") }.toString()
-
-        if (dungeonPlayers != 0) {
-            if (dungeonPlayers > 1) {
-                for (i in 1..dungeonPlayers) {
-                    extraLines = extraLines.filter { sidebarLines.nextAfter(clearedLine, i) != it }
-                }
-            }
-        }
 
         // Remove jacobs contest
         for (i in 1..3)
