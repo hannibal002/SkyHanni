@@ -117,7 +117,7 @@ class Mob(
     }
 
     private fun removeExtraEntitiesFromChecking() =
-        extraEntities?.count { MobData.retries.contains(MobData.RetryEntityInstancing(it, 0)) }?.also {
+        extraEntities?.count { MobData.retries.contains(MobData.RetryEntityInstancing(it)) }?.also {
             MobData.externRemoveOfRetryAmount += it
         }
 

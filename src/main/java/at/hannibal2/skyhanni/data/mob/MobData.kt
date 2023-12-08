@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.passive.EntityBat
+import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
@@ -27,7 +28,8 @@ import java.util.TreeSet
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-private const val MAX_RETRIES = 100
+private const val MAX_RETRIES = 20 * 5
+
 
 class MobData {
     private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
@@ -53,6 +55,7 @@ class MobData {
 
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
         const val DETECTION_RANGE = 22.0
+        private const val DISPLAY_NPC_DETECTION_RANGE = 24.0 // 24.0
 
         var externRemoveOfRetryAmount = 0
     }
@@ -111,14 +114,20 @@ class MobData {
         }
     }
 
-    private fun EntitySpawn(entity: EntityLivingBase): Boolean {
-        MobDevTracker.data.spawn++
-        when {
-            entity is EntityPlayer && entity.isRealPlayer() -> MobEvent.Spawn.Player(MobFactories.player(entity))
-                .postAndCatch()
+    private fun EntityLivingBase.getRoughType() = when {
+        this is EntityPlayer && this.isRealPlayer() -> Mob.Type.Player
+        this.isDisplayNPC() -> Mob.Type.DisplayNPC
+        this.isSkyBlockMob() -> Mob.Type.Basic
+        else -> null
+    }
 
-            entity.isDisplayNPC() -> return MobFilter.createDisplayNPC(entity)
-            entity.isSkyBlockMob() -> {
+    private fun EntitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
+        MobDevTracker.data.spawn++
+        when (roughType) {
+            Mob.Type.Player -> MobEvent.Spawn.Player(MobFactories.player(entity)).postAndCatch()
+
+            Mob.Type.DisplayNPC -> return MobFilter.createDisplayNPC(entity)
+            Mob.Type.Basic -> {
                 if (islandException()) return true
                 val it = MobFilter.createSkyblockEntity(entity)
                 if (it.result == Result.NotYetFound) return false
@@ -127,26 +136,44 @@ class MobData {
                 when (it.mob.mobType) {
                     Mob.Type.Summon -> MobEvent.Spawn.Summon(it.mob).postAndCatch()
 
-                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(it.mob)
-                        .postAndCatch()
+                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(it.mob).postAndCatch()
 
                     Mob.Type.Special -> MobEvent.Spawn.Special(it.mob).postAndCatch()
                     Mob.Type.Projectile -> MobEvent.Spawn.Projectile(it.mob).postAndCatch()
                     else -> {}
                 }
             }
+
+            else -> return true
         }
         return true
     }
 
     private val batFromPacket = LinkedBlockingQueue<Int>()
+    private val villagerFromPacket = LinkedBlockingQueue<Int>()
 
     private fun handleMobsFromPacket() {
         while (batFromPacket.isNotEmpty()) {
             val entity = EntityUtils.getEntityByID(batFromPacket.take()) as? EntityLivingBase ?: continue
             if (entityToMob[entity] != null) continue
-            retries.remove(RetryEntityInstancing(entity, 0))
+            retries.remove(RetryEntityInstancing(entity))
             MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
+        }
+        while (villagerFromPacket.isNotEmpty()) {
+            val entity = EntityUtils.getEntityByID(villagerFromPacket.take()) as? EntityLivingBase ?: continue
+            val mob = entityToMob[entity]
+            if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
+                MobEvent.DeSpawn.DisplayNPC(mob)
+                retry(entity)
+                continue
+            }
+            val retryInstance = RetryEntityInstancing(entity)
+            retries.find { it == retryInstance }?.let {
+                if (it.roughType == Mob.Type.DisplayNPC) {
+                    retries.remove(retryInstance)
+                    retry(entity)
+                }
+            }
         }
     }
 
@@ -154,6 +181,9 @@ class MobData {
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         if (event.entity is EntityBat && event.health == 6) {
             batFromPacket.add(event.entity.entityId)
+        }
+        if (event.entity is EntityVillager && event.health != 20) {
+            villagerFromPacket.add(event.entity.entityId)
         }
     }
 
@@ -179,12 +209,16 @@ class MobData {
         packetEntityIds.remove(entity.entityId)
     }
 
-    private fun retry(entity: EntityLivingBase) =
-        retries.add(RetryEntityInstancing(entity, 0)).also { MobDevTracker.data.startedRetries++ }
+    private fun retry(entity: EntityLivingBase) = entity.getRoughType()?.let { type ->
+        retries.add(RetryEntityInstancing(entity, 0, type)).also { MobDevTracker.data.startedRetries++ }
+    }
 
-    private fun removeRetry(entity: EntityLivingBase) = retries.removeIf { it.entity == entity }
+    private fun removeRetry(entity: EntityLivingBase) = retries.remove(RetryEntityInstancing(entity))
 
-    class RetryEntityInstancing(var entity: EntityLivingBase, var times: Int) : Comparable<RetryEntityInstancing> {
+    class RetryEntityInstancing(var entity: EntityLivingBase, var times: Int, val roughType: Mob.Type) : Comparable<RetryEntityInstancing> {
+
+        constructor(entity: EntityLivingBase) : this(entity, 0, Mob.Type.Special) // Only use this for compare
+
         override fun hashCode() = entity.hashCode()
         override fun compareTo(other: RetryEntityInstancing) = this.hashCode() - other.hashCode()
         override fun equals(other: Any?) = (other as? EntityLivingBase) == entity
@@ -200,8 +234,12 @@ class MobData {
                 continue
             }
             val entity = retry.entity
-            if (entity.getLorenzVec()
-                    .distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > DETECTION_RANGE
+            val type = retry.roughType
+            if (entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (type) {
+                    Mob.Type.DisplayNPC -> DISPLAY_NPC_DETECTION_RANGE
+                    Mob.Type.Player -> Double.POSITIVE_INFINITY
+                    else -> DETECTION_RANGE
+                }
             ) {
                 MobDevTracker.data.outOfRangeRetries++
                 continue
@@ -209,7 +247,7 @@ class MobData {
             MobDevTracker.data.retries++
             if (retry.times > MAX_RETRIES) {
                 LorenzDebug.log(
-                    "I (`${retry.entity.name}`${retry.entity.entityId} missed. Position: ${retry.entity.getLorenzVec()} Distance: ${
+                    "I (`${retry.entity.name}`${retry.entity.entityId} missed (Found? ${entityToMob[retry.entity] != null}). Position: ${retry.entity.getLorenzVec()} Distance: ${
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     } , ${
                         entity.getLorenzVec().subtract(LocationUtils.playerLocation())
@@ -221,7 +259,7 @@ class MobData {
                 retry.times = Int.MIN_VALUE
                 // continue
             }
-            if (!EntitySpawn(entity)) {
+            if (!EntitySpawn(entity, type)) {
                 retry.times++
                 continue
             }

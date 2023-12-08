@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.makeMobResult
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
@@ -68,10 +67,9 @@ object MobFilter {
     fun Entity.isSkyBlockMob(): Boolean = when {
         this !is EntityLivingBase -> false
         this is EntityArmorStand -> false
-        this is EntityOtherPlayerMP && this.isRealPlayer() -> false
+        this is EntityPlayer && this.isRealPlayer() -> false
         this.isDisplayNPC() -> false
-        this is EntityWither && (this.entityId < 0 || this.invulTime == 800) -> false
-        this is EntityPlayerSP -> false
+        this is EntityWither && this.entityId < 0 -> false
         else -> true
     }
 
@@ -82,9 +80,8 @@ object MobFilter {
         extraDisplayNPCByName.contains(this.name) -> true
         else -> false
     }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
-        || (this is EntityWitch && this.entityId == 253) // Alchemist NPC
-        || (this is EntityCow && this.entityId == 175) // Shania NPC
-        || (this is EntityCow && this.entityId == 275) // Shania NPC in Rift
+        || (this is EntityWitch && this.entityId <= 500) // Alchemist NPC
+        || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
         || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
 
     private val extraDisplayNPCByName = setOf(
@@ -151,6 +148,7 @@ object MobFilter {
         if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return MobData.MobResult(Found, MobFactories.projectile(baseEntity, "Giant Sword"))  // Will false trigger if there is another Dinnerbone Giant
         if (baseEntity is EntityCaveSpider) MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
             ?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.also { return MobData.MobResult(Illegal, null) } }
+        if (baseEntity is EntityWither && baseEntity.invulTime == 800) return MobData.MobResult(Found, MobFactories.special(baseEntity, "Mini Wither"))
         return null
     }
 
@@ -178,7 +176,7 @@ object MobFilter {
             IslandType.HUB -> {
                 if (baseEntity is EntityZombie) { // Rat
                     val from = 3
-                    val to = 9
+                    val to = 11
                     generateSequence(from) { it + 1 }.take(to - from + 1).map { i ->
                         MobUtils.getArmorStand(
                             baseEntity, i
@@ -272,7 +270,7 @@ object MobFilter {
     fun createDisplayNPC(entity: EntityLivingBase): Boolean =
         MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
             !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
-        }?.let { armorStand ->
-            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch().also { true }
-        } ?: false
+        }?.also { armorStand ->
+            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
+        }?.let { true } ?: false
 }
