@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent
@@ -17,32 +17,34 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
 class BingoCardReader {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
+    private val percentagePattern by RepoPattern.pattern("bingo.card.percentage", " {2}§8Top §.(?<percentage>.*)%")
+
     // TODO USE SH-REPO
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
-
     private val personalHiddenGoalPattern = ".*§7§eThe next hint will unlock in (?<time>.*)".toPattern()
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
 
         BingoAPI.bingoGoals.clear()
         for ((slot, stack) in event.inventoryItems) {
+            val lore = stack.getLore()
             val goalType = when {
-                stack.getLore().any { it.endsWith("Personal Goal") } -> GoalType.PERSONAL
-                stack.getLore().any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
+                lore.any { it.endsWith("Personal Goal") } -> GoalType.PERSONAL
+                lore.any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
                 else -> continue
             }
             val name = stack.name?.removeColor() ?: continue
-            val lore = stack.getLore()
             var index = 0
             val builder = StringBuilder()
             for (s in lore) {
@@ -61,17 +63,29 @@ class BingoCardReader {
                 description = description.substring(2)
             }
 
-            val done = stack.getLore().any { it.contains("GOAL REACHED") }
+            val done = lore.any { it.contains("GOAL REACHED") }
+            val communtyGoalPercentage = readCommuntyGoalPercentage(lore)
 
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
 
-            val bingoGoal = BingoGoal(name, visualDescription, goalType, slot, done, hiddenGoalData)
+            val bingoGoal =
+                BingoGoal(name, visualDescription, goalType, slot, done, communtyGoalPercentage, hiddenGoalData)
             BingoAPI.bingoGoals.add(bingoGoal)
         }
         BingoAPI.lastBingoCardOpenTime = SimpleTimeMark.now()
 
         BingoCardUpdateEvent().postAndCatch()
+    }
+
+    private fun readCommuntyGoalPercentage(lore: List<String>): Double? {
+        for (line in lore) {
+            percentagePattern.matchMatcher(line) {
+                return group("percentage").toDouble() / 100
+            }
+        }
+
+        return null
     }
 
     private fun getHiddenGoalData(

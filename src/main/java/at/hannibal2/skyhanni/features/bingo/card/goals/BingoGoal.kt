@@ -6,6 +6,7 @@ class BingoGoal(
     val type: GoalType,
     val slot: Int,
     var done: Boolean,
+    val communtyGoalPercentage: Double?,
     val hiddenGoalData: HiddenGoalData,
 ) {
     override fun toString(): String = displayName
