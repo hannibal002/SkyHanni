@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -332,11 +333,9 @@ class MinionFeatures {
         }
     }
 
-    private fun enable() =
-        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+    private fun enable() = IslandType.PRIVATE_ISLAND.isInIsland()
 
-    private fun enableWithHub() =
-        enable() || (LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB)
+    private fun enableWithHub() = enable() || IslandType.HUB.isInIsland()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
