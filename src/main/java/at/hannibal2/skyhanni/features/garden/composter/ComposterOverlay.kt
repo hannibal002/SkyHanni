@@ -421,7 +421,7 @@ object ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (KeyboardManager.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
                     retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
                 }

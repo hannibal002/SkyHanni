@@ -140,7 +140,7 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isControlKeyDown()
+        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isModifierKeyDown()
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
     }
 
