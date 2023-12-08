@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -33,7 +34,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -61,11 +62,11 @@ class MinionFeatures {
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+    private val minionCoinPattern = "§aYou received §r§6(.*) coins§r§a!".toPattern()
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enableWithHub()) return
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 
         val lookingAt = event.pos.offset(event.face).toLorenzVec()
@@ -82,8 +83,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enableWithHub()) return
 
         if (!Mouse.getEventButtonState()) return
         if (Mouse.getEventButton() != 1) return
@@ -101,8 +101,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastClickedMinion(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
         val special = config.lastClickedMinion.color
@@ -126,8 +125,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enableWithHub()) return
         if (!event.inventoryName.contains("Minion ")) return
 
         event.inventoryItems[48]?.let {
@@ -143,6 +141,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!enableWithHub()) return
         if (minionInventoryOpen) {
             MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
         }
@@ -155,7 +154,7 @@ class MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        if (!minions.contains(entity)) {
+        if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
             MinionFeatures.minions = minions.editCopy {
                 this[entity] = Storage.ProfileSpecific.MinionConfig().apply {
                     displayName = name
@@ -163,8 +162,10 @@ class MinionFeatures {
                 }
             }
         } else {
-            if (minions[entity]!!.displayName != name) {
-                minions[entity]!!.displayName = name
+            minions[entity]?.let {
+                if (it.displayName != name) {
+                    it.displayName = name
+                }
             }
         }
         lastMinion = entity
@@ -196,7 +197,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
         if (coinsPerDay != "") return
 
         if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
@@ -249,15 +250,13 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+        if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
-
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
             minions = minions?.editCopy { remove(lastMinion) }
@@ -287,8 +286,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastEmptied(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
 
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
@@ -318,8 +316,7 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
         if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
@@ -335,6 +332,10 @@ class MinionFeatures {
             }
         }
     }
+
+    private fun enable() = IslandType.PRIVATE_ISLAND.isInIsland()
+
+    private fun enableWithHub() = enable() || IslandType.HUB.isInIsland()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
