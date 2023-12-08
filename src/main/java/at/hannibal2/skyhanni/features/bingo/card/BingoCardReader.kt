@@ -36,13 +36,13 @@ class BingoCardReader {
 
         BingoAPI.bingoGoals.clear()
         for ((slot, stack) in event.inventoryItems) {
+            val lore = stack.getLore()
             val goalType = when {
-                stack.getLore().any { it.endsWith("Personal Goal") } -> GoalType.PERSONAL
-                stack.getLore().any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
+                lore.any { it.endsWith("Personal Goal") } -> GoalType.PERSONAL
+                lore.any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
                 else -> continue
             }
             val name = stack.name?.removeColor() ?: continue
-            val lore = stack.getLore()
             var index = 0
             val builder = StringBuilder()
             for (s in lore) {
@@ -61,7 +61,7 @@ class BingoCardReader {
                 description = description.substring(2)
             }
 
-            val done = stack.getLore().any { it.contains("GOAL REACHED") }
+            val done = lore.any { it.contains("GOAL REACHED") }
 
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
