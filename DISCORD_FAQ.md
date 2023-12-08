@@ -29,5 +29,8 @@ _Frequently Asked Questions_
 > 2. Delete ".minecraft\config\skyhanni\jacob_contests.json".
 > 3. Open minecraft.
 
-*This FAQ was last updated on december 05th, 2023.
+> **9: How can I get bigger crop hitboxes?**
+> Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hitboxes in 1.8.9.
+
+*This FAQ was last updated on december 08th, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
