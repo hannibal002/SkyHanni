@@ -12,6 +12,26 @@ import java.util.function.Supplier
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 enum class Events(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
+    VOTING(
+        {
+            val list = mutableListOf<String>()
+
+            list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§6Year ") && it.endsWith(" Votes") } ?: "<hidden>"
+            if (ScoreboardData.sidebarLinesFormatted.nextAfter(list[0]) == "§7Waiting for") {
+                list += "§7Waiting for"
+                list += "§7your vote..."
+            } else {
+                for (i in 1 until 6) {
+                    list += ScoreboardData.sidebarLinesFormatted.nextAfter(list[0], i) ?: "<hidden>"
+                }
+            }
+
+            list
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6Year ") && it.endsWith(" Votes") }
+        }
+    ),
     SERVER_CLOSE(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§cServer closing: ") }
@@ -189,7 +209,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Flight Duration:") }
         }
     ),
-    WINTER( // not tested
+    WINTER(
         {
             val list = mutableListOf<String>()
 

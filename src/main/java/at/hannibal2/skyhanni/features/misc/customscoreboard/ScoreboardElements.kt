@@ -171,7 +171,9 @@ enum class ScoreboardElements(
     ),
     ISLAND(
         {
-            listOf("§7㋖ §a" + HypixelData.skyBlockIsland.toString().split("_").joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
+            listOf(
+                "§7㋖ §a" + HypixelData.skyBlockIsland.toString().split("_")
+                    .joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
         },
         {
             true
@@ -416,7 +418,10 @@ enum class ScoreboardElements(
             listOf("§cUndetected Lines:" to AlignmentEnum.LEFT) + extraLines.map { it to AlignmentEnum.LEFT }
         },
         {
-            extraLines.isNotEmpty()
+            if (extraLines.isNotEmpty()) {
+                amountOfExtraLines = 0
+            }
+            false
         },
         "§7Extra lines the mod is not detecting"
     ),

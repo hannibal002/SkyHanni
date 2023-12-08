@@ -146,7 +146,11 @@ class InformationGetter {
             "Points: ",
             "Challenge:",
             *dungeonClassList.toTypedArray(),
-            "§cLocked"
+            "§cLocked",
+            "§fCleanup§7:",
+            "§6Year ",
+            "§7Waiting for",
+            "§7your vote..."
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -172,5 +176,11 @@ class InformationGetter {
         // Remove slayer
         extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
         extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
+
+        // remove voting lines
+        val votedLine = sidebarLines.firstOrNull { it.startsWith("§6Year ") } ?: "§6Year "
+        for (i in 1 until 6) {
+            extraLines = extraLines.filter { sidebarLines.nextAfter(votedLine, i) != it }
+        }
     }
 }
