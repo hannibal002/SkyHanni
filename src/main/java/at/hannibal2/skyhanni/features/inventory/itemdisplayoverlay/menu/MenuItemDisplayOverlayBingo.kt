@@ -9,15 +9,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
 
     private val secretBingoDiscoveryLoreLinePattern = (("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to").toPattern())
-    private val secretBingoHintCountdownLoreLinePattern = (("(§.)+(The next hint will unlock in )?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)").toPattern())
     private val rowColumnDiagonalItemNamePattern = (("§e((Community )?Diagonal|Row #.|Column #.)").toPattern())
     private val topBlankPercentContribLoreLinePattern = (("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%").toPattern())
     private val communityPersonalGoalLoreLinePattern = (("(§.)*(?<goalType>Community|Personal) Goal").toPattern())
@@ -35,18 +32,6 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
         val itemName = item.cleanName()
 
         if (lore.isNotEmpty() && itemName.isNotEmpty() && (chestName == "Bingo Card")) { // only for items in bingo card menu and have item lore at all
-            if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_HINT_COUNTDOWN)) {
-                communityPersonalGoalLoreLinePattern.matchMatcher(lore.first()) {
-                    if ((group("goalType") == "Personal") && (lore.lastOrNull() == "§cgoal!")) {
-                        for (line in lore) {
-                            secretBingoHintCountdownLoreLinePattern.matchMatcher(line) {
-                                return TimeUtils.getDuration(group("fullDuration")).format(maxUnits = 1)
-                            }
-                        }
-                    }
-                }
-            }
-
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_DISCOVERY) && (lore.lastOrNull() == "§aGOAL REACHED")) {
                 for (line in lore) {
                     secretBingoDiscoveryLoreLinePattern.matchMatcher(line) {
@@ -70,8 +55,10 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.TOP_BLANK_PERCENT_COMMUNITY_GOAL_CONTRIB)) {
                 communityPersonalGoalLoreLinePattern.matchMatcher(lore.first()) {
                     if (group("goalType") == "Community") {
-                        topBlankPercentContribLoreLinePattern.matchMatcher(lore.last()) {
-                            return group("toUse")
+                        for (line in lore) {
+                            topBlankPercentContribLoreLinePattern.matchMatcher(line) {
+                                return group("toUse")
+                            }
                         }
                     }
                 }

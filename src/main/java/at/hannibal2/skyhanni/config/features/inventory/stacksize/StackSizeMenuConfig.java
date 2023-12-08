@@ -17,12 +17,12 @@ public class StackSizeMenuConfig {
     )
     @ConfigEditorDraggableList
     public List<Bingo> bingo = new ArrayList<>(Arrays.asList(
-        Bingo.SECRET_BINGO_DISCOVERY
+        Bingo.SECRET_BINGO_DISCOVERY,
+        Bingo.TOP_BLANK_PERCENT_COMMUNITY_GOAL_CONTRIB
     ));
 
     public enum Bingo {
         SECRET_BINGO_DISCOVERY("§bSecret Bingo Goal Discovery"), // (#, caps at 10k)
-        SECRET_BINGO_HINT_COUNTDOWN("§bSecret Bingo Goal Countdown"), // (shows largest unit of time)
         ROW_COLUMN_DIAGONAL_PROGRESS("§bRow/Diagonal/Column Progress"), // (§a✔§b/§c§l✖§b)
         TOP_BLANK_PERCENT_COMMUNITY_GOAL_CONTRIB("§bCommunity Goals Percent Position"), //(#)
         ;
