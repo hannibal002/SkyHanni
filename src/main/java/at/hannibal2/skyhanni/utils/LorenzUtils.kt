@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -329,7 +330,7 @@ object LorenzUtils {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
@@ -419,7 +420,7 @@ object LorenzUtils {
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit
+        crossinline onChange: (T) -> Unit,
     ) = buildList {
         add(prefix)
         for (entry in enumValues<T>()) {
@@ -490,7 +491,7 @@ object LorenzUtils {
             }
         }
 
-    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after}, skip)
+    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
         var missing = -1
@@ -628,4 +629,9 @@ object LorenzUtils {
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     fun isInDevEnviromen() = Launch.blackboard.get("fml.deobfuscatedEnvironment") as Boolean
+
+    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+        while (true)
+            list.add(this.poll() ?: break)
+    }
 }

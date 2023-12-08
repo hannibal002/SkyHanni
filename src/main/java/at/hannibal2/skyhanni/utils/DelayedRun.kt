@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
@@ -23,7 +24,6 @@ object DelayedRun {
             }
             inPast
         }
-        while (true)
-            tasks.add(futureTasks.poll() ?: break)
+        futureTasks.drainTo(tasks)
     }
 }
