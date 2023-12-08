@@ -171,7 +171,7 @@ public class InventoryConfig {
     public boolean shiftClickForEquipment = false;
 
     @Expose
-    @ConfigOption(name = "Dojo Rank Display", desc = "ui")
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score and actual belt in the Challenges inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showDojoRankDisplay = false;
