@@ -94,9 +94,9 @@ public class Storage {
         }
 
         @Expose
-        public Map<Long, BingoProfile> bingoProfiles = new HashMap<>();
+        public Map<Long, BingoSession> bingoSessions = new HashMap<>();
 
-        public static class BingoProfile {
+        public static class BingoSession {
 
             @Expose
             public List<String> tierOneMinionsDone = new ArrayList<>();

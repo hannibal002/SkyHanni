@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
-import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoProfile
+import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
@@ -44,9 +44,9 @@ object BingoAPI {
         tips[displayName]
     }
 
-    val bingoStorage: BingoProfile by lazy {
+    val bingoStorage: BingoSession by lazy {
         val playerSpecific = ProfileStorageData.playerSpecific ?: error("playerSpecific is null")
-        playerSpecific.bingoProfiles.getOrPut(getStartOfMonthInMillis()) { BingoProfile() }
+        playerSpecific.bingoSessions.getOrPut(getStartOfMonthInMillis()) { BingoSession() }
     }
 
     private fun getStartOfMonthInMillis() = OffsetDateTime.of(
