@@ -40,7 +40,8 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Show For Seconds",
-        desc = "Show plots border for a given amount of seconds after holding a vacuum.\n§e0 = Always show when holding vacuum"
+        desc = "Show plots border for a given amount of seconds after holding a vacuum.\n" +
+            "§e0 = Always show when holding vacuum"
     )
     @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 10)
     public int showBorderForSeconds = 1;
