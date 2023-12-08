@@ -97,7 +97,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     }
 
     @SubscribeEvent
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    override fun onRenderItemTip(event: RenderItemTipEvent) {
         isDepositCoinsItemNamePattern.matchMatcher(event.stack.cleanName()) { return }
         /*
         so apparently i have to make a whole separate event for the bank balance display.
@@ -116,7 +116,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
 
         - ery
         */
-        event.stackTip = getStackTip(event.stack)
+        super.onRenderItemTip(event)
     }
 
 
