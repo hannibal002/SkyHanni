@@ -25,6 +25,11 @@ object KeyboardManager {
     fun isCopyingKeysDown() = isModifierKeyDown() && Keyboard.KEY_C.isKeyHeld()
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+
+    /**
+     * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
+     * allow the user to set a different option instead and just set the default key to isModifierKeyDown
+     */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
     @SubscribeEvent
