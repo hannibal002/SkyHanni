@@ -28,6 +28,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Hide the repeating fire sale reminder chat messages. - hannibal2
 
 #### Chat Filter
 
@@ -341,6 +342,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Support for tips in hidden bingo card display. - hannibal2
++ Support for 'found by' info in bingo card. - hannibal2
++ Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
+
 </details>
 <details open><summary>
 
@@ -499,7 +508,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
 
-### Pests
+### Garden Pests
 
 + Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
   + Enable via /sh vacuum.
@@ -518,6 +527,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Option to only show the time while holding vacuum in the hand.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe
 
 </details>
 <details open><summary>

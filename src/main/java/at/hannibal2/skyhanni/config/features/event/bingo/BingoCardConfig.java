@@ -42,4 +42,14 @@ public class BingoCardConfig {
 
     @Expose
     public Position bingoCardPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Next Tip Duration", desc = "Show the duration until the next hidden personal goal gets a tip revealed.")
+    @ConfigEditorBoolean
+    public Property<Boolean> nextTipDuration = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Hide Difficulty When Done", desc = "Remove the background difficulty color in the bingo card inventory when the goal is done.")
+    @ConfigEditorBoolean
+    public boolean hideDoneDifficulty = true;
 }

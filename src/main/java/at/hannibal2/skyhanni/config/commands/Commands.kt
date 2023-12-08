@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
-import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
+import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -266,6 +267,7 @@ object Commands {
     }
 
     private fun developersCodingHelp() {
+        registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
         registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
