@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlaySBLeveling {
+class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
     private val guideTaskChestNamePattern = ((".*(Guide |Task).*").toPattern())
     private val progressPatternLoreLinePattern = ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
     private val checkmarkItemNamePattern = (("✔.*").toPattern())
@@ -26,10 +26,10 @@ class MenuItemDisplayOverlaySBLeveling {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.sbLeveling.isEmpty()) return ""
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.sbLeveling.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.sbLeveling
+        val stackSizeConfig = configMenuStackSize.sbLeveling
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.GUIDE_PROGRESS)) {
