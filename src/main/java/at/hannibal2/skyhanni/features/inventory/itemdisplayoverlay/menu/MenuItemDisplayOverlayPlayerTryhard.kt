@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
 import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
@@ -19,7 +19,7 @@ import net.minecraft.item.ItemEnderEye
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayPlayerTryhard {
+class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val auctionHousePageLoreLinePattern = "§7\\((?<pagenumber>[0-9]+).*".toPattern()
     private val otherMenusPageLoreLinePattern = "§.Page (?<pagenumber>[0-9]+)".toPattern()
@@ -57,10 +57,10 @@ class MenuItemDisplayOverlayPlayerTryhard {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.playerTryhard.isEmpty()) return ""
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.playerTryhard.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerTryhard
+        val stackSizeConfig = configMenuStackSize.playerTryhard
         val chestName = InventoryUtils.openInventoryName()
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.MENU_NAVIGATION)) {
