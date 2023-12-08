@@ -122,7 +122,9 @@ class InformationGetter {
             "Inferno Demo",
             "Combat XP",
             "Flight Duration:",
-            "§a✌ §"
+            "§a✌ §",
+            "Points: ",
+            "Challenge:"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }

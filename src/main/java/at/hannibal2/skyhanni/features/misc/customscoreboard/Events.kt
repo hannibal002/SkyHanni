@@ -125,6 +125,27 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             IslandType.KUUDRA_ARENA.isInIsland()
         }
     ),
+    DOJO(
+        {
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Challenge: ") }) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Challenge: ") }
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Points: ")}) {
+                list += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Points: ") }
+            }
+
+            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
+                true -> listOf("<hidden>")
+                false -> listOf("§cNo Dojo Data")
+            } else list
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Challenge: ")}
+        }
+    ),
     JACOB_CONTEST(
         {
             val list = mutableListOf<String>()
