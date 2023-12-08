@@ -455,7 +455,7 @@ object GardenNextJacobContest {
     private fun askToSendContests() =
         config.shareAutomatically == 0 // 0 = Ask, 1 = Send (Only call if isSendEnabled())
 
-    fun fetchContestsIfAble() {
+    private fun fetchContestsIfAble() {
         if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
         // Allows retries every 10 minutes when it's after 1 day into the new year
         val currentMills = System.currentTimeMillis()
