@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -63,7 +63,7 @@ class GardenLevelDisplay {
         val item = event.inventoryItems[4]!!
 
         namePattern.matchMatcher(item.name!!.removeColor()) {
-            val currentLevel = group("currentLevel").romanToDecimalIfNeeded()
+            val currentLevel = group("currentLevel").romanToDecimalIfNecessary()
             var nextLevelExp = 0L
             for (line in item.getLore()) {
                 expToNextLevelPattern.matchMatcher(line) {

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,20 +28,18 @@ class WildStrawberryDyeNotification {
         if (!GardenAPI.config.wildStrawberryDyeNotification) return
 
         val itemStack = event.itemStack
-        MinecraftExecutor.OnThread.execute {
 
-            // Prevent false positives when buying the item in ah or moving it from a storage
-            val diff = System.currentTimeMillis() - lastCloseTime
-            if (diff < 1_000) return@execute
+        // Prevent false positives when buying the item in ah or moving it from a storage
+        val diff = System.currentTimeMillis() - lastCloseTime
+        if (diff < 1_000) return
 
-            val internalName = itemStack.getInternalName()
-            if (internalName == item) {
-                val name = itemStack.name!!
-                LorenzUtils.sendTitle(name, 5.seconds)
-                LorenzUtils.chat("You found a $name§e!")
-                SoundUtils.playBeepSound()
-                ItemBlink.setBlink(itemStack, 5_000)
-            }
+        val internalName = itemStack.getInternalName()
+        if (internalName == item) {
+            val name = itemStack.name!!
+            LorenzUtils.sendTitle(name, 5.seconds)
+            LorenzUtils.chat("You found a $name§e!")
+            SoundUtils.playBeepSound()
+            ItemBlink.setBlink(itemStack, 5_000)
         }
     }
 }

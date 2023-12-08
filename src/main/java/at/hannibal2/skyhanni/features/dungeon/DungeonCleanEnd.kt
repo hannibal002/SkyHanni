@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.item.EntityArmorStand
@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+    private val catacombsPattern = "([ ]*)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)".toPattern()
 
     private var bossDone = false
     private var chestsSpawned = false
@@ -32,7 +33,7 @@ class DungeonCleanEnd {
 
         val message = event.message
 
-        if (message.matchRegex("([ ]*)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)")) {
+        catacombsPattern.matchMatcher(message) {
             chestsSpawned = true
         }
     }

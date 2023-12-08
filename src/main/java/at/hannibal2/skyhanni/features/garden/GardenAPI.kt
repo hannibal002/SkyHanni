@@ -23,20 +23,18 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
@@ -99,14 +97,12 @@ object GardenAPI {
         }
     }
 
+    // TODO use IslandChangeEvent
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        SkyHanniMod.coroutineScope.launch {
-            delay(2.seconds)
-            withContext(MinecraftDispatcher) {
-                if (inGarden()) {
-                    checkItemInHand()
-                }
+        DelayedRun.runDelayed(2.seconds) {
+            if (inGarden()) {
+                checkItemInHand()
             }
         }
     }
@@ -147,9 +143,14 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun MutableList<Any>.addCropIcon(crop: CropType) {
+    fun MutableList<Any>.addCropIcon(crop: CropType, highlight: Boolean = false) {
         try {
-            add(crop.icon)
+            var icon = crop.icon.copy()
+            if (highlight) {
+                // Hack to add enchant glint, like Hypixel does it
+                icon.addEnchantment(Enchantment.protection, 0)
+            }
+            add(icon)
         } catch (e: NullPointerException) {
             e.printStackTrace()
         }
@@ -184,7 +185,6 @@ object GardenAPI {
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
-
 
         val position = event.position
         if (lastLocation == position) {

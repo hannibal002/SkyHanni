@@ -527,6 +527,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
+    // TODO repo
     private val hasAlwaysScavenger = listOf(
         "CRYPT_DREADLORD_SWORD".asInternalName(),
         "ZOMBIE_SOLDIER_CUTLASS".asInternalName(),
@@ -535,6 +536,12 @@ object EstimatedItemValueCalculator {
         "ZOMBIE_KNIGHT_SWORD".asInternalName(),
         "SILENT_DEATH".asInternalName(),
         "ZOMBIE_COMMANDER_WHIP".asInternalName(),
+        "ICE_SPRAY_WAND".asInternalName(),
+    )
+
+    private val hasAlwaysReplenish = listOf(
+        "ADVANCED_GARDENING_HOE".asInternalName(),
+        "ADVANCED_GARDENING_AXE".asInternalName(),
     )
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
@@ -551,6 +558,10 @@ object EstimatedItemValueCalculator {
             if (rawName == "efficiency") continue
 
             if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
+            }
+
+            if (rawName == "replenish" && rawLevel == 1 && internalName in hasAlwaysReplenish) {
                 continue
             }
 

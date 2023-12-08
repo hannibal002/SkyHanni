@@ -47,7 +47,7 @@ class ShowFishingItemName {
         if (!isEnabled()) return
         if (hasRodInHand) {
             for (entityItem in EntityUtils.getEntities<EntityItem>()) {
-                val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)
+                val location = event.exactLocation(entityItem).add(y = 0.8)
                 if (location.distance(LocationUtils.playerLocation()) > 15) continue
                 val itemStack = entityItem.entityItem
                 var name = itemStack.name ?: continue
