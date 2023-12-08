@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// Please use LorenzToolTipEvent over ItemTooltipEvent if no special EventPriority is necessary
 class ToolTipData {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

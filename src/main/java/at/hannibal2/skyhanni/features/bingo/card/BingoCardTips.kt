@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.BingoAPI.getTip
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
@@ -12,14 +13,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardTips {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: ItemTooltipEvent) {
+    fun onItemTooltipLow(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Bingo Card") return
 

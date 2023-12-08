@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -128,11 +128,11 @@ object ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (inComposterUpgrades) {
             update()
             for (upgrade in ComposterUpgrade.entries) {
-                event.itemStack?.name?.let {
+                event.itemStack.name?.let {
                     if (it.contains(upgrade.displayName)) {
                         maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
                             group("level")?.romanToDecimalIfNecessary() ?: 0
