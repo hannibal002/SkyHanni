@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -31,7 +33,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -59,6 +61,7 @@ class MinionFeatures {
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+    private val minionCoinPattern = "§aYou received §r§6(.*) coins§r§a!".toPattern()
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
@@ -140,6 +143,13 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (minionInventoryOpen) {
+            MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         val minions = minions ?: return
         val entity = lastClickedEntity ?: return
@@ -166,6 +176,8 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (event.reopenSameName) return
+
         minionStorageInventoryOpen = false
         if (!minionInventoryOpen) return
         val minions = minions ?: return
@@ -180,6 +192,7 @@ class MinionFeatures {
         if (location !in minions) {
             minions[location]!!.lastClicked = 0
         }
+        MinionCloseEvent().postAndCatch()
     }
 
     @SubscribeEvent
@@ -241,11 +254,10 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+        if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
-
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
             minions = minions?.editCopy { remove(lastMinion) }
@@ -281,7 +293,7 @@ class MinionFeatures {
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
-            val location = minion.key.add(0.0, 1.0, 0.0)
+            val location = minion.key.add(y = 1.0)
             if (!location.canBeSeen()) continue
 
             val lastEmptied = minion.value.lastClicked
@@ -292,14 +304,14 @@ class MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                event.drawString(location.add(0.0, 0.65, 0.0), name, true)
+                event.drawString(location.add(y = 0.65), name, true)
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
                 val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(0.0, 1.15, 0.0), text, true)
+                event.drawString(location.add(y = 1.15), text, true)
             }
         }
     }

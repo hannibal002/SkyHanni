@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo.nextstep
+package at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps
 
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
