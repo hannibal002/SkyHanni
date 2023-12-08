@@ -70,16 +70,16 @@ object TrevorFeatures {
 
     init {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
-            Minecraft.getMinecraft().addScheduledTask {
-                try {
-                    if (config.trapperSolver && onFarmingIsland()) {
+            if (onFarmingIsland() && config.trapperSolver) {
+                Minecraft.getMinecraft().addScheduledTask {
+                    try {
                         updateTrapper()
-                        TrevorTracker.saveAndUpdate()
+                        TrevorTracker.update()
                         TrevorTracker.calculatePeltsPerHour()
                         if (questActive) TrevorSolver.findMob()
+                    } catch (error: Throwable) {
+                        ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                     }
-                } catch (error: Throwable) {
-                    ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }
@@ -161,7 +161,6 @@ object TrevorFeatures {
         )
     }
 
-
     private fun updateTrapper() {
         timeUntilNextReady -= 1
         if (trapperReady && timeUntilNextReady > 0) {
@@ -223,7 +222,7 @@ object TrevorFeatures {
             { config.trapperTalkCooldown }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
+                    event.drawString(it.add(y = 2.23), currentLabel)
                 }
             }
         }
@@ -239,11 +238,11 @@ object TrevorFeatures {
                     TrevorSolver.currentMob!!.mobName
                 }
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), displayName, 1.5)
+                event.drawWaypointFilled(location.add(y = -2), LorenzColor.GREEN.toColor(), true, true)
+                event.drawDynamicText(location.add(y = 1), displayName, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
+                event.drawDynamicText(location.add(y = 1), TrevorSolver.mobLocation.location, 1.5)
             }
         }
     }

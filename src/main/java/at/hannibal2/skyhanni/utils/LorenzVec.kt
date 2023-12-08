@@ -50,7 +50,7 @@ data class LorenzVec(
 
     fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
-    fun add(x: Int, y: Int, z: Int): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
+    fun add(x: Int = 0, y: Int = 0, z: Int = 0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
@@ -159,7 +159,7 @@ data class LorenzVec(
             return LorenzVec(x, y, z)
         }
 
-        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(0.0, -1.0, 0.0)
+        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(y = -1.0)
     }
 }
 

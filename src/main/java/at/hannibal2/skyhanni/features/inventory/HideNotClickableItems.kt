@@ -4,6 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
@@ -27,9 +30,6 @@ import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -131,7 +131,7 @@ class HideNotClickableItems {
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass) {
-                    event.toolTip.add("  §7(Bypass by holding the control key)")
+                    event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
                 }
             }
         }
@@ -162,7 +162,7 @@ class HideNotClickableItems {
         }
     }
 
-    private fun bypasssActive() = config.itemsBypass && KeyboardManager.isControlKeyDown()
+    private fun bypasssActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
 
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true

@@ -17,6 +17,7 @@ class SkillExperience {
     // TODO USE SH-REPO
     private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
     private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
+    private val actionBarLowLevelPattern = ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*".toPattern()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -37,8 +38,7 @@ class SkillExperience {
             skillExp[skill] = totalExp
             SkillExpGainEvent(skill).postAndCatch()
         }
-        val pattern = ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*".toPattern()
-        pattern.matchMatcher(event.message) {
+        actionBarLowLevelPattern.matchMatcher(event.message) {
             val skill = group("skill").lowercase()
             SkillExpGainEvent(skill).postAndCatch()
         }

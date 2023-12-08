@@ -15,5 +15,7 @@ public class BingoJson {
 
         @Expose
         public List<String> note;
+        @Expose
+        public String found;
     }
 }
