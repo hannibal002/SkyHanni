@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -49,6 +50,7 @@ class ConfigManager {
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+            .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
                 override fun write(out: JsonWriter, value: UUID) {
                     out.value(value.toString())
