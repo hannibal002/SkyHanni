@@ -173,11 +173,11 @@ class MinionCraftHelper {
 
     private fun firstMinionTier(otherItems: Map<NEUInternalName, Int>, minions: MutableMap<String, NEUInternalName>) {
         val help = otherItems.filter { !it.key.startsWith("WOOD_") }
-        val tierOneMinionsFiltered = tierOneMinions.filter { it !in tierOneMinionsDone }
+        val tierOneMinionsFiltered = tierOneMinions.filter { it.asString() !in tierOneMinionsDone }
         for (minionId in tierOneMinionsFiltered) {
             val prefix = minionId.asString().dropLast(1)
             if (minions.any { it.value.startsWith(prefix) }) {
-                tierOneMinionsDone.add(minionId)
+                tierOneMinionsDone.add(minionId.toString())
             }
         }
         for (minionId in tierOneMinionsFiltered) {
