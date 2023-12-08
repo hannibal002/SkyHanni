@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -18,7 +18,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayPlayer {
+class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val museumDonationLoreLinePattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
     private val skyblockLevelLoreLinePattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
@@ -60,10 +60,10 @@ class MenuItemDisplayOverlayPlayer {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.player.isEmpty()) return ""
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.player.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.player
+        val stackSizeConfig = configMenuStackSize.player
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKYBLOCK_LEVEL) && chestName.lowercase() == ("skyblock menu")) {
@@ -71,7 +71,7 @@ class MenuItemDisplayOverlayPlayer {
             skyblockLevelingItemNamePattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
                     skyblockLevelLoreLinePattern.matchMatcher(line) {
-                        return "${group("sblvl")}"
+                        return group("sblvl")
                     }
                 }
             }
@@ -79,7 +79,7 @@ class MenuItemDisplayOverlayPlayer {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.SKILL_GARDEN_DUNGEON_LEVELS)) {
             if (chestName == "Your Skills" || chestName == "Dungeoneering") {
-                if (item.getLore().isNotEmpty() && item.getLore().last().equals("§eClick to view!")) {
+                if (item.getLore().isNotEmpty() && item.getLore().last() == ("§eClick to view!")) {
                     if (chestName == "Your Skills") {
                         if (CollectionAPI.isCollectionTier0(item.getLore()) && (itemName != ("Dungeoneering"))) return "0"
                         if (itemName.split(" ").size < 2) return "" //thanks to watchdogshelper we had to add this hotfix line
