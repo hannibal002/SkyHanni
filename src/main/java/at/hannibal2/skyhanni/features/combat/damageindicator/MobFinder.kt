@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
@@ -15,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -36,6 +37,7 @@ import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
@@ -69,6 +71,8 @@ class MobFinder {
     //F5
     private var floor5lividEntity: EntityOtherPlayerMP? = null
     private var floor5lividEntitySpawnTime = 0L
+    private val correctLividPattern =
+        "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
 
     //F6
     private var floor6Giants = false
@@ -80,6 +84,7 @@ class MobFinder {
     internal fun tryAdd(entity: EntityLivingBase) = when {
         LorenzUtils.inDungeons -> tryAddDungeon(entity)
         RiftAPI.inRift() -> tryAddRift(entity)
+        GardenAPI.inGarden() -> tryAddGarden(entity)
         else -> {
             when (entity) {
                 /*
@@ -89,7 +94,6 @@ class MobFinder {
                      * Please take this into consideration if you are to modify this.
                     */
                 is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(entity)
-                is EntitySilverfish -> tryAddEntitySilverfish(entity)
                 is EntityIronGolem -> tryAddEntityIronGolem(entity)
                 is EntityPigZombie -> tryAddEntityPigZombie(entity)
                 is EntityMagmaCube -> tryAddEntityMagmaCube(entity)
@@ -109,21 +113,20 @@ class MobFinder {
         }
     }
 
-    private fun tryAddEntitySilverfish(entity: EntitySilverfish): EntityResult? {
-        if (!GardenAPI.inGarden()) return null
-
-        if (entity.hasNameTagWith(3, "Beetle")) return EntityResult(bossType = BossType.GARDEN_PEST_BEETLE)
-        if (entity.hasNameTagWith(3, "Cricket")) return EntityResult(bossType = BossType.GARDEN_PEST_CRICKET)
-        if (entity.hasNameTagWith(3, "Fly")) return EntityResult(bossType = BossType.GARDEN_PEST_FLY)
-        if (entity.hasNameTagWith(3, "Locust")) return EntityResult(bossType = BossType.GARDEN_PEST_LOCUST)
-        if (entity.hasNameTagWith(3, "Mite")) return EntityResult(bossType = BossType.GARDEN_PEST_MITE)
-        if (entity.hasNameTagWith(3, "Mosquito")) return EntityResult(bossType = BossType.GARDEN_PEST_MOSQUITO)
-        if (entity.hasNameTagWith(3, "Moth")) return EntityResult(bossType = BossType.GARDEN_PEST_MOTH)
-        if (entity.hasNameTagWith(3, "Rat")) return EntityResult(bossType = BossType.GARDEN_PEST_RAT)
-        if (entity.hasNameTagWith(3, "Slug")) return EntityResult(bossType = BossType.GARDEN_PEST_SLUG)
-        if (entity.hasNameTagWith(3, "Earthworm")) return EntityResult(bossType = BossType.GARDEN_PEST_EARTHWORM)
+    private fun tryAddGarden(entity: EntityLivingBase): EntityResult? {
+        if (entity is EntitySilverfish || entity is EntityBat) {
+            return tryAddGardenPest(entity)
+        }
 
         return null
+    }
+
+    private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
+        if (!GardenAPI.inGarden()) return null
+
+        return PestType.entries
+            .firstOrNull { entity.hasNameTagWith(3, it.displayName) }
+            ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 
     private fun tryAddDungeon(entity: EntityLivingBase) = when {
@@ -586,7 +589,7 @@ class MobFinder {
             }
         }
 
-        if (message.matchRegex("§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!")) {
+            correctLividPattern.matchMatcher(message) {
             floor5lividEntity = null
         }
     }

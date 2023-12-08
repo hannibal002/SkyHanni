@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.getOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -115,7 +115,7 @@ class DungeonAPI {
 
             DungeonClass.entries.forEach {
                 if (playerTeam.contains("(${it.scoreboardName} ")) {
-                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNeeded()
+                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
                     playerClass = it
                     playerClassLevel = level
                 }

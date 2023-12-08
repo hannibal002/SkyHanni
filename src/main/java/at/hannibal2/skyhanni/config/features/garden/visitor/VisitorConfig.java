@@ -60,7 +60,7 @@ public class VisitorConfig {
     public boolean hypixelArrivedMessage = true;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth, Jacob and Spaceman)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = true;
@@ -98,7 +98,7 @@ public class VisitorConfig {
         desc = "Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling"
     )
     @ConfigEditorDropdown
-    public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.ONLY_ON_BINGO;
+    public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.DONT;
 
     public enum VisitorBlockBehaviour {
         DONT("Don't"), ALWAYS("Always"), ONLY_ON_BINGO("Only on Bingo");

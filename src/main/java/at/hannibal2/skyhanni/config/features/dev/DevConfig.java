@@ -30,6 +30,11 @@ public class DevConfig {
     public DebugConfig debug = new DebugConfig();
 
     @Expose
+    @ConfigOption(name = "RepoPattern", desc = "")
+    @Accordion
+    public RepoPatternConfig repoPattern = new RepoPatternConfig();
+
+    @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showSlotNumberKey = Keyboard.KEY_NONE;

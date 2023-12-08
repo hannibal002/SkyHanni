@@ -21,4 +21,9 @@ public class FishingProfitTrackerConfig {
     @ConfigOption(name = "Hide Moving", desc = "Hide the Fishing Profit Tracker while moving.")
     @ConfigEditorBoolean
     public boolean hideMoving = true;
+
+    @Expose
+    @ConfigOption(name = "Show When Pickup", desc = "Show the fishing tracker for a couple of seconds after catching something even while moving.")
+    @ConfigEditorBoolean
+    public boolean showWhenPickup = true;
 }

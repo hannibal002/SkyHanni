@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -24,6 +26,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
 
@@ -32,6 +35,7 @@ object FishingProfitTracker {
 
     private val coinsChatPattern = ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.".toPattern()
 
+    private var lastCatchTime = SimpleTimeMark.farPast()
     private val tracker = SkyHanniItemTracker(
         "Fishing Profit Tracker",
         { Data() },
@@ -169,15 +173,26 @@ object FishingProfitTracker {
         tracker.modify {
             it.totalCatchAmount++
         }
+        lastCatchTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!FishingAPI.hasFishingRodInHand()) return
-        if (FishingProfitPlayerMoving.isMoving && config.hideMoving) return
+
+        val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
+        if (!recentPickup) {
+            if (!FishingAPI.hasFishingRodInHand()) return
+            // TODO remove hide moving chech, replace with last cast location + radius
+            if (FishingProfitPlayerMoving.isMoving && config.hideMoving) return
+        }
 
         tracker.renderDisplay(config.position)
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastCatchTime = SimpleTimeMark.farPast()
     }
 
     private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {

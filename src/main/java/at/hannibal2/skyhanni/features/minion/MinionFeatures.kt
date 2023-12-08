@@ -7,11 +7,14 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,12 +28,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -51,15 +54,14 @@ import java.awt.Color
 class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
-    private var lastMinion: LorenzVec? = null
     private var newMinion: LorenzVec? = null
     private var newMinionName: String? = null
     private var lastMinionOpened = 0L
-    private var minionInventoryOpen = false
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+    private val minionCoinPattern = "§aYou received §r§6(.*) coins§r§a!".toPattern()
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
@@ -91,6 +93,10 @@ class MinionFeatures {
         val entity = minecraft.pointedEntity
         if (entity != null) {
             lastClickedEntity = entity.getLorenzVec()
+            return
+        }
+        minecraft.thePlayer.rayTrace(16.0, 1.0f)?.let {
+            lastStorage = it.blockPos.toLorenzVec()
         }
     }
 
@@ -123,12 +129,23 @@ class MinionFeatures {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!event.inventoryName.contains(" Minion ")) return
+        if (!event.inventoryName.contains("Minion ")) return
 
         event.inventoryItems[48]?.let {
             if ("§aCollect All" == it.name) {
                 MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+                return
             }
+        }
+
+        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()
+        minionStorageInventoryOpen = true
+    }
+
+    @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (minionInventoryOpen) {
+            MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
         }
     }
 
@@ -159,6 +176,9 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (event.reopenSameName) return
+
+        minionStorageInventoryOpen = false
         if (!minionInventoryOpen) return
         val minions = minions ?: return
 
@@ -172,6 +192,7 @@ class MinionFeatures {
         if (location !in minions) {
             minions[location]!!.lastClicked = 0
         }
+        MinionCloseEvent().postAndCatch()
     }
 
     @SubscribeEvent
@@ -224,6 +245,7 @@ class MinionFeatures {
         lastMinion = null
         lastMinionOpened = 0L
         minionInventoryOpen = false
+        minionStorageInventoryOpen = false
     }
 
     @SubscribeEvent
@@ -232,11 +254,10 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+        if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
-
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
             minions = minions?.editCopy { remove(lastMinion) }
@@ -256,7 +277,7 @@ class MinionFeatures {
         }
 
         minionUpgradePattern.matchMatcher(message) {
-            val newTier = group("tier").romanToDecimalIfNeeded()
+            val newTier = group("tier").romanToDecimalIfNecessary()
             minions?.get(lastMinion)?.let {
                 val minionName = getMinionName(it.displayName, newTier)
                 it.displayName = minionName
@@ -272,7 +293,7 @@ class MinionFeatures {
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
-            val location = minion.key.add(0.0, 1.0, 0.0)
+            val location = minion.key.add(y = 1.0)
             if (!location.canBeSeen()) continue
 
             val lastEmptied = minion.value.lastClicked
@@ -283,14 +304,14 @@ class MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                event.drawString(location.add(0.0, 0.65, 0.0), name, true)
+                event.drawString(location.add(y = 0.65), name, true)
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
                 val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(0.0, 1.15, 0.0), text, true)
+                event.drawString(location.add(y = 1.15), text, true)
             }
         }
     }
@@ -326,6 +347,12 @@ class MinionFeatures {
     }
 
     companion object {
+
+        var lastMinion: LorenzVec? = null
+        var lastStorage: LorenzVec? = null
+        var minionInventoryOpen = false
+        var minionStorageInventoryOpen = false
+
         private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
             get() {
                 return ProfileStorageData.profileSpecific?.minions

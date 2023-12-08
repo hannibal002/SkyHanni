@@ -210,11 +210,19 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             else -> FFStats.equipmentTotalFF
         }
 
+        val maxEquipmentBaseFortune = 5.0
+        val maxEquipmentAbilityFortune = 15.0
+        val maxEquipmentReforgeFortune = 15.0
+        val maxGreenThumbFortune = GardenAPI.totalAmountVisitorsExisting.toDouble() / 4
+
+        val maxFortunePerPiece = maxEquipmentBaseFortune + maxEquipmentAbilityFortune + maxEquipmentReforgeFortune + maxGreenThumbFortune
+
         line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar(
             "§2Total $word Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
-            if (currentEquipment == 0) 218 else 54.5,
+            if (currentEquipment == 0) maxFortunePerPiece * 4 else maxFortunePerPiece,
+
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
@@ -222,7 +230,7 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
         else "§7§2Total base fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar(
             "§2$word Base Fortune", line, equipmentFF[FFTypes.BASE] ?: 0,
-            if (currentEquipment == 0) 20 else 5,
+            if (currentEquipment == 0) maxEquipmentBaseFortune * 4 else maxEquipmentBaseFortune,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
@@ -231,7 +239,7 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             else "§7§2Total ability fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar(
             "§2$word Ability", line, equipmentFF[FFTypes.ABILITY] ?: 0,
-            if (currentEquipment == 0) 60 else 15,
+            if (currentEquipment == 0) maxEquipmentAbilityFortune * 4 else maxEquipmentAbilityFortune,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
@@ -240,11 +248,10 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             else "§7§2Total reforge fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar(
             "§2$word Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
-            if (currentEquipment == 0) 60 else 15,
+            if (currentEquipment == 0) maxEquipmentReforgeFortune * 4 else maxEquipmentReforgeFortune,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
-        val maxGreenThumbFortune = GardenAPI.totalAmountVisitorsExisting.toDouble() / 4
         line =
             if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
             else "§7§2Total enchantment fortune from your\n${equipmentItem.getItem().displayName}"

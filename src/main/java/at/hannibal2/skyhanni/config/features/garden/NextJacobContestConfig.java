@@ -16,7 +16,7 @@ public class NextJacobContestConfig {
     public boolean display = true;
 
     @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in Garden but everywhere in SkyBlock.")
+    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in the Garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
     public boolean everywhere = false;
 
