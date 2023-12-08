@@ -44,7 +44,7 @@ object BingoAPI {
         tips[displayName]
     }
 
-    private val bingoStorage: BingoProfile by lazy {
+    val bingoStorage: BingoProfile by lazy {
         val playerSpecific = ProfileStorageData.playerSpecific ?: error("playerSpecific is null")
         playerSpecific.bingoProfiles.getOrPut(getStartOfMonthInMillis()) { BingoProfile() }
     }

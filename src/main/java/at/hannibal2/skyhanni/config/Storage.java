@@ -99,6 +99,9 @@ public class Storage {
         public static class BingoProfile {
 
             @Expose
+            public List<String> tierOneMinionsDone = new ArrayList<>();
+
+            @Expose
             public Map<Integer, BingoGoal> goals = new HashMap<>();
         }
     }
