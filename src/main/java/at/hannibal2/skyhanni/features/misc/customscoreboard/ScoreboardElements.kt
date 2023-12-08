@@ -285,12 +285,12 @@ enum class ScoreboardElements(
         },
         {
             listOf(
-                at.hannibal2.skyhanni.data.IslandType.HUB,
-                at.hannibal2.skyhanni.data.IslandType.SPIDER_DEN,
-                at.hannibal2.skyhanni.data.IslandType.THE_PARK,
-                at.hannibal2.skyhanni.data.IslandType.THE_END,
-                at.hannibal2.skyhanni.data.IslandType.CRIMSON_ISLE,
-                at.hannibal2.skyhanni.data.IslandType.THE_RIFT
+                IslandType.HUB,
+                IslandType.SPIDER_DEN,
+                IslandType.THE_PARK,
+                IslandType.THE_END,
+                IslandType.CRIMSON_ISLE,
+                IslandType.THE_RIFT
             ).contains(HypixelData.skyBlockIsland)
         },
         "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
