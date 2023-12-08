@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -38,6 +39,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
@@ -250,12 +252,23 @@ class SkyHanniDebugsAndTests {
             LorenzUtils.chat("stopped ${modules.size} listener classes.")
         }
 
-        fun whereami() {
+        fun whereAmI() {
             if (LorenzUtils.inSkyBlock) {
                 LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
                 return
             }
             LorenzUtils.chat("§eYou are not in Skyblock.")
+        }
+
+        fun clearContestData() {
+            GardenNextJacobContest.contests.clear()
+            GardenNextJacobContest.fetchedFromElite = false
+            GardenNextJacobContest.isFetchingContests = true
+            SkyHanniMod.coroutineScope.launch {
+                GardenNextJacobContest.fetchUpcomingContests()
+                GardenNextJacobContest.lastFetchAttempted = System.currentTimeMillis()
+                GardenNextJacobContest.isFetchingContests = false
+            }
         }
 
         fun copyLocation(args: Array<String>) {
