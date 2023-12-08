@@ -11,5 +11,5 @@ abstract class AbstractStackSize {
 }
 
 abstract class AbstractMenuStackSize : AbstractStackSize()  {
-    val configMenuStackSize get() = SkyHanniMod.feature.inventory.stackSize.menu
+    val configMenuStackSize get() = configItemStackSize.stackSize.menu
 }
