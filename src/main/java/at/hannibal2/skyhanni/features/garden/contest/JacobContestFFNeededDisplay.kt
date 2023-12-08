@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
-import kotlin.math.max
 
 class JacobContestFFNeededDisplay {
     private val config get() = GardenAPI.config
@@ -107,8 +106,9 @@ class JacobContestFFNeededDisplay {
         val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"
         val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
-        val farmingFortune = formatFarmingFortune(max(0.0, (cropsPerSecond * 100 / 20 / crop.baseDrops) - 100))
-        return " ${bracket.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
+        val farmingFortune = (cropsPerSecond * 100 / 20 / crop.baseDrops) - 100
+        val format = formatFarmingFortune(farmingFortune.coerceAtLeast(0.0))
+        return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
     @SubscribeEvent
