@@ -421,12 +421,7 @@ object GardenNextJacobContest {
         )
     }
 
-    private fun warnForCrop(): Boolean {
-        for(crop in nextContestCrops) {
-            if (config.warnFor.contains(crop.ordinal)) return true
-        }
-        return false
-    }
+    private fun warnForCrop(): Boolean = nextContestCrops.any { it in config.warnFor }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
