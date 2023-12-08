@@ -2,18 +2,28 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.Item
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 object HarpFeatures {
@@ -32,8 +42,10 @@ object HarpFeatures {
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
     private val inventoryTitleRegex by RepoPattern.pattern("harp.inventory", "^Harp.*")
+    private val menuTitleRegex by RepoPattern.pattern("harp.menu", "^Melody.*")
 
-    private fun isHarpGui() = inventoryTitleRegex.matches(openInventoryName())
+    private fun isHarpGui() = inventoryTitleRegex.matches(InventoryUtils.openInventoryName())
+    private fun isMenuGui() = menuTitleRegex.matches(InventoryUtils.openInventoryName())
 
     fun getKey(index: Int) = when (index) {
         0 -> config.harpKeybinds.key1
@@ -78,12 +90,12 @@ object HarpFeatures {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
         when {
-            event.inventoryName.startsWith("Melody") -> {
+            isMenuGui() -> {
                 setGUI()
                 openTime = SimpleTimeMark.now()
             }
 
-            event.inventoryName.startsWith("Harp") -> {
+            isHarpGui() -> {
                 setGUI()
             }
         }
@@ -138,7 +150,7 @@ object HarpFeatures {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.quickRestart) return
-        if (!InventoryUtils.openInventoryName().startsWith("Melody")) return
+        if (!isMenuGui()) return
         if (event.slot?.slotNumber != 40) return
         if (openTime.passedSince() > 2.seconds) return
         event.container.inventory.indexOfFirst { it.getLore().contains("§aSong is selected!") }.takeIf { it != -1 }?.let {
