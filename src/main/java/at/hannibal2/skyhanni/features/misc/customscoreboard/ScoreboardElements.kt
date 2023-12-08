@@ -176,7 +176,7 @@ enum class ScoreboardElements(
         {
             true
         },
-        "Hub"
+        "§7㋖ §aHub"
     ),
     LOCATION(
         {
