@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -50,9 +51,13 @@ class SeaCreatureFeatures {
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
             { config.highlight }
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlight }
+
+            // Water hydra splitting in two
+            if (creatureType == RareSeaCreatureType.WATER_HYDRA && entity.health == (entity.baseMaxHealth.toFloat() / 2)) continue
+
             if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
-                TitleManager.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6)
+                TitleManager.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7.0)
                 if (config.playSound) SoundUtils.playBeepSound()
             }
         }
@@ -64,7 +69,7 @@ class SeaCreatureFeatures {
         if (!config.alertOwnCatches) return
 
         if (event.seaCreature.rare) {
-            TitleManager.sendTitle("${event.seaCreature.rarity.chatColorCode}RARE CATCH!", 3.seconds, 3.6)
+            TitleManager.sendTitle("${event.seaCreature.rarity.chatColorCode}RARE CATCH!", 3.seconds, 2.8, 7.0)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }
