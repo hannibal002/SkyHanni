@@ -103,7 +103,6 @@ object GardenPlotAPI {
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
-    
 
     fun LorenzRenderWorldEvent.renderPlot(plot: GardenPlotAPI.Plot, lineColor: Color, cornerColor: Color) {
 
