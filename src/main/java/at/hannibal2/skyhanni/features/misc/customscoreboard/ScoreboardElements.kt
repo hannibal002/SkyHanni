@@ -169,6 +169,15 @@ enum class ScoreboardElements(
         },
         ""
     ),
+    ISLAND(
+        {
+            listOf(HypixelData.skyBlockIsland.toString().split("_").joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
+        },
+        {
+            true
+        },
+        "Hub"
+    ),
     LOCATION(
         {
             listOf((replaceString(location) ?: "<hidden>") to AlignmentEnum.LEFT)
