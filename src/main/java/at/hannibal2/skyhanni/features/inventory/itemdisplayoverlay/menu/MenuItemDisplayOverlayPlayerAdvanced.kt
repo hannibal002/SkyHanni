@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -17,7 +17,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayPlayerAdvanced {
+class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
     private val dojoTestOfGradeLoreLinePattern = ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*".toPattern()
     private val skyblockStatBreakdownItemNamePattern = "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)".toPattern()
@@ -120,10 +120,10 @@ class MenuItemDisplayOverlayPlayerAdvanced {
     }
 
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced.isEmpty()) return ""
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.playerAdvanced.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.playerAdvanced
+        val stackSizeConfig = configMenuStackSize.playerAdvanced
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.UNLOCKED_RECIPES)) {
@@ -305,7 +305,7 @@ class MenuItemDisplayOverlayPlayerAdvanced {
                 if (item.item == Item.getItemFromBlock(Blocks.glass_pane) || item.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
                 isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return "§c§l✖" } //all of my homies possess a strong dislike towards dante
                 val colorCode = item.name?.take(2)
-                val candidates = MayorElection.rawMayorData!!.current!!.candidates!!
+                val candidates = MayorElection.rawMayorData?.current?.candidates ?: return ""
                 for (candidate in candidates) {
                     if (candidate.name == itemName) {
                         return "$colorCode${candidate.perks.size}"
