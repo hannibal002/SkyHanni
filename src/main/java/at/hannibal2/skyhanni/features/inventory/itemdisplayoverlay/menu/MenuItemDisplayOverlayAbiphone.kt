@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.menu
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuStackSize
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MenuItemDisplayOverlayAbiphone {
+class MenuItemDisplayOverlayAbiphone : AbstractMenuStackSize() {
     private val abiphoneContactsDirectoryChestNamePattern = (("(.*A.iphone.*|Contacts Directory)").toPattern())
     private val yourContactsLoreLinePattern = (("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
     private val isAContactItemNamePattern = ((".*§f§.*").toPattern())
@@ -27,10 +27,10 @@ class MenuItemDisplayOverlayAbiphone {
         event.stackTip = getStackTip(event.stack)
     }
 
-    private fun getStackTip(item: ItemStack): String {
-        if (SkyHanniMod.feature.inventory.stackSize.menu.abiphone.isEmpty()) return ""
+    override fun getStackTip(item: ItemStack): String {
+        if (configMenuStackSize.abiphone.isEmpty()) return ""
         val itemName = item.cleanName()
-        val stackSizeConfig = SkyHanniMod.feature.inventory.stackSize.menu.abiphone
+        val stackSizeConfig = configMenuStackSize.abiphone
         val chestName = InventoryUtils.openInventoryName()
 
         abiphoneContactsDirectoryChestNamePattern.matchMatcher(chestName) {
