@@ -171,7 +171,7 @@ enum class ScoreboardElements(
     ),
     ISLAND(
         {
-            listOf(HypixelData.skyBlockIsland.toString().split("_").joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
+            listOf("§7㋖ §a" + HypixelData.skyBlockIsland.toString().split("_").joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
         },
         {
             true
