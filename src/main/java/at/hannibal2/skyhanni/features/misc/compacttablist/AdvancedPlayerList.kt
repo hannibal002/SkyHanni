@@ -206,7 +206,7 @@ object AdvancedPlayerList {
     private fun getSocialScoreIcon(score: Int) = when (score) {
 //        10 -> "§c§lME"
         10 -> ""
-        8 -> "§e§lMARKED"
+        8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"
