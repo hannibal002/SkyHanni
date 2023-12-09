@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -14,7 +13,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
-import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -38,7 +37,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class FarmingFortuneDisplay {
     private val tabFortuneUniversalPattern = " Farming Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
-    private val tabFortuneCropPattern = " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
+    private val tabFortuneCropPattern =
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
 
     private var display = emptyList<List<Any>>()
     private var accessoryProgressDisplay = ""
@@ -124,15 +124,9 @@ class FarmingFortuneDisplay {
             }
         })
 
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            PestFinder.pestsInScoreboardPattern.matchMatcher(line) {
-                val pests = group("pests").toInt()
-                val ffReduction = getPestFFReduction(pests)
-                if (ffReduction > 0) {
-                    updatedDisplay.addAsSingletonList("§cPests are reducing your fortune by §e$ffReduction%§c!")
-                }
-                break
-            }
+        val ffReduction = getPestFFReduction()
+        if (ffReduction > 0) {
+            updatedDisplay.addAsSingletonList("§cPests are reducing your fortune by §e$ffReduction%§c!")
         }
 
         if (wrongTabCrop) {
@@ -160,15 +154,13 @@ class FarmingFortuneDisplay {
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
-    private fun getPestFFReduction(pests: Int): Int {
-        return when (pests) {
-            in 0..3 -> 0
-            4 -> 5
-            5 -> 15
-            6 -> 30
-            7 -> 50
-            else -> 75
-        }
+    private fun getPestFFReduction(): Int = when (PestAPI.scoreboardPests) {
+        in 0..3 -> 0
+        4 -> 5
+        5 -> 15
+        6 -> 30
+        7 -> 50
+        else -> 75
     }
 
     companion object {
