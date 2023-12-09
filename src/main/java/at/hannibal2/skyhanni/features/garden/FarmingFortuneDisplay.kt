@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -122,6 +124,17 @@ class FarmingFortuneDisplay {
             }
         })
 
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            PestFinder.pestsInScoreboardPattern.matchMatcher(line) {
+                val pests = group("pests").toInt()
+                val ffReduction = getPestFFReduction(pests)
+                if (ffReduction > 0) {
+                    updatedDisplay.addAsSingletonList("§cPests are reducing your fortune by §e$ffReduction%§c!")
+                }
+                break
+            }
+        }
+
         if (wrongTabCrop) {
             var text = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see"
             if (farmingFortune != -1.0) text += " latest"
@@ -146,6 +159,17 @@ class FarmingFortuneDisplay {
     }
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
+
+    private fun getPestFFReduction(pests: Int): Int {
+        return when (pests) {
+            in 0..3 -> 0
+            4 -> 5
+            5 -> 15
+            6 -> 30
+            7 -> 50
+            else -> 75
+        }
+    }
 
     companion object {
         private val config get() = GardenAPI.config.farmingFortunes
