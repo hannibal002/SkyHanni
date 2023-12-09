@@ -11,11 +11,17 @@ public class SprayConfig {
     @Expose
     @ConfigOption(
         name = "Pest Spray Selector",
-        desc = "Show the pests that are attracted when changing the selected material of the §aSprayanator§7."
+        desc = "Show the pests that are attracted when changing the selected material of the §aSprayonator§7."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean pestWhenSelector = true;
+
+    @Expose
+    @ConfigOption(name = "Draw Plot Border", desc = "Draw plots border when holding the Sprayonator.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean drawPlotsBorderWhenInHands = true;
 
     @Expose
     public Position position = new Position(315, -200, 2.3f);

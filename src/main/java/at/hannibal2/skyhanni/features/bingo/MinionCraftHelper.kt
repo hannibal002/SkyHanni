@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -30,7 +31,7 @@ class MinionCraftHelper {
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
     private val tierOneMinions = mutableListOf<String>()
-    private val tierOneMinionsDone = mutableListOf<String>()
+    private val tierOneMinionsDone get() = BingoAPI.bingoStorage.tierOneMinionsDone
     private val allIngredients = mutableListOf<String>()
     private val alreadyNotified = mutableListOf<String>()
 
@@ -76,16 +77,11 @@ class MinionCraftHelper {
         for ((minionName, minionId) in minions) {
             minionNamePattern.matchMatcher(minionName) {
                 val cleanName = group("name").removeColor()
-                val number = group("number").romanToDecimalIfNeeded()
+                val number = group("number").romanToDecimalIfNecessary()
                 addMinion(cleanName, number, minionId, otherItems, newDisplay)
             }
         }
         return newDisplay
-    }
-
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        tierOneMinionsDone.clear()
     }
 
     private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, String>, MutableMap<String, Int>> {
@@ -107,6 +103,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
+            if (item.hasEnchantments()) continue
             val rawId = item.getInternalName_old()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
@@ -128,7 +125,7 @@ class MinionCraftHelper {
             val recipes = NEUItems.getRecipes(minion)
 
             for (recipe in recipes) {
-                for (ingredient in recipe.ingredients) {
+                for (ingredient in recipe.getCachedIngredients()) {
                     val ingredientInternalName = ingredient.internalItemId
                     if (ingredientInternalName == internalName) return true
 
@@ -159,7 +156,7 @@ class MinionCraftHelper {
                 for (recipe in NEUItems.getRecipes(internalId)) {
                     if (recipe !is CraftingRecipe) continue
 
-                    for (ingredient in recipe.ingredients) {
+                    for (ingredient in recipe.getCachedIngredients()) {
                         val id = ingredient.internalItemId
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
@@ -182,7 +179,7 @@ class MinionCraftHelper {
         for (minionId in tierOneMinionsFiltered) {
             for (recipe in NEUItems.getRecipes(minionId)) {
                 if (recipe !is CraftingRecipe) continue
-                if (recipe.ingredients.any { help.contains(it.internalItemId) }) {
+                if (recipe.getCachedIngredients().any { help.contains(it.internalItemId) }) {
                     val name = recipe.output.itemStack.name!!.removeColor()
                     val abc = name.replace(" I", " 0")
                     minions[abc] = minionId.replace("_1", "_0")
@@ -223,11 +220,16 @@ class MinionCraftHelper {
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
                 val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
+                val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
-                    val color = if (itemId.startsWith("WOOD_")) "§7" else "§a"
+                    val color = if (isTool) "§7" else "§a"
                     newDisplay.add("  $itemName§8: ${color}DONE")
                     otherItems[itemId] = have - needAmount
                 } else {
+                    if (!config.minionCraftHelperProgressFirst && !isTool && minionId.endsWith("_0")) {
+                        newDisplay.removeLast()
+                        return
+                    }
                     val format = LorenzUtils.formatPercentage(percentage)
                     val haveFormat = LorenzUtils.formatInteger(have)
                     val needFormat = LorenzUtils.formatInteger(needAmount)
@@ -275,7 +277,8 @@ class MinionCraftHelper {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
-            val internalName = NEUItems.getRawInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
+            val internalName = NEUItems.getRawInternalName("$name I")
+                .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }

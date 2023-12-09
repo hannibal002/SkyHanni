@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,7 +37,9 @@ class OwnInventoryData {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
                 val item = packet.func_149174_e() ?: return
-                OwnInventoryItemUpdateEvent(item).postAndCatch()
+                DelayedRun.runNextTick {
+                    OwnInventoryItemUpdateEvent(item).postAndCatch()
+                }
             }
         }
     }

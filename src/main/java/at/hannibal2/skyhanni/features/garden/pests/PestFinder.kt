@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -40,6 +42,7 @@ class PestFinder {
 
     private var display = emptyList<Renderable>()
     private var scoreboardPests = 0
+    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onPestSpawn(event: PestSpawnEvent) {
@@ -175,22 +178,28 @@ class PestFinder {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (!config.waypointInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+        if (!config.showPlotInWorld) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         for (plot in getPlotsWithPests()) {
-            if (plot.isPlayerInside()) continue
+            if (plot.isPlayerInside()) {
+                event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                continue
+            }
+            event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
+
             val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
             val plotName = plot.name
             val middle = plot.middle
             val location = playerLocation.copy(x = middle.x, z = middle.z)
             event.drawWaypointFilled(location, LorenzColor.RED.toColor())
             event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
+
         }
     }
 
-    private var lastKeyPress =  SimpleTimeMark.farPast()
+    private var lastKeyPress = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
@@ -215,5 +224,13 @@ class PestFinder {
         plot.sendTeleportTo()
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.waypointInWorld)
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (!isEnabled()) return
+        if (!config.showPlotInWorld) return
+        if (event.oldItem !in PestAPI.vacuumVariants) return
+        lastTimeVacuumHold = SimpleTimeMark.now()
+    }
+
+    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)
 }
