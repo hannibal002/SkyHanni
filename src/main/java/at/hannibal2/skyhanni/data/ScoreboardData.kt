@@ -38,7 +38,15 @@ class ScoreboardData {
                 val split = line.split(separator)
                 val start = split[0]
                 var end = split[1]
-                if (end.length >= 2 && end[0] == '§' && (end[1] in '0'..'9' || end[1] in 'a'..'f')) {
+                // get last color code in start
+                val lastColorIndex = start.lastIndexOf('§')
+                val lastColor = when (lastColorIndex != -1 && lastColorIndex + 1 < start.length) {
+                    true -> start[lastColorIndex] + "" + start[lastColorIndex + 1]
+                    false -> ""
+                }
+
+                // remove first color code from end, when it is the same as the last color code in start
+                if (end.length >= 2 && end[0] == '§' && (end[1] in '0'..'9' || end[1] in 'a'..'f') && end[1] == lastColor[1]) {
                     end = end.substring(2)
                 }
                 list.add(start + end)
