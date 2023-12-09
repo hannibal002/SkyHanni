@@ -144,7 +144,7 @@ object GardenAPI {
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
     fun MutableList<Any>.addCropIcon(crop: CropType, highlight: Boolean = false) =
-        add(addItemIcon(crop.icon.copy().getInternalName(), highlight))
+        addItemIcon(crop.icon.copy().getInternalName(), highlight)
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
         SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
