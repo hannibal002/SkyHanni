@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -59,8 +60,36 @@ public class ChestValueConfig {
 
     @Expose
     @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
-    @ConfigEditorDropdown(values = {"Short", "Long"})
-    public int formatType = 0;
+    @ConfigEditorDropdown()
+    public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
+
+    public enum NumberFormatEntry implements HasLegacyId {
+        SHORT("Short", 0),
+        LONG("Long", 1);
+
+        private final String str;
+        private final int legacyId;
+
+        NumberFormatEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        NumberFormatEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +

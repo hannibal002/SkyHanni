@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -9,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -162,9 +166,10 @@ class ChestValue {
             })
 
         newDisplay.addButton("§7Value format: ",
-            getName = FormatType.entries[config.formatType].type,
+            getName = FormatType.entries[config.formatType.ordinal].type, // todo avoid ordinal
             onChange = {
-                config.formatType = (config.formatType + 1) % 2
+                // todo avoid ordinal
+                config.formatType = ChestValueConfig.NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
                 update()
             })
 
@@ -211,8 +216,11 @@ class ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            0 -> if (this > 1_000_000_000) NumberUtil.format(this, true) else NumberUtil.format(this)
-            1 -> this.addSeparators()
+            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) NumberUtil.format(this, true) else NumberUtil.format(
+                this
+            )
+
+            NumberFormatEntry.LONG -> this.addSeparators()
             else -> "0"
         }
     }
@@ -280,4 +288,12 @@ class ChestValue {
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "combat.bestiary.numberFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+    }
 }
