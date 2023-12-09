@@ -178,6 +178,7 @@ object EstimatedItemValue {
         // Hides the rune item
         if (internalName.contains("_RUNE;")) return listOf()
         if (internalName.contains("UNIQUE_RUNE")) return listOf()
+        if (internalName.contains("WISP_POTION")) return listOf()
 
 
         if (internalName.getItemStackOrNull() == null) {
