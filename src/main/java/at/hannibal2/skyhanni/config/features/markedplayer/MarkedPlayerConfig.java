@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.markedplayer;
 
+import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
@@ -21,4 +23,10 @@ public class MarkedPlayerConfig {
     @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
     @ConfigEditorBoolean()
     public Property<Boolean> markOwnName = Property.of(false);
+
+    @ConfigOption(name = "Marked Chat Color", desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings")
+    @Expose
+    @ConfigEditorDropdown
+    public Property<LorenzColor> chatColor = Property.of(LorenzColor.YELLOW);
+
 }
