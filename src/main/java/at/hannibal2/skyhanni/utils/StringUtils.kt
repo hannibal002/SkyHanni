@@ -263,4 +263,6 @@ object StringUtils {
     }
 
     fun Pattern.matches(string: String) = matcher(string).matches()
+
+    fun Pattern.find(string: String) = matcher(string).find()
 }
