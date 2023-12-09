@@ -127,19 +127,9 @@ class BingoCardDisplay {
         add(Renderable.string(" "))
     }
 
-    private fun percentageFormat(it: BingoGoal): String {
-        val percentage = it.communtyGoalPercentage ?: return ""
-
-        val percentageColor = when {
-            percentage < 0.01 -> "§a"
-            percentage < 0.05 -> "§e"
-            percentage < 0.1 -> "§6"
-            percentage < 0.25 -> "§6"
-
-            else -> "§c"
-        }
-        return " " + percentageColor + LorenzUtils.formatPercentage(percentage)
-    }
+    private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
+        " " + BingoAPI.getCommunityPercentageColor(it)
+    } ?: ""
 
     private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()
@@ -262,6 +252,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
+        if (!LorenzUtils.isBingoProfile) return
         update()
     }
 
