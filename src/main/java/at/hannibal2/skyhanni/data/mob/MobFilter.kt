@@ -47,14 +47,6 @@ import net.minecraft.entity.player.EntityPlayer
 
 object MobFilter {
 
-    enum class DungeonAttribute {
-        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
-
-        companion object {
-            val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
-        }
-    }
-
     val mobNameFilter = "(\\[\\w+([0-9]+)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
@@ -63,6 +55,30 @@ object MobFilter {
     val summonRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     val summonOwnerRegex = "Spawned by: (.*)".toRegex()
     val dojoFilter = "^(?:(\\d+) pts|(\\w+))$".toRegex()
+
+    private val RatSkull = "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
+    private val HellwispTentacleSkull = "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val RiftEyeSkull1 = "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val RiftEyeSkull2 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
+
+    enum class DungeonAttribute {
+        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
+
+        companion object {
+            val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
+        }
+    }
+
+    private val extraDisplayNPCByName = setOf(
+        "Guy ", // Guy NPC (but only as visitor)
+        "§bSam ", // Sam NPC (in Private Island)
+        "BarbarianGuard ", // BarbarianGuard NPCs
+        "Branchstrutter ", // Those guys in the Trees in the first area in Rift
+        "vswiblxdxg", // Mayor Cole
+        "anrrtqytsl", // Weaponsmith
+    )
+
+    val illegalDisplayNPCArmorStandNames = listOf("§e§lCLICK", "§a§lSTAY SAFE!", "§6§lNEW UPDATE", "§6§lSkyBlock Wiki", "§6Thaumaturgist")
 
     fun Entity.isSkyBlockMob(): Boolean = when {
         this !is EntityLivingBase -> false
@@ -84,32 +100,16 @@ object MobFilter {
         || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
         || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
 
-    private val extraDisplayNPCByName = setOf(
-        "Guy ", // Guy NPC (but only as visitor)
-        "§bSam ", // Sam NPC (in Private Island)
-        "BarbarianGuard ", // BarbarianGuard NPCs
-        "Branchstrutter ", // Those guys in the Trees in the first area in Rift
-        "vswiblxdxg", // Mayor Cole
-        "anrrtqytsl", // Weaponsmith
-    )
+    fun createDisplayNPC(entity: EntityLivingBase): Boolean =
+        MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
+            !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
+        }?.also { armorStand ->
+            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
+        }?.let { true } ?: false
 
-    val illegalDisplayNPCArmorStandNames = listOf("§e§lCLICK", "§a§lSTAY SAFE!", "§6§lNEW UPDATE", "§6§lSkyBlock Wiki", "§6Thaumaturgist")
-
-    fun EntityLivingBase.isFarmMob() =
-        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
-
-
-    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-        MobFactories.summon(baseEntity, armorStand, extraEntityList)
-            ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
-            ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
-            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(baseEntity, armorStand, extraEntityList) else (MobFactories.basic(baseEntity, armorStand, extraEntityList)
-                ?: MobFactories.dojo(baseEntity, armorStand))
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     fun createSkyblockEntity(baseEntity: EntityLivingBase): MobData.MobResult {
-        noArmorStandMobs(baseEntity)?.also { return it }
-
         val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? EntityLivingBase
 
         exceptions(baseEntity, nextEntity)?.let { return it }
@@ -140,67 +140,35 @@ object MobFilter {
             ?: MobData.MobResult(NotYetFound, null)
     }
 
-    private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobData.MobResult? {
-        if (baseEntity is EntityBat) return createBat(baseEntity)?.let { MobData.MobResult(Found, it) }
-            ?: MobData.MobResult(NotYetFound, null)
-        if (baseEntity.isFarmMob()) return createFarmMobs(baseEntity)?.let { MobData.MobResult(Found, it) }
-        if (baseEntity is EntityDragon) return MobData.MobResult(Found, MobFactories.basic(baseEntity, baseEntity.cleanName()))
-        if (baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone") return MobData.MobResult(Found, MobFactories.projectile(baseEntity, "Giant Sword"))  // Will false trigger if there is another Dinnerbone Giant
-        if (baseEntity is EntityCaveSpider) MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
-            ?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.also { return MobData.MobResult(Illegal, null) } }
-        if (baseEntity is EntityWither && baseEntity.invulTime == 800) return MobData.MobResult(Found, MobFactories.special(baseEntity, "Mini Wither"))
-        return null
-    }
+    private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
+        MobFactories.summon(baseEntity, armorStand, extraEntityList)
+            ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
+            ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
+            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(baseEntity, armorStand, extraEntityList) else (MobFactories.basic(baseEntity, armorStand, extraEntityList)
+                ?: MobFactories.dojo(baseEntity, armorStand))
 
-    private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobData.MobResult? {
-        if (DungeonAPI.inDungeon()) {
-            if (baseEntity is EntityZombie && nextEntity is EntityArmorStand && (nextEntity.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || nextEntity.name == "§3§lWatchful Eye§r")) return MobData.MobResult(Found, MobFactories.special(baseEntity, nextEntity.cleanName(), nextEntity))
-            if (baseEntity is EntityCaveSpider) return MobUtils.getClosedArmorStand(baseEntity, 2.0).takeNonDefault().makeMobResult { MobFactories.dungeon(baseEntity, it) }
-            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin") return MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin").makeMobResult { MobFactories.dungeon(baseEntity, it) }
-            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor") return MobUtils.getArmorStand(baseEntity, 9).makeMobResult { MobFactories.boss(baseEntity, it) }
-            if (baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid")) return MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid").makeMobResult {
-                MobFactories.boss(baseEntity, it, overriddenName = "Real Livid")
-            }
-        } else when (LorenzUtils.skyBlockIsland) {
-            IslandType.PRIVATE_ISLAND -> if (nextEntity !is EntityArmorStand) return MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
-            IslandType.THE_RIFT -> {
-                if (baseEntity is EntitySlime && nextEntity is EntitySlime) return MobData.MobResult(Illegal, null)// Bacte Tentacle
-                if (baseEntity is EntitySlime && nextEntity is EntityArmorStand && nextEntity.cleanName().startsWith("﴾ [Lv10] B")) return MobData.MobResult(Found, MobFactories.boss(baseEntity, nextEntity, overriddenName = "Bacte"))
-            }
+    private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobData.MobResult? =
+        when {
+            baseEntity is EntityBat -> createBat(baseEntity)?.let { MobData.MobResult(Found, it) }
+                ?: MobData.MobResult(NotYetFound, null)
 
-            IslandType.CRIMSON_ISLE -> {
-                if (baseEntity is EntitySlime && nextEntity?.name == "§f§lCOLLECT!") return MobData.MobResult(Found, MobFactories.special(baseEntity, "Heavy Pearl"))
-                if (baseEntity is EntityPig && nextEntity is EntityPig) return MobData.MobResult(Illegal, null) // Matriarch Tongue
-            }
+            baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobData.MobResult(Found, it) }
+            baseEntity is EntityDragon -> MobData.MobResult(Found, MobFactories.basic(baseEntity, baseEntity.cleanName()))
+            baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobData.MobResult(Found, MobFactories.projectile(baseEntity, "Giant Sword")) // Will false trigger if there is another Dinnerbone Giant
+            baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
+                ?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.let { MobData.MobResult(Illegal, null) } }
 
-            IslandType.HUB -> {
-                if (baseEntity is EntityZombie) { // Rat
-                    val from = 3
-                    val to = 11
-                    generateSequence(from) { it + 1 }.take(to - from + 1).map { i ->
-                        MobUtils.getArmorStand(
-                            baseEntity, i
-                        )
-                    }.firstOrNull {
-                        it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)?.getSkullTexture() == RatSkull
-                    }?.also { return MobData.MobResult(Found, Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = it, name = "Rat")) }
-                    if (nextEntity is EntityZombie) return MobData.MobResult(NotYetFound, null)
-                }
-            }
-
-            IslandType.DWARVEN_MINES -> {
-                if (baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000) return MobData.MobResult(Found, MobFactories.basic(baseEntity, "Ghost"))
-            }
-
-            IslandType.CRYSTAL_HOLLOWS -> {
-                if (baseEntity is EntityMagmaCube && nextEntity is EntityArmorStand && nextEntity.cleanName() == "[Lv100] Bal ???❤") return MobData.MobResult(Found, Mob(baseEntity, Mob.Type.Boss, nextEntity, "Bal", levelOrTier = 100))
-            }
-
-            else -> {}
+            baseEntity is EntityWither && baseEntity.invulTime == 800 -> MobData.MobResult(Found, MobFactories.special(baseEntity, "Mini Wither"))
+            else -> null
         }
 
 
-        val armorStand = nextEntity as? EntityArmorStand ?: return null
+    private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobData.MobResult? {
+        noArmorStandMobs(baseEntity)?.also { return it }
+        val armorStand = nextEntity as? EntityArmorStand
+        islandSpecificExceptions(baseEntity, armorStand, nextEntity)?.also { return it }
+
+        if (armorStand == null) return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
         return when {
             baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> MobData.MobResult(Illegal, null) // Pig Pet
@@ -214,6 +182,56 @@ object MobFilter {
             else -> null
         }
     }
+
+    private fun islandSpecificExceptions(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, nextEntity: EntityLivingBase?): MobData.MobResult? {
+        return if (DungeonAPI.inDungeon()) {
+            when {
+                baseEntity is EntityZombie && armorStand != null && (armorStand.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") -> MobData.MobResult(Found, MobFactories.special(baseEntity, armorStand.cleanName(), armorStand))
+                baseEntity is EntityCaveSpider -> MobUtils.getClosedArmorStand(baseEntity, 2.0).takeNonDefault().makeMobResult { MobFactories.dungeon(baseEntity, it) }
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin" -> MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin").makeMobResult { MobFactories.dungeon(baseEntity, it) }
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor" -> MobUtils.getArmorStand(baseEntity, 9).makeMobResult { MobFactories.boss(baseEntity, it) }
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid") -> MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid").makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
+                else -> null
+            }
+        } else when (LorenzUtils.skyBlockIsland) {
+            IslandType.PRIVATE_ISLAND -> when {
+                armorStand != null -> MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
+                else -> null
+            }
+
+            IslandType.THE_RIFT -> when {
+                baseEntity is EntitySlime && nextEntity is EntitySlime -> MobData.MobResult(Illegal, null)// Bacte Tentacle
+                baseEntity is EntitySlime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") -> MobData.MobResult(Found, MobFactories.boss(baseEntity, armorStand, overriddenName = "Bacte"))
+                else -> null
+            }
+
+            IslandType.CRIMSON_ISLE -> when {
+                baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" -> MobData.MobResult(Found, MobFactories.special(baseEntity, "Heavy Pearl"))
+                baseEntity is EntityPig && nextEntity is EntityPig -> MobData.MobResult(Illegal, null) // Matriarch Tongue
+                else -> null
+            }
+
+
+            IslandType.DWARVEN_MINES -> when {
+                baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000 -> MobData.MobResult(Found, MobFactories.basic(baseEntity, "Ghost"))
+                else -> null
+            }
+
+            IslandType.CRYSTAL_HOLLOWS -> when {
+                baseEntity is EntityMagmaCube && armorStand != null && armorStand.cleanName() == "[Lv100] Bal ???❤" -> MobData.MobResult(Found, Mob(baseEntity, Mob.Type.Boss, armorStand, "Bal", levelOrTier = 100))
+                else -> null
+            }
+
+            IslandType.HUB -> when {
+                baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
+                baseEntity is EntityZombie -> ratHandler(baseEntity) // Possible Rat
+                else -> null
+            }
+
+            else -> null
+        }
+    }
+
 
     private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobData.MobResult? {
         if (DungeonAPI.inDungeon()) {
@@ -239,10 +257,8 @@ object MobFilter {
         return null
     }
 
-    private val RatSkull = "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
-    private val HellwispTentacleSkull = "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-    private val RiftEyeSkull1 = "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-    private val RiftEyeSkull2 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
+    fun EntityLivingBase.isFarmMob() =
+        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
     private fun createFarmMobs(baseEntity: EntityLivingBase): Mob? = when (baseEntity) {
         is EntityMooshroom -> MobFactories.basic(baseEntity, "Farm Mooshroom")
@@ -267,10 +283,15 @@ object MobFilter {
         else -> null
     }
 
-    fun createDisplayNPC(entity: EntityLivingBase): Boolean =
-        MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
-            !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
-        }?.also { armorStand ->
-            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
-        }?.let { true } ?: false
+    private fun ratHandler(baseEntity: EntityZombie): MobData.MobResult? =
+        generateSequence(ratSearchStart) { it + 1 }.take(ratSearchUpTo - ratSearchStart + 1).map { i ->
+            MobUtils.getArmorStand(
+                baseEntity, i
+            )
+        }.firstOrNull {
+            it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)?.getSkullTexture() == RatSkull
+        }?.let { MobData.MobResult(Found, Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = it, name = "Rat")) }
+
+    private const val ratSearchStart = 3
+    private const val ratSearchUpTo = 11
 }
