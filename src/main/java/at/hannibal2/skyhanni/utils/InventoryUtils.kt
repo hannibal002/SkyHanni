@@ -15,6 +15,7 @@ object InventoryUtils {
     var itemInHandId = NEUInternalName.NONE
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
+
     fun getItemsInOpenChest() = buildList<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
         for (slot in guiChest.inventorySlots.inventorySlots) {
