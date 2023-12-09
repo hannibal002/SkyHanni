@@ -24,9 +24,14 @@ public class MarkedPlayerConfig {
     @ConfigEditorBoolean()
     public Property<Boolean> markOwnName = Property.of(false);
 
-    @ConfigOption(name = "Marked Chat Color", desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings")
+    @ConfigOption(name = "Marked Chat Color", desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings.")
     @Expose
     @ConfigEditorDropdown
     public LorenzColor chatColor = LorenzColor.YELLOW;
+
+    @ConfigOption(name = "Marked Entity Color", desc = "The color of the marked player in the world. §cDoes not yet support chroma.")
+    @Expose
+    @ConfigEditorDropdown
+    public LorenzColor entityColor = LorenzColor.YELLOW;
 
 }
