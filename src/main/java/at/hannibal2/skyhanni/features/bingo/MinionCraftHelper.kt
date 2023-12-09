@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -32,7 +31,7 @@ class MinionCraftHelper {
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
     private val tierOneMinions = mutableListOf<String>()
-    private val tierOneMinionsDone = mutableListOf<String>()
+    private val tierOneMinionsDone get() = BingoAPI.bingoStorage.tierOneMinionsDone
     private val allIngredients = mutableListOf<String>()
     private val alreadyNotified = mutableListOf<String>()
 
@@ -83,11 +82,6 @@ class MinionCraftHelper {
             }
         }
         return newDisplay
-    }
-
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        tierOneMinionsDone.clear()
     }
 
     private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, String>, MutableMap<String, Int>> {
@@ -283,7 +277,8 @@ class MinionCraftHelper {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
-            val internalName = NEUItems.getRawInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
+            val internalName = NEUItems.getRawInternalName("$name I")
+                .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }

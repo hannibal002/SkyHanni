@@ -36,7 +36,6 @@ class BingoCardReader {
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
 
-        BingoAPI.bingoGoals.clear()
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             val goalType = when {
@@ -69,9 +68,15 @@ class BingoCardReader {
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
 
-            val bingoGoal =
-                BingoGoal(name, visualDescription, goalType, slot, done, communtyGoalPercentage, hiddenGoalData)
-            BingoAPI.bingoGoals.add(bingoGoal)
+            val bingoGoal = BingoAPI.bingoGoals.getOrPut(slot) { BingoGoal() }
+            with(bingoGoal) {
+                this.type = goalType
+                this.displayName = name
+                this.description = visualDescription
+                this.done = done
+                this.hiddenGoalData = hiddenGoalData
+                this.communtyGoalPercentage = communtyGoalPercentage
+            }
         }
         BingoAPI.lastBingoCardOpenTime = SimpleTimeMark.now()
 
