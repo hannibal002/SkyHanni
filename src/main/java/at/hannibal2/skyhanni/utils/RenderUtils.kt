@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -16,6 +17,7 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
@@ -483,6 +485,19 @@ object RenderUtils {
         }
         GlStateManager.popMatrix()
         return offsetX
+    }
+
+    fun MutableList<Any>.addItemIcon(internalName: NEUInternalName, highlight: Boolean = false) {
+        try {
+            val item = internalName.getItemStack()
+            if (highlight) {
+                // Hack to add enchant glint, like Hypixel does it
+                item.addEnchantment(Enchantment.protection, 0)
+            }
+            add(item)
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
     }
 
     // totally not modified Autumn Client's TargetStrafe
