@@ -71,14 +71,9 @@ object MobFilter {
 
     private val extraDisplayNPCByName = setOf(
         "Guy ", // Guy NPC (but only as visitor)
-        "§bSam ", // Sam NPC (in Private Island)
-        "BarbarianGuard ", // BarbarianGuard NPCs
-        "Branchstrutter ", // Those guys in the Trees in the first area in Rift
         "vswiblxdxg", // Mayor Cole
         "anrrtqytsl", // Weaponsmith
     )
-
-    val illegalDisplayNPCArmorStandNames = listOf("§e§lCLICK", "§a§lSTAY SAFE!", "§6§lNEW UPDATE", "§6§lSkyBlock Wiki", "§6Thaumaturgist")
 
     fun Entity.isSkyBlockMob(): Boolean = when {
         this !is EntityLivingBase -> false
@@ -92,20 +87,21 @@ object MobFilter {
     fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
 
     fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && when {
+        this.name.startsWith('§') -> true
         this.name.any { it in '0'..'9' } -> true
         extraDisplayNPCByName.contains(this.name) -> true
         else -> false
     }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
         || (this is EntityWitch && this.entityId <= 500) // Alchemist NPC
         || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
-        || (this is EntityPlayer && extraDisplayNPCByName.contains(this.name))
 
     fun createDisplayNPC(entity: EntityLivingBase): Boolean =
         MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
-            !illegalDisplayNPCArmorStandNames.any { armorStand.name.startsWith(it) } && !armorStand.isDefaultValue()
-        }?.also { armorStand ->
+            armorStand.name == "§e§lCLICK"
+        }?.let { MobUtils.getArmorStand(it, -1) }?.let { armorStand ->
             MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
-        }?.let { true } ?: false
+            true
+        } ?: false
 
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
@@ -195,19 +191,21 @@ object MobFilter {
             }
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> when {
-                armorStand != null -> MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
+                armorStand == null -> MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
                 else -> null
             }
 
             IslandType.THE_RIFT -> when {
                 baseEntity is EntitySlime && nextEntity is EntitySlime -> MobData.MobResult(Illegal, null)// Bacte Tentacle
                 baseEntity is EntitySlime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") -> MobData.MobResult(Found, MobFactories.boss(baseEntity, armorStand, overriddenName = "Bacte"))
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Branchstrutter " -> MobData.MobResult(Found, Mob(baseEntity, Mob.Type.DisplayNPC, name = "Branchstrutter"))
                 else -> null
             }
 
             IslandType.CRIMSON_ISLE -> when {
                 baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" -> MobData.MobResult(Found, MobFactories.special(baseEntity, "Heavy Pearl"))
                 baseEntity is EntityPig && nextEntity is EntityPig -> MobData.MobResult(Illegal, null) // Matriarch Tongue
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "BarbarianGuard " -> MobData.MobResult(Found, Mob(baseEntity, Mob.Type.DisplayNPC, name = "Barbarian Guard"))
                 else -> null
             }
 

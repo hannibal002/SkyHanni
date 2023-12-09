@@ -131,17 +131,18 @@ class MobData {
             Mob.Type.DisplayNPC -> return MobFilter.createDisplayNPC(entity)
             Mob.Type.Basic -> {
                 if (islandException()) return true
-                val it = MobFilter.createSkyblockEntity(entity)
-                if (it.result == Result.NotYetFound) return false
-                if (it.result == Result.Illegal) return true
-                if (it.mob == null) throw IllegalStateException("Mob is null even though result is Found")
-                when (it.mob.mobType) {
-                    Mob.Type.Summon -> MobEvent.Spawn.Summon(it.mob).postAndCatch()
+                val mobResult = MobFilter.createSkyblockEntity(entity)
+                if (mobResult.result == Result.NotYetFound) return false
+                if (mobResult.result == Result.Illegal) return true
+                if (mobResult.mob == null) throw IllegalStateException("Mob is null even though result is Found")
+                when (mobResult.mob.mobType) {
+                    Mob.Type.Summon -> MobEvent.Spawn.Summon(mobResult.mob).postAndCatch()
 
-                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(it.mob).postAndCatch()
+                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(mobResult.mob).postAndCatch()
 
-                    Mob.Type.Special -> MobEvent.Spawn.Special(it.mob).postAndCatch()
-                    Mob.Type.Projectile -> MobEvent.Spawn.Projectile(it.mob).postAndCatch()
+                    Mob.Type.Special -> MobEvent.Spawn.Special(mobResult.mob).postAndCatch()
+                    Mob.Type.Projectile -> MobEvent.Spawn.Projectile(mobResult.mob).postAndCatch()
+                    Mob.Type.DisplayNPC -> MobEvent.Spawn.DisplayNPC(mobResult.mob).postAndCatch()
                     else -> {}
                 }
             }
