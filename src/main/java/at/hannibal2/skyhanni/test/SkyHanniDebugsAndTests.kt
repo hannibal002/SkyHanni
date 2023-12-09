@@ -10,9 +10,11 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -36,15 +38,17 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniDebugsAndTests {
 
@@ -250,12 +254,31 @@ class SkyHanniDebugsAndTests {
             LorenzUtils.chat("stopped ${modules.size} listener classes.")
         }
 
-        fun whereami() {
+        fun whereAmI() {
             if (LorenzUtils.inSkyBlock) {
                 LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
                 return
             }
             LorenzUtils.chat("§eYou are not in Skyblock.")
+        }
+
+        private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
+
+        fun clearContestData() {
+            if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
+                LorenzUtils.userError("§cYou already cleared Jacob's Contest data recently!")
+                return
+            }
+            lastManualContestDataUpdate = SimpleTimeMark.now()
+
+            GardenNextJacobContest.contests.clear()
+            GardenNextJacobContest.fetchedFromElite = false
+            GardenNextJacobContest.isFetchingContests = true
+            SkyHanniMod.coroutineScope.launch {
+                GardenNextJacobContest.fetchUpcomingContests()
+                GardenNextJacobContest.lastFetchAttempted = System.currentTimeMillis()
+                GardenNextJacobContest.isFetchingContests = false
+            }
         }
 
         fun copyLocation(args: Array<String>) {
@@ -344,13 +367,13 @@ class SkyHanniDebugsAndTests {
         fun copyItemInternalName() {
             val hand = InventoryUtils.getItemInHand()
             if (hand == null) {
-                LorenzUtils.chat("§cNo item in hand!")
+                LorenzUtils.userError("No item in hand!")
                 return
             }
 
             val internalName = hand.getInternalNameOrNull()
             if (internalName == null) {
-                LorenzUtils.chat("§cInternal name is null for item ${hand.name}")
+                LorenzUtils.error("§cInternal name is null for item ${hand.name}")
                 return
             }
 
@@ -382,10 +405,10 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onShowInternalName(event: ItemTooltipEvent) {
+    fun onShowInternalName(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showInternalName) return
-        val itemStack = event.itemStack ?: return
+        val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
         if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
@@ -393,21 +416,20 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun showItemRarity(event: ItemTooltipEvent) {
+    fun showItemRarity(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemRarity) return
-        val itemStack = event.itemStack ?: return
+        val itemStack = event.itemStack
 
         val rarity = itemStack.getItemRarityOrNull(logError = false)
         event.toolTip.add("Item rarity: $rarity")
     }
 
     @SubscribeEvent
-    fun onSHowNpcPrice(event: ItemTooltipEvent) {
+    fun onSHowNpcPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
-        val itemStack = event.itemStack ?: return
-        val internalName = itemStack.getInternalNameOrNull() ?: return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7Npc price: §6${npcPrice.addSeparators()}")

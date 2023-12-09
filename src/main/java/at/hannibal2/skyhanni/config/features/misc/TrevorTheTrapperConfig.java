@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -12,6 +13,18 @@ import org.lwjgl.input.Keyboard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.ELUSIVE;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.ENDANGERED;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.KILLED;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.PELTS_PER_HOUR;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.QUESTS_STARTED;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.SPACER_1;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.TITLE;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.TOTAL_PELTS;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.TRACKABLE;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.UNDETECTED;
+import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.UNTRACKABLE;
 
 public class TrevorTheTrapperConfig {
 
@@ -39,23 +52,59 @@ public class TrevorTheTrapperConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§b§lTrevor Data Tracker",
-            "§b1,428 §9Quests Started",
-            "§b11,281 §5Total Pelts Gained",
-            "§b2,448 §5Pelts Per Hour",
-            "",
-            "§b850 §cKilled Animals",
-            "§b153 §cSelf Killing Animals",
-            "§b788 §fTrackable Animals",
-            "§b239 §aUntrackable Animals",
-            "§b115 §9Undetected Animals",
-            "§b73 §5Endangered Animals",
-            "§b12 §6Elusive Animals"
+    @ConfigEditorDraggableList()
+    public List<TrackerEntry> textFormat = new ArrayList<>(Arrays.asList(
+        TITLE,
+        QUESTS_STARTED,
+        TOTAL_PELTS,
+        PELTS_PER_HOUR,
+        SPACER_1,
+        KILLED,
+        TRACKABLE,
+        UNTRACKABLE,
+        UNDETECTED,
+        ENDANGERED,
+        ELUSIVE
+    ));
+
+    public enum TrackerEntry implements HasLegacyId {
+        TITLE("§b§lTrevor Data Tracker", 0),
+        QUESTS_STARTED("§b1,428 §9Quests Started", 1),
+        TOTAL_PELTS("§b11,281 §5Total Pelts Gained", 2),
+        PELTS_PER_HOUR("§b2,448 §5Pelts Per Hour", 3),
+        SPACER_1("", 4),
+        KILLED("§b850 §cKilled Animals", 5),
+        SELF_KILLING("§b153 §cSelf Killing Animals", 6),
+        TRACKABLE("§b788 §fTrackable Animals", 7),
+        UNTRACKABLE("§b239 §aUntrackable Animals", 8),
+        UNDETECTED("§b115 §9Undetected Animals", 9),
+        ENDANGERED("§b73 §5Endangered Animals", 10),
+        ELUSIVE("§b12 §6Elusive Animals", 11),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        TrackerEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
         }
-    )
-    public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11));
+
+        // Constructor if new enum elements are added post-migration
+        TrackerEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     public Position position = new Position(10, 80, false, true);

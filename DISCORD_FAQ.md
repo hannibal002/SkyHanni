@@ -7,8 +7,8 @@ _Frequently Asked Questions_
 > To make the mod work, you need to use the latest version from <#1123201092193366027>.
 
 > **3: How can I resize the GUI?**
-> Do `/sh gui` to open the position editor. Then hover over a element and scroll your mouse wheel to change the size of a single gui element.
-> Do `/sh scale` to change the global gui scale of all elements at once.
+> Do `/sh gui` to open the position editor. Then hover over an element and scroll your mouse wheel to change the size of a single GUI element.
+> Do `/sh scale` to change the global GUI scale of all elements at once.
 
 > **4: My Garden Crop Milestones are not accurate. What should I do?**
 > To sync your Crop Milestones with SkyHanni, open /cropmilestones once.
@@ -19,14 +19,19 @@ _Frequently Asked Questions_
 > **6: Will SkyHanni support Minecraft versions 1.19 or 1.20? (Foraging Update)**
 > The Foraging update isn't expected to release for several months.
 > Thus, we'll wait for other mods in the community to update for Minecraft versions 1.19 or 1.20.
-> Switching from 1.8.9 to 1.19 should only take a couple of days, and we plan to discontinue support for 1.8.9 afterward since we won't support multiple versions at once.
+> Switching from 1.8.9 to 1.19 will take some time, and we plan to discontinue support for 1.8.9 afterward since we won't support multiple versions at once.
 
-> **7: Does the barn fishing timer work on the Crimson Isle?**
-> No, the barn fishing timer is not supported in the Crimson Isle in Hypixel Skyblock because it would disrupt other fishers due to competition for the maximum sea creature cap, potentially leading to conflicts and stealing of sea creatures.
+> **7: My Jacob Contest Display crops are wrong, how do I fix this?**
+> 1. Close your minecraft.
+> 2. Delete ".minecraft\config\skyhanni\jacob_contests.json".
+> 3. Open minecraft.
 
-> **8: My Jacob Contest Display crops are wrong, how do I fix this?**
-> 1. Run the command `/shconfig reset config.storage.gardenJacobFarmingContestTimes`
-> 2. Restart the game
+> **8: How can I get bigger crop hit boxes?**
+> Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hit boxes in 1.8.9.
 
-*This FAQ was last updated on October 17th, 2023.
+> **9: Why does my Item Tracker feature not track this item?**
+> Check if the item goes directly into your sacks. If it does, enable the sack pickup chat message from Hypixel.
+> You can use SkyHanni's own setting to still hide the message from chat.
+
+*This FAQ was last updated on December 08th, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

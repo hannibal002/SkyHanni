@@ -28,6 +28,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Hide the repeating fire sale reminder chat messages. - hannibal2
 
 #### Chat Filter
 
@@ -174,6 +175,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 </details>
 <details open><summary>
 
@@ -340,6 +342,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Support for tips in hidden bingo card display. - hannibal2
++ Support for 'found by' info in bingo card. - hannibal2
++ Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
+
 </details>
 <details open><summary>
 
@@ -498,7 +509,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
 
-### Pests
+### Garden Pests
 
 + Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
   + Enable via /sh vacuum.
@@ -507,7 +518,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Change how the pest spawn chat message should be formatted. - hannibal2
   + Unchanged, compact or hide the message entirely.
 + Show a Title when a pest spawns. - hannibal2
-+ Press a key to warp to the plot where the last pest has spawned. - hannibal2
 + Show the time since the last pest spawned in your garden. - hannibal2
   + Option to only show the time while holding vacuum in the hand.
 + Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
@@ -516,6 +526,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show a display with all known pest locations. - hannibal2
   + Click to warp to the plot.
   + Option to only show the time while holding vacuum in the hand.
++ Mark the plots with pests on them in the world. - hannibal2
++ Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe
 
 </details>
 <details open><summary>
@@ -621,6 +634,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
 + Play warning sound when the next Primal Fear can spawn. - thunderblade73
++ Unique Gifting Opportunities. - nea
+  + Highlight players who you haven't given gifts to yet.
+  + Only highlight ungifted players while holding a gift.
+  + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
++ Unique Gifted users counter. - hannibal2
+  + Show in a display how many unique players you have given gifts to in the winter 2023 event.
+  + Run command /opengenerowmenu to sync up.
++ Waypoints for 2023 Lobby Presents. - walker
 </details>
 <details open><summary>
 

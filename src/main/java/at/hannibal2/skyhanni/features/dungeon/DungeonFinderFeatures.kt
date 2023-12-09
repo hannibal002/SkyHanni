@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -11,13 +12,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonFinderFeatures {
@@ -47,11 +47,11 @@ class DungeonFinderFeatures {
             } else if (itemName == "Entrance") {
                 event.stackTip = "E"
             } else if (itemName.startsWith("Floor ")) {
-                event.stackTip = itemName.split(' ').last().romanToDecimalIfNeeded().toString()
+                event.stackTip = itemName.split(' ').last().romanToDecimalIfNecessary().toString()
             }
         } else if (itemName.startsWith("The Catacombs - ") || itemName.startsWith("MM Catacombs -")) {
             val floor = itemName.split(" - ").last().removeColor()
-            val floorNum = floor.split(' ').last().romanToDecimalIfNeeded().toString()
+            val floorNum = floor.split(' ').last().romanToDecimalIfNecessary().toString()
             val isMasterMode = itemName.contains("MM ")
 
             event.stackTip = if (floor.contains("Entrance")) {
@@ -64,7 +64,7 @@ class DungeonFinderFeatures {
         } else if (itemName.endsWith("'s Party")) {
             val floor = event.stack.getLore().find { it.startsWith("§7Floor: ") } ?: return
             val dungeon = event.stack.getLore().find { it.startsWith("§7Dungeon: ") } ?: return
-            val floorNum = floor.split(' ').last().romanToDecimalIfNeeded().toString()
+            val floorNum = floor.split(' ').last().romanToDecimalIfNecessary().toString()
             val isMasterMode = dungeon.contains("Master Mode")
 
             event.stackTip = if (floor.contains("Entrance")) {
@@ -136,11 +136,10 @@ class DungeonFinderFeatures {
     }
 
     @SubscribeEvent
-    fun onItemTooltip(event: ItemTooltipEvent) {
+    fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.coloredClassLevel) return
 
-        if (event.toolTip == null) return
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
 

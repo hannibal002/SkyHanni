@@ -152,25 +152,24 @@ object GriffinBurrowHelper {
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
             for (inquis in InquisitorWaypointShare.waypoints.values) {
-                val playerName = inquis.fromPlayer
                 val location = inquis.location
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
                     val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
-                    event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {
-                    event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor", 1.7)
+                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
                 }
                 if (distance < 5) {
-                    InquisitorWaypointShare.maybeRemove(playerName)
+                    InquisitorWaypointShare.maybeRemove(inquis)
                 }
-                event.drawDynamicText(location.add(0, 1, 0), "§eFrom §b$playerName", 1.6, yOff = 9f)
+                event.drawDynamicText(location.add(y = 1), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = inquis.spawnTime
                     val format = TimeUtils.formatDuration(75.seconds - spawnTime.passedSince())
-                    event.drawDynamicText(location.add(0, 1, 0), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                    event.drawDynamicText(location.add(y = 1), "§eDespawns in §b$format", 1.6, yOff = 18f)
                 }
             }
         }
@@ -185,7 +184,7 @@ object GriffinBurrowHelper {
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
                 event.drawColor(location, burrowType.color, distance > 10)
-                event.drawDynamicText(location.add(0, 1, 0), burrowType.text, 1.5)
+                event.drawDynamicText(location.add(y = 1), burrowType.text, 1.5)
             }
         }
 
@@ -194,10 +193,10 @@ object GriffinBurrowHelper {
                 val guessLocation = findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                event.drawDynamicText(guessLocation.add(0, 1, 0), "Guess", 1.5)
+                event.drawDynamicText(guessLocation.add(y = 1), "Guess", 1.5)
                 if (distance > 5) {
                     val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
-                    event.drawDynamicText(guessLocation.add(0, 1, 0), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                    event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
         }
@@ -224,7 +223,7 @@ object GriffinBurrowHelper {
         if (config.burrowNearestWarp) {
             BurrowWarpHelper.currentWarp?.let { warp ->
                 animationLocation?.let {
-                    event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
+                    event.drawColor(it.add(y = 1), LorenzColor.AQUA)
                     if (it.distanceToPlayer() < 10) {
                         event.drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
                         if (config.keyBindWarp != Keyboard.KEY_NONE) {

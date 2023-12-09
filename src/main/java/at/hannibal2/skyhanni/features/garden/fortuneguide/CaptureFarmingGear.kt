@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -170,7 +170,7 @@ class CaptureFarmingGear {
         if (event.inventoryName.contains("Your Skills")) {
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("Farming ")) {
-                    storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
+                    storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNecessary()
                 }
             }
         }
@@ -226,7 +226,7 @@ class CaptureFarmingGear {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
         }
         farmingLevelUpPattern.matchMatcher(msg) {
-            storage.farmingLevel = group("level").romanToDecimalIfNeeded()
+            storage.farmingLevel = group("level").romanToDecimalIfNecessary()
         }
         anitaBuffPattern.matchMatcher(msg) {
             storage.anitaUpgrade = group("level").toInt() / 4
