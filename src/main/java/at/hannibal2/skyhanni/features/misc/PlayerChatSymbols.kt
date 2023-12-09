@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.chat.ChatSymbols
+import at.hannibal2.skyhanni.config.features.chat.ChatSymbols.SymbolLocationEntry
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameAndRankFromChatMessage
@@ -79,8 +83,17 @@ class PlayerChatSymbols {
 
     private fun getNewText(emblemText: String, oldText: String, rankAndName: String): String =
         when (config.symbolLocation) {
-            0 -> oldText.replace(rankAndName, "$emblemText $rankAndName")
-            1 -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
+            ChatSymbols.SymbolLocationEntry.LEFT -> oldText.replace(rankAndName, "$emblemText $rankAndName")
+            ChatSymbols.SymbolLocationEntry.RIGHT -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
+            ChatSymbols.SymbolLocationEntry.HIDDEN -> oldText
             else -> oldText
         }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "chat.chatSymbols.symbolLocation") { element ->
+            ConfigUtils.migrateIntToEnum(element, SymbolLocationEntry::class.java)
+        }
+    }
 }
