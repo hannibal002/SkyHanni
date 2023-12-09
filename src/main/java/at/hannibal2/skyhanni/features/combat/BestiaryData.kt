@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
+import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.DisplayTypeEntry
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -105,6 +106,9 @@ object BestiaryData {
         // TODO Replace with transform when PR 769 is merged
         event.move(14, "combat.bestiary.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+        event.move(14, "combat.bestiary.displayType") { element ->
+            ConfigUtils.migrateIntToEnum(element, DisplayTypeEntry::class.java)
         }
     }
 
@@ -216,14 +220,14 @@ object BestiaryData {
 
     private fun sortMobList(): MutableList<BestiaryMob> {
         val sortedMobList = when (config.displayType) {
-            0 -> mobList.sortedBy { it.percentToMax() }
-            1 -> mobList.sortedBy { it.percentToTier() }
-            2 -> mobList.sortedBy { it.totalKills }
-            3 -> mobList.sortedByDescending { it.totalKills }
-            4 -> mobList.sortedBy { it.killNeededToMax() }
-            5 -> mobList.sortedByDescending { it.killNeededToMax() }
-            6 -> mobList.sortedBy { it.killNeededToNextLevel() }
-            7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
+            BestiaryConfig.DisplayTypeEntry.GLOBAL_MAX -> mobList.sortedBy { it.percentToMax() }
+            BestiaryConfig.DisplayTypeEntry.GLOBAL_NEXT -> mobList.sortedBy { it.percentToTier() }
+            BestiaryConfig.DisplayTypeEntry.LOWEST_TOTAL -> mobList.sortedBy { it.totalKills }
+            BestiaryConfig.DisplayTypeEntry.HIGHEST_TOTAL -> mobList.sortedByDescending { it.totalKills }
+            BestiaryConfig.DisplayTypeEntry.LOWEST_MAX -> mobList.sortedBy { it.killNeededToMax() }
+            BestiaryConfig.DisplayTypeEntry.HIGHEST_MAX -> mobList.sortedByDescending { it.killNeededToMax() }
+            BestiaryConfig.DisplayTypeEntry.LOWEST_NEXT -> mobList.sortedBy { it.killNeededToNextLevel() }
+            BestiaryConfig.DisplayTypeEntry.HIGHEST_NEXT -> mobList.sortedByDescending { it.killNeededToNextLevel() }
             else -> mobList.sortedBy { it.totalKills }
         }.toMutableList()
         return sortedMobList
@@ -277,34 +281,34 @@ object BestiaryData {
             "§c§lMAXED! §7(§b${mob.actualRealTotalKill.formatNumber()}§7 kills)"
         } else {
             when (displayType) {
-                0, 1 -> {
+                BestiaryConfig.DisplayTypeEntry.GLOBAL_MAX, BestiaryConfig.DisplayTypeEntry.GLOBAL_NEXT -> {
                     val currentKill = when (displayType) {
-                        0 -> mob.totalKills
-                        1 -> mob.currentKillToNextLevel
+                        BestiaryConfig.DisplayTypeEntry.GLOBAL_MAX -> mob.totalKills
+                        BestiaryConfig.DisplayTypeEntry.GLOBAL_NEXT -> mob.currentKillToNextLevel
                         else -> 0
                     }
                     val killNeeded = when (displayType) {
-                        0 -> mob.killToMax
-                        1 -> mob.killNeededForNextLevel
+                        BestiaryConfig.DisplayTypeEntry.GLOBAL_MAX -> mob.killToMax
+                        BestiaryConfig.DisplayTypeEntry.GLOBAL_NEXT -> mob.killNeededForNextLevel
                         else -> 0
                     }
                     "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
                         ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
                             2
                         )
-                    }§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
+                    }§6% ${if (displayType == BestiaryConfig.DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
                 }
 
-                2, 3 -> {
+                BestiaryConfig.DisplayTypeEntry.LOWEST_TOTAL, BestiaryConfig.DisplayTypeEntry.HIGHEST_TOTAL -> {
 
                     "§6${mob.totalKills.formatNumber()} §7total kills"
                 }
 
-                4, 5 -> {
+                BestiaryConfig.DisplayTypeEntry.LOWEST_MAX, BestiaryConfig.DisplayTypeEntry.HIGHEST_MAX -> {
                     "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
                 }
 
-                6, 7 -> {
+                BestiaryConfig.DisplayTypeEntry.LOWEST_NEXT, BestiaryConfig.DisplayTypeEntry.HIGHEST_NEXT -> {
                     "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
                 }
 
@@ -326,9 +330,10 @@ object BestiaryData {
 
         newDisplay.addButton(
             prefix = "§7Display Type: ",
-            getName = DisplayType.entries[config.displayType].type,
+            getName = DisplayType.entries[config.displayType.ordinal].type, // todo: avoid ordinal
             onChange = {
-                config.displayType = (config.displayType + 1) % 8
+                // todo: avoid ordinal
+                config.displayType = BestiaryConfig.DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
                 update()
             })
 

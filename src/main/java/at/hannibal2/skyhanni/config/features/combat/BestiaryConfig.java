@@ -50,17 +50,42 @@ public class BestiaryConfig {
 
     @Expose
     @ConfigOption(name = "Display type", desc = "Choose what the display should show")
-    @ConfigEditorDropdown(values = {
-        "Global to max",
-        "Global to next tier",
-        "Lowest total kills",
-        "Highest total kills",
-        "Lowest kills needed to max",
-        "Highest kills needed to max",
-        "Lowest kills needed to next tier",
-        "Highest kills needed to next tier"
-    })
-    public int displayType = 0;
+    @ConfigEditorDropdown()
+    public DisplayTypeEntry displayType = DisplayTypeEntry.GLOBAL_MAX;
+
+    public enum DisplayTypeEntry implements HasLegacyId {
+        GLOBAL_MAX("Global to max", 0),
+        GLOBAL_NEXT("Global to next tier", 1),
+        LOWEST_TOTAL("Lowest total kills", 2),
+        HIGHEST_TOTAL("Highest total kills", 3),
+        LOWEST_MAX("Lowest kills needed to max", 4),
+        HIGHEST_MAX("Highest kills needed to max", 5),
+        LOWEST_NEXT("Lowest kills needed to next tier", 6),
+        HIGHEST_NEXT("Highest kills needed to next tier", 7);
+
+        private final String str;
+        private final int legacyId;
+
+        DisplayTypeEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        DisplayTypeEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs.")
