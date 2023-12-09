@@ -55,7 +55,7 @@ public class BingoCardConfig {
     public boolean hideDoneDifficulty = true;
 
     @Expose
-    @ConfigOption(name = "Community Goal Progress", desc = "Show a chat message with the positive or negative progress in the community goal percentage after opening the bingo card inventory.")
+    @ConfigOption(name = "Community Percentages", desc = "Send a chat message with the change of community goal percentages after opening the bingo card inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean communityGoalProgress = true;
