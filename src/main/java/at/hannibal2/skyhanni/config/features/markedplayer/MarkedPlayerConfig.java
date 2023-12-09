@@ -27,6 +27,6 @@ public class MarkedPlayerConfig {
     @ConfigOption(name = "Marked Chat Color", desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings")
     @Expose
     @ConfigEditorDropdown
-    public Property<LorenzColor> chatColor = Property.of(LorenzColor.YELLOW);
+    public LorenzColor chatColor = LorenzColor.YELLOW;
 
 }

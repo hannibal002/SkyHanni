@@ -42,7 +42,7 @@ class PlayerDeathMessages {
             ) {
                 val reason = group("reason").removeColor()
 
-                val color = SkyHanniMod.feature.markedPlayers.chatColor.get().getChatColor()
+                val color = SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()
                 LorenzUtils.chat(" §c☠ $color$name §7$reason", false)
                 event.blockedReason = "marked_player_death"
                 return

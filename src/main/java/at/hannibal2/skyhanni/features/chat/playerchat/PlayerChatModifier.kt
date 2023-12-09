@@ -79,12 +79,11 @@ class PlayerChatModifier {
         }
 
         if (SkyHanniMod.feature.markedPlayers.highlightInChat) {
-            val color = SkyHanniMod.feature.markedPlayers.chatColor.get().getChatColor()
+            val color = SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()
             for (markedPlayer in MarkedPlayerManager.playerNamesToMark) {
                 string = string.replace(markedPlayer, "$color$markedPlayer§r")
             }
         }
-
 
         return string
     }
