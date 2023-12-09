@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
@@ -655,5 +656,12 @@ object LorenzUtils {
      */
     fun Matcher.groupOrNull(groupName: String): String? {
         return runCatching { this.group(groupName) }.getOrNull()
+    }
+
+    inline fun <reified T> ConcurrentLinkedQueue<T>.forEachPolling(action: (T) -> Unit) {
+        while (true) {
+            val value = this.poll() ?: break
+            action(value)
+        }
     }
 }

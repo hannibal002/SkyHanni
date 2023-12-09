@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.forEachPolling
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -25,6 +26,7 @@ import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.TreeSet
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -149,23 +151,23 @@ class MobData {
         return true
     }
 
-    private val batFromPacket = LinkedBlockingQueue<Int>()
-    private val villagerFromPacket = LinkedBlockingQueue<Int>()
+    private val batFromPacket = ConcurrentLinkedQueue<Int>()
+    private val villagerFromPacket = ConcurrentLinkedQueue<Int>()
 
     private fun handleMobsFromPacket() {
-        while (batFromPacket.isNotEmpty()) {
-            val entity = EntityUtils.getEntityByID(batFromPacket.take()) as? EntityLivingBase ?: continue
-            if (entityToMob[entity] != null) continue
+        batFromPacket.forEachPolling { id ->
+            val entity = EntityUtils.getEntityByID(id) as? EntityLivingBase ?: return@forEachPolling
+            if (entityToMob[entity] != null) return@forEachPolling
             retries.remove(RetryEntityInstancing(entity))
             MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
         }
-        while (villagerFromPacket.isNotEmpty()) {
-            val entity = EntityUtils.getEntityByID(villagerFromPacket.take()) as? EntityLivingBase ?: continue
+        villagerFromPacket.forEachPolling { id ->
+            val entity = EntityUtils.getEntityByID(id) as? EntityLivingBase ?: return@forEachPolling
             val mob = entityToMob[entity]
             if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
                 MobEvent.DeSpawn.DisplayNPC(mob)
                 retry(entity)
-                continue
+                return@forEachPolling
             }
             val retryInstance = RetryEntityInstancing(entity)
             retries.find { it == retryInstance }?.let {
