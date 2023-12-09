@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -9,8 +10,40 @@ public class AdvancedPlayerListConfig {
 
     @Expose
     @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
-    @ConfigEditorDropdown(values = {"Rank (Default)", "SB Level", "Name (Abc)", "Ironman/Bingo", "Party/Friends/Guild", "Random"})
-    public int playerSortOrder = 0;
+    @ConfigEditorDropdown()
+    public PlayerSortEntry playerSortOrder = PlayerSortEntry.RANK;
+
+    public enum PlayerSortEntry implements HasLegacyId {
+        RANK("§7Rank (Default)", 0),
+        SB_LEVEL("§7SB Level", 1),
+        NAME("§7Name (Abc)", 2),
+        PROFILE_TYPE("Ironman/Bingo", 3),
+        SOCIAL_STATUS("Party/Friends/Guild", 4),
+        RANDOM("Random", 5);
+
+        private final String str;
+        private final int legacyId;
+
+        PlayerSortEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        PlayerSortEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
