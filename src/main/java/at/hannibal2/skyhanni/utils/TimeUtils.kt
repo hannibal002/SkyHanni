@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -149,6 +151,8 @@ object TimeUtils {
             "$datePart$timePart".trim()
         }
     }
+
+    fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 }
 
 private const val FACTOR_SECONDS = 1000L

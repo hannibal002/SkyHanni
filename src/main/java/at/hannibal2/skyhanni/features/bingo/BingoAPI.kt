@@ -9,11 +9,10 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 
 object BingoAPI {
@@ -51,7 +50,7 @@ object BingoAPI {
     }
 
     private fun getStartOfMonthInMillis() = OffsetDateTime.of(
-        LocalDate.now(ZoneId.of("UTC")).plusDays(5).withDayOfMonth(1),
+        TimeUtils.getCurrentLocalDate().plusDays(5).withDayOfMonth(1),
         LocalTime.MIDNIGHT, ZoneOffset.UTC
     ).toEpochSecond()
 

@@ -187,10 +187,12 @@ class MinionFeatures {
         coinsPerDay = ""
         lastInventoryClosed = System.currentTimeMillis()
 
-        val location = lastMinion ?: return
+        if (IslandType.PRIVATE_ISLAND.isInIsland()) {
+            val location = lastMinion ?: return
 
-        if (location !in minions) {
-            minions[location]!!.lastClicked = 0
+            if (location !in minions) {
+                minions[location]?.lastClicked = 0
+            }
         }
         MinionCloseEvent().postAndCatch()
     }
