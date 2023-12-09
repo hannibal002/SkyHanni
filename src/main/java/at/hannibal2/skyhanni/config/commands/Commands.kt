@@ -216,7 +216,11 @@ object Commands {
         registerCommand(
             "shwhereami",
             "Print current island in chat"
-        ) { SkyHanniDebugsAndTests.whereami() }
+        ) { SkyHanniDebugsAndTests.whereAmI() }
+        registerCommand(
+            "shclearcontestdata",
+            "Resets Jacob's Contest Data"
+        ) { SkyHanniDebugsAndTests.clearContestData() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
