@@ -145,7 +145,12 @@ object NEUItems {
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
-    fun NEUInternalName.getNpcPriceOrNull() = BazaarDataHolder.getNpcPrice(this)
+    fun NEUInternalName.getNpcPriceOrNull(): Double? {
+        if (equals("WISP_POTION")) {
+            return 20_000.0
+        }
+        return BazaarDataHolder.getNpcPrice(this)
+    }
 
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
