@@ -42,7 +42,7 @@ class JyrreTimer {
     }
 
     private fun resetDisplay() {
-        display = if (config.showInactive.get()) drawDisplay() else emptyList()
+        display = if (config.showInactive) drawDisplay() else emptyList()
         duration = 0.seconds
     }
 
@@ -61,7 +61,7 @@ class JyrreTimer {
     private fun updateJyrreDisplay() {
         if (!isEnabled()) return
 
-        if (display.isNotEmpty() && !config.showInactive.get() && duration <= 0.seconds) {
+        if (display.isNotEmpty() && !config.showInactive && duration <= 0.seconds) {
             resetDisplay()
             return
         }
@@ -76,7 +76,7 @@ class JyrreTimer {
             addItemIcon("REFINED_BOTTLE_OF_JYRRE".asInternalName())
             add("§aJyrre Boost: ")
 
-            if (duration <= 0.seconds && config.showInactive.get()) {
+            if (duration <= 0.seconds && config.showInactive) {
                 add("§cInactive!")
             } else {
                 val format = TimeUtils.formatDuration(duration)
@@ -85,5 +85,5 @@ class JyrreTimer {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
