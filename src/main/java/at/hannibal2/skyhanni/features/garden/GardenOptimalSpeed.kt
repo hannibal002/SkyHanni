@@ -125,6 +125,7 @@ class GardenOptimalSpeed {
         event.move(3, "garden.optimalSpeedCustom.sugarCane", "garden.optimalSpeeds.customSpeed.sugarCane")
         event.move(3, "garden.optimalSpeedCustom.cactus", "garden.optimalSpeeds.customSpeed.cactus")
         event.move(3, "garden.optimalSpeedCustom.mushroom", "garden.optimalSpeeds.customSpeed.mushroom")
+
         event.move(14, "garden.optimalSpeeds.enabled", "garden.optimalSpeeds.showOnHUD")
     }
 }
