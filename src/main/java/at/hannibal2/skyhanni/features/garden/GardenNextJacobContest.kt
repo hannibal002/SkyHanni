@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -238,7 +241,7 @@ object GardenNextJacobContest {
     fun shareContestConfirmed(array: Array<String>) {
         if (array.size == 1) {
             if (array[0] == "enable") {
-                config.shareAutomatically = 1
+                config.shareAutomatically = NextJacobContestConfig.ShareContestsEntry.AUTO
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 LorenzUtils.chat("§2Enabled automatic sharing of future contests!")
             }
@@ -247,7 +250,7 @@ object GardenNextJacobContest {
         if (contests.size == maxContestsPerYear) {
             sendContests()
         }
-        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == 0) {
+        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == NextJacobContestConfig.ShareContestsEntry.ASK) {
             LorenzUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
@@ -451,9 +454,10 @@ object GardenNextJacobContest {
         && (GardenAPI.inGarden() || config.everywhere)
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
-    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != 2 // 2 = Disabled
+    private fun isSendEnabled() =
+        isFetchEnabled() && config.shareAutomatically != NextJacobContestConfig.ShareContestsEntry.DISABLED // 2 = Disabled
     private fun askToSendContests() =
-        config.shareAutomatically == 0 // 0 = Ask, 1 = Send (Only call if isSendEnabled())
+        config.shareAutomatically == NextJacobContestConfig.ShareContestsEntry.ASK // 0 = Ask, 1 = Send (Only call if isSendEnabled())
 
     private fun fetchContestsIfAble() {
         if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
@@ -564,5 +568,9 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContests.warnTime")
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "garden.nextJacobContests.shareAutomatically") { element ->
+            ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
+        }
     }
 }
