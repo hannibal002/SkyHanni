@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -16,8 +17,36 @@ public class BestiaryConfig {
 
     @Expose
     @ConfigOption(name = "Number format", desc = "Short: 1.1k\nLong: 1.100")
-    @ConfigEditorDropdown(values = {"Short", "Long"})
-    public int numberFormat = 0;
+    @ConfigEditorDropdown()
+    public NumberFormatEntry numberFormat = NumberFormatEntry.SHORT;
+
+    public enum NumberFormatEntry implements HasLegacyId {
+        SHORT("Short", 0),
+        LONG("Long", 1);
+
+        private final String str;
+        private final int legacyId;
+
+        NumberFormatEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        NumberFormatEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Display type", desc = "Choose what the display should show")

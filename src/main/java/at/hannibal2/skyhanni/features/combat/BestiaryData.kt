@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
+import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -99,6 +102,10 @@ object BestiaryData {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.bestiaryData", "combat.bestiary")
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "combat.bestiary.numberFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
     }
 
     private fun update() {
@@ -310,9 +317,10 @@ object BestiaryData {
     private fun addButtons(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton(
             prefix = "§7Number Format: ",
-            getName = FormatType.entries[config.numberFormat].type,
+            getName = FormatType.entries[config.numberFormat.ordinal].type, // todo: avoid ordinal
             onChange = {
-                config.numberFormat = (config.numberFormat + 1) % 2
+                // todo: avoid ordinal
+                config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
                 update()
             })
 
@@ -417,8 +425,8 @@ object BestiaryData {
     }
 
     private fun Long.formatNumber(): String = when (config.numberFormat) {
-        0 -> NumberUtil.format(this)
-        1 -> this.addSeparators()
+        BestiaryConfig.NumberFormatEntry.SHORT -> NumberUtil.format(this)
+        BestiaryConfig.NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 
