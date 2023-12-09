@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -47,6 +48,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniDebugsAndTests {
 
@@ -260,7 +262,15 @@ class SkyHanniDebugsAndTests {
             LorenzUtils.chat("§eYou are not in Skyblock.")
         }
 
+        private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
+
         fun clearContestData() {
+            if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
+                LorenzUtils.userError("§cYou already cleared Jacob's Contest data recently!")
+                return
+            }
+            lastManualContestDataUpdate = SimpleTimeMark.now()
+
             GardenNextJacobContest.contests.clear()
             GardenNextJacobContest.fetchedFromElite = false
             GardenNextJacobContest.isFetchingContests = true
