@@ -106,7 +106,9 @@ class CityProjectFeatures {
 
                 for (line in item.getLore()) {
                     contributeAgainPattern.matchMatcher(line) {
-                        val duration = TimeUtils.getMillis(group("time"))
+                        val rawTime = group("time")
+                        if (rawTime.contains("Soon!")) return@matchMatcher
+                        val duration = TimeUtils.getMillis(rawTime)
                         val endTime = System.currentTimeMillis() + duration
                         if (endTime < nextTime) {
                             nextTime = endTime

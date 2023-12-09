@@ -52,6 +52,8 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
+    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
     /**

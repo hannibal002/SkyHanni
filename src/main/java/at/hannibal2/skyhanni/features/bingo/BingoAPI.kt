@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 
 object BingoAPI {
@@ -50,7 +50,16 @@ object BingoAPI {
     }
 
     private fun getStartOfMonthInMillis() = OffsetDateTime.of(
-        LocalDate.now(ZoneId.of("UTC")).plusDays(5).withDayOfMonth(1),
+        TimeUtils.getCurrentLocalDate().plusDays(5).withDayOfMonth(1),
         LocalTime.MIDNIGHT, ZoneOffset.UTC
     ).toEpochSecond()
+
+    fun getCommunityPercentageColor(percentage: Double): String = when {
+        percentage < 0.01 -> "§a"
+        percentage < 0.05 -> "§e"
+        percentage < 0.1 -> "§6"
+        percentage < 0.25 -> "§6"
+
+        else -> "§c"
+    } + LorenzUtils.formatPercentage(percentage)
 }
