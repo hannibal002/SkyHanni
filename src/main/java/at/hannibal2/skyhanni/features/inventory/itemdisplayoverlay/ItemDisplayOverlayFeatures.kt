@@ -194,18 +194,19 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     private fun isDungeonHead(internalName: NEUInternalName): Boolean = DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalNamePattern.matches(internalName)
     private fun getDungeonHeadTip(internalName: NEUInternalName): String {
-        var floor = ""
-        dungeonBossHeadInternalNamePattern.matchMatcher(internalName.asString()) { floor = group("type") }
-        return when (floor) {
-            "BONZO" -> "1"
-            "SCARF" -> "2"
-            "PROFESSOR" -> "3"
-            "THORN" -> "4"
-            "LIVID" -> "5"
-            "SADAN" -> "6"
-            "NECRON" -> "7"
-            else -> ""
+        dungeonBossHeadInternalNamePattern.matchMatcher(internalName.asString()) {
+            return when (group("dungeonBoss")) {
+                "BONZO" -> "1"
+                "SCARF" -> "2"
+                "PROFESSOR" -> "3"
+                "THORN" -> "4"
+                "LIVID" -> "5"
+                "SADAN" -> "6"
+                "NECRON" -> "7"
+                else -> ""
+            }
         }
+        return ""
     }
 
     private fun isNewYearCake(internalName: NEUInternalName): Boolean = NEW_YEAR_CAKE.isSelected() && internalName == newYearCakeInternalName
