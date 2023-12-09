@@ -25,9 +25,8 @@ class GardenNextPlotPrice {
         var next = false
         val list = event.toolTip
         var i = -1
-        for (l in list) {
+        for (line in event.toolTipRemovedPrefix()) {
             i++
-            val line = l.substring(4)
             if (line.contains("Cost")) {
                 next = true
                 continue
