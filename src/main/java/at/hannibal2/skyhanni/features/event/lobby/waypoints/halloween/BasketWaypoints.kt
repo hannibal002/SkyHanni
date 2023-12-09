@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.mainlobby.halloweenwaypoints
+package at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -15,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BasketWaypoints {
-    private val config get() = SkyHanniMod.feature.event.halloweenBasket
+    private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.halloweenBasket
     private var closest: Basket? = null
     private var isHalloween: Boolean = false
 
@@ -44,7 +45,7 @@ class BasketWaypoints {
         if (LorenzUtils.inSkyBlock) return
 
         if (event.repeatSeconds(1)) {
-            isHalloween = chechScoreboardHalloweenSpecific()
+            isHalloween = checkScoreboardHalloweenSpecific()
         }
 
         if (isHalloween) {
@@ -92,8 +93,13 @@ class BasketWaypoints {
         return if (config.onlyClosest) closest == this else true
     }
 
-    private fun chechScoreboardHalloweenSpecific(): Boolean {
+    private fun checkScoreboardHalloweenSpecific(): Boolean {
         val list = ScoreboardData.sidebarLinesFormatted
         return list.anyContains("Hypixel Level") && list.anyContains("Halloween") && list.anyContains("Baskets")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(13, "event.halloweenBasket", "event.lobbyWaypoints.halloweenBasket")
     }
 }
