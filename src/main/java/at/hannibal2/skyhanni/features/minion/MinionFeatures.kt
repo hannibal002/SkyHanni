@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -61,12 +62,14 @@ class MinionFeatures {
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
-    private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
-    private val minionCoinPattern = "§aYou received §r§6(.*) coins§r§a!".toPattern()
+    private val minionUpgradePattern by RepoPattern.pattern("minion.chat.upgrade", "§aYou have upgraded your Minion to Tier (?<tier>.*)")
+    private val minionCoinPattern by RepoPattern.pattern("minion.chat.coin", "§aYou received §r§6(.*) coins§r§a!")
+    private val minionTitlePattern by RepoPattern.pattern("minion.title", "Minion ")
+    private val minionCollectItemPattern by RepoPattern.pattern("minion.item.collect", "^§aCollect All$")
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (!enableWithHub()) return
+        if (!enable()) return
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 
         val lookingAt = event.pos.offset(event.face).toLorenzVec()
@@ -126,10 +129,10 @@ class MinionFeatures {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
-        if (!event.inventoryName.contains("Minion ")) return
+        if (!minionTitlePattern.matches(event.inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if ("§aCollect All" == it.name) {
+            if (minionCollectItemPattern.matches(it.name ?: "")) {
                 MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
                 return
             }
