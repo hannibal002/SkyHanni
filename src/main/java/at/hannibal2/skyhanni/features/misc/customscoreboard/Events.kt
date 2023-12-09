@@ -77,7 +77,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                     InformationGetter.dungeonClassList.any { lines ->
                         it.startsWith(lines)
                     }
-                }
+                }.map { it.replace("[Lv", "§7[Lv") }
             }
 
             if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
