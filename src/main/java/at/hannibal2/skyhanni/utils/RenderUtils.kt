@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -496,7 +497,10 @@ object RenderUtils {
             }
             add(item)
         } catch (e: NullPointerException) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "add item icon to renderable list",
+                "internalName" to internalName
+            )
         }
     }
 
