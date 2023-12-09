@@ -291,6 +291,7 @@ object NEUItems {
 
     }
 
+    @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
     fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
         val pair = getMultiplier(internalName.asInternalName(), tryCount)
         return Pair(pair.first.asString(), pair.second)
