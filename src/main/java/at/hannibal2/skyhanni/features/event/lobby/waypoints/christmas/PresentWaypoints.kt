@@ -28,6 +28,7 @@ class PresentWaypoints {
     private val presentSet get() = presentLocations[HypixelData.lobbyType]
     private val presentEntranceSet get() = presentEntranceLocations[HypixelData.lobbyType]
 
+    // TODO use repo pattern
     private val presentAlreadyFoundPattern = "§cYou have already found this present!".toPattern()
     private val presentFoundPattern = "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)".toPattern()
     private val allFoundPattern = "§aCongratulations! You found all the presents in every lobby!".toPattern()
@@ -110,5 +111,5 @@ class PresentWaypoints {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.onHypixel && HypixelData.inLobby && (config.allWaypoints || config.allEntranceWaypoints)
+        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints)
 }
