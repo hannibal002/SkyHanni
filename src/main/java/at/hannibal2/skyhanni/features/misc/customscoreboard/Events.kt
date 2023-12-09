@@ -188,6 +188,25 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§6§lGOLD §fmedals") }
         }
     ),
+    TRAPPER(
+        {
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Pelts: §5") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Pelts: §5") }
+                    ?: "<hidden>"
+            }
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "Tracker Mob Location:" }) {
+                list += "Tracker Mob Location:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("Tracker Mob Location:") ?: "<hidden>"
+            }
+
+            list
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Pelts: §5") || it == "Tracker Mob Location:"}
+        }
+    ),
     GARDEN_CLEAN_UP(
         {
             listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.trim().startsWith("§fCleanup§7:") }

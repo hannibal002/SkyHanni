@@ -150,7 +150,9 @@ class InformationGetter {
             "§6Year ",
             "§7Waiting for",
             "§7your vote...",
-            "e: §e§b0%"
+            "e: §e§b0%",
+            "Pelts: §5",
+            "Tracker Mob Location:"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -182,5 +184,8 @@ class InformationGetter {
         for (i in 1 until 6) {
             extraLines = extraLines.filter { sidebarLines.nextAfter(votedLine, i) != it }
         }
+
+        // remove trapper mob location
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
     }
 }
