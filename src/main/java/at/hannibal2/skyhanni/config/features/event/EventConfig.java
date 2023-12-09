@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
+import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -43,9 +44,8 @@ public class EventConfig {
     @Expose
     public CenturyConfig century = new CenturyConfig();
 
+    @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
-    @ConfigOption(name = "Main Lobby Halloween Basket Waypoints", desc = "")
-    @Accordion
-    public HalloweenBasketConfig halloweenBasket = new HalloweenBasketConfig();
+    public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
 
 }

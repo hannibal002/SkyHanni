@@ -349,6 +349,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
 + Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
   + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
 </details>
 <details open><summary>
@@ -640,6 +641,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
++ Waypoints for 2023 Lobby Presents. - walker
 </details>
 <details open><summary>
 
