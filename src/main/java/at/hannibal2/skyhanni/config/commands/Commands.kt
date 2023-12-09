@@ -422,6 +422,9 @@ object Commands {
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+            error("The command '$name is already registered!'")
+        }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
         commands.add(CommandInfo(name, description, currentCategory))
     }
