@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -35,7 +36,16 @@ class GardenComposterInventoryFeatures {
         var amountItems = 0
         for (originalLine in list) {
             i++
-            val line = originalLine.substring(4)
+            val line = try {
+                originalLine.substring(4)
+            } catch (e: Throwable) {
+                ErrorManager.logErrorWithData(
+                    e, "Error reading composter data.",
+                    "originalLine" to originalLine,
+                    "list" to list,
+                )
+                return
+            }
             if (line == "§7Upgrade Cost:") {
                 next = true
                 indexFullCost = i
