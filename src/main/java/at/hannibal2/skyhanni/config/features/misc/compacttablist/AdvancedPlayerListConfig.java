@@ -14,9 +14,9 @@ public class AdvancedPlayerListConfig {
     public PlayerSortEntry playerSortOrder = PlayerSortEntry.RANK;
 
     public enum PlayerSortEntry implements HasLegacyId {
-        RANK("§7Rank (Default)", 0),
-        SB_LEVEL("§7SB Level", 1),
-        NAME("§7Name (Abc)", 2),
+        RANK("Rank (Default)", 0),
+        SB_LEVEL("SB Level", 1),
+        NAME("Name (Abc)", 2),
         PROFILE_TYPE("Ironman/Bingo", 3),
         SOCIAL_STATUS("Party/Friends/Guild", 4),
         RANDOM("Random", 5);
