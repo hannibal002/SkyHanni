@@ -33,10 +33,6 @@ class BingoCardDisplay {
 
     private var hasHiddenPersonalGoals = false
 
-    init {
-        update()
-    }
-
     companion object {
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
@@ -225,14 +221,6 @@ class BingoCardDisplay {
         }
     }
 
-    private var highlightedMaps = mutableMapOf<String, Boolean>()
-
-    var BingoGoal.highlight: Boolean
-        get() = highlightedMaps[displayName] ?: false
-        set(value) {
-            highlightedMaps[displayName] = value
-        }
-
     private var lastSneak = false
     private var inventoryOpen = false
 
@@ -281,6 +269,7 @@ class BingoCardDisplay {
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideCommunityGoals.onToggle { update() }
         config.nextTipDuration.onToggle { update() }
+        update()
     }
 
     @SubscribeEvent
