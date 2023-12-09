@@ -149,7 +149,8 @@ class InformationGetter {
             "§fCleanup§7:",
             "§6Year ",
             "§7Waiting for",
-            "§7your vote..."
+            "§7your vote...",
+            "e: §e§b0%"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -159,11 +160,11 @@ class InformationGetter {
 
         // remove objectives
         extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
-        val objectiveLines =
+        val objectiveLine =
             ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
-        extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLines) != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         extraLines =
-            extraLines.filter { sidebarLines.nextAfter(objectiveLines, 2) != it && !extraObjectiveLines.contains(it) }
+            extraLines.filter { sidebarLines.nextAfter(objectiveLine, 2) != it && !extraObjectiveLines.contains(it) }
 
         // remove wind compass
         extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
@@ -181,8 +182,5 @@ class InformationGetter {
         for (i in 1 until 6) {
             extraLines = extraLines.filter { sidebarLines.nextAfter(votedLine, i) != it }
         }
-
-        // remove that buggy redstone line wth hypixel
-        extraLines = extraLines.filter { "^\\s*e: §e§b(\\d{1,2}|100)%\$".toPattern().matcher(it).matches() }
     }
 }

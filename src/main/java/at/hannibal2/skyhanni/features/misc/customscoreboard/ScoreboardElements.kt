@@ -445,7 +445,7 @@ enum class ScoreboardElements(
             if (extraLines.isNotEmpty()) {
                 amountOfExtraLines = 0
             }
-            false
+            extraLines.isNotEmpty()
         },
         "§7Extra lines the mod is not detecting"
     ),
