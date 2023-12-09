@@ -96,7 +96,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
-                    if (KeyboardManager.isControlKeyDown()) {
+                    if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
                         LorenzUtils.chat("Removed $cleanName §efrom Fishing Frofit Tracker.")
                         lastClickDelay = System.currentTimeMillis() + 500

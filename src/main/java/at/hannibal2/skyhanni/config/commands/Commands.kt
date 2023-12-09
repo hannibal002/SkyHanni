@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -217,7 +218,11 @@ object Commands {
         registerCommand(
             "shwhereami",
             "Print current island in chat"
-        ) { SkyHanniDebugsAndTests.whereami() }
+        ) { SkyHanniDebugsAndTests.whereAmI() }
+        registerCommand(
+            "shclearcontestdata",
+            "Resets Jacob's Contest Data"
+        ) { SkyHanniDebugsAndTests.clearContestData() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
@@ -321,6 +326,10 @@ object Commands {
             "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
         registerCommand(
+            "shsendtitle",
+            "Display a title on the screen with the specified settings."
+        ) { TitleManager.command(it) }
+        registerCommand(
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
         ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
@@ -419,6 +428,9 @@ object Commands {
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+            error("The command '$name is already registered!'")
+        }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
         commands.add(CommandInfo(name, description, currentCategory))
     }

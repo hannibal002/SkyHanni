@@ -28,11 +28,11 @@ class RepoPatternGui private constructor() {
 
     @field:Bind
     var search: String = ""
-    var lastSearch = null as String?
-    val allKeys = RepoPatternManager.allPatterns.toList()
+    private var lastSearch = null as String?
+    private val allKeys = RepoPatternManager.allPatterns.toList()
         .sortedBy { it.key }
         .map { RepoPatternInfo(it) }
-    var searchCache = ObservableList(mutableListOf<RepoPatternInfo>())
+    private var searchCache = ObservableList(mutableListOf<RepoPatternInfo>())
 
 
     class RepoPatternInfo(

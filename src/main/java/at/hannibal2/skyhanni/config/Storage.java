@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.Powers;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
@@ -93,6 +94,17 @@ public class Storage {
             public int amountGifted = 0;
         }
 
+        @Expose
+        public Map<Long, BingoSession> bingoSessions = new HashMap<>();
+
+        public static class BingoSession {
+
+            @Expose
+            public List<String> tierOneMinionsDone = new ArrayList<>();
+
+            @Expose
+            public Map<Integer, BingoGoal> goals = new HashMap<>();
+        }
     }
 
     public static class ProfileSpecific {
@@ -117,9 +129,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                    "displayName='" + displayName + '\'' +
-                    ", lastClicked=" + lastClicked +
-                    '}';
+                        "displayName='" + displayName + '\'' +
+                        ", lastClicked=" + lastClicked +
+                        '}';
             }
         }
 
@@ -371,11 +383,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                    "currentMeter=" + currentMeter +
-                    ", gainPerBoss=" + gainPerBoss +
-                    ", goalNeeded=" + goalNeeded +
-                    ", itemGoal='" + itemGoal + '\'' +
-                    '}';
+                        "currentMeter=" + currentMeter +
+                        ", gainPerBoss=" + gainPerBoss +
+                        ", goalNeeded=" + goalNeeded +
+                        ", itemGoal='" + itemGoal + '\'' +
+                        '}';
             }
         }
 

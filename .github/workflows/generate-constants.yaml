@@ -3,7 +3,7 @@
 name: RepoPattern
 
 env:
-    data_repo: nea89o/SkyHanni-REPO
+    data_repo: hannibal002/SkyHanni-REPO
 
 on:
     push:
