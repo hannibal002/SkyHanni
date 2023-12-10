@@ -64,7 +64,6 @@ public class SackDisplayConfig {
         }
     }
 
-
     @Expose
     @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
     @ConfigEditorSlider(
@@ -102,8 +101,36 @@ public class SackDisplayConfig {
     @ConfigOption(name = "Price Format", desc = "Format of the price displayed.\n" +
         "§eFormatted: §7(12k)\n" +
         "§eUnformatted: §7(12,421)")
-    @ConfigEditorDropdown(values = {"Formatted", "Unformatted"})
-    public int priceFormat = 0;
+    @ConfigEditorDropdown()
+    public PriceFormatEntry priceFormat = PriceFormatEntry.FORMATTED;
+
+    public enum PriceFormatEntry implements HasLegacyId {
+        FORMATTED("Formatted", 0),
+        UNFORMATTED("Unformatted", 1);
+
+        private final String str;
+        private final int legacyId;
+
+        PriceFormatEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        PriceFormatEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")

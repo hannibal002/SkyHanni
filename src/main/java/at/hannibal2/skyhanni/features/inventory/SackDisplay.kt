@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -164,9 +165,11 @@ object SackDisplay {
                     })
                 newDisplay.addButton(
                     prefix = "§7Price Format: ",
-                    getName = PriceFormat.entries[config.priceFormat].displayName,
+                    getName = PriceFormat.entries[config.priceFormat.ordinal].displayName, // todo avoid ordinal
                     onChange = {
-                        config.priceFormat = (config.priceFormat + 1) % 2
+                        // todo avoid ordinal
+                        config.priceFormat =
+                            SackDisplayConfig.PriceFormatEntry.entries[(config.priceFormat.ordinal + 1) % 2]
                         update(false)
                     }
                 )
@@ -208,7 +211,8 @@ object SackDisplay {
         return newDisplay
     }
 
-    private fun format(price: Long) = if (config.priceFormat == 0) NumberUtil.format(price) else price.addSeparators()
+    private fun format(price: Long) =
+        if (config.priceFormat == SackDisplayConfig.PriceFormatEntry.FORMATTED) NumberUtil.format(price) else price.addSeparators()
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
@@ -243,6 +247,9 @@ object SackDisplay {
         // TODO Replace with transform when PR 769 is merged
         event.move(14, "inventory.sackDisplay.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+        event.move(14, "inventory.sackDisplay.priceFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
         }
     }
 }
