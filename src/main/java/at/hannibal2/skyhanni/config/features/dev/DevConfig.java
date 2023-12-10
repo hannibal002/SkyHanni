@@ -30,7 +30,7 @@ public class DevConfig {
     public DebugConfig debug = new DebugConfig();
 
     @Expose
-    @ConfigOption(name = "RepoPattern", desc = "")
+    @ConfigOption(name = "Repo Pattern", desc = "")
     @Accordion
     public RepoPatternConfig repoPattern = new RepoPatternConfig();
 
