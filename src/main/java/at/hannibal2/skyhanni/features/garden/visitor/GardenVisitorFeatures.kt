@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightStatusEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -386,10 +387,10 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.needs.display && config.highlightStatus == 3) return
+        if (!config.needs.display && config.highlightStatus == HighlightStatusEntry.DISABLED) return
         if (!event.isMod(10)) return
 
-        if (GardenAPI.onBarnPlot && config.highlightStatus != 3) {
+        if (GardenAPI.onBarnPlot && config.highlightStatus != HighlightStatusEntry.DISABLED) {
             checkVisitorsReady()
         }
     }
@@ -467,13 +468,13 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if ((config.highlightStatus == 0 || config.highlightStatus == 2) && entity is EntityLivingBase) {
+            if ((config.highlightStatus == HighlightStatusEntry.COLOR || config.highlightStatus == HighlightStatusEntry.BOTH) && entity is EntityLivingBase) {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
                         color
-                    ) { config.highlightStatus == 0 || config.highlightStatus == 2 }
+                    ) { config.highlightStatus == HighlightStatusEntry.COLOR || config.highlightStatus == HighlightStatusEntry.BOTH }
                 }
                 // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
                 if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
@@ -623,6 +624,10 @@ class GardenVisitorFeatures {
             }
 
             drops
+        }
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "garden.visitors.highlightStatus") { element ->
+            ConfigUtils.migrateIntToEnum(element, HighlightStatusEntry::class.java)
         }
     }
 

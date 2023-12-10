@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -44,8 +45,37 @@ public class VisitorConfig {
 
     @Expose
     @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
-    @ConfigEditorDropdown(values = {"Color Only", "Name Only", "Both", "Disabled"})
-    public int highlightStatus = 2;
+    @ConfigEditorDropdown()
+    public HighlightStatusEntry highlightStatus = HighlightStatusEntry.BOTH;
+
+    public enum HighlightStatusEntry implements HasLegacyId {
+        COLOR("Color Only", 0),
+        NAME("Name Only", 1),
+        BOTH("Both", 2),
+        DISABLED("Disabled", 3);
+        private final String str;
+        private final int legacyId;
+
+        HighlightStatusEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        HighlightStatusEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
