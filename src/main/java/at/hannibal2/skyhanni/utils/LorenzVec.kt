@@ -23,8 +23,6 @@ data class LorenzVec(
 
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    @Deprecated("Misspelled function name", replaceWith = ReplaceWith("toBlockPos()"))
-    fun toBlocPos(): BlockPos = toBlockPos()
     fun toBlockPos(): BlockPos = BlockPos(x, y, z)
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
