@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignEntry
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.fishes
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
@@ -42,7 +45,7 @@ class TrophyFishMessages {
         val amount = trophyFishCounts.addOrPut(rarity, 1)
         event.blockedReason = "trophy_fish"
 
-        if (config.enabled && config.design == 0 && amount == 1) {
+        if (config.enabled && config.design == ChatMessagesConfig.DesignEntry.STYLE_1 && amount == 1) {
             LorenzUtils.chat("§6§lTROPHY FISH! §c§lFIRST §r$displayRarity $displayName", prefix = false)
             return
         }
@@ -57,8 +60,8 @@ class TrophyFishMessages {
         val component = ChatComponentText(
             if (config.enabled) {
                 "§6§lTROPHY FISH! " + when (config.design) {
-                    0 -> "§7$amount. §r$displayRarity $displayName$totalText"
-                    1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})$totalText"
+                    ChatMessagesConfig.DesignEntry.STYLE_1 -> "§7$amount. §r$displayRarity $displayName$totalText"
+                    ChatMessagesConfig.DesignEntry.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})$totalText"
                     else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b.$totalText"
                 }
             } else event.message
@@ -84,5 +87,9 @@ class TrophyFishMessages {
         event.move(2, "fishing.trophyFishDuplicateHider", "fishing.trophyFishing.chatMessages.duplicateHider")
         event.move(2, "fishing.trophyFishBronzeHider", "fishing.trophyFishing.chatMessages.bronzeHider")
         event.move(2, "fishing.trophyFishSilverHider", "fishing.trophyFishing.chatMessages.silverHider")
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "fishing.trophyFishing.chatMessages.design") { element ->
+            ConfigUtils.migrateIntToEnum(element, DesignEntry::class.java)
+        }
     }
 }

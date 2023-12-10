@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -24,8 +25,36 @@ public class ChatMessagesConfig {
             "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
             "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
     )
-    @ConfigEditorDropdown(values = {"Style 1", "Style 2", "Style 3"})
-    public int design = 0;
+    @ConfigEditorDropdown()
+    public DesignEntry design = DesignEntry.STYLE_1;
+
+    public enum DesignEntry implements HasLegacyId {
+        STYLE_1("Style 1", 0),
+        STYLE_2("Style 2", 1),
+        STYLE_3("Style 3", 2);
+        private final String str;
+        private final int legacyId;
+
+        DesignEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        DesignEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Show Total Amount", desc = "Show total amount of all rarities at the end of the chat message.")
