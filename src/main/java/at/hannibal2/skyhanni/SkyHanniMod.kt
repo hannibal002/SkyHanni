@@ -674,7 +674,6 @@ class SkyHanniMod {
         loadModule(SkymallDisplay())
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
-        loadModule(SkymallDisplay())
 
         init()
 
