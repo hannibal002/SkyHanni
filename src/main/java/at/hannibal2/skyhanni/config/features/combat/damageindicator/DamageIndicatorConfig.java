@@ -46,8 +46,38 @@ public class DamageIndicatorConfig {
     @ConfigOption(
         name = "Boss Name",
         desc = "Change how the boss name should be displayed.")
-    @ConfigEditorDropdown(values = {"Hidden", "Full Name", "Short Name"})
-    public int bossName = 1;
+    @ConfigEditorDropdown()
+    public BossNameEntry bossName = BossNameEntry.FULL_NAME;
+
+    public enum BossNameEntry implements HasLegacyId {
+        HIDDEN("Hidden", 0),
+        FULL_NAME("Full Name", 1),
+        SHORT_NAME("Short Name", 2),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        BossNameEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        BossNameEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(
