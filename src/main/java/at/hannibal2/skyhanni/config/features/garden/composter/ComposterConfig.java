@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.composter;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -20,8 +21,36 @@ public class ComposterConfig {
 
     @Expose
     @ConfigOption(name = "Overlay Price", desc = "Toggle for Bazaar 'buy order' vs 'instant buy' price in composter overlay.")
-    @ConfigEditorDropdown(values = {"Instant Buy", "Buy Order"})
-    public int overlayPriceType = 0;
+    @ConfigEditorDropdown()
+    public OverlayPriceTypeEntry overlayPriceType = OverlayPriceTypeEntry.INSTANT_BUY;
+
+    public enum OverlayPriceTypeEntry implements HasLegacyId {
+        INSTANT_BUY("Instant Buy", 0),
+        BUY_ORDER("Buy Order", 1),
+        ;
+        private final String str;
+        private final int legacyId;
+
+        OverlayPriceTypeEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        OverlayPriceTypeEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
