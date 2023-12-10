@@ -133,6 +133,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         event.move(2, "misc.reputationHelperHotkey", "crimsonIsle.reputationHelper.hotkey")
         event.move(2, "misc.crimsonIsleReputationHelperPos", "crimsonIsle.reputationHelper.position")
         event.move(2, "misc.crimsonIsleReputationShowLocation", "crimsonIsle.reputationHelper.showLocation")
+        // TODO Replace with transform when PR 769 is merged
         event.move(14, "crimsonIsle.reputationHelper.showLocation") { element ->
             ConfigUtils.migrateIntToEnum(element, ShowLocationEntry::class.java)
         }

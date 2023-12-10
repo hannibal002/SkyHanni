@@ -197,6 +197,7 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        // TODO Replace with transform when PR 769 is merged
         event.move(14, "rift.motes.inventoryValue.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
         }
