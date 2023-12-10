@@ -1,20 +1,20 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.BingoAPI
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.ContributorListJson
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -140,7 +140,7 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isControlKeyDown()
+        val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
     }
 
@@ -206,7 +206,7 @@ object AdvancedPlayerList {
     private fun getSocialScoreIcon(score: Int) = when (score) {
 //        10 -> "§c§lME"
         10 -> ""
-        8 -> "§e§lMARKED"
+        8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"

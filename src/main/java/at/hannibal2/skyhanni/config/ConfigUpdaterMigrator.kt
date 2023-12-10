@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 10
+    const val CONFIG_VERSION = 14
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -34,7 +34,7 @@ object ConfigUpdaterMigrator {
             }
         }
 
-        fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
+        fun move(since: Int, oldPath: String, newPath: String = oldPath, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return

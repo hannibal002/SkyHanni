@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -32,29 +31,25 @@ class WikiManager {
     }
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
 
-        val packet = event.packet
-
-        if (packet is C01PacketChatMessage) {
-            val message = packet.message.lowercase()
-            if (!(message.startsWith("/wiki"))) return
-            event.isCanceled = true
-            if (message == "/wiki") {
-                LorenzUtils.chat("Opening the Fandom Wiki..")
-                OSUtils.openBrowser("${urlPrefix}Hypixel_SkyBlock_Wiki")
-            } else if (message.startsWith("/wiki ") || message == ("/wikithis")) { //conditional to see if we need Special:Search page
-                if (message == ("/wikithis")) {
-                    val itemInHand = InventoryUtils.getItemInHand() ?: return
-                    wikiTheItem(itemInHand)
-                } else {
-                    val search = packet.message.split("/wiki ").last()
-                    LorenzUtils.chat("Searching the Fandom Wiki for §a$search")
-                    val wikiUrlCustom = "$urlSearchPrefix$search&scope=internal"
-                    OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
-                }
+        val message = event.message.lowercase()
+        if (!(message.startsWith("/wiki"))) return
+        event.isCanceled = true
+        if (message == "/wiki") {
+            LorenzUtils.chat("Opening the Fandom Wiki..")
+            OSUtils.openBrowser("${urlPrefix}Hypixel_SkyBlock_Wiki")
+        } else if (message.startsWith("/wiki ") || message == ("/wikithis")) { //conditional to see if we need Special:Search page
+            if (message == ("/wikithis")) {
+                val itemInHand = InventoryUtils.getItemInHand() ?: return
+                wikiTheItem(itemInHand)
+            } else {
+                val search = event.message.split("/wiki ").last()
+                LorenzUtils.chat("Searching the Fandom Wiki for §a$search")
+                val wikiUrlCustom = "$urlSearchPrefix$search&scope=internal"
+                OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
             }
         }
     }

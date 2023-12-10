@@ -45,7 +45,7 @@ class ChestValue {
         if (InventoryUtils.openInventoryName() == "") return
 
         if (!config.showDuringEstimatedItemValue) {
-            if (EstimatedItemValue.currentlyShowing) return
+            if (EstimatedItemValue.isCurrentlyShowing()) return
         }
 
         if (inInventory) {

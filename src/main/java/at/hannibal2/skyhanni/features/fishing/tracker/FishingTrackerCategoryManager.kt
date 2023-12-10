@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.jsonobjects.FishingProfitItemsJson
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 

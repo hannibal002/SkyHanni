@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -46,7 +47,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
@@ -232,9 +234,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
-            MinecraftExecutor.OnThread.execute {
-                update()
-            }
+            update()
         }
     }
 
@@ -258,12 +258,12 @@ class GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        event.parent.drawString(location.add(0.0, 2.23, 0.0), text)
+        event.parent.drawString(location.add(y = 2.23), text)
         if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                event.parent.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
+                event.parent.drawString(location.add(y = 2.73), "§c!$name§c!")
             }
         }
     }
@@ -436,6 +436,7 @@ class GardenVisitorFeatures {
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val name = group("name")
+        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
@@ -606,6 +607,23 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
+        event.move(11, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, VisitorReward::class.java)
+        }
+        event.move(12, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (jsonElement in element.asJsonArray) {
+                val old = jsonElement.asString
+                val new = VisitorReward.entries.firstOrNull { old.startsWith(it.name) }
+                if (new == null) {
+                    println("error with migrating old VisitorReward entity: '$old'")
+                    continue
+                }
+                drops.add(JsonPrimitive(new.name))
+            }
+
+            drops
+        }
     }
 
 }

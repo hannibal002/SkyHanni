@@ -3,10 +3,45 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonBossMessages {
+
+    private val config get() = SkyHanniMod.feature.chat
+    private val bossPattern = "§([cd4])\\[BOSS] (.*)".toPattern()
+
+    private val excludedMessages = listOf(
+        "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
+    )
+
+    private val messageList = listOf(
+        //M7 – Dragons
+        "§cThe Crystal withers your soul as you hold it in your hands!",
+        "§cIt doesn't seem like that is supposed to go there."
+    )
+
+    private val messageContainsList = listOf(
+        " The Watcher§r§f: ",
+        " Bonzo§r§f: ",
+        " Scarf§r§f:",
+        "Professor§r§f",
+        " Livid§r§f: ",
+        " Enderman§r§f: ",
+        " Thorn§r§f: ",
+        " Sadan§r§f: ",
+        " Maxor§r§c: ",
+        " Storm§r§c: ",
+        " Goldor§r§c: ",
+        " Necron§r§c: ",
+        " §r§4§kWither King§r§c:"
+    )
+
+    private val messageEndsWithList = listOf(
+        " Necron§r§c: That is enough, fool!",
+        " Necron§r§c: Adventurers! Be careful of who you are messing with..",
+        " Necron§r§c: Before I have to deal with you myself."
+    )
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -15,39 +50,30 @@ class DungeonBossMessages {
 
         DungeonAPI.handleBossMessage(event.message)
 
-        if (SkyHanniMod.feature.chat.dungeonBossMessages) {
+        if (config.dungeonBossMessages) {
             event.blockedReason = "dungeon_boss"
         }
     }
 
+    /**
+     * Checks if the message is a boss message
+     * @return true if the message is a boss message
+     * @param message The message to check
+     * @see excludedMessages
+     * @see messageList
+     * @see messageContainsList
+     * @see messageEndsWithList
+     */
     private fun isBoss(message: String): Boolean {
-        when {
-            message.matchRegex("§([cd4])\\[BOSS] (.*)") -> {
-                when {
-                    message.contains(" The Watcher§r§f: ") ->
-                        message != "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
+        // Cases that match below but should not be blocked
+        if (message in excludedMessages) return false
 
-                    message.contains(" Bonzo§r§f: ") -> return true
-                    message.contains(" Scarf§r§f:") -> return true
-                    message.contains("Professor§r§f") -> return true
-                    message.contains(" Livid§r§f: ") || message.contains(" Enderman§r§f: ") -> return true
-                    message.contains(" Thorn§r§f: ") -> return true
-                    message.contains(" Sadan§r§f: ") -> return true
-                    message.contains(" Maxor§r§c: ") -> return true
-                    message.contains(" Storm§r§c: ") -> return true
-                    message.contains(" Goldor§r§c: ") -> return true
-                    message.contains(" Necron§r§c: ") -> return true
-                    message.contains(" §r§4§kWither King§r§c:") -> return true
+        // Exact Matches
+        if (message in messageList) return true
 
-                    message.endsWith(" Necron§r§c: That is enough, fool!") -> return true
-                    message.endsWith(" Necron§r§c: Adventurers! Be careful of who you are messing with..") -> return true
-                    message.endsWith(" Necron§r§c: Before I have to deal with you myself.") -> return true
-                }
-            }
-
-            //M7 – Dragons
-            message == "§cThe Crystal withers your soul as you hold it in your hands!" -> return true
-            message == "§cIt doesn't seem like that is supposed to go there." -> return true
+        // Matches Regex for Boss Prefix
+        bossPattern.matchMatcher(message) {
+            return messageContainsList.any { message.contains(it) } || messageEndsWithList.any { message.endsWith(it) }
         }
         return false
     }

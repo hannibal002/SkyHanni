@@ -459,7 +459,7 @@ open class VisualWordGui : GuiScreen() {
         super.keyTyped(typedChar, keyCode)
         if (!currentlyEditing) {
             if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
-                if (KeyboardManager.isControlKeyDown()) {
+                if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
                 } else {
                     pageScroll -= 30
@@ -467,7 +467,7 @@ open class VisualWordGui : GuiScreen() {
                 scrollScreen()
             }
             if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_W) {
-                if (KeyboardManager.isControlKeyDown()) {
+                if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = 0
                 } else {
                     pageScroll += 30
@@ -481,7 +481,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
-                currentText = if (KeyboardManager.isControlKeyDown()) {
+                currentText = if (KeyboardManager.isModifierKeyDown()) {
                     ""
                 } else if (KeyboardManager.isShiftKeyDown()) {
                     val lastSpaceIndex = currentText.lastIndexOf(' ')

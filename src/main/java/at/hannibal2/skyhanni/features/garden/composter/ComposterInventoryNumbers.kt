@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -18,7 +17,7 @@ class ComposterInventoryNumbers {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.composters.inventoryNumbers) return
+        if (!GardenAPI.config.composters.inventoryNumbers) return
 
         if (event.inventoryName != "Composter") return
 

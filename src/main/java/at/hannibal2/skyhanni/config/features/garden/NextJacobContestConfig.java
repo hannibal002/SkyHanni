@@ -2,11 +2,16 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NextJacobContestConfig {
     @Expose
@@ -16,7 +21,7 @@ public class NextJacobContestConfig {
     public boolean display = true;
 
     @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in Garden but everywhere in SkyBlock.")
+    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in the Garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
     public boolean everywhere = false;
 
@@ -53,6 +58,14 @@ public class NextJacobContestConfig {
     @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
     @ConfigEditorBoolean
     public boolean warnPopup = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Warn For",
+        desc = "Only warn for these crops."
+    )
+    @ConfigEditorDraggableList
+    public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
 
     @Expose
     public Position pos = new Position(-200, 10, false, true);

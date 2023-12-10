@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
@@ -16,8 +17,10 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -483,6 +486,21 @@ object RenderUtils {
         }
         GlStateManager.popMatrix()
         return offsetX
+    }
+
+    fun MutableList<Any>.addItemIcon(item: ItemStack, highlight: Boolean = false) {
+        try {
+            if (highlight) {
+                // Hack to add enchant glint, like Hypixel does it
+                item.addEnchantment(Enchantment.protection, 0)
+            }
+            add(item)
+        } catch (e: NullPointerException) {
+            ErrorManager.logErrorWithData(
+                e, "Add item icon to renderable list",
+                "item" to item
+            )
+        }
     }
 
     // totally not modified Autumn Client's TargetStrafe

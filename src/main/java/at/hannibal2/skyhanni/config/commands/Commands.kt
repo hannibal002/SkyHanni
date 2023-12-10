@@ -7,8 +7,9 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
-import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
+import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
@@ -56,6 +57,7 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -74,7 +76,6 @@ object Commands {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
-            val arr = mutableListOf<String>()
             ConfigGuiManager.openConfigGui()
         }
     }
@@ -225,7 +226,11 @@ object Commands {
         registerCommand(
             "shwhereami",
             "Print current island in chat"
-        ) { SkyHanniDebugsAndTests.whereami() }
+        ) { SkyHanniDebugsAndTests.whereAmI() }
+        registerCommand(
+            "shclearcontestdata",
+            "Resets Jacob's Contest Data"
+        ) { SkyHanniDebugsAndTests.clearContestData() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
@@ -281,6 +286,7 @@ object Commands {
     }
 
     private fun developersCodingHelp() {
+        registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
         registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
@@ -332,6 +338,10 @@ object Commands {
             "shplaysound",
             "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
+        registerCommand(
+            "shsendtitle",
+            "Display a title on the screen with the specified settings."
+        ) { TitleManager.command(it) }
         registerCommand(
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
@@ -402,7 +412,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cJoin SkyBlock to open the fortune guide!", false)
+            LorenzUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -412,7 +422,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.chat("§cYou need to join Hypixel to use this feature!", false)
+            LorenzUtils.userError("You need to join Hypixel to use this feature!")
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
@@ -427,6 +437,9 @@ object Commands {
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+            error("The command '$name is already registered!'")
+        }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
         commands.add(CommandInfo(name, description, currentCategory))
     }

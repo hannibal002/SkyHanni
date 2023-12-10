@@ -20,12 +20,17 @@ public class TrackerConfig {
     public int priceFrom = 1;
 
     @Expose
-    @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown when starting.")
+    @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
-    public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.TOTAL);
+    public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.REMEMBER_LAST);
 
     @Expose
     @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")
     @ConfigEditorBoolean
     public boolean showRecentDrops = true;
+
+    @Expose
+    @ConfigOption(name = "Exclude Hidden", desc = "Exclude hidden items in the total price calculation.")
+    @ConfigEditorBoolean
+    public boolean excludeHiddenItemsInPrice = false;
 }

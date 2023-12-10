@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -11,12 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -42,7 +43,7 @@ object GardenCropMilestonesCommunityFix {
 
     fun openInventory(inventoryItems: Map<Int, ItemStack>) {
         if (!showWrongData) return
-        if (!SkyHanniMod.feature.garden.copyMilestoneData) return
+        if (!GardenAPI.config.copyMilestoneData) return
         fixForWrongData(inventoryItems)
     }
 
@@ -74,7 +75,7 @@ object GardenCropMilestonesCommunityFix {
     ) {
         val name = stack.name ?: return
         val rawNumber = name.removeColor().replace(crop.cropName, "").trim()
-        val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNeeded()
+        val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
         val next = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 3) ?: return
