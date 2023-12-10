@@ -48,6 +48,7 @@ class MobData {
         val displayNPCs = MobSet()
         val skyblockMobs = MobSet()
         val summoningMobs = MobSet()
+        val special = MobSet()
         val currentMobs = MobSet()
 
         val entityToMob = mutableMapOf<EntityLivingBase, Mob>()
@@ -365,6 +366,11 @@ class MobData {
     }
 
     @SubscribeEvent
+    fun onSpecialSpawnEvent(event: MobEvent.Spawn.Special) {
+        special.add(event.mob)
+    }
+
+    @SubscribeEvent
     fun onDisplayNPCSpawnEvent(event: MobEvent.Spawn.DisplayNPC) {
         displayNPCs.add(event.mob)
     }
@@ -391,6 +397,11 @@ class MobData {
     @SubscribeEvent
     fun onSummonDeSpawnEvent(event: MobEvent.DeSpawn.Summon) {
         summoningMobs.remove(event.mob)
+    }
+
+    @SubscribeEvent
+    fun onSpecialDeSpawnEvent(event: MobEvent.DeSpawn.Special) {
+        special.remove(event.mob)
     }
 
     @SubscribeEvent
