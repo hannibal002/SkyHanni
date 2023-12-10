@@ -136,10 +136,10 @@ class ParkourHelper(
         if (LocationUtils.playerLocation().distance(nextPosition) > currentPosition.distance(nextPosition)) return null
 
         val factor = LocationUtils.playerLocation().distance(currentPosition) / currentPosition.distance(nextPosition)
-        val solpeLocation = lookAheadStart.slope(lookAheadEnd, factor)
+        val slopeLocation = lookAheadStart.slope(lookAheadEnd, factor)
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
-            IndexedValue(current + lookAhead, solpeLocation)
+            IndexedValue(current + lookAhead, slopeLocation)
         )
     }
 
