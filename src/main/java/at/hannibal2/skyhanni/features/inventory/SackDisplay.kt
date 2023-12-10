@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -158,9 +159,9 @@ object SackDisplay {
             if (config.showPrice) {
                 newDisplay.addSelector<PriceFrom>(" ",
                     getName = { type -> type.displayName },
-                    isCurrent = { it.ordinal == config.priceFrom },
+                    isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
                     onChange = {
-                        config.priceFrom = it.ordinal
+                        config.priceFrom = SackDisplayConfig.PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
                         update(false)
                     })
                 newDisplay.addButton(
@@ -250,6 +251,9 @@ object SackDisplay {
         }
         event.move(14, "inventory.sackDisplay.priceFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
+        }
+        event.move(14, "inventory.sackDisplay.priceFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, PriceFromEntry::class.java)
         }
     }
 }
