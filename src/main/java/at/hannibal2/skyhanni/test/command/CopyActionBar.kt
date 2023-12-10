@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 object CopyActionBar {
     fun command(args: Array<String>) {
         val noColor = args.size == 1 && args[0] == "true"
-        var string = ""
-        string = ActionBarStatsData.actionBar.transformIf({noColor}) { removeColor() }
+        val string = ActionBarStatsData.actionBar.transformIf({noColor}) { removeColor() }
 
         OSUtils.copyToClipboard(string)
         LorenzUtils.chat("§e[SkyHanni] actionbar copied into your clipboard!")
