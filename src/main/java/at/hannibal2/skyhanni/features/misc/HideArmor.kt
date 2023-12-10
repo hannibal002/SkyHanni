@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig
+import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -24,10 +28,10 @@ class HideArmor {
         if (entity.isNPC()) return false
 
         return when (config.mode) {
-            0 -> true
+            HideArmorConfig.ModeEntry.ALL -> true
 
-            1 -> entity is EntityPlayerSP
-            2 -> entity !is EntityPlayerSP
+            HideArmorConfig.ModeEntry.OWN -> entity is EntityPlayerSP
+            HideArmorConfig.ModeEntry.OTHERS -> entity !is EntityPlayerSP
 
             else -> false
         }
@@ -59,6 +63,14 @@ class HideArmor {
 
         for ((index, stack) in armor) {
             armorInventory[index] = stack
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "misc.hideArmor2.mode") { element ->
+            ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
         }
     }
 }
