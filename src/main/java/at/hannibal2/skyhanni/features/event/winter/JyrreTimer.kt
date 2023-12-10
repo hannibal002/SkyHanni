@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -69,11 +70,13 @@ class JyrreTimer {
         display = drawDisplay()
     }
 
+    private val displayIcon by lazy { "REFINED_BOTTLE_OF_JYRRE".asInternalName().getItemStack() }
+
     fun drawDisplay(): MutableList<Any> {
         duration -= 1.seconds
 
         return mutableListOf<Any>().apply {
-            addItemIcon("REFINED_BOTTLE_OF_JYRRE".asInternalName())
+            addItemIcon(displayIcon)
             add("§aJyrre Boost: ")
 
             if (duration <= 0.seconds && config.showInactive) {
