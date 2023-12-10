@@ -74,8 +74,38 @@ public class SackDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sack.")
-    @ConfigEditorDropdown(values = {"Descending (Stored)", "Ascending (Stored)", "Descending (Price)", "Ascending (Price)"})
-    public int sortingType = 0;
+    @ConfigEditorDropdown()
+    public SortingTypeEntry sortingType = SortingTypeEntry.DESC_STORED;
+
+    public enum SortingTypeEntry implements HasLegacyId {
+        DESC_STORED("Descending (Stored)", 0),
+        ASC_STORED("Ascending (Stored)", 1),
+        DESC_PRICE("Descending (Price)", 2),
+        ASC_PRICE("Ascending (Price)", 3);
+
+        private final String str;
+        private final int legacyId;
+
+        SortingTypeEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        SortingTypeEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +

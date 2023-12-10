@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFromEntry
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -69,10 +70,10 @@ object SackDisplay {
         val sackItems = SackAPI.sackItem.toList()
         if (sackItems.isNotEmpty()) {
             val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-                0 -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
-                1 -> sackItems.sortedBy { it.second.stored.formatNumber() }
-                2 -> sackItems.sortedByDescending { it.second.price }
-                3 -> sackItems.sortedBy { it.second.price }
+                SackDisplayConfig.SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
+                SackDisplayConfig.SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored.formatNumber() }
+                SackDisplayConfig.SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
+                SackDisplayConfig.SortingTypeEntry.ASC_PRICE -> sackItems.sortedBy { it.second.price }
                 else -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
             }.toMap().toMutableMap()
 
@@ -134,14 +135,14 @@ object SackDisplay {
 
             if (SackAPI.isTrophySack) newDisplay.addAsSingletonList("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
 
-            val name = SortType.entries[config.sortingType].longName
+            val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
             newDisplay.addAsSingletonList("§7Sorted By: §c$name")
 
             newDisplay.addSelector<SortType>(" ",
                 getName = { type -> type.shortName },
-                isCurrent = { it.ordinal == config.sortingType },
+                isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.sortingType = it.ordinal
+                    config.sortingType = SackDisplayConfig.SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
                     update(false)
                 })
 
@@ -254,6 +255,9 @@ object SackDisplay {
         }
         event.move(14, "inventory.sackDisplay.priceFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFromEntry::class.java)
+        }
+        event.move(14, "inventory.sackDisplay.sortingType") { element ->
+            ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
         }
     }
 }
