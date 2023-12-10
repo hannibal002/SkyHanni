@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -152,16 +153,17 @@ class ChestValue {
     }
 
     private fun sortedList() = when (config.sortingType) {
-        0 -> chestItems.values.sortedByDescending { it.total }
-        1 -> chestItems.values.sortedBy { it.total }
+        ChestValueConfig.SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
+        ChestValueConfig.SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
         else -> chestItems.values.sortedByDescending { it.total }
     }.toMutableList()
 
     private fun addButton(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton("§7Sorted By: ",
-            getName = SortType.entries[config.sortingType].longName,
+            getName = SortType.entries[config.sortingType.ordinal].longName, // todo avoid ordinal
             onChange = {
-                config.sortingType = (config.sortingType + 1) % 2
+                // todo avoid ordinals
+                config.sortingType = ChestValueConfig.SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
                 update()
             })
 
@@ -292,8 +294,11 @@ class ChestValue {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         // TODO Replace with transform when PR 769 is merged
-        event.move(14, "combat.bestiary.numberFormat") { element ->
+        event.move(14, "inventory.chestValueConfig.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+        event.move(14, "inventory.chestValueConfig.sortingType") { element ->
+            ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
         }
     }
 }

@@ -55,8 +55,36 @@ public class ChestValueConfig {
 
     @Expose
     @ConfigOption(name = "Sorting Type", desc = "Price sorting type.")
-    @ConfigEditorDropdown(values = {"Descending", "Ascending"})
-    public int sortingType = 0;
+    @ConfigEditorDropdown()
+    public SortingTypeEntry sortingType = SortingTypeEntry.DESCENDING;
+
+    public enum SortingTypeEntry implements HasLegacyId {
+        DESCENDING("Descending", 0),
+        ASCENDING("Ascending", 1),
+        ;
+        private final String str;
+        private final int legacyId;
+
+        SortingTypeEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        SortingTypeEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
