@@ -54,8 +54,36 @@ public class ComposterConfig {
 
     @Expose
     @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
-    @ConfigEditorDropdown(values = {"Bazaar", "Sacks"})
-    public int retrieveFrom = 0;
+    @ConfigEditorDropdown()
+    public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.BAZAAR;
+
+    public enum RetrieveFromEntry implements HasLegacyId {
+        BAZAAR("Bazaar", 0),
+        SACKS("Sacks", 1),
+        ;
+        private final String str;
+        private final int legacyId;
+
+        RetrieveFromEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        RetrieveFromEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     public Position overlayOrganicMatterPos = new Position(140, 152, false, true);

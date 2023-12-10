@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -446,7 +447,7 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: String, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0 || internalName == "BIOFUEL") return
-        if (config.retrieveFrom == 0 && !LorenzUtils.noTradeMode) {
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
@@ -584,6 +585,9 @@ object ComposterOverlay {
         // TODO Replace with transform when PR 769 is merged
         event.move(14, "garden.composters.overlayPriceType") { element ->
             ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
+        }
+        event.move(14, "garden.composters.retrieveFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
         }
     }
 }
