@@ -16,21 +16,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 object WorldEdit {
-    var leftPos = null as BlockPos?
-    var rightPos = null as BlockPos?
+    private var leftPos = null as BlockPos?
+    private var rightPos = null as BlockPos?
 
-    fun funAABB(left: BlockPos, right: BlockPos): AxisAlignedBB {
-        return AxisAlignedBB(
-            minOf(left.x, left.x + 1, right.x, right.x + 1).toDouble(),
-            minOf(left.y, left.y + 1, right.y, right.y + 1).toDouble(),
-            minOf(left.z, left.z + 1, right.z, right.z + 1).toDouble(),
-            maxOf(left.x, left.x + 1, right.x, right.x + 1).toDouble(),
-            maxOf(left.y, left.y + 1, right.y, right.y + 1).toDouble(),
-            maxOf(left.z, left.z + 1, right.z, right.z + 1).toDouble(),
-        )
-    }
+    private fun funAABB(left: BlockPos, right: BlockPos) = AxisAlignedBB(
+        minOf(left.x, left.x + 1, right.x, right.x + 1).toDouble(),
+        minOf(left.y, left.y + 1, right.y, right.y + 1).toDouble(),
+        minOf(left.z, left.z + 1, right.z, right.z + 1).toDouble(),
+        maxOf(left.x, left.x + 1, right.x, right.x + 1).toDouble(),
+        maxOf(left.y, left.y + 1, right.y, right.y + 1).toDouble(),
+        maxOf(left.z, left.z + 1, right.z, right.z + 1).toDouble(),
+    )
 
-    val aabb
+    private val aabb
         get() = leftPos?.let { l ->
             rightPos?.let { r ->
                 funAABB(l, r)
@@ -41,11 +39,11 @@ object WorldEdit {
         ClipboardUtils.copyToClipboard(generateCodeSnippet())
     }
 
-    fun generateCodeSnippet(): String {
+    private fun generateCodeSnippet(): String {
         var text = ""
-        leftPos?.let { text += "val redLeft = net.minecraft.util.BlockPos(${it.x}, ${it.y}, ${it.z})\n" }
-        rightPos?.let { text += "val blueRight = net.minecraft.util.BlockPos(${it.x}, ${it.y}, ${it.z})\n" }
-        aabb?.let { text += "val aabb = net.minecraft.util.AxisAlignedBB(${it.minX}, ${it.minY}, ${it.minZ}, ${it.maxX}, ${it.maxY}, ${it.maxZ})\n" }
+        leftPos?.run { text += "val redLeft = net.minecraft.util.BlockPos($x, $y, $z)\n" }
+        rightPos?.run { text += "val blueRight = net.minecraft.util.BlockPos($x, $y, $z)\n" }
+        aabb?.run { text += "val aabb = net.minecraft.util.AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ)\n" }
         return text
     }
 
@@ -58,7 +56,6 @@ object WorldEdit {
             rightPos = event.position.toBlockPos()
         }
     }
-
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {

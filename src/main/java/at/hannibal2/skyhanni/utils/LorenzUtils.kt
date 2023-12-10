@@ -634,7 +634,7 @@ object LorenzUtils {
         enumValueOfOrNull<T>(name)
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
-    fun isInDevEnviromen() = Launch.blackboard.get("fml.deobfuscatedEnvironment") as Boolean
+    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
