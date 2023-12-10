@@ -248,16 +248,16 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cWave ") }) {
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§cWave ") } ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left§c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Magma Cubes Left§c") }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Magma Cubes Left") }
                     ?: "<hidden>"
             }
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Dama") }) {
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Total Dama") }
                     ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage§c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Cube Damage§c") }
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Cube Damage") }
                     ?: "<hidden>"
             }
 
