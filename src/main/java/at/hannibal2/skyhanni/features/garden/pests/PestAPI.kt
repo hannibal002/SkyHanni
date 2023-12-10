@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack
 object PestAPI {
     val config get() = GardenAPI.config.pests
 
+    var scoreboardPests = 0
+
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
