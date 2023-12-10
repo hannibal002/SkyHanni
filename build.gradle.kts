@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
 
 plugins {
     idea
@@ -11,7 +12,17 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.22.Beta.6"
+version = "0.22.Beta.9"
+
+val gitHash by lazy {
+    val baos = ByteArrayOutputStream()
+    exec {
+        standardOutput = baos
+        commandLine("git", "rev-parse", "--short", "HEAD")
+        isIgnoreExitValue = true
+    }
+    baos.toByteArray().decodeToString().trim()
+}
 
 // Toolchains:
 java {
@@ -51,6 +62,11 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
+val headlessLwjgl by configurations.creating {
+    isTransitive = false
+    isVisible = false
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
@@ -63,7 +79,9 @@ dependencies {
         exclude(module = "gson")
         because("Different version conflicts with Minecraft's Log4j")
     }
+    compileOnly(libs.jbAnnotations)
 
+    headlessLwjgl(libs.headlessLwjgl)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -147,6 +165,24 @@ tasks.processResources {
     filesMatching("mcmod.info") {
         expand("version" to version)
     }
+}
+
+val generateRepoPatterns by tasks.creating(JavaExec::class) {
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass.set("net.fabricmc.devlaunchinjector.Main")
+    workingDir(project.file("run"))
+    classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
+    jvmArgs(
+        "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
+        "-Dfabric.dli.env=client",
+        "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
+        "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
+        "-javaagent:${headlessLwjgl.singleFile.absolutePath}"
+    )
+    val outputFile = project.file("build/regexes/constants.json")
+    environment("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
+    environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
 }
 
 tasks.compileJava {

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -295,6 +295,9 @@ class ChatFilter {
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
+        "§c {3}♨ .* Skin §e\\(.* §eleft\\)§c".toPattern(),
+        "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
+        "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -307,6 +310,7 @@ class ChatFilter {
     )
     private val fireSaleMessages = listOf(
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
+        "§c♨ §eSelling multiple items for a limited time!",
     )
 
     private val skymallPatterns = listOf(
@@ -434,9 +438,9 @@ class ChatFilter {
      * @see messagesStartsWithMap
      */
     private fun String.isPresent(key: String) = this in (messagesMap[key] ?: emptyList()) ||
-            (patternsMap[key] ?: emptyList()).any { it.matchMatcher(this) { } != null } ||
-            (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
-            (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
+        (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
+        (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
+        (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

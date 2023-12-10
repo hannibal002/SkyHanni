@@ -54,6 +54,11 @@
 + Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
 + Added support for tips in hidden bingo card display. - hannibal2
 + Added support for 'found by' info in bingo card. - hannibal2
++ Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
 #### Inventory Features
 
@@ -68,6 +73,11 @@
 
 + Hide the repeating fire sale reminder chat messages. - hannibal2
 
+
+#### Event Features
+
++ Added Waypoints for 2023 Lobby Presents. - walker
+
 ### Changes
 
 #### Garden Changes
@@ -81,6 +91,13 @@
 + Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
 + Made the wording of "no pest spawned yet" message more clear. - hannibal2
 + Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
++ Use different colors in the tab list depending on the pest count. - alexia
++ Highlight the boosted crop contest in all Jacob's Contest displays. - alexia
++ Added Delicate 5 to visitor drop counter and visitor block refuse and highlighter. - hannibal2
++ Block visitor interaction for dedication cycling is now disabled by default. - hannibal2
++ Added an option to only warn for specific crop contests. - Obsidian
++ Added an option to show plot borders for a given number of seconds after holding a vacuum. - HiZe
++ Added command /shclearcontestdata to Reset Jacob's Contest Data. - martimavocado
 
 #### Fishing Changes
 
@@ -89,6 +106,25 @@
 #### Winter Changes
 
 + Hiding Unique Gifted Players Highlighting for ironman and bingo while not on those modes. - Thunderblade73
+
+#### Chat Changes
+
++ Added fire sale messages in the hub to the chat message filter. - hannibal2
++ Added compact potion message support for splash messages and for Poisoned Candy I. - walker
++ Added "fire sale starting soon" message to fire sale chat hider. - hannibal2
+
+#### Bingo Changes
+
++ Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
++ Mark the background difficulty gray for unknown goals. - hannibal2
+  + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
++ Added the community goal percentage to the bingo card display. - hannibal2
++ Saving minion craft helper crafted tier 1 minions and bingo card goals per bingo session/month. - hannibal2
+
+#### Misc Changes
+
++ Titles sent by SkyHanni look better now. - Cad
++ Added support for show XP gained from wheat minion in hub. - Thunderblade73
 
 ### Fixes
 
@@ -104,12 +140,37 @@
 + Fixed showing on the scoreboard  "garden outside" immediately after teleporting to a plot. - hannibal2
 + Fixed visitor timer counting down too fast sometimes. - hannibal2
 + Fixed Mooshroom cow Perk display not showing when maxed. - hannibal2
++ Show a text around the new year that the calendar is not loaded for the next Jacob Contest. - hannibal2
++ Fixed visitor reward item refuse inconsistencies. - hannibal2
++ Fixed wrong base 100ff calculations in the farming fortune needed display. - alexia
++ Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
+
+#### Bingo Fixes
+
++ Hide the long hint line in the Bingo Goal Display. - hannibal2
++ Show community goals in the Bingo Display correctly. - hannibal2
++ Hide enchanted tools in Minion Craft Helper. - hannibal2
++ Opening the bingo card will no longer crash the game sometimes. Showing an error message instead. - hannibal2
+
+#### Minion Fixes
+
++ Fixed Minion XP display not showing sometimes. - Thunderblade73
++ Updating the Minion XP display when the minion picks up a new item while inside the inventory. - hannibal2
++ Fixed minion features disappear inside the minion inventory when picking up an item. - hannibal2
+
+#### Fishing Fixes
+
++ Fixed Water Hydra warning showing up multiple times. - Cad
 
 #### Misc Fixes
 
 + Fixed Item Tracker not ignoring manual sack movements. - hannibal2
 + Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
 + Fixed NPC messages getting detected as player messages. - CalMWolfs
++ Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. - hannibal2
++ Fixed an error when the king talisman helper does not find the king in range. - hannibal2
++ Fixed control/modifier key logic on Apple devices. - walker
++ Fixed lag spikes when downloading updates. - nea
 
 #### Config Fixes
 
@@ -129,6 +190,25 @@
 + Changed OwnInventoryItemUpdateEvent to be called synced to the main thread. - hannibal2
 + romanToDecimalIfNeeded -> romanToDecimalIfNecessary. - hannibal2
   + For more context: https://chat.openai.com/share/502571b5-8851-4047-b343-3b1475ca8a88
++ Added the debug feature SkyHanni Event Counter. - hannibal2
++ Fix Consecutive Spaces in RegEx. - walker
++ No longer creating new regex pattern elements each time in DungeonDeathCounter. - walker
++ Changed DungeonChatFilter to use lists of patterns. - walker
++ Code cleanup in DungeonMilestoneDisplay. - walker
++ Code cleanup and removed .matchRegex() - walker
++ Misc pattern optimizations. - walker
++ Moving the bingo goal list into BingoAPI. - hannibal2
++ Created BingoGoalReachedEvent. - hannibal2
++ Created Matcher.groupOrNull. - walker
++ cleanPlayerName respects playerRankHider option now. - hannibal2
++ Replaced ItemWarnEntry with VisitorReward. This should fix some errors. - hannibal2
++ GardenNextJacobContest now uses SimpleTimeMark. SimpleTimeMark is storable in the config and comparable - hannibal2
++ No longer sending contest data to elite close to new year. - hannibal2
++ Added RepoPatterns. - nea
++ Use LorenzToolTipEvent over ItemTooltipEvent if possible. - hannibal2
++ Added an abstract error message on LorenzToolTipEvent error. - hannibal2
++ Added test command /shsendtitle - Cad
++ Saving bingo goal data into the config. - hannibal2
 
 ## Version 0.21.1
 
