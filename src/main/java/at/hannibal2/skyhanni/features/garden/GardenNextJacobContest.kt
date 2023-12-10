@@ -46,7 +46,7 @@ object GardenNextJacobContest {
     private var dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
-    private var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
+    var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
 
     private val patternDay = "§aDay (?<day>.*)".toPattern()
@@ -61,9 +61,9 @@ object GardenNextJacobContest {
     private var loadedContestsYear = -1
     private var nextContestsAvailableAt = -1L
 
-    private var lastFetchAttempted = 0L
-    private var isFetchingContests = false
-    private var fetchedFromElite = false
+    var lastFetchAttempted = 0L
+    var isFetchingContests = false
+    var fetchedFromElite = false
     private var isSendingContests = false
 
     @SubscribeEvent
@@ -349,7 +349,7 @@ object GardenNextJacobContest {
             val lineStripped = line.removeColor().trim()
             if (!lineStripped.startsWith("☘ ")) continue
             for (crop in nextContest.crops) {
-                if (line.removeColor().trim() == "☘ ${crop.cropName}") {
+                if (line.removeColor().trim().startsWith("☘ ${crop.cropName}")) {
                     return crop
                 }
             }
@@ -361,6 +361,7 @@ object GardenNextJacobContest {
     private fun warn(duration: Duration, crops: List<CropType>, boostedCrop: CropType?) {
         if (!config.warn) return
         if (config.warnTime.seconds <= duration) return
+        if (!warnForCrop()) return
 
         if (System.currentTimeMillis() < lastWarningTime) return
         lastWarningTime = System.currentTimeMillis() + 60_000 * 40
@@ -370,8 +371,8 @@ object GardenNextJacobContest {
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
-        val cropTextNoColor =
-            crops.joinToString(", ") { if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
+        val cropTextNoColor = crops.joinToString(", ") {
+            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
@@ -420,6 +421,8 @@ object GardenNextJacobContest {
         )
     }
 
+    private fun warnForCrop(): Boolean = nextContestCrops.any { it in config.warnFor }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -467,7 +470,7 @@ object GardenNextJacobContest {
         }
     }
 
-    private suspend fun fetchUpcomingContests() {
+    suspend fun fetchUpcomingContests() {
         try {
             val url = "https://api.elitebot.dev/contests/at/now"
             val result = withContext(dispatcher) { APIUtil.getJSONResponse(url) }.asJsonObject

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -45,6 +46,7 @@ import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -173,9 +175,18 @@ object Commands {
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
         ) { EnderNodeTracker.resetCommand(it) }
-        registerCommand("shresetarmordroptracker", "Resets the Armor Drop Tracker") { ArmorDropTracker.resetCommand(it) }
-        registerCommand("shresetfrozentreasuretracker", "Resets the Frozen Treasure Tracker") { FrozenTreasureTracker.resetCommand(it) }
-        registerCommand("shresetfishingtracker", "Resets the Frozen Treasure Tracker") { FishingProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetarmordroptracker",
+            "Resets the Armor Drop Tracker"
+        ) { ArmorDropTracker.resetCommand(it) }
+        registerCommand(
+            "shresetfrozentreasuretracker",
+            "Resets the Frozen Treasure Tracker"
+        ) { FrozenTreasureTracker.resetCommand(it) }
+        registerCommand(
+            "shresetfishingtracker",
+            "Resets the Frozen Treasure Tracker"
+        ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -215,7 +226,11 @@ object Commands {
         registerCommand(
             "shwhereami",
             "Print current island in chat"
-        ) { SkyHanniDebugsAndTests.whereami() }
+        ) { SkyHanniDebugsAndTests.whereAmI() }
+        registerCommand(
+            "shclearcontestdata",
+            "Resets Jacob's Contest Data"
+        ) { SkyHanniDebugsAndTests.clearContestData() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
@@ -259,6 +274,11 @@ object Commands {
         registerCommand("shtestinquisitor", "dev command") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation", "dev command") { CropMoneyDisplay.toggleShowCalculation() }
         registerCommand("shcropspeedmeter", "Debugs how many crops you collect over time") { CropSpeedMeter.toggle() }
+        registerCommand0(
+            "shworldedit",
+            "Select regions in the world",
+            { WorldEdit.command(it) },
+            { listOf("copy", "reset", "help", "left", "right") })
         registerCommand(
             "shconfigsave",
             "Manually saving the config"
@@ -318,6 +338,10 @@ object Commands {
             "shplaysound",
             "Play the specified sound effect at the given pitch and volume."
         ) { SoundUtils.command(it) }
+        registerCommand(
+            "shsendtitle",
+            "Display a title on the screen with the specified settings."
+        ) { TitleManager.command(it) }
         registerCommand(
             "shconfigmanagerreset",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
@@ -413,6 +437,9 @@ object Commands {
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+            error("The command '$name is already registered!'")
+        }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
         commands.add(CommandInfo(name, description, currentCategory))
     }

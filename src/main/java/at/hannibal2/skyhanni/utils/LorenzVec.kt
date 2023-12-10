@@ -28,7 +28,7 @@ data class LorenzVec(
 
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    fun toBlocPos(): BlockPos = BlockPos(x, y, z)
+    fun toBlockPos(): BlockPos = BlockPos(x, y, z)
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 

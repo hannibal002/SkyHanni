@@ -52,8 +52,13 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
+    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
+    /**
+     * Consider using IslandType.isInIsland() instead
+     */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
@@ -640,7 +645,7 @@ object LorenzUtils {
         }
     }
 
-    fun isInDevEnviromen() = Launch.blackboard.get("fml.deobfuscatedEnvironment") as Boolean
+    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
