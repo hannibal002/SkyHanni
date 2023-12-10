@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -12,7 +14,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -50,7 +51,9 @@ object WorldEdit {
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
+        if (!isEnabled()) return
         if (event.itemInHand?.getItemId() != "WOOD_AXE") return
+
         if (event.clickType == ClickType.LEFT_CLICK) {
             leftPos = event.position.toBlockPos()
         } else if (event.clickType == ClickType.RIGHT_CLICK) {
@@ -59,13 +62,15 @@ object WorldEdit {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         leftPos = null
         rightPos = null
     }
 
     @SubscribeEvent
     fun onRenderWorldLast(event: RenderWorldLastEvent) {
+        if (!isEnabled()) return
+
         leftPos?.let { l ->
             RenderUtils.drawWireframeBoundingBox_nea(
                 funAABB(l, l).expandBlock(),
@@ -91,6 +96,10 @@ object WorldEdit {
     }
 
     fun command(it: Array<String>) {
+        if (!isEnabled()) {
+            LorenzUtils.userError("World Edit is disabled in the config. Enable it if you want to use it.")
+            return
+        }
         when (it.firstOrNull()) {
             null, "help" -> {
                 LorenzUtils.chat("Use a wood axe and left/right click to select a region in the world. Then use /shworldedit copy or /shworldedit reset.")
@@ -122,4 +131,6 @@ object WorldEdit {
             }
         }
     }
+
+    fun isEnabled() = SkyHanniMod.feature.dev.worldEdit
 }

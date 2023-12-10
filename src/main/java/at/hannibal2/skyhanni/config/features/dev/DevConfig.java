@@ -39,6 +39,11 @@ public class DevConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showSlotNumberKey = Keyboard.KEY_NONE;
 
+    @Expose
+    @ConfigOption(name = "World Edit", desc = "Use wood axe or command /shworldedit to render a box, similar like the WorldEdit plugin.")
+    @ConfigEditorBoolean
+    public boolean worldEdit = false;
+
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose
