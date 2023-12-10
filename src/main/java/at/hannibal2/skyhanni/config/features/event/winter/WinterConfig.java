@@ -24,6 +24,11 @@ public class WinterConfig {
     @ConfigOption(name = "Unique Gift Counter", desc = "Keep track how many unique players you have given gifts to.")
     public UniqueGiftConfig uniqueGiftCounter = new UniqueGiftConfig();
 
+    @Accordion
+    @Expose
+    @ConfigOption(name = "Refined Bottle of Jyrre Timer", desc = "")
+    public JyrreTimerConfig jyrreTimer = new JyrreTimerConfig();
+
     @Expose
     @ConfigOption(name = "Island Close Time", desc = "While on the Winter Island, show a timer until Jerry's Workshop closes.")
     @ConfigEditorBoolean

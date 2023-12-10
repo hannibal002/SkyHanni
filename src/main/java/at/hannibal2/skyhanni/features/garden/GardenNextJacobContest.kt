@@ -352,7 +352,7 @@ object GardenNextJacobContest {
             val lineStripped = line.removeColor().trim()
             if (!lineStripped.startsWith("☘ ")) continue
             for (crop in nextContest.crops) {
-                if (line.removeColor().trim() == "☘ ${crop.cropName}") {
+                if (line.removeColor().trim().startsWith("☘ ${crop.cropName}")) {
                     return crop
                 }
             }
