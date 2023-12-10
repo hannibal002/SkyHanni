@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig
+import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
@@ -25,7 +28,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (config.display == 0) return
+        if (config.display == FireVeilWandConfig.DisplayEntry.PARTICLES) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
         if (event.type == EnumParticleTypes.FLAME && event.speed == 0.55f) {
             event.isCanceled = true
@@ -48,7 +51,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (config.display != 1) return
+        if (config.display != FireVeilWandConfig.DisplayEntry.LINE) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
         val color = config.displayColor.toChromaColor()
@@ -60,5 +63,9 @@ class FireVeilWandParticles {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
         event.move(3, "itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "itemAbilities.fireVeilWands.display") { element ->
+            ConfigUtils.migrateIntToEnum(element, DisplayEntry::class.java)
+        }
     }
 }
