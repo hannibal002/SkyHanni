@@ -116,6 +116,7 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureT
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween.BasketWaypoints
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
+import at.hannibal2.skyhanni.features.event.winter.JyrreTimer
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -669,6 +670,7 @@ class SkyHanniMod {
         loadModule(PestFinder())
         loadModule(SprayFeatures())
         loadModule(PresentWaypoints())
+        loadModule(JyrreTimer())
 
         init()
 
