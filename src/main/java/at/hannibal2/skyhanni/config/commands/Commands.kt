@@ -278,7 +278,7 @@ object Commands {
             "shworldedit",
             "Select regions in the world",
             { WorldEdit.command(it) },
-            { listOf("copy", "reset", "help") })
+            { listOf("copy", "reset", "help", "left", "right") })
         registerCommand(
             "shconfigsave",
             "Manually saving the config"

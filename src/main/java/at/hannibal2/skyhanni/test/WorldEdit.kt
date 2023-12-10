@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
@@ -104,6 +105,16 @@ object WorldEdit {
                 leftPos = null
                 rightPos = null
                 LorenzUtils.chat("Reset selected region")
+            }
+
+            "left", "pos1" -> {
+                leftPos = LocationUtils.playerLocation().toBlockPos()
+                LorenzUtils.chat("Set left pos.")
+            }
+
+            "right", "pos2" -> {
+                leftPos = LocationUtils.playerLocation().toBlockPos()
+                LorenzUtils.chat("Set right pos.")
             }
 
             else -> {
