@@ -32,6 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 20 * 5
 
+private const val MOB_DETECTION_LOG_PREFIX = "MobDetection: "
+
 
 class MobData {
     private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
@@ -62,7 +64,7 @@ class MobData {
         var externRemoveOfRetryAmount = 0
     }
 
-    var shouldClear: AtomicBoolean = AtomicBoolean(false)
+    private var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
         currentMobs.map {
@@ -78,11 +80,23 @@ class MobData {
     }
 
 
-    enum class Result {
-        Found, NotYetFound, Illegal
+    internal enum class Result {
+        Found, NotYetFound, Illegal, SomethingWentWrong
     }
 
-    class MobResult(val result: Result, val mob: Mob?)
+    internal class MobResult(val result: Result, val mob: Mob?) {
+        companion object {
+            val illegal = MobResult(Result.Illegal, null)
+            val notYetFound = MobResult(Result.NotYetFound, null)
+            val somethingWentWrong = MobResult(Result.SomethingWentWrong, null)
+            fun found(mob: Mob) = MobResult(Result.Found, mob)
+
+            fun EntityArmorStand?.makeMobResult(mob: (EntityArmorStand) -> Mob?) =
+                this?.let { armor ->
+                    mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
+                } ?: notYetFound
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -123,7 +137,11 @@ class MobData {
         else -> null
     }
 
-    private fun EntitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
+    /** @return always true */
+    private fun mobDetectionError(string: String) = LorenzDebug.log(MOB_DETECTION_LOG_PREFIX + string).let { true }
+
+    /**@return a false means that it should try again (later)*/
+    private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
         MobDevTracker.data.spawn++
         when (roughType) {
             Mob.Type.Player -> MobEvent.Spawn.Player(MobFactories.player(entity)).postAndCatch()
@@ -134,7 +152,8 @@ class MobData {
                 val mobResult = MobFilter.createSkyblockEntity(entity)
                 if (mobResult.result == Result.NotYetFound) return false
                 if (mobResult.result == Result.Illegal) return true
-                if (mobResult.mob == null) throw IllegalStateException("Mob is null even though result is Found")
+                if (mobResult.result == Result.SomethingWentWrong) return mobDetectionError("Something Went Wrong!")
+                if (mobResult.mob == null) return mobDetectionError("Mob is null even though result is Found")
                 when (mobResult.mob.mobType) {
                     Mob.Type.Summon -> MobEvent.Spawn.Summon(mobResult.mob).postAndCatch()
 
@@ -143,7 +162,7 @@ class MobData {
                     Mob.Type.Special -> MobEvent.Spawn.Special(mobResult.mob).postAndCatch()
                     Mob.Type.Projectile -> MobEvent.Spawn.Projectile(mobResult.mob).postAndCatch()
                     Mob.Type.DisplayNPC -> MobEvent.Spawn.DisplayNPC(mobResult.mob).postAndCatch()
-                    else -> {}
+                    Mob.Type.Player -> return mobDetectionError("An Player Ended Here. How?")
                 }
             }
 
@@ -249,8 +268,8 @@ class MobData {
             }
             MobDevTracker.data.retries++
             if (retry.times > MAX_RETRIES) {
-                LorenzDebug.log(
-                    "I (`${retry.entity.name}`${retry.entity.entityId} missed (Found? ${entityToMob[retry.entity] != null}). Position: ${retry.entity.getLorenzVec()} Distance: ${
+                mobDetectionError(
+                    "(`${retry.entity.name}`${retry.entity.entityId} missed (Found? ${entityToMob[retry.entity] != null}). Position: ${retry.entity.getLorenzVec()} Distance: ${
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     } , ${
                         entity.getLorenzVec().subtract(LocationUtils.playerLocation())
@@ -262,7 +281,7 @@ class MobData {
                 retry.times = Int.MIN_VALUE
                 // continue
             }
-            if (!EntitySpawn(entity, type)) {
+            if (!entitySpawn(entity, type)) {
                 retry.times++
                 continue
             }

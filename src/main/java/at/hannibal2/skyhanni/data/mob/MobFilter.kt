@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData.Result.Found
-import at.hannibal2.skyhanni.data.mob.MobData.Result.Illegal
-import at.hannibal2.skyhanni.data.mob.MobData.Result.NotYetFound
+import at.hannibal2.skyhanni.data.mob.MobData.MobResult
+import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.MobUtils.makeMobResult
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -95,7 +93,7 @@ object MobFilter {
         || (this is EntityWitch && this.entityId <= 500) // Alchemist NPC
         || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
 
-    fun createDisplayNPC(entity: EntityLivingBase): Boolean =
+    internal fun createDisplayNPC(entity: EntityLivingBase): Boolean =
         MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
             armorStand.name == "§e§lCLICK"
         }?.let { MobUtils.getArmorStand(it, -1) }?.let { armorStand ->
@@ -105,14 +103,14 @@ object MobFilter {
 
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
-    fun createSkyblockEntity(baseEntity: EntityLivingBase): MobData.MobResult {
+    internal fun createSkyblockEntity(baseEntity: EntityLivingBase): MobResult {
         val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? EntityLivingBase
 
         exceptions(baseEntity, nextEntity)?.let { return it }
 
         // Check if Late Stack
         nextEntity?.let { nextEntity ->
-            MobData.entityToMob[nextEntity]?.apply { internalAddEntity(baseEntity) }?.also { return MobData.MobResult(Illegal, null) }
+            MobData.entityToMob[nextEntity]?.apply { internalAddEntity(baseEntity) }?.also { return MobResult.illegal }
         }
 
         // Stack up the mob
@@ -125,15 +123,15 @@ object MobFilter {
         stackedMobsException(baseEntity, extraEntityList)?.let { return it }
 
         // If Late Stack add all entities
-        caughtSkyblockMob?.apply { internalAddEntity(extraEntityList.dropLast(1)) }?.also { return MobData.MobResult(Illegal, null) }
+        caughtSkyblockMob?.apply { internalAddEntity(extraEntityList.dropLast(1)) }?.also { return MobResult.illegal }
 
 
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand
-            ?: return MobData.MobResult(NotYetFound, null)
+            ?: return MobResult.notYetFound
 
-        if (armorStand.isDefaultValue()) return MobData.MobResult(NotYetFound, null)
-        return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))?.let { MobData.MobResult(Found, it) }
-            ?: MobData.MobResult(NotYetFound, null)
+        if (armorStand.isDefaultValue()) return MobResult.notYetFound
+        return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))?.let { MobResult.found(it) }
+            ?: MobResult.notYetFound
     }
 
     private fun createSkyblockMob(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
@@ -143,23 +141,21 @@ object MobFilter {
             ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(baseEntity, armorStand, extraEntityList) else (MobFactories.basic(baseEntity, armorStand, extraEntityList)
                 ?: MobFactories.dojo(baseEntity, armorStand))
 
-    private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobData.MobResult? =
-        when {
-            baseEntity is EntityBat -> createBat(baseEntity)?.let { MobData.MobResult(Found, it) }
-                ?: MobData.MobResult(NotYetFound, null)
+    private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobResult? = when {
+        baseEntity is EntityBat -> createBat(baseEntity)?.let { MobResult.found(it) }
+            ?: MobResult.notYetFound
 
-            baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobData.MobResult(Found, it) }
-            baseEntity is EntityDragon -> MobData.MobResult(Found, MobFactories.basic(baseEntity, baseEntity.cleanName()))
-            baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobData.MobResult(Found, MobFactories.projectile(baseEntity, "Giant Sword")) // Will false trigger if there is another Dinnerbone Giant
-            baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }
-                ?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.let { MobData.MobResult(Illegal, null) } }
+        baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
+        baseEntity is EntityDragon -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+        baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobResult.found(MobFactories.projectile(baseEntity, "Giant Sword")) // Will false trigger if there is another Dinnerbone Giant
+        baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.let { MobResult.illegal } }
 
-            baseEntity is EntityWither && baseEntity.invulTime == 800 -> MobData.MobResult(Found, MobFactories.special(baseEntity, "Mini Wither"))
-            else -> null
-        }
+        baseEntity is EntityWither && baseEntity.invulTime == 800 -> MobResult.found(MobFactories.special(baseEntity, "Mini Wither"))
+        else -> null
+    }
 
 
-    private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobData.MobResult? {
+    private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobResult? {
         noArmorStandMobs(baseEntity)?.also { return it }
         val armorStand = nextEntity as? EntityArmorStand
         islandSpecificExceptions(baseEntity, armorStand, nextEntity)?.also { return it }
@@ -167,22 +163,22 @@ object MobFilter {
         if (armorStand == null) return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
         return when {
-            baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> MobData.MobResult(Illegal, null) // Pig Pet
+            baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> MobResult.illegal // Pig Pet
 
-            baseEntity is EntityHorse && armorStand.name.endsWith("'s Skeleton Horse") -> MobData.MobResult(Illegal, null)// Skeleton Horse Pet
+            baseEntity is EntityHorse && armorStand.name.endsWith("'s Skeleton Horse") -> MobResult.illegal// Skeleton Horse Pet
 
-            baseEntity is EntityHorse && armorStand.name.endsWith("'s Horse") -> MobData.MobResult(Illegal, null) // Horse Pet
+            baseEntity is EntityHorse && armorStand.name.endsWith("'s Horse") -> MobResult.illegal // Horse Pet
 
-            baseEntity is EntityGuardian && armorStand.cleanName().matches("^\\d+".toRegex()) -> MobData.MobResult(Illegal, null) // Wierd Sea Guardian Ability
+            baseEntity is EntityGuardian && armorStand.cleanName().matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
 
             else -> null
         }
     }
 
-    private fun islandSpecificExceptions(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, nextEntity: EntityLivingBase?): MobData.MobResult? {
+    private fun islandSpecificExceptions(baseEntity: EntityLivingBase, armorStand: EntityArmorStand?, nextEntity: EntityLivingBase?): MobResult? {
         return if (DungeonAPI.inDungeon()) {
             when {
-                baseEntity is EntityZombie && armorStand != null && (armorStand.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") -> MobData.MobResult(Found, MobFactories.special(baseEntity, armorStand.cleanName(), armorStand))
+                baseEntity is EntityZombie && armorStand != null && (armorStand.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") -> MobResult.found(MobFactories.special(baseEntity, armorStand.cleanName(), armorStand))
                 baseEntity is EntityCaveSpider -> MobUtils.getClosedArmorStand(baseEntity, 2.0).takeNonDefault().makeMobResult { MobFactories.dungeon(baseEntity, it) }
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin" -> MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin").makeMobResult { MobFactories.dungeon(baseEntity, it) }
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor" -> MobUtils.getArmorStand(baseEntity, 9).makeMobResult { MobFactories.boss(baseEntity, it) }
@@ -191,38 +187,38 @@ object MobFilter {
             }
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> when {
-                armorStand == null -> MobData.MobResult(Illegal, null) // TODO fix to always include Valid Mobs on Private Island
+                armorStand == null -> MobResult.illegal // TODO fix to always include Valid Mobs on Private Island
                 else -> null
             }
 
             IslandType.THE_RIFT -> when {
-                baseEntity is EntitySlime && nextEntity is EntitySlime -> MobData.MobResult(Illegal, null)// Bacte Tentacle
-                baseEntity is EntitySlime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") -> MobData.MobResult(Found, MobFactories.boss(baseEntity, armorStand, overriddenName = "Bacte"))
-                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Branchstrutter " -> MobData.MobResult(Found, Mob(baseEntity, Mob.Type.DisplayNPC, name = "Branchstrutter"))
+                baseEntity is EntitySlime && nextEntity is EntitySlime -> MobResult.illegal// Bacte Tentacle
+                baseEntity is EntitySlime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") -> MobResult.found(Mob(baseEntity, Mob.Type.Boss, armorStand, name = "Bacte"))
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Branchstrutter " -> MobResult.found(Mob(baseEntity, Mob.Type.DisplayNPC, name = "Branchstrutter"))
                 else -> null
             }
 
             IslandType.CRIMSON_ISLE -> when {
-                baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" -> MobData.MobResult(Found, MobFactories.special(baseEntity, "Heavy Pearl"))
-                baseEntity is EntityPig && nextEntity is EntityPig -> MobData.MobResult(Illegal, null) // Matriarch Tongue
-                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "BarbarianGuard " -> MobData.MobResult(Found, Mob(baseEntity, Mob.Type.DisplayNPC, name = "Barbarian Guard"))
+                baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" -> MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
+                baseEntity is EntityPig && nextEntity is EntityPig -> MobResult.illegal // Matriarch Tongue
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "BarbarianGuard " -> MobResult.found(Mob(baseEntity, Mob.Type.DisplayNPC, name = "Barbarian Guard"))
                 else -> null
             }
 
 
             IslandType.DWARVEN_MINES -> when {
-                baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000 -> MobData.MobResult(Found, MobFactories.basic(baseEntity, "Ghost"))
+                baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Ghost"))
                 else -> null
             }
 
             IslandType.CRYSTAL_HOLLOWS -> when {
-                baseEntity is EntityMagmaCube && armorStand != null && armorStand.cleanName() == "[Lv100] Bal ???❤" -> MobData.MobResult(Found, Mob(baseEntity, Mob.Type.Boss, armorStand, "Bal", levelOrTier = 100))
+                baseEntity is EntityMagmaCube && armorStand != null && armorStand.cleanName() == "[Lv100] Bal ???❤" -> MobResult.found(Mob(baseEntity, Mob.Type.Boss, armorStand, "Bal", levelOrTier = 100))
                 else -> null
             }
 
             IslandType.HUB -> when {
                 baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
-                baseEntity is EntityZombie -> ratHandler(baseEntity) // Possible Rat
+                baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
                 else -> null
             }
 
@@ -231,26 +227,31 @@ object MobFilter {
     }
 
 
-    private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobData.MobResult? {
+    private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobData.MobResult? =
         if (DungeonAPI.inDungeon()) {
-            if ((baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) && extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿") return MobData.MobResult(Illegal, null) // Livid Start Animation
+            when {
+                (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) && extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
+                else -> null
+            }
         } else when (LorenzUtils.skyBlockIsland) {
-            IslandType.CRIMSON_ISLE -> {}
-            else -> {}
+            IslandType.CRIMSON_ISLE -> when {
+                else -> null
+            }
+
+            else -> null
         }
-        return null
-    }
+
 
     private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobData.MobResult? {
         if (baseEntity !is EntityZombie) return null
         when {
-            armorStand.name.endsWith("'s Armadillo") -> return MobData.MobResult(Illegal, null) // Armadillo Pet
-            armorStand.name.endsWith("'s Rat") -> return MobData.MobResult(Illegal, null) // Rat Pet
+            armorStand.name.endsWith("'s Armadillo") -> return MobResult.illegal // Armadillo Pet
+            armorStand.name.endsWith("'s Rat") -> return MobResult.illegal // Rat Pet
         }
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
-            HellwispTentacleSkull -> return MobData.MobResult(Illegal, null) // Hellwisp Tentacle
-            RiftEyeSkull1 -> return MobData.MobResult(Found, MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
-            RiftEyeSkull2 -> return MobData.MobResult(Found, MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            HellwispTentacleSkull -> return MobResult.illegal // Hellwisp Tentacle
+            RiftEyeSkull1 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            RiftEyeSkull2 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
         }
         return null
     }
@@ -281,14 +282,15 @@ object MobFilter {
         else -> null
     }
 
-    private fun ratHandler(baseEntity: EntityZombie): MobData.MobResult? =
+    private fun ratHandler(baseEntity: EntityZombie, nextEntity: EntityLivingBase?): MobResult? =
         generateSequence(ratSearchStart) { it + 1 }.take(ratSearchUpTo - ratSearchStart + 1).map { i ->
             MobUtils.getArmorStand(
                 baseEntity, i
             )
         }.firstOrNull {
             it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)?.getSkullTexture() == RatSkull
-        }?.let { MobData.MobResult(Found, Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = it, name = "Rat")) }
+        }?.let { MobResult.found(Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = it, name = "Rat")) }
+            ?: if (nextEntity is EntityZombie) MobResult.notYetFound else null
 
     private const val ratSearchStart = 3
     private const val ratSearchUpTo = 11

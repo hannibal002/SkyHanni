@@ -31,10 +31,6 @@ object MobUtils {
 
     fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
 
-    fun EntityArmorStand?.makeMobResult(mob: (EntityArmorStand) -> Mob?) =
-        this?.let { MobData.MobResult(MobData.Result.Found, mob.invoke(it)) }
-            ?: MobData.MobResult(MobData.Result.NotYetFound, null)
-
 
     class OwnerShip(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
