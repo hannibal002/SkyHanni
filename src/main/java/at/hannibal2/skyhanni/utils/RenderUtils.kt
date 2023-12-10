@@ -858,6 +858,65 @@ object RenderUtils {
         drawFilledBoundingBox_nea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
 
+
+    fun drawWireframeBoundingBox_nea(
+        aabb: AxisAlignedBB,
+        c: Color,
+        partialTicks: Float,
+    ) {
+        GlStateManager.enableBlend()
+        GlStateManager.disableLighting()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableCull()
+        val vp = getViewerPos(partialTicks)
+        val effectiveAABB = AxisAlignedBB(
+            aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
+            aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
+        )
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+
+        GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
+        // Bottom face
+        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
+        tessellator.draw()
+
+        // Top face
+        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
+        tessellator.draw()
+
+
+        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
+
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
+
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
+        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
+
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
+
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
+        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
+
+        tessellator.draw()
+
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
+        GlStateManager.disableBlend()
+    }
+
+
     fun drawFilledBoundingBox_nea(
         aabb: AxisAlignedBB,
         c: Color,
