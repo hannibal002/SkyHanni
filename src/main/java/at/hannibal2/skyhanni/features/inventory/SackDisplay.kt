@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -95,9 +99,11 @@ object SackDisplay {
 
                     add(
                         when (config.numberFormat) {
-                            0 -> "$colorCode${stored}§7/§b${total}"
-                            1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                            2 -> "$colorCode${stored}§7/§b${total.formatNumber().addSeparators()}"
+                            SackDisplayConfig.NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${total}"
+                            SackDisplayConfig.NumberFormatEntry.FORMATTED -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                            SackDisplayConfig.NumberFormatEntry.UNFORMATTED -> "$colorCode${stored}§7/§b${
+                                total.formatNumber().addSeparators()
+                            }"
                             else -> "$colorCode${stored}§7/§b${total}"
                         }
                     )
@@ -139,9 +145,11 @@ object SackDisplay {
 
             newDisplay.addButton(
                 prefix = "§7Number format: ",
-                getName = NumberFormat.entries[config.numberFormat].DisplayName,
+                getName = NumberFormat.entries[config.numberFormat.ordinal].DisplayName, // todo avoid ordinal
                 onChange = {
-                    config.numberFormat = (config.numberFormat + 1) % 3
+                    // todo avoid ordinal
+                    config.numberFormat =
+                        SackDisplayConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 3]
                     update(false)
                 }
             )
@@ -228,5 +236,13 @@ object SackDisplay {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        // TODO Replace with transform when PR 769 is merged
+        event.move(14, "inventory.sackDisplay.numberFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -31,8 +32,38 @@ public class SackDisplayConfig {
         "§eDefault: §72,240/2.2k\n" +
         "§eFormatted: §72.2k/2.2k\n" +
         "§eUnformatted: §72,240/2,200")
-    @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
-    public int numberFormat = 1;
+    @ConfigEditorDropdown()
+    public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
+
+    public enum NumberFormatEntry implements HasLegacyId {
+        DEFAULT("Default", 0),
+        FORMATTED("Formatted", 1),
+        UNFORMATTED("Unformatted", 2);
+
+        private final String str;
+        private final int legacyId;
+
+        NumberFormatEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        NumberFormatEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
 
     @Expose
     @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
