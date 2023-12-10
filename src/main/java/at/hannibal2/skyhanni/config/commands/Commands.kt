@@ -48,6 +48,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.CopyActionBar
+import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -176,9 +177,18 @@ object Commands {
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
         ) { EnderNodeTracker.resetCommand(it) }
-        registerCommand("shresetarmordroptracker", "Resets the Armor Drop Tracker") { ArmorDropTracker.resetCommand(it) }
-        registerCommand("shresetfrozentreasuretracker", "Resets the Frozen Treasure Tracker") { FrozenTreasureTracker.resetCommand(it) }
-        registerCommand("shresetfishingtracker", "Resets the Frozen Treasure Tracker") { FishingProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetarmordroptracker",
+            "Resets the Armor Drop Tracker"
+        ) { ArmorDropTracker.resetCommand(it) }
+        registerCommand(
+            "shresetfrozentreasuretracker",
+            "Resets the Frozen Treasure Tracker"
+        ) { FrozenTreasureTracker.resetCommand(it) }
+        registerCommand(
+            "shresetfishingtracker",
+            "Resets the Frozen Treasure Tracker"
+        ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -266,6 +276,11 @@ object Commands {
         registerCommand("shtestinquisitor", "dev command") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation", "dev command") { CropMoneyDisplay.toggleShowCalculation() }
         registerCommand("shcropspeedmeter", "Debugs how many crops you collect over time") { CropSpeedMeter.toggle() }
+        registerCommand0(
+            "shworldedit",
+            "Select regions in the world",
+            { WorldEdit.command(it) },
+            { listOf("copy", "reset", "help", "left", "right") })
         registerCommand(
             "shconfigsave",
             "Manually saving the config"

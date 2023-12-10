@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
@@ -17,8 +18,10 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -531,6 +534,21 @@ object RenderUtils {
         return offsetX
     }
 
+    fun MutableList<Any>.addItemIcon(item: ItemStack, highlight: Boolean = false) {
+        try {
+            if (highlight) {
+                // Hack to add enchant glint, like Hypixel does it
+                item.addEnchantment(Enchantment.protection, 0)
+            }
+            add(item)
+        } catch (e: NullPointerException) {
+            ErrorManager.logErrorWithData(
+                e, "Add item icon to renderable list",
+                "item" to item
+            )
+        }
+    }
+
     // totally not modified Autumn Client's TargetStrafe
     fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
@@ -886,6 +904,71 @@ object RenderUtils {
         drawFilledBoundingBox_nea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
 
+    fun drawWireframeBoundingBox_nea(
+        aabb: AxisAlignedBB,
+        color: Color,
+        partialTicks: Float,
+    ) {
+        GlStateManager.enableBlend()
+        GlStateManager.disableLighting()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableCull()
+        val vp = getViewerPos(partialTicks)
+        val effectiveAABB = AxisAlignedBB(
+            aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
+            aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
+        )
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+
+        with(color) {
+            GlStateManager.color(red / 255f, green / 255f, blue / 255f, alpha / 255f)
+        }
+        // Bottom face
+        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+        with(effectiveAABB) {
+            worldRenderer.pos(minX, minY, minZ).endVertex()
+            worldRenderer.pos(maxX, minY, minZ).endVertex()
+            worldRenderer.pos(maxX, minY, maxZ).endVertex()
+            worldRenderer.pos(minX, minY, maxZ).endVertex()
+        }
+        tessellator.draw()
+
+        // Top face
+        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+        with(effectiveAABB) {
+            worldRenderer.pos(minX, maxY, maxZ).endVertex()
+            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
+            worldRenderer.pos(maxX, maxY, minZ).endVertex()
+            worldRenderer.pos(minX, maxY, minZ).endVertex()
+        }
+        tessellator.draw()
+
+
+        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
+
+        with(effectiveAABB) {
+            worldRenderer.pos(minX, minY, minZ).endVertex()
+            worldRenderer.pos(minX, maxY, minZ).endVertex()
+
+            worldRenderer.pos(minX, minY, maxZ).endVertex()
+            worldRenderer.pos(minX, maxY, maxZ).endVertex()
+
+            worldRenderer.pos(maxX, minY, minZ).endVertex()
+            worldRenderer.pos(maxX, maxY, minZ).endVertex()
+
+            worldRenderer.pos(maxX, minY, maxZ).endVertex()
+            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
+        }
+
+        tessellator.draw()
+
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
+        GlStateManager.disableBlend()
+    }
+
     fun drawFilledBoundingBox_nea(
         aabb: AxisAlignedBB,
         c: Color,
@@ -920,17 +1003,19 @@ object RenderUtils {
         if (drawVerticalBarriers) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-            worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
-            worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
-            worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
-            worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
-            tessellator.draw()
-            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-            worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
-            worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
-            worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
-            worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
-            tessellator.draw()
+            with(effectiveAABB) {
+                worldRenderer.pos(minX, minY, minZ).endVertex()
+                worldRenderer.pos(maxX, minY, minZ).endVertex()
+                worldRenderer.pos(maxX, minY, maxZ).endVertex()
+                worldRenderer.pos(minX, minY, maxZ).endVertex()
+                tessellator.draw()
+                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+                worldRenderer.pos(minX, maxY, maxZ).endVertex()
+                worldRenderer.pos(maxX, maxY, maxZ).endVertex()
+                worldRenderer.pos(maxX, maxY, minZ).endVertex()
+                worldRenderer.pos(minX, maxY, minZ).endVertex()
+                tessellator.draw()
+            }
         }
         GlStateManager.color(
             c.red / 255f * 0.8f,
@@ -941,16 +1026,18 @@ object RenderUtils {
 
         //x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
+        with(effectiveAABB) {
+            worldRenderer.pos(minX, minY, maxZ).endVertex()
+            worldRenderer.pos(minX, maxY, maxZ).endVertex()
+            worldRenderer.pos(minX, maxY, minZ).endVertex()
+            worldRenderer.pos(minX, minY, minZ).endVertex()
+            tessellator.draw()
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(maxX, minY, minZ).endVertex()
+            worldRenderer.pos(maxX, maxY, minZ).endVertex()
+            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
+            worldRenderer.pos(maxX, minY, maxZ).endVertex()
+        }
         tessellator.draw()
         GlStateManager.color(
             c.red / 255f * 0.9f,
@@ -960,16 +1047,18 @@ object RenderUtils {
         )
         //z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ).endVertex()
-        worldRenderer.pos(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
-        worldRenderer.pos(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ).endVertex()
+        with(effectiveAABB) {
+            worldRenderer.pos(minX, maxY, minZ).endVertex()
+            worldRenderer.pos(maxX, maxY, minZ).endVertex()
+            worldRenderer.pos(maxX, minY, minZ).endVertex()
+            worldRenderer.pos(minX, minY, minZ).endVertex()
+            tessellator.draw()
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(minX, minY, maxZ).endVertex()
+            worldRenderer.pos(maxX, minY, maxZ).endVertex()
+            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
+            worldRenderer.pos(minX, maxY, maxZ).endVertex()
+        }
         tessellator.draw()
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()

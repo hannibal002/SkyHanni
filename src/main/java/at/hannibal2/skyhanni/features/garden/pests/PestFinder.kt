@@ -38,10 +38,10 @@ class PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
+    // TODO repo pattern
     private val pestsInScoreboardPattern = " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)".toPattern()
 
     private var display = emptyList<Renderable>()
-    private var scoreboardPests = 0
     private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -78,12 +78,14 @@ class PestFinder {
     }
 
     private fun update() {
-        display = drawDisplay()
+        if (isEnabled()) {
+            display = drawDisplay()
+        }
     }
 
     private fun drawDisplay() = buildList {
         val totalAmount = getPlotsWithPests().sumOf { it.pests }
-        if (totalAmount != scoreboardPests) {
+        if (totalAmount != PestAPI.scoreboardPests) {
             add(Renderable.string("§cIncorrect pest amount!"))
             add(Renderable.string("§eOpen Configure Plots Menu!"))
             return@buildList
@@ -129,7 +131,7 @@ class PestFinder {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
 
         var newPests = 0
         for (line in event.newList) {
@@ -138,14 +140,15 @@ class PestFinder {
             }
         }
 
-        if (newPests == scoreboardPests) return
+        if (newPests == PestAPI.scoreboardPests) return
 
-        removePests(scoreboardPests - newPests)
-        scoreboardPests = newPests
+        removePests(PestAPI.scoreboardPests - newPests)
+        PestAPI.scoreboardPests = newPests
         update()
     }
 
     private fun removePests(removedPests: Int) {
+        if (!isEnabled()) return
         if (removedPests < 1) return
         repeat(removedPests) {
             removeNearestPest()
