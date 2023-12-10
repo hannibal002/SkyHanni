@@ -5,10 +5,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -30,9 +33,9 @@ class MinionCraftHelper {
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
-    private val tierOneMinions = mutableListOf<String>()
+    private val tierOneMinions = mutableListOf<NEUInternalName>()
     private val tierOneMinionsDone get() = BingoAPI.bingoStorage.tierOneMinionsDone
-    private val allIngredients = mutableListOf<String>()
+    private val allIngredients = mutableListOf<NEUInternalName>()
     private val alreadyNotified = mutableListOf<String>()
 
     @SubscribeEvent
@@ -70,8 +73,8 @@ class MinionCraftHelper {
     }
 
     private fun drawDisplay(
-        minions: MutableMap<String, String>,
-        otherItems: MutableMap<String, Int>,
+        minions: MutableMap<String, NEUInternalName>,
+        otherItems: MutableMap<NEUInternalName, Int>,
     ): MutableList<String> {
         val newDisplay = mutableListOf<String>()
         for ((minionName, minionId) in minions) {
@@ -84,15 +87,15 @@ class MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, String>, MutableMap<String, Int>> {
+    private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
-        val minions = mutableMapOf<String, String>()
-        val otherItems = mutableMapOf<String, Int>()
+        val minions = mutableMapOf<String, NEUInternalName>()
+        val otherItems = mutableMapOf<NEUInternalName, Int>()
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName_old()
+            val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
             }
@@ -104,7 +107,7 @@ class MinionCraftHelper {
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
             if (item.hasEnchantments()) continue
-            val rawId = item.getInternalName_old()
+            val rawId = item.getInternalName()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
@@ -119,14 +122,14 @@ class MinionCraftHelper {
         return Pair(minions, otherItems)
     }
 
-    private fun isAllowed(allMinions: List<String>, internalName: String): Boolean {
+    private fun isAllowed(allMinions: List<NEUInternalName>, internalName: NEUInternalName): Boolean {
         val a = NEUItems.getMultiplier(internalName)
         for (minion in allMinions) {
             val recipes = NEUItems.getRecipes(minion)
 
             for (recipe in recipes) {
                 for (ingredient in recipe.getCachedIngredients()) {
-                    val ingredientInternalName = ingredient.internalItemId
+                    val ingredientInternalName = ingredient.internalItemId.asInternalName()
                     if (ingredientInternalName == internalName) return true
 
                     val b = NEUItems.getMultiplier(ingredientInternalName)
@@ -143,21 +146,22 @@ class MinionCraftHelper {
         allIngredients.clear()
 
         for (internalId in NotEnoughUpdates.INSTANCE.manager.itemInformation.keys) {
-            if (internalId.endsWith("_GENERATOR_1")) {
-                if (internalId == "REVENANT_GENERATOR_1") continue
-                if (internalId == "TARANTULA_GENERATOR_1") continue
-                if (internalId == "VOIDLING_GENERATOR_1") continue
-                if (internalId == "INFERNO_GENERATOR_1") continue
-                if (internalId == "VAMPIRE_GENERATOR_1") continue
-                tierOneMinions.add(internalId)
+            val internalName = internalId.asInternalName()
+            if (internalName.endsWith("_GENERATOR_1")) {
+                if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||
+                internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
+                internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
+                internalName == "INFERNO_GENERATOR_1".asInternalName() ||
+                internalName == "VAMPIRE_GENERATOR_1".asInternalName()) continue
+                tierOneMinions.add(internalName)
             }
 
-            if (internalId.contains("_GENERATOR_")) {
-                for (recipe in NEUItems.getRecipes(internalId)) {
+            if (internalName.contains("_GENERATOR_")) {
+                for (recipe in NEUItems.getRecipes(internalName)) {
                     if (recipe !is CraftingRecipe) continue
 
                     for (ingredient in recipe.getCachedIngredients()) {
-                        val id = ingredient.internalItemId
+                        val id = ingredient.internalItemId.asInternalName()
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
                         }
@@ -167,19 +171,19 @@ class MinionCraftHelper {
         }
     }
 
-    private fun firstMinionTier(otherItems: Map<String, Int>, minions: MutableMap<String, String>) {
+    private fun firstMinionTier(otherItems: Map<NEUInternalName, Int>, minions: MutableMap<String, NEUInternalName>) {
         val help = otherItems.filter { !it.key.startsWith("WOOD_") }
-        val tierOneMinionsFiltered = tierOneMinions.filter { it !in tierOneMinionsDone }
+        val tierOneMinionsFiltered = tierOneMinions.filter { it.asString() !in tierOneMinionsDone }
         for (minionId in tierOneMinionsFiltered) {
-            val prefix = minionId.dropLast(1)
+            val prefix = minionId.asString().dropLast(1)
             if (minions.any { it.value.startsWith(prefix) }) {
-                tierOneMinionsDone.add(minionId)
+                tierOneMinionsDone.add(minionId.toString())
             }
         }
         for (minionId in tierOneMinionsFiltered) {
             for (recipe in NEUItems.getRecipes(minionId)) {
                 if (recipe !is CraftingRecipe) continue
-                if (recipe.getCachedIngredients().any { help.contains(it.internalItemId) }) {
+                if (recipe.getCachedIngredients().any { help.contains(it.internalItemId.asInternalName()) }) {
                     val name = recipe.output.itemStack.name!!.removeColor()
                     val abc = name.replace(" I", " 0")
                     minions[abc] = minionId.replace("_1", "_0")
@@ -191,8 +195,8 @@ class MinionCraftHelper {
     private fun addMinion(
         name: String,
         minionTier: Int,
-        minionId: String,
-        otherItems: MutableMap<String, Int>,
+        minionId: NEUInternalName,
+        otherItems: MutableMap<NEUInternalName, Int>,
         newDisplay: MutableList<String>,
     ) {
         val nextTier = minionTier + 1
@@ -202,11 +206,11 @@ class MinionCraftHelper {
         for (recipe in NEUItems.getRecipes(nextMinionId)) {
             if (recipe !is CraftingRecipe) continue
             val output = recipe.output
-            val internalItemId = output.internalItemId
+            val internalItemId = output.internalItemId.asInternalName()
             if (!internalItemId.contains("_GENERATOR_")) continue
-            val map = mutableMapOf<String, Int>()
+            val map = mutableMapOf<NEUInternalName, Int>()
             for (input in recipe.inputs) {
-                val itemId = input.internalItemId
+                val itemId = input.internalItemId.asInternalName()
                 if (minionId != itemId) {
                     val count = input.count.toInt()
                     val old = map.getOrDefault(itemId, 0)
@@ -219,7 +223,7 @@ class MinionCraftHelper {
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
-                val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
+                val itemName = rawId.getItemName()
                 val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
                     val color = if (isTool) "§7" else "§a"
@@ -260,8 +264,8 @@ class MinionCraftHelper {
         alreadyNotified.add(minionName)
     }
 
-    private fun String.addOneToId(): String {
-        val lastText = split("_").last()
+    private fun NEUInternalName.addOneToId(): NEUInternalName {
+        val lastText = asString().split("_").last()
         val next = lastText.toInt() + 1
         return replace(lastText, "" + next)
     }
@@ -276,7 +280,6 @@ class MinionCraftHelper {
         for ((_, b) in event.inventoryItems) {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
-
             val internalName = NEUItems.getRawInternalName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
             if (!tierOneMinionsDone.contains(internalName)) {
