@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.chroma;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
@@ -40,8 +41,38 @@ public class ChromaConfig {
 
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
-    @ConfigEditorDropdown(values = {"Forward + Right", "Forward + Left", "Backward + Right", "Backward + Left"})
-    public int chromaDirection = 0;
+    @ConfigEditorDropdown()
+    public ChromaDirectionEntry chromaDirection = ChromaDirectionEntry.FORWARD_RIGHT;
+
+    public enum ChromaDirectionEntry implements HasLegacyId {
+        FORWARD_RIGHT("Forward + Right", 0),
+        FORWARD_LEFT("Forward + Left", 1),
+        BACKWARD_RIGHT("Backward + Right", 2),
+        BACKWARD_LEFT("Backward + Left", 3);
+
+        private final String str;
+        private final int legacyId;
+
+        ChromaDirectionEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        ChromaDirectionEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @ConfigOption(name = "Reset to Default", desc = "Resets all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
@@ -57,6 +88,6 @@ public class ChromaConfig {
         SkyHanniMod.getFeature().chroma.chromaSpeed = 6f;
         SkyHanniMod.getFeature().chroma.chromaSaturation = 0.75f;
         SkyHanniMod.getFeature().chroma.allChroma = false;
-        SkyHanniMod.getFeature().chroma.chromaDirection = 0;
+        SkyHanniMod.getFeature().chroma.chromaDirection = ChromaDirectionEntry.FORWARD_RIGHT;
     }
 }
