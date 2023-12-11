@@ -309,6 +309,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerFeatures
 import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticles
+import at.hannibal2.skyhanni.features.stranded.HighlightPlaceableNpcs
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -670,6 +671,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(SprayFeatures())
+        loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
 
