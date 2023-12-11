@@ -16,9 +16,9 @@ object PartyAPI {
     private val youJoinedPartyPattern = "§eYou have joined (?<name>.*)'s §eparty!".toPattern()
     private val othersJoinedPartyPattern = "(?<name>.*) §ejoined the party.".toPattern()
     // §dParty Finder §f> §bSkirtwearer §ejoined the group! (§3Combat Level 46§e)
-    private val partyFinderJoinpattern1 = "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level (\\d+)§e\\)".toPattern()
+    private val kuudraFinderJoinPattern = "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level (\\d+)§e\\)".toPattern()
     // §dParty Finder §f> §bSkirtwearer §ejoined the dungeon group! (§bArcher Level 22§e)
-    private val partyFinderJoinpattern2 = "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)".toPattern()
+    private val dungeonFinderJoinPattern = "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)".toPattern()
     private val othersInThePartyPattern = "§eYou'll be partying with: (?<names>.*)".toPattern()
     private val otherLeftPattern = "(?<name>.*) §ehas left the party.".toPattern()
     private val otherKickedPattern = "(?<name>.*) §ehas been removed from the party.".toPattern()
@@ -70,12 +70,12 @@ object PartyAPI {
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
             }
         }
-        partyFinderJoinpattern1.matchMatcher(message) {
+        kuudraFinderJoinPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             if (name == LorenzUtils.getPlayerName()) return@matchMatcher
             if (!partyMembers.contains(name)) partyMembers.add(name)
         }
-        partyFinderJoinpattern2.matchMatcher(message) {
+        dungeonFinderJoinPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             if (name == LorenzUtils.getPlayerName()) return@matchMatcher
             if (!partyMembers.contains(name)) partyMembers.add(name)
