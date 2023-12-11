@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -13,13 +14,32 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 
 class KingTalismanHelper {
-    private val config get() = SkyHanniMod.feature.mining
+    private val config get() = SkyHanniMod.feature.mining.kingTalisman
+
+    companion object {
+        private var currentOffset: Int? = null
+        private var skyblockYear = 0
+
+        private fun getCurrentOffset(): Int? {
+            if (SkyBlockTime.now().year != skyblockYear) {
+                return null
+            }
+            return currentOffset
+        }
+
+        fun kingFix() {
+            currentOffset = null
+            LorenzUtils.chat("Reset internal offset of King Talisman Helper.")
+        }
+    }
 
     private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
     private val kingCircles = listOf(
@@ -36,27 +56,52 @@ class KingTalismanHelper {
     private var farDisplay = ""
     private var display = emptyList<String>()
 
-    fun isNearby() = LorenzUtils.skyBlockArea == "Royal Palace" && kingLocation.distanceToPlayer() < 10
+    private fun isNearby() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Royal Palace" &&
+        kingLocation.distanceToPlayer() < 10
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(20)) return
+        if (!isEnabled()) return
+        val profileSpecific = ProfileStorageData.profileSpecific ?: return
 
-        if (!isEnabled()) {
-            display = emptyList()
+        val nearby = isNearby()
+        if (nearby && getCurrentOffset() == null) {
+            checkOffset()
+        }
+
+        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        if (getCurrentOffset() == null) {
+            val allKings = kingsTalkedTo.size == kingCircles.size
+            display = if (allKings) emptyList() else listOf("§cVisit the king to sync up.")
             return
         }
 
-        update()
-        display = if (isNearby()) allKingsDisplay else Collections.singletonList(farDisplay)
+        update(kingsTalkedTo)
+        display = if (nearby) allKingsDisplay else Collections.singletonList(farDisplay)
     }
 
-    fun isEnabled() = config.kingTalismanHelper && IslandType.DWARVEN_MINES.isInIsland()
+    private fun checkOffset() {
+        val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
+            .filter { it.name.startsWith("§6§lKing ") }.firstOrNull() ?: return
+        val foundKing = "§6§lKing (?<name>.*)".toPattern().matchMatcher(king.name) {
+            group("name")
+        } ?: return
+
+        val currentId = kingCircles.indexOf(getCurrentKing())
+        val foundId = kingCircles.indexOf(foundKing)
+        currentOffset = currentId - foundId
+        skyblockYear = SkyBlockTime.now().year
+    }
+
+    fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
+        && (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Commissions") return
         if (!isEnabled()) return
+        if (getCurrentOffset() == null) return
         if (!isNearby()) return
         val profileSpecific = ProfileStorageData.profileSpecific ?: return
 
@@ -65,14 +110,12 @@ class KingTalismanHelper {
         if (currentKing !in kingsTalkedTo) {
             LorenzUtils.debug("Found new king!")
             kingsTalkedTo.add(currentKing)
-            update()
+            update(kingsTalkedTo)
             display = allKingsDisplay
         }
     }
 
-    private fun update() {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+    private fun update(kingsTalkedTo: MutableList<String>) {
         if (kingsTalkedTo.size == kingCircles.size) {
             allKingsDisplay = Collections.singletonList("§eAll Kings found.")
             farDisplay = ""
@@ -120,12 +163,14 @@ class KingTalismanHelper {
     }
 
     private fun getKingTimes(): MutableMap<String, Long> {
+        val currentOffset = getCurrentOffset() ?: 0
         val oneSbDay = 1000 * 60 * 20
         val oneCircleTime = oneSbDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
         for ((index, king) in kingCircles.withIndex()) {
-
-            val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
+//             val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
+//             val startTime = SkyBlockTime(day = index - kingCircles.size)
+            val startTime = SkyBlockTime(day = index + currentOffset - kingCircles.size)
             var timeNext = startTime.toMillis()
             while (timeNext < System.currentTimeMillis()) {
                 timeNext += oneCircleTime
@@ -140,8 +185,8 @@ class KingTalismanHelper {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.kingTalismanHelper) return
+        if (!isEnabled()) return
 
-        config.kingTalismanHelperPos.renderStrings(display, posLabel = "King Talisman Helper")
+        config.position.renderStrings(display, posLabel = "King Talisman Helper")
     }
 }

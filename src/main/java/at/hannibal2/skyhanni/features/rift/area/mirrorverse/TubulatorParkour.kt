@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TubulatorParkour {
-    private val config get() = RiftAPI.config.area.mirrorVerseConfig.tubulatorConfig
+    private val config get() = RiftAPI.config.area.mirrorverse.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
     private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 

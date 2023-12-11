@@ -8,12 +8,15 @@ import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangFreezeCooldown {
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
+
+    // TODO USE SH-REPO
+    private val cryogenicBlastPattern = "§cAshfang Follower's Cryogenic Blast hit you for (.*) damage!".toPattern()
 
     private var lastHit = 0L
 
@@ -22,7 +25,7 @@ class AshfangFreezeCooldown {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message.matchRegex("§cAshfang Follower's Cryogenic Blast hit you for (.*) damage!")) {
+        cryogenicBlastPattern.matchMatcher(message) {
             lastHit = System.currentTimeMillis()
         }
     }
@@ -51,6 +54,6 @@ class AshfangFreezeCooldown {
 
     private fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.freezeCooldown &&
-                DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

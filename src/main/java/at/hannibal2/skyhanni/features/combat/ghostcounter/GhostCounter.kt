@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -34,11 +35,13 @@ import at.hannibal2.skyhanni.utils.CombatUtils.lastKillUpdate
 import at.hannibal2.skyhanni.utils.CombatUtils.lastUpdate
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHour
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -61,7 +64,7 @@ import kotlin.math.roundToLong
 object GhostCounter {
 
     val config get() = SkyHanniMod.feature.combat.ghostCounter
-    val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
+    val storage get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File =
         File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
@@ -110,7 +113,8 @@ object GhostCounter {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.ghostDisplayText) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }
@@ -127,7 +131,7 @@ object GhostCounter {
         }
         val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((hidden?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> "${((((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting
@@ -151,9 +155,9 @@ object GhostCounter {
         }
 
         val bestiaryFormatting = textFormatting.bestiaryFormatting
-        val currentKill = hidden?.bestiaryCurrentKill?.toInt() ?: 0
-        val killNeeded = hidden?.bestiaryKillNeeded?.toInt() ?: 0
-        val nextLevel = hidden?.bestiaryNextLevel?.toInt() ?: -1
+        val currentKill = storage?.bestiaryCurrentKill?.toInt() ?: 0
+        val killNeeded = storage?.bestiaryKillNeeded?.toInt() ?: 0
+        val nextLevel = storage?.bestiaryNextLevel?.toInt() ?: -1
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
@@ -283,7 +287,7 @@ object GhostCounter {
                         Option.KILLCOMBO.add(num)
                         Option.SKILLXPGAINED.add(gained * num.roundToLong())
                         Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                        hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
+                        storage?.bestiaryCurrentKill = storage?.bestiaryCurrentKill?.plus(num) ?: num
                     }
                     lastXp = res
                 }
@@ -292,8 +296,9 @@ object GhostCounter {
                 notifyCTModule = false
                 if (isUsingCTGhostCounter()) {
                     clickableChat(
-                        "§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
-                        "shimportghostcounterdata"
+                        "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
+                        "shimportghostcounterdata",
+                        prefixColor = "§6",
                     )
                 }
             }
@@ -385,7 +390,7 @@ object GhostCounter {
                     Option.SORROWCOUNT, Option.VOLTACOUNT, Option.PLASMACOUNT, Option.GHOSTLYBOOTS -> {
                         opt.add(1.0)
                         opt.add(1.0, true)
-                        hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
+                        storage?.totalMF = storage?.totalMF?.plus(group("mf").substring(4).toDouble())
                             ?: group("mf").substring(4).toDouble()
                         Option.TOTALDROPS.add(1.0)
                         if (opt == Option.SORROWCOUNT)
@@ -424,16 +429,16 @@ object GhostCounter {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
                 26 -> {
-                    hidden?.bestiaryNextLevel = 26.0
-                    hidden?.bestiaryCurrentKill = 250_000.0
-                    hidden?.bestiaryKillNeeded = 0.0
+                    storage?.bestiaryNextLevel = 26.0
+                    storage?.bestiaryCurrentKill = 250_000.0
+                    storage?.bestiaryKillNeeded = 0.0
                 }
 
                 else -> {
                     val killNeeded: Int = bestiaryData[nextLevel] ?: -1
-                    hidden?.bestiaryNextLevel = nextLevel.toDouble()
-                    hidden?.bestiaryCurrentKill = 0.0
-                    hidden?.bestiaryKillNeeded = killNeeded.toDouble()
+                    storage?.bestiaryNextLevel = nextLevel.toDouble()
+                    storage?.bestiaryCurrentKill = 0.0
+                    storage?.bestiaryKillNeeded = killNeeded.toDouble()
                 }
             }
             update()
@@ -459,7 +464,7 @@ object GhostCounter {
         val bestiaryNextLevel =
             if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8)
                 .romanToDecimal() + 1
-        hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
+        storage?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         var kills = 0.0
         for (line in ghostStack.getLore()) {
             val l = line.removeColor().trim()
@@ -467,8 +472,8 @@ object GhostCounter {
                 kills = "Kills: (.*)".toRegex().find(l)?.groupValues?.get(1)?.formatNumber()?.toDouble() ?: 0.0
             }
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {
-                hidden?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatNumber().toDouble()
-                hidden?.bestiaryKillNeeded = group("total").formatNumber().toDouble()
+                storage?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatNumber().toDouble()
+                storage?.bestiaryKillNeeded = group("total").formatNumber().toDouble()
             }
         }
         update()
@@ -476,19 +481,20 @@ object GhostCounter {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        if (hidden?.configUpdateVersion == 0) {
+        if (storage?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
-            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
-            hidden?.configUpdateVersion = CONFIG_VALUE_VERSION
+            chat("Your GhostCounter config has been automatically adjusted.")
+            storage?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
+        event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, GhostDisplayEntry::class.java)
+        }
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
-    }
+    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
 }

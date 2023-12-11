@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -66,35 +67,7 @@ class VisitorListener {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        var found = false
-        val visitorsInTab = mutableListOf<String>()
-        for (line in event.tabList) {
-            if (line.startsWith("§b§lVisitors:")) {
-                found = true
-                continue
-            }
-            if (!found) continue
-
-            if (line.isEmpty()) {
-                found = false
-                continue
-            }
-            val name = VisitorAPI.fromHypixelName(line)
-
-            // Hide hypixel watchdog entries
-            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
-                logger.log("Ignore wrong red name: '$name'")
-                continue
-            }
-
-            //hide own player name
-            if (name.contains(LorenzUtils.getPlayerName())) {
-                logger.log("Ignore wrong own name: '$name'")
-                continue
-            }
-
-            visitorsInTab.add(name)
-        }
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
         VisitorAPI.getVisitors().forEach {
             val name = it.visitorName
@@ -165,15 +138,16 @@ class VisitorListener {
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
                     if (config.rewardWarning.bypassKey.isKeyHeld()) {
-                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        LorenzUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
-                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    LorenzUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
                         LorenzUtils.clickableChat(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                            "sh bypass"
+                            "sh bypass",
+                            false
                         )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()
@@ -204,7 +178,7 @@ class VisitorListener {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -216,7 +190,7 @@ class VisitorListener {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {

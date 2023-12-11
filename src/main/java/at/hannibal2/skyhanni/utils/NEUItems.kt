@@ -17,6 +17,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
+import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -32,8 +33,9 @@ import java.util.regex.Pattern
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
-    private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
-    private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
+    private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
+    private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
+    private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
@@ -143,7 +145,12 @@ object NEUItems {
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
-    fun NEUInternalName.getNpcPriceOrNull() = BazaarDataHolder.getNpcPrice(this)
+    fun NEUInternalName.getNpcPriceOrNull(): Double? {
+        if (equals("WISP_POTION")) {
+            return 20_000.0
+        }
+        return BazaarDataHolder.getNpcPrice(this)
+    }
 
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
@@ -185,8 +192,8 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
@@ -224,44 +231,41 @@ object NEUItems {
     }
 
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        val pair = getMultiplier(internalName.asString(), tryCount)
-        return Pair(pair.first.asInternalName(), pair.second)
-    }
-
-    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$internalName'"
-            Error(message).printStackTrace()
-            LorenzUtils.error(message)
+            ErrorManager.logErrorStateWithData(
+                "Cound not load recipe data.",
+                "Failed to find item multiplier",
+                "internalName" to internalName
+            )
             return Pair(internalName, 1)
         }
         for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
 
-            val map = mutableMapOf<String, Int>()
-            for (ingredient in recipe.ingredients) {
+            val map = mutableMapOf<NEUInternalName, Int>()
+            for (ingredient in recipe.getCachedIngredients()) {
                 val count = ingredient.count.toInt()
-                var internalItemId = ingredient.internalItemId
+                var internalItemId = ingredient.internalItemId.asInternalName()
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN" && internalItemId == "INK_SACK-2") {
-                    internalItemId = "CACTUS"
+                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
+                    internalItemId = "CACTUS".asInternalName()
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE" && internalItemId == "WHEAT") {
+                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
                     continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT" && internalItemId == "GOLDEN_CARROT") {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
                     continue
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER" && internalItemId == "RABBIT_HIDE") {
+                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
                     continue
                 }
 
@@ -284,16 +288,25 @@ object NEUItems {
         val result = Pair(internalName, 1)
         multiplierCache[internalName] = result
         return result
+
     }
 
-    fun getRecipes(minionId: String): Set<NeuRecipe> {
-        if (recipesCache.contains(minionId)) {
-            return recipesCache[minionId]!!
+    @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
+    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
+        val pair = getMultiplier(internalName.asInternalName(), tryCount)
+        return Pair(pair.first.asString(), pair.second)
+    }
+
+    fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
+        if (recipesCache.contains(internalName)) {
+            return recipesCache[internalName]!!
         }
-        val recipes = manager.getRecipesFor(minionId)
-        recipesCache[minionId] = recipes
+        val recipes = manager.getRecipesFor(internalName.asString())
+        recipesCache[internalName] = recipes
         return recipes
     }
+
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
@@ -310,8 +323,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU

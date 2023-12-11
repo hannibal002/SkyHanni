@@ -1,34 +1,42 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import com.google.gson.JsonObject
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
+import kotlin.concurrent.thread
+
 
 class HypixelData {
     // TODO USE SH-REPO
     private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
-    private val westVillageFarmArea = AxisAlignedBB(-54.0, 69.0, -115.0, -40.0, 75.0, -127.0)
-    private val howlingCaveArea = AxisAlignedBB(-401.0, 50.0, -104.0, -337.0, 90.0, 36.0)
-    private val fakeZealotBruiserHideoutArea = AxisAlignedBB(-520.0, 66.0, -332.0, -558.0, 85.0, -280.0)
-    private val realZealotBruiserHideoutArea = AxisAlignedBB(-552.0, 50.0, -245.0, -580.0, 72.0, -209.0)
+    private val lobbyTypePattern = "(?<lobbyType>.*lobby)\\d+".toPattern()
+
+    private var lastLocRaw = 0L
 
     companion object {
         var hypixelLive = false
         var hypixelAlpha = false
+        var inLobby = false
+        var inLimbo = false
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
 
@@ -43,13 +51,35 @@ class HypixelData {
         var joinedWorld = 0L
 
         var skyBlockArea = "?"
+
+        // Data from locraw
+        var locrawData: JsonObject? = null
+        private var locraw: MutableMap<String, String> = mutableMapOf(
+            "server" to "",
+            "gametype" to "",
+            "lobbyname" to "",
+            "lobbytype" to "",
+            "mode" to "",
+            "map" to ""
+        )
+
+        val server get() = locraw["server"] ?: ""
+        val gameType get() = locraw["gametype"] ?: ""
+        val lobbyName get() = locraw["lobbyname"] ?: ""
+        val lobbyType get() = locraw["lobbytype"] ?: ""
+        val mode get() = locraw["mode"] ?: ""
+        val map get() = locraw["map"] ?: ""
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        locrawData = null
         skyBlock = false
+        inLimbo = false
+        inLobby = false
+        locraw.forEach { locraw[it.key] = "" }
         joinedWorld = System.currentTimeMillis()
     }
 
@@ -58,6 +88,9 @@ class HypixelData {
         hypixelLive = false
         hypixelAlpha = false
         skyBlock = false
+        inLobby = false
+        locraw.forEach { locraw[it.key] = "" }
+        locrawData = null
     }
 
     @SubscribeEvent
@@ -80,20 +113,32 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) {
+            // Modified from NEU.
+            // NEU does not send locraw when not in SkyBlock.
+            // So, as requested by Hannibal, use locraw from
+            // NEU and have NEU send it.
+            // Remove this when NEU dependency is removed
+            val currentTime = System.currentTimeMillis()
+            if (Minecraft.getMinecraft().thePlayer != null &&
+                Minecraft.getMinecraft().theWorld != null &&
+                locrawData == null &&
+                currentTime - lastLocRaw > 15000
+            ) {
+                lastLocRaw = System.currentTimeMillis()
+                thread(start = true) {
+                    Thread.sleep(1000)
+                    NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
+                }
+            }
+        }
+
         if (event.isMod(2) && LorenzUtils.inSkyBlock) {
             val originalLocation = ScoreboardData.sidebarLinesFormatted
                 .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                 ?.substring(5)?.removeColor()
                 ?: "?"
-
-            skyBlockArea = when {
-                skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside() -> "Dreadfarm"
-                skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside() -> "Howling Cave"
-                skyBlockIsland == IslandType.THE_END && fakeZealotBruiserHideoutArea.isPlayerInside() -> "The End"
-                skyBlockIsland == IslandType.THE_END && realZealotBruiserHideoutArea.isPlayerInside() -> "Zealot Bruiser Hideout"
-
-                else -> originalLocation
-            }
+            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
 
             checkProfileName()
         }
@@ -188,7 +233,7 @@ class HypixelData {
     }
 
     private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
-        val islandType = IslandType.getBySidebarName(newIsland)
+        val islandType = IslandType.getByNameOrUnknown(newIsland)
         if (guesting) {
             if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
             if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
@@ -204,6 +249,36 @@ class HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
-                scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+    }
+
+    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
+    private val jsonBracketPattern = "^\\{.+}".toPattern()
+
+    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    fun onChatMessage(event: ClientChatReceivedEvent) {
+        jsonBracketPattern.matchMatcher(event.message.unformattedText) {
+            try {
+                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
+                if (obj.has("server")) {
+                    locrawData = obj
+                    locraw.keys.forEach { key ->
+                        locraw[key] = obj[key]?.asString ?: ""
+                    }
+                    inLimbo = locraw["server"] == "limbo"
+                    inLobby = locraw["lobbyname"] != ""
+
+                    if (inLobby) {
+                        locraw["lobbyname"]?.let {
+                            lobbyTypePattern.matchMatcher(it) {
+                                locraw["lobbytype"] = group("lobbyType")
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+            }
+        }
     }
 }
