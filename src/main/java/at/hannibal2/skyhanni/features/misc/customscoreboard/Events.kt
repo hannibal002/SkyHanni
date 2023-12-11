@@ -231,33 +231,34 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     WINTER(
         {
             val list = mutableListOf<String>()
+            val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("North Stars: §d") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("North Stars: §d") }
+            if (sidebarLines.any { it.startsWith("North Stars: §d") }) {
+                list += sidebarLines.firstOrNull { it.startsWith("North Stars: §d") }
                     ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event Start: §a") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Event Start: §a") }
+            if (sidebarLines.any { it.startsWith("Event Start: §a") }) {
+                list += sidebarLines.firstOrNull { it.startsWith("Event Start: §a") }
                     ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Next Wave: §a") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Next Wave: §a") }
+            if (sidebarLines.any { it.startsWith("Next Wave: §a") } && sidebarLines.none { it == "Next Wave: §aSoon!" }) {
+                list += sidebarLines.firstOrNull { it.startsWith("Next Wave: §a") }
                     ?: "<hidden>"
             }
             list += ""
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cWave ") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§cWave ") } ?: "<hidden>"
+            if (sidebarLines.any { it.startsWith("§cWave ") }) {
+                list += sidebarLines.firstOrNull { it.startsWith("§cWave ") } ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Magma Cubes Left") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Magma Cubes Left") }
+            if (sidebarLines.any { it.startsWith("Magma Cubes Left") }) {
+                list += sidebarLines.firstOrNull { it.startsWith("Magma Cubes Left") }
                     ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Total Dama") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Total Dama") }
+            if (sidebarLines.any { it.startsWith("Your Total Dama") }) {
+                list += sidebarLines.firstOrNull { it.startsWith("Your Total Dama") }
                     ?: "<hidden>"
             }
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Cube Damage") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Cube Damage") }
+            if (sidebarLines.any { it.startsWith("Your Cube Damage") }) {
+                list += sidebarLines.firstOrNull { it.startsWith("Your Cube Damage") }
                     ?: "<hidden>"
             }
 
