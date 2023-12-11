@@ -53,8 +53,7 @@ object ChromaShader : Shader("chroma", "chroma") {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "config.chromaDirection") { element ->
+        event.transform(14, "config.chromaDirection") { element ->
             ConfigUtils.migrateIntToEnum(element, ChromaDirectionEntry::class.java)
         }
     }

@@ -91,8 +91,7 @@ class PlayerChatSymbols {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "chat.chatSymbols.symbolLocation") { element ->
+        event.transform(14, "chat.chatSymbols.symbolLocation") { element ->
             ConfigUtils.migrateIntToEnum(element, SymbolLocationEntry::class.java)
         }
     }

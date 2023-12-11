@@ -161,8 +161,7 @@ class ToolTooltipTweaks {
         event.move(3, "garden.compactToolTooltips", "garden.tooltipTweak.compactToolTooltips")
         event.move(3, "garden.fortuneTooltipKeybind", "garden.tooltipTweak.fortuneTooltipKeybind")
         event.move(3, "garden.cropTooltipFortune", "garden.tooltipTweak.cropTooltipFortune")
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "garden.tooltipTweak.cropTooltipFortune") { element ->
+        event.transform(14, "garden.tooltipTweak.cropTooltipFortune") { element ->
             ConfigUtils.migrateIntToEnum(element, CropTooltipFortuneEntry::class.java)
         }
     }

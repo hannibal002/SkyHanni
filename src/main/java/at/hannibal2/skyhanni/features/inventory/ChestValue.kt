@@ -293,11 +293,10 @@ class ChestValue {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "inventory.chestValueConfig.numberFormat") { element ->
+        event.transform(14, "inventory.chestValueConfig.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
         }
-        event.move(14, "inventory.chestValueConfig.sortingType") { element ->
+        event.transform(14, "inventory.chestValueConfig.sortingType") { element ->
             ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
         }
     }

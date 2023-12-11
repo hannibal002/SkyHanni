@@ -582,11 +582,10 @@ object ComposterOverlay {
         event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
         event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
         event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "garden.composters.overlayPriceType") { element ->
+        event.transform(14, "garden.composters.overlayPriceType") { element ->
             ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
         }
-        event.move(14, "garden.composters.retrieveFrom") { element ->
+        event.transform(14, "garden.composters.retrieveFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
         }
     }

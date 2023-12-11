@@ -68,8 +68,7 @@ class HideArmor {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "misc.hideArmor2.mode") { element ->
+        event.transform(14, "misc.hideArmor2.mode") { element ->
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
         }
     }

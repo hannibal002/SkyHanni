@@ -63,8 +63,7 @@ class FireVeilWandParticles {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
         event.move(3, "itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "itemAbilities.fireVeilWands.display") { element ->
+        event.transform(14, "itemAbilities.fireVeilWands.display") { element ->
             ConfigUtils.migrateIntToEnum(element, DisplayEntry::class.java)
         }
     }

@@ -180,8 +180,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "misc.tracker.priceFrom") { element ->
+        event.transform(14, "misc.tracker.priceFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFromEntry::class.java)
         }
     }

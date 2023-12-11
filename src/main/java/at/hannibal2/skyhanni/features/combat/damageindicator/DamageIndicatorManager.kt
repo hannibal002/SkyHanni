@@ -877,8 +877,7 @@ class DamageIndicatorManager {
         event.transform(11, "combat.damageIndicator.bossesToShow") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DamageIndicatorBossEntry::class.java)
         }
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "combat.damageIndicator.bossName") { element ->
+        event.transform(14, "combat.damageIndicator.bossName") { element ->
             ConfigUtils.migrateIntToEnum(element, BossNameEntry::class.java)
         }
     }

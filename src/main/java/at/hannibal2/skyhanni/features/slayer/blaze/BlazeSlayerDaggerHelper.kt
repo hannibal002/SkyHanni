@@ -251,8 +251,7 @@ class BlazeSlayerDaggerHelper {
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
         event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
         event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "slayer.blazes.hellion.firstDagger") { element ->
+        event.transform(14, "slayer.blazes.hellion.firstDagger") { element ->
             ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
         }
     }

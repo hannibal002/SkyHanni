@@ -103,11 +103,10 @@ object BestiaryData {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.bestiaryData", "combat.bestiary")
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "combat.bestiary.numberFormat") { element ->
+        event.transform(14, "combat.bestiary.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
         }
-        event.move(14, "combat.bestiary.displayType") { element ->
+        event.transform(14, "combat.bestiary.displayType") { element ->
             ConfigUtils.migrateIntToEnum(element, DisplayTypeEntry::class.java)
         }
     }

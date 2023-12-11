@@ -61,8 +61,7 @@ class PestSpawn {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "garden.pests.pestSpawn.chatMessageFormat") { element ->
+        event.transform(14, "garden.pests.pestSpawn.chatMessageFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, ChatMessageFormatEntry::class.java)
         }
     }

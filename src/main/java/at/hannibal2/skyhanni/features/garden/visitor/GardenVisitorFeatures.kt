@@ -625,8 +625,7 @@ class GardenVisitorFeatures {
 
             drops
         }
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "garden.visitors.highlightStatus") { element ->
+        event.transform(14, "garden.visitors.highlightStatus") { element ->
             ConfigUtils.migrateIntToEnum(element, HighlightStatusEntry::class.java)
         }
     }

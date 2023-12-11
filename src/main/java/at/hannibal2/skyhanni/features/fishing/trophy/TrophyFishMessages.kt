@@ -87,8 +87,7 @@ class TrophyFishMessages {
         event.move(2, "fishing.trophyFishDuplicateHider", "fishing.trophyFishing.chatMessages.duplicateHider")
         event.move(2, "fishing.trophyFishBronzeHider", "fishing.trophyFishing.chatMessages.bronzeHider")
         event.move(2, "fishing.trophyFishSilverHider", "fishing.trophyFishing.chatMessages.silverHider")
-        // TODO Replace with transform when PR 769 is merged
-        event.move(14, "fishing.trophyFishing.chatMessages.design") { element ->
+        event.transform(14, "fishing.trophyFishing.chatMessages.design") { element ->
             ConfigUtils.migrateIntToEnum(element, DesignEntry::class.java)
         }
     }
