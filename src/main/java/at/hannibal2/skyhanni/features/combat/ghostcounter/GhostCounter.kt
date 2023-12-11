@@ -491,7 +491,7 @@ object GhostCounter {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
-        event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->
+        event.move(11, "combat.ghostCounter.ghostDisplayText", "combat.ghostCounter.ghostDisplayText") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, GhostDisplayEntry::class.java)
         }
     }
