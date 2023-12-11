@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
 
 class InformationGetter {
     companion object {
@@ -152,7 +152,10 @@ class InformationGetter {
             "§7your vote...",
             "e: §e§b0%",
             "Pelts: §5",
-            "Tracker Mob Location:"
+            "Tracker Mob Location:",
+            "§7Boss: §c",
+            "§7Damage Soaked:",
+            "§6Kill the Magmas:",
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -187,5 +190,9 @@ class InformationGetter {
 
         // remove trapper mob location
         extraLines = extraLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
+
+        // magma boss
+        extraLines = extraLines.filter { sidebarLines.nextAfter("§7Damage Soaked:") != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("§6Kill the Magmas:") != it }
     }
 }

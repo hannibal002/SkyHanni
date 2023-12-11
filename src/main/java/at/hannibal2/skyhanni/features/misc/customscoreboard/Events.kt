@@ -156,6 +156,31 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Challenge: ") }
         }
     ),
+    MAGMA_BOSS(
+        {
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c")}){
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§7Boss: §c") }
+                    ?: "<hidden>"
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§7Damage Soaked:"}) {
+                list += "§7Damage Soaked:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§7Damage Soaked:") ?: "<hidden>"
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§6Kill the Magmas:"}){
+                list += "§6Kill the Magmas:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§6Kill the Magmas:") ?: "<hidden>"
+            }
+
+            list
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c") || it == "§6Kill the Magmas:" }
+        }
+    ),
     JACOB_CONTEST(
         {
             val list = mutableListOf<String>()
