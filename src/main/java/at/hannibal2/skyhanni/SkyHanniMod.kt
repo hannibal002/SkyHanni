@@ -325,6 +325,7 @@ import at.hannibal2.skyhanni.test.TestCopyBestiaryValues
 import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
+import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -353,7 +354,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.9",
+    version = "0.22.Beta.10",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -689,6 +690,7 @@ class SkyHanniMod {
         loadModule(ParkourWaypointSaver())
         loadModule(TestShowSlotNumber())
         loadModule(SkyHanniDebugsAndTests)
+        loadModule(WorldEdit)
         loadModule(HotSwapDetection)
         PreInitFinishedEvent().postAndCatch()
     }
