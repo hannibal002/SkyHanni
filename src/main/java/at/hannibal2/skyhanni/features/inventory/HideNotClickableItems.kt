@@ -240,7 +240,7 @@ class HideNotClickableItems {
             return false
         }
 
-        hideReason = "Only sell the selected items!"
+        hideReason = "Only insert the selected items!"
         return true
     }
 
