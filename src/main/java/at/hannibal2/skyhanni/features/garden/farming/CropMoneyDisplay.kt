@@ -441,7 +441,7 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
         event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
-        event.transform(11, "garden.moneyPerHours.customFormat") { element ->
+        event.move(11, "garden.moneyPerHours.customFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
         }
     }

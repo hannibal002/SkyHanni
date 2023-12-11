@@ -74,7 +74,7 @@ class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
+        event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
         event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
         event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
         event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
@@ -385,9 +385,7 @@ class FarmingWeightDisplay {
         private fun checkOffScreenLeaderboardChanges() {
             val profileSpecific = ProfileStorageData.profileSpecific ?: return
             val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
-
-            if (oldPosition <= 0) return
-            if (leaderboardPosition <= 0) return
+            if (oldPosition == -1) return
 
             val diff = leaderboardPosition - oldPosition
             if (diff == 0) return
