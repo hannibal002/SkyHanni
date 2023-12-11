@@ -385,7 +385,9 @@ class FarmingWeightDisplay {
         private fun checkOffScreenLeaderboardChanges() {
             val profileSpecific = ProfileStorageData.profileSpecific ?: return
             val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
-            if (oldPosition == -1) return
+
+            if (oldPosition <= 0) return
+            if (leaderboardPosition <= 0) return
 
             val diff = leaderboardPosition - oldPosition
             if (diff == 0) return
