@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -55,14 +55,10 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
     }
 
-    private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss): Boolean {
-        val bossQuest = reputationHelper.questHelper.getQuest<MiniBossQuest>()
-        if (bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED) {
-            return true
-        }
-
-        return false
-    }
+    private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss) =
+        reputationHelper.questHelper.getQuest<MiniBossQuest>()?.let {
+            it.miniBoss == miniBoss && it.state == QuestState.ACCEPTED
+        } ?: false
 
     private fun finished(miniBoss: CrimsonMiniBoss) {
         reputationHelper.questHelper.finishMiniBoss(miniBoss)
@@ -84,7 +80,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
-                    lineList.add(NEUItems.getItemStack(displayItem))
+                    lineList.add(getItemStack(displayItem))
                     lineList.add("§5$displayName§7: $result")
                     display.add(lineList)
                 }

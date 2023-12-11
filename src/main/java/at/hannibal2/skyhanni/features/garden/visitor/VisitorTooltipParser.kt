@@ -36,7 +36,7 @@ class VisitorTooltipParser {
                 }
             }
 
-            return parsedData;
+            return parsedData
         }
     }
 }

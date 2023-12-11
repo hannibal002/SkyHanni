@@ -20,6 +20,7 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
+    // TOOD maybe we can migrate this already
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
@@ -86,6 +87,11 @@ public class MiscConfig {
     @ConfigOption(name = "Kick Duration", desc = "")
     @Accordion
     public KickDurationConfig kickDuration = new KickDurationConfig();
+
+    @Expose
+    @ConfigOption(name = "Tracker", desc = "Tracker Config")
+    @Accordion
+    public TrackerConfig tracker = new TrackerConfig();
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
@@ -204,6 +210,13 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean abiphoneContactsProgress = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Lock Mouse Message",
+        desc = "Show a message in chat when toggling the /shmouselock.")
+    @ConfigEditorBoolean
+    public boolean lockMouseLookChatMessage = true;
 
     @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);

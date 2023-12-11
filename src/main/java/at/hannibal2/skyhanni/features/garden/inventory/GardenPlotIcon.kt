@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -21,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenPlotIcon {
 
-    private val config get() = SkyHanniMod.feature.garden.plotIcon
+    private val config get() = GardenAPI.config.plotIcon
     private val plotList get() = GardenAPI.storage?.plotIcon?.plotList
     private var inInventory = false
     private var copyStack: ItemStack? = null
@@ -30,7 +28,8 @@ object GardenPlotIcon {
     private var originalStack = mutableMapOf<Int, ItemStack>()
     private var cachedStack = mutableMapOf<Int, ItemStack>()
     private val editStack = ItemStack(Items.wooden_axe)
-    private val whitelistedSlot = listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
+    private val whitelistedSlot =
+        listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
 
     var hardReset = false
 
@@ -104,9 +103,9 @@ object GardenPlotIcon {
         if (editMode != 0) {
             if (event.slotId in 54..89) {
                 event.isCanceled = true
-                if (event.slot.stack == null) return
-                copyStack = event.slot.stack
-                chat("§6§lClick an item in the desk menu to replace it with that item!")
+                copyStack = event.slot.stack ?: return
+                // TODO different format, not bold or show not in chat at all.
+                LorenzUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }
             if (event.slotId != 53) {

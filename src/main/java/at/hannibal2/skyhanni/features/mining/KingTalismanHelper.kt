@@ -37,7 +37,7 @@ class KingTalismanHelper {
 
         fun kingFix() {
             currentOffset = null
-            LorenzUtils.chat("§e[SkyHanni] Reset internal offset of King Talisman Helper.")
+            LorenzUtils.chat("Reset internal offset of King Talisman Helper.")
         }
     }
 
@@ -83,7 +83,7 @@ class KingTalismanHelper {
 
     private fun checkOffset() {
         val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
-            .filter { it.name.startsWith("§6§lKing ") }.first()
+            .filter { it.name.startsWith("§6§lKing ") }.firstOrNull() ?: return
         val foundKing = "§6§lKing (?<name>.*)".toPattern().matchMatcher(king.name) {
             group("name")
         } ?: return

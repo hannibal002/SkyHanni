@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -11,6 +12,10 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.INSTANT_SELL;
+import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.NPC_PRICE;
+import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.SELL_OFFER;
 
 public class MoneyPerHourConfig {
     @Expose
@@ -40,7 +45,7 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Always On",
-        desc = "Always show the money/hour Display while on the garden.")
+        desc = "Always show the money/hour Display while in the garden.")
     @ConfigEditorBoolean
     public boolean alwaysOn = false;
 
@@ -70,14 +75,43 @@ public class MoneyPerHourConfig {
         name = "Custom Format",
         desc = "Set what prices to show")
     @ConfigEditorDraggableList(
-        exampleText = {
-            "§eSell Offer",
-            "§eInstant Sell",
-            "§eNPC Price"
-        },
         requireNonEmpty = true
     )
-    public List<Integer> customFormat = new ArrayList<>(Arrays.asList(0, 1, 2));
+    public List<CustomFormatEntry> customFormat = new ArrayList<>(Arrays.asList(
+        SELL_OFFER,
+        INSTANT_SELL,
+        NPC_PRICE
+    ));
+
+    public enum CustomFormatEntry implements HasLegacyId {
+        SELL_OFFER("§eSell Offer", 0),
+        INSTANT_SELL("§eInstant Sell", 1),
+        NPC_PRICE("§eNPC Price", 2),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        CustomFormatEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        CustomFormatEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(

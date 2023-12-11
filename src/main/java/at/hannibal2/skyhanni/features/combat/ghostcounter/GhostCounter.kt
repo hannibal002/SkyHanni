@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -34,11 +35,13 @@ import at.hannibal2.skyhanni.utils.CombatUtils.lastKillUpdate
 import at.hannibal2.skyhanni.utils.CombatUtils.lastUpdate
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHour
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -110,7 +113,8 @@ object GhostCounter {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.ghostDisplayText) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }
@@ -292,8 +296,9 @@ object GhostCounter {
                 notifyCTModule = false
                 if (isUsingCTGhostCounter()) {
                     clickableChat(
-                        "§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
-                        "shimportghostcounterdata"
+                        "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
+                        "shimportghostcounterdata",
+                        prefixColor = "§6",
                     )
                 }
             }
@@ -478,7 +483,7 @@ object GhostCounter {
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (storage?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
-            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
+            chat("Your GhostCounter config has been automatically adjusted.")
             storage?.configUpdateVersion = CONFIG_VALUE_VERSION
         }
     }
@@ -486,9 +491,10 @@ object GhostCounter {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
+        event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, GhostDisplayEntry::class.java)
+        }
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
-    }
+    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
 }

@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.chat.ChatSymbols.SymbolLocationEntry
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameAndRankFromChatMessage
@@ -72,13 +75,23 @@ class PlayerChatSymbols {
         if (!component.text_skyhanni().contains(rankAndName)) return false
         val oldText = component.text_skyhanni()
 
-        component.setText_skyhanni(component.text_skyhanni().replace(oldText, getNewText(emblemText, oldText, rankAndName)))
+        val newText = getNewText(emblemText, oldText, rankAndName)
+        component.setText_skyhanni(component.text_skyhanni().replace(oldText, newText))
         return true
     }
 
-    private fun getNewText(emblemText: String, oldText: String, rankAndName: String): String = when (config.symbolLocation) {
-        0 -> oldText.replace(rankAndName, "$emblemText $rankAndName")
-        1 -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
-        else -> oldText
+    private fun getNewText(emblemText: String, oldText: String, rankAndName: String): String =
+        when (config.symbolLocation) {
+            SymbolLocationEntry.LEFT -> oldText.replace(rankAndName, "$emblemText $rankAndName")
+            SymbolLocationEntry.RIGHT -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
+            SymbolLocationEntry.HIDDEN -> oldText
+            else -> oldText
+        }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "chat.chatSymbols.symbolLocation") { element ->
+            ConfigUtils.migrateIntToEnum(element, SymbolLocationEntry::class.java)
+        }
     }
 }

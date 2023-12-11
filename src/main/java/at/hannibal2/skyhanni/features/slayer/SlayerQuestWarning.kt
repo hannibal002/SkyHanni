@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
@@ -18,6 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class SlayerQuestWarning {
     private val config get() = SkyHanniMod.feature.slayer
+    private val talkToMaddoxPattern = " {3}§r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!".toPattern()
     private var needSlayerQuest = false
     private var lastWarning = 0L
     private var currentReason = ""
@@ -43,7 +44,7 @@ class SlayerQuestWarning {
         }
 
         //no auto slayer
-        if (message.matchRegex("   §r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!")) {
+        talkToMaddoxPattern.matchMatcher(message) {
             needNewQuest("You have no Auto-Slayer active!")
         }
         if (message == "  §r§a§lSLAYER QUEST COMPLETE!") {
@@ -131,7 +132,7 @@ class SlayerQuestWarning {
         if (lastWarning + 10_000 > System.currentTimeMillis()) return
 
         lastWarning = System.currentTimeMillis()
-        LorenzUtils.chat("§e[SkyHanni] $chatMessage")
+        LorenzUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
             LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)

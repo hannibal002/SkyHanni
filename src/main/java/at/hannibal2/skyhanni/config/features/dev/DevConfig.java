@@ -7,6 +7,7 @@ import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -19,14 +20,29 @@ public class DevConfig {
     public boolean repoAutoUpdate = true;
 
     @Expose
+    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+    public int logExpiryTime = 14;
+
+    @Expose
     @ConfigOption(name = "Debug", desc = "")
     @Accordion
     public DebugConfig debug = new DebugConfig();
 
     @Expose
+    @ConfigOption(name = "Repo Pattern", desc = "")
+    @Accordion
+    public RepoPatternConfig repoPattern = new RepoPatternConfig();
+
+    @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showSlotNumberKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "World Edit", desc = "Use wood axe or command /shworldedit to render a box, similar like the WorldEdit plugin.")
+    @ConfigEditorBoolean
+    public boolean worldEdit = false;
 
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion

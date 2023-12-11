@@ -1,19 +1,25 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -27,17 +33,15 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -52,7 +56,7 @@ object ComposterOverlay {
     private var fuelFactors: Map<String, Double> = emptyMap()
     private var organicMatter: Map<String, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden.composters
+    private val config get() = GardenAPI.config.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 
@@ -87,11 +91,11 @@ object ComposterOverlay {
 
     fun onCommand(args: Array<String>) {
         if (args.size != 1) {
-            LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+            LorenzUtils.userError("Usage: /shtestcomposter <offset>")
             return
         }
         testOffset = args[0].toInt()
-        LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+        LorenzUtils.chat("Composter test offset set to $testOffset.")
     }
 
     @SubscribeEvent
@@ -128,14 +132,14 @@ object ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (inComposterUpgrades) {
             update()
             for (upgrade in ComposterUpgrade.entries) {
-                event.itemStack?.name?.let {
+                event.itemStack.name?.let {
                     if (it.contains(upgrade.displayName)) {
                         maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
-                            group("level")?.romanToDecimalIfNeeded() ?: 0
+                            group("level")?.romanToDecimalIfNecessary() ?: 0
                         } == 25
                         extraComposterUpgrade = upgrade
                         update()
@@ -382,7 +386,7 @@ object ComposterOverlay {
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            LorenzUtils.chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
+            LorenzUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
@@ -421,7 +425,7 @@ object ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (KeyboardManager.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
                     retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
                 }
@@ -443,13 +447,13 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: String, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0 || internalName == "BIOFUEL") return
-        if (config.retrieveFrom == 0 && !LorenzUtils.noTradeMode) {
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
         val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName_old() == internalName }
         if (having >= itemsNeeded) {
-            LorenzUtils.chat("§e[SkyHanni] $itemName §8x${itemsNeeded} §ealready found in inventory!")
+            LorenzUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
@@ -463,16 +467,16 @@ object ComposterOverlay {
             val sackType = if (internalName == "VOLTA" || internalName == "OIL_BARREL") "Mining"
             else "Enchanted Agronomy"
             LorenzUtils.clickableChat(
-                "§e[SkyHanni] Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
             )
             return
         } else if (amountInSacks == 0L) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks.")
+                LorenzUtils.chat("No $itemName §efound in sacks.")
             } else {
-                LorenzUtils.chat("§e[SkyHanni] No $itemName §efound in sacks. Opening Bazaar.")
+                LorenzUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             }
             return
@@ -481,10 +485,10 @@ object ComposterOverlay {
         LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("§e[SkyHanni] You're out of $itemName §ein your sacks!")
+                LorenzUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 LorenzUtils.clickableChat(
-                    "§e[SkyHanni] You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     "bz ${itemName.removeColor()}"
                 )
             }
@@ -492,7 +496,7 @@ object ComposterOverlay {
     }
 
     private fun getPrice(internalName: String): Double {
-        val useSellPrice = config.overlayPriceType == 1
+        val useSellPrice = config.overlayPriceType == ComposterConfig.OverlayPriceTypeEntry.BUY_ORDER
         val price = NEUItems.getPrice(internalName, useSellPrice)
         if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
 
@@ -550,6 +554,8 @@ object ComposterOverlay {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (EstimatedItemValue.isCurrentlyShowing()) return
+
         if (inInventory) {
             config.overlayOrganicMatterPos.renderStringsAndItems(
                 organicMatterDisplay,
@@ -576,5 +582,12 @@ object ComposterOverlay {
         event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
         event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
         event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
+
+        event.transform(15, "garden.composters.overlayPriceType") { element ->
+            ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
+        }
+        event.transform(15, "garden.composters.retrieveFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
+        }
     }
 }

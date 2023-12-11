@@ -26,6 +26,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
 
+    fun ItemStack.getBookwormBookCount() = getAttributeInt("bookworm_books")
+
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
@@ -176,6 +178,10 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
+
+    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+
+    fun ItemStack.getEdition() = getAttributeInt("edition")
 
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")

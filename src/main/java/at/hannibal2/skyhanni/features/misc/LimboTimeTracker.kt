@@ -49,7 +49,7 @@ class LimboTimeTracker {
         if (!isEnabled()) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
-        LorenzUtils.run { chat("§e[SkyHanni] You left the limbo after §b$duration") }
+        LorenzUtils.run { chat("You left the limbo after §b$duration") }
     }
 
     fun isEnabled() = config.showTimeInLimbo

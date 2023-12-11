@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.config.features.dev.DevConfig;
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig;
 import at.hannibal2.skyhanni.config.features.event.EventConfig;
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
-import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig;
+import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
+import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -51,7 +52,7 @@ public class Features extends Config {
 
     @Override
     public void saveNow() {
-        SkyHanniMod.configManager.saveConfig("close-gui");
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui");
     }
 
     @Override
@@ -136,6 +137,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
+
+    @Expose
+    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")

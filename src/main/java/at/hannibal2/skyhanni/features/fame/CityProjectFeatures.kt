@@ -42,7 +42,7 @@ class CityProjectFeatures {
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
-            LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
+            LorenzUtils.chat("Disabled city project reminder messages!")
         }
     }
 
@@ -68,7 +68,7 @@ class CityProjectFeatures {
         lastReminderSend = System.currentTimeMillis()
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Daily City Project Reminder! (Click here to disable this reminder)",
+            "Daily City Project Reminder! (Click here to disable this reminder)",
             "shstopcityprojectreminder"
         )
     }
@@ -106,7 +106,9 @@ class CityProjectFeatures {
 
                 for (line in item.getLore()) {
                     contributeAgainPattern.matchMatcher(line) {
-                        val duration = TimeUtils.getMillis(group("time"))
+                        val rawTime = group("time")
+                        if (rawTime.contains("Soon!")) return@matchMatcher
+                        val duration = TimeUtils.getMillis(rawTime)
                         val endTime = System.currentTimeMillis() + duration
                         if (endTime < nextTime) {
                             nextTime = endTime

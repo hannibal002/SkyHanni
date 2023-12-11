@@ -74,6 +74,12 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean profileJoin = true;
 
+    @Expose
+    @ConfigOption(name = "Fire Sale", desc = "Hide the repeating fire sale reminder chat messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fireSale = true;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
