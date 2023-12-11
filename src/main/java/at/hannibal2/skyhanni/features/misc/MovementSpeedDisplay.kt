@@ -2,16 +2,17 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class MovementSpeedDisplay {
     private val config get() = SkyHanniMod.feature.misc
+    private var lastLocation: LorenzVec? = null
     private var display = ""
 
     init {
@@ -23,14 +24,17 @@ class MovementSpeedDisplay {
     private fun checkSpeed() {
         if (!isEnabled()) return
 
-        val distance = with(Minecraft.getMinecraft().thePlayer) {
-            val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
-            val newPos = LorenzVec(posX, posY, posZ)
-
-            // Distance from previous tick, multiplied by TPS
-            oldPos.distance(newPos) * 20
+        val currentLocation = LocationUtils.playerLocation()
+        if (lastLocation == null) {
+            lastLocation = currentLocation
+            return
         }
-        display = "Movement Speed: ${distance.round(2)}"
+
+        lastLocation?.let {
+            val distance = it.distance(currentLocation) * 4
+            display = "Movement Speed: ${distance.round(2)}"
+            lastLocation = currentLocation
+        }
     }
 
     @SubscribeEvent
