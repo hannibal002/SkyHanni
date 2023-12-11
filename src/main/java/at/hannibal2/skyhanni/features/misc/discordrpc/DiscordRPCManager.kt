@@ -217,16 +217,16 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "misc.discordRPC.firstLine") { element ->
+        event.move(11, "misc.discordRPC.firstLine", "misc.discordRPC.firstLine") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
         }
-        event.transform(11, "misc.discordRPC.secondLine") { element ->
+        event.move(11, "misc.discordRPC.secondLine", "misc.discordRPC.secondLine") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
         }
-        event.transform(11, "misc.discordRPC.auto") { element ->
+        event.move(11, "misc.discordRPC.auto", "misc.discordRPC.auto") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
         }
-        event.transform(11, "misc.discordRPC.autoPriority") { element ->
+        event.move(11, "misc.discordRPC.autoPriority", "misc.discordRPC.autoPriority") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
         }
     }
