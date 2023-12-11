@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
@@ -109,8 +111,8 @@ enum class ScoreboardElements(
 
 
 private fun getTitleDisplayPair() = when (config.displayConfig.useHypixelTitleAnimation) {
-        true -> listOf(ScoreboardData.objectiveTitle to getTitleAndFooterAlignment())
-        false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
+    true -> listOf(ScoreboardData.objectiveTitle to getTitleAndFooterAlignment())
+    false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
 }
 
 private fun getProfileDisplayPair() =
@@ -183,8 +185,10 @@ private fun getLocationDisplayPair() =
 
 
 private fun getVisitDisplayPair() =
-    listOf((ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith(" §a✌ §") }?.trim()
-        ?: "<hidden>") to AlignmentEnum.LEFT)
+    listOf(
+        (ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith(" §a✌ §") }?.trim()
+            ?: "<hidden>") to AlignmentEnum.LEFT
+    )
 
 private fun getVisitShowWhen() = ScoreboardData.sidebarLinesFormatted.any { it.startsWith(" §a✌ §") }
 
@@ -290,7 +294,12 @@ private fun getEventsShowWhen() = Events.getEvent().isNotEmpty()
 private fun getMayorDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return listOf(
         (MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.mayorNameToColorCode(it) }
-            ?: "<hidden>") to AlignmentEnum.LEFT
+            ?: "<hidden>") +
+            (if (config.showTimeTillNextMayor) {
+                "§7 (§e${TimeUtils.formatDuration(MayorElection.timeTillNextMayor, TimeUnit.DAY)}§7)"
+            } else {
+                ""
+            }) to AlignmentEnum.LEFT
     ) + (if (config.showMayorPerks) {
         MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" to AlignmentEnum.LEFT } ?: emptyList()
     } else {

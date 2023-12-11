@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,6 +21,7 @@ class MayorElection {
         var rawMayorData: MayorJson? = null
         var candidates = mapOf<Int, MayorJson.Candidate>()
         var currentCandidate: MayorJson.Candidate? = null  //todo: should it not be called currentMayor?
+        var timeTillNextMayor = 0L
 
         fun isPerkActive(mayor: String, perk: String) = currentCandidate?.let { currentCandidate ->
             currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
@@ -33,7 +34,21 @@ class MayorElection {
 
         if (event.repeatSeconds(3)) {
             check()
+            getTimeTillNextMayor()
         }
+    }
+
+    private fun getTimeTillNextMayor() {
+        var currentYear = SkyBlockTime.now().year
+        val month = 3 // Late Spring
+        // check if date is after 27th of Late Spring
+        if (SkyBlockTime.now().month >= month && SkyBlockTime.now().day > 27) {
+            // if so, next mayor will be in the next year
+            currentYear++
+        }
+        val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
+
+        timeTillNextMayor = nextMayorTime - System.currentTimeMillis()
     }
 
     private fun check() {
