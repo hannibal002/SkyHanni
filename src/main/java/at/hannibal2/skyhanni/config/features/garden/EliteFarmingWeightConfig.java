@@ -34,7 +34,6 @@ public class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Show LB Change", desc = "Show the change of your position in the farming weight leaderboard while you were offline.")
     @ConfigEditorBoolean
-    // TODO migrate
     public boolean showLbChange = true;
 
     @Expose
