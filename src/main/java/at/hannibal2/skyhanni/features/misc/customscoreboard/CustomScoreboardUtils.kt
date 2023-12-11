@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import net.minecraft.client.Minecraft
+
+private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 object CustomScoreboardUtils {
     fun mayorNameToColorCode(input: String): String {
@@ -49,6 +53,11 @@ object CustomScoreboardUtils {
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
         if (tabList.footer_skyhanni == null) return ""
         return tabList.footer_skyhanni.formattedText.replace("§r", "")
+    }
+
+    fun getTitleAndFooterAlignment() = when (config.displayConfig.centerTitleAndFooter) {
+            true -> AlignmentEnum.CENTER
+            false -> AlignmentEnum.LEFT
     }
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
