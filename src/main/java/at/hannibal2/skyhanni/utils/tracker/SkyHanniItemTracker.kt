@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -50,9 +51,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             lists.addSelector<PriceSource>(
                 "",
                 getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom },
+                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = it.ordinal
+                    config.priceFrom = PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
                     update()
                 }
             )

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
@@ -37,8 +38,38 @@ public class NextJacobContestConfig {
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
-    @ConfigEditorDropdown(values = {"Ask When Needed", "Share Automatically", "Disabled"})
-    public int shareAutomatically = 0;
+    @ConfigEditorDropdown()
+    public ShareContestsEntry shareAutomatically = ShareContestsEntry.ASK;
+
+    public enum ShareContestsEntry implements HasLegacyId {
+        ASK("Ask When Needed", 0),
+        AUTO("Share Automatically", 1),
+        DISABLED("Disabled", 2),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        ShareContestsEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        ShareContestsEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's Contest starts.")
