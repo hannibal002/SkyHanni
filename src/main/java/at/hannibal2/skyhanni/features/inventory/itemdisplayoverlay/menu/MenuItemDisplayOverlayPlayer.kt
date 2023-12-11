@@ -20,14 +20,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val museumDonationLoreLinePattern = "§7Items Donated: §.(?<amount>[0-9.]+).*".toPattern()
-    private val skyblockLevelLoreLinePattern = "§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*".toPattern()
-    private val skillAvgLoreLinePattern = "§[0-9](?<avg>[0-9]{1,2}(\\.[0-9])?) Skill Avg\\..*".toPattern()
-    private val dungeonClassLevelItemNamePattern = "(?<class>[A-z ]+)( )(?<level>[0-9]+)".toPattern()
-    private val dungeonEssenceRewardItemNamePattern = "(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)".toPattern()
-    private val essenceCountLoreLinePattern = "(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)".toPattern()
-    private val essenceCountOtherLoreLinePattern = ".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*".toPattern()
-    private val profileManagementLoreLinePattern = "(?<icon>.)? (?<type>.+)?(?<profile> Profile: )(?<fruit>.+)".toPattern() // FOR THIS EXPRESSION SPECIFICALLY, FORMATTING CODES ***MUST*** BE REMOVED FIRST, OTHERWISE THIS REGEX WONT WORK!!! -ERY
+    private val museumDonationLoreLinePattern = (("§7Items Donated: §.(?<amount>[0-9.]+).*").toPattern())
+    private val skyblockLevelLoreLinePattern = (("§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*").toPattern())
+    private val skillAvgLoreLinePattern = (("§[0-9](?<avg>[0-9]{1,2}(\\.[0-9])?) Skill Avg\\..*").toPattern())
+    private val dungeonClassLevelItemNamePattern = (("(?<class>[A-z ]+)( )(?<level>[0-9]+)").toPattern())
+    private val dungeonEssenceRewardItemNamePattern = (("(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)").toPattern())
+    private val essenceCountLoreLinePattern = (("(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)").toPattern())
+    private val essenceCountOtherLoreLinePattern = ((".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*").toPattern())
+    private val profileIconVariantOneDisplayNamePattern = (("(((§.)*(?<icon>[^A-z])? (§.)*(?<type>.+)?) ?(§.)*(?<profile>Profile: )(§.)*(?<fruit>.+))").toPattern())
+    private val profileIconVariantTwoDisplayNamePattern = (("(§.)*(Profile: )(§.)*(?<fruit>[\\w]+)").toPattern())
     private val skyblockLevelingItemNamePattern = ((".* Leveling").toPattern())
     private val skillLevelItemNamePattern = (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern())
     private val gardenLevelSkillLevelItemNamePattern = (("Garden Level (?<level>[\\w]+)").toPattern())
@@ -163,7 +164,11 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management")) {
-            profileManagementLoreLinePattern.matchMatcher(itemName) { return group("icon") } ?: return "©"
+            profileIconVariantOneDisplayNamePattern.matchMatcher(itemName) { return group("icon") }
+            profileIconVariantTwoDisplayNamePattern.matchMatcher(itemName) { return "©" }
+            if (itemName == "§cLocked profile slot") {
+                return "§c\uD83D\uDD12\u0020"
+            }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PET_SCORE_STATUS)) {
