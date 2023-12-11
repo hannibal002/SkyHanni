@@ -16,7 +16,8 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         {
             val list = mutableListOf<String>()
 
-            list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§6Year ") && it.endsWith(" Votes") } ?: "<hidden>"
+            list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§6Year ") && it.endsWith(" Votes") }
+                ?: "<hidden>"
             if (ScoreboardData.sidebarLinesFormatted.nextAfter(list[0]) == "§7Waiting for") {
                 list += "§7Waiting for"
                 list += "§7your vote..."
@@ -160,17 +161,17 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         {
             val list = mutableListOf<String>()
 
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c")}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c") }) {
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§7Boss: §c") }
                     ?: "<hidden>"
             }
 
-            if (ScoreboardData.sidebarLinesFormatted.any { it == "§7Damage Soaked:"}) {
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§7Damage Soaked:" }) {
                 list += "§7Damage Soaked:"
                 list += ScoreboardData.sidebarLinesFormatted.nextAfter("§7Damage Soaked:") ?: "<hidden>"
             }
 
-            if (ScoreboardData.sidebarLinesFormatted.any { it == "§6Kill the Magmas:"}){
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§6Kill the Magmas:" }) {
                 list += "§6Kill the Magmas:"
                 list += ScoreboardData.sidebarLinesFormatted.nextAfter("§6Kill the Magmas:") ?: "<hidden>"
             }
@@ -229,7 +230,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             list
         },
         {
-            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Pelts: §5") || it == "Tracker Mob Location:"}
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Pelts: §5") || it == "Tracker Mob Location:" }
         }
     ),
     GARDEN_CLEAN_UP(

@@ -25,6 +25,7 @@ class InformationGetter {
             "§c[T] ",
         )
     }
+
     fun getInformation() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
