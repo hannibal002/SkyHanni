@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,7 +18,7 @@ import kotlin.math.floor
 
 object GardenPlotAPI {
 
-    private val pestNamePattern = "§aPlot §7- §b(?<name>.*)".toPattern()
+    private val plotNamePattern by RepoPattern.pattern("garden.plot.name", "§.Plot §7- §b(?<name>.*)")
 
     var plots = listOf<Plot>()
 
@@ -96,7 +97,7 @@ object GardenPlotAPI {
 
         for (plot in plots) {
             val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            pestNamePattern.matchMatcher(itemName) {
+            plotNamePattern.matchMatcher(itemName) {
                 plot.name = group("name")
             }
         }
@@ -104,7 +105,7 @@ object GardenPlotAPI {
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 
-    fun LorenzRenderWorldEvent.renderPlot(plot: GardenPlotAPI.Plot, lineColor: Color, cornerColor: Color) {
+    fun LorenzRenderWorldEvent.renderPlot(plot: Plot, lineColor: Color, cornerColor: Color) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
         // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
