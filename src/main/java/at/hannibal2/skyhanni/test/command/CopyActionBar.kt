@@ -12,6 +12,6 @@ object CopyActionBar {
         val string = ActionBarStatsData.actionBar.transformIf({noColor}) { removeColor() }
 
         OSUtils.copyToClipboard(string)
-        LorenzUtils.chat("§e[SkyHanni] actionbar copied into your clipboard!")
+        LorenzUtils.chat("Actionbar copied into your clipboard!")
     }
 }
