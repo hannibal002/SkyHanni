@@ -37,7 +37,9 @@ object UniqueGiftingOpportunitiesFeatures {
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-        (InventoryUtils.itemInHandId.endsWith("_GIFT")
+        (InventoryUtils.itemInHandId.contains("WHITE_GIFT") || 
+        InventoryUtils.itemInHandId.contains("GREEN_GIFT") ||
+        InventoryUtils.itemInHandId.contains("RED_GIFT")
             || !config.highlighWithGiftOnly)
 
     private val hasNotGiftedNametag = "§a§lꤥ"
