@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -16,6 +19,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -443,7 +447,7 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: String, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0 || internalName == "BIOFUEL") return
-        if (config.retrieveFrom == 0 && !LorenzUtils.noTradeMode) {
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
@@ -492,7 +496,7 @@ object ComposterOverlay {
     }
 
     private fun getPrice(internalName: String): Double {
-        val useSellPrice = config.overlayPriceType == 1
+        val useSellPrice = config.overlayPriceType == ComposterConfig.OverlayPriceTypeEntry.BUY_ORDER
         val price = NEUItems.getPrice(internalName, useSellPrice)
         if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
 
@@ -578,5 +582,11 @@ object ComposterOverlay {
         event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
         event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
         event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
+        event.transform(14, "garden.composters.overlayPriceType") { element ->
+            ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
+        }
+        event.transform(14, "garden.composters.retrieveFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
+        }
     }
 }

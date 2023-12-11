@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -16,8 +17,36 @@ public class TrackerConfig {
 
     @Expose
     @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
-    @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
-    public int priceFrom = 1;
+    @ConfigEditorDropdown()
+    public PriceFromEntry priceFrom = PriceFromEntry.SELL_OFFER;
+
+    public enum PriceFromEntry implements HasLegacyId {
+        INSTANT_SELL("Instant Sell", 0),
+        SELL_OFFER("Sell Offer", 1),
+        NPC("NPC", 2);
+        private final String str;
+        private final int legacyId;
+
+        PriceFromEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        PriceFromEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
