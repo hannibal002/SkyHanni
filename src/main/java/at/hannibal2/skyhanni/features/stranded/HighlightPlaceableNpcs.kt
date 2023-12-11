@@ -9,12 +9,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightPlaceableNpcs {
-    private val config get() = SkyHanniMod.feature.stranded
+    private val config get() = SkyHanniMod.feature.stranded.highlightPlaceableNpcs
     private val locationPattern = "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]".toPattern()
 
     private var inInventory = false
@@ -60,8 +59,11 @@ class HighlightPlaceableNpcs {
         }
 
         // Checking if is already placed
-        return lore.none { locationPattern.matches(it) }
+        for (line in lore) {
+            if (locationPattern.matcher(line).matches()) return false
+        }
+        return true
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.isStrandedProfile && config.highlightPlaceableNpcs
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config
 }

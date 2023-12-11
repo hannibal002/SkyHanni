@@ -19,7 +19,7 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniTracker<Data : TrackerData>(
-    val name: String,
+    private val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
     private val drawDisplay: (Data) -> List<List<Any>>,

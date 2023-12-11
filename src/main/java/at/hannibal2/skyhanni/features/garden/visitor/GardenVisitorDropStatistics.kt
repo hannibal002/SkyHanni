@@ -247,7 +247,7 @@ object GardenVisitorDropStatistics {
         event.move(3, "${originalPrefix}onlyOnBarn", "${newPrefix}onlyOnBarn")
         event.move(3, "${originalPrefix}visitorDropPos", "${newPrefix}pos")
 
-        event.transform(11, "${newPrefix}textFormat") { element ->
+        event.move(11, "${newPrefix}textFormat", "${newPrefix}textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
         }
     }
