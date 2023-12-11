@@ -197,7 +197,7 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "rift.motes.inventoryValue.formatType") { element ->
+        event.transform(15, "rift.motes.inventoryValue.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
         }
     }

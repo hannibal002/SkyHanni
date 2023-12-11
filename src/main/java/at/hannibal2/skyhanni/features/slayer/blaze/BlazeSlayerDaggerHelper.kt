@@ -251,7 +251,8 @@ class BlazeSlayerDaggerHelper {
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
         event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
         event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
-        event.transform(14, "slayer.blazes.hellion.firstDagger") { element ->
+
+        event.transform(15, "slayer.blazes.hellion.firstDagger") { element ->
             ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
         }
     }
