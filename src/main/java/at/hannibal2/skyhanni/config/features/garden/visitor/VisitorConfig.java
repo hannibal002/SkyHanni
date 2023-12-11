@@ -46,9 +46,9 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
     @ConfigEditorDropdown()
-    public HighlightStatusEntry highlightStatus = HighlightStatusEntry.BOTH;
+    public HighlightMode highlightStatus = HighlightMode.BOTH;
 
-    public enum HighlightStatusEntry implements HasLegacyId {
+    public enum HighlightMode implements HasLegacyId {
         COLOR("Color Only", 0),
         NAME("Name Only", 1),
         BOTH("Both", 2),
@@ -56,13 +56,13 @@ public class VisitorConfig {
         private final String str;
         private final int legacyId;
 
-        HighlightStatusEntry(String str, int legacyId) {
+        HighlightMode(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        HighlightStatusEntry(String str) {
+        HighlightMode(String str) {
             this(str, -1);
         }
 

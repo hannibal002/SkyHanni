@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
@@ -82,8 +81,8 @@ class ToolTooltipTweaks {
                 val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
 
                 val fortuneLine = when (config.cropTooltipFortune) {
-                    TooltipTweaksConfig.CropTooltipFortuneEntry.DEFAULT -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
-                    TooltipTweaksConfig.CropTooltipFortuneEntry.SHOW -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+                    CropTooltipFortuneEntry.DEFAULT -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+                    CropTooltipFortuneEntry.SHOW -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
                     else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 iterator.set(fortuneLine)

@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossNameEntry
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
@@ -198,9 +197,9 @@ class DamageIndicatorManager {
             }
 
             var bossName = when (config.bossName) {
-                DamageIndicatorConfig.BossNameEntry.HIDDEN -> ""
-                DamageIndicatorConfig.BossNameEntry.FULL_NAME -> data.bossType.fullName
-                DamageIndicatorConfig.BossNameEntry.SHORT_NAME -> data.bossType.shortName
+                NameVisibility.HIDDEN -> ""
+                NameVisibility.FULL_NAME -> data.bossType.fullName
+                NameVisibility.SHORT_NAME -> data.bossType.shortName
                 else -> data.bossType.fullName
             }
 
@@ -875,10 +874,10 @@ class DamageIndicatorManager {
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
         event.transform(11, "combat.damageIndicator.bossesToShow") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, DamageIndicatorBossEntry::class.java)
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, BossCategory::class.java)
         }
         event.transform(14, "combat.damageIndicator.bossName") { element ->
-            ConfigUtils.migrateIntToEnum(element, BossNameEntry::class.java)
+            ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
         }
     }
 

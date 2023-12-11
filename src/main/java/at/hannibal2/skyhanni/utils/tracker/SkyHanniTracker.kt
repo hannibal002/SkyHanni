@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.TrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
@@ -41,8 +40,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
-            TrackerConfig.PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
-            TrackerConfig.PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
 
             else -> name.getNpcPriceOrNull() ?: 0.0
         }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
@@ -28,10 +27,10 @@ class HideArmor {
         if (entity.isNPC()) return false
 
         return when (config.mode) {
-            HideArmorConfig.ModeEntry.ALL -> true
+            ModeEntry.ALL -> true
 
-            HideArmorConfig.ModeEntry.OWN -> entity is EntityPlayerSP
-            HideArmorConfig.ModeEntry.OTHERS -> entity !is EntityPlayerSP
+            ModeEntry.OWN -> entity is EntityPlayerSP
+            ModeEntry.OTHERS -> entity !is EntityPlayerSP
 
             else -> false
         }

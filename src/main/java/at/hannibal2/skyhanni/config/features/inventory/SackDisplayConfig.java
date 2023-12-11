@@ -165,22 +165,22 @@ public class SackDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
     @ConfigEditorDropdown()
-    public PriceFromEntry priceFrom = PriceFromEntry.BAZAAR;
+    public PriceFrom priceFrom = PriceFrom.BAZAAR;
 
-    public enum PriceFromEntry implements HasLegacyId {
+    public enum PriceFrom implements HasLegacyId {
         BAZAAR("Bazaar", 0),
         NPC("NPC", 1);
 
         private final String str;
         private final int legacyId;
 
-        PriceFromEntry(String str, int legacyId) {
+        PriceFrom(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        PriceFromEntry(String str) {
+        PriceFrom(String str) {
             this(str, -1);
         }
 

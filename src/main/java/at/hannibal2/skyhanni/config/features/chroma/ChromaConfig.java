@@ -42,9 +42,9 @@ public class ChromaConfig {
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
     @ConfigEditorDropdown()
-    public ChromaDirectionEntry chromaDirection = ChromaDirectionEntry.FORWARD_RIGHT;
+    public Direction chromaDirection = Direction.FORWARD_RIGHT;
 
-    public enum ChromaDirectionEntry implements HasLegacyId {
+    public enum Direction implements HasLegacyId {
         FORWARD_RIGHT("Forward + Right", 0),
         FORWARD_LEFT("Forward + Left", 1),
         BACKWARD_RIGHT("Backward + Right", 2),
@@ -53,13 +53,13 @@ public class ChromaConfig {
         private final String str;
         private final int legacyId;
 
-        ChromaDirectionEntry(String str, int legacyId) {
+        Direction(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ChromaDirectionEntry(String str) {
+        Direction(String str) {
             this(str, -1);
         }
 
@@ -88,6 +88,6 @@ public class ChromaConfig {
         SkyHanniMod.getFeature().chroma.chromaSpeed = 6f;
         SkyHanniMod.getFeature().chroma.chromaSaturation = 0.75f;
         SkyHanniMod.getFeature().chroma.allChroma = false;
-        SkyHanniMod.getFeature().chroma.chromaDirection = ChromaDirectionEntry.FORWARD_RIGHT;
+        SkyHanniMod.getFeature().chroma.chromaDirection = Direction.FORWARD_RIGHT;
     }
 }

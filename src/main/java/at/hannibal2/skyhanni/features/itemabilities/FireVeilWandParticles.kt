@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig
 import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -28,7 +27,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (config.display == FireVeilWandConfig.DisplayEntry.PARTICLES) return
+        if (config.display == DisplayEntry.PARTICLES) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
         if (event.type == EnumParticleTypes.FLAME && event.speed == 0.55f) {
             event.isCanceled = true
@@ -51,7 +50,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (config.display != FireVeilWandConfig.DisplayEntry.LINE) return
+        if (config.display != DisplayEntry.LINE) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
         val color = config.displayColor.toChromaColor()

@@ -13,21 +13,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.ARACHNE;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.DIANA_MOBS;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.DUNGEON_ALL;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.GARDEN_PESTS;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.INFERNO_DEMONLORD;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.NETHER_MINI_BOSSES;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.REINDRAKE;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.REVENANT_HORROR;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.RIFTSTALKER_BLOODFIEND;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.SEA_CREATURES;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.SVEN_PACKMASTER;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.TARANTULA_BROODFATHER;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.THE_RIFT_BOSSES;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.VANQUISHER;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.DamageIndicatorBossEntry.VOIDGLOOM_SERAPH;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.ARACHNE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DIANA_MOBS;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DUNGEON_ALL;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.GARDEN_PESTS;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.INFERNO_DEMONLORD;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.NETHER_MINI_BOSSES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.REINDRAKE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.REVENANT_HORROR;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.RIFTSTALKER_BLOODFIEND;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.SEA_CREATURES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.SVEN_PACKMASTER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.TARANTULA_BROODFATHER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.THE_RIFT_BOSSES;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.VANQUISHER;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.VOIDGLOOM_SERAPH;
 
 public class DamageIndicatorConfig {
 
@@ -47,9 +47,9 @@ public class DamageIndicatorConfig {
         name = "Boss Name",
         desc = "Change how the boss name should be displayed.")
     @ConfigEditorDropdown()
-    public BossNameEntry bossName = BossNameEntry.FULL_NAME;
+    public NameVisibility bossName = NameVisibility.FULL_NAME;
 
-    public enum BossNameEntry implements HasLegacyId {
+    public enum NameVisibility implements HasLegacyId {
         HIDDEN("Hidden", 0),
         FULL_NAME("Full Name", 1),
         SHORT_NAME("Short Name", 2),
@@ -58,13 +58,13 @@ public class DamageIndicatorConfig {
         private final String str;
         private final int legacyId;
 
-        BossNameEntry(String str, int legacyId) {
+        NameVisibility(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        BossNameEntry(String str) {
+        NameVisibility(String str) {
             this(str, -1);
         }
 
@@ -86,7 +86,7 @@ public class DamageIndicatorConfig {
     )
     @ConfigEditorDraggableList()
     //TODO only show currently working and tested features
-    public List<DamageIndicatorBossEntry> bossesToShow = new ArrayList<>(Arrays.asList(
+    public List<BossCategory> bossesToShow = new ArrayList<>(Arrays.asList(
         DUNGEON_ALL,
         NETHER_MINI_BOSSES,
         VANQUISHER,
@@ -105,7 +105,7 @@ public class DamageIndicatorConfig {
 
     ));
 
-    public enum DamageIndicatorBossEntry implements HasLegacyId {
+    public enum BossCategory implements HasLegacyId {
         DUNGEON_ALL("§bDungeon All", 0),
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
         VANQUISHER("§bVanquisher", 2),
@@ -137,13 +137,13 @@ public class DamageIndicatorConfig {
         private final String str;
         private final int legacyId;
 
-        DamageIndicatorBossEntry(String str, int legacyId) {
+        BossCategory(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DamageIndicatorBossEntry(String str) {
+        BossCategory(String str) {
             this(str, -1);
         }
 

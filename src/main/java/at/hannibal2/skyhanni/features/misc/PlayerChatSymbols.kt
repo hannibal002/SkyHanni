@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.chat.ChatSymbols
 import at.hannibal2.skyhanni.config.features.chat.ChatSymbols.SymbolLocationEntry
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
@@ -83,9 +82,9 @@ class PlayerChatSymbols {
 
     private fun getNewText(emblemText: String, oldText: String, rankAndName: String): String =
         when (config.symbolLocation) {
-            ChatSymbols.SymbolLocationEntry.LEFT -> oldText.replace(rankAndName, "$emblemText $rankAndName")
-            ChatSymbols.SymbolLocationEntry.RIGHT -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
-            ChatSymbols.SymbolLocationEntry.HIDDEN -> oldText
+            SymbolLocationEntry.LEFT -> oldText.replace(rankAndName, "$emblemText $rankAndName")
+            SymbolLocationEntry.RIGHT -> oldText.replace(rankAndName, "$rankAndName $emblemText ")
+            SymbolLocationEntry.HIDDEN -> oldText
             else -> oldText
         }
 

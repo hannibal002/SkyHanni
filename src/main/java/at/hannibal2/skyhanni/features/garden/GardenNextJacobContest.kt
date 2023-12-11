@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -241,7 +240,7 @@ object GardenNextJacobContest {
     fun shareContestConfirmed(array: Array<String>) {
         if (array.size == 1) {
             if (array[0] == "enable") {
-                config.shareAutomatically = NextJacobContestConfig.ShareContestsEntry.AUTO
+                config.shareAutomatically = ShareContestsEntry.AUTO
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 LorenzUtils.chat("§2Enabled automatic sharing of future contests!")
             }
@@ -250,7 +249,7 @@ object GardenNextJacobContest {
         if (contests.size == maxContestsPerYear) {
             sendContests()
         }
-        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == NextJacobContestConfig.ShareContestsEntry.ASK) {
+        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == ShareContestsEntry.ASK) {
             LorenzUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
@@ -455,9 +454,9 @@ object GardenNextJacobContest {
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
-        isFetchEnabled() && config.shareAutomatically != NextJacobContestConfig.ShareContestsEntry.DISABLED // 2 = Disabled
+        isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
     private fun askToSendContests() =
-        config.shareAutomatically == NextJacobContestConfig.ShareContestsEntry.ASK // 0 = Ask, 1 = Send (Only call if isSendEnabled())
+        config.shareAutomatically == ShareContestsEntry.ASK // (Only call if isSendEnabled())
 
     private fun fetchContestsIfAble() {
         if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -153,8 +152,8 @@ class ChestValue {
     }
 
     private fun sortedList() = when (config.sortingType) {
-        ChestValueConfig.SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
-        ChestValueConfig.SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
+        SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
+        SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
         else -> chestItems.values.sortedByDescending { it.total }
     }.toMutableList()
 
@@ -163,7 +162,7 @@ class ChestValue {
             getName = SortType.entries[config.sortingType.ordinal].longName, // todo avoid ordinal
             onChange = {
                 // todo avoid ordinals
-                config.sortingType = ChestValueConfig.SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
+                config.sortingType = SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
                 update()
             })
 
@@ -171,7 +170,7 @@ class ChestValue {
             getName = FormatType.entries[config.formatType.ordinal].type, // todo avoid ordinal
             onChange = {
                 // todo avoid ordinal
-                config.formatType = ChestValueConfig.NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
+                config.formatType = NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
                 update()
             })
 

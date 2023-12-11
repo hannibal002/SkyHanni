@@ -26,22 +26,22 @@ public class ChatMessagesConfig {
             "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
     )
     @ConfigEditorDropdown()
-    public DesignEntry design = DesignEntry.STYLE_1;
+    public DesignFormat design = DesignFormat.STYLE_1;
 
-    public enum DesignEntry implements HasLegacyId {
+    public enum DesignFormat implements HasLegacyId {
         STYLE_1("Style 1", 0),
         STYLE_2("Style 2", 1),
         STYLE_3("Style 3", 2);
         private final String str;
         private final int legacyId;
 
-        DesignEntry(String str, int legacyId) {
+        DesignFormat(String str, int legacyId) {
             this.str = str;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DesignEntry(String str) {
+        DesignFormat(String str) {
             this(str, -1);
         }
 

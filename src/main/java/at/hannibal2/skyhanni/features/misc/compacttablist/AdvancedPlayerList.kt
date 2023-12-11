@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.IslandType
@@ -111,23 +111,23 @@ object AdvancedPlayerList {
         val sorted = when (config.playerSortOrder) {
 
             // SB Level
-            AdvancedPlayerListConfig.PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
+            PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
 
             // Name (Abc)
-            AdvancedPlayerListConfig.PlayerSortEntry.NAME -> prepare.sortedBy {
+            PlayerSortEntry.NAME -> prepare.sortedBy {
                 it.value.name.lowercase().replace("_", "")
             }
 
             // Ironman/Bingo
-            AdvancedPlayerListConfig.PlayerSortEntry.PROFILE_TYPE -> prepare.sortedBy {
+            PlayerSortEntry.PROFILE_TYPE -> prepare.sortedBy {
                 -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1
             }
 
             // Party/Friends/Guild First
-            AdvancedPlayerListConfig.PlayerSortEntry.SOCIAL_STATUS -> prepare.sortedBy { -socialScore(it.value.name) }
+            PlayerSortEntry.SOCIAL_STATUS -> prepare.sortedBy { -socialScore(it.value.name) }
 
             // Random
-            AdvancedPlayerListConfig.PlayerSortEntry.RANDOM -> prepare.sortedBy { getRandomOrder(it.value.name) }
+            PlayerSortEntry.RANDOM -> prepare.sortedBy { getRandomOrder(it.value.name) }
 
             // Rank (Default)
             else -> prepare
@@ -250,7 +250,7 @@ object AdvancedPlayerList {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(14, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
-            ConfigUtils.migrateIntToEnum(element, AdvancedPlayerListConfig.PlayerSortEntry::class.java)
+            ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
         }
     }
 }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -164,8 +163,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun showLocations() = when (config.showLocation) {
-        ReputationHelperConfig.ShowLocationEntry.ALWAYS -> true
-        ReputationHelperConfig.ShowLocationEntry.ONLY_HOTKEY -> config.hotkey.isKeyHeld()
+        ShowLocationEntry.ALWAYS -> true
+        ShowLocationEntry.ONLY_HOTKEY -> config.hotkey.isKeyHeld()
         else -> false
     }
 }

@@ -178,7 +178,7 @@ class VisitorListener {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != VisitorConfig.HighlightStatusEntry.NAME && config.highlightStatus != VisitorConfig.HighlightStatusEntry.BOTH) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -190,7 +190,7 @@ class VisitorListener {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != VisitorConfig.HighlightStatusEntry.NAME && config.highlightStatus != VisitorConfig.HighlightStatusEntry.BOTH) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {
