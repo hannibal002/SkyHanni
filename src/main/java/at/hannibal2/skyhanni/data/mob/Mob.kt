@@ -121,11 +121,16 @@ class Mob(
             MobData.externRemoveOfRetryAmount += it
         }
 
+    fun updateBoundingBox() {
+        if (extraEntities?.isNotEmpty() == true) relativeBoundingBox = makeRelativeBoundingBox()
+    }
+
+
     private fun makeRelativeBoundingBox() =
         (baseEntity.entityBoundingBox.union(extraEntities?.filter { it !is EntityArmorStand }
             ?.mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
-    fun internalAddEntity(entity: EntityLivingBase) {
+    internal fun internalAddEntity(entity: EntityLivingBase) {
         if (baseEntity.entityId > entity.entityId) {
             extraEntitiesList?.add(0, baseEntity) ?: run { extraEntitiesList = mutableListOf(baseEntity) }
             baseEntity = entity
@@ -137,7 +142,7 @@ class Mob(
         MobData.entityToMob[entity] = this
     }
 
-    fun internalAddEntity(entities: Collection<EntityLivingBase>) {
+    internal fun internalAddEntity(entities: Collection<EntityLivingBase>) {
         val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
         extraEntitiesList?.addAll(0, list) ?: run { extraEntitiesList = list }
         baseEntity = entities.first()
@@ -146,7 +151,7 @@ class Mob(
         MobData.entityToMob.putAll(entities.associateWith { this })
     }
 
-    fun internalUpdateOfEntity(entity: EntityLivingBase) {
+    internal fun internalUpdateOfEntity(entity: EntityLivingBase) {
         if (entity == baseEntity) baseEntity = entity else {
             extraEntitiesList?.remove(entity)
             extraEntitiesList?.add(entity)

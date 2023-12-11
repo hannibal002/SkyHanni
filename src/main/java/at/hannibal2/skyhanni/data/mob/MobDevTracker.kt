@@ -8,7 +8,7 @@ import java.io.IOException
 
 object MobDevTracker {
 
-    const val FILE_NAME: String = "config/skyhanni/logs/mob/Tracker.txt"
+    private const val FILE_NAME: String = "config/skyhanni/logs/mob/Tracker.txt"
 
     val data = Data()
 

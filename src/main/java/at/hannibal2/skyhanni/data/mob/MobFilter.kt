@@ -227,7 +227,7 @@ object MobFilter {
     }
 
 
-    private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobData.MobResult? =
+    private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobResult? =
         if (DungeonAPI.inDungeon()) {
             when {
                 (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) && extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
@@ -242,7 +242,7 @@ object MobFilter {
         }
 
 
-    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobData.MobResult? {
+    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobResult? {
         if (baseEntity !is EntityZombie) return null
         when {
             armorStand.name.endsWith("'s Armadillo") -> return MobResult.illegal // Armadillo Pet
