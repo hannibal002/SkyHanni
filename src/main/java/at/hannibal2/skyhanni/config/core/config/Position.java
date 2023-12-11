@@ -136,7 +136,6 @@ public class Position {
         return ret;
     }
 
-
     public int moveX(int deltaX, int objWidth) {
         int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
         boolean wasPositiveX = this.x >= 0;
