@@ -28,7 +28,7 @@ class CurrentPetDisplay {
     fun onChatMessage(event: LorenzChatEvent) {
         findPetInChat(event.message)?.let {
             PetAPI.currentPet = it
-            if (config.display && config.hideAutopet) {
+            if (config.hideAutopet) {
                 event.blockedReason = "pets"
             }
         }
