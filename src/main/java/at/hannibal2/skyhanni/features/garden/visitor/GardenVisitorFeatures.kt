@@ -608,10 +608,10 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
-        event.move(11, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
+        event.transform(11, "garden.visitors.rewardWarning.drops") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, VisitorReward::class.java)
         }
-        event.move(12, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
+        event.transform(12, "garden.visitors.rewardWarning.drops") { element ->
             val drops = JsonArray()
             for (jsonElement in element.asJsonArray) {
                 val old = jsonElement.asString
