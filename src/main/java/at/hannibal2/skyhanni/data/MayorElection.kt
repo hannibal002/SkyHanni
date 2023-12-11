@@ -41,8 +41,8 @@ class MayorElection {
     private fun getTimeTillNextMayor() {
         var currentYear = SkyBlockTime.now().year
         val month = 3 // Late Spring
-        // check if date is after 27th of Late Spring
-        if (SkyBlockTime.now().month >= month && SkyBlockTime.now().day > 27) {
+        // check if either the month is already over or the day is after 27th and third month
+        if (SkyBlockTime.now().month > month || (SkyBlockTime.now().day >= 27 && SkyBlockTime.now().month == month)) {
             // if so, next mayor will be in the next year
             currentYear++
         }
