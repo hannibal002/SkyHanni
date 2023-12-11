@@ -2,10 +2,14 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
+import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.DisplayTypeEntry
+import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -15,7 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -99,6 +103,12 @@ object BestiaryData {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.bestiaryData", "combat.bestiary")
+        event.transform(14, "combat.bestiary.numberFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+        event.transform(14, "combat.bestiary.displayType") { element ->
+            ConfigUtils.migrateIntToEnum(element, DisplayTypeEntry::class.java)
+        }
     }
 
     private fun update() {
@@ -209,14 +219,14 @@ object BestiaryData {
 
     private fun sortMobList(): MutableList<BestiaryMob> {
         val sortedMobList = when (config.displayType) {
-            0 -> mobList.sortedBy { it.percentToMax() }
-            1 -> mobList.sortedBy { it.percentToTier() }
-            2 -> mobList.sortedBy { it.totalKills }
-            3 -> mobList.sortedByDescending { it.totalKills }
-            4 -> mobList.sortedBy { it.killNeededToMax() }
-            5 -> mobList.sortedByDescending { it.killNeededToMax() }
-            6 -> mobList.sortedBy { it.killNeededToNextLevel() }
-            7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
+            DisplayTypeEntry.GLOBAL_MAX -> mobList.sortedBy { it.percentToMax() }
+            DisplayTypeEntry.GLOBAL_NEXT -> mobList.sortedBy { it.percentToTier() }
+            DisplayTypeEntry.LOWEST_TOTAL -> mobList.sortedBy { it.totalKills }
+            DisplayTypeEntry.HIGHEST_TOTAL -> mobList.sortedByDescending { it.totalKills }
+            DisplayTypeEntry.LOWEST_MAX -> mobList.sortedBy { it.killNeededToMax() }
+            DisplayTypeEntry.HIGHEST_MAX -> mobList.sortedByDescending { it.killNeededToMax() }
+            DisplayTypeEntry.LOWEST_NEXT -> mobList.sortedBy { it.killNeededToNextLevel() }
+            DisplayTypeEntry.HIGHEST_NEXT -> mobList.sortedByDescending { it.killNeededToNextLevel() }
             else -> mobList.sortedBy { it.totalKills }
         }.toMutableList()
         return sortedMobList
@@ -245,7 +255,7 @@ object BestiaryData {
 
     private fun getMobHover(mob: BestiaryMob) = listOf(
         "§6Name: §b${mob.name}",
-        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNeeded()})" else ""}",
+        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNecessary()})" else ""}",
         "§6Total Kills: §b${mob.actualRealTotalKill.formatNumber()}",
         "§6Kills needed to max: §b${mob.killNeededToMax().formatNumber()}",
         "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().formatNumber()}",
@@ -270,34 +280,34 @@ object BestiaryData {
             "§c§lMAXED! §7(§b${mob.actualRealTotalKill.formatNumber()}§7 kills)"
         } else {
             when (displayType) {
-                0, 1 -> {
+                DisplayTypeEntry.GLOBAL_MAX, DisplayTypeEntry.GLOBAL_NEXT -> {
                     val currentKill = when (displayType) {
-                        0 -> mob.totalKills
-                        1 -> mob.currentKillToNextLevel
+                        DisplayTypeEntry.GLOBAL_MAX -> mob.totalKills
+                        DisplayTypeEntry.GLOBAL_NEXT -> mob.currentKillToNextLevel
                         else -> 0
                     }
                     val killNeeded = when (displayType) {
-                        0 -> mob.killToMax
-                        1 -> mob.killNeededForNextLevel
+                        DisplayTypeEntry.GLOBAL_MAX -> mob.killToMax
+                        DisplayTypeEntry.GLOBAL_NEXT -> mob.killNeededForNextLevel
                         else -> 0
                     }
                     "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
                         ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
                             2
                         )
-                    }§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
+                    }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
                 }
 
-                2, 3 -> {
+                DisplayTypeEntry.LOWEST_TOTAL, DisplayTypeEntry.HIGHEST_TOTAL -> {
 
                     "§6${mob.totalKills.formatNumber()} §7total kills"
                 }
 
-                4, 5 -> {
+                DisplayTypeEntry.LOWEST_MAX, DisplayTypeEntry.HIGHEST_MAX -> {
                     "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
                 }
 
-                6, 7 -> {
+                DisplayTypeEntry.LOWEST_NEXT, DisplayTypeEntry.HIGHEST_NEXT -> {
                     "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
                 }
 
@@ -310,17 +320,19 @@ object BestiaryData {
     private fun addButtons(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton(
             prefix = "§7Number Format: ",
-            getName = FormatType.entries[config.numberFormat].type,
+            getName = FormatType.entries[config.numberFormat.ordinal].type, // todo: avoid ordinal
             onChange = {
-                config.numberFormat = (config.numberFormat + 1) % 2
+                // todo: avoid ordinal
+                config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
                 update()
             })
 
         newDisplay.addButton(
             prefix = "§7Display Type: ",
-            getName = DisplayType.entries[config.displayType].type,
+            getName = DisplayType.entries[config.displayType.ordinal].type, // todo: avoid ordinal
             onChange = {
-                config.displayType = (config.displayType + 1) % 8
+                // todo: avoid ordinal
+                config.displayType = DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
                 update()
             })
 
@@ -417,8 +429,8 @@ object BestiaryData {
     }
 
     private fun Long.formatNumber(): String = when (config.numberFormat) {
-        0 -> NumberUtil.format(this)
-        1 -> this.addSeparators()
+        BestiaryConfig.NumberFormatEntry.SHORT -> NumberUtil.format(this)
+        BestiaryConfig.NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 
@@ -459,7 +471,7 @@ object BestiaryData {
     }
 
 
-    private fun String.romanOrInt() = romanToDecimalIfNeeded().let {
+    private fun String.romanOrInt() = romanToDecimalIfNecessary().let {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
@@ -473,7 +485,7 @@ object BestiaryData {
                 if (this == "0") {
                     "I".romanOrInt()
                 } else {
-                    val intValue = romanToDecimalIfNeeded()
+                    val intValue = romanToDecimalIfNecessary()
                     (intValue + 1).toRoman().romanOrInt()
                 }
             }

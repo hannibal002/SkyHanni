@@ -129,14 +129,14 @@ class EndermanSlayerFeatures {
                 val durationFormat = duration.format(showMilliSeconds = true)
                 event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
                 event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), "§4Beacon §b$durationFormat", 1.8)
+                event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }
         }
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
                 val beaconLocation = event.exactLocation(beacon)
-                event.drawDynamicText(beaconLocation.add(0, 1, 0), "§4Beacon", 1.8)
+                event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
             }
 
             if (beaconConfig.showLine) {

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
@@ -38,25 +39,20 @@ public class RewardWarningConfig {
     public int bypassKey = Keyboard.KEY_NONE;
 
 
-    /**
-     * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
-     */
     @Expose
     @ConfigOption(
         name = "Items",
-        desc = "Warn for these reward items."
+        desc = "Warn for these reward item visitor drops."
     )
-    @ConfigEditorDraggableList(
-        exampleText = {
-            "§9Flowering Bouquet",
-            "§9Overgrown Grass",
-            "§9Green Bandana",
-            "§9Dedication IV",
-            "§9Music Rune",
-            "§cSpace Helmet",
-            "§9Cultivating I",
-            "§9Replenish I",
-        }
-    )
-    public List<Integer> drops = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
+    @ConfigEditorDraggableList
+    public List<VisitorReward> drops = new ArrayList<>(Arrays.asList(
+        VisitorReward.OVERGROWN_GRASS,
+        VisitorReward.GREEN_BANDANA,
+        VisitorReward.DEDICATION,
+        VisitorReward.MUSIC_RUNE,
+        VisitorReward.SPACE_HELMET,
+        VisitorReward.CULTIVATING,
+        VisitorReward.REPLENISH
+    ));
+
 }

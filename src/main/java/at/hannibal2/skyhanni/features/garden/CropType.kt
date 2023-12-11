@@ -40,6 +40,8 @@ enum class CropType(
 
     val multiplier by lazy { if (this == SUGAR_CANE || this == CACTUS) 2 else 1 }
 
+    override fun toString(): String = cropName
+
     companion object {
         fun getByNameOrNull(itemName: String): CropType? {
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
@@ -59,8 +61,7 @@ enum class CropType(
                 Blocks.melon_block -> MELON
                 Blocks.cactus -> CACTUS
                 Blocks.cocoa -> COCOA_BEANS
-                Blocks.red_mushroom -> MUSHROOM
-                Blocks.brown_mushroom -> MUSHROOM
+                Blocks.red_mushroom, Blocks.brown_mushroom -> MUSHROOM
                 Blocks.nether_wart -> NETHER_WART
                 else -> null
             }

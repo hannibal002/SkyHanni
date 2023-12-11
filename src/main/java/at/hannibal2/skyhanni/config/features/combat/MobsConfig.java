@@ -6,11 +6,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class MobsConfig {
-
-    @Expose
-    @ConfigOption(name = "Highlighters", desc = "")
-    public boolean highlighters = false;
-
     @Expose
     @ConfigOption(name = "Area Boss", desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze.")
     @ConfigEditorBoolean
@@ -55,10 +50,6 @@ public class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean arachneBossHighlighter = true;
-
-    @Expose
-    @ConfigOption(name = "Respawn Timers", desc = "")
-    public boolean timers = false;
 
     @Expose
     @ConfigOption(

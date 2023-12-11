@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.CombatUtils.lastKillUpdate
 import at.hannibal2.skyhanni.utils.CombatUtils.lastUpdate
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHour
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -111,7 +113,8 @@ object GhostCounter {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.ghostDisplayText) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }
@@ -488,6 +491,9 @@ object GhostCounter {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
+        event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, GhostDisplayEntry::class.java)
+        }
     }
 
     fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()

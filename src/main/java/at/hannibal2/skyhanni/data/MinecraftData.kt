@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -75,11 +76,12 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        DelayedRun.checkRuns()
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NEUInternalName.NONE
-        if (newItem != InventoryUtils.itemInHandId) {
-            ItemInHandChangeEvent(newItem, hand).postAndCatch()
+        val oldItem = InventoryUtils.itemInHandId
+        if (newItem != oldItem) {
 
             InventoryUtils.recentItemsInHand.keys.removeIf { it + 30_000 > System.currentTimeMillis() }
             if (newItem != NEUInternalName.NONE) {
@@ -87,6 +89,7 @@ object MinecraftData {
             }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
+            ItemInHandChangeEvent(newItem, oldItem).postAndCatch()
         }
     }
 
