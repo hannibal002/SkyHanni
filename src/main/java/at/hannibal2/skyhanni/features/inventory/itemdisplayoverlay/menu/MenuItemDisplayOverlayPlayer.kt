@@ -167,7 +167,7 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
             profileIconVariantOneDisplayNamePattern.matchMatcher(itemName) { return group("icon") }
             profileIconVariantTwoDisplayNamePattern.matchMatcher(itemName) { return "©" }
             if (itemName == "§cLocked profile slot") {
-                return "§c\uD83D\uDD12\u0020"
+                return "§c┏┓"
             }
         }
 
