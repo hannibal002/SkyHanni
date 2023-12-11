@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -24,14 +23,13 @@ class MovementSpeedDisplay {
     private fun checkSpeed() {
         if (!isEnabled()) return
 
-        val player = Minecraft.getMinecraft().thePlayer
+        val distance = with(Minecraft.getMinecraft().thePlayer) {
+            val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
+            val newPos = LorenzVec(posX, posY, posZ)
 
-        val oldPos = LorenzVec(player.prevPosX, player.prevPosY, player.prevPosZ)
-        val newPos = LorenzVec(player.posX, player.posY, player.posZ)
-
-        // Distance from previous tick, multiplied by TPS
-        val distance = oldPos.distance(newPos) * 20
-
+            // Distance from previous tick, multiplied by TPS
+            oldPos.distance(newPos) * 20
+        }
         display = "Movement Speed: ${distance.round(2)}"
     }
 
