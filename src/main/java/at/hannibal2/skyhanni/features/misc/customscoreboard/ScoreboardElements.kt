@@ -346,9 +346,11 @@ private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
     if (amountOfExtraLines != extraLines.size && config.unknownLinesWarning) {
         ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected unknown lines"),
-            "CustomScoreboard detected unknown lines",
-            "extraLines" to extraLines
+            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${extraLines.size} unknown line${if (extraLines.size > 1) "s" else ""}"),
+            "CustomScoreboard detected ${extraLines.size} unknown line${if (extraLines.size > 1) "s" else ""}",
+            "Extra Lines" to extraLines,
+            "Island" to HypixelData.skyBlockIsland,
+            "Area" to HypixelData.skyBlockArea
         )
         amountOfExtraLines = extraLines.size
     }
