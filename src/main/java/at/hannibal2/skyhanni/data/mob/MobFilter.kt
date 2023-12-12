@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -37,6 +38,7 @@ import net.minecraft.entity.passive.EntityChicken
 import net.minecraft.entity.passive.EntityCow
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityMooshroom
+import net.minecraft.entity.passive.EntityOcelot
 import net.minecraft.entity.passive.EntityPig
 import net.minecraft.entity.passive.EntityRabbit
 import net.minecraft.entity.passive.EntitySheep
@@ -49,6 +51,7 @@ object MobFilter {
     val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter = "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
+    val petCareNameRegex = "^\\[\\w+ (\\d+)\\] (.*)".toRegex()
 
     val summonRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     val summonOwnerRegex = "Spawned by: (.*)".toRegex()
@@ -217,6 +220,10 @@ object MobFilter {
             }
 
             IslandType.HUB -> when {
+                baseEntity is EntityOcelot && armorStand?.isDefaultValue() == false && armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it) }
+                baseEntity is EntityOcelot && nextEntity is EntityOcelot -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it) }
+                baseEntity is EntityOtherPlayerMP && (baseEntity.name == "Minos Champion" || baseEntity.name == "Minos Inquisitor") && armorStand != null -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }
+                baseEntity is EntityZombie && armorStand?.isDefaultValue() == true && getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true -> petCareHandler(baseEntity)
                 baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
                 baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
                 else -> null
@@ -224,6 +231,23 @@ object MobFilter {
 
             else -> null
         }
+    }
+
+    private fun petCareHandler(baseEntity: EntityLivingBase): MobResult {
+        val extraEntityList = listOf(1, 2, 3, 4).mapNotNull { MobUtils.getArmorStand(baseEntity, it) }
+        if (extraEntityList.size != 4) return MobResult.notYetFound
+        return petCareNameRegex.find(extraEntityList[1].cleanName())?.groupValues?.let {
+            MobResult.found(
+                Mob(
+                    baseEntity,
+                    Mob.Type.Special,
+                    armorStand = extraEntityList[1],
+                    name = it[2],
+                    additionalEntities = extraEntityList,
+                    levelOrTier = it[1].toInt()
+                ),
+            )
+        } ?: MobResult.somethingWentWrong
     }
 
 

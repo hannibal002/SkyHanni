@@ -25,7 +25,7 @@ object MobFactories {
                 ?.let { MobFilter.DungeonAttribute.valueOf(it) })
         }
 
-    fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
+    fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>? = null): Mob? =
         MobFilter.mobNameFilter.find(armorStand.cleanName())?.let {
             Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = it.groupValues[4].removeCorruptedSuffix(it.groupValues[3].isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].takeIf { it.isNotEmpty() }
                 ?.toInt() ?: -1)
