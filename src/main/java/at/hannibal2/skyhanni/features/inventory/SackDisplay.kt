@@ -245,16 +245,16 @@ object SackDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "inventory.sackDisplay.numberFormat") { element ->
+        event.transform(15, "inventory.sackDisplay.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
         }
-        event.transform(14, "inventory.sackDisplay.priceFormat") { element ->
+        event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
         }
-        event.transform(14, "inventory.sackDisplay.priceFrom") { element ->
+        event.transform(15, "inventory.sackDisplay.priceFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, SackDisplayConfig.PriceFrom::class.java)
         }
-        event.transform(14, "inventory.sackDisplay.sortingType") { element ->
+        event.transform(15, "inventory.sackDisplay.sortingType") { element ->
             ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
         }
     }
