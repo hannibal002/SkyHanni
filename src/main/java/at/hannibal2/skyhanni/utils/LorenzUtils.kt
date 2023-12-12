@@ -294,10 +294,10 @@ object LorenzUtils {
         }
     }
 
-    fun setTextIntoSign(text: String) {
+    fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[0] = ChatComponentText(text)
+        gui.tileSign.signText[line] = ChatComponentText(text)
     }
 
     fun addTextIntoSign(addedText: String) {
@@ -306,7 +306,7 @@ object LorenzUtils {
         val lines = gui.tileSign.signText
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
-        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
 
     /**
