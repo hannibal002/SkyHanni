@@ -64,7 +64,7 @@ object SlayerProfitTracker {
             val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
             return listOf(
                 "§7Killing mobs gives you coins (more with scavenger).",
-                "§7You got §6$mobKillCoinsFormat coins §7way."
+                "§7You got §6$mobKillCoinsFormat coins §7that way."
             )
         }
     }
