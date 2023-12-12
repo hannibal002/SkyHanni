@@ -93,8 +93,8 @@ public class ComposterConfig {
 
     @Expose
     @ConfigOption(
-        name = "Display Element",
-        desc = "Displays the Compost data from the tab list as GUI element."
+        name = "Composter Display",
+        desc = "Displays the Composter data from the tab list as GUI element."
     )
     @ConfigEditorBoolean
     @FeatureToggle

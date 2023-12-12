@@ -90,7 +90,7 @@ class PlayerChatSymbols {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "chat.chatSymbols.symbolLocation") { element ->
+        event.transform(15, "chat.chatSymbols.symbolLocation") { element ->
             ConfigUtils.migrateIntToEnum(element, SymbolLocationEntry::class.java)
         }
     }
