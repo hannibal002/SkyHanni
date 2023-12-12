@@ -81,6 +81,17 @@
 
 + Added Waypoints for 2023 Lobby Presents. - walker
 
+#### Stranded Featuers
+
++ Highlights NPCs in the stranded menu that are placeable but not placed. - walker
+
+#### Diana Features
+
++ Added Diana Profit Tracker. - hannibal2
+  + Same options as slayer and fising trackers.
+
+#### 
+
 ### Changes
 
 #### Garden Changes
@@ -107,6 +118,7 @@
 #### Fishing Changes
 
 + Show the fishing tracker for a couple of seconds after catching something even while moving. - hannibal2
++ Show breakdown of different shark types caught during festivals. - Cad
 
 #### Winter Changes
 
@@ -133,6 +145,11 @@
 + Option to change the color of Marked Players in chat and in the world. - walker & hannibal2
 + Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
 + Hide "Winter Island Close" timer during the month of December. - hannibal2
++ Changes Ctrl+V in signs to better sign editing. - Obsidian
+  +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
++ Improve accuracy of movement speed display. - alexia
++ Added toggle to hide autopet messages. - CalMWolfs
++ Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
 
 ### Fixes
 
@@ -155,6 +172,10 @@
 + Fixed an error message in the composter inventory when hovering over some items.- hannibal2
 + Correctly load the plot names of locked plots from inventory. - hannibal2
 + Fixed the boosted crop not being highlighted during contest participation. - alexia
++ Fixed farming weight leaderboard showing new position as -1 sometimes. - alexia
++ Fix typo with Not Clickable Items in Composter. - absterge
++ Added missing preview number from Visitor Drop Statistics. - absterge
++ Fixed error message with newly bought fungi cutter. - hannibal2
 
 #### Bingo Fixes
 
@@ -186,6 +207,7 @@
 + Fixed the city project time remaining "soon!" error. - hannibal2
 + Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
 + Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
++ Fixed locraw sending outside Hypixel. - walker
 
 #### Config Fixes
 
@@ -231,6 +253,10 @@
 + Cleanup getItemsInOpenChest. - walker
 + Changed MinionCraftHelper to use NeuInternalName. - walker
 + Added a separate debug hotkey for Bypass Advanced Tab List. - hannibal2
++ Added Config Transform function. - walker
++ Migrate Deprecated Config Values to Enums. - walker
++ Migrate Config Value in EliteFarmingWeight. - walker
++ Add limbo time PB. - mar
 
 ## Version 0.21.1
 

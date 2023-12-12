@@ -625,7 +625,8 @@ class GardenVisitorFeatures {
 
             drops
         }
-        event.transform(14, "garden.visitors.highlightStatus") { element ->
+
+        event.transform(15, "garden.visitors.highlightStatus") { element ->
             ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)
         }
     }
