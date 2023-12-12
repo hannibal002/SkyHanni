@@ -91,4 +91,9 @@ public class DebugConfig {
         "show the total amount in console output.")
     @ConfigEditorBoolean
     public boolean eventCounter = false;
+
+    @Expose
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advaced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
 }

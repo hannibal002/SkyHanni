@@ -48,6 +48,9 @@
 + Added Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
++ Jyrre Timer for Bottle of Jyrre. - walker
+    + A timer showing the remaining duration of your intelligence boost.
+    + Option to show the timer when inactive rather than removing it.
 
 #### Bingo Features
 
@@ -58,6 +61,7 @@
 + Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
 + Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
   + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
 #### Inventory Features
 
@@ -71,6 +75,22 @@
 #### Chat Features
 
 + Hide the repeating fire sale reminder chat messages. - hannibal2
+
+
+#### Event Features
+
++ Added Waypoints for 2023 Lobby Presents. - walker
+
+#### Stranded Featuers
+
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
+
+#### Diana Features
+
++ Added Diana Profit Tracker. - hannibal2
+  + Same options as slayer and fising trackers.
+
+#### 
 
 ### Changes
 
@@ -89,10 +109,16 @@
 + Highlight the boosted crop contest in all Jacob's Contest displays. - alexia
 + Added Delicate 5 to visitor drop counter and visitor block refuse and highlighter. - hannibal2
 + Block visitor interaction for dedication cycling is now disabled by default. - hannibal2
++ Added an option to only warn for specific crop contests. - Obsidian
++ Added an option to show plot borders for a given number of seconds after holding a vacuum. - HiZe
++ Added command /shclearcontestdata to Reset Jacob's Contest Data. - martimavocado
++ Display Farming Fortune reduction from pests on the HUD. - alexia
++ Allow showing optimal speed warning without HUD enabled. - alexia
 
 #### Fishing Changes
 
 + Show the fishing tracker for a couple of seconds after catching something even while moving. - hannibal2
++ Show breakdown of different shark types caught during festivals. - Cad
 
 #### Winter Changes
 
@@ -102,12 +128,28 @@
 
 + Added fire sale messages in the hub to the chat message filter. - hannibal2
 + Added compact potion message support for splash messages and for Poisoned Candy I. - walker
++ Added "fire sale starting soon" message to fire sale chat hider. - hannibal2
 
 #### Bingo Changes
 
 + Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
 + Mark the background difficulty gray for unknown goals. - hannibal2
   + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
++ Added the community goal percentage to the bingo card display. - hannibal2
++ Saving minion craft helper crafted tier 1 minions and bingo card goals per bingo session/month. - hannibal2
+
+#### Misc Changes
+
++ Titles sent by SkyHanni look better now. - Cad
++ Added support for show XP gained from wheat minion in hub. - Thunderblade73
++ Option to change the color of Marked Players in chat and in the world. - walker & hannibal2
++ Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
++ Hide "Winter Island Close" timer during the month of December. - hannibal2
++ Changes Ctrl+V in signs to better sign editing. - Obsidian
+  +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
++ Improve accuracy of movement speed display. - alexia
++ Added toggle to hide autopet messages. - CalMWolfs
++ Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
 
 ### Fixes
 
@@ -125,18 +167,32 @@
 + Fixed Mooshroom cow Perk display not showing when maxed. - hannibal2
 + Show a text around the new year that the calendar is not loaded for the next Jacob Contest. - hannibal2
 + Fixed visitor reward item refuse inconsistencies. - hannibal2
++ Fixed wrong base 100ff calculations in the farming fortune needed display. - alexia
++ Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
++ Fixed an error message in the composter inventory when hovering over some items.- hannibal2
++ Correctly load the plot names of locked plots from inventory. - hannibal2
++ Fixed the boosted crop not being highlighted during contest participation. - alexia
++ Fixed farming weight leaderboard showing new position as -1 sometimes. - alexia
++ Fix typo with Not Clickable Items in Composter. - absterge
++ Added missing preview number from Visitor Drop Statistics. - absterge
++ Fixed error message with newly bought fungi cutter. - hannibal2
 
 #### Bingo Fixes
 
 + Hide the long hint line in the Bingo Goal Display. - hannibal2
 + Show community goals in the Bingo Display correctly. - hannibal2
 + Hide enchanted tools in Minion Craft Helper. - hannibal2
++ Opening the bingo card will no longer crash the game sometimes. Showing an error message instead. - hannibal2
 
 #### Minion Fixes
 
 + Fixed Minion XP display not showing sometimes. - Thunderblade73
 + Updating the Minion XP display when the minion picks up a new item while inside the inventory. - hannibal2
 + Fixed minion features disappear inside the minion inventory when picking up an item. - hannibal2
+
+#### Fishing Fixes
+
++ Fixed Water Hydra warning showing up multiple times. - Cad
 
 #### Misc Fixes
 
@@ -145,6 +201,13 @@
 + Fixed NPC messages getting detected as player messages. - CalMWolfs
 + Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. - hannibal2
 + Fixed an error when the king talisman helper does not find the king in range. - hannibal2
++ Fixed control/modifier key logic on Apple devices. - walker
++ Fixed lag spikes when downloading updates. - nea
++ Fixed showing the Minion XP display in the Bazaar. - Thunderblade73
++ Fixed the city project time remaining "soon!" error. - hannibal2
++ Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
++ Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
++ Fixed locraw sending outside Hypixel. - walker
 
 #### Config Fixes
 
@@ -178,6 +241,22 @@
 + Replaced ItemWarnEntry with VisitorReward. This should fix some errors. - hannibal2
 + GardenNextJacobContest now uses SimpleTimeMark. SimpleTimeMark is storable in the config and comparable - hannibal2
 + No longer sending contest data to elite close to new year. - hannibal2
++ Added RepoPatterns. - nea
++ Use LorenzToolTipEvent over ItemTooltipEvent if possible. - hannibal2
++ Added an abstract error message on LorenzToolTipEvent error. - hannibal2
++ Added test command /shsendtitle - Cad
++ Saving bingo goal data into the config. - hannibal2
++ Added WorldEdit region selection preview support. - nea
+  + Command /shworldedit and rigth/left clicking with a wood axe work.
++ Fixed error message in the "/shconfig set" command. - Thunderblade73
++ Add a check for the SkyHanni repository ID in publish. - walker
++ Cleanup getItemsInOpenChest. - walker
++ Changed MinionCraftHelper to use NeuInternalName. - walker
++ Added a separate debug hotkey for Bypass Advanced Tab List. - hannibal2
++ Added Config Transform function. - walker
++ Migrate Deprecated Config Values to Enums. - walker
++ Migrate Config Value in EliteFarmingWeight. - walker
++ Add limbo time PB. - mar
 
 ## Version 0.21.1
 

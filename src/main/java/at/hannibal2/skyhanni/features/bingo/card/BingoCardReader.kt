@@ -32,11 +32,9 @@ class BingoCardReader {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
 
-        BingoAPI.bingoGoals.clear()
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             val goalType = when {
@@ -69,13 +67,35 @@ class BingoCardReader {
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
 
-            val bingoGoal =
-                BingoGoal(name, visualDescription, goalType, slot, done, communtyGoalPercentage, hiddenGoalData)
-            BingoAPI.bingoGoals.add(bingoGoal)
+            val bingoGoal = BingoAPI.bingoGoals.getOrPut(slot) { BingoGoal() }
+
+            with(bingoGoal) {
+                this.type = goalType
+                this.displayName = name
+                this.description = visualDescription
+                this.done = done
+                this.hiddenGoalData = hiddenGoalData
+            }
+            communtyGoalPercentage?.let {
+                bingoGoalDifference(bingoGoal, it)
+                bingoGoal.communtyGoalPercentage = it
+            }
         }
         BingoAPI.lastBingoCardOpenTime = SimpleTimeMark.now()
 
         BingoCardUpdateEvent().postAndCatch()
+    }
+
+    private fun bingoGoalDifference(bingoGoal: BingoGoal, new: Double) {
+        val old = bingoGoal.communtyGoalPercentage ?: 1.0
+
+        if (!config.communityGoalProgress) return
+        if (new == old) return
+
+        val oldFormat = BingoAPI.getCommunityPercentageColor(old)
+        val newFormat = BingoAPI.getCommunityPercentageColor(new)
+        val color = if (new > old) "§c" else "§a"
+        LorenzUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
     }
 
     private fun readCommuntyGoalPercentage(lore: List<String>): Double? {

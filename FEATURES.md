@@ -324,6 +324,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Inquisitor Sharing**
     + Share aypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
++ Diana Profit Tracker. - hannibal2
+    + Same options as slayer and fising trackers.
 </details>
 <details open><summary>
 
@@ -349,6 +351,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
 + Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
   + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
 </details>
 <details open><summary>
@@ -640,6 +643,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
++ Waypoints for 2023 Lobby Presents. - walker
++ Jyrre Timer for Bottle of Jyrre. - walker
+  + A timer showing the remaining duration of your intelligence boost.
+  + Option to show the timer when inactive rather than removing it.
 </details>
 <details open><summary>
 
@@ -659,6 +666,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
+</details>
+<details open><summary>
+
+## Stranded
+</summary>
+
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
+
 </details>
 <details open><summary>
 

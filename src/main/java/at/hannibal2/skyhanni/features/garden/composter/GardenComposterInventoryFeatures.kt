@@ -33,9 +33,8 @@ class GardenComposterInventoryFeatures {
         var indexFullCost = 0
         var fullPrice = 0.0
         var amountItems = 0
-        for (originalLine in list) {
+        for (line in event.toolTipRemovedPrefix()) {
             i++
-            val line = originalLine.substring(4)
             if (line == "§7Upgrade Cost:") {
                 next = true
                 indexFullCost = i

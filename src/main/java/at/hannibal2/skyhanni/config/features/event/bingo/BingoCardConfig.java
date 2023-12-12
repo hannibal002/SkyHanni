@@ -13,6 +13,7 @@ public class BingoCardConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
     @Expose
     @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the Bingo Card or the step helper by sneaking with SkyBlock Menu in hand.")
     @ConfigEditorBoolean
@@ -52,4 +53,10 @@ public class BingoCardConfig {
     @ConfigOption(name = "Hide Difficulty When Done", desc = "Remove the background difficulty color in the bingo card inventory when the goal is done.")
     @ConfigEditorBoolean
     public boolean hideDoneDifficulty = true;
+
+    @Expose
+    @ConfigOption(name = "Community Percentages", desc = "Send a chat message with the change of community goal percentages after opening the bingo card inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean communityGoalProgress = true;
 }
