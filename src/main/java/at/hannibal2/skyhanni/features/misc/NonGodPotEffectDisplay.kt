@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.color
 import at.hannibal2.skyhanni.utils.Timer
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -123,7 +124,7 @@ class NonGodPotEffectDisplay {
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
-            val color = colorForTime(remaining)
+            val color = remaining.color()
 
             val displayName = effect.tabListName
             newDisplay.add("$displayName $color$format")
@@ -135,13 +136,6 @@ class NonGodPotEffectDisplay {
             checkFooter = true
         }
         return newDisplay
-    }
-
-    private fun colorForTime(duration: Duration) = when (duration) {
-        in 0.seconds..60.seconds -> "§c"
-        in 60.seconds..3.minutes -> "§6"
-        in 3.minutes..10.minutes -> "§e"
-        else -> "§f"
     }
 
     @SubscribeEvent
