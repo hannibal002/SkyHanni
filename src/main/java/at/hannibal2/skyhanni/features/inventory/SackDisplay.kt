@@ -1,10 +1,16 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -63,10 +69,10 @@ object SackDisplay {
         val sackItems = SackAPI.sackItem.toList()
         if (sackItems.isNotEmpty()) {
             val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-                0 -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
-                1 -> sackItems.sortedBy { it.second.stored.formatNumber() }
-                2 -> sackItems.sortedByDescending { it.second.price }
-                3 -> sackItems.sortedBy { it.second.price }
+                SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
+                SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored.formatNumber() }
+                SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
+                SortingTypeEntry.ASC_PRICE -> sackItems.sortedBy { it.second.price }
                 else -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
             }.toMap().toMutableMap()
 
@@ -95,9 +101,11 @@ object SackDisplay {
 
                     add(
                         when (config.numberFormat) {
-                            0 -> "$colorCode${stored}§7/§b${total}"
-                            1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                            2 -> "$colorCode${stored}§7/§b${total.formatNumber().addSeparators()}"
+                            NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${total}"
+                            NumberFormatEntry.FORMATTED -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                            NumberFormatEntry.UNFORMATTED -> "$colorCode${stored}§7/§b${
+                                total.formatNumber().addSeparators()
+                            }"
                             else -> "$colorCode${stored}§7/§b${total}"
                         }
                     )
@@ -126,22 +134,24 @@ object SackDisplay {
 
             if (SackAPI.isTrophySack) newDisplay.addAsSingletonList("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
 
-            val name = SortType.entries[config.sortingType].longName
+            val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
             newDisplay.addAsSingletonList("§7Sorted By: §c$name")
 
             newDisplay.addSelector<SortType>(" ",
                 getName = { type -> type.shortName },
-                isCurrent = { it.ordinal == config.sortingType },
+                isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.sortingType = it.ordinal
+                    config.sortingType = SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
                     update(false)
                 })
 
             newDisplay.addButton(
                 prefix = "§7Number format: ",
-                getName = NumberFormat.entries[config.numberFormat].DisplayName,
+                getName = NumberFormat.entries[config.numberFormat.ordinal].DisplayName, // todo avoid ordinal
                 onChange = {
-                    config.numberFormat = (config.numberFormat + 1) % 3
+                    // todo avoid ordinal
+                    config.numberFormat =
+                        NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 3]
                     update(false)
                 }
             )
@@ -149,16 +159,18 @@ object SackDisplay {
             if (config.showPrice) {
                 newDisplay.addSelector<PriceFrom>(" ",
                     getName = { type -> type.displayName },
-                    isCurrent = { it.ordinal == config.priceFrom },
+                    isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
                     onChange = {
-                        config.priceFrom = it.ordinal
+                        config.priceFrom = SackDisplayConfig.PriceFrom.entries[it.ordinal] // todo avoid ordinal
                         update(false)
                     })
                 newDisplay.addButton(
                     prefix = "§7Price Format: ",
-                    getName = PriceFormat.entries[config.priceFormat].displayName,
+                    getName = PriceFormat.entries[config.priceFormat.ordinal].displayName, // todo avoid ordinal
                     onChange = {
-                        config.priceFormat = (config.priceFormat + 1) % 2
+                        // todo avoid ordinal
+                        config.priceFormat =
+                            PriceFormatEntry.entries[(config.priceFormat.ordinal + 1) % 2]
                         update(false)
                     }
                 )
@@ -200,7 +212,8 @@ object SackDisplay {
         return newDisplay
     }
 
-    private fun format(price: Long) = if (config.priceFormat == 0) NumberUtil.format(price) else price.addSeparators()
+    private fun format(price: Long) =
+        if (config.priceFormat == PriceFormatEntry.FORMATTED) NumberUtil.format(price) else price.addSeparators()
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
@@ -228,5 +241,21 @@ object SackDisplay {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "inventory.sackDisplay.numberFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+        event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
+        }
+        event.transform(15, "inventory.sackDisplay.priceFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, SackDisplayConfig.PriceFrom::class.java)
+        }
+        event.transform(15, "inventory.sackDisplay.sortingType") { element ->
+            ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
+        }
     }
 }

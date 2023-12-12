@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -9,12 +12,14 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -37,7 +42,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -128,11 +132,11 @@ object ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (inComposterUpgrades) {
             update()
             for (upgrade in ComposterUpgrade.entries) {
-                event.itemStack?.name?.let {
+                event.itemStack.name?.let {
                     if (it.contains(upgrade.displayName)) {
                         maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
                             group("level")?.romanToDecimalIfNecessary() ?: 0
@@ -421,7 +425,7 @@ object ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (KeyboardManager.isControlKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
                     retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
                 }
@@ -443,7 +447,7 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: String, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0 || internalName == "BIOFUEL") return
-        if (config.retrieveFrom == 0 && !LorenzUtils.noTradeMode) {
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
@@ -492,7 +496,7 @@ object ComposterOverlay {
     }
 
     private fun getPrice(internalName: String): Double {
-        val useSellPrice = config.overlayPriceType == 1
+        val useSellPrice = config.overlayPriceType == ComposterConfig.OverlayPriceTypeEntry.BUY_ORDER
         val price = NEUItems.getPrice(internalName, useSellPrice)
         if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
 
@@ -578,5 +582,12 @@ object ComposterOverlay {
         event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
         event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
         event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
+
+        event.transform(15, "garden.composters.overlayPriceType") { element ->
+            ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
+        }
+        event.transform(15, "garden.composters.retrieveFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
+        }
     }
 }

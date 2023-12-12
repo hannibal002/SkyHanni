@@ -345,6 +345,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
 + Support for tips in hidden bingo card display. - hannibal2
 + Support for 'found by' info in bingo card. - hannibal2
++ Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
+
 </details>
 <details open><summary>
 
@@ -635,6 +641,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
++ Waypoints for 2023 Lobby Presents. - walker
++ Jyrre Timer for Bottle of Jyrre. - walker
+  + A timer showing the remaining duration of your intelligence boost.
+  + Option to show the timer when inactive rather than removing it.
 </details>
 <details open><summary>
 

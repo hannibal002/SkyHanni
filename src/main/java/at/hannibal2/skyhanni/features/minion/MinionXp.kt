@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -19,7 +20,6 @@ import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
@@ -83,7 +83,7 @@ class MinionXp {
 
     private fun getStorageXpAndUpdateTotal(
         minionPosition: LorenzVec,
-        xpTotal: EnumMap<XpType, Double>
+        xpTotal: EnumMap<XpType, Double>,
     ): Boolean {
         if (!getHasStorage(minionPosition)) return false
         val storage = minionStorages.firstOrNull {
@@ -110,7 +110,7 @@ class MinionXp {
             val name = item.name
             val xp = xpInfoMap[name] ?: return@forEach
 
-            //TODO add wisdom and Derpy to calculation and random extra Exp Events
+            // TODO add wisdom and Derpy to calculation and random extra Exp Events
             val xpAmount = xp.amount * item.stackSize
 
             xpItemMap[item] = collectMessage(xp.type, xpAmount)
@@ -140,14 +140,14 @@ class MinionXp {
         )
 
         return positionsToCheck.any { position ->
-            val pos = minionPosition.add(position).toBlocPos()
+            val pos = minionPosition.add(position).toBlockPos()
             val block = Minecraft.getMinecraft().theWorld.getBlockState(pos).block
             block is BlockChest
         }
     }
 
     @SubscribeEvent
-    fun onItemTooltipEvent(event: ItemTooltipEvent) {
+    fun onItemTooltipEvent(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.xpDisplay) return
         when {
@@ -166,7 +166,7 @@ class MinionXp {
         }
     }
 
-    private fun addXpInfoToTooltip(event: ItemTooltipEvent) {
+    private fun addXpInfoToTooltip(event: LorenzToolTipEvent) {
         xpItemMap[toPrimitiveItemStack(event.itemStack)]?.let {
             event.toolTip.add("")
             event.toolTip.add(it)
@@ -181,7 +181,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onMinionClose(event: MinionCloseEvent) {
         xpItemMap.clear()
         collectItemXpList.clear()
     }

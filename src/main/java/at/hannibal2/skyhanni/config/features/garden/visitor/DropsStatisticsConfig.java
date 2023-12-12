@@ -12,18 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.ACCEPTED;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COINS_SPENT;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DEDICATION_IV;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DENIED;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.FARMING_EXP;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.GREEN_BANDANA;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.OVERGROWN_GRASS;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.SPACER_1;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TITLE;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TOTAL_VISITORS;
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.VISITORS_BY_RARITY;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.*;
 
 public class DropsStatisticsConfig {
 
@@ -57,7 +46,12 @@ public class DropsStatisticsConfig {
         DEDICATION_IV
     ));
 
+    /**
+     * Do not change the order of the enums added to that list! New items are to be synced up with the implementation in GardenVisitorDropStatistics.drawDisplay.
+     * Generic non VisitorReward stuff belongs in front of the first VisitorReward.
+     */
     public enum DropsStatisticsTextEntry implements HasLegacyId {
+        // generic stuff
         TITLE("§e§lVisitor Statistics", 0),
         TOTAL_VISITORS("§e1,636 Total", 1),
         VISITORS_BY_RARITY("§a1,172§f-§9382§f-§681§f-§d2§f-§c1", 2),
@@ -67,6 +61,13 @@ public class DropsStatisticsConfig {
         COPPER("§c62,072 Copper", 6),
         FARMING_EXP("§33.2m Farming EXP", 7),
         COINS_SPENT("§647.2m Coins Spent", 8),
+        SPACER_2(" ", 17),
+        GARDEN_EXP("§212,600 Garden EXP", 18),
+        BITS("§b4.2k Bits", 19),
+        MITHRIL_POWDER("§220k Mithril Powder", 20),
+        GEMSTONE_POWDER("§d18k Gemstone Powder", 21),
+
+        // VisitorReward items
         FLOWERING_BOUQUET("§b23 §9Flowering Bouquet", 9),
         OVERGROWN_GRASS("§b4 §9Overgrown Grass", 10),
         GREEN_BANDANA("§b2 §5Green Bandana", 11),
@@ -75,11 +76,7 @@ public class DropsStatisticsConfig {
         SPACE_HELMET("§b1 §cSpace Helmet", 14),
         CULTIVATING_I("§b1 §9Cultivating I", 15),
         REPLENISH_I("§b1 §9Replenish I", 16),
-        SPACER_2(" ", 17),
-        GARDEN_EXP("§212,600 Garden EXP", 18),
-        BITS("§b4.2k Bits", 19),
-        MITHRIL_POWDER("§220k Mithril Powder", 20),
-        GEMSTONE_POWDER("§d18k Gemstone Powder", 21),
+        DELICATE("§b1 §9Delicate V"),
         ;
 
         private final String str;

@@ -70,16 +70,16 @@ object TrevorFeatures {
 
     init {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
-            Minecraft.getMinecraft().addScheduledTask {
-                try {
-                    if (config.trapperSolver && onFarmingIsland()) {
+            if (onFarmingIsland() && config.trapperSolver) {
+                Minecraft.getMinecraft().addScheduledTask {
+                    try {
                         updateTrapper()
-                        TrevorTracker.saveAndUpdate()
+                        TrevorTracker.update()
                         TrevorTracker.calculatePeltsPerHour()
                         if (questActive) TrevorSolver.findMob()
+                    } catch (error: Throwable) {
+                        ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                     }
-                } catch (error: Throwable) {
-                    ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }
@@ -160,7 +160,6 @@ object TrevorFeatures {
             posLabel = "Trapper Cooldown GUI"
         )
     }
-
 
     private fun updateTrapper() {
         timeUntilNextReady -= 1
@@ -308,7 +307,7 @@ object TrevorFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(11, "misc.trevorTheTrapper.textFormat", "misc.trevorTheTrapper.textFormat") { element ->
+        event.transform(11, "misc.trevorTheTrapper.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)
         }
     }

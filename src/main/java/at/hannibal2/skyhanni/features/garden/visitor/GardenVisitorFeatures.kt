@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.visitor.RewardWarningConfig.ItemWarnEntry
+import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -48,6 +48,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
@@ -385,10 +387,10 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.needs.display && config.highlightStatus == 3) return
+        if (!config.needs.display && config.highlightStatus == HighlightMode.DISABLED) return
         if (!event.isMod(10)) return
 
-        if (GardenAPI.onBarnPlot && config.highlightStatus != 3) {
+        if (GardenAPI.onBarnPlot && config.highlightStatus != HighlightMode.DISABLED) {
             checkVisitorsReady()
         }
     }
@@ -466,13 +468,13 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if ((config.highlightStatus == 0 || config.highlightStatus == 2) && entity is EntityLivingBase) {
+            if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) && entity is EntityLivingBase) {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
                         color
-                    ) { config.highlightStatus == 0 || config.highlightStatus == 2 }
+                    ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
                 }
                 // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
                 if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
@@ -606,8 +608,26 @@ class GardenVisitorFeatures {
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
-        event.move(11, "garden.visitors.rewardWarning.drops", "garden.visitors.rewardWarning.drops") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemWarnEntry::class.java)
+        event.transform(11, "garden.visitors.rewardWarning.drops") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, VisitorReward::class.java)
+        }
+        event.transform(12, "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (jsonElement in element.asJsonArray) {
+                val old = jsonElement.asString
+                val new = VisitorReward.entries.firstOrNull { old.startsWith(it.name) }
+                if (new == null) {
+                    println("error with migrating old VisitorReward entity: '$old'")
+                    continue
+                }
+                drops.add(JsonPrimitive(new.name))
+            }
+
+            drops
+        }
+
+        event.transform(15, "garden.visitors.highlightStatus") { element ->
+            ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)
         }
     }
 

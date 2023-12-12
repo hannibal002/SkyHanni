@@ -85,4 +85,15 @@ public class DebugConfig {
     @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
     @ConfigEditorBoolean
     public boolean hotSwapDetection = false;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni Event Counter", desc = "Count once per second how many skyhanni events gets triggered, " +
+        "show the total amount in console output.")
+    @ConfigEditorBoolean
+    public boolean eventCounter = false;
+
+    @Expose
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advaced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
 }

@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 object PestAPI {
     val config get() = GardenAPI.config.pests
 
+    var scoreboardPests = 0
+
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),

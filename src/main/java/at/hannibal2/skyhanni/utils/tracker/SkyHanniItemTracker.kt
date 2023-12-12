@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.test.PriceSource
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -51,9 +51,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             lists.addSelector<PriceSource>(
                 "",
                 getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom },
+                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = it.ordinal
+                    config.priceFrom = PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
                     update()
                 }
             )
@@ -79,7 +79,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val cleanName = if (internalName == SKYBLOCK_COIN) {
                 data.getCoinName(itemProfit)
             } else {
-                internalName.getItemStack().nameWithEnchantment ?: error("no name for $internalName")
+                internalName.getNameWithEnchantment()
             }
 
             val priceFormat = NumberUtil.format(price)
@@ -96,9 +96,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
-                    if (KeyboardManager.isControlKeyDown()) {
+                    if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
-                        LorenzUtils.chat("Removed $cleanName §efrom Fishing Frofit Tracker.")
+                        LorenzUtils.chat("Removed $cleanName §efrom $name.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         modify {
