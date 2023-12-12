@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -26,14 +25,12 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 object SlayerProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
 
     private var itemLogCategory = ""
     private var baseSlayerType = ""
-    private val logger = LorenzLogger("slayer/profit_tracker")
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
 
     class Data : ItemTrackerData() {
@@ -89,11 +86,9 @@ object SlayerProfitTracker {
         if (!isEnabled()) return
         val coins = event.coins
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
-            logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
-            addMobKillCoins(coins.toInt())
+            getTracker()?.addCoins(coins.toInt())
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            logger.log("Coins paid for starting slayer quest: ${coins.addSeparators()}")
             addSlayerCosts(coins.toInt())
         }
     }
@@ -104,14 +99,6 @@ object SlayerProfitTracker {
         itemLogCategory = newSlayer.removeColor()
         baseSlayerType = itemLogCategory.substringBeforeLast(" ")
         getTracker()?.update()
-    }
-
-    private fun addMobKillCoins(coins: Int) {
-        getTracker()?.addCoins(coins)
-    }
-
-    private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
-        getTracker()?.addItem(internalName, stackSize)
     }
 
     private fun getTracker(): SkyHanniItemTracker<Data>? {
@@ -148,15 +135,7 @@ object SlayerProfitTracker {
             return
         }
 
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        addItemPickup(internalName, amount)
-        logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
-        if (config.priceInChat && price > config.minimumPrice) {
-            LorenzUtils.chat("§a+Slayer Drop§7: §r$itemName")
-        }
-        if (config.titleWarning && price > config.minimumPriceWarning) {
-            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
-        }
+        getTracker()?.addItem(internalName, amount)
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean {
