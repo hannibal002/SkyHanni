@@ -20,7 +20,7 @@ class ItemClickData {
     @SubscribeEvent
     fun onItemClickSend(event: PacketEvent.SendEvent) {
         val packet = event.packet
-        if (packet is C08PacketPlayerBlockPlacement && packet.placedBlockDirection != 255) {
+        if (packet is C08PacketPlayerBlockPlacement) {
             val position = packet.position.toLorenzVec()
             BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
         }

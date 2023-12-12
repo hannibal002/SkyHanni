@@ -61,7 +61,7 @@ class DungeonHighlightClickedBlocks {
         }
 
         if (type == ClickedBlockType.WITHER_ESSENCE) {
-            val text = BlockUtils.getTextureFromSkull(position.toBlockPos())
+            val text = BlockUtils.getTextureFromSkull(position.toBlocPos())
             if (text != "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQ" +
                 "ubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3M" +
                 "DdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="

@@ -209,6 +209,7 @@ import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mining.SkymallDisplay
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
@@ -327,7 +328,6 @@ import at.hannibal2.skyhanni.test.TestCopyBestiaryValues
 import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
-import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -677,6 +677,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(SprayFeatures())
+        loadModule(SkymallDisplay())
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
@@ -695,7 +696,6 @@ class SkyHanniMod {
         loadModule(ParkourWaypointSaver())
         loadModule(TestShowSlotNumber())
         loadModule(SkyHanniDebugsAndTests)
-        loadModule(WorldEdit)
         loadModule(HotSwapDetection)
         PreInitFinishedEvent().postAndCatch()
     }

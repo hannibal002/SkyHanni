@@ -21,7 +21,6 @@ public class WiltedBerberisConfig {
     @Expose
     @ConfigOption(name = "Hide Particles", desc = "Hide the Wilted Berberis particles.")
     @ConfigEditorBoolean
-    // TODO fix typo
     public boolean hideparticles = false;
 
 }

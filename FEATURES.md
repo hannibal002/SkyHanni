@@ -644,9 +644,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
 + Waypoints for 2023 Lobby Presents. - walker
-+ Jyrre Timer for Bottle of Jyrre. - walker
-  + A timer showing the remaining duration of your intelligence boost.
-  + Option to show the timer when inactive rather than removing it.
 </details>
 <details open><summary>
 

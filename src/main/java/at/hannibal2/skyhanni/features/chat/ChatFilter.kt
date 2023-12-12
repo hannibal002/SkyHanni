@@ -188,6 +188,8 @@ class ChatFilter {
         "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
         "§cYour Mining Speed Boost has expired!",
         "§a§r§6Mining Speed Boost §r§ais now available!",
+        "§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!",
+        "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
     // Party
@@ -311,6 +313,10 @@ class ChatFilter {
         "§c♨ §eSelling multiple items for a limited time!",
     )
 
+    private val skymallPatterns = listOf(
+        "§eNew buff§r§r§r: (.*)".toPattern(),
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -325,6 +331,7 @@ class ChatFilter {
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
         "powder_mining" to powderMiningPatterns,
+        "skymall" to skymallPatterns,
         "fire_sale" to fireSalePatterns,
     )
 
@@ -379,8 +386,8 @@ class ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
+        config.skymall && message.isPresent("skymall") -> "skymall"
         config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
-
         else -> ""
     }
 

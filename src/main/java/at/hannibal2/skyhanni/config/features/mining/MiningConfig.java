@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -17,6 +18,11 @@ public class MiningConfig {
     @ConfigOption(name = "King Talisman", desc = "")
     @Accordion
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
+
+    @Expose
+    @ConfigOption(name = "Sky Mall Display", desc = "")
+    @Accordion
+    public SkyMallConfig skymall = new SkyMallConfig();
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")

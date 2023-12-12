@@ -48,9 +48,6 @@
 + Added Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
-+ Jyrre Timer for Bottle of Jyrre. - walker
-    + A timer showing the remaining duration of your intelligence boost.
-    + Option to show the timer when inactive rather than removing it.
 
 #### Bingo Features
 
@@ -112,8 +109,6 @@
 + Added an option to only warn for specific crop contests. - Obsidian
 + Added an option to show plot borders for a given number of seconds after holding a vacuum. - HiZe
 + Added command /shclearcontestdata to Reset Jacob's Contest Data. - martimavocado
-+ Display Farming Fortune reduction from pests on the HUD. - alexia
-+ Allow showing optimal speed warning without HUD enabled. - alexia
 
 #### Fishing Changes
 
@@ -256,7 +251,7 @@
 + Added Config Transform function. - walker
 + Migrate Deprecated Config Values to Enums. - walker
 + Migrate Config Value in EliteFarmingWeight. - walker
-+ Add limbo time PB. - mar
++ Add limbo time PB. - martimavocado
 
 ## Version 0.21.1
 
