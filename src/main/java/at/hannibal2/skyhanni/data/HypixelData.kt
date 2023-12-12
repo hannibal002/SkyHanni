@@ -120,7 +120,8 @@ class HypixelData {
             // NEU and have NEU send it.
             // Remove this when NEU dependency is removed
             val currentTime = System.currentTimeMillis()
-            if (Minecraft.getMinecraft().thePlayer != null &&
+            if (LorenzUtils.onHypixel &&
+                Minecraft.getMinecraft().thePlayer != null &&
                 Minecraft.getMinecraft().theWorld != null &&
                 locrawData == null &&
                 currentTime - lastLocRaw > 15000
