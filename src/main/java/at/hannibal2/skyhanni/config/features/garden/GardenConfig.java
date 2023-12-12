@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
+import at.hannibal2.skyhanni.config.features.garden.optimaldepthstrider.OptimalDepthStriderConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
@@ -43,6 +44,10 @@ public class GardenConfig {
     @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
+
+    @Expose
+    @Category(name = "Optimal Depth Strider", desc = "Optimal Depth Strider Settings")
+    public OptimalDepthStriderConfig optimalDepthStrider = new OptimalDepthStriderConfig();
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
