@@ -166,7 +166,7 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.PROFILE_ICON) && chestName == ("Profile Management")) {
             profileIconVariantOneDisplayNamePattern.matchMatcher(itemName) { return group("icon") }
             profileIconVariantTwoDisplayNamePattern.matchMatcher(itemName) { return "©" }
-            if (itemName == "§cLocked profile slot") {
+            if (itemName == "Locked profile slot") {
                 return "§c┏┓"
             }
         }
