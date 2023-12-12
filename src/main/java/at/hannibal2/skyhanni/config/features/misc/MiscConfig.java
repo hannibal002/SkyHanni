@@ -20,7 +20,7 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TOOD maybe we can migrate this already
+    // TODO maybe we can migrate this already
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
@@ -119,6 +119,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
+
+    @Expose
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean colorMonthNames = false;
 
     @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")

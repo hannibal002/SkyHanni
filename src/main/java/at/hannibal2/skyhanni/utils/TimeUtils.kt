@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -145,11 +146,13 @@ object TimeUtils {
         }
         val timePart = if (hoursAndMinutesElement) "$hour:$minute$timeOfDay" else ""
 
-        return if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
-            "$datePart, $timePart"
-        } else {
-            "$datePart$timePart".trim()
-        }
+        return replaceString(
+            if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
+                "$datePart, $timePart"
+            } else {
+                "$datePart$timePart".trim()
+            }
+        ) ?: ""
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
