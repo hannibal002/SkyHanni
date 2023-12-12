@@ -41,7 +41,10 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
-    public Float savedMouseSensitivity = .5f;
+    public Float savedMouselockedSensitivity = .5f;
+
+    @Expose
+    public Float savedMouseloweredSensitivity = .5f;
 
     @Deprecated
     @Expose
