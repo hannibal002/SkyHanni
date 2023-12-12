@@ -324,6 +324,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Inquisitor Sharing**
     + Share aypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
++ Diana Profit Tracker. - hannibal2
+    + Same options as slayer and fising trackers.
 </details>
 <details open><summary>
 
@@ -661,6 +663,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
+</details>
+<details open><summary>
+
+## Stranded
+</summary>
+
++ Highlights NPCs in the stranded menu that are placeable but not placed. - walker
+
 </details>
 <details open><summary>
 

@@ -78,6 +78,17 @@
 
 + Added Waypoints for 2023 Lobby Presents. - walker
 
+#### Stranded Featuers
+
++ Highlights NPCs in the stranded menu that are placeable but not placed. - walker
+
+#### Diana Features
+
++ Added Diana Profit Tracker. - hannibal2
+  + Same options as slayer and fising trackers.
+
+#### 
+
 ### Changes
 
 #### Garden Changes
@@ -102,6 +113,7 @@
 #### Fishing Changes
 
 + Show the fishing tracker for a couple of seconds after catching something even while moving. - hannibal2
++ Show breakdown of different shark types caught during festivals. - Cad
 
 #### Winter Changes
 
@@ -125,6 +137,14 @@
 
 + Titles sent by SkyHanni look better now. - Cad
 + Added support for show XP gained from wheat minion in hub. - Thunderblade73
++ Option to change the color of Marked Players in chat and in the world. - walker & hannibal2
++ Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
++ Hide "Winter Island Close" timer during the month of December. - hannibal2
++ Changes Ctrl+V in signs to better sign editing. - Obsidian
+  +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
++ Improve accuracy of movement speed display. - alexia
++ Added toggle to hide autopet messages. - CalMWolfs
++ Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
 
 ### Fixes
 
@@ -144,6 +164,13 @@
 + Fixed visitor reward item refuse inconsistencies. - hannibal2
 + Fixed wrong base 100ff calculations in the farming fortune needed display. - alexia
 + Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
++ Fixed an error message in the composter inventory when hovering over some items.- hannibal2
++ Correctly load the plot names of locked plots from inventory. - hannibal2
++ Fixed the boosted crop not being highlighted during contest participation. - alexia
++ Fixed farming weight leaderboard showing new position as -1 sometimes. - alexia
++ Fix typo with Not Clickable Items in Composter. - absterge
++ Added missing preview number from Visitor Drop Statistics. - absterge
++ Fixed error message with newly bought fungi cutter. - hannibal2
 
 #### Bingo Fixes
 
@@ -171,6 +198,11 @@
 + Fixed an error when the king talisman helper does not find the king in range. - hannibal2
 + Fixed control/modifier key logic on Apple devices. - walker
 + Fixed lag spikes when downloading updates. - nea
++ Fixed showing the Minion XP display in the Bazaar. - Thunderblade73
++ Fixed the city project time remaining "soon!" error. - hannibal2
++ Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
++ Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
++ Fixed locraw sending outside Hypixel. - walker
 
 #### Config Fixes
 
@@ -209,6 +241,17 @@
 + Added an abstract error message on LorenzToolTipEvent error. - hannibal2
 + Added test command /shsendtitle - Cad
 + Saving bingo goal data into the config. - hannibal2
++ Added WorldEdit region selection preview support. - nea
+  + Command /shworldedit and rigth/left clicking with a wood axe work.
++ Fixed error message in the "/shconfig set" command. - Thunderblade73
++ Add a check for the SkyHanni repository ID in publish. - walker
++ Cleanup getItemsInOpenChest. - walker
++ Changed MinionCraftHelper to use NeuInternalName. - walker
++ Added a separate debug hotkey for Bypass Advanced Tab List. - hannibal2
++ Added Config Transform function. - walker
++ Migrate Deprecated Config Values to Enums. - walker
++ Migrate Config Value in EliteFarmingWeight. - walker
++ Add limbo time PB. - martimavocado
 
 ## Version 0.21.1
 
