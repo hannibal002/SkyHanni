@@ -249,7 +249,7 @@ object AdvancedPlayerList {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
+        event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
             ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
         }
     }
