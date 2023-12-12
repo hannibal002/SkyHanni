@@ -67,7 +67,7 @@ class HideArmor {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "misc.hideArmor2.mode") { element ->
+        event.transform(15, "misc.hideArmor2.mode") { element ->
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
         }
     }
