@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
@@ -25,7 +26,37 @@ class BetterSignEditing {
         if (!SkyHanniMod.feature.misc.betterSignEditing) return
 
         val gui = Minecraft.getMinecraft().currentScreen
+        checkPaste()
+        checkCopying(gui)
+        checkDeleting(gui)
+    }
 
+    private fun checkDeleting(gui: GuiScreen?) {
+        val deleteWordClicked = Keyboard.KEY_BACK.isKeyHeld() && KeyboardManager.isModifierKeyDown()
+        if (!deleteWordLastClicked && deleteWordClicked && gui is AccessorGuiEditSign) {
+            SkyHanniMod.coroutineScope.launch {
+                val newLine = if (KeyboardManager.isShiftKeyDown()) "" else {
+                    val currentLine = gui.tileSign.signText[gui.editLine].unformattedText
+                    val lastSpaceIndex = currentLine.lastIndexOf(' ')
+                    if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 1) else ""
+                }
+                LorenzUtils.setTextIntoSign(newLine, gui.editLine)
+            }
+        }
+        deleteWordLastClicked = deleteWordClicked
+    }
+
+    private fun checkCopying(gui: GuiScreen?) {
+        val copyClicked = KeyboardManager.isCopyingKeysDown()
+        if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
+            SkyHanniMod.coroutineScope.launch {
+                ClipboardUtils.copyToClipboard(gui.tileSign.signText[gui.editLine].unformattedText)
+            }
+        }
+        copyLastClicked = copyClicked
+    }
+
+    private fun checkPaste() {
         val pasteClicked = KeyboardManager.isPastingKeysDown()
         if (!pasteLastClicked && pasteClicked) {
             SkyHanniMod.coroutineScope.launch {
@@ -35,31 +66,10 @@ class BetterSignEditing {
             }
         }
         pasteLastClicked = pasteClicked
-
-        val copyClicked = KeyboardManager.isCopyingKeysDown()
-        if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.coroutineScope.launch {
-                ClipboardUtils.copyToClipboard(gui.tileSign.signText[gui.editLine].unformattedText)
-            }
-        }
-        copyLastClicked = copyClicked
-
-        val deleteWordClicked = Keyboard.KEY_BACK.isKeyHeld() && KeyboardManager.isControlKeyDown()
-        if (!deleteWordLastClicked && deleteWordClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.coroutineScope.launch {
-            val newLine = if (KeyboardManager.isShiftKeyDown()) "" else {
-                val currentLine = gui.tileSign.signText[gui.editLine].unformattedText
-                val lastSpaceIndex = currentLine.lastIndexOf(' ')
-                if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 1) else ""
-            }
-            LorenzUtils.setTextIntoSign(newLine,gui.editLine)
-            }
-        }
-        deleteWordLastClicked = deleteWordClicked
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(11, "misc.pasteIntoSigns", "misc.betterSignEditing")
+        event.move(16, "misc.pasteIntoSigns", "misc.betterSignEditing")
     }
 }
