@@ -219,4 +219,7 @@ public class MiscConfig {
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
+
+    @Expose
+    public int limboTimePB = 0;
 }
