@@ -48,9 +48,6 @@
 + Added Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
-+ Jyrre Timer for Bottle of Jyrre. - walker
-    + A timer showing the remaining duration of your intelligence boost.
-    + Option to show the timer when inactive rather than removing it.
 
 #### Bingo Features
 
@@ -101,8 +98,6 @@
 + Added an option to only warn for specific crop contests. - Obsidian
 + Added an option to show plot borders for a given number of seconds after holding a vacuum. - HiZe
 + Added command /shclearcontestdata to Reset Jacob's Contest Data. - martimavocado
-+ Display Farming Fortune reduction from pests on the HUD. - alexia
-+ Allow showing optimal speed warning without HUD enabled. - alexia
 
 #### Fishing Changes
 
@@ -130,9 +125,6 @@
 
 + Titles sent by SkyHanni look better now. - Cad
 + Added support for show XP gained from wheat minion in hub. - Thunderblade73
-+ Option to change the color of Marked Players in chat and in the world. - walker & hannibal2
-+ Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
-+ Hide "Winter Island Close" timer during the month of December. - hannibal2
 
 ### Fixes
 
@@ -152,9 +144,6 @@
 + Fixed visitor reward item refuse inconsistencies. - hannibal2
 + Fixed wrong base 100ff calculations in the farming fortune needed display. - alexia
 + Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
-+ Fixed an error message in the composter inventory when hovering over some items.- hannibal2
-+ Correctly load the plot names of locked plots from inventory. - hannibal2
-+ Fixed the boosted crop not being highlighted during contest participation. - alexia
 
 #### Bingo Fixes
 
@@ -182,10 +171,6 @@
 + Fixed an error when the king talisman helper does not find the king in range. - hannibal2
 + Fixed control/modifier key logic on Apple devices. - walker
 + Fixed lag spikes when downloading updates. - nea
-+ Fixed showing the Minion XP display in the Bazaar. - Thunderblade73
-+ Fixed the city project time remaining "soon!" error. - hannibal2
-+ Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
-+ Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
 
 #### Config Fixes
 
@@ -224,13 +209,6 @@
 + Added an abstract error message on LorenzToolTipEvent error. - hannibal2
 + Added test command /shsendtitle - Cad
 + Saving bingo goal data into the config. - hannibal2
-+ Added WorldEdit region selection preview support. - nea
-  + Command /shworldedit and rigth/left clicking with a wood axe work.
-+ Fixed error message in the "/shconfig set" command. - Thunderblade73
-+ Add a check for the SkyHanni repository ID in publish. - walker
-+ Cleanup getItemsInOpenChest. - walker
-+ Changed MinionCraftHelper to use NeuInternalName. - walker
-+ Added a separate debug hotkey for Bypass Advanced Tab List. - hannibal2
 
 ## Version 0.21.1
 

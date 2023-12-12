@@ -14,10 +14,10 @@ object BlockUtils {
         getBlockStateAt().block
 
     fun LorenzVec.getBlockStateAt(): IBlockState =
-        Minecraft.getMinecraft().theWorld.getBlockState(toBlockPos())
+        Minecraft.getMinecraft().theWorld.getBlockState(toBlocPos())
 
     fun LorenzVec.isInLoadedChunk(): Boolean =
-        Minecraft.getMinecraft().theWorld.chunkProvider.provideChunk(toBlockPos()).isLoaded
+        Minecraft.getMinecraft().theWorld.chunkProvider.provideChunk(toBlocPos()).isLoaded
 
     fun getTextureFromSkull(position: BlockPos?): String? {
         val entity = Minecraft.getMinecraft().theWorld.getTileEntity(position) as TileEntitySkull
