@@ -179,7 +179,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "misc.tracker.priceFrom") { element ->
+        event.transform(15, "misc.tracker.priceFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFromEntry::class.java)
         }
     }
