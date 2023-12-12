@@ -83,7 +83,7 @@
 
 #### Stranded Featuers
 
-+ Highlights NPCs in the stranded menu that are placeable but not placed. - walker
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
 
 #### Diana Features
 
