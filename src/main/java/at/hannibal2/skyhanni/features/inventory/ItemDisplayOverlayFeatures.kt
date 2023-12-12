@@ -165,7 +165,7 @@ object ItemDisplayOverlayFeatures {
         if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
             val ranchersSpeed = item.getRanchersSpeed()
             if (ranchersSpeed != null) {
-                return ranchersSpeed
+                return ranchersSpeed.toString()
             }
         }
 

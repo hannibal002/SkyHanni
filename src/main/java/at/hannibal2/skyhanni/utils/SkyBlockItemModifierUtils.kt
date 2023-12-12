@@ -121,7 +121,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getFungiCutterMode() = getAttributeString("fungi_cutter_mode")
 
-    fun ItemStack.getRanchersSpeed() = getAttributeString("ranchers_speed")
+    fun ItemStack.getRanchersSpeed() = getAttributeInt("ranchers_speed")
 
     fun ItemStack.getRune(): NEUInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
