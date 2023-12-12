@@ -65,7 +65,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     private val bazaarViewModeItemNamePattern = ((".* Mode").toPattern())
     private val containsArrowChestNamePattern = ((".* ➜ .*").toPattern())
     private val instasellIgnoreItemNamePattern = (("Instasell Ignore").toPattern())
-    private val instasellIgnoreStatusLoreLinePattern = (("(§.)*Bulk Instasell: (?<display>(§.)*A)llowed!").toPattern())
+    private val instasellIgnoreStatusLoreLinePattern = (("(§.)*Bulk Instasell: (?<display>(§.)*.)[\\w]+!").toPattern())
     private val totalBidsOnItemLoreLinePattern = (("(§.)*Total bids: (§.)*(?<bids>[\\S]+) .*").toPattern())
     private val isAuctionHouseMainMenuChestNamePattern = ((".*Auction House").toPattern())
     private val isOneBidAndTopBidLoreLinePattern = ((".*top bid .*").toPattern())
