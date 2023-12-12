@@ -86,7 +86,8 @@ class TrophyFishMessages {
         event.move(2, "fishing.trophyFishDuplicateHider", "fishing.trophyFishing.chatMessages.duplicateHider")
         event.move(2, "fishing.trophyFishBronzeHider", "fishing.trophyFishing.chatMessages.bronzeHider")
         event.move(2, "fishing.trophyFishSilverHider", "fishing.trophyFishing.chatMessages.silverHider")
-        event.transform(14, "fishing.trophyFishing.chatMessages.design") { element ->
+
+        event.transform(15, "fishing.trophyFishing.chatMessages.design") { element ->
             ConfigUtils.migrateIntToEnum(element, DesignFormat::class.java)
         }
     }
