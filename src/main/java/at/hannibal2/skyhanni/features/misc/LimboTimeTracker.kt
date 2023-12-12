@@ -6,14 +6,14 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.DurationUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-
+import kotlin.time.DurationUnit
 
 class LimboTimeTracker {
     private val config get() = SkyHanniMod.feature.misc
@@ -33,13 +33,14 @@ class LimboTimeTracker {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (config.limboTimePB == limboJoinTime.passedSince().toInt(DurationUnit.SECONDS) && !shownPB && inLimbo && config.limboTimePB != 0) {
+        if (inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
             shownPB = true
             oldPB = config.limboTimePB.seconds
             LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
             LorenzUtils.chat("§fKeep it up!")
         }
     }
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (!inLimbo) return
@@ -66,13 +67,14 @@ class LimboTimeTracker {
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
         val userLuckMultiplier = 0.000810185
-        if (passedSince.toInt(DurationUnit.SECONDS) > config.limboTimePB ) {
-            oldPB = config.limboTimePB.seconds
+        val currentPB = config.limboTimePB.seconds
+        if (passedSince > currentPB) {
+            oldPB = currentPB
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
             LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
             val userLuck = config.limboTimePB * userLuckMultiplier
-            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${String.format("%.2f", userLuck)}✴ SkyHanni User Luck§f!")
+            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
         } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
         shownPB = false
     }
