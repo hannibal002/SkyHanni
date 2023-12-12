@@ -215,7 +215,11 @@ private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower == null) {
     true -> listOf("§c§lPlease visit Maxwell!" to AlignmentEnum.LEFT)
     false ->
         when (config.displayConfig.displayNumbersFirst) {
-            true -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
+            true -> when (MaxwellAPI.currentPower?.power?.endsWith("Power")) {
+                true -> listOf("${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
+                false -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
+                null -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
+            }
             false -> listOf("Power: ${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
         }
 }
