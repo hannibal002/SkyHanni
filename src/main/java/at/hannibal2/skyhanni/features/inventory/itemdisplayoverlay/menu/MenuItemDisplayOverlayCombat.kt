@@ -20,6 +20,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
     private val combatWisdomBuffLoreLinePattern = (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern())
     private val rngMeterProgressPercentLoreLinePattern = ((".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
     private val unlockedSlayerRecipesLoreLinePattern = ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern())
+    private val overallProgressToggleLoreLinePattern = (("(§.)*Overall Progress: (§.)*(?<status>[\\w]+)").toPattern())
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -42,8 +43,15 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_OVERALL_FAMILY_PROGRESS)) {
             bestiaryChestNamePattern.matchMatcher(chestName) {
+                val lore = item.getLore()
+                if (itemName == "Toggle Families Completed Display") {
+                    for (line in lore) {
+                        overallProgressToggleLoreLinePattern.matchMatcher(line) {
+                            if (group("status") != "SHOWN") return "§c‼‼‼"
+                        }
+                    }
+                }
                 if (itemName.isNotEmpty()) {
-                    val lore = item.getLore()
                     for (line in lore) {
                         familiesCompletedOverallProgressPercentLoreLinePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
