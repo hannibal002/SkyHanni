@@ -24,7 +24,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
-
 class HypixelData {
     // TODO USE SH-REPO
     private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
@@ -121,8 +120,6 @@ class HypixelData {
             // Remove this when NEU dependency is removed
             val currentTime = System.currentTimeMillis()
             if (LorenzUtils.onHypixel &&
-                Minecraft.getMinecraft().thePlayer != null &&
-                Minecraft.getMinecraft().theWorld != null &&
                 locrawData == null &&
                 currentTime - lastLocRaw > 15000
             ) {
