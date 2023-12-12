@@ -233,7 +233,7 @@ import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
-import at.hannibal2.skyhanni.features.misc.PasteIntoSigns
+import at.hannibal2.skyhanni.features.misc.BetterSignEditing
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
@@ -553,7 +553,7 @@ class SkyHanniMod {
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
-        loadModule(PasteIntoSigns())
+        loadModule(BetterSignEditing())
         loadModule(PatcherSendCoordinates())
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
