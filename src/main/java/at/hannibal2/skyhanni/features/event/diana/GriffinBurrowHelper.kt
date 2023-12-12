@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -18,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -42,7 +40,6 @@ object GriffinBurrowHelper {
     private var teleportedLocation: LorenzVec? = null
     private var lastGuessTime = 0L
     private var lastAnimationTime = 0L
-    private var burrowsTooFarAway = emptyList<LorenzVec>()
 
     @SubscribeEvent
     fun onSoopyGuessBurrow(event: SoopyGuessBurrowEvent) {
@@ -68,39 +65,13 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (event.repeatSeconds(2)) {
-            val max = 25
-            if (particleBurrows.size > max) {
-                var index = 0
-                val list = particleBurrows.map { it.key to it.key.distanceToPlayer() }.sorted().map { it.first }
-                val newHiddenList = mutableListOf<LorenzVec>()
-                for (vec in list) {
-                    index++
-                    if (index > max) {
-                        newHiddenList.add(vec)
-                    }
-                }
-                burrowsTooFarAway = newHiddenList
-            }
-        } else {
-            burrowsTooFarAway = emptyList()
-        }
-    }
-
-    @SubscribeEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
-        burrowUpdate()
 
         if (config.burrowsNearbyDetection) {
             checkRemoveGuess(true)
         }
-    }
-
-    private fun burrowUpdate() {
-
     }
 
     private fun checkRemoveGuess(animation: Boolean) {
@@ -119,7 +90,6 @@ object GriffinBurrowHelper {
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { remove(location) }
-        burrowUpdate()
         if (particleBurrows.isNotEmpty()) {
             animationLocation = location
         }
@@ -139,7 +109,6 @@ object GriffinBurrowHelper {
         if (!DianaAPI.featuresEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
-            burrowUpdate()
         }
     }
 
@@ -150,7 +119,6 @@ object GriffinBurrowHelper {
         animationLocation = null
         lastDug = null
         particleBurrows = particleBurrows.editCopy { clear() }
-        burrowUpdate()
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
@@ -213,8 +181,6 @@ object GriffinBurrowHelper {
         if (config.burrowsNearbyDetection) {
             for (burrow in particleBurrows) {
                 val location = burrow.key
-                if (location in burrowsTooFarAway && burrow.value == BurrowType.START) continue
-
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
                 event.drawColor(location, burrowType.color, distance > 10)
