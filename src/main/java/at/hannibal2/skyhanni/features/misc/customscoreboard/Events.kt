@@ -157,6 +157,22 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Challenge: ") }
         }
     ),
+    DARK_AUCTION(
+        {
+            val list = mutableListOf<String>()
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Time Left: §b") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Time Left: §b") }
+                    ?: "<hidden>"
+            }
+            list += "Current Item:"
+            list += ScoreboardData.sidebarLinesFormatted.nextAfter("Current Item:") ?: "<hidden>"
+
+            list
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it == "Current Item:" }
+        }
+    ),
     MAGMA_BOSS(
         {
             val list = mutableListOf<String>()

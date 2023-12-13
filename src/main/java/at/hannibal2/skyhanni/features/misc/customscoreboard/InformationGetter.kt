@@ -157,6 +157,8 @@ class InformationGetter {
             "§7Boss: §c",
             "§7Damage Soaked:",
             "§6Kill the Magmas:",
+            "Time Left: §b",
+            "Current Item:",
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -195,5 +197,8 @@ class InformationGetter {
         // magma boss
         extraLines = extraLines.filter { sidebarLines.nextAfter("§7Damage Soaked:") != it }
         extraLines = extraLines.filter { sidebarLines.nextAfter("§6Kill the Magmas:") != it }
+
+        // da
+        extraLines = extraLines.filter { sidebarLines.nextAfter("Current Item:") != it }
     }
 }
