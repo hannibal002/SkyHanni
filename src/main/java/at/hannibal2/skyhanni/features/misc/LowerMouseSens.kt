@@ -34,7 +34,7 @@ object LowerMouseSens {
         config.loweredMouseDisplay.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
     }
 
-    fun toggleSens() {
+    private fun toggleSens() {
         val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         isToggled = !isToggled
         if (isToggled) {
