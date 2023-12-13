@@ -2,12 +2,16 @@ package at.hannibal2.skyhanni.features.event.winter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -21,6 +25,7 @@ object UniqueGiftCounter {
     private val pattern = "§7Unique Players Gifted: §a(?<amount>.*)".toPattern()
 
     private var display = ""
+    private var giftIDs = listOf<NEUInternalName>()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -69,6 +74,5 @@ object UniqueGiftCounter {
             posLabel = "Unique Gift Counter"
         )
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && InventoryUtils.itemInHandId.endsWith("_GIFT")
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && UniqueGiftingOpportunitiesFeatures.isHoldingGift()
 }

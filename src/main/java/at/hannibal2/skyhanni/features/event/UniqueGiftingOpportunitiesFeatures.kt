@@ -3,9 +3,12 @@ package at.hannibal2.skyhanni.features.event
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -13,6 +16,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
@@ -23,6 +27,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object UniqueGiftingOpportunitiesFeatures {
+    private var giftIDs = listOf<NEUInternalName>()
     private val playerList: MutableSet<String>?
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
@@ -36,9 +41,18 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        giftIDs = event.getConstant<ItemsJson>("Items").gifts
+    }
+
+    fun isHoldingGift(): Boolean {
+        return giftIDs.contains(InventoryUtils.itemInHandId)
+    }
+
+
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-        (InventoryUtils.itemInHandId.endsWith("_GIFT")
-            || !config.highlighWithGiftOnly)
+        (isHoldingGift() || !config.highlighWithGiftOnly)
 
     private val hasNotGiftedNametag = "§a§lꤥ"
     private val hasGiftedNametag = "§c§lꤥ"
