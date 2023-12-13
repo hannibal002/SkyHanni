@@ -49,6 +49,236 @@ object BestiaryData {
         28, 29, 30, 31, 32, 33, 34,
         37, 38, 39, 40, 41, 42, 43
     )
+    private val mobsData = mapOf<String, Long>(
+        //private island
+        "Creeper" to 200,
+        "Enderman" to 200,
+        "Skeleton" to 200,
+        "Slime" to 200,
+        "Spider" to 200,
+        "Witch" to 200,
+        "Zombie" to 200,
+        // hub
+        "Crypt Ghoul" to 40_000,
+        "Golden Ghoul" to 4_000,
+        "Graveyard Zombie" to 200,
+        "Old Wolf" to 4_000,
+        "Wolf" to 40_000,
+        "Zombie Villager" to 1_000,
+        //farming island
+        "Chicken" to 200,
+        "Cow" to 200,
+        "Mushroom Cow" to 200,
+        "Pig" to 200,
+        "Rabbit" to 200,
+        "Sheep" to 200,
+        //garden
+        "Beetle" to 250,
+        "Cricket" to 250,
+        "Earthworm" to 250,
+        "Fly" to 250,
+        "Locust" to 250,
+        "Mite" to 250,
+        "Mosquito" to 250,
+        "Moth" to 250,
+        "Rat" to 250,
+        "Slug" to 250,
+        //spider's den
+        "Arachne" to 500,
+        "Arachne's Brood" to 1_000,
+        "Arachne's Keeper" to 400,
+        "Broodmother" to 400,
+        "Dasher Spider" to 10_000,
+        "Gravel Skeleton" to 4_000,
+        "Rain Slime" to 1_000,
+        "Silverfish" to 10_000,
+        "Spider Jockey" to 4_000,
+        "Splitter Spider" to 10_000,
+        "Voracious Spider" to 10_000,
+        "Weaver Spider" to 10_000,
+        //the end
+        "Dragon" to 1_000,
+        "Enderman" to 25_000,
+        "Endemite" to 10_000,
+        "Endstone Protector" to 500,
+        "Obsidian Defender" to 10_000,
+        "Voidling Extremist" to 4_000,
+        "Voidling Fanatic" to 25_000,
+        "Watcher" to 10_000,
+        "Zealot" to 25_000,
+        //crimson isle
+        "Ashfang" to 1_000,
+        "Barbarian Duke X" to 1_000,
+        "Bladesoul" to 1_000,
+        "Blaze" to 3_000,
+        "Flaming Spider" to 10_000,
+        "Flare" to 100_000,
+        "Ghast" to 3_000,
+        "Kada Knight" to 3_000,
+        "Mage Outlaw" to 1_000,
+        "Magma Boss" to 1_000,
+        "Magma Cube" to 10_000,
+        "Magma Cube Rider" to 3_000,
+        "Matcho" to 400,
+        "Millenia-Aged Blaze" to 4_000,
+        "Mushroom Bull" to 10_000,
+        "Pigman" to 10_000,
+        "Smoldering Blaze" to 25_000,
+        "Tentacle" to 1_000,
+        "Vanquisher" to 1_000,
+        "Wither Skeleton" to 3_000,
+        "Wither Spectre" to 10_000,
+        //deep cavern
+        "Emerald Slime" to 3_000,
+        "Lapis Zombie" to 3_000,
+        "Miner Skeleton" to 3_000,
+        "Miner Zombie" to 3_000,
+        "Redstone Pigman" to 3_000,
+        "Sneaky Creeper" to 300,
+        //dwarven mines
+        "Diamond Goblin" to 100,
+        "Ghost" to 250_000,
+        "Goblin" to 25_000,
+        "Goblin Raiders" to 1_000,
+        "Golden Goblin" to 400,
+        "Ice Walker" to 10_000,
+        "Powder Ghast" to 200,
+        "Star Sentry" to 1_000,
+        "Treasure Hoarder" to 4_000,
+        //crystal hollows
+        "Automaton" to 10_000,
+        "Bal" to 250,
+        "Butterfly" to 1_000,
+        "Grunt" to 4_000,
+        "Key Guardian" to 250,
+        "Sludge" to 10_000,
+        "Thyst" to 4_000,
+        "Worm" to 400,
+        "Yog" to 4_000,
+        //the park
+        "Howling Spirit" to 10_000,
+        "Pack Spirit" to 10_000,
+        "Soul of the Alpha" to 1_000,
+        //spooky fest
+        "Crazy Witch" to 750,
+        "Headless Horseman" to 500,
+        "Phantom Spirit" to 750,
+        "Scary Jerry" to 750,
+        "Trick or Treater" to 750,
+        "Wither Gourd" to 750,
+        "Wraith" to 750,
+        //bad place with lot of mobs
+        "Angry Archeologist" to 3_000,
+        "Bat" to 1_000,
+        "Cellar Spider" to 1_000,
+        "Crypt Dreadlord" to 25_000,
+        "Crypt Lurker" to 25_000,
+        "Crypt Souleater" to 25_000,
+        "Fels" to 10_000,
+        "Golem" to 1_000,
+        "King Midas" to 750,
+        "Lonely Spider" to 25_000,
+        "Lost Adventurer" to 3_000,
+        "Mimic" to 1_000,
+        "Scared Skeleton" to 4_000,
+        "Shadow Assassin" to 3_000,
+        "Skeleton Grunt" to 4_000,
+        "Skeleton Lord" to 1_000,
+        "Skeleton Master" to 25_000,
+        "Skeleton Solider" to 40_000,
+        "Skeletor" to 10_000,
+        "Sniper" to 4_000,
+        "Super Archer" to 10_000,
+        "Super Tank Zombie" to 25_000,
+        "Tank Zombie" to 4_000,
+        "Terracotta" to 40_000,
+        "Undead" to 10_000,
+        "Undead Skeleton" to 25_000,
+        "Wither Guard" to 10_000,
+        "Wither Husk" to 0,
+        "Wither Miner" to 25_000,
+        "Withermancer" to 25_000,
+        "Zombie Commander" to 3_000,
+        "Zombie Grunt" to 4_000,
+        "Zombie Knight" to 10_000,
+        "Zombie Lord" to 1_000,
+        "Zombie Solider" to 40_000,
+        //fishing
+        "Abyssal Miner" to 250,
+        "Agarimoo" to 0,
+        "Carrot King" to 400,
+        "Catfish" to 1_000,
+        "Deep Sea Protector" to 1_000,
+        "Guardian Defender" to 1_000,
+        "Night Squid" to 1_000,
+        "Oasis Rabbit" to 0,
+        "Oasis Sheep" to 300,
+        "Poisoned Water Worm" to 0,
+        "Rider of the Deep" to 4_000,
+        "Sea Archer" to 4_000,
+        "Sea Guardian" to 4_000,
+        "Sea Leech" to 1_000,
+        "Sea Walker" to 4_000,
+        "Sea Witch" to 4_000,
+        "Squid" to 10_000,
+        "The Sea Emperor" to 100,
+        "Water Hydra" to 400,
+        "Water Worm" to 0,
+        "Fire Eel" to 1_000,
+        "Flaming Worm" to 0,
+        "Lava Blaze" to 1_000,
+        "Lava Flame" to 1_000,
+        "Lava Leech" to 4_000,
+        "Lava Pigman" to 1_000,
+        "Lord Jawbus" to 250,
+        "Magma Slug" to 10_000,
+        "Moogma" to 4_000,
+        "Plhlegblast" to 7,
+        "Pyroclastic Worm" to 4_000,
+        "Taurus" to 1_000,
+        "Thunder" to 400,
+        "Grim Reaper" to 100,
+        "Nightmare" to 1_000,
+        "Phantom Fisher" to 250,
+        "Scarecrow" to 4_000,
+        "Werewolf" to 1_000,
+        "Blue Shark" to 1_000,
+        "Great White Shark" to 400,
+        "Nurse Shark" to 4_000,
+        "Tiger Shark" to 1_000,
+        "Frosty" to 4_000,
+        "Frozen Steve" to 4_000,
+        "Grinch" to 250,
+        "Nutcracker" to 0,
+        "Reindrake" to 0,
+        "Yeti" to 0,
+        //diana
+        "Gaia Construct" to 3_000,
+        "Minos Champion" to 1_000,
+        "Minos Hunter" to 1_000,
+        "Minos Inquisitor" to 0,
+        "Minotaur" to 3_000,
+        "Siamese Lynx" to 3_000,
+        //jerry
+        "Blue Jerry" to 30,
+        "Golden Jerry" to 20,
+        "Green Jerry" to 75,
+        "Purple Jerry" to 25,
+        //drakuu
+        "Blazing Golem" to 0,
+        "Blight" to 10_000,
+        "Dropship" to 300,
+        "Explosive Imp" to 3_000,
+        "Inferno Magma Cube" to 10_000,
+        "Kuudra Berserker" to 10_000,
+        "Kuudra Follower" to 25_000,
+        "Kuudra Knocker" to 10_000,
+        "Kuudra Landmine" to 10_000,
+        "Kuudra Slasher" to 30,
+        "Magma Follower" to 0,
+        "Wandering Blaze" to 3_000,
+        "Wither Sentry" to 75
+    )
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -73,16 +303,12 @@ object BestiaryData {
                 if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
                     slot highlight LorenzColor.GREEN
                 }
-                if (lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                    slot highlight LorenzColor.GOLD
-                }
                 if (!overallProgressEnabled) {
                     if (lore.any { it == "§7Families Found: §a100%" }) {
                         slot highlight LorenzColor.GREEN
                     }
                 }
             }
-
         }
     }
 
@@ -193,13 +419,15 @@ object BestiaryData {
                     progressPattern.matchMatcher(progress) {
                         totalKillToTier = group("needed").formatNumber()
                         currentKillToTier = group("current").formatNumber()
+                        totalKillToMax = mobsData.getOrDefault(name.removeColor(), 0)//group("needed").formatNumber()
+                        currentTotalKill = actualRealTotalKill
                     }
-                } else if (previousLine.contains("Overall Progress")) {
+                } /*else if (previousLine.contains("Overall Progress")) {
                     progressPattern.matchMatcher(progress) {
-                        totalKillToMax = group("needed").formatNumber()
+                        totalKillToMax = mobsData.getOrDefault(name.removeColor(), 0)//group("needed").formatNumber()
                         currentTotalKill = group("current").formatNumber()
                     }
-                }
+                }*/
             }
             mobList.add(
                 BestiaryMob(
@@ -217,9 +445,6 @@ object BestiaryData {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-
-        if (!overallProgressEnabled)
-            newDisplay.addAsSingletonList("§cPlease enable Overall Progress display using the ender eye to show more data!")
 
         init()
 
@@ -308,14 +533,13 @@ object BestiaryData {
                         DisplayTypeEntry.GLOBAL_NEXT -> mob.killNeededForNextLevel
                         else -> 0
                     }
-                    if (overallProgressEnabled)
-                        "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
-                            ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
-                                2
-                            )
-                        }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
-                    else
-                        "§cPlease enable Overall Progress display!"
+
+                    "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
+                        ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
+                            2
+                        )
+                    }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
+
                 }
 
                 DisplayTypeEntry.LOWEST_TOTAL, DisplayTypeEntry.HIGHEST_TOTAL -> {
@@ -323,17 +547,11 @@ object BestiaryData {
                 }
 
                 DisplayTypeEntry.LOWEST_MAX, DisplayTypeEntry.HIGHEST_MAX -> {
-                    if (overallProgressEnabled)
-                        "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
-                    else
-                        "todo"
+                    "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
                 }
 
                 DisplayTypeEntry.LOWEST_NEXT, DisplayTypeEntry.HIGHEST_NEXT -> {
-                    if (overallProgressEnabled)
-                        "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
-                    else
-                        "todo"
+                    "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
                 }
 
                 else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
