@@ -422,12 +422,7 @@ object BestiaryData {
                         totalKillToMax = mobsData.getOrDefault(name.removeColor(), 0)//group("needed").formatNumber()
                         currentTotalKill = actualRealTotalKill
                     }
-                } /*else if (previousLine.contains("Overall Progress")) {
-                    progressPattern.matchMatcher(progress) {
-                        totalKillToMax = mobsData.getOrDefault(name.removeColor(), 0)//group("needed").formatNumber()
-                        currentTotalKill = group("current").formatNumber()
-                    }
-                }*/
+                }
             }
             mobList.add(
                 BestiaryMob(
@@ -533,13 +528,11 @@ object BestiaryData {
                         DisplayTypeEntry.GLOBAL_NEXT -> mob.killNeededForNextLevel
                         else -> 0
                     }
-
                     "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
                         ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
                             2
                         )
                     }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
-
                 }
 
                 DisplayTypeEntry.LOWEST_TOTAL, DisplayTypeEntry.HIGHEST_TOTAL -> {
