@@ -1,3 +1,7 @@
+//
+// https://discord.com/channels/997079228510117908/1167847565564334090
+//
+
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -8,72 +12,102 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
+private var display = emptyList<String>()
+private var totems: List<Totem> = emptyList()
+
 class TotemOfCorruption {
-    private var totemEntity: EntityArmorStand? = null
-    private var timeRemainingEntity: EntityArmorStand? = null
-    private var ownerEntity: EntityArmorStand? = null
-    private var timeRemainingSeconds: Int? = null
-    private var ownerName: String? = null
-
-    private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
-    private var display = emptyList<String>()
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!enabled()) return
-
-        totemEntity = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(40.0)
-            .firstOrNull { it.inventory?.get(4)?.name == "§aTotem of Corruption" } ?: return clearData()
-        timeRemainingEntity = EntityUtils.getEntitiesNearby<EntityArmorStand>(totemEntity!!.getLorenzVec(), 2.0)
-            .firstOrNull { it.name.startsWith("§7Remaining: §e") } ?: return clearData()
-        ownerEntity = EntityUtils.getEntitiesNearby<EntityArmorStand>(totemEntity!!.getLorenzVec(), 2.0)
-            .firstOrNull { it.name.startsWith("§7Owner: §e") } ?: return clearData()
-
-        // time format: 1min 23s AND 24s, returns seconds
-        timeRemainingSeconds =
-            timeRemainingEntity!!.name.substring(15).replace("m", "").replace("s", "").split(" ").let {
-                if (it.size == 2) {
-                    it[0].toInt() * 60 + it[1].substring(0, it[1].length).toInt()
-                } else {
-                    it[0].substring(0, it[0].length).toInt()
-                }
-            }
-
-        ownerName = ownerEntity!!.name.substring(11)
-
-        display = createLines()
-    }
-
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!enabled()) return
         if (display.isEmpty()) return
 
+        LorenzUtils.chat("totems: ${totems.size}")
+        LorenzUtils.chat("display: ${display.size}")
+
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!enabled()) return
+
+        if (getTotems().isEmpty()) {
+            clearData()
+            return
+        }
+
+        LorenzUtils.chat("amount: ${getTotems().size}")
+
+        for (totem in getTotems()) {
+            if (totem == null) continue
+            val timeRemainingEntity = EntityUtils.getEntitiesNearby<EntityArmorStand>(
+                totem.getLorenzVec(),
+                2.0
+            ).filter { it.name.startsWith("§7Time Remaining: §e") }.firstOrNull()
+            val ownerEntity = EntityUtils.getEntitiesNearby<EntityArmorStand>(
+                totem.getLorenzVec(),
+                2.0
+            ).filter { it.name.startsWith("§7Owner: §e") }.firstOrNull()
+            if (timeRemainingEntity != null && ownerEntity != null) {
+                totems += Totem(
+                    totem,
+                    timeRemainingEntity.nameToSeconds(),
+                    ownerEntity.name.substring(11)
+                )
+            }
+        }
+
+        display = createLines()
+    }
+
     private fun createLines(): List<String> {
+        val totem = getTotemToShow() ?: return emptyList()
+        LorenzUtils.chat("building string")
         val lines = mutableListOf<String>()
         lines.add("§5§lTotem of Corruption")
-        if (timeRemainingSeconds!! < 60) {
-            lines.add("§7Remaining: §e${timeRemainingSeconds!! % 60}s")
+        if (totem.timeRemainingSeconds < 60) {
+            lines.add("§7Remaining: §e${totem.timeRemainingSeconds % 60}s")
         } else {
-            lines.add("§7Remaining: §e${timeRemainingSeconds!! / 60}min ${timeRemainingSeconds!! % 60}s")
+            lines.add("§7Remaining: §e${totem.timeRemainingSeconds / 60}min ${totem.timeRemainingSeconds % 60}s")
         }
-        lines.add("§7Owner: §e$ownerName")
+        lines.add("§7Owner: §e${totem.ownerName}")
         return lines
     }
 
-    private fun enabled() = config.enabled && LorenzUtils.inSkyBlock
+    private fun getTotemToShow(): Totem? {
+        return totems.maxByOrNull { it.timeRemainingSeconds }
+    }
+
+    private fun getTotems(): List<EntityArmorStand?> {
+        return EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(20.0)
+            .filter { it.inventory?.get(4)?.name == "§aTotem of Corruption" }.toList()
+    }
 
     private fun clearData() {
-        totemEntity = null
-        timeRemainingEntity = null
-        ownerEntity = null
-        timeRemainingSeconds = null
+        totems = emptyList()
         display = emptyList()
     }
+
+    private fun Entity.nameToSeconds(): Int {
+        return name.substring(15).replace("m", "").replace("s", "").split(" ").let {
+            if (it.size == 2) {
+                it[0].toInt() * 60 + it[1].substring(0, it[1].length).toInt()
+            } else {
+                it[0].substring(0, it[0].length).toInt()
+            }
+        }
+    }
+
+    private fun enabled() = config.enabled && LorenzUtils.inSkyBlock
 }
+
+class Totem(
+    val totemEntity: EntityArmorStand,
+    val timeRemainingSeconds: Int,
+    val ownerName: String
+)
