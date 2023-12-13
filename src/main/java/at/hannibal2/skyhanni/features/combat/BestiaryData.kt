@@ -529,7 +529,9 @@ object BestiaryData {
                         else -> 0
                     }
                     "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
-                        ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
+                        ((currentKill.toDouble()
+                            / killNeeded)
+                            * 100).roundToPrecision(
                             2
                         )
                     }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
@@ -601,9 +603,7 @@ object BestiaryData {
                         overallProgressEnabled && cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
                         overallProgressEnabled && cat.familiesFound < cat.totalFamilies ->
                             "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-
-                        !overallProgressEnabled && cat.familiesFound == cat.totalFamilies -> "§a100% found!"
-                        !overallProgressEnabled && cat.familiesFound < cat.totalFamilies -> "§a${cat.familiesFound}§7/§a${cat.totalFamilies} found"
+                        !overallProgressEnabled -> "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §c§lfound!"
 
                         else -> continue
                     }
@@ -691,14 +691,14 @@ object BestiaryData {
     ) {
 
         fun killNeededToMax(): Long {
-            return 0L.coerceAtLeast(killToMax - totalKills)
+            return 0L.coerceAtLeast(killToMax - actualRealTotalKill)
         }
 
         fun killNeededToNextLevel(): Long {
             return 0L.coerceAtLeast(killNeededForNextLevel - currentKillToNextLevel)
         }
 
-        fun percentToMax() = totalKills.toDouble() / killToMax
+        fun percentToMax() = actualRealTotalKill.toDouble() / killToMax
 
         fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
 
