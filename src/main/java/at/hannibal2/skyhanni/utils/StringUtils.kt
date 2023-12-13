@@ -156,6 +156,15 @@ object StringUtils {
         }
     }
 
+    fun createCommaSeparatedList(list: List<String>, separator: String = ", "): String {
+        if (list.isEmpty()) return ""
+        if (list.size == 1) return list[0]
+        if (list.size == 2) return "${list[0]} and ${list[1]}"
+        val lastIndex = list.size - 1
+        val allButLast = list.subList(0, lastIndex).joinToString(separator)
+        return "$allButLast$separator and ${list[lastIndex]}"
+    }
+
     fun optionalPlural(number: Int, singular: String, plural: String) =
         "${number.addSeparators()} " + canBePlural(number, singular, plural)
 

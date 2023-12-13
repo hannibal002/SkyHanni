@@ -18,12 +18,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.color
+import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -124,7 +123,7 @@ class NonGodPotEffectDisplay {
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
-            val color = remaining.color()
+            val color = remaining.timerColor()
 
             val displayName = effect.tabListName
             newDisplay.add("$displayName $color$format")

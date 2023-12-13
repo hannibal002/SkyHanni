@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,6 +18,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.floor
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object GardenPlotAPI {
@@ -53,7 +52,10 @@ object GardenPlotAPI {
         var sprayExpiryTime: SimpleTimeMark,
 
         @Expose
-        var sprayType: SprayType?
+        var sprayType: SprayType?,
+
+        @Expose
+        var sprayHasNotified: Boolean
     )
 
     data class SprayData(
@@ -61,7 +63,7 @@ object GardenPlotAPI {
         val type: SprayType
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, SimpleTimeMark.farPast(), null) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, SimpleTimeMark.farPast(), null, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -78,9 +80,27 @@ object GardenPlotAPI {
     val Plot.currentSpray: SprayData?
         get() = this.getData()?.let {
             if (it.sprayExpiryTime.isInPast()) return null
-            val type = it.sprayType ?: return null // this should never be null?
-            return  SprayData(it.sprayExpiryTime, type)
+            val type = it.sprayType ?: return null
+            return SprayData(it.sprayExpiryTime, type)
         }
+
+    val Plot.isSprayExpired: Boolean
+        get() = this.getData()?.let {
+            !it.sprayHasNotified && it.sprayExpiryTime.isInPast()
+        } == true
+
+
+    fun Plot.markExpiredSprayAsNotified() {
+        getData()?.apply { sprayHasNotified = true }
+    }
+
+    private fun Plot.setSpray(spray: SprayType, duration: Duration) {
+        getData()?.apply {
+            sprayType = spray
+            sprayExpiryTime = SimpleTimeMark.now() + duration
+            sprayHasNotified = false
+        }
+    }
 
     fun Plot.isBarn() = id == -1
 
@@ -130,10 +150,7 @@ object GardenPlotAPI {
             val plot = getPlotByName(plotName)
             val spray = SprayType.getByName(sprayName) ?: return
 
-            plot?.getData()?.apply {
-                sprayType = spray
-                sprayExpiryTime = SimpleTimeMark.now() + 30.minutes
-            }
+            plot?.setSpray(spray, 30.minutes)
         }
     }
 

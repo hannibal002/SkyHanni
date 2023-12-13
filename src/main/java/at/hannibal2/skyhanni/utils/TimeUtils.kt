@@ -32,11 +32,11 @@ object TimeUtils {
         inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
 
-    fun Duration.color() = when (this) {
+    fun Duration.timerColor(default: String = "§f") = when (this) {
         in 0.seconds..60.seconds -> "§c"
         in 60.seconds..3.minutes -> "§6"
         in 3.minutes..10.minutes -> "§e"
-        else -> "§f"
+        else -> default
     }
 
     fun formatDuration(
