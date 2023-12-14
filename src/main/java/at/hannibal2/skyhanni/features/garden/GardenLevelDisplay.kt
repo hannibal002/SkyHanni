@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class GardenLevelDisplay {
     private val config get() = GardenAPI.config.gardenLevels
     private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
-    private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
+    private val overflowPattern = ".*§r §6(?<overflow>.*)".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
     private var display = ""
     private var visitorRewardPattern = " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience".toPattern()
