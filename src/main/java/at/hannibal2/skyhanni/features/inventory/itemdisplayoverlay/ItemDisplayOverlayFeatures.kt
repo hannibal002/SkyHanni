@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.STORAGE_TIER
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeConfig.ItemNumberEntry.YETI_ROD
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -52,6 +53,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFishesCaught
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFruitBowlNames
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.matches
@@ -144,7 +146,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
             isMinionTier(itemName) -> getMinionTierTip(itemName, lore)
             isSack(item) -> getSackTip(itemName)
             isKuudraKey(internalName, itemName) -> getKuudraKeyTip(internalName)
-            isRanchersBoots(internalName) -> getRanchersBootsTip(lore)
+            isRanchersBoots(internalName) -> getRanchersBootsTip(item)
             isLarvaHook(internalName) -> getLarvaHookTip(lore)
             isDungeonPotion(item, internalName) -> getDungeonPotionTip(item)
             isVacuumGarden(item) -> getVacuumGardenTip(lore)
@@ -270,13 +272,14 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     }
 
     private fun isRanchersBoots(internalName: NEUInternalName): Boolean = RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
-    private fun getRanchersBootsTip(lore: List<String>): String {
-        for (line in lore) {
-            rancherBootsSpeedCapLoreLinePattern.matchMatcher(line) {
-                return group("cap")
+    private fun getRanchersBootsTip(item: ItemStack): String {
+        item.getRanchersSpeed()?.let {
+            return if (it > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
+                "§c$it"
+            } else {
+                "§a$it"
             }
         }
-        return ""
     }
 
     private fun isLarvaHook(internalName: NEUInternalName): Boolean = LARVA_HOOK.isSelected() && internalName == larvaHookInternalName

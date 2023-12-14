@@ -5,12 +5,14 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import net.minecraft.item.ItemStack
 
 object DianaAPI {
 
-    val spade by lazy { "ANCESTRAL_SPADE".asInternalName() }
+    private val spade by lazy { "ANCESTRAL_SPADE".asInternalName() }
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId == spade
 
@@ -20,4 +22,8 @@ object DianaAPI {
     fun hasGriffinPet() = PetAPI.currentPet?.contains("Griffin") ?: false
 
     fun featuresEnabled() = IslandType.HUB.isInIsland() && isRitualActive()
+
+    val ItemStack.isDianaSpade get() = getInternalName() == spade
+
+    fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 }

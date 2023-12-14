@@ -13,7 +13,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class NextConfig {
     @Expose
     @ConfigOption(
-        name = "Best Display",
+        name = "Best Crop Time",
         desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
