@@ -250,8 +250,7 @@ object ItemDisplayOverlayFeatures {
                 } else {
                     "§a$it"
             }
-        }
-        return ""
+         } ?: return ""
     }
 
     private fun isLarvaHook(internalName: NEUInternalName) = LARVA_HOOK.isSelected() && internalName == larvaHook
