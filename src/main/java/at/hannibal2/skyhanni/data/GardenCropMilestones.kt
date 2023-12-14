@@ -24,6 +24,8 @@ object GardenCropMilestones {
         "§7Total: §a(?<name>.*)"
     )
 
+    private val config get() = GardenAPI.config.cropMilestones
+
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         for (line in itemStack.getLore()) {
             cropPattern.matchMatcher(line) {
@@ -63,15 +65,34 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
+        if (config.overflowMilestones.get()) return false
+
         // TODO change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }
 
-    fun getTierForCropCount(count: Long, crop: CropType): Int {
+    fun getTiers(crop: CropType, allowOverflow: Boolean = false): Sequence<Int>? {
+        val tiers = cropMilestoneData[crop] ?: return null
+        val lastTier = tiers.last()
+
+        return sequence {
+            for (tier in tiers) {
+                yield(tier)
+            }
+
+            if (allowOverflow && config.overflowMilestones.get()) {
+                while (true) {
+                    yield(lastTier)
+                }
+            }
+        }
+    }
+
+    fun getTierForCropCount(count: Long, crop: CropType, allowOverflow: Boolean = false): Int {
         var tier = 0
         var totalCrops = 0L
-        val cropMilestone = cropMilestoneData[crop] ?: return 0
+        val cropMilestone = getTiers(crop, allowOverflow) ?: return 0
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             if (totalCrops > count) {
@@ -88,7 +109,7 @@ object GardenCropMilestones {
     fun getCropsForTier(requestedTier: Int, crop: CropType): Long {
         var totalCrops = 0L
         var tier = 0
-        val cropMilestone = cropMilestoneData[crop] ?: return 0
+        val cropMilestone = getTiers(crop, allowOverflow = true) ?: return 0
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             tier++
@@ -102,7 +123,7 @@ object GardenCropMilestones {
 
     fun CropType.progressToNextLevel(): Double {
         val progress = getCounter()
-        val startTier = getTierForCropCount(progress, this)
+        val startTier = getTierForCropCount(progress, this, allowOverflow = true)
         val startCrops = getCropsForTier(startTier, this)
         val end = getCropsForTier(startTier + 1, this).toDouble()
         return (progress - startCrops) / (end - startCrops)

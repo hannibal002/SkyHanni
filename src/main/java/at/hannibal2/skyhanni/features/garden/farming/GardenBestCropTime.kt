@@ -38,7 +38,7 @@ class GardenBestCropTime {
                 if (crop.isMaxed()) continue
 
                 val counter = crop.getCounter()
-                val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
+                val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
 
                 val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
                 val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
@@ -66,7 +66,7 @@ class GardenBestCropTime {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
                 if (crop.isMaxed()) continue
-                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime
@@ -115,7 +115,7 @@ class GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
             val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
 
             val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""

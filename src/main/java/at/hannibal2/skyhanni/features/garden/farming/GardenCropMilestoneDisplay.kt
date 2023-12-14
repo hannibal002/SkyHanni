@@ -139,8 +139,8 @@ object GardenCropMilestoneDisplay {
         val lineMap = HashMap<Int, List<Any>>()
         lineMap[0] = Collections.singletonList("§6Crop Milestones")
 
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
-        val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
+        val nextTier = if (config.bestShowMaxedNeeded.get() && currentTier <= 46) 46 else currentTier + 1
 
         val list = mutableListOf<Any>()
         list.addCropIcon(crop)
@@ -257,7 +257,7 @@ object GardenCropMilestoneDisplay {
         val lineMap = HashMap<Int, List<Any>>()
         val counter = mushroom.getCounter()
 
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom)
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom, allowOverflow = true)
         val nextTier = currentTier + 1
 
         val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, mushroom)

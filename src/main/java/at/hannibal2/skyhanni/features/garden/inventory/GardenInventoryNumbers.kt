@@ -32,7 +32,7 @@ class GardenInventoryNumbers {
 
             val crop = GardenCropMilestones.getCropTypeByLore(event.stack) ?: return
             val counter = crop.getCounter()
-            val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
+            val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
             event.stackTip = "" + currentTier
         }
 

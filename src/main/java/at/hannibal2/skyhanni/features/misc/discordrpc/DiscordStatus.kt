@@ -278,7 +278,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     CROP_MILESTONES({
         val crop = InventoryUtils.getItemInHand()?.getCropType()
         val cropCounter = crop?.getCounter()
-        val tier = cropCounter?.let { getTierForCropCount(it, crop) }
+        val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow = true) }
 
         val progress = tier?.let {
             LorenzUtils.formatPercentage(crop.progressToNextLevel())

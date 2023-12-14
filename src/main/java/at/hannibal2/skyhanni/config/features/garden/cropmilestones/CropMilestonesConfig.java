@@ -91,6 +91,13 @@ public class CropMilestonesConfig {
 
     @Expose
     @ConfigOption(
+        name = "Overflow Milestones",
+        desc = "Show overflow crop milestones beyond 46.")
+    @ConfigEditorBoolean
+    public Property<Boolean> overflowMilestones = Property.of(false);
+
+    @Expose
+    @ConfigOption(
         name = "Milestone Text",
         desc = "Drag text to change the appearance of the overlay.\n" +
             "Hold a farming tool to show the overlay."
