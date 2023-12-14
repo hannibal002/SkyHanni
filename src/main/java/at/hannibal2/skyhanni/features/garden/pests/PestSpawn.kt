@@ -61,7 +61,7 @@ class PestSpawn {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "garden.pests.pestSpawn.chatMessageFormat") { element ->
+        event.transform(15, "garden.pests.pestSpawn.chatMessageFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, ChatMessageFormatEntry::class.java)
         }
     }
