@@ -70,7 +70,6 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     // TODO repo
     // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
     private val masterStarPattern = (("(?<tier>[A-Z])+_MASTER_STAR").toPattern())
-    private val rancherBootsSpeedCapLoreLinePattern = (("§7Current Speed Cap: §a(?<cap>.*)").toPattern())
     private val petLevelItemNamePattern = (("\\[Lvl (?<level>.*)] .*").toPattern())
     private val shredderBonusDamageLoreLinePattern = (("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)").toPattern())
     private val bottleOfJerryLoreLinePattern = (("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)").toPattern())
@@ -280,6 +279,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
                 "§a$it"
             }
         }
+        return ""
     }
 
     private fun isLarvaHook(internalName: NEUInternalName): Boolean = LARVA_HOOK.isSelected() && internalName == larvaHookInternalName
