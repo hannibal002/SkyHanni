@@ -12,6 +12,7 @@ public class ItemAbilityConfig {
     @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to "enabled"
     public boolean itemAbilityCooldown = false;
 
     @Expose

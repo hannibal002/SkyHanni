@@ -31,6 +31,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 class ItemAbilityCooldown {
+    private val config get() = SkyHanniMod.feature.itemAbilities
+
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
@@ -215,9 +217,7 @@ class ItemAbilityCooldown {
         lastAbility = ""
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
-    }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
@@ -242,7 +242,7 @@ class ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
-        val readyText = if (SkyHanniMod.feature.itemAbilities.itemAbilityShowWhenReady) "R" else ""
+        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
             val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
             val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
@@ -288,11 +288,11 @@ class ItemAbilityCooldown {
             event.renderObjects.add(renderObject)
 
             // fix multiple problems when having multiple abilities
-            if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
+            if (config.itemAbilityCooldownBackground) {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
-                    if (!SkyHanniMod.feature.itemAbilities.itemAbilityShowWhenReady) return
+                    if (!config.itemAbilityShowWhenReady) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }
