@@ -39,7 +39,7 @@ class PatcherSendCoordinates {
             val z = if (end.contains(" ")) {
                 val split = end.split(" ")
                 val extra = split.drop(1).joinToString(" ")
-                description += " " + extra
+                description += " $extra"
 
                 split.first().toFloat()
             } else end.toFloat()
