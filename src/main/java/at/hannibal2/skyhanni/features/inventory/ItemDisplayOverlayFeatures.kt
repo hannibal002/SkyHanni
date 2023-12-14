@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -37,6 +38,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -47,7 +49,6 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     // TODO repo
-    private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val masterSkullPattern = "(.*)Master Skull - Tier .".toPattern()
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
@@ -163,10 +164,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
-            for (line in item.getLore()) {
-                rancherBootsSpeedCapPattern.matchMatcher(line) {
-                    return group("cap")
+            val ranchersSpeed = item.getRanchersSpeed()
+            if (ranchersSpeed != null) {
+                if (ranchersSpeed > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
+                    return "§c" + ranchersSpeed.toString()
                 }
+                return "§a" + ranchersSpeed.toString()
             }
         }
 
