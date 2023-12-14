@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboa
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -39,10 +40,8 @@ public class GUIConfig {
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
 
-
     @Expose
-    @ConfigOption(name = "Custom Scoreboard", desc = "")
-    @Accordion
+    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
     public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
 
     @Expose

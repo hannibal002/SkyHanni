@@ -52,16 +52,9 @@ public class CustomScoreboardConfig {
     public PartyConfig partyConfig = new PartyConfig();
 
     @Expose
-    @ConfigOption(name = "Show Mayor Perks", desc = "Show the perks of the current mayor.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showMayorPerks = true;
-
-    @Expose
-    @ConfigOption(name = "Show Time till next mayor", desc = "Show the time till the next mayor is elected.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showTimeTillNextMayor = true;
+    @ConfigOption(name = "Mayor Options", desc = "")
+    @Accordion
+    public MayorConfig mayorConfig = new MayorConfig();
 
     @Expose
     @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")

@@ -110,9 +110,9 @@ enum class ScoreboardElements(
 }
 
 
-private fun getTitleDisplayPair() = when (config.displayConfig.useHypixelTitleAnimation) {
+private fun getTitleDisplayPair() = when (config.displayConfig.titleAndFooter.useHypixelTitleAnimation) {
     true -> listOf(ScoreboardData.objectiveTitle to getTitleAndFooterAlignment())
-    false -> listOf(config.displayConfig.customTitle.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
+    false -> listOf(config.displayConfig.titleAndFooter.customTitle.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
 }
 
 private fun getProfileDisplayPair() =
@@ -299,12 +299,12 @@ private fun getMayorDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return listOf(
         (MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.mayorNameToColorCode(it) }
             ?: "<hidden>") +
-            (if (config.showTimeTillNextMayor) {
+            (if (config.mayorConfig.showTimeTillNextMayor) {
                 "§7 (§e${TimeUtils.formatDuration(MayorElection.timeTillNextMayor, TimeUnit.DAY)}§7)"
             } else {
                 ""
             }) to AlignmentEnum.LEFT
-    ) + (if (config.showMayorPerks) {
+    ) + (if (config.mayorConfig.showMayorPerks) {
         MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" to AlignmentEnum.LEFT } ?: emptyList()
     } else {
         emptyList()
@@ -342,9 +342,7 @@ private fun getPartyShowWhen() = when (inDungeons) {
 }
 
 private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
-
-
-    return listOf(config.displayConfig.customFooter.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
+    return listOf(config.displayConfig.titleAndFooter.customFooter.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
 }
 
 private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {

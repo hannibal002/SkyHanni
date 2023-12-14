@@ -55,7 +55,7 @@ object CustomScoreboardUtils {
         return tabList.footer_skyhanni.formattedText.replace("§r", "")
     }
 
-    fun getTitleAndFooterAlignment() = when (config.displayConfig.centerTitleAndFooter) {
+    fun getTitleAndFooterAlignment() = when (config.displayConfig.titleAndFooter.centerTitleAndFooter) {
             true -> AlignmentEnum.CENTER
             false -> AlignmentEnum.LEFT
     }

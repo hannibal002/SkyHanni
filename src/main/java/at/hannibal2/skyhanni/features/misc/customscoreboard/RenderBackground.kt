@@ -33,11 +33,11 @@ class RenderBackground {
 
         position.set(
             Position(
-                when (config.displayConfig.alignRight) {
+                when (config.displayConfig.alignment.alignRight) {
                     true -> scaledWidth - elementWidth - (border * 2)
                     false -> x
                 },
-                when (config.displayConfig.alignCenterVertically) {
+                when (config.displayConfig.alignment.alignCenterVertically) {
                     true -> scaledHeight / 2 - elementHeight / 2
                     false -> y
                 },
