@@ -33,8 +33,8 @@ import java.util.regex.Pattern
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
-    private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
-    private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
+    private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
+    private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
@@ -145,7 +145,12 @@ object NEUItems {
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
-    fun NEUInternalName.getNpcPriceOrNull() = BazaarDataHolder.getNpcPrice(this)
+    fun NEUInternalName.getNpcPriceOrNull(): Double? {
+        if (equals("WISP_POTION")) {
+            return 20_000.0
+        }
+        return BazaarDataHolder.getNpcPrice(this)
+    }
 
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
@@ -226,11 +231,6 @@ object NEUItems {
     }
 
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        val pair = getMultiplier(internalName.asString(), tryCount)
-        return Pair(pair.first.asInternalName(), pair.second)
-    }
-
-    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!
         }
@@ -245,27 +245,27 @@ object NEUItems {
         for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
 
-            val map = mutableMapOf<String, Int>()
+            val map = mutableMapOf<NEUInternalName, Int>()
             for (ingredient in recipe.getCachedIngredients()) {
                 val count = ingredient.count.toInt()
-                var internalItemId = ingredient.internalItemId
+                var internalItemId = ingredient.internalItemId.asInternalName()
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN" && internalItemId == "INK_SACK-2") {
-                    internalItemId = "CACTUS"
+                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
+                    internalItemId = "CACTUS".asInternalName()
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE" && internalItemId == "WHEAT") {
+                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
                     continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT" && internalItemId == "GOLDEN_CARROT") {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
                     continue
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER" && internalItemId == "RABBIT_HIDE") {
+                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
                     continue
                 }
 
@@ -288,14 +288,21 @@ object NEUItems {
         val result = Pair(internalName, 1)
         multiplierCache[internalName] = result
         return result
+
     }
 
-    fun getRecipes(minionId: String): Set<NeuRecipe> {
-        if (recipesCache.contains(minionId)) {
-            return recipesCache[minionId]!!
+    @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
+    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
+        val pair = getMultiplier(internalName.asInternalName(), tryCount)
+        return Pair(pair.first.asString(), pair.second)
+    }
+
+    fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
+        if (recipesCache.contains(internalName)) {
+            return recipesCache[internalName]!!
         }
-        val recipes = manager.getRecipesFor(minionId)
-        recipesCache[minionId] = recipes
+        val recipes = manager.getRecipesFor(internalName.asString())
+        recipesCache[internalName] = recipes
         return recipes
     }
 

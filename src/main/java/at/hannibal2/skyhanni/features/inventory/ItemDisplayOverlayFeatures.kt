@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.matchMatcher
 import at.hannibal2.skyhanni.utils.matches
@@ -55,7 +57,6 @@ object ItemDisplayOverlayFeatures {
     private val dungeonHeadPattern = "(GOLD|DIAMOND)_(?<floor>[A-Z])+_HEAD".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
     private val kuudraKeyPattern = "KUUDRA_(?:(?<tier>.+)_)?TIER_KEY".toPattern()
-    private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val gardenVacuumPattern = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
     private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
     private val bingoGoalRankPattern =
@@ -243,9 +244,11 @@ object ItemDisplayOverlayFeatures {
         RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBoots
 
     private fun getRanchersBootsTip(item: ItemStack): String {
-        for (line in item.getLore()) {
-            rancherBootsSpeedCapPattern.matchMatcher(line) {
-                return group("cap")
+         item.getRanchersSpeed()?.let {
+                return if (it > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
+                    "§c$it"
+                } else {
+                    "§a$it"
             }
         }
         return ""
@@ -337,7 +340,7 @@ object ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(11, "inventory.itemNumberAsStackSize", "inventory.itemNumberAsStackSize") { element ->
+        event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
         }
     }

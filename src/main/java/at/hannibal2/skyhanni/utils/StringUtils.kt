@@ -258,9 +258,9 @@ object StringUtils {
         return if (matcher.matches()) matcher else null
     }
 
-    fun String.convertToFormatted(): String {
-        return this.replace("&&", "§")
-    }
+    fun String.convertToFormatted(): String = this.replace("&&", "§")
 
     fun Pattern.matches(string: String) = matcher(string).matches()
+
+    fun Pattern.find(string: String) = matcher(string).find()
 }
