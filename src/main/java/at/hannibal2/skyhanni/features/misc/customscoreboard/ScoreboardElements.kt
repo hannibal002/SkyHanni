@@ -363,7 +363,7 @@ private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
 }
 
 private fun getExtraShowWhen(): Boolean {
-    if (extraLines.isNotEmpty()) {
+    if (extraLines.isEmpty()) {
         amountOfExtraLines = 0
     }
     return extraLines.isNotEmpty()
