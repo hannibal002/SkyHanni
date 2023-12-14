@@ -299,6 +299,9 @@ class GardenVisitorFeatures {
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
+
+            // Ignoring custom NEU items like copper
+            if (internalName.startsWith("SKYBLOCK_")) continue
             val price = internalName.getPrice() * amount
 
             if (readingItemsNeeded) {
@@ -356,6 +359,9 @@ class GardenVisitorFeatures {
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
+
+            // Ignoring custom NEU items like copper
+            if (internalName.startsWith("SKYBLOCK_")) continue
             val price = internalName.getPrice() * amount
 
             if (config.inventory.showPrice) {
@@ -625,7 +631,8 @@ class GardenVisitorFeatures {
 
             drops
         }
-        event.transform(14, "garden.visitors.highlightStatus") { element ->
+
+        event.transform(15, "garden.visitors.highlightStatus") { element ->
             ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)
         }
     }
