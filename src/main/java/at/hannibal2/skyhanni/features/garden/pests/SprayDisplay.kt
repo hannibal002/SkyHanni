@@ -24,9 +24,9 @@ class SprayDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(5)) return
+        if (!GardenAPI.inGarden() || !event.isMod(5)) return
 
-        if (isDisplayEnabled()) {
+        if (config.displayEnabled) {
             val plot = GardenPlotAPI.getCurrentPlot() ?: return
             display = plot.currentSpray?.let {
                 val timer = it.expiry.timeUntil()
@@ -34,41 +34,33 @@ class SprayDisplay {
             }
         }
 
-        if (isNotificationEnabled()) {
+        if (config.expiryNotification) {
             sendExpiredPlotsToChat(false)
         }
     }
 
     @SubscribeEvent
     fun onJoin(event: IslandChangeEvent) {
-        if (!isNotificationEnabled() || event.newIsland != IslandType.GARDEN) return
-        if (event.newIsland == event.oldIsland) return
-
+        if (!config.expiryNotification || event.newIsland != IslandType.GARDEN) return
         sendExpiredPlotsToChat(true)
     }
 
     @SubscribeEvent
     fun onRenderOverlay(ignored: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isDisplayEnabled()) return
-
+        if (!GardenAPI.inGarden() || !config.displayEnabled) return
         val display = display ?: return
-
         config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")
     }
-
-    private fun isDisplayEnabled() = GardenAPI.inGarden() && config.displayEnabled
-    private fun isNotificationEnabled() = GardenAPI.inGarden() && config.expiryNotification
 
     private fun sendExpiredPlotsToChat(wasAway: Boolean) {
         val expiredPlots = plots.filter { it.isSprayExpired }
         if (expiredPlots.isEmpty()) return
 
         expiredPlots.forEach { it.markExpiredSprayAsNotified() }
-        val wasAwayString = if (wasAway) "While you were away, §7your" else "§7Your"
-        val plotString = StringUtils.createCommaSeparatedList(expiredPlots.map { "§b${it.name}" }, "§7, ")
+        val wasAwayString = if (wasAway) "§7While you were away, your" else "§7Your"
+        val plotString = StringUtils.createCommaSeparatedList(expiredPlots.map { "§b${it.name}" }, "§7")
         val sprayString = if (expiredPlots.size > 1) "sprays" else "spray"
-        val out = "§e[SkyHanni] ${wasAwayString} $sprayString on §aPlot §7- $plotString §7expired."
+        val out = "$wasAwayString $sprayString on §aPlot §7- $plotString §7expired."
         LorenzUtils.chat(out)
     }
-
 }

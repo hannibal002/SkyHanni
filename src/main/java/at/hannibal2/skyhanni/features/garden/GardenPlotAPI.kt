@@ -49,7 +49,7 @@ object GardenPlotAPI {
         var pests: Int,
 
         @Expose
-        var sprayExpiryTime: SimpleTimeMark,
+        var sprayExpiryTime: SimpleTimeMark?,
 
         @Expose
         var sprayType: SprayType?,
@@ -63,7 +63,7 @@ object GardenPlotAPI {
         val type: SprayType
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, SimpleTimeMark.farPast(), null, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -78,15 +78,15 @@ object GardenPlotAPI {
         }
 
     val Plot.currentSpray: SprayData?
-        get() = this.getData()?.let {
-            if (it.sprayExpiryTime.isInPast()) return null
-            val type = it.sprayType ?: return null
-            return SprayData(it.sprayExpiryTime, type)
+        get() = this.getData()?.let { plot ->
+            val expiry = plot.sprayExpiryTime?.takeIf { !it.isInPast() } ?: return null
+            val type = plot.sprayType ?: return null
+            return SprayData(expiry, type)
         }
 
     val Plot.isSprayExpired: Boolean
         get() = this.getData()?.let {
-            !it.sprayHasNotified && it.sprayExpiryTime.isInPast()
+            !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
 
 
