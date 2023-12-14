@@ -437,6 +437,14 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Essence: ") }
         }
     ),
+    EFFIGIES(
+        {
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Effigies: ") } ?: "<hidden>")
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Effigies: ") }
+        }
+    ),
     NONE( // maybe use default state tablist: "Events: smth" idk
         {
             when {
