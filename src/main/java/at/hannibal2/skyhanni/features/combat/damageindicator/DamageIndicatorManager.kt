@@ -876,7 +876,8 @@ class DamageIndicatorManager {
         event.transform(11, "combat.damageIndicator.bossesToShow") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, BossCategory::class.java)
         }
-        event.transform(14, "combat.damageIndicator.bossName") { element ->
+
+        event.transform(15, "combat.damageIndicator.bossName") { element ->
             ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
         }
     }
