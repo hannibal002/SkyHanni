@@ -672,7 +672,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 ## Stranded
 </summary>
 
-+ Highlights NPCs in the stranded menu that are placeable but not placed. - walker
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
 
 </details>
 <details open><summary>

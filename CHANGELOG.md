@@ -83,7 +83,7 @@
 
 #### Stranded Featuers
 
-+ Highlights NPCs in the stranded menu that are placeable but not placed. - walker
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
 
 #### Diana Features
 
@@ -150,6 +150,8 @@
 + Improve accuracy of movement speed display. - alexia
 + Added toggle to hide autopet messages. - CalMWolfs
 + Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
++ Added Support to read Badlion sendcoords format. - Cad
++ Added an option to not show cooldown when ability is ready. - Obsidian
 
 ### Fixes
 
@@ -176,6 +178,9 @@
 + Fix typo with Not Clickable Items in Composter. - absterge
 + Added missing preview number from Visitor Drop Statistics. - absterge
 + Fixed error message with newly bought fungi cutter. - hannibal2
++ Ignoring custom NEU items like copper that causes wrong coins per copper price. - hannibal2
++ Fixed rancher boots speed stack size. - walker
++ Fixed overflow garden level detection. - hannibal2
 
 #### Bingo Fixes
 
@@ -194,6 +199,11 @@
 
 + Fixed Water Hydra warning showing up multiple times. - Cad
 
+#### Diana Fixes
+
++ Fixed the closest burrow warp point being off, especially for the castle. - hannibal2
++ Fixed show inquisitor waypoints outside the hub. - Cad
+
 #### Misc Fixes
 
 + Fixed Item Tracker not ignoring manual sack movements. - hannibal2
@@ -208,6 +218,9 @@
 + Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
 + Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
 + Fixed locraw sending outside Hypixel. - walker
++ Fixed finished city project still reminding and suggests buying items. - hannibal2
+  + Open the city project inventory once again to fix warnings correctly.
++ Fixed kick alert triggering instantly. - alexia
 
 #### Config Fixes
 
