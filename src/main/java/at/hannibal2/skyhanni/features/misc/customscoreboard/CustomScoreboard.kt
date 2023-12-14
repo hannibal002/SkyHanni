@@ -47,7 +47,7 @@ class CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isCustomScoreboardEnabled()) return
 
-        // Draws the custom scoreboard
+        // Creates the lines
         display = createLines()
 
         // Get Information
@@ -66,8 +66,8 @@ class CustomScoreboard {
 
     private fun formatLines(lineMap: HashMap<Int, List<Pair<String, AlignmentEnum>>>): MutableList<Pair<String, AlignmentEnum>> {
         val newList = mutableListOf<Pair<String, AlignmentEnum>>()
-        for (index in config.scoreboardEntries) {
-            lineMap[index.ordinal]?.let {
+        for (element in config.scoreboardEntries) {
+            lineMap[element.ordinal]?.let {
                 // Hide consecutive empty lines
                 if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0].first == "<empty>" && newList.last().first == "") {
                     continue
