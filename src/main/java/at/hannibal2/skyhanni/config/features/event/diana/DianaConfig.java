@@ -11,6 +11,12 @@ import org.lwjgl.input.Keyboard;
 public class DianaConfig {
 
     @Expose
+    @ConfigOption(name = "Highlight Inquisitors", desc = "Highlights Inquisitors found from the Mythological Event perk.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightInquisitors = true;
+
+    @Expose
     @ConfigOption(name = "Soopy Guess", desc = "Uses §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
     @ConfigEditorBoolean
     @FeatureToggle
