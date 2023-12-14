@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -63,7 +62,8 @@ class WrongFungiCutterWarning {
     }
 
     private fun readItem(item: ItemStack) {
-        val rawMode = item.getFungiCutterMode() ?: error("Tool without fungi cutter mode: '${item.name}'")
+        // The fungi cutter mode is not set into the item nbt data immediately after purchasing it.
+        val rawMode = item.getFungiCutterMode() ?: return
         mode = FungiMode.getOrNull(rawMode)
     }
 

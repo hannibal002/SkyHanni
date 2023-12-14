@@ -57,7 +57,7 @@ object GriffinBurrowHelper {
         targetLocation = location
 
         if (config.burrowNearestWarp) {
-            BurrowWarpHelper.shouldUseWarps(location)
+            BurrowWarpHelper.shouldUseWarps(findBlock(location))
         }
         if (config.burrowsNearbyDetection) {
             checkRemoveGuess(false)

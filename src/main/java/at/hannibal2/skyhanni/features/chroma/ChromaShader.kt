@@ -53,7 +53,7 @@ object ChromaShader : Shader("chroma", "chroma") {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(14, "config.chromaDirection") { element ->
+        event.transform(15, "config.chromaDirection") { element ->
             ConfigUtils.migrateIntToEnum(element, Direction::class.java)
         }
     }

@@ -132,7 +132,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         event.move(2, "misc.reputationHelperHotkey", "crimsonIsle.reputationHelper.hotkey")
         event.move(2, "misc.crimsonIsleReputationHelperPos", "crimsonIsle.reputationHelper.position")
         event.move(2, "misc.crimsonIsleReputationShowLocation", "crimsonIsle.reputationHelper.showLocation")
-        event.transform(14, "crimsonIsle.reputationHelper.showLocation") { element ->
+
+        event.transform(15, "crimsonIsle.reputationHelper.showLocation") { element ->
             ConfigUtils.migrateIntToEnum(element, ShowLocationEntry::class.java)
         }
     }
