@@ -164,12 +164,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
-            val ranchersSpeed = item.getRanchersSpeed()
-            if (ranchersSpeed != null) {
-                if (ranchersSpeed > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
-                    return "§c" + ranchersSpeed.toString()
+            item.getRanchersSpeed()?.let {
+                return if (it > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
+                    "§c$it"
+                } else {
+                    "§a$it"
                 }
-                return "§a" + ranchersSpeed.toString()
             }
         }
 
