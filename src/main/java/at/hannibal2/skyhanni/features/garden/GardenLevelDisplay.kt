@@ -13,16 +13,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
     private val config get() = GardenAPI.config.gardenLevels
-    private val expToNextLevelPattern = ".* §e(?<nextLevelExp>.*)§6/.*".toPattern()
-    private val overflowPattern = ".*§r §6(?<overflow>.*)".toPattern()
-    private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
+    private val expToNextLevelPattern by RepoPattern.pattern("garden.level.inventory.nextxp", ".* §e(?<nextLevelExp>.*)§6/.*")
+    private val overflowPattern by RepoPattern.pattern("garden.level.inventory.overflow", ".*§r §6(?<overflow>.*)")
+    private val currentLevelPattern by RepoPattern.pattern("garden.level.inventory.currentlevel", "Garden Level (?<currentLevel>.*)")
     private var display = ""
-    private var visitorRewardPattern = " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience".toPattern()
+    private val visitorRewardPattern by RepoPattern.pattern("garden.level.chat.increase", " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience")
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -62,7 +63,7 @@ class GardenLevelDisplay {
         if (event.inventoryName != "Desk") return
         val item = event.inventoryItems[4]!!
 
-        val currentLevel = namePattern.matchMatcher(item.name!!.removeColor()) {
+        val currentLevel = currentLevelPattern.matchMatcher(item.name!!.removeColor()) {
             group("currentLevel").romanToDecimalIfNecessary()
         } ?: return
         var nextLevelExp = 0L
