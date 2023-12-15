@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -65,7 +64,7 @@ object VerminTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        for (verminType in VerminType.entries) {
+        VerminType.entries.forEach { verminType ->
             if (verminType.pattern.matches(event.message)) {
                 addVermin(verminType)
                 if (config.hideChat) {
@@ -80,21 +79,17 @@ object VerminTracker {
         if (!RiftAPI.inRift() || event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
-        var bag = InventoryUtils.getItemsInOwnInventory()
+        val bag = InventoryUtils.getItemsInOwnInventory()
             .firstOrNull { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName() }
             ?.getLore() ?: emptyList()
 
         val binCounts = countVermin(bin, verminBinPattern)
-        VerminType.entries.forEach {
-            setVermin(it, binCounts[it] ?: 0)
-        }
+        VerminType.entries.forEach { setVermin(it, binCounts[it] ?: 0) }
 
-        if (bag == emptyList<String>()) return
+        if (bag.isEmpty()) return
 
         val bagCounts = countVermin(bag, verminBagPattern)
-        VerminType.entries.forEach {
-            addVermin(it, bagCounts[it] ?: 0)
-        }
+        VerminType.entries.forEach { addVermin(it, bagCounts[it] ?: 0) }
     }
 
     private fun countVermin(lore: List<String>, pattern: Pattern): MutableMap<VerminTracker.VerminType, Int> {
@@ -116,12 +111,9 @@ object VerminTracker {
 
     private fun getVerminType(vermin: String): VerminType {
         return when (vermin) {
-            "silverfish" -> VerminType.SILVERFISH
-            "silverfishes" -> VerminType.SILVERFISH
-            "spider" -> VerminType.SPIDER
-            "spiders" -> VerminType.SPIDER
-            "fly" -> VerminType.FLY
-            "flies" -> VerminType.FLY
+            "silverfish", "silverfishes" -> VerminType.SILVERFISH
+            "spider", "spiders" -> VerminType.SPIDER
+            "fly", "flies" -> VerminType.FLY
             else -> VerminType.SILVERFISH
         }
     }
@@ -131,12 +123,12 @@ object VerminTracker {
     }
 
     private fun setVermin(vermin: VerminType, count: Int) {
-        tracker.modify { it.count.set(vermin, count) }
+        tracker.modify { it.count[vermin] = count }
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Vermin Tracker:")
-        for ((vermin, amount) in data.count.sortedDesc()) {
+        data.count.entries.sortedByDescending { it.value }.forEach { (vermin, amount) ->
             val verminName = vermin.vermin
             addAsSingletonList(" §7- §e${amount.addSeparators()} $verminName")
         }
