@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.winter
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -9,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -37,7 +35,7 @@ class NewYearCakeReminder {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         //  cake already claimed
-        if (event.inventoryName == "Baker" && IslandType.HUB.isInIsland()) {
+        if (event.inventoryName == "Baker") {
             makedClaimed()
         }
     }
@@ -74,8 +72,8 @@ class NewYearCakeReminder {
         lastReminderSend = SimpleTimeMark.now()
 
         LorenzUtils.clickableChat(
-            "Reminding you to grab the free New Year Cake in the Hub. Click here to warp to hub!",
-            "warp hub"
+            "Reminding you to grab the free New Year Cake. Click here to open the baker menu!",
+            "openbaker"
         )
     }
 }
