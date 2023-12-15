@@ -155,7 +155,7 @@ class InformationGetter {
             "e: §e§b0%",
             "Pelts: §5",
             "Tracker Mob Location:",
-            "§7Boss: §c",
+            "§7Boss: §",
             "§7Damage Soaked:",
             "§6Kill the Magmas:",
             "Time Left: §b",

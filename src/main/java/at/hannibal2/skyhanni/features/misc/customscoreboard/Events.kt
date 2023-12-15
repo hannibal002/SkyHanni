@@ -195,7 +195,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             list
         },
         {
-            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c") || it == "§6Kill the Magmas:" }
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §") || it == "§6Kill the Magmas:" }
         }
     ),
     JACOB_CONTEST(
