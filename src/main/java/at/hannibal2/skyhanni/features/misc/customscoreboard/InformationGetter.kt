@@ -84,6 +84,7 @@ class InformationGetter {
             "§ewww.hyp",
             "§ealpha.hyp",
             "§cServer closing: ",
+            "§cServer closing§8",
             "Auto-closing in:",
             "Starting in:",
             "Keys: ",
