@@ -118,6 +118,7 @@ import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWay
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween.BasketWaypoints
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.event.winter.JyrreTimer
+import at.hannibal2.skyhanni.features.event.winter.NewYearCakeReminder
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -676,6 +677,7 @@ class SkyHanniMod {
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
+        loadModule(NewYearCakeReminder())
 
         init()
 
