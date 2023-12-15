@@ -139,6 +139,5 @@ class DianaProfitTracker {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
     }
 
-    fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && DianaAPI.featuresEnabled() && DianaAPI.hasSpadeInInventory()
+    fun isEnabled() = DianaAPI.featuresEnabled() && config.enabled && DianaAPI.hasSpadeInInventory()
 }
