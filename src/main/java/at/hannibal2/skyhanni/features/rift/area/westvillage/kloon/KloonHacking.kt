@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.westvillage
+package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
