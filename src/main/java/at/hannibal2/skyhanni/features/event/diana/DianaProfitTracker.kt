@@ -139,5 +139,5 @@ class DianaProfitTracker {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
     }
 
-    fun isEnabled() = DianaAPI.featuresEnabled() && config.enabled && DianaAPI.hasSpadeInInventory()
+    fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 }
