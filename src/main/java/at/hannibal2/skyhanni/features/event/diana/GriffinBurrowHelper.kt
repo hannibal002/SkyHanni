@@ -110,15 +110,22 @@ object GriffinBurrowHelper {
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
+        if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
+            reset()
+        }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        reset()
+    }
+
+    private fun reset() {
         guessLocation = null
         targetLocation = null
         animationLocation = null
         lastDug = null
-        particleBurrows = particleBurrows.editCopy { clear() }
+        particleBurrows = emptyMap()
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
