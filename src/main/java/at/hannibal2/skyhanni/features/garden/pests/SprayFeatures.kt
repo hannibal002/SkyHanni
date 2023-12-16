@@ -24,7 +24,7 @@ class SprayFeatures {
     private var display: String? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
 
-    private val pattern by RepoPattern.pattern(
+    private val changeMaterialPattern by RepoPattern.pattern(
         "garden.spray.material",
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!"
     )
@@ -33,7 +33,7 @@ class SprayFeatures {
     fun onChat(event: LorenzChatEvent) {
         if (!config.pestWhenSelector) return
 
-        val type = pattern.matchMatcher(event.message) {
+        val type = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
             SprayType.getByName(sprayName) ?: run {
                 ErrorManager.logErrorStateWithData(

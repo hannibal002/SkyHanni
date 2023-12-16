@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SprayDisplay {
