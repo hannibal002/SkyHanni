@@ -21,7 +21,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     ;
 
     val chatColorCode by lazy { color.getChatColor() }
-    private val rawName by lazy { name.replace("_", " ") }
+    val rawName by lazy { name.replace("_", " ") }
     private val normalName by lazy { "$chatColorCode§l$rawName" }
     private val recombName by lazy { "$chatColorCode§l§ka§r $chatColorCode§l$chatColorCode§l$rawName" }
 
