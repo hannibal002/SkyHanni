@@ -185,6 +185,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
 import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
@@ -675,6 +676,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(SprayFeatures())
+        loadModule(SprayDisplay())
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
