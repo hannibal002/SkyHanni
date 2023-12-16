@@ -21,7 +21,7 @@ class GardenLevelDisplay {
     private val config get() = GardenAPI.config.gardenLevels
     private val expToNextLevelPattern by RepoPattern.pattern("garden.level.inventory.nextxp", ".* §e(?<nextLevelExp>.*)§6/.*")
     private val overflowPattern by RepoPattern.pattern("garden.level.inventory.overflow", ".*§r §6(?<overflow>.*)")
-    private val currentLevelPattern by RepoPattern.pattern("garden.level.inventory.currentlevel", "Garden Level (?<currentLevel>.*)")
+    private val currentLevelPattern by RepoPattern.pattern("garden.level.inventory.currentlevel", ".*Garden Level (?<currentLevel>.*)")
     private var display = ""
     private val visitorRewardPattern by RepoPattern.pattern("garden.level.chat.increase", " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience")
 

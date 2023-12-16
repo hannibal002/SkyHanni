@@ -25,6 +25,7 @@ class DungeonFinderFeatures {
 
     private val pricePattern = "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?mil)".toRegex(RegexOption.IGNORE_CASE)
     private val carryPattern = "(carry|cary|carries|caries|comp|to cata [0-9]{2})".toRegex(RegexOption.IGNORE_CASE)
+    private val nonPugPattern = "(perm|vc|discord)".toRegex(RegexOption.IGNORE_CASE)
     private val memberPattern = "^ §.*?§.: §.([A-Z]+)§. \\(§.([0-9]+)§.\\)".toRegex(RegexOption.IGNORE_CASE)
     private val ineligiblePattern =
         "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)".toRegex()
@@ -116,6 +117,15 @@ class DungeonFinderFeatures {
 
                 if (pricePattern.containsMatchIn(note) && carryPattern.containsMatchIn(note)) {
                     slot highlight LorenzColor.RED
+                    continue
+                }
+            }
+
+            if (config.markNonPugs) {
+                val note = slot.stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
+
+                if (nonPugPattern.containsMatchIn(note)) {
+                    slot highlight LorenzColor.LIGHT_PURPLE
                     continue
                 }
             }
