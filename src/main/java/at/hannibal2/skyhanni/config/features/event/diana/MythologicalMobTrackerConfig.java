@@ -19,7 +19,7 @@ public class MythologicalMobTrackerConfig {
     public Position position = new Position(20, 20, false, true);
 
     @Expose
-    @ConfigOption(name = "Show Percentage", desc = "Show percentage of mob compared to all mobs")
+    @ConfigOption(name = "Show Percentage", desc = "Show percentage how often what mob spawned.")
     @ConfigEditorBoolean
     public Property<Boolean> showPercentage = Property.of(false);
 
