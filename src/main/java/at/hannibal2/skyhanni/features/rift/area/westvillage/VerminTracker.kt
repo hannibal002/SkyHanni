@@ -53,7 +53,8 @@ object VerminTracker {
     fun onChat(event: LorenzChatEvent) {
         VerminType.entries.forEach { verminType ->
             if (verminType.pattern.matches(event.message)) {
-                addVermin(verminType)
+                tracker.modify { it.count.addOrPut(verminType, 1) }
+
                 if (config.hideChat) {
                     event.blockedReason = "vermin_vacuumed"
                 }
@@ -106,11 +107,11 @@ object VerminTracker {
     }
 
     private fun addVermin(vermin: VerminType, count: Int = 1) {
-        tracker.modify { it.count.addOrPut(vermin, count) }
+        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { it.count.addOrPut(vermin, count) }
     }
 
     private fun setVermin(vermin: VerminType, count: Int) {
-        tracker.modify { it.count[vermin] = count }
+        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { it.count[vermin] = count }
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
