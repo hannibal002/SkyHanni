@@ -29,6 +29,7 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.monster.EntityPigZombie
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityWitch
 import net.minecraft.entity.monster.EntityZombie
@@ -61,6 +62,7 @@ object MobFilter {
     private val HellwispTentacleSkull = "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
     private val RiftEyeSkull1 = "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
     private val RiftEyeSkull2 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
+    private val NPCTurdSkull = "ewogICJ0aW1lc3RhbXAiIDogMTYzOTUxMjYxNzc5MywKICAicHJvZmlsZUlkIiA6ICIwZjczMDA3NjEyNGU0NGM3YWYxMTE1NDY5YzQ5OTY3OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJPcmVfTWluZXIxMjMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjM2MzBkOWIwMjA4OGVhMTkyNGE4NzIyNDJhYmM3NWI2MjYyYzJhY2E5MmFlY2Y4NzE0YTU3YTQxZWVhMGI5ZCIKICAgIH0KICB9Cn0="
 
     const val minionMobPrefix = "Minion Mob "
 
@@ -99,12 +101,18 @@ object MobFilter {
         || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
 
     internal fun createDisplayNPC(entity: EntityLivingBase): Boolean =
-        MobUtils.getArmorStandByRangeAll(entity, 2.0).firstOrNull { armorStand ->
-            armorStand.name == "§e§lCLICK"
-        }?.let { MobUtils.getArmorStand(it, -1) }?.let { armorStand ->
-            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
-            true
-        } ?: false
+        MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
+            listOfClickArmorStand.contains(armorStand.name)
+        }?.let { MobUtils.getArmorStand(it, -1) }
+            ?.let { armorStand ->
+                MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
+                true
+            } ?: false
+
+    private val listOfClickArmorStand = setOf(
+        "§e§lCLICK",
+        "§6§lSEASONAL SKINS",
+    )
 
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
@@ -207,6 +215,10 @@ object MobFilter {
                 baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" -> MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
                 baseEntity is EntityPig && nextEntity is EntityPig -> MobResult.illegal // Matriarch Tongue
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "BarbarianGuard " -> MobResult.found(Mob(baseEntity, Mob.Type.DisplayNPC, name = "Barbarian Guard"))
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "MageGuard " -> MobResult.found(Mob(baseEntity, Mob.Type.DisplayNPC, name = "Mage Guard"))
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Mage Outlaw" -> MobResult.found(Mob(baseEntity, Mob.Type.Boss, armorStand, name = "Mage Outlaw")) // fix for wierd name
+                baseEntity is EntityPigZombie && baseEntity.inventory?.get(4)?.getSkullTexture() == NPCTurdSkull -> MobResult.found(Mob(baseEntity, Mob.Type.DisplayNPC, name = "Turd"))
+                baseEntity is EntityOcelot -> if (createDisplayNPC(baseEntity)) MobResult.illegal else MobResult.notYetFound // Maybe a problem in the future
                 else -> null
             }
 
