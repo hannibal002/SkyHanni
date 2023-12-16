@@ -68,4 +68,9 @@ public class DianaConfig {
     @ConfigOption(name = "Diana Profit Tracker", desc = "")
     @Accordion
     public DianaProfitTrackerConfig dianaProfitTracker = new DianaProfitTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Mythological Mob Tracker", desc = "")
+    @Accordion
+    public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
 }

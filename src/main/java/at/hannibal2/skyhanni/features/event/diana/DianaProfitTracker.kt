@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DianaProfitTracker {
+object DianaProfitTracker {
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
 
@@ -137,6 +137,10 @@ class DianaProfitTracker {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
+    }
+
+    fun resetCommand(args: Array<String>) {
+        tracker.resetCommand(args, "shresetdianaprofittracker")
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
