@@ -93,6 +93,9 @@ public class Storage {
 
             @Expose
             public int amountGifted = 0;
+
+            @Expose
+            public int cakeCollectedYear = 0;
         }
 
         @Expose

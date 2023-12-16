@@ -19,11 +19,11 @@ object DianaAPI {
     private fun isRitualActive() = MayorElection.isPerkActive("Diana", "Mythological Ritual") ||
         MayorElection.isPerkActive("Jerry", "Perkpocalypse") || SkyHanniMod.feature.event.diana.alwaysDiana
 
-    fun hasGriffinPet() = PetAPI.currentPet?.contains("Griffin") ?: false
+    fun hasGriffinPet() = PetAPI.isCurrentPet("Griffin")
 
-    fun featuresEnabled() = IslandType.HUB.isInIsland() && isRitualActive()
+    fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInInventory()
 
     val ItemStack.isDianaSpade get() = getInternalName() == spade
 
-    fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
+    private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 }

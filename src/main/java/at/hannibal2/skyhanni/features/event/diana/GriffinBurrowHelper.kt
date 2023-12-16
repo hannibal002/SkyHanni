@@ -98,7 +98,7 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!DianaAPI.isDoingDiana()) return
         if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
             teleportedLocation = event.newLocation
         }
@@ -106,19 +106,26 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!DianaAPI.isDoingDiana()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
+        }
+        if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
+            reset()
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        reset()
+    }
+
+    private fun reset() {
         guessLocation = null
         targetLocation = null
         animationLocation = null
         lastDug = null
-        particleBurrows = particleBurrows.editCopy { clear() }
+        particleBurrows = emptyMap()
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
@@ -146,7 +153,7 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!DianaAPI.isDoingDiana()) return
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()
