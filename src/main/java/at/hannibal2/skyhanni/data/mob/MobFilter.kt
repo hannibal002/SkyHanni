@@ -28,6 +28,7 @@ import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityPigZombie
 import net.minecraft.entity.monster.EntitySlime
@@ -53,6 +54,7 @@ object MobFilter {
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter = "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
     val petCareNameRegex = "^\\[\\w+ (\\d+)\\] (.*)".toRegex()
+    val wokeSleepingGolemRegex = "(?:Woke)|(?:Sleeping) Golem".toRegex()
 
     val summonRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     val summonOwnerRegex = "Spawned by: (.*)".toRegex()
@@ -108,11 +110,10 @@ object MobFilter {
     internal fun createDisplayNPC(entity: EntityLivingBase): Boolean =
         MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
             listOfClickArmorStand.contains(armorStand.name)
-        }?.let { MobUtils.getArmorStand(it, -1) }
-            ?.let { armorStand ->
-                MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
-                true
-            } ?: false
+        }?.let { MobUtils.getArmorStand(it, -1) }?.let { armorStand ->
+            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
+            true
+        } ?: false
 
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
@@ -139,8 +140,7 @@ object MobFilter {
         caughtSkyblockMob?.apply { internalAddEntity(extraEntityList.dropLast(1)) }?.also { return MobResult.illegal }
 
 
-        val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand
-            ?: return MobResult.notYetFound
+        val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return MobResult.notYetFound
 
         if (armorStand.isDefaultValue()) return MobResult.notYetFound
         return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))?.let { MobResult.found(it) }
@@ -155,8 +155,7 @@ object MobFilter {
                 ?: MobFactories.dojo(baseEntity, armorStand))
 
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobResult? = when {
-        baseEntity is EntityBat -> createBat(baseEntity)?.let { MobResult.found(it) }
-            ?: MobResult.notYetFound
+        baseEntity is EntityBat -> createBat(baseEntity)?.let { MobResult.found(it) } ?: MobResult.notYetFound
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
         baseEntity is EntityDragon -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
@@ -196,6 +195,9 @@ object MobFilter {
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin" -> MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin").makeMobResult { MobFactories.dungeon(baseEntity, it) }
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor" -> MobUtils.getArmorStand(baseEntity, 9).makeMobResult { MobFactories.boss(baseEntity, it) }
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid") -> MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid").makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
+                baseEntity is EntityIronGolem && wokeSleepingGolemRegex.matches(
+                    armorStand?.name ?: ""
+                ) -> MobResult.found(Mob(baseEntity, Mob.Type.Dungeon, armorStand, "Woke Golem")) // Consistency fix
                 else -> null
             }
         } else when (LorenzUtils.skyBlockIsland) {
@@ -258,12 +260,7 @@ object MobFilter {
         return petCareNameRegex.find(extraEntityList[1].cleanName())?.groupValues?.let {
             MobResult.found(
                 Mob(
-                    baseEntity,
-                    Mob.Type.Special,
-                    armorStand = extraEntityList[1],
-                    name = it[2],
-                    additionalEntities = extraEntityList,
-                    levelOrTier = it[1].toInt()
+                    baseEntity, Mob.Type.Special, armorStand = extraEntityList[1], name = it[2], additionalEntities = extraEntityList, levelOrTier = it[1].toInt()
                 ),
             )
         } ?: MobResult.somethingWentWrong
