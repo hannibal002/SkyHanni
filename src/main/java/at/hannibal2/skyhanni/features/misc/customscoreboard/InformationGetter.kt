@@ -169,8 +169,11 @@ class InformationGetter {
         // filter empty lines
         extraLines = extraLines.filter { it.isNotBlank() }
 
-        // remove objectives
+        // remove objectives kuudra
         extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
+        extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective", 2) != it && !extraObjectiveKuudraLines.contains(it) }
+
+        // remove objectives
         val objectiveLine =
             ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
         extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLine) != it }

@@ -125,6 +125,14 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             if (ScoreboardData.sidebarLinesFormatted.any { it == "§fObjective:" }) {
                 list += "§fObjective:"
                 list += ScoreboardData.sidebarLinesFormatted.nextAfter("§fObjective:") ?: "§cNo Objective"
+                if (extraObjectiveKuudraLines.any {
+                        it == ScoreboardData.sidebarLinesFormatted.nextAfter(
+                            "§fObjective:",
+                            2
+                        )
+                    }) {
+                    list += ScoreboardData.sidebarLinesFormatted.nextAfter("§fObjective:", 2) ?: "§cNo Objective"
+                }
             }
 
             if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {

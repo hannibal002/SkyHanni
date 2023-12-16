@@ -38,6 +38,7 @@ var gemstonePowder = "0"
 var extraLines = listOf<String>()
 
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
+val extraObjectiveKuudraLines = listOf("§edefeat Kuudra")
 var amountOfExtraLines = 0
 
 enum class ScoreboardElements(
