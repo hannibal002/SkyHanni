@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getHelmet
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -167,7 +166,9 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
             item.getRanchersSpeed()?.let {
-                return if (it > 400 && (PetAPI.currentPet?.contains("Black Cat") == true || getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())) {
+                return if (it > 400 && (PetAPI.currentPet?.contains("Black Cat") == true ||
+                        InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())
+                ) {
                     "§c$it"
                 } else {
                     "§a$it"
