@@ -35,7 +35,7 @@ var lobbyCode = "None"
 var heat = "0"
 var mithrilPowder = "0"
 var gemstonePowder = "0"
-var extraLines = listOf<String>()
+var unknownLines = listOf<String>()
 
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
 val extraObjectiveKuudraLines = listOf("§edefeat Kuudra")
@@ -89,7 +89,7 @@ enum class ScoreboardElements(
         "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"
     ),
     FOOTER({ getFooterDisplayPair() }, { true }, "§ewww.hypixel.net"),
-    EXTRA({ getExtraDisplayPair() }, { getExtraShowWhen() }, "§7Extra lines the mod is not detecting"),
+    EXTRA({ getExtraDisplayPair() }, { getExtraShowWhen() }, "§Unknown lines the mod is not detecting"),
     ;
 
     override fun toString(): String {
@@ -347,23 +347,23 @@ private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
 }
 
 private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    if (amountOfExtraLines != extraLines.size && config.unknownLinesWarning) {
+    if (amountOfExtraLines != unknownLines.size && config.unknownLinesWarning) {
         ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${extraLines.size} unknown line${if (extraLines.size > 1) "s" else ""}"),
-            "CustomScoreboard detected ${extraLines.size} unknown line${if (extraLines.size > 1) "s" else ""}",
-            "Extra Lines" to extraLines,
+            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${unknownLines.size} unknown line${if (unknownLines.size > 1) "s" else ""}"),
+            "CustomScoreboard detected ${unknownLines.size} unknown line${if (unknownLines.size > 1) "s" else ""}",
+            "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea
         )
-        amountOfExtraLines = extraLines.size
+        amountOfExtraLines = unknownLines.size
     }
 
-    return listOf("§cUndetected Lines:" to AlignmentEnum.LEFT) + extraLines.map { it to AlignmentEnum.LEFT }
+    return listOf("§cUndetected Lines:" to AlignmentEnum.LEFT) + unknownLines.map { it to AlignmentEnum.LEFT }
 }
 
 private fun getExtraShowWhen(): Boolean {
-    if (extraLines.isEmpty()) {
+    if (unknownLines.isEmpty()) {
         amountOfExtraLines = 0
     }
-    return extraLines.isNotEmpty()
+    return unknownLines.isNotEmpty()
 }

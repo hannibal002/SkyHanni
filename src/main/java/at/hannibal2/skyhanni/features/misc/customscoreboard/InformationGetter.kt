@@ -164,47 +164,47 @@ class InformationGetter {
             "§cThe boss is reforming!"
         )
 
-        extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
+        unknownLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
 
         // filter empty lines
-        extraLines = extraLines.filter { it.isNotBlank() }
+        unknownLines = unknownLines.filter { it.isNotBlank() }
 
         // remove objectives kuudra
-        extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective") != it }
-        extraLines = extraLines.filter { sidebarLines.nextAfter("§fObjective", 2) != it && !extraObjectiveKuudraLines.contains(it) }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§fObjective") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§fObjective", 2) != it && !extraObjectiveKuudraLines.contains(it) }
 
         // remove objectives
         val objectiveLine =
             ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
-        extraLines = extraLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
-        extraLines =
-            extraLines.filter { sidebarLines.nextAfter(objectiveLine, 2) != it && !extraObjectiveLines.contains(it) }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
+        unknownLines =
+            unknownLines.filter { sidebarLines.nextAfter(objectiveLine, 2) != it && !extraObjectiveLines.contains(it) }
 
         // remove wind compass
-        extraLines = extraLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
 
         // Remove jacobs contest
         for (i in 1..3)
-            extraLines = extraLines.filter { sidebarLines.nextAfter("§eJacob's Contest", i) != it }
+            unknownLines = unknownLines.filter { sidebarLines.nextAfter("§eJacob's Contest", i) != it }
 
         // Remove slayer
-        extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
-        extraLines = extraLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
 
         // remove voting lines
         val votedLine = sidebarLines.firstOrNull { it.startsWith("§6Year ") } ?: "§6Year "
         for (i in 1 until 6) {
-            extraLines = extraLines.filter { sidebarLines.nextAfter(votedLine, i) != it }
+            unknownLines = unknownLines.filter { sidebarLines.nextAfter(votedLine, i) != it }
         }
 
         // remove trapper mob location
-        extraLines = extraLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
 
         // magma boss
-        extraLines = extraLines.filter { sidebarLines.nextAfter("§7Damage Soaked:") != it }
-        extraLines = extraLines.filter { sidebarLines.nextAfter("§6Kill the Magmas:") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§7Damage Soaked:") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§6Kill the Magmas:") != it }
 
         // da
-        extraLines = extraLines.filter { sidebarLines.nextAfter("Current Item:") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Current Item:") != it }
     }
 }
