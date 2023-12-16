@@ -112,6 +112,7 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
 import at.hannibal2.skyhanni.features.event.diana.GriffinPetWarning
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.jerry.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
@@ -678,6 +679,7 @@ class SkyHanniMod {
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
         loadModule(NewYearCakeReminder())
+        loadModule(HighlightInquisitors())
 
         init()
 
