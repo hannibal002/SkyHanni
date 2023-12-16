@@ -244,6 +244,7 @@ import at.hannibal2.skyhanni.features.misc.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
+import at.hannibal2.skyhanni.features.misc.ReforgeHelper
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
@@ -457,6 +458,7 @@ class SkyHanniMod {
         loadModule(TrophyFishMessages())
         loadModule(BazaarBestSellMethod())
         loadModule(BazaarOpenPriceWebsite())
+        loadModule(ReforgeHelper())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown())
