@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.inventory.Container
-import net.minecraft.item.EnumRarity
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.atomic.AtomicBoolean
@@ -41,18 +42,18 @@ class ReforgeHelper {
         }
     }
 
-    class Reforge(val name: String, val type: ReforgeType, val stats: Map<EnumRarity, List<Stat>>)
+    class Reforge(val name: String, val type: ReforgeType, val stats: Map<LorenzRarity, List<Stat>>)
 
     private val reforges = listOf(
-        Reforge("Clean", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(9, StatType.Strength)))),
-        Reforge("Fierce", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(8, StatType.Strength)))),
-        Reforge("Heavy", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(7, StatType.Strength)))),
-        Reforge("Light", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(6, StatType.Strength)))),
-        Reforge("Mythic", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(5, StatType.Strength)))),
-        Reforge("Pure", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(4, StatType.Strength)))),
-        Reforge("Smart", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(3, StatType.Strength)))),
-        Reforge("Titanic", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(2, StatType.Strength)))),
-        Reforge("Wise", ReforgeType.Armor, mapOf(EnumRarity.COMMON to listOf(Stat(1, StatType.Strength)))),
+        Reforge("Clean", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(9, StatType.Strength)))),
+        Reforge("Fierce", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(8, StatType.Strength)))),
+        Reforge("Heavy", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(7, StatType.Strength)))),
+        Reforge("Light", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(6, StatType.Strength)))),
+        Reforge("Mythic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(5, StatType.Strength)))),
+        Reforge("Pure", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(4, StatType.Strength)))),
+        Reforge("Smart", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(3, StatType.Strength)))),
+        Reforge("Titanic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(2, StatType.Strength)))),
+        Reforge("Wise", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(1, StatType.Strength)))),
     )
 
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
@@ -188,10 +189,10 @@ class ReforgeHelper {
         this.add(Renderable.string("Reforge Overlay"))
         val item = item ?: return@buildList
         val itemType = ReforgeType.Armor
-        val itemRarity = item.rarity
-        val list = reforges.filter { it.type == itemType }.map {
-            Renderable.clickAndHover(it.name, it.stats[itemRarity]?.map { if (it.amount < 0) "§c$it" else "§a+$it" }
-                ?: listOf("")) { reforgeToSearch = it.name.lowercase() }
+        val itemRarity = item.getItemRarityOrNull()
+        val list = reforges.filter { it.type == itemType }.map { reforge ->
+            Renderable.clickAndHover(reforge.name, itemRarity?.let { reforge.stats[it]?.map { if (it.amount < 0) "§c$reforge" else "§a+$reforge" } }
+                ?: listOf("")) { reforgeToSearch = reforge.name.lowercase() }
         }
         this.addAll(list)
         if (itemType == null) {
