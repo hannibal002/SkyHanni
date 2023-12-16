@@ -17,7 +17,7 @@ public class DianaConfig {
     public boolean highlightInquisitors = true;
 
     @Expose
-    @ConfigOption(name = "Soopy Guess", desc = "Uses §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
+    @ConfigOption(name = "Guess Next Burrow", desc = "Uses math from §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean burrowsSoopyGuess = false;
