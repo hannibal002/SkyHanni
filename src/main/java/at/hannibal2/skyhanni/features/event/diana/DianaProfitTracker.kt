@@ -114,14 +114,29 @@ object DianaProfitTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (chatDugOutPattern.matches(event.message)) {
+        val message = event.message
+        if (chatDugOutPattern.matches(message)) {
             tracker.modify {
                 it.burrowsDug++
             }
+            tryHide(event)
         }
-        chatDugOutCoinsPattern.matchMatcher(event.message) {
+        chatDugOutCoinsPattern.matchMatcher(message) {
             val coins = group("coins").formatNumber().toInt()
             tracker.addCoins(coins)
+            tryHide(event)
+        }
+
+        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
+            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
+        ) {
+            tryHide(event)
+        }
+    }
+
+    private fun tryHide(event: LorenzChatEvent) {
+        if (SkyHanniMod.feature.chat.filterType.diana) {
+            event.blockedReason = "diana_chain_or_drops"
         }
     }
 
