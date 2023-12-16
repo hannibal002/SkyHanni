@@ -111,7 +111,9 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
 import at.hannibal2.skyhanni.features.event.diana.GriffinPetWarning
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.jerry.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
@@ -184,6 +186,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
 import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
@@ -287,7 +290,8 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftLavaMazeParkour
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
-import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonHacking
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
@@ -356,7 +360,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.12",
+    version = "0.22.Beta.13",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -501,7 +505,8 @@ class SkyHanniMod {
         loadModule(StatsTuning())
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
-        loadModule(DianaProfitTracker())
+        loadModule(DianaProfitTracker)
+        loadModule(MythologicalMobTracker)
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
@@ -675,11 +680,14 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(SprayFeatures())
+        loadModule(SprayDisplay())
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(JyrreTimer())
         loadModule(NewYearCakeReminder())
         loadModule(SulphurSkitterBox())
+        loadModule(HighlightInquisitors())
+        loadModule(VerminTracker)
 
         init()
 

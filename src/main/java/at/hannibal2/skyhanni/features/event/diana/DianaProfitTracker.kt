@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DianaProfitTracker {
+object DianaProfitTracker {
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
 
@@ -114,14 +114,29 @@ class DianaProfitTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (chatDugOutPattern.matches(event.message)) {
+        val message = event.message
+        if (chatDugOutPattern.matches(message)) {
             tracker.modify {
                 it.burrowsDug++
             }
+            tryHide(event)
         }
-        chatDugOutCoinsPattern.matchMatcher(event.message) {
+        chatDugOutCoinsPattern.matchMatcher(message) {
             val coins = group("coins").formatNumber().toInt()
             tracker.addCoins(coins)
+            tryHide(event)
+        }
+
+        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
+            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
+        ) {
+            tryHide(event)
+        }
+    }
+
+    private fun tryHide(event: LorenzChatEvent) {
+        if (SkyHanniMod.feature.chat.filterType.diana) {
+            event.blockedReason = "diana_chain_or_drops"
         }
     }
 
@@ -139,5 +154,9 @@ class DianaProfitTracker {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
     }
 
-    fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
+    fun resetCommand(args: Array<String>) {
+        tracker.resetCommand(args, "shresetdianaprofittracker")
+    }
+
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 }

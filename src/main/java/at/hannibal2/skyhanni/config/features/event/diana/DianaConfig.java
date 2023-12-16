@@ -11,7 +11,13 @@ import org.lwjgl.input.Keyboard;
 public class DianaConfig {
 
     @Expose
-    @ConfigOption(name = "Soopy Guess", desc = "Uses §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
+    @ConfigOption(name = "Highlight Inquisitors", desc = "Highlights Inquisitors found from the Mythological Event perk.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightInquisitors = true;
+
+    @Expose
+    @ConfigOption(name = "Guess Next Burrow", desc = "Uses math from §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean burrowsSoopyGuess = false;
@@ -62,4 +68,9 @@ public class DianaConfig {
     @ConfigOption(name = "Diana Profit Tracker", desc = "")
     @Accordion
     public DianaProfitTrackerConfig dianaProfitTracker = new DianaProfitTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Mythological Mob Tracker", desc = "")
+    @Accordion
+    public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
 }

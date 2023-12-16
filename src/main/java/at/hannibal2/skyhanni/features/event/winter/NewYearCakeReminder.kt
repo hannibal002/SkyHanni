@@ -64,6 +64,7 @@ class NewYearCakeReminder {
     }
 
     private fun check() {
+        if (!cakeTime) return
         if (!config.newYearCakeReminder) return
         if (ReminderUtils.isBusy()) return
         if (isClaimed()) return
