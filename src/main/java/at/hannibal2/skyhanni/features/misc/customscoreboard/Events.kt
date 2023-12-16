@@ -192,10 +192,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.nextAfter("§6Kill the Magmas:") ?: "<hidden>"
             }
 
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cThe boss is reforming!") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§cThe boss is reforming!") }
+                    ?: "<hidden>"
+            }
+
             list
         },
         {
-            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §") || it == "§6Kill the Magmas:" }
+            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §") || it == "§6Kill the Magmas:" || it == "§cThe boss is reforming!" }
         }
     ),
     JACOB_CONTEST(

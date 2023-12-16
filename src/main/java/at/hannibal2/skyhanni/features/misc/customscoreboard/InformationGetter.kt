@@ -161,6 +161,7 @@ class InformationGetter {
             "Time Left: §b",
             "Current Item:",
             "Effigies: ",
+            "§cThe boss is reforming!"
         )
 
         extraLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
