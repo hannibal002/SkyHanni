@@ -31,7 +31,7 @@ class SprayDisplay {
             display = plot.currentSpray?.let {
                 val timer = it.expiry.timeUntil()
                 "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
-            }
+            } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
         }
 
         if (config.expiryNotification) {
