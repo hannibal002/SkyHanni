@@ -62,6 +62,8 @@ object MobFilter {
     private val RiftEyeSkull1 = "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
     private val RiftEyeSkull2 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
 
+    const val minionMobPrefix = "Minion Mob "
+
     enum class DungeonAttribute {
         Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
 
@@ -190,7 +192,7 @@ object MobFilter {
             }
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> when {
-                armorStand == null -> MobResult.illegal // TODO fix to always include Valid Mobs on Private Island
+                armorStand?.isDefaultValue() != false -> MobResult.found(MobFactories.minionMob(baseEntity)) // TODO fix to always include Valid Mobs on Private Island
                 else -> null
             }
 

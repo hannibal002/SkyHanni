@@ -57,4 +57,7 @@ object MobFactories {
             )
         }
 
+    fun minionMob(baseEntity: EntityLivingBase) =
+        Mob(baseEntity, Mob.Type.Special, name = MobFilter.minionMobPrefix + baseEntity.cleanName())
+
 }
