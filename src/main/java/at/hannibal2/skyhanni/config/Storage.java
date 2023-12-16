@@ -19,7 +19,8 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
-import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -357,6 +358,9 @@ public class Storage {
 
             @Expose
             public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();
+
+            @Expose
+            public VerminTracker.Data verminTracker = new VerminTracker.Data();
 
         }
 
