@@ -259,7 +259,7 @@ object InquisitorWaypointShare {
         }
     }
 
-    fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
