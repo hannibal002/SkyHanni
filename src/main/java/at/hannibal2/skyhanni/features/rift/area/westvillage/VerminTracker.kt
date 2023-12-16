@@ -21,26 +21,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 object VerminTracker {
-    private val silverfishPattern by RepoPattern.pattern(
-        "rift.area.westvillage.vermintracker.silverfish",
-        ".*§eYou vacuumed a §.*Silverfish.*"
-    )
-    private val spiderPattern by RepoPattern.pattern(
-        "rift.area.westvillage.vermintracker.spider",
-        ".*§eYou vacuumed a §.*Spider.*"
-    )
-    private val flyPattern by RepoPattern.pattern(
-        "rift.area.westvillage.vermintracker.fly",
-        ".*§eYou vacuumed a §.*Fly.*"
-    )
-    private val verminBinPattern by RepoPattern.pattern(
-        "rift.area.westvillage.vermintracker.binline",
-        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)"
-    )
-    private val verminBagPattern by RepoPattern.pattern(
-        "rift.area.westvillage.vermintracker.bagline",
-        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)"
-    )
+
+    private val group = RepoPattern.group("rift.area.westvillage.vermintracker")
+    private val silverfishPattern by group.pattern("silverfish", ".*§eYou vacuumed a §.*Silverfish.*")
+    private val spiderPattern by group.pattern("spider", ".*§eYou vacuumed a §.*Spider.*")
+    private val flyPattern by group.pattern("fly", ".*§eYou vacuumed a §.*Fly.*")
+    private val verminBinPattern by group.pattern("binline", "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)")
+    private val verminBagPattern by group.pattern("bagline", "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)")
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 
@@ -92,7 +79,7 @@ object VerminTracker {
         VerminType.entries.forEach { addVermin(it, bagCounts[it] ?: 0) }
     }
 
-    private fun countVermin(lore: List<String>, pattern: Pattern): MutableMap<VerminTracker.VerminType, Int> {
+    private fun countVermin(lore: List<String>, pattern: Pattern): Map<VerminType, Int> {
         val verminCounts = mutableMapOf(
             VerminType.SILVERFISH to 0,
             VerminType.SPIDER to 0,
@@ -138,7 +125,7 @@ object VerminTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        tracker.renderDisplay(config.pos)
+        tracker.renderDisplay(config.position)
     }
 
     fun resetCommand(args: Array<String>) {
