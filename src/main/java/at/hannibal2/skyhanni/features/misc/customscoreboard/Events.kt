@@ -181,36 +181,6 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it == "Current Item:" }
         }
     ),
-    MAGMA_BOSS(
-        {
-            val list = mutableListOf<String>()
-
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§7Boss: §c") }
-                    ?: "<hidden>"
-            }
-
-            if (ScoreboardData.sidebarLinesFormatted.any { it == "§7Damage Soaked:" }) {
-                list += "§7Damage Soaked:"
-                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§7Damage Soaked:") ?: "<hidden>"
-            }
-
-            if (ScoreboardData.sidebarLinesFormatted.any { it == "§6Kill the Magmas:" }) {
-                list += "§6Kill the Magmas:"
-                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§6Kill the Magmas:") ?: "<hidden>"
-            }
-
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cThe boss is reforming!") }) {
-                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§cThe boss is reforming!") }
-                    ?: "<hidden>"
-            }
-
-            list
-        },
-        {
-            ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §") || it == "§6Kill the Magmas:" || it == "§cThe boss is reforming!" }
-        }
-    ),
     JACOB_CONTEST(
         {
             val list = mutableListOf<String>()
@@ -440,6 +410,47 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
         },
         {
             ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Your Damage: §c") }
+        }
+    ),
+    MAGMA_BOSS(
+        {
+            val list = mutableListOf<String>()
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§7Boss: §c") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§7Boss: §c") }
+                    ?: "<hidden>"
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§7Damage Soaked:" }) {
+                list += "§7Damage Soaked:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§7Damage Soaked:") ?: "<hidden>"
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§6Kill the Magmas:" }) {
+                list += "§6Kill the Magmas:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§6Kill the Magmas:") ?: "<hidden>"
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("§cThe boss is reforming!") }) {
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("§cThe boss is reforming!") }
+                    ?: "<hidden>"
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it == "§7Boss Health:" }) {
+                list += "§7Boss Health:"
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§7Boss Health:") ?: "<hidden>"
+            }
+
+
+            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
+                true -> listOf("<hidden>")
+                false -> listOf("§cNo Magma Boss Data")
+            } else
+
+            list
+        },
+        {
+            at.hannibal2.skyhanni.data.HypixelData.skyBlockArea == "Magma Chamber"
         }
     ),
     ESSENCE(

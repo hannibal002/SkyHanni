@@ -161,7 +161,8 @@ class InformationGetter {
             "Time Left: §b",
             "Current Item:",
             "Effigies: ",
-            "§cThe boss is reforming!"
+            "§cThe boss is reforming!",
+            "§7Boss Health:"
         )
 
         unknownLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
@@ -203,6 +204,7 @@ class InformationGetter {
         // magma boss
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("§7Damage Soaked:") != it }
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("§6Kill the Magmas:") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§7Boss Health:") != it }
 
         // da
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("Current Item:") != it }
