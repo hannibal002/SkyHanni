@@ -80,6 +80,11 @@ object MobFilter {
         "anrrtqytsl", // Weaponsmith
     )
 
+    private val listOfClickArmorStand = setOf(
+        "§e§lCLICK",
+        "§6§lSEASONAL SKINS",
+    )
+
     fun Entity.isSkyBlockMob(): Boolean = when {
         this !is EntityLivingBase -> false
         this is EntityArmorStand -> false
@@ -108,11 +113,6 @@ object MobFilter {
                 MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
                 true
             } ?: false
-
-    private val listOfClickArmorStand = setOf(
-        "§e§lCLICK",
-        "§6§lSEASONAL SKINS",
-    )
 
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
@@ -240,6 +240,11 @@ object MobFilter {
                 baseEntity is EntityZombie && armorStand?.isDefaultValue() == true && getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true -> petCareHandler(baseEntity)
                 baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
                 baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
+                else -> null
+            }
+
+            IslandType.GARDEN -> when {
+                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() -> MobResult.found(Mob(baseEntity, Mob.Type.DisplayNPC, name = baseEntity.cleanName()))
                 else -> null
             }
 
