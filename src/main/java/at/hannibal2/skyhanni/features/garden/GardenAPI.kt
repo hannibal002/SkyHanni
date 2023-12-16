@@ -45,7 +45,7 @@ object GardenAPI {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
-    val mushroomCowPet get() = PetAPI.currentPet?.contains("Mooshroom Cow") ?: false
+    val mushroomCowPet get() = PetAPI.isCurrentPet("Mooshroom Cow")
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
