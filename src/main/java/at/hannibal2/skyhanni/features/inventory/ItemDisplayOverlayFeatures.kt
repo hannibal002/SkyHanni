@@ -166,7 +166,7 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
             item.getRanchersSpeed()?.let {
-                return if (it > 400 && (PetAPI.currentPet?.contains("Black Cat") == true ||
+                return if (it > 400 && (PetAPI.isCurrentPet("Black Cat") ||
                         InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())
                 ) {
                     "§c$it"
