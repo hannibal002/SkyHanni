@@ -320,7 +320,6 @@ import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
 import at.hannibal2.skyhanni.test.HotSwapDetection
-import at.hannibal2.skyhanni.test.ItemClassErrorMaker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.ParkourWaypointSaver
 import at.hannibal2.skyhanni.test.ShowItemUuid
@@ -702,7 +701,6 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
         loadModule(HotSwapDetection)
-        loadModule(ItemClassErrorMaker())
         PreInitFinishedEvent().postAndCatch()
     }
 

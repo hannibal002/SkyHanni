@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import net.minecraft.item.ItemStack
 
 
 // TODO: replace id with ordinal
@@ -22,10 +20,6 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
     val chatColorCode by lazy { color.getChatColor() }
     val rawName by lazy { name.replace("_", " ") }
-    private val normalName by lazy { "$chatColorCode§l$rawName" }
-    private val recombName by lazy { "$chatColorCode§l§ka§r $chatColorCode§l$chatColorCode§l$rawName" }
-
-    //§d§l§ka§r §d§l§d§lMYTHIC
 
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal - 1)
@@ -52,20 +46,8 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     }
 
     companion object {
-        fun getById(id: Int) = entries.firstOrNull { it.ordinal == id }
+        fun getById(id: Int) = if (entries.size > id) entries[id] else null
         fun getByName(name: String) = entries.firstOrNull { it.name == name }
-
-        fun readItemRarity(itemStack: ItemStack): LorenzRarity? {
-            for (line in itemStack.getLore()) {
-                val string = line.replace("SHINY ", "")
-                for (rarity in LorenzRarity.entries) {
-                    if (string.startsWith(rarity.normalName) || string.startsWith(rarity.recombName)) {
-                        return rarity
-                    }
-                }
-            }
-            return null
-        }
     }
 
 }
