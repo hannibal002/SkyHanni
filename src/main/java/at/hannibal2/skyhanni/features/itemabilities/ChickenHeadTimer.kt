@@ -23,7 +23,7 @@ class ChickenHeadTimer {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        val itemStack = InventoryUtils.getArmor()[3]
+        val itemStack = InventoryUtils.getHelmet()
         val name = itemStack?.name ?: ""
         hasChickenHead = name.contains("Chicken Head")
     }

@@ -326,6 +326,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a timer until the inquisitor will despawn.
 + Diana Profit Tracker. - hannibal2
     + Same options as slayer and fising trackers.
++ Highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Mythological Mob Tracker. - hannibal2
+  + Counts the different mythological mobs you have dug up.
+  + Show percentage how often what mob spawned.
+  + Hide the chat messages when digging up a mythological mob.
++ Diana Chat hider. - hannibal2
+  + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 </details>
 <details open><summary>
 
@@ -531,6 +538,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
 + Draw plot borders when holding the Sprayonator. - HiZe
++ Added Spray Display and Spray Expiration Notice. - appable
+  + Show the active spray and duration for your current plot.
+  + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
 
 </details>
 <details open><summary>
@@ -604,6 +614,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide the wilted berberis particles
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
++ Vermin Tracker. - walker
 </details>
 <details open><summary>
 
@@ -647,6 +658,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Jyrre Timer for Bottle of Jyrre. - walker
   + A timer showing the remaining duration of your intelligence boost.
   + Option to show the timer when inactive rather than removing it.
++ New Year Cake Reminder. - hannibal2
+
 </details>
 <details open><summary>
 
