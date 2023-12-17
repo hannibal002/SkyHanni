@@ -245,7 +245,9 @@ object ItemDisplayOverlayFeatures {
 
     private fun getRanchersBootsTip(item: ItemStack): String {
          item.getRanchersSpeed()?.let {
-                return if (it > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
+                return if (it > 400 && (PetAPI.isCurrentPet("Black Cat") ||
+                        InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())
+                ) {
                     "§c$it"
                 } else {
                     "§a$it"
