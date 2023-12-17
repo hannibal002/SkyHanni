@@ -11,4 +11,10 @@ public class ItemsJson {
 
     @Expose
     public Map<String, Integer> crimson_tiers;
+
+    @Expose
+    public List<String> lava_fishing_rods;
+
+    @Expose
+    public List<String> water_fishing_rods;
 }
