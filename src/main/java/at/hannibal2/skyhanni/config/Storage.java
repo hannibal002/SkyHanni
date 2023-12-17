@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
+import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
@@ -19,7 +20,8 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
-import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -92,6 +94,9 @@ public class Storage {
 
             @Expose
             public int amountGifted = 0;
+
+            @Expose
+            public int cakeCollectedYear = 0;
         }
 
         @Expose
@@ -355,6 +360,9 @@ public class Storage {
             @Expose
             public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();
 
+            @Expose
+            public VerminTracker.Data verminTracker = new VerminTracker.Data();
+
         }
 
         @Expose
@@ -443,7 +451,11 @@ public class Storage {
         public static class DianaStorage {
 
             @Expose
+            // TODO rename to 'profitTracker'
             public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
+
+            @Expose
+            public MythologicalMobTracker.Data mythologicalMobTracker = new MythologicalMobTracker.Data();
 
         }
     }
