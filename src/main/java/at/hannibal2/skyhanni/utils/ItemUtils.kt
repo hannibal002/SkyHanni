@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -38,6 +40,22 @@ object ItemUtils {
         "Healer",
         "➡",
     )
+
+    /** Examples:
+    §d§l§ka§r §d§l§d§lMYTHIC ACCESSORY §d§l§ka
+    §d§l§ka§r §d§l§d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+    §6§lSHINY LEGENDARY DUNGEON BOOTS
+    §6§lLEGENDARY DUNGEON BOOTS
+    §5§lEPIC BOOTS
+    §f§lCOMMON
+     **/
+    private val rarityLoreLinePattern by RepoPattern.pattern("item.lore.rarityLine", "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${LorenzRarity.entries.joinToString(separator = "|") { it.rawName }}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$")
+
+    private
+    val abiPhonePattern by RepoPattern.pattern("item.name.abiphone", ".{2}Abiphone .*")
+
+    private
+    val enchantedBookPattern by RepoPattern.pattern("item.name.enchanted.book", ".{2}?Enchanted Book")
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -205,29 +223,59 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
-    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
-        val data = cachedData
-        if (data.itemRarityLastCheck.asTimeMark().passedSince() < 1.seconds) {
-            return data.itemRarity
+    private fun ItemStack.readItemCategoryAndRarity(logError: Boolean): Pair<LorenzRarity?, ItemCategory?> {
+        val name = this.name ?: ""
+        val cleanName = this.cleanName()
+        for (line in this.getLore().reversed()) {
+            rarityLoreLinePattern.matchMatcher(line) {
+                val itemCategory = group("ItemCategory").replace(" ", "_")
+                val rarity = group("Rarity").replace(" ", "_")
+                try {
+                    return LorenzRarity.valueOf(rarity) to if (itemCategory.isEmpty()) {
+                        when {
+                            abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
+                            isPet(cleanName) -> ItemCategory.PET
+                            enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
+                            else -> ItemCategory.NONE
+                        }
+                    } else {
+                        ItemCategory.valueOf(itemCategory)
+                    }
+                } catch (e: IllegalArgumentException) {
+                    if (logError) {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read category for item $name",
+                            "Failed to read category from item rarity via item lore",
+                            "internal name" to getInternalName(),
+                            "item name" to name,
+                            "inventory name" to InventoryUtils.openInventoryName(),
+                            "pattern result" to itemCategory,
+                            "lore" to getLore(),
+                        )
+                    }
+                    return LorenzRarity.valueOf(rarity) to null
+                }
+            }
         }
-        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+        if (isPet(cleanName)) {
+            return getPetRarity(this) to ItemCategory.PET
+        }
+        return null to null
+    }
 
+    fun ItemStack.updateCategoryAndRarity(logError: Boolean = true) {
+        val data = cachedData
+        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
         val internalName = getInternalName()
         if (internalName == NEUInternalName.NONE) {
             data.itemRarity = null
-            return null
+            data.itemCategory = null
+            return
         }
-
-
-        if (isPet(cleanName())) {
-            val petRarity = getPetRarity(this)
-            data.itemRarity = petRarity
-            return petRarity
-        }
-
-        val rarity = LorenzRarity.readItemRarity(this)
-        data.itemRarity = rarity
-        if (rarity == null && logError) {
+        val pair = this.readItemCategoryAndRarity(logError)
+        data.itemRarity = pair.first
+        data.itemCategory = pair.second
+        if (data.itemRarity == null && logError) {
             ErrorManager.logErrorStateWithData(
                 "Could not read rarity for item $name",
                 "Failed to read rarity from item rarity via item lore",
@@ -237,10 +285,28 @@ object ItemUtils {
                 "lore" to getLore(),
             )
         }
-        return rarity
     }
 
-    //extra method for shorter name and kotlin nullability logic
+    fun ItemStack.getItemCategoryOrNull(logError: Boolean = true): ItemCategory? {
+        val data = cachedData
+        if (itemRarityLastCheck(data)) {
+            this.updateCategoryAndRarity(logError)
+        }
+        return data.itemCategory
+    }
+
+    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
+        val data = cachedData
+        if (itemRarityLastCheck(data)) {
+            this.updateCategoryAndRarity(logError)
+        }
+        return data.itemRarity
+    }
+
+    private fun itemRarityLastCheck(data: CachedItemData) =
+        data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
+
+    // extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?
         get() = this.displayName
         set(value) {
@@ -310,8 +376,8 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
-    private fun getPetRarity(pet: ItemStack): LorenzRarity? {
-        val rarityId = pet.getInternalName().asString().split(";").last().toInt()
+    fun getPetRarity(pet: ItemStack): LorenzRarity? {
+        val rarityId = pet.getInternalName().asString().last() - '0'
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
