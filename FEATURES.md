@@ -327,6 +327,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Diana Profit Tracker. - hannibal2
     + Same options as slayer and fising trackers.
 + Highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Mythological Mob Tracker. - hannibal2
+  + Counts the different mythological mobs you have dug up.
+  + Show percentage how often what mob spawned.
+  + Hide the chat messages when digging up a mythological mob.
++ Diana Chat hider. - hannibal2
+  + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 </details>
 <details open><summary>
 
