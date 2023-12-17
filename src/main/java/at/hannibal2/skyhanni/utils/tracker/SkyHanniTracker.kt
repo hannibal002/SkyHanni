@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -16,10 +19,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniTracker<Data : TrackerData>(
-    private val name: String,
+    val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
     private val drawDisplay: (Data) -> List<List<Any>>,
@@ -36,8 +40,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
-            0 -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
-            1 -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
 
             else -> name.getNpcPriceOrNull() ?: 0.0
         }
@@ -62,6 +66,16 @@ open class SkyHanniTracker<Data : TrackerData>(
             it.modify(modifyFunction)
             update()
         }
+    }
+
+    fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+        val storage = ProfileStorageData.profileSpecific ?: return
+        val data: Data = when (mode) {
+            DisplayMode.TOTAL -> storage.getTotal()
+            DisplayMode.SESSION -> storage.getCurrentSession()
+        }
+        modifyFunction(data)
+        update()
     }
 
     fun renderDisplay(position: Position) {
@@ -123,8 +137,12 @@ open class SkyHanniTracker<Data : TrackerData>(
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
-        SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
+        SharedTracker(it.getTotal(), it.getCurrentSession())
     }
+
+    private fun Storage.ProfileSpecific.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
+
+    private fun Storage.ProfileSpecific.getTotal(): Data = getStorage(this)
 
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.let {
@@ -171,5 +189,12 @@ open class SkyHanniTracker<Data : TrackerData>(
         ;
 
         override fun toString() = display
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "misc.tracker.priceFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, PriceFromEntry::class.java)
+        }
     }
 }

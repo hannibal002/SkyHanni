@@ -28,6 +28,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Hide the repeating fire sale reminder chat messages. - hannibal2
 
 #### Chat Filter
 
@@ -174,6 +175,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 </details>
 <details open><summary>
 
@@ -322,6 +324,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Inquisitor Sharing**
     + Share aypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
++ Diana Profit Tracker. - hannibal2
+    + Same options as slayer and fising trackers.
++ Highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Mythological Mob Tracker. - hannibal2
+  + Counts the different mythological mobs you have dug up.
+  + Show percentage how often what mob spawned.
+  + Hide the chat messages when digging up a mythological mob.
++ Diana Chat hider. - hannibal2
+  + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 </details>
 <details open><summary>
 
@@ -340,6 +351,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Support for tips in hidden bingo card display. - hannibal2
++ Support for 'found by' info in bingo card. - hannibal2
++ Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
+
 </details>
 <details open><summary>
 
@@ -498,7 +518,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
 
-### Pests
+### Garden Pests
 
 + Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
   + Enable via /sh vacuum.
@@ -517,6 +537,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Option to only show the time while holding vacuum in the hand.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe
++ Added Spray Display and Spray Expiration Notice. - appable
+  + Show the active spray and duration for your current plot.
+  + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
 
 </details>
 <details open><summary>
@@ -590,6 +614,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide the wilted berberis particles
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
++ Vermin Tracker. - walker
 </details>
 <details open><summary>
 
@@ -629,6 +654,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Unique Gifted users counter. - hannibal2
   + Show in a display how many unique players you have given gifts to in the winter 2023 event.
   + Run command /opengenerowmenu to sync up.
++ Waypoints for 2023 Lobby Presents. - walker
++ Jyrre Timer for Bottle of Jyrre. - walker
+  + A timer showing the remaining duration of your intelligence boost.
+  + Option to show the timer when inactive rather than removing it.
++ New Year Cake Reminder. - hannibal2
+
 </details>
 <details open><summary>
 
@@ -648,6 +679,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
+</details>
+<details open><summary>
+
+## Stranded
+</summary>
+
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
+
 </details>
 <details open><summary>
 

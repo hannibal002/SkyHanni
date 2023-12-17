@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import net.minecraft.client.Minecraft
@@ -44,7 +45,7 @@ object GardenAPI {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
-    val mushroomCowPet get() = PetAPI.currentPet?.contains("Mooshroom Cow") ?: false
+    val mushroomCowPet get() = PetAPI.isCurrentPet("Mooshroom Cow")
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
@@ -142,13 +143,8 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun MutableList<Any>.addCropIcon(crop: CropType) {
-        try {
-            add(crop.icon)
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-        }
-    }
+    fun MutableList<Any>.addCropIcon(crop: CropType, highlight: Boolean = false) =
+        addItemIcon(crop.icon.copy(), highlight)
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
         SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()

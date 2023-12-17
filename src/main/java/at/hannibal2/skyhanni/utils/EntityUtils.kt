@@ -34,9 +34,9 @@ object EntityUtils {
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(0, y, 0)
-        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
-        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
+        val center = getLorenzVec().add(y = y)
+        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlockPos()
+        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlockPos()
         val alignedBB = AxisAlignedBB(a, b)
         val clazz = EntityArmorStand::class.java
         val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
@@ -58,9 +58,9 @@ object EntityUtils {
         contains: String,
         radius: Double = 3.0,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(0, 3, 0)
-        val a = center.add(-radius, -radius - 3, -radius).toBlocPos()
-        val b = center.add(radius, radius + 3, radius).toBlocPos()
+        val center = getLorenzVec().add(y = 3)
+        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
+        val b = center.add(radius, radius + 3, radius).toBlockPos()
         val alignedBB = AxisAlignedBB(a, b)
         val clazz = EntityArmorStand::class.java
         val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
@@ -77,9 +77,9 @@ object EntityUtils {
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? {
-        val center = getLorenzVec().add(0, y, 0)
-        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
-        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
+        val center = getLorenzVec().add(y = y)
+        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlockPos()
+        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlockPos()
         val alignedBB = AxisAlignedBB(a, b)
         val clazz = EntityArmorStand::class.java
         val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)

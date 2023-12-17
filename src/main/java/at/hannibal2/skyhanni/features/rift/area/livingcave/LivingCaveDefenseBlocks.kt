@@ -147,7 +147,7 @@ class LivingCaveDefenseBlocks {
                 val location = block.location
                 event.drawWaypointFilled(location, color)
                 event.draw3DLine(
-                    block.entity.getLorenzVec().add(0.0, 0.5, 0.0),
+                    block.entity.getLorenzVec().add(y = 0.5),
                     location.add(0.5, 0.5, 0.5),
                     color,
                     1,
@@ -161,7 +161,7 @@ class LivingCaveDefenseBlocks {
             event.drawWaypointFilled(location, color)
 
             event.draw3DLine(
-                block.entity.getLorenzVec().add(0.0, 0.5, 0.0),
+                block.entity.getLorenzVec().add(y = 0.5),
                 location.add(0.5, 0.5, 0.5),
                 color,
                 3,

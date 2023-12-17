@@ -25,6 +25,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Color
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -34,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -49,8 +51,13 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
+    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
+    /**
+     * Consider using IslandType.isInIsland() instead
+     */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
@@ -280,10 +287,10 @@ object LorenzUtils {
         }
     }
 
-    fun setTextIntoSign(text: String) {
+    fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[0] = ChatComponentText(text)
+        gui.tileSign.signText[line] = ChatComponentText(text)
     }
 
     fun addTextIntoSign(addedText: String) {
@@ -292,7 +299,7 @@ object LorenzUtils {
         val lines = gui.tileSign.signText
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
-        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
 
     /**
@@ -490,7 +497,7 @@ object LorenzUtils {
             }
         }
 
-    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after}, skip)
+    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
         var missing = -1
@@ -627,5 +634,21 @@ object LorenzUtils {
         enumValueOfOrNull<T>(name)
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
-    fun isInDevEnviromen() = Launch.blackboard.get("fml.deobfuscatedEnvironment") as Boolean
+    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+
+    fun shutdownMinecraft(reason: String? = null) {
+        System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
+        reason?.let {
+            System.err.println("Reason: $it")
+        }
+        FMLCommonHandler.instance().handleExit(-1)
+    }
+
+    /**
+     * Get the group, otherwise, return null
+     * @param groupName The group name in the pattern
+     */
+    fun Matcher.groupOrNull(groupName: String): String? {
+        return runCatching { this.group(groupName) }.getOrNull()
+    }
 }

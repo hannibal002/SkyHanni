@@ -15,21 +15,16 @@ object InventoryUtils {
     var itemInHandId = NEUInternalName.NONE
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
+
     fun getItemsInOpenChest() = buildList<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
-        val inventorySlots = guiChest.inventorySlots.inventorySlots
-        val skipAt = inventorySlots.size - 9 * 4
-        var i = 0
-        for (slot in inventorySlots) {
-            val stack = slot.stack
-            if (stack != null) {
-                add(slot)
-            }
-            i++
-            if (i == skipAt) break
+        for (slot in guiChest.inventorySlots.inventorySlots) {
+            if (slot.inventory is InventoryPlayer) break
+            if (slot.stack != null) add(slot)
         }
     }
 
+    // TODO add cache that persists until the next gui/window open/close packet is sent/received
     fun openInventoryName() = Minecraft.getMinecraft().currentScreen.let {
         if (it is GuiChest) {
             val chest = it.inventorySlots as ContainerChest
@@ -53,6 +48,12 @@ object InventoryUtils {
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
 
     fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+
+    fun getHelmet(): ItemStack? = getArmor()[3]
+    fun getChestplate(): ItemStack? = getArmor()[2]
+    fun getLeggings(): ItemStack? = getArmor()[1]
+    fun getBoots(): ItemStack? = getArmor()[0]
+
 
     val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
         try {

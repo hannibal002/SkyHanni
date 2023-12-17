@@ -232,7 +232,7 @@ class CaptureFarmingGear {
     private fun String.isLotusUpgrade(outdatedItems: MutableMap<FarmingItems, Boolean>): Boolean {
         return lotusUpgradePattern.matchMatcher(this) {
             updateOutdatedItems(
-                group("piece").uppercase(), outdatedItems
+                group("piece").uppercase().replace("✦", "").trim().replace(" ", "_"), outdatedItems
             )
         } != null
     }

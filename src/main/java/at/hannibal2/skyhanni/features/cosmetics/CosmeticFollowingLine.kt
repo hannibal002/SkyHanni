@@ -69,7 +69,7 @@ class CosmeticFollowingLine {
     }
 
     private fun updateClose(event: LorenzRenderWorldEvent) {
-        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(0.0, 0.3, 0.0)
+        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(y = 0.3)
 
         latestLocations = latestLocations.editCopy {
             val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
@@ -110,7 +110,7 @@ class CosmeticFollowingLine {
         }
 
         if (event.isMod(2)) {
-            val playerLocation = LocationUtils.playerLocation().add(0.0, 0.3, 0.0)
+            val playerLocation = LocationUtils.playerLocation().add(y = 0.3)
 
             locations.keys.lastOrNull()?.let {
                 if (it.distance(playerLocation) < 0.1) return

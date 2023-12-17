@@ -3,18 +3,20 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -22,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
+    private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
 
     private var clientSideClicked = false
     private var textTop = ""
@@ -34,12 +37,10 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.hideDaggerWarning) return
+        if (!config.hideDaggerWarning) return
 
         val message = event.message
-        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
-            message == "§cYour hit was reduced by Hellion Shield!"
-        ) {
+        if (attunementPattern.matches(message) || message == "§cYour hit was reduced by Hellion Shield!") {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }
@@ -63,7 +64,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazes.hellion.firstDagger]
+        val first = Dagger.entries[config.firstDagger.ordinal] // todo avoid ordinal
         val second = first.other()
 
         textTop = format(holding, true, first) + " " + format(holding, true, second)
@@ -71,7 +72,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun findNearest(): HellionShield? {
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.markRightHellionShield) return null
+        if (!config.markRightHellionShield) return null
 
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()
@@ -250,6 +251,10 @@ class BlazeSlayerDaggerHelper {
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
         event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
         event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
+
+        event.transform(15, "slayer.blazes.hellion.firstDagger") { element ->
+            ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
+        }
     }
 
 }
