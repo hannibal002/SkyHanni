@@ -19,7 +19,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     ;
 
     val chatColorCode by lazy { color.getChatColor() }
-    val rawName by lazy { name.replace("_", " ") }
+    val rawName = name.replace("_", " ")
 
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal - 1)
