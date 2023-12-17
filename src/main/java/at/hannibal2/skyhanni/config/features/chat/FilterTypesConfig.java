@@ -80,6 +80,12 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean fireSale = true;
 
+    @Expose
+    @ConfigOption(name = "Diana", desc = "Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean diana = false;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
