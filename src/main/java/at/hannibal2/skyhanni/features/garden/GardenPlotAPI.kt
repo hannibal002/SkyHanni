@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -15,10 +18,17 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.floor
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object GardenPlotAPI {
 
     private val plotNamePattern by RepoPattern.pattern("garden.plot.name", "§.Plot §7- §b(?<name>.*)")
+
+    private val plotSprayedPattern by RepoPattern.pattern(
+        "garden.plot.spray.target",
+        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+    )
 
     var plots = listOf<Plot>()
 
@@ -36,10 +46,24 @@ object GardenPlotAPI {
         var name: String,
 
         @Expose
-        var pests: Int
+        var pests: Int,
+
+        @Expose
+        var sprayExpiryTime: SimpleTimeMark?,
+
+        @Expose
+        var sprayType: SprayType?,
+
+        @Expose
+        var sprayHasNotified: Boolean
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0) }
+    data class SprayData(
+        val expiry: SimpleTimeMark,
+        val type: SprayType
+    )
+
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -52,6 +76,31 @@ object GardenPlotAPI {
         set(value) {
             getData()?.pests = value
         }
+
+    val Plot.currentSpray: SprayData?
+        get() = this.getData()?.let { plot ->
+            val expiry = plot.sprayExpiryTime?.takeIf { !it.isInPast() } ?: return null
+            val type = plot.sprayType ?: return null
+            return SprayData(expiry, type)
+        }
+
+    val Plot.isSprayExpired: Boolean
+        get() = this.getData()?.let {
+            !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
+        } == true
+
+
+    fun Plot.markExpiredSprayAsNotified() {
+        getData()?.apply { sprayHasNotified = true }
+    }
+
+    private fun Plot.setSpray(spray: SprayType, duration: Duration) {
+        getData()?.apply {
+            sprayType = spray
+            sprayExpiryTime = SimpleTimeMark.now() + duration
+            sprayHasNotified = false
+        }
+    }
 
     fun Plot.isBarn() = id == -1
 
@@ -88,6 +137,21 @@ object GardenPlotAPI {
             slot += 4
         }
         plots = list
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!GardenAPI.inGarden()) return
+
+        plotSprayedPattern.matchMatcher(event.message) {
+            val sprayName = group("spray")
+            val plotName = group("plot")
+
+            val plot = getPlotByName(plotName)
+            val spray = SprayType.getByName(sprayName) ?: return
+
+            plot?.setSpray(spray, 30.minutes)
+        }
     }
 
     @SubscribeEvent

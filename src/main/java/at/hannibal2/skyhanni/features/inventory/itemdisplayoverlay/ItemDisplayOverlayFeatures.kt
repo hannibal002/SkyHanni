@@ -110,6 +110,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val shredderInternalName = (("THE_SHREDDER").asInternalName())
     private val spookyPieInternalName = (("SPOOKY_PIE").asInternalName())
     private val potionInternalName = (("POTION").asInternalName())
+    private val racingHelmetInternalName = (("RACING_HELMET").asInternalName())
 
     private val tieredEnchants = listOf(
         "compact",
@@ -273,7 +274,9 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isRanchersBoots(internalName: NEUInternalName): Boolean = RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
     private fun getRanchersBootsTip(item: ItemStack): String {
         item.getRanchersSpeed()?.let {
-            return if (it > 400 && PetAPI.currentPet?.contains("Black Cat") == false) {
+            return if (it > 400 && (PetAPI.isCurrentPet("Black Cat") ||
+                    InventoryUtils.getHelmet()?.getInternalName() == racingHelmetInternalName)
+            ) {
                 "§c$it"
             } else {
                 "§a$it"
