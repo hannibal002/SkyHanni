@@ -163,6 +163,13 @@ public class InventoryConfig {
     public boolean highlightAuctions = true;
 
     @Expose
+    @ConfigOption(name = "Copy Underbid Price",
+        desc = "Copies the price of an item in the \"Create BIN Auction\" minus 1 coin into the clipboard for faster under-bidding.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean copyUnderbidPrice = false;
+
+    @Expose
     @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
     @ConfigEditorBoolean
     @FeatureToggle
