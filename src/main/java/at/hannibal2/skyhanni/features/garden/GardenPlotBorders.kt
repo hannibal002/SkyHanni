@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -34,10 +35,12 @@ object GardenPlotBorders {
     fun render(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
-        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        val plot = GardenPlotAPI.getCurrentPlot() ?: getClosestPlot() ?: return
         event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }
 
+    private fun getClosestPlot(): GardenPlotAPI.Plot? =
+        GardenPlotAPI.plots.minByOrNull { it.middle.distanceSqToPlayer() }
 
     fun isEnabled() = GardenAPI.inGarden() && config
 }
