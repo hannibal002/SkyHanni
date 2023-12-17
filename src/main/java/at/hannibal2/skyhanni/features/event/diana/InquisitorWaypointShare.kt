@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -243,10 +242,6 @@ object InquisitorWaypointShare {
             }
             val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
             waypoints = waypoints.editCopy { this[name] = inquis }
-            if (config.focusInquisitor) {
-                GriffinBurrowHelper.setTargetLocation(location.add(y = 1))
-                GriffinBurrowHelper.animationLocation = LocationUtils.playerLocation()
-            }
 
             event.isCanceled = true
         }
@@ -259,7 +254,7 @@ object InquisitorWaypointShare {
         }
     }
 
-    fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
