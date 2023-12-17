@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.RegexData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -40,20 +40,6 @@ object ItemUtils {
         "Healer",
         "➡",
     )
-
-    /** Examples:
-    §d§l§ka§r §d§l§d§lMYTHIC ACCESSORY §d§l§ka
-    §d§l§ka§r §d§l§d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
-    §6§lSHINY LEGENDARY DUNGEON BOOTS
-    §6§lLEGENDARY DUNGEON BOOTS
-    §5§lEPIC BOOTS
-    §f§lCOMMON
-     **/
-    private val rarityLoreLinePattern by RepoPattern.pattern("item.lore.rarity.line", "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${LorenzRarity.entries.joinToString(separator = "|") { it.rawName }}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$")
-
-    private val abiPhonePattern by RepoPattern.pattern("item.name.abiphone", ".{2}Abiphone .*")
-
-    private val enchantedBookPattern by RepoPattern.pattern("item.name.enchanted.book", ".{2}?Enchanted Book")
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -225,15 +211,15 @@ object ItemUtils {
         val name = this.name ?: ""
         val cleanName = this.cleanName()
         for (line in this.getLore().reversed()) {
-            rarityLoreLinePattern.matchMatcher(line) {
+            RegexData.rarityLoreLinePattern.matchMatcher(line) {
                 val itemCategory = group("ItemCategory").replace(" ", "_")
                 val rarity = group("Rarity").replace(" ", "_")
                 try {
                     return LorenzRarity.valueOf(rarity) to if (itemCategory.isEmpty()) {
                         when {
-                            abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
+                            RegexData.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
                             isPet(cleanName) -> ItemCategory.PET
-                            enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
+                            RegexData.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
                             else -> ItemCategory.NONE
                         }
                     } else {
