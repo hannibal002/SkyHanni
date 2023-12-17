@@ -292,7 +292,10 @@ private fun getPowderDisplayPair() = when (config.displayConfig.displayNumbersFi
 private fun getPowderShowWhen() =
     listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
 
-private fun getEventsDisplayPair() = Events.getEvent().flatMap { it.getLines().map { i -> i to AlignmentEnum.LEFT } }
+private fun getEventsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    if (Events.getEvent().isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
+    return Events.getEvent().flatMap { it.getLines().map { i -> i to AlignmentEnum.LEFT } }
+}
 
 private fun getEventsShowWhen() = Events.getEvent().isNotEmpty()
 
@@ -347,6 +350,8 @@ private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
 }
 
 private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    if (unknownLines.isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
+
     if (amountOfExtraLines != unknownLines.size && config.unknownLinesWarning) {
         ErrorManager.logErrorWithData(
             CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${unknownLines.size} unknown line${if (unknownLines.size > 1) "s" else ""}"),
