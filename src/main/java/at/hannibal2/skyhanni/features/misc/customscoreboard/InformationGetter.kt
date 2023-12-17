@@ -149,6 +149,7 @@ class InformationGetter {
             *dungeonClassList.toTypedArray(),
             "§cLocked",
             "§fCleanup§7:",
+            "§fPasting§7: ",
             "§6Year ",
             "§7Waiting for",
             "§7your vote...",

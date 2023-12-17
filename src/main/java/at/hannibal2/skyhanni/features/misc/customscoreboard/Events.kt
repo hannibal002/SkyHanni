@@ -241,6 +241,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             ScoreboardData.sidebarLinesFormatted.any { it.trim().startsWith("§fCleanup§7:") }
         }
     ),
+    GARDEN_PASTING(
+        {
+            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.trim().startsWith("§fPasting§7: ") }
+                ?: "<hidden>")
+        },
+        {
+            ScoreboardData.sidebarLinesFormatted.any { it.trim().startsWith("§fPasting§7: ") }
+        }
+    ),
     FLIGHT_DURATION(
         {
             listOf(
