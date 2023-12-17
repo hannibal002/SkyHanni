@@ -162,8 +162,7 @@ class GardenVisitorTimer {
         }
 
         val extraSpeed = if (diff in 2.seconds..10.seconds) {
-            val factor = diff.inWholeSeconds.toDouble()
-            val duration = millis / factor
+            val duration = millis / 3
             "§7/§$formatColor" + duration.format()
         } else ""
         if (config.newVisitorPing && millis < 10.seconds) {
