@@ -16,7 +16,7 @@ import java.util.regex.Pattern
 
 class GardenCropMilestoneFix {
     private val tabListPattern = " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%".toPattern()
-    private val levelUpPattern = Pattern.compile(" {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8(?:.*)➜§3(?<tier>.*)")
+    private val levelUpPattern = " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)".toPattern()
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 

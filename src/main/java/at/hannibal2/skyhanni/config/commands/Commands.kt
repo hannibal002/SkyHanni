@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -41,6 +43,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -185,7 +188,7 @@ object Commands {
         ) { FrozenTreasureTracker.resetCommand(it) }
         registerCommand(
             "shresetfishingtracker",
-            "Resets the Frozen Treasure Tracker"
+            "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
@@ -203,6 +206,18 @@ object Commands {
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
+        registerCommand(
+            "shresetvermintracker",
+            "Resets the Vermin Tracker"
+        ) { VerminTracker.resetCommand(it) }
+        registerCommand(
+            "shresetdianaprofittracker",
+            "Resets the Diana Profit Tracker"
+        ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetmythologicalmobtracker",
+            "Resets the Mythological Mob Tracker"
+        ) { MythologicalMobTracker.resetCommand(it) }
     }
 
     private fun usersBugFix() {

@@ -299,6 +299,9 @@ class GardenVisitorFeatures {
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
+
+            // Ignoring custom NEU items like copper
+            if (internalName.startsWith("SKYBLOCK_")) continue
             val price = internalName.getPrice() * amount
 
             if (readingItemsNeeded) {
@@ -356,6 +359,9 @@ class GardenVisitorFeatures {
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
+
+            // Ignoring custom NEU items like copper
+            if (internalName.startsWith("SKYBLOCK_")) continue
             val price = internalName.getPrice() * amount
 
             if (config.inventory.showPrice) {
