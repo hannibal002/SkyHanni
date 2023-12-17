@@ -36,7 +36,7 @@ object GardenPlotBorders {
         if (!isEnabled()) return
         if (!showBorders) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: getClosestPlot() ?: return
-        event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
+        event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor(), showBuildLimit = true)
     }
 
     private fun getClosestPlot(): GardenPlotAPI.Plot? =
