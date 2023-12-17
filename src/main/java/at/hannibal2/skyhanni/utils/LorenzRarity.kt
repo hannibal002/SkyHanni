@@ -17,7 +17,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     SUPREME(LorenzColor.DARK_RED, 7),
     SPECIAL(LorenzColor.RED, 8),
     VERY_SPECIAL(LorenzColor.RED, 9),
-    ULTIMATE_COSMETIC(LorenzColor.DARK_RED, 10),
+    ULTIMATE(LorenzColor.DARK_RED, 10),
     ;
 
     val chatColorCode by lazy { color.getChatColor() }
