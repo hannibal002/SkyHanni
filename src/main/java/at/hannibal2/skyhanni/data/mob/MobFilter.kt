@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
@@ -310,15 +311,15 @@ object MobFilter {
     }
 
     private fun createBat(baseEntity: EntityLivingBase): Mob? = when (baseEntity.baseMaxHealth.derpy()) {
-        // TODO Bat Pinata, Mega Bat
         5_000_000 -> MobFactories.basic(baseEntity, "Cinderbat")
         75_000 -> MobFactories.basic(baseEntity, "Thorn Bat")
         100 -> MobFactories.basic(
-            baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else "Private Island Bat"
+            baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else if (IslandType.PRIVATE_ISLAND.isInIsland()) "Private Island Bat" else "Mega Bat"
         )
 
         20 -> MobFactories.projectile(baseEntity, "Vampire Mask Bat")
         // 6 -> MobFactories.projectile(baseEntity, "Spirit Scepter Bat") // moved to Packet Event because 6 is default Health of Bats
+        5 -> MobFactories.special(baseEntity, "Bat Pinata")
         else -> null
     }
 
