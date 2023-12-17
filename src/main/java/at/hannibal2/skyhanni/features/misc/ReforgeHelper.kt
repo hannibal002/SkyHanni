@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.EnumMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -33,27 +34,79 @@ class ReforgeHelper {
     }
 
     enum class StatType(val icon: String) {
-        Strength("§c❁")
+        Strength("§c❁"),
+        Health("§c❤"),
+        Defence("§a❈"),
+        Intelligence("§b✎");
+
+        fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
     }
 
-    data class Stat(val amount: Int, val type: StatType) {
-        override fun toString(): String {
-            return amount.toString() + " " + type.icon
+
+    class StatList : EnumMap<StatType, Int>(StatType::class.java) {
+        operator fun minus(other: StatList): StatList {
+            return StatList().apply {
+                for ((key, value) in this@StatList) {
+                    this[key] = value - (other[key] ?: 0)
+                }
+                for ((key, value) in other) {
+                    if (this[key] == null) {
+                        this[key] = (this@StatList[key] ?: 0) - value
+                    }
+                }
+            }
+        }
+
+        fun print(current: StatList?): List<String> {
+            val diff = current?.let { this - it }
+            return diff?.mapNotNull {
+                val value = it.value
+                val key = it.key
+                if (key == null || value == null) return@mapNotNull null
+                buildString {
+                    append("§9")
+                    append(key.asString(this@StatList[key] ?: 0))
+                    while (this.length < 12) {
+                        append(" ")
+                    }
+                    append(if (value < 0) "§c" else "§a")
+                    append(key.asString(value))
+                }
+            } ?: this.mapNotNull {
+                val value = it.value
+                val key = it.key
+                if (key == null || value == null) return@mapNotNull null
+                buildString {
+                    append("§9")
+                    append(key.asString(value))
+                }
+            }
+        }
+
+
+        companion object {
+            fun mapOf(vararg list: Pair<StatType, Int>) = StatList().apply {
+                for ((key, value) in list) {
+                    this[key] = value
+                }
+            }
         }
     }
 
-    class Reforge(val name: String, val type: ReforgeType, val stats: Map<LorenzRarity, List<Stat>>)
+    class Reforge(val name: String, val type: ReforgeType, val stats: Map<LorenzRarity, StatList>) {
+
+    }
 
     private val reforges = listOf(
-        Reforge("Clean", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(9, StatType.Strength)))),
-        Reforge("Fierce", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(8, StatType.Strength)))),
-        Reforge("Heavy", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(7, StatType.Strength)))),
-        Reforge("Light", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(6, StatType.Strength)))),
-        Reforge("Mythic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(5, StatType.Strength)))),
-        Reforge("Pure", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(4, StatType.Strength)))),
-        Reforge("Smart", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(3, StatType.Strength)))),
-        Reforge("Titanic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(2, StatType.Strength)))),
-        Reforge("Wise", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to listOf(Stat(1, StatType.Strength)))),
+        Reforge("Clean", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 9))),
+        Reforge("Fierce", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 8))),
+        Reforge("Heavy", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 7))),
+        Reforge("Light", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 6))),
+        Reforge("Mythic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 5))),
+        Reforge("Pure", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 4))),
+        Reforge("Smart", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Health to 4, StatType.Defence to 4, StatType.Intelligence to 20))),
+        Reforge("Titanic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Health to 10, StatType.Defence to 10))),
+        Reforge("Wise", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 1))),
     )
 
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
@@ -78,13 +131,16 @@ class ReforgeHelper {
     var currentReforge: String = ""
         set(value) {
             field = value
-            formattedCurrentReforge = if (value.isEmpty()) "" else "§7Now:  §3${value.replaceFirstChar { it.uppercase() }}"
+            currentReforgeCapitalized = value.replaceFirstChar { it.uppercase() }
+            formattedCurrentReforge = if (value.isEmpty()) "" else "§7Now:  §3${currentReforgeCapitalized}"
         }
     var reforgeToSearch: String = ""
         set(value) {
             field = value
             formattedReforgeToSearch = if (value.isEmpty()) "" else "§7Goal: §9${value.replaceFirstChar { it.uppercase() }}"
         }
+
+    var currentReforgeCapitalized = ""
 
     var formattedCurrentReforge = ""
     var formattedReforgeToSearch = ""
@@ -108,20 +164,18 @@ class ReforgeHelper {
             if (currentReforge == reforgeToSearch) {
                 event.isCanceled = true
                 waitForChat.set(false)
-                return
-            }
-            if (waitForChat.get()) {
-                waitDelay = true
-                event.isCanceled = true
-            } else {
-                if (event.clickedButton == 2) return
-                if (waitDelay) {
-                    waitDelay = false
+            } else
+                if (waitForChat.get()) {
+                    waitDelay = true
+                    event.isCanceled = true
                 } else {
-                    waitForChat.set(true)
+                    if (event.clickedButton == 2) return
+                    if (waitDelay) {
+                        waitDelay = false
+                    } else {
+                        waitForChat.set(true)
+                    }
                 }
-            }
-            return
         }
 
         DelayedRun.runNextTick {
@@ -190,9 +244,11 @@ class ReforgeHelper {
         val item = item ?: return@buildList
         val itemType = ReforgeType.Armor
         val itemRarity = item.getItemRarityOrNull()
+        val currentReforge = reforges.firstOrNull { it.name == currentReforgeCapitalized }
         val list = reforges.filter { it.type == itemType }.map { reforge ->
-            Renderable.clickAndHover(reforge.name, itemRarity?.let { reforge.stats[it]?.map { if (it.amount < 0) "§c$reforge" else "§a+$reforge" } }
-                ?: listOf("")) { reforgeToSearch = reforge.name.lowercase() }
+            Renderable.clickAndHover(reforge.name,
+                itemRarity?.let { rarity -> reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) }
+                    ?: listOf("")) { reforgeToSearch = reforge.name.lowercase() }
         }
         this.addAll(list)
         if (itemType == null) {
