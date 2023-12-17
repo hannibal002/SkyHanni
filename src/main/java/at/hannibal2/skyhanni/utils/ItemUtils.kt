@@ -49,13 +49,11 @@ object ItemUtils {
     §5§lEPIC BOOTS
     §f§lCOMMON
      **/
-    private val rarityLoreLinePattern by RepoPattern.pattern("item.lore.rarityLine", "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${LorenzRarity.entries.joinToString(separator = "|") { it.rawName }}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$")
+    private val rarityLoreLinePattern by RepoPattern.pattern("item.lore.rarity.line", "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${LorenzRarity.entries.joinToString(separator = "|") { it.rawName }}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$")
 
-    private
-    val abiPhonePattern by RepoPattern.pattern("item.name.abiphone", ".{2}Abiphone .*")
+    private val abiPhonePattern by RepoPattern.pattern("item.name.abiphone", ".{2}Abiphone .*")
 
-    private
-    val enchantedBookPattern by RepoPattern.pattern("item.name.enchanted.book", ".{2}?Enchanted Book")
+    private val enchantedBookPattern by RepoPattern.pattern("item.name.enchanted.book", ".{2}?Enchanted Book")
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
