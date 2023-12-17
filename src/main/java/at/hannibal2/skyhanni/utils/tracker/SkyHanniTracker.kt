@@ -68,6 +68,16 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
+    fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+        val storage = ProfileStorageData.profileSpecific ?: return
+        val data: Data = when (mode) {
+            DisplayMode.TOTAL -> storage.getTotal()
+            DisplayMode.SESSION -> storage.getCurrentSession()
+        }
+        modifyFunction(data)
+        update()
+    }
+
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
@@ -127,8 +137,12 @@ open class SkyHanniTracker<Data : TrackerData>(
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
-        SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
+        SharedTracker(it.getTotal(), it.getCurrentSession())
     }
+
+    private fun Storage.ProfileSpecific.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
+
+    private fun Storage.ProfileSpecific.getTotal(): Data = getStorage(this)
 
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.let {
