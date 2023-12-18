@@ -89,7 +89,7 @@ enum class ScoreboardElements(
         "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"
     ),
     FOOTER({ getFooterDisplayPair() }, { true }, "§ewww.hypixel.net"),
-    EXTRA({ getExtraDisplayPair() }, { getExtraShowWhen() }, "§Unknown lines the mod is not detecting"),
+    EXTRA({ getExtraDisplayPair() }, { getExtraShowWhen() }, "§cUnknown lines the mod is not detecting"),
     ;
 
     override fun toString(): String {
