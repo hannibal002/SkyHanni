@@ -33,5 +33,12 @@ _Frequently Asked Questions_
 > Check if the item goes directly into your sacks. If it does, enable the sack pickup chat message from Hypixel.
 > You can use SkyHanni's own setting to still hide the message from chat.
 
-*This FAQ was last updated on December 08th, 2023.
+> **10: How do I remove SkyHanni GUI elements?**
+> 1. Type `/sh gui`
+> 2. Hover over the UI element
+> 3. See the element name in the top center of screen
+> 4. Search for that element with /sh name
+> 5. Disable this feature
+
+*This FAQ was last updated on December 17th, 2023.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

@@ -37,6 +37,15 @@ public class SprayConfig {
 
     @Expose
     @ConfigOption(
+        name = "Show If Not Sprayed",
+        desc = "Also show if current plot is not sprayed."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showNotSprayed = false;
+
+    @Expose
+    @ConfigOption(
         name = "Spray Expiration Notice",
         desc = "Show a notification in chat when a spray runs out in any plot. Only active in Garden."
     )
