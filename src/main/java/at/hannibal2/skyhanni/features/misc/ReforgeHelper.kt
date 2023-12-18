@@ -27,13 +27,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+fun Int.toStringWithPlus() = (if (this == 0) " " else if (this > 0) "+" else "") + this.toString()
+
 class ReforgeHelper {
 
     enum class ReforgeType {
-        Sword, Ranged, Armor, Tool, Equipment
+        Sword, Ranged, Armor, Chestplate, Axe, Hoe, Pickaxe, Equipment
     }
 
     enum class StatType(val icon: String) {
+        AttackSpeed("§e⚔"),
         Strength("§c❁"),
         Health("§c❤"),
         Defence("§a❈"),
@@ -59,28 +62,30 @@ class ReforgeHelper {
 
         fun print(current: StatList?): List<String> {
             val diff = current?.let { this - it }
-            return diff?.mapNotNull {
+            return listOf("§6Reforge Stats") + (diff?.mapNotNull {
                 val value = it.value
                 val key = it.key
                 if (key == null || value == null) return@mapNotNull null
                 buildString {
-                    append("§9")
-                    append(key.asString(this@StatList[key] ?: 0))
+                    append(key.icon)
+                    append(" §9")
+                    append((this@StatList[key] ?: 0).toStringWithPlus())
                     while (this.length < 12) {
                         append(" ")
                     }
-                    append(if (value < 0) "§c" else "§a")
-                    append(key.asString(value))
+                    append(if (value < 0) "§c" else "§a+")
+                    append(value)
                 }
             } ?: this.mapNotNull {
                 val value = it.value
                 val key = it.key
                 if (key == null || value == null) return@mapNotNull null
                 buildString {
-                    append("§9")
-                    append(key.asString(value))
+                    append(key.icon)
+                    append(" §9")
+                    append(value.toStringWithPlus())
                 }
-            }
+            })
         }
 
 
@@ -240,15 +245,15 @@ class ReforgeHelper {
     }
 
     fun generateDisplay() = buildList<Renderable> {
-        this.add(Renderable.string("Reforge Overlay"))
+        this.add(Renderable.string("§6Reforge Overlay"))
         val item = item ?: return@buildList
         val itemType = ReforgeType.Armor
         val itemRarity = item.getItemRarityOrNull()
         val currentReforge = reforges.firstOrNull { it.name == currentReforgeCapitalized }
         val list = reforges.filter { it.type == itemType }.map { reforge ->
-            Renderable.clickAndHover(reforge.name,
+            Renderable.clickAndHover("§7" + reforge.name,
                 itemRarity?.let { rarity -> reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) }
-                    ?: listOf("")) { reforgeToSearch = reforge.name.lowercase() }
+                    ?: listOf("")) { reforgeToSearch = reforge.name.replaceFirstChar { it.lowercase() } }
         }
         this.addAll(list)
         if (itemType == null) {
@@ -274,3 +279,4 @@ class ReforgeHelper {
 
     }
 }
+
