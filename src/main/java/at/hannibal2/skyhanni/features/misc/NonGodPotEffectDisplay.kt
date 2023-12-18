@@ -52,6 +52,7 @@ class NonGodPotEffectDisplay {
         SVEN("§bWolf Fur Mixin", true),
         VOID("§6Ender Portal Fumes", true),
         BLAZE("§fGabagoey", true),
+        GLOWING_MUSH("§2Glowing Mush Mixin", true),
 
         DEEP_TERROR("§4Deepterror", true),
 
