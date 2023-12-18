@@ -188,7 +188,7 @@ object Commands {
         ) { FrozenTreasureTracker.resetCommand(it) }
         registerCommand(
             "shresetfishingtracker",
-            "Resets the Frozen Treasure Tracker"
+            "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(

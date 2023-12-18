@@ -95,6 +95,7 @@ object OtherInventoryData {
 
     private fun done(inventory: Inventory) {
         InventoryFullyOpenedEvent(inventory).postAndCatch()
+        inventory.fullyOpenedOnce = true
         InventoryUpdatedEvent(inventory).postAndCatch()
         acceptItems = false
     }
@@ -104,5 +105,6 @@ object OtherInventoryData {
         val title: String,
         val slotCount: Int,
         val items: MutableMap<Int, ItemStack> = mutableMapOf(),
+        var fullyOpenedOnce: Boolean = false
     )
 }
