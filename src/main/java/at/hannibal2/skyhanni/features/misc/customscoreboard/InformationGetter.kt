@@ -99,6 +99,7 @@ class InformationGetter {
             "§fObjective",
             "Objective",
             "§eJacob's Contest",
+            "Â§eJacob's Contes",
             "§6§lGOLD §fmedals",
             "§f§lSILVER §fmedals",
             "§c§lBRONZE §fmedals",
