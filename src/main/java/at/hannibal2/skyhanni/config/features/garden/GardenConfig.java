@@ -99,6 +99,11 @@ public class GardenConfig {
     public YawPitchDisplayConfig yawPitchDisplay = new YawPitchDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Sensitivity Reducer", desc = "")
+    @Accordion
+    public MouseSensConfig MouseSensConfig = new MouseSensConfig();
+
+    @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")
     @Accordion
     public CropStartLocationConfig cropStartLocation = new CropStartLocationConfig();

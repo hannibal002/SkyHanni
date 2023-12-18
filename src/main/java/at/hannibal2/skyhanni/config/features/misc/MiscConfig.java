@@ -209,25 +209,10 @@ public class MiscConfig {
     public boolean lockMouseLookChatMessage = true;
 
     @Expose
-    @ConfigOption(
-        name = "Lower Mouse Sensitivity",
-        desc = "Lowers mouse sensitivity while the key is held.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int mouseSensKey = Keyboard.KEY_NONE;
-
-    @Expose
-    @ConfigOption(name = "Lower Mouse Sensitivity Divisor", desc = "Applies a Divisor to your current sensitivity")
-    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
-    public int divisorSens = 25;
-
-    @Expose
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
 
     @Expose
     public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
-
-    @Expose
-    public Position loweredMouseDisplay = new Position(400, 400, 0.8f);
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
