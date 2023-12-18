@@ -124,6 +124,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sack items can be crafted normally.
 + **Shift Click Equipment**. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Added Copy Underbid Price. - hannibal2
+    + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
 </details>
 <details open><summary>
 
