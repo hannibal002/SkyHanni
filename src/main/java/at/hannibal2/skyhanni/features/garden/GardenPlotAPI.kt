@@ -89,7 +89,6 @@ object GardenPlotAPI {
             !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
 
-
     fun Plot.markExpiredSprayAsNotified() {
         getData()?.apply { sprayHasNotified = true }
     }
@@ -169,7 +168,12 @@ object GardenPlotAPI {
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 
-    fun LorenzRenderWorldEvent.renderPlot(plot: Plot, lineColor: Color, cornerColor: Color) {
+    fun LorenzRenderWorldEvent.renderPlot(
+        plot: Plot,
+        lineColor: Color,
+        cornerColor: Color,
+        showBuildLimit: Boolean = false
+    ) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
         // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
@@ -181,7 +185,7 @@ object GardenPlotAPI {
 
         // Lowest point in the garden
         val minHeight = 66
-        val maxHeight = 256
+        val maxHeight = 66 + 36
 
         // Render 4 vertical corners
         for (i in 0..plotSize step plotSize) {
@@ -213,16 +217,25 @@ object GardenPlotAPI {
         }
 
         // Render horizontal
-        for (y in minHeight..maxHeight step 4) {
+        val buildLimit = minHeight + 11
+        val ints = if (showBuildLimit) {
+            (minHeight..maxHeight step 4) + buildLimit
+        } else {
+            minHeight..maxHeight step 4
+        }
+        for (y in ints) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
+            val isRedLine = y == buildLimit
+            val color = if (isRedLine) Color.red else lineColor
+            val depth = if (isRedLine) 2 else 1
             // (minX, minZ) -> (minX, minZ + 96)
-            tryDraw3DLine(start, start.add(z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start, start.add(z = plotSize), color, depth, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
-            tryDraw3DLine(start.add(z = plotSize), start.add(x = plotSize, z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), start.add(x = plotSize, z = plotSize), color, depth, true)
             // (minX + 96, minZ + 96) -> (minX + 96, minZ)
-            tryDraw3DLine(start.add(x = plotSize, z = plotSize), start.add(x = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize, z = plotSize), start.add(x = plotSize), color, depth, true)
             // (minX + 96, minZ) -> (minX, minZ)
-            tryDraw3DLine(start.add(x = plotSize), start, lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), start, color, depth, true)
         }
     }
 
