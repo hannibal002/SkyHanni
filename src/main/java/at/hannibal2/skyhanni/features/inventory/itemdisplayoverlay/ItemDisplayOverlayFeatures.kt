@@ -274,7 +274,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isRanchersBoots(internalName: NEUInternalName): Boolean = RANCHERS_BOOTS_SPEED.isSelected() && internalName == ranchersBootsInternalName
     private fun getRanchersBootsTip(item: ItemStack): String {
         item.getRanchersSpeed()?.let {
-            return if (it > 400 && (PetAPI.isCurrentPet("Black Cat") ||
+            return if (it > 400 && !(PetAPI.isCurrentPet("Black Cat") ||
                     InventoryUtils.getHelmet()?.getInternalName() == racingHelmetInternalName)
             ) {
                 "§c$it"
