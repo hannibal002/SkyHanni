@@ -62,7 +62,7 @@ interface Renderable {
             text: String,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable =
             link(string(text), onClick, bypassChecks, condition)
 
@@ -70,7 +70,7 @@ interface Renderable {
             renderable: Renderable,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable {
             return clickable(
                 hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
@@ -85,7 +85,7 @@ interface Renderable {
             text: String,
             tips: List<String>,
             bypassChecks: Boolean = false,
-            onClick: () -> Unit
+            onClick: () -> Unit,
         ): Renderable {
             return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
         }
@@ -95,7 +95,7 @@ interface Renderable {
             onClick: () -> Unit,
             button: Int = 0,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) =
             object : Renderable {
                 override val width: Int
@@ -124,7 +124,7 @@ interface Renderable {
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable {
 
             val render = string(text)
@@ -211,7 +211,7 @@ interface Renderable {
             hovered: Renderable,
             unhovered: Renderable,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) =
             object : Renderable {
                 override val width: Int
@@ -259,6 +259,44 @@ interface Renderable {
             override val height = 10
 
             override fun render(posX: Int, posY: Int) {
+            }
+        }
+
+        fun table(content: List<List<Renderable>>, xPadding: Int = 1, yPadding: Int = 0) = object : Renderable {
+            val xOffsets: List<Int> = let {
+                var buffer = 0
+                var index = 0
+                buildList {
+                    add(0)
+                    while (true) {
+                        buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOf {
+                            it?.width ?: 0
+                        }?.let { it + xPadding } ?: break
+                        add(buffer)
+                        index++
+                    }
+                }
+            }
+            val yOffsets: List<Int> = let {
+                var buffer = 0
+                listOf(0) + content.map { row ->
+                    buffer += row.maxOf { it.height } + yPadding
+                    buffer
+                }
+            }
+
+            override val width = xOffsets.last()
+            override val height = yOffsets.last()
+
+            override fun render(posX: Int, posY: Int) {
+                content.forEachIndexed { rowIndex, row ->
+                    row.forEachIndexed { index, renderable ->
+                        GlStateManager.pushMatrix()
+                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        renderable.render(posX + xOffsets[index], posY + yOffsets[rowIndex])
+                        GlStateManager.popMatrix()
+                    }
+                }
             }
         }
     }
