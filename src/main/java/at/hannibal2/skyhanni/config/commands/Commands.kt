@@ -211,6 +211,7 @@ object Commands {
             "shmouselower",
             "Lowers the mouse sensitivity for easier small adjustments (for farming)"
         ) { LowerMouseSens.manualToggle() }
+        registerCommand(
             "shresetvermintracker",
             "Resets the Vermin Tracker"
         ) { VerminTracker.resetCommand(it) }
