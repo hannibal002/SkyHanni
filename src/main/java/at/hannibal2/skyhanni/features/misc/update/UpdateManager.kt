@@ -62,11 +62,11 @@ object UpdateManager {
         }
     }
 
-    fun isBetaRelease(): Boolean {
+    fun isCurrentlyBeta(): Boolean {
         return getCurrentVersion().contains("beta", ignoreCase = true)
     }
 
-    val config get() = SkyHanniMod.feature.about
+    private val config get() = SkyHanniMod.feature.about
 
     fun reset() {
         updateState = UpdateState.NONE
@@ -82,7 +82,7 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         var updateStream = config.updateStream.get()
-        if (updateStream == About.UpdateStream.RELEASES && isBetaRelease()) {
+        if (updateStream == About.UpdateStream.RELEASES && isCurrentlyBeta()) {
             updateStream = About.UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)
@@ -115,11 +115,11 @@ object UpdateManager {
         }.thenAcceptAsync({
             logger.log("Update download completed, setting exit hook")
             updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executeUpdate()
+            potentialUpdate!!.executePreparedUpdate()
         }, MinecraftExecutor.OnThread)
     }
 
-    val context = UpdateContext(
+    private val context = UpdateContext(
         UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         CurrentVersion.ofTag(SkyHanniMod.version),
@@ -137,5 +137,5 @@ object UpdateManager {
         NONE
     }
 
-    var potentialUpdate: PotentialUpdate? = null
+    private var potentialUpdate: PotentialUpdate? = null
 }

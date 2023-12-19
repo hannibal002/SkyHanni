@@ -23,7 +23,7 @@ class AshfangGravityOrbs {
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang.gravityOrbs
 
     private val texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV" +
-            "0L3RleHR1cmUvMWE2OWNjZjdhZDkwNGM5YTg1MmVhMmZmM2Y1YjRlMjNhZGViZjcyZWQxMmQ1ZjI0Yjc4Y2UyZDQ0YjRhMiJ9fX0="
+        "0L3RleHR1cmUvMWE2OWNjZjdhZDkwNGM5YTg1MmVhMmZmM2Y1YjRlMjNhZGViZjcyZWQxMmQ1ZjI0Yjc4Y2UyZDQ0YjRhMiJ9fX0="
     private val orbs = mutableListOf<EntityArmorStand>()
 
     @SubscribeEvent
@@ -49,7 +49,7 @@ class AshfangGravityOrbs {
 
             if (orbLocation.distance(playerLocation) < 15) {
                 //TODO find way to dynamically change color
-                event.drawString(orbLocation.add(0.0, 2.5, 0.0), "§cGravity Orb")
+                event.drawString(orbLocation.add(y = 2.5), "§cGravity Orb")
             }
         }
     }
@@ -68,5 +68,5 @@ class AshfangGravityOrbs {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+        DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
 }

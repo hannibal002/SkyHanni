@@ -28,6 +28,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
++ Hide the repeating fire sale reminder chat messages. - hannibal2
 
 #### Chat Filter
 
@@ -123,6 +124,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sack items can be crafted normally.
 + **Shift Click Equipment**. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
++ Added Copy Underbid Price. - hannibal2
+    + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
 </details>
 <details open><summary>
 
@@ -174,6 +177,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 </details>
 <details open><summary>
 
@@ -245,6 +249,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 - Hide the vanilla nametag of damage indicator bosses.
+- Garden Pests in Damage Indicator
 - **Time to Kill**
     - Show the time it takes to kill the Slayer boss.
 
@@ -321,6 +326,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Inquisitor Sharing**
     + Share aypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
++ Diana Profit Tracker. - hannibal2
+    + Same options as slayer and fising trackers.
++ Highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Mythological Mob Tracker. - hannibal2
+  + Counts the different mythological mobs you have dug up.
+  + Show percentage how often what mob spawned.
+  + Hide the chat messages when digging up a mythological mob.
++ Diana Chat hider. - hannibal2
+  + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 </details>
 <details open><summary>
 
@@ -339,6 +353,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Support for tips in hidden bingo card display. - hannibal2
++ Support for 'found by' info in bingo card. - hannibal2
++ Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
+
 </details>
 <details open><summary>
 
@@ -440,7 +463,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the
   composter inventory
-+ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
++ Hide chat messages from the visitors in the garden. (Except Beth, Jacob and Spaceman)
 + Show the average crop milestone in the crop milestone inventory.
 + **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest
   inventory.
@@ -488,6 +511,39 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
++ Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+    + Enable via /sh vacuum.
+
+### Garden Pests
+
++ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+  + Enable via /sh vacuum.
++ Added Pests to Damage Indicator. - hannibal2
+  + Enable Damage Indicator and select Garden Pests.
++ Change how the pest spawn chat message should be formatted. - hannibal2
+  + Unchanged, compact or hide the message entirely.
++ Show a Title when a pest spawns. - hannibal2
++ Show the time since the last pest spawned in your garden. - hannibal2
+  + Option to only show the time while holding vacuum in the hand.
++ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
++ Show a display with all known pest locations. - hannibal2
+  + Click to warp to the plot.
+  + Option to only show the time while holding vacuum in the hand.
++ Mark the plots with pests on them in the world. - hannibal2
++ Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe
++ Added Spray Display and Spray Expiration Notice. - appable
+  + Show the active spray and duration for your current plot.
+  + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
+
 </details>
 <details open><summary>
 
@@ -560,6 +616,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide the wilted berberis particles
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
++ Vermin Tracker. - walker
 </details>
 <details open><summary>
 
@@ -592,6 +649,19 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
 + Play warning sound when the next Primal Fear can spawn. - thunderblade73
++ Unique Gifting Opportunities. - nea
+  + Highlight players who you haven't given gifts to yet.
+  + Only highlight ungifted players while holding a gift.
+  + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
++ Unique Gifted users counter. - hannibal2
+  + Show in a display how many unique players you have given gifts to in the winter 2023 event.
+  + Run command /opengenerowmenu to sync up.
++ Waypoints for 2023 Lobby Presents. - walker
++ Jyrre Timer for Bottle of Jyrre. - walker
+  + A timer showing the remaining duration of your intelligence boost.
+  + Option to show the timer when inactive rather than removing it.
++ New Year Cake Reminder. - hannibal2
+
 </details>
 <details open><summary>
 
@@ -611,6 +681,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
+</details>
+<details open><summary>
+
+## Stranded
+</summary>
+
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
+
 </details>
 <details open><summary>
 

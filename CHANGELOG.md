@@ -1,13 +1,356 @@
 # SkyHanni - Change Log
 
-## Version 0.21.1 (unreleased)
+## Version 0.22 (Unreleased)
 
+### New Features
+
+#### Garden Features
+
++ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
+  + Enable via /sh vacuum.
++ Added Pests to Damage Indicator. - hannibal2
+  + Enable Damage Indicator and select Garden Pests.
++ Change how the pest spawn chat message should be formatted. - hannibal2
+  + Unchanged, compact or hide the message entirely.
++ Show a Title when a pest spawns. - hannibal2
++ Show the time since the last pest spawned in your garden. - hannibal2
+  + Option to only show the time while holding vacuum in the hand.
++ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
++ Show a display with all known pest locations. - hannibal2
+  + Click to warp to the plot.
+  + Option to only show the time while holding vacuum in the hand.
++ Mark the plots with pests on them in the world. - hannibal2
++ Press the key to warp to the nearest plot with pests on it. - hannibal2
++ Draw plot borders when holding the Sprayonator. - HiZe 
++ Added Spray Display and Spray Expiration Notice. - appable
+  + Show the active spray and duration for your current plot.
+  + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
+
+#### Fishing Features
+
++ Added Barn Fishing Timer to Jerry's Workshop and Crimson Isle. - martimavocado
++ Added Fishing Tracker and changed trackers in general. - hannibal2
+  + This tracker GUI behaves the same way as the Slayer Tracker: Allows for single item remove or hide
+  + Counts coin drops from chat.
+  + Mark the amount in green when recently gained the item.
+  + Option to hide the Fishing Tracker while moving.
+  + Option to hide all Trackers while Estimated Item Value is visible.
+  + Option to change the default display mode for all trackers.
+  + The hidden flag for items in Item Trackers is now shared between total view and session view.
+  + Option to exclude hidden items in the total price calculation.
+  + Option to change the display mode that gets shown on default: Total, Current or remember last.
+
+#### Winter Features
+
++ Added Unique Gifting Opportunities. - nea
+  + Highlight players who you haven't given gifts to yet.
+  + Only highlight ungifted players while holding a gift.
+  + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
++ Added Unique Gifted users counter. - hannibal2
+  + Show in a display how many unique players you have given gifts to in the winter 2023 event.
+  + Run command /opengenerowmenu to sync up.
++ Jyrre Timer for Bottle of Jyrre. - walker
+    + A timer showing the remaining duration of your intelligence boost.
+    + Option to show the timer when inactive rather than removing it.
+
+#### Bingo Features
+
++ Show the duration until the next hidden bingo goal tip gets revealed. - hannibal2
++ Added support for tips in hidden bingo card display. - hannibal2
++ Added support for 'found by' info in bingo card. - hannibal2
++ Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
++ Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
+  + If at least one goal is highlighted, non-highlighted goals will be hidden.
++ Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
+
+#### Inventory Features
+
++ Added bottle of Jyrre time overlay in stack size feature. - HiZe
++ Added show special edition number as stack size when below 1k. - hannibal2
++ Added Copy Underbid Price. - hannibal2
+  + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
+
+#### Minion Features
+
++ Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
+
+#### Chat Features
+
++ Hide the repeating fire sale reminder chat messages. - hannibal2
+
+
+#### Event Features
+
++ Added Waypoints for 2023 Lobby Presents. - walker
++ Added New Year Cake Reminder. - hannibal2
+
+#### Stranded Featuers
+
++ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
+
+#### Diana Features
+
++ Added Diana Profit Tracker. - hannibal2
+  + Same options as slayer and fising trackers.
++ Added highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Added Mythological Mob Tracker. - hannibal2
+    + Counts the different mythological mobs you have dug up.
+    + Show percentage how often what mob spawned.
+    + Hide the chat messages when digging up a mythological mob.
++ Added Diana Chat hider. - hannibal2
+    + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
+
+#### Rift Features
+
++ Added Vermin Tracker. - walker
+
+### Changes
+
+#### Garden Changes
+
++ Added option to enable/disable the vacuum bag item number being capped to 40. - hannibal2
++ Automatic unlocking /shmouselock when teleporting in the garden. - hannibal2
++ Don't hide messages from Jacob. - alexia
+  + This is a workaround for wrongly hidden Jakob messages.
++ Show the hint to open Configure Plot only if the pest display is incorrect. - hannibal2
++ Added the "plot" word to the sidebar again (only if there are no pests in garden). - hannibal2
++ Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
++ Made the wording of "no pest spawned yet" message more clear. - hannibal2
++ Not only show the waypoint for infested plots, also show their waypoints in the world. - hannibal2
++ Use different colors in the tab list depending on the pest count. - alexia
++ Highlight the boosted crop contest in all Jacob's Contest displays. - alexia
++ Added Delicate 5 to visitor drop counter and visitor block refuse and highlighter. - hannibal2
++ Block visitor interaction for dedication cycling is now disabled by default. - hannibal2
++ Added an option to only warn for specific crop contests. - Obsidian
++ Added an option to show plot borders for a given number of seconds after holding a vacuum. - HiZe
++ Added command /shclearcontestdata to Reset Jacob's Contest Data. - martimavocado
++ Display Farming Fortune reduction from pests on the HUD. - alexia
++ Allow showing optimal speed warning without HUD enabled. - alexia
++ Highlight Rancher Boots speed in green when a Racing Helmet is equipped. — walker
++ Show the closest plot border when outside a garden plot. - hannibal2 
+  + Especially useful when building farms.
++ Show the garden build limit with F3+G on. - hannibal2
++ Added an option to show if the plot is not sprayed. - alexia
++ Changed pest spawn message format. - hannibal2
+
+#### Fishing Changes
+
++ Show the fishing tracker for a couple of seconds after catching something even while moving. - hannibal2
++ Show breakdown of different shark types caught during festivals. - Cad
+
+#### Winter Changes
+
++ Hiding Unique Gifted Players Highlighting for ironman and bingo while not on those modes. - Thunderblade73
+
+#### Chat Changes
+
++ Added fire sale messages in the hub to the chat message filter. - hannibal2
++ Added compact potion message support for splash messages and for Poisoned Candy I. - walker
++ Added "fire sale starting soon" message to fire sale chat hider. - hannibal2
+
+#### Bingo Changes
+
++ Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
++ Mark the background difficulty gray for unknown goals. - hannibal2
+  + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
++ Added the community goal percentage to the bingo card display. - hannibal2
++ Saving minion craft helper crafted tier 1 minions and bingo card goals per bingo session/month. - hannibal2
+
+#### Diana Changes
+
++ Resetting the guess and burrow locations when clearing the burrows at Diana NPC. - hannibal2
++ Removed Diana "Smooth Transition" and replaced it with "Line to Next". - hannibal2
+
+#### Misc Changes
+
++ Titles sent by SkyHanni look better now. - Cad
++ Added support for show XP gained from wheat minion in hub. - Thunderblade73
++ Option to change the color of Marked Players in chat and in the world. - walker & hannibal2
++ Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
++ Hide "Winter Island Close" timer during the month of December. - hannibal2
++ Changes Ctrl+V in signs to better sign editing. - Obsidian
+  +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
++ Improve accuracy of movement speed display. - alexia
++ Added toggle to hide autopet messages. - CalMWolfs
++ Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
++ Added Support to read Badlion sendcoords format. - Cad
++ Added an option to not show cooldown when ability is ready. - Obsidian
++ Added an option to highlight dungeon perm/vc parties. - Cad
++ Added Glowing Mush Mixin support to the Non-God Pod display. - jani
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed pest damage indicator not working for some pests. - hannibal2
++ Fixed pest kill detection. - hannibal2
++ Fixed /tp <plot name> not working with uppercase characters. - hannibal2
++ Fixed total equipment fortune in /ff. - alexia
++ Fixed Locust pest not getting detected in damage indicator. - hannibal2
++ Fixed Pest Spray Display showing outside the garden. - hannibal2
++ Fixed pest detection when more than 3 pests are spawned at once. - hannibal2
++ Fixed showing on the scoreboard  "garden outside" immediately after teleporting to a plot. - hannibal2
++ Fixed visitor timer counting down too fast sometimes. - hannibal2
++ Fixed Mooshroom cow Perk display not showing when maxed. - hannibal2
++ Show a text around the new year that the calendar is not loaded for the next Jacob Contest. - hannibal2
++ Fixed visitor reward item refuse inconsistencies. - hannibal2
++ Fixed wrong base 100ff calculations in the farming fortune needed display. - alexia
++ Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
++ Fixed an error message in the composter inventory when hovering over some items.- hannibal2
++ Correctly load the plot names of locked plots from inventory. - hannibal2
++ Fixed the boosted crop not being highlighted during contest participation. - alexia
++ Fixed farming weight leaderboard showing new position as -1 sometimes. - alexia
++ Fix typo with Not Clickable Items in Composter. - absterge
++ Added missing preview number from Visitor Drop Statistics. - absterge
++ Fixed error message with newly bought fungi cutter. - hannibal2
++ Ignoring custom NEU items like copper that causes wrong coins per copper price. - hannibal2
++ Fixed rancher boots speed stack size. - walker
++ Fixed overflow garden level detection. - hannibal2
++ Fixed pet level up check in /ff. - alexia
++ Fixed next visitor time while farming. - alexia
++ Fixed sixth visitor warning title showing when disabled. - alexia
++ Show not revealed brackets in the Jacob Contest time needed display. - hannibal2
++ Fixed wrong Rancher Boots item stack size color in combination with Black Cat or Racing Helmet.- hannibal2
+
+#### Bingo Fixes
+
++ Hide the long hint line in the Bingo Goal Display. - hannibal2
++ Show community goals in the Bingo Display correctly. - hannibal2
++ Hide enchanted tools in Minion Craft Helper. - hannibal2
++ Opening the bingo card will no longer crash the game sometimes. Showing an error message instead. - hannibal2
+
+#### Minion Fixes
+
++ Fixed Minion XP display not showing sometimes. - Thunderblade73
++ Updating the Minion XP display when the minion picks up a new item while inside the inventory. - hannibal2
++ Fixed minion features disappear inside the minion inventory when picking up an item. - hannibal2
+
+#### Fishing Fixes
+
++ Fixed Water Hydra warning showing up multiple times. - Cad
++ Fixed Shark Message missing a color code. - jani
++ Fixed /shresetfishingtracker description - absterge
+
+#### Diana Fixes
+
++ Fixed the closest burrow warp point being off, especially for the castle. - hannibal2
++ Fixed show inquisitor waypoints outside the hub. - Cad
++ Fixed Minos Inquisitor highlighting not working while the mob is getting damage. - hannibal2
+
+#### Chat Fixes
+
++ Fixed an error message on /pt. - nea
++ Fixed the fire sale filter when a rune is selling. - j10a1n15
+
+#### Misc Fixes
+
++ Fixed Item Tracker not ignoring manual sack movements. - hannibal2
++ Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
++ Fixed NPC messages getting detected as player messages. - CalMWolfs
++ Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. - hannibal2
++ Fixed an error when the king talisman helper does not find the king in range. - hannibal2
++ Fixed control/modifier key logic on Apple devices. - walker
++ Fixed lag spikes when downloading updates. - nea
++ Fixed showing the Minion XP display in the Bazaar. - Thunderblade73
++ Fixed the city project time remaining "soon!" error. - hannibal2
++ Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
++ Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
++ Fixed locraw sending outside Hypixel. - walker
++ Fixed finished city project still reminding and suggests buying items. - hannibal2
+  + Open the city project inventory once again to fix warnings correctly.
++ Fixed kick alert triggering instantly. - alexia
++ Fixed daily boss kill detection in Crimson Isle Reputation Helper. - hannibal2
++ Fixed Estimated Item Value error in Jerry's Island Deliveries menu. - hannibal2
+
+#### Config Fixes
+
++ Fixed a typo in config. - walker
+
+### Technical Details
+
++ Code cleanup in many files. - walker & hannibal2
++ Moved the JSON object files into another package. - walker
++ Replaced SkyHanniMod.feature.garden with GardenAPI.config. - hannibal2
++ Added MessageSendToServerEvent. - hannibal2
++ Added GardenPlotAPI, support for detecting the current slot of the player. - hannibal2
++ Updated .editorconfig file to better support imports. - Thunderblade73
++ Migrate Integer to Enums in Config. - walker
++ Using a broken config no longer resets the config in dev env. - hannibal2
++ Auto-removing all labels of PRs on merging/closing. - hannibal2
++ Changed OwnInventoryItemUpdateEvent to be called synced to the main thread. - hannibal2
++ romanToDecimalIfNeeded -> romanToDecimalIfNecessary. - hannibal2
+  + For more context: https://chat.openai.com/share/502571b5-8851-4047-b343-3b1475ca8a88
++ Added the debug feature SkyHanni Event Counter. - hannibal2
++ Fix Consecutive Spaces in RegEx. - walker
++ No longer creating new regex pattern elements each time in DungeonDeathCounter. - walker
++ Changed DungeonChatFilter to use lists of patterns. - walker
++ Code cleanup in DungeonMilestoneDisplay. - walker
++ Code cleanup and removed .matchRegex() - walker
++ Misc pattern optimizations. - walker
++ Moving the bingo goal list into BingoAPI. - hannibal2
++ Created BingoGoalReachedEvent. - hannibal2
++ Created Matcher.groupOrNull. - walker
++ cleanPlayerName respects playerRankHider option now. - hannibal2
++ Replaced ItemWarnEntry with VisitorReward. This should fix some errors. - hannibal2
++ GardenNextJacobContest now uses SimpleTimeMark. SimpleTimeMark is storable in the config and comparable - hannibal2
++ No longer sending contest data to elite close to new year. - hannibal2
++ Added RepoPatterns. - nea
++ Use LorenzToolTipEvent over ItemTooltipEvent if possible. - hannibal2
++ Added an abstract error message on LorenzToolTipEvent error. - hannibal2
++ Added test command /shsendtitle - Cad
++ Saving bingo goal data into the config. - hannibal2
++ Added WorldEdit region selection preview support. - nea
+  + Command /shworldedit and rigth/left clicking with a wood axe work.
++ Fixed error message in the "/shconfig set" command. - Thunderblade73
++ Add a check for the SkyHanni repository ID in publish. - walker
++ Cleanup getItemsInOpenChest. - walker
++ Changed MinionCraftHelper to use NeuInternalName. - walker
++ Added a separate debug hotkey for Bypass Advanced Tab List. - hannibal2
++ Added Config Transform function. - walker
++ Migrate Deprecated Config Values to Enums. - walker
++ Migrate Config Value in EliteFarmingWeight. - walker
++ Add limbo time PB. - mar
++ Added helper functions for armor. - walker
++ Created PetAPI.isCurrentPet. - hannibal2
++ Refactored Duplicate Code in SkyHanniInstallerFrame. - walker
++ Removed unnecessary non-capturing groups. - walker
+
+## Version 0.21.1
 
 ### New Features
 
 + Organised the config into sub categories. - nea & walker
++ Wrong crop milestone step detection. - hannibal2
+    + When opening the crop milestone menu, a chat message is sent if Hypixel's crops per milestone level data is
+      different from SkyHanni's.
+    + You can use this to share your hypixel data with SkyHanni via the discord.
+    + This will allow us to fix the crop milestone features quicker, as we currently do not have accurate data for this.
+    + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 
 ### Changes
+
++ /shtrackcollection now supports sack messages. - hannibal2
++ Changed formatting of coin value to be more consistent over multiple features. - hannibal2
++ Made skill level as item number no longer default enabled. - hannibal2
+
+### Fixes
+
++ Fixed the wrong colouring of hidden items in Slayer Profit Tracker. - hannibal2
++ Added support for NEU Heavy Pearl TO-DO fix working without nether sacks as well. - hannibal2
++ Fixed Estimated Item Value getting shown in pet rule creation wardrobe slot pick menu. - hannibal2
+
+### Technical Details
+
++ Added /shwhereami command to show the current island. - martimavocado
++ Tons of code clean-ups over the whole project. - walker & hannibal2
+  + Added ItemAddEvent. - hannibal2
++ Gets called when the user collects an item into inventory or sacks.
++ Created SkyHanniItemTracker. - hannibal2
+  + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different price variants.
++ Migrated slayer profit data into SkyHanniTracker format. - hannibal2
 
 #### Garden Changes
 
@@ -16,11 +359,23 @@
 + Added option to change the item scale of SkyMart Coins per Copper list. - hannibal2
 + Added support for Sunder 6 in /ff upgrades. - hannibal2
 + Added support for mythic in Visitor Drop Statistics. - hannibal2
++ Use the crop fortune from tab in Farming Fortune HUD. - alexia
++ Shows the last saved ff value in gray while switching tools instead of the question mark. - hannibal2
++ Removed chat message that your crop milestone data is correct. - hannibal2
++ Removed the message when crop milestones look different in the menu than stored SkyHanni data. - hannibal2
+    + We already have the correct data now, and Hypixel rounds the numbers in the menu poorly.
+    + Only show the Total Crop Milestone info in crop milestone inventory when below tier 20. - hannibal2
+    + Hypixel now has their own line for the same information for tier 20+
++ Make the FF Display only visible while holding a farming tool in hand. - hannibal2
++ Hide in crop milestone display the line with time remaining entirely when the milestone is maxed. - hannibal2
 
 #### Other Changes
 
 + Added guess seconds to the Visitor Timer when the tab list doesn't show seconds. - hannibal2
 + Add option to hide the chat message when toggling /shmouselock. - hannibal2
++ Reminds to use the GUI Position Editor hotkey. - hannibal2
+    + Reminds every 30 minutes after using /sh gui or clicking the GUI edit button.
++ Added Bookworm Book to the Estimated Item Value feature. - jani
 
 ### Fixes
 
@@ -36,6 +391,16 @@
 + Fixed Farming Contest Medal Icons in Inventory not showing. - hannibal2
 + Fixed /ff not detecting collection analyst fortune. - hannibal2
 + Fixed Mushroom Cow Perk display not working. - hannibal2
++ Fixed visitor timer error if the visitors aren't unlocked yet. - hannibal2
++ Fixed farming weight no longer updating on block breaking. - hannibal2
++ Added cooldown to prevent spam clicking on farming weight buttons to open many web pages. - hannibal2
++ Fixed clickable farming weight GUI no longer opens #1000 in lb website. - hannibal2
++ Fixed /ff upgrade suggests updating bustling reforge even when no farming armor is found. - hannibal2
++ Fixed maxed sunder fortune in the /ff stats breakdown. - alexia
++ Fixed the farming contest summary not showing when the crop is buffed by Anita Talisman/Ring/Artifact. - hannibal2
++ Fixed Farming Fortune Display not showing for non crop-specific tools. - hannibal2
++ Fixed green thumb fortune in /ff to include Maeve. - hannibal2
++ Fixed crops per second and time remaining not using the 100 base ff in their formula. - alexia
 
 #### Other Fixes
 
@@ -46,6 +411,10 @@
 + Fixed Archfiend Dice and High Class Archfiend Dice counting as slayer drops when rolled. - hannibal2
 + Fixed dice roll profit counting as Mob Kill Coins in Slayer Tracker. - hannibal2
 + Fixed Sack Display sometimes not formatting a million correctly. - Hize
++ Fixed Estimated Item Value getting shown in stats breakdown menu. - hannibal2
++ Fixed a bug with the ender chest and SkyHanni GUI editor. - hannibal2
++ Fixed crimson isle faction icon in tab list showing twice and not going away fully when enabling the "hide faction"
+  option of advanced player list. - hannibal2
 
 ### Technical Details
 
@@ -56,6 +425,19 @@
 + Extracted sacks, friends, known features and Jacob contests in to their separate files. - CalMWolfs
 + Add log clearing. - CalMWolfs
 + Add auto-prefix to chat message methods. - walker
++ Added support for extra data in error manager. - hannibal2
++ Added /readcropmilestonefromclipboard. - hannibal2
+    + This command reads the clipboard content, in the format of users sending crop milestone step data.
+    + The new data gets compared to the currently saved data, differences are getting replaced and the result gets put
+      into the clipboard. The clipboard context can be used to update the repo content.
+
+### Removed Features
+
++ Removed 100 Farming Fortune from "Show As Drop Multiplier" from all displays (also known as "base ff"). - hannibal2
+    + This can cause some numbers to show 100 FF too much. Simply update the values to fix it.
+    + Those "base FF" values were never really part of your farming fortune stats. They are just a result of looking at
+      the crop drop formula. SkyHanni used those values to be more comparable with other Discord Bots and spreadsheets.
+      This also caused confusion, so we have removed it entirely now.
 
 ## Version 0.21
 
@@ -882,7 +1264,7 @@
 ### Fixes
 
 + Fixed Pocket Sack-In-A-Sack Replace in lore
-+ Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
++ Fixed possible crash with broken neu repo when opening the desk inventory in the garden (Contributed by CalMWolfs)
 + Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
 + Fixed bug with ghost counter sometimes not detecting new kills (Contributed by CalMWolfs)
 + Fixed **Ghost Counter** - HiZe & ksipli
@@ -1195,7 +1577,7 @@
       and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the
   composter inventory
-+ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
++ Hide chat messages from the visitors in the garden. (Except Beth and Spaceman)
 + Introduced a new command '/shcroptime <amount> <item>' that displays the estimated time it will take to gather the
   requested quantity of a particular item based on the current crop speed.
 + Show the average crop milestone in the crop milestone inventory.

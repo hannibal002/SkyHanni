@@ -2,16 +2,15 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -91,9 +90,10 @@ object SackAPI {
     }
 
     private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        0 -> (getPrice(true) * stored.formatNumber()).toLong().let { if (it < 0) 0L else it }
+        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatNumber()).toLong()
+            .let { if (it < 0) 0L else it }
 
-        1 -> try {
+        PriceFrom.NPC -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
             (npcPrice * stored.formatNumber()).toLong()
         } catch (e: Exception) {
@@ -161,13 +161,8 @@ object SackAPI {
 
                         if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
                         item.price = if (isTrophySack) {
-                            val internal = stack.getInternalName_old()
-                            val trophyFishName = internal.substringBeforeLast("_")
-                                .replace("_", "").lowercase()
-                            val trophyRarityName = internal.substringAfterLast("_")
-                            val info = TrophyFishManager.getInfo(trophyFishName)
-                            val rarity = TrophyRarity.getByName(trophyRarityName) ?: TrophyRarity.BRONZE
-                            val filletValue = (info?.getFilletValue(rarity) ?: 0) * stored.formatNumber()
+                            val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
+                            val filletValue = filletPerTrophy * stored.formatNumber()
                             item.magmaFish = filletValue
                             "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
                         } else {

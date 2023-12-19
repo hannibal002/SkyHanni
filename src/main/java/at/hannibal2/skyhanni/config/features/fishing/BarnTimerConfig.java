@@ -22,15 +22,31 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Worm Fishing",
-        desc = "Show the Barn Fishing Timer even for worms or other sea creatures in the Crystal Hollows."
+        desc = "Show the Barn Fishing Timer in the Crystal Hollows."
     )
     @ConfigEditorBoolean
     public boolean crystalHollows = true;
 
     @Expose
     @ConfigOption(
+        name = "Lava Fishing",
+        desc = "Show the Barn Fishing Timer in the Crimson Isle."
+    )
+    @ConfigEditorBoolean
+    public boolean crimsonIsle = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Winter Fishing",
+        desc = "Show the Barn Fishing Timer on the Jerry's Workshop."
+    )
+    @ConfigEditorBoolean
+    public boolean winterIsland = true;
+
+    @Expose
+    @ConfigOption(
         name = "Stranded Fishing",
-        desc = "Show the Barn Fishing Timer even on all the different islands Stranded players can visit."
+        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit."
     )
     @ConfigEditorBoolean
     public boolean forStranded = true;

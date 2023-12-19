@@ -16,10 +16,10 @@ import kotlin.time.Duration.Companion.seconds
 class SkyBlockKickDuration {
     private val config get() = SkyHanniMod.feature.misc.kickDuration
 
-    var kickMessage = false
-    var showTime = false
-    var lastKickTime = SimpleTimeMark.farPast()
-    var hasWarned = false
+    private var kickMessage = false
+    private var showTime = false
+    private var lastKickTime = SimpleTimeMark.farPast()
+    private var hasWarned = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -29,7 +29,7 @@ class SkyBlockKickDuration {
             if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
-                lastKickTime = SimpleTimeMark.farPast()
+                lastKickTime = SimpleTimeMark.now()
             } else {
                 kickMessage = true
             }
@@ -38,7 +38,7 @@ class SkyBlockKickDuration {
         if (event.message == "§cThere was a problem joining SkyBlock, try again in a moment!") {
             kickMessage = false
             showTime = true
-            lastKickTime = SimpleTimeMark.farPast()
+            lastKickTime = SimpleTimeMark.now()
         }
     }
 
@@ -48,7 +48,7 @@ class SkyBlockKickDuration {
         if (kickMessage) {
             kickMessage = false
             showTime = true
-            lastKickTime = SimpleTimeMark.farPast()
+            lastKickTime = SimpleTimeMark.now()
         }
         hasWarned = false
     }

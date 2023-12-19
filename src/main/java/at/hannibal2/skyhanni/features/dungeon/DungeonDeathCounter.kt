@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonDeathCounter {
@@ -15,37 +15,39 @@ class DungeonDeathCounter {
     private var display = ""
     private var deaths = 0
 
-    private fun isDeathMessage(message: String): Boolean = when {
-        message.matchRegex("§c ☠ §r§7You were killed by (.*)§r§7 and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r§7(.*) was killed by (.*) and became a ghost§r§7.") -> true
+    private val deathPatternsList = listOf(
+        // TODO USE SH-REPO
+        "§c ☠ §r§7You were killed by (.*)§r§7 and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r§7(.*) was killed by (.*) and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You were crushed and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r§7§r(.*)§r§7 was crushed and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You were crushed and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r§7§r(.*)§r§7 was crushed and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You died to a trap and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r(.*)§r§7 died to a trap and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You died to a trap and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r(.*)§r§7 died to a trap and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You burnt to death and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r(.*)§r§7 burnt to death and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You burnt to death and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r(.*)§r§7 burnt to death and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You died and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r(.*)§r§7 died and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You died and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r(.*)§r§7 died and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You suffocated and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r§7§r(.*)§r§7 suffocated and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You suffocated and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r§7§r(.*)§r§7 suffocated and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You died to a mob and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r(.*)§7 died to a mob and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You died to a mob and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r(.*)§7 died to a mob and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7You fell into a deep hole and became a ghost§r§7.") -> true
-        message.matchRegex("§c ☠ §r(.*)§r§7 fell into a deep hole and became a ghost§r§7.") -> true
+        "§c ☠ §r§7You fell into a deep hole and became a ghost§r§7.".toPattern(),
+        "§c ☠ §r(.*)§r§7 fell into a deep hole and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§(.*)§r§7 disconnected from the Dungeon and became a ghost§r§7.") -> true
+        "§c ☠ §r§(.*)§r§7 disconnected from the Dungeon and became a ghost§r§7.".toPattern(),
 
-        message.matchRegex("§c ☠ §r§7(.*)§r§7 fell to their death with help from §r(.*)§r§7 and became a ghost§r§7.") -> true
+        "§c ☠ §r§7(.*)§r§7 fell to their death with help from §r(.*)§r§7 and became a ghost§r§7.".toPattern()
+    )
 
-        else -> false
-    }
+    private fun isDeathMessage(message: String): Boolean =
+        deathPatternsList.any { it.matches(message) }
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatPacket(event: LorenzChatEvent) {
@@ -88,7 +90,10 @@ class DungeonDeathCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + display, posLabel = "Dungeon Death Counter")
+        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(
+            DungeonMilestonesDisplay.color + display,
+            posLabel = "Dungeon Death Counter"
+        )
     }
 
     private fun isEnabled(): Boolean {

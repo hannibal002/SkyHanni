@@ -138,7 +138,7 @@ object GhostFormatting {
     fun reset() {
         with(GhostCounter.config.textFormatting) {
             titleFormat = "&6Ghost Counter"
-            ghostKilledFormat = "  &6Ghost Killed: &b%value% &7(%session%)"
+            ghostKilledFormat = "  &6Ghosts Killed: &b%value% &7(%session%)"
             sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)"
             ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%"
             ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%"

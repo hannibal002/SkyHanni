@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -34,7 +37,7 @@ object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
     private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
-    private val config get() = SkyHanniMod.feature.garden.cropMilestones
+    private val config get() = GardenAPI.config.cropMilestones
     private val bestCropTime = GardenBestCropTime()
 
     private var lastPlaySoundTime = 0L
@@ -101,6 +104,8 @@ object GardenCropMilestoneDisplay {
                 val addedCounter = (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
+                // Farming Simulator: There is a 25% chance for Mathematical Hoes and the Cultivating Enchantment to count twice.
+                // 0.8 = 1 / 1.25
                 crop.setCounter(
                     crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {
                         (addedCounter.toDouble() * 0.8).toInt()
@@ -163,20 +168,19 @@ object GardenCropMilestoneDisplay {
             Collections.singletonList("§e$haveFormat§8/§e$needFormat")
         }
 
-        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
+        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
-        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
+        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).round(1).toInt()
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            if (crop.isMaxed()) {
-                lineMap[3] = listOf("§7In §bMaxed")
-            } else {
+            if (!crop.isMaxed()) {
                 val missing = need - have
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+                // TODO, change functionality to use enum rather than ordinals
+                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
                 val duration = TimeUtils.formatDuration(millis, biggestUnit)
                 tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
                 val speedText = "§7In §b$duration"
@@ -225,7 +229,8 @@ object GardenCropMilestoneDisplay {
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.text) {
-            lineMap[index]?.let {
+            // TODO, change functionality to use enum rather than ordinals
+            lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
         }
@@ -238,14 +243,23 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun addMushroomCowData() {
-        val lineMap = HashMap<Int, List<Any>>()
-        val counter = CropType.MUSHROOM.getCounter()
+        val mushroom = CropType.MUSHROOM
+        if (mushroom.isMaxed()) {
+            mushroomCowPerkDisplay = listOf(
+                listOf("§6Mooshroom Cow Perk"),
+                listOf("§eMushroom crop is maxed!"),
+            )
+            return
+        }
 
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, CropType.MUSHROOM)
+        val lineMap = HashMap<Int, List<Any>>()
+        val counter = mushroom.getCounter()
+
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom)
         val nextTier = currentTier + 1
 
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, CropType.MUSHROOM)
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, CropType.MUSHROOM)
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, mushroom)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, mushroom)
 
         val have = counter - cropsForCurrentTier
         val need = cropsForNextTier - cropsForCurrentTier
@@ -258,7 +272,7 @@ object GardenCropMilestoneDisplay {
         lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
 
         val list = mutableListOf<Any>()
-        list.addCropIcon(CropType.MUSHROOM)
+        list.addCropIcon(mushroom)
         list.add("§7Mushroom Tier $nextTier")
         lineMap[1] = list
 
@@ -270,7 +284,8 @@ object GardenCropMilestoneDisplay {
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+            // TODO, change functionality to use enum rather than ordinals
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
             lineMap[3] = Collections.singletonList("§7In §b$duration")
         }
@@ -280,7 +295,8 @@ object GardenCropMilestoneDisplay {
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.mushroomPetPerk.text) {
-            lineMap[index]?.let {
+            // TODO, change functionality to use enum rather than ordinals
+            lineMap[index.ordinal]?.let {
                 newList.add(it)
             }
         }
@@ -304,5 +320,26 @@ object GardenCropMilestoneDisplay {
         event.move(3, "garden.cropMilestoneMushroomPetPerkEnabled", "garden.cropMilestones.mushroomPetPerk.enabled")
         event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropMilestones.mushroomPetPerk.text")
         event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropMilestones.mushroomPetPerk.pos")
+        event.move(
+            11,
+            "garden.cropMilestones.highestTimeFormat",
+            "garden.cropMilestones.highestTimeFormat"
+        ) { element ->
+            ConfigUtils.migrateIntToEnum(element, TimeFormatEntry::class.java)
+        }
+        event.move(
+            11,
+            "garden.cropMilestones.text",
+            "garden.cropMilestones.text"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MilestoneTextEntry::class.java)
+        }
+        event.move(
+            11,
+            "garden.cropMilestones.mushroomPetPerk.text",
+            "garden.cropMilestones.mushroomPetPerk.text"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MushroomTextEntry::class.java)
+        }
     }
 }

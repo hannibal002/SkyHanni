@@ -28,7 +28,7 @@ class VisitorToolTipParserTest {
         assert(parsedData.itemsNeeded.isNotEmpty()) {
             "Visitor items needed is ${parsedData.itemsNeeded.count()} instead of 1"
         }
-        assert(parsedData.itemsNeeded.get("§aEnchanted Hay Bale") == 28) {
+        assert(parsedData.itemsNeeded["§aEnchanted Hay Bale"] == 28) {
             "Visitor items needed does not contain '§aEnchanted Hay Bale'"
         }
     }
@@ -52,7 +52,7 @@ class VisitorToolTipParserTest {
         )
 
         for ((itemName, amount) in assertions) {
-            assert(parsedData.rewards.get(itemName) == amount) {
+            assert(parsedData.rewards[itemName] == amount) {
                 "Visitor rewards does not contain '$itemName' with amount '$amount'"
             }
         }
@@ -63,7 +63,7 @@ class VisitorToolTipParserTest {
         val parsedData = VisitorTooltipParser.parse(lore,
             GardenConfig()
         )
-        val copper = parsedData.rewards.get("Copper")
+        val copper = parsedData.rewards["Copper"]
         assert(copper == 23) {
             "Visitor rewards does not contain 'Copper' with amount '23'"
         }

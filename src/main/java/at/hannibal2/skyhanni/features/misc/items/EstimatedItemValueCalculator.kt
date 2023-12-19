@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBookwormBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -84,6 +85,7 @@ object EstimatedItemValueCalculator {
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
         totalPrice += addPolarvoidBook(stack, list)
+        totalPrice += addBookwormBook(stack, list)
 
         // cosmetic
         totalPrice += addHelmetSkin(stack, list)
@@ -339,6 +341,15 @@ object EstimatedItemValueCalculator {
         return price
     }
 
+    private fun addBookwormBook(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getBookwormBookCount() ?: return 0.0
+
+        val tfHardcodedItemAgain = "BOOKWORM_BOOK".asInternalName()
+        val price = tfHardcodedItemAgain.getPrice() * count
+        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
     private fun addSilex(stack: ItemStack, list: MutableList<String>): Double {
         val tier = stack.getSilexCount() ?: return 0.0
 
@@ -516,6 +527,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
+    // TODO repo
     private val hasAlwaysScavenger = listOf(
         "CRYPT_DREADLORD_SWORD".asInternalName(),
         "ZOMBIE_SOLDIER_CUTLASS".asInternalName(),
@@ -524,6 +536,12 @@ object EstimatedItemValueCalculator {
         "ZOMBIE_KNIGHT_SWORD".asInternalName(),
         "SILENT_DEATH".asInternalName(),
         "ZOMBIE_COMMANDER_WHIP".asInternalName(),
+        "ICE_SPRAY_WAND".asInternalName(),
+    )
+
+    private val hasAlwaysReplenish = listOf(
+        "ADVANCED_GARDENING_HOE".asInternalName(),
+        "ADVANCED_GARDENING_AXE".asInternalName(),
     )
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
@@ -540,6 +558,10 @@ object EstimatedItemValueCalculator {
             if (rawName == "efficiency") continue
 
             if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
+            }
+
+            if (rawName == "replenish" && rawLevel == 1 && internalName in hasAlwaysReplenish) {
                 continue
             }
 

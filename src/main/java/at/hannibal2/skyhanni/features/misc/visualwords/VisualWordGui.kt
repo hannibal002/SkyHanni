@@ -137,7 +137,11 @@ open class VisualWordGui : GuiScreen() {
                     inBox = true
                 }
 
-                drawUnmodifiedString("${index + 1}.", (guiLeft + 5) * inverseScale, (adjustedY + 10 + 30 * index) * inverseScale)
+                drawUnmodifiedString(
+                    "${index + 1}.",
+                    (guiLeft + 5) * inverseScale,
+                    (adjustedY + 10 + 30 * index) * inverseScale
+                )
 
                 val top = adjustedY + 30 * index + 7
                 if (isPointInLastClicked(guiLeft + 335, top, 16, 16)) {
@@ -167,7 +171,14 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 if (inBox) {
-                    GuiRenderUtils.drawScaledRec(guiLeft, adjustedY + 30 * index, guiLeft + sizeX, adjustedY + 30 * index + 30, colorB, inverseScale)
+                    GuiRenderUtils.drawScaledRec(
+                        guiLeft,
+                        adjustedY + 30 * index,
+                        guiLeft + sizeX,
+                        adjustedY + 30 * index + 30,
+                        colorB,
+                        inverseScale
+                    )
                 }
 
                 val statusBlock = if (phrase.enabled) {
@@ -190,11 +201,27 @@ open class VisualWordGui : GuiScreen() {
                 GlStateManager.scale(scale, scale, 1f)
 
                 if (inBox) {
-                    drawUnmodifiedString(phrase.phrase, (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
-                    drawUnmodifiedString(phrase.replacement, (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
+                    drawUnmodifiedString(
+                        phrase.phrase,
+                        (guiLeft + 15) * inverseScale,
+                        (adjustedY + 5 + 30 * index) * inverseScale
+                    )
+                    drawUnmodifiedString(
+                        phrase.replacement,
+                        (guiLeft + 15) * inverseScale,
+                        (adjustedY + 15 + 30 * index) * inverseScale
+                    )
                 } else {
-                    drawUnmodifiedString(phrase.phrase.convertToFormatted(), (guiLeft + 15) * inverseScale, (adjustedY + 5 + 30 * index) * inverseScale)
-                    drawUnmodifiedString(phrase.replacement.convertToFormatted(), (guiLeft + 15) * inverseScale, (adjustedY + 15 + 30 * index) * inverseScale)
+                    drawUnmodifiedString(
+                        phrase.phrase.convertToFormatted(),
+                        (guiLeft + 15) * inverseScale,
+                        (adjustedY + 5 + 30 * index) * inverseScale
+                    )
+                    drawUnmodifiedString(
+                        phrase.replacement.convertToFormatted(),
+                        (guiLeft + 15) * inverseScale,
+                        (adjustedY + 15 + 30 * index) * inverseScale
+                    )
                 }
             }
 
@@ -256,17 +283,46 @@ open class VisualWordGui : GuiScreen() {
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
 
-                drawUnmodifiedString("§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale)
-                drawUnmodifiedString("§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale)
+                // TODO remove more code duplication
+                drawUnmodifiedString(
+                    "§bThe top line of each section",
+                    (guiLeft + 10) * inverseScale,
+                    (guiTop + 12) * inverseScale
+                )
+                drawUnmodifiedString(
+                    "§bis the preview of the bottom text",
+                    (guiLeft + 10) * inverseScale,
+                    (guiTop + 22) * inverseScale
+                )
 
-                drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
-                drawUnmodifiedString("§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale)
+                drawUnmodifiedString(
+                    "§bTo get the Minecraft",
+                    (guiLeft + 220) * inverseScale,
+                    (guiTop + 12) * inverseScale
+                )
+                drawUnmodifiedString(
+                    "§b formatting character use \"&&\"",
+                    (guiLeft + 220) * inverseScale,
+                    (guiTop + 22) * inverseScale
+                )
 
-                drawUnmodifiedString(currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale)
+                drawUnmodifiedString(
+                    currentPhrase.phrase.convertToFormatted(),
+                    (guiLeft + 30) * inverseScale,
+                    (guiTop + 40) * inverseScale
+                )
                 drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
-                drawUnmodifiedString(currentPhrase.replacement.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 95) * inverseScale)
-                drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
+                drawUnmodifiedString(
+                    currentPhrase.replacement.convertToFormatted(),
+                    (guiLeft + 30) * inverseScale,
+                    (guiTop + 95) * inverseScale
+                )
+                drawUnmodifiedString(
+                    currentPhrase.replacement,
+                    (guiLeft + 30) * inverseScale,
+                    (guiTop + 110) * inverseScale
+                )
 
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
             }
@@ -403,7 +459,7 @@ open class VisualWordGui : GuiScreen() {
         super.keyTyped(typedChar, keyCode)
         if (!currentlyEditing) {
             if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
-                if (KeyboardManager.isControlKeyDown()) {
+                if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
                 } else {
                     pageScroll -= 30
@@ -411,7 +467,7 @@ open class VisualWordGui : GuiScreen() {
                 scrollScreen()
             }
             if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_W) {
-                if (KeyboardManager.isControlKeyDown()) {
+                if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = 0
                 } else {
                     pageScroll += 30
@@ -425,7 +481,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
-                currentText = if (KeyboardManager.isControlKeyDown()) {
+                currentText = if (KeyboardManager.isModifierKeyDown()) {
                     ""
                 } else if (KeyboardManager.isShiftKeyDown()) {
                     val lastSpaceIndex = currentText.lastIndexOf(' ')

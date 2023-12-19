@@ -166,8 +166,8 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                 margin = 5;
 
                 BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass()
-                        .getClassLoader()
-                        .getResourceAsStream("assets/skyhanni/logo.png"), "Logo not found."));
+                    .getClassLoader()
+                    .getResourceAsStream("assets/skyhanni/logo.png"), "Logo not found."));
                 Image scaled = myPicture.getScaledInstance(w - margin * 2, h - margin, Image.SCALE_SMOOTH);
                 logo = new JLabel(new ImageIcon(scaled));
                 logo.setName("Logo");
@@ -213,17 +213,10 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
                 descriptionText = new JTextArea();
                 descriptionText.setName("TextArea");
-                descriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
-                descriptionText.setEditable(false);
-                descriptionText.setHighlighter(null);
-                descriptionText.setEnabled(true);
-                descriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-                descriptionText.setLineWrap(true);
-                descriptionText.setOpaque(false);
-                descriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+                setStandardFormatting(descriptionText);
                 descriptionText.setText(
-                        "This installer will copy SkyHanni into your forge mods folder for you, and replace any old versions that already exist. " +
-                                "Close this if you prefer to do this yourself!");
+                    "This installer will copy SkyHanni into your forge mods folder for you, and replace any old versions that already exist. " +
+                        "Close this if you prefer to do this yourself!");
                 descriptionText.setWrapStyleWord(true);
 
                 y += h;
@@ -234,6 +227,17 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         return descriptionText;
     }
 
+    private void setStandardFormatting(JTextArea descriptionText) {
+        descriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
+        descriptionText.setEditable(false);
+        descriptionText.setHighlighter(null);
+        descriptionText.setEnabled(true);
+        descriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
+        descriptionText.setLineWrap(true);
+        descriptionText.setOpaque(false);
+        descriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+    }
+
     private JTextArea getForgeTextArea() {
         if (forgeDescriptionText == null) {
             try {
@@ -242,16 +246,9 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
                 forgeDescriptionText = new JTextArea();
                 forgeDescriptionText.setName("TextAreaForge");
-                forgeDescriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
-                forgeDescriptionText.setEditable(false);
-                forgeDescriptionText.setHighlighter(null);
-                forgeDescriptionText.setEnabled(true);
-                forgeDescriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-                forgeDescriptionText.setLineWrap(true);
-                forgeDescriptionText.setOpaque(false);
-                forgeDescriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+                setStandardFormatting(forgeDescriptionText);
                 forgeDescriptionText.setText(
-                        "However, you still need to install Forge client in order to be able to run this mod. Click here to visit the download page for Forge 1.8.9!");
+                    "However, you still need to install Forge client in order to be able to run this mod. Click here to visit the download page for Forge 1.8.9!");
                 forgeDescriptionText.setForeground(Color.BLUE.darker());
                 forgeDescriptionText.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 forgeDescriptionText.setWrapStyleWord(true);
@@ -315,8 +312,8 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
             try {
                 BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass()
-                        .getClassLoader()
-                        .getResourceAsStream("assets/skyhanni/folder.png"), "Folder icon not found."));
+                    .getClassLoader()
+                    .getResourceAsStream("assets/skyhanni/folder.png"), "Folder icon not found."));
                 Image scaled = myPicture.getScaledInstance(w - 8, h - 6, Image.SCALE_SMOOTH);
                 buttonChooseFolder = new JButton(new ImageIcon(scaled));
                 buttonChooseFolder.setName("ButtonFolder");
@@ -430,7 +427,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         if (e.getSource() == getForgeTextArea()) {
             try {
                 Desktop.getDesktop().browse(new URI(
-                        "http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
+                    "https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
             } catch (IOException | URISyntaxException ex) {
                 showErrorPopup(ex);
             }
@@ -519,10 +516,10 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 showErrorMessage("Was not able to delete the other SkyHanni files found in your mods folder!" +
-                                        System.lineSeparator() +
-                                        "Please make sure that your minecraft is currently closed and try again, or feel" +
-                                        System.lineSeparator() +
-                                        "free to open your mods folder and delete those files manually.");
+                                    System.lineSeparator() +
+                                    "Please make sure that your minecraft is currently closed and try again, or feel" +
+                                    System.lineSeparator() +
+                                    "free to open your mods folder and delete those files manually.");
                                 return true;
                             }
                             continue;
@@ -667,10 +664,10 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     private File getThisFile() {
         try {
             return new File(SkyHanniInstallerFrame.class
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .toURI());
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .toURI());
         } catch (URISyntaxException ex) {
             showErrorPopup(ex);
         }

@@ -48,7 +48,7 @@ object SkyHanniConfigSearchResetCommand {
         if (term.startsWith("playerSpecific")) return "§cCannot reset playerSpecific! Use §e/shconfig set §cinstead."
         if (term.startsWith("profileSpecific")) return "§cCannot reset profileSpecific! Use §e/shconfig set §cinstead."
 
-        return try {
+        try {
             val (field, defaultObject, _) = getComplexField(term, Features())
             val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
             val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
@@ -56,10 +56,10 @@ object SkyHanniConfigSearchResetCommand {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
             field.set(parent, defaultObject)
-            "§eSuccessfully reset config element '$term'"
-        } catch (e: Exception) {
+            return "§eSuccessfully reset config element '$term'"
+        } catch (e: Throwable) {
             ErrorManager.logError(e, "Could not reset config element '$term'")
-            "§cCould not reset config element '$term'"
+            return "§cCould not reset config element '$term'"
         }
     }
 
@@ -182,7 +182,7 @@ object SkyHanniConfigSearchResetCommand {
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
                 if (obj !is Runnable && objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                            objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
+                        objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
                 } else {
@@ -244,8 +244,7 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Runnable) return "Runnable"
 
         // we don't use javaClass.simpleName since we want to catch edge cases
-        val name = javaClass.name
-        return when (name) {
+        return when (val name = javaClass.name) {
             "at.hannibal2.skyhanni.config.core.config.Position" -> "Position"
             "java.lang.Boolean" -> "Boolean"
             "java.lang.Integer" -> "Int"

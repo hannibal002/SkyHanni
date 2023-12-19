@@ -258,7 +258,8 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     AUTO({
         var autoReturn = ""
         for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
-            val autoStatus = AutoStatus.entries[statusID]
+            // TODO, change functionality to use enum rather than ordinals
+            val autoStatus = AutoStatus.entries[statusID.ordinal]
             val result =
                 autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
             if (result != autoStatus.placeholderText) { // if that value is useful, display it
@@ -269,7 +270,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         if (autoReturn == "") { // if we didn't find any useful information, display the fallback
             val statusNoAuto = DiscordStatus.entries.toMutableList()
             statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get().ordinal].getDisplayString()
         }
         autoReturn
     }),
@@ -371,8 +372,10 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     AFK({
-        if (beenAfkFor.passedSince() > 5.minutes) "AFK for ${beenAfkFor.passedSince().format(maxUnits = 1, longName = true)}"
-        else AutoStatus.AFK.placeholderText
+        if (beenAfkFor.passedSince() > 5.minutes) {
+            val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            "AFK for $format"
+        } else AutoStatus.AFK.placeholderText
     })
     ;
 

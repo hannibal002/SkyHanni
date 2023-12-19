@@ -46,4 +46,10 @@ object LockMouseLook {
         if (!lockedMouse) return
         config.lockedMouseDisplay.renderString("§eMouse Locked", posLabel = "Mouse Locked")
     }
+
+    fun autoDisable() {
+        if (lockedMouse) {
+            toggleLock()
+        }
+    }
 }

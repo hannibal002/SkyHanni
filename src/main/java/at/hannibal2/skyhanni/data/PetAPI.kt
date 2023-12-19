@@ -8,4 +8,6 @@ object PetAPI {
         set(value) {
             ProfileStorageData.profileSpecific?.currentPet = value
         }
+
+    fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
 }

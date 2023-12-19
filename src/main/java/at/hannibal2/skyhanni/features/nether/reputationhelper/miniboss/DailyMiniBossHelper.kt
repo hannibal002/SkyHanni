@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
@@ -13,10 +14,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -25,8 +26,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!reputationHelper.config.enabled) return
 
         val message = event.message
@@ -55,14 +55,10 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
     }
 
-    private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss): Boolean {
-        val bossQuest = reputationHelper.questHelper.getQuest<MiniBossQuest>()
-        if (bossQuest != null && bossQuest.miniBoss == miniBoss && bossQuest.state == QuestState.ACCEPTED) {
-            return true
-        }
-
-        return false
-    }
+    private fun needMiniBossQuest(miniBoss: CrimsonMiniBoss) =
+        reputationHelper.questHelper.getQuest<MiniBossQuest>()?.let {
+            it.miniBoss == miniBoss && it.state == QuestState.ACCEPTED
+        } ?: false
 
     private fun finished(miniBoss: CrimsonMiniBoss) {
         reputationHelper.questHelper.finishMiniBoss(miniBoss)
@@ -84,7 +80,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
-                    lineList.add(NEUItems.getItemStack(displayItem))
+                    lineList.add(getItemStack(displayItem))
                     lineList.add("§5$displayName§7: $result")
                     display.add(lineList)
                 }
@@ -109,7 +105,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         miniBosses.clear()
         for ((displayName, quest) in data) {
             val displayItem = quest.item
-            val pattern = " *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
+            val pattern = "§f *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
             val location = reputationHelper.readLocationData(quest.location)
             miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, pattern))
         }

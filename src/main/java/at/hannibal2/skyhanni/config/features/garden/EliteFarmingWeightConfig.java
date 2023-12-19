@@ -32,9 +32,9 @@ public class EliteFarmingWeightConfig {
     public boolean overtakeETA = false;
 
     @Expose
-    @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining Garden how many spots you have dropped since last Garden join.")
+    @ConfigOption(name = "Show LB Change", desc = "Show the change of your position in the farming weight leaderboard while you were offline.")
     @ConfigEditorBoolean
-    public boolean offScreenDropMessage = true;
+    public boolean showLbChange = true;
 
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")

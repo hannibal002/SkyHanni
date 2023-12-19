@@ -2,10 +2,14 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
+import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -14,7 +18,9 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -157,7 +163,7 @@ class DamageIndicatorManager {
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
-            if (!data.ignoreBlocks && !player.canEntityBeSeen(data.entity)) continue
+            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0)) continue
             if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
@@ -191,9 +197,9 @@ class DamageIndicatorManager {
             }
 
             var bossName = when (config.bossName) {
-                0 -> ""
-                1 -> data.bossType.fullName
-                2 -> data.bossType.shortName
+                NameVisibility.HIDDEN -> ""
+                NameVisibility.FULL_NAME -> data.bossType.fullName
+                NameVisibility.SHORT_NAME -> data.bossType.shortName
                 else -> data.bossType.fullName
             }
 
@@ -852,10 +858,28 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+        val data = data[event.entity.uniqueID] ?: return
+        if (event.health <= 1) {
+            if (!data.firstDeath) {
+                data.firstDeath = true
+                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
+        event.transform(11, "combat.damageIndicator.bossesToShow") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, BossCategory::class.java)
+        }
+
+        event.transform(15, "combat.damageIndicator.bossName") { element ->
+            ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
+        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
