@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.features.misc.LowerMouseSens
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -189,6 +190,10 @@ object Commands {
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
+        registerCommand(
+            "shmouselower",
+            "Lowers the mouse sensitivity for easier small adjustments (for farming)"
+        ) { LowerMouseSens.manualToggle() }
     }
 
     private fun usersBugFix() {
