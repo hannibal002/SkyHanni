@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -27,7 +28,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-fun Int.toStringWithPlus() = (if (this == 0) " " else if (this > 0) "+" else "") + this.toString()
+private const val specialSpaceNumber = "\u2001"
+private const val specialSpaceSign = " "
+
+fun Int.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
 
 class ReforgeHelper {
 
@@ -36,11 +40,47 @@ class ReforgeHelper {
     }
 
     enum class StatType(val icon: String) {
-        AttackSpeed("§e⚔"),
-        Strength("§c❁"),
         Health("§c❤"),
         Defence("§a❈"),
-        Intelligence("§b✎");
+        Strength("§c❁"),
+        Intelligence("§b✎"),
+        Crit_Damage("§9☠"),
+        Crit_Chance("§9☣"),
+        Ferocity("§c⫽"),
+        Attack_Speed("§e⚔"),
+        Ability_Damage("§c๑"),
+        Health_Regen("§c❣"),
+        Vitality("§4♨"),
+        Mending("§a☄"),
+        True_Defence("§7❂"),
+        Swing_Range("§eⓈ"),
+        Speed("§f✦"),
+        Sea_Creature_Chance("§3α"),
+        MagicFind("§b✯"),
+        PetLuck("§d♣"),
+        Fishing_Speed("§b☂"),
+        Bonus_Pest_Chance("§2ൠ"),
+        Combat_Wisdom("§3☯"),
+        Mining_Wisdom("§3☯"),
+        Farming_Wisdom("§3☯"),
+        Foraging_Wisdom("§3☯"),
+        Fishing_Wisdom("§3☯"),
+        Enchanting_Wisdom("§3☯"),
+        Alchemy_Wisdom("§3☯"),
+        Carpentry_Wisdom("§3☯"),
+        Runecrafting_Wisdom("§3☯"),
+        Social_Wisdom("§3☯"),
+        Taming_Wisdom("§3☯"),
+        Mining_Speed("§6⸕"),
+        Breaking_Power("§2Ⓟ"),
+        Pristine("§5✧"),
+        Foraging_Fortune("§☘"),
+        Farming_Fortune("§6☘"),
+        Mining_Fortune("§6☘"),
+        Fear("§a☠")
+        ;
+
+        val iconWithName = icon + " " + name.replace("_", " ")
 
         fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
     }
@@ -61,29 +101,40 @@ class ReforgeHelper {
         }
 
         fun print(current: StatList?): List<String> {
+            val numbersInSpaces = 2
+            val fontRender = Minecraft.getMinecraft().fontRendererObj
             val diff = current?.let { this - it }
             return listOf("§6Reforge Stats") + (diff?.mapNotNull {
                 val value = it.value
                 val key = it.key
                 if (key == null || value == null) return@mapNotNull null
                 buildString {
-                    append(key.icon)
-                    append(" §9")
+                    append("§9")
                     append((this@StatList[key] ?: 0).toStringWithPlus())
-                    while (this.length < 12) {
-                        append(" ")
+                    LorenzDebug.log((fontRender.getStringWidth(this.toString()).toFloat() / fontRender.getStringWidth(" ").toFloat()).toString())
+                    while (this.length < 8) {
+                        append(specialSpaceNumber)
                     }
                     append(if (value < 0) "§c" else "§a+")
                     append(value)
+                    while (this.length < 16) {
+                        append(specialSpaceNumber)
+                    }
+                    append(" ")
+                    append(key.iconWithName)
                 }
             } ?: this.mapNotNull {
                 val value = it.value
                 val key = it.key
                 if (key == null || value == null) return@mapNotNull null
                 buildString {
-                    append(key.icon)
-                    append(" §9")
+                    append("§9")
                     append(value.toStringWithPlus())
+                    while (this.length < 8) {
+                        append(specialSpaceNumber)
+                    }
+                    append(" ")
+                    append(key.iconWithName)
                 }
             })
         }
@@ -103,7 +154,7 @@ class ReforgeHelper {
     }
 
     private val reforges = listOf(
-        Reforge("Clean", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 9))),
+        Reforge("Clean", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 200))),
         Reforge("Fierce", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 8))),
         Reforge("Heavy", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 7))),
         Reforge("Light", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 6))),
