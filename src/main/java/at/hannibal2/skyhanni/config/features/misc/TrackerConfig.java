@@ -69,9 +69,9 @@ public class TrackerConfig {
     @Expose
     @ConfigOption(name = "Item Warnings", desc = "Item Warnings")
     @Accordion
-    public TrackerWarningConfig warnings = new TrackerWarningConfig();
+    public TrackerItemWarningsConfig warnings = new TrackerItemWarningsConfig();
 
-    public static class TrackerWarningConfig {
+    public static class TrackerItemWarningsConfig {
 
         @Expose
         @ConfigOption(name = "Price in Chat", desc = "Show an extra chat message when you pick up an expensive item. " +
