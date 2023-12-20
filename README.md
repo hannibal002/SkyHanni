@@ -28,4 +28,8 @@ our [Discord](https://discord.gg/skyhanni-997079228510117908).
 If you are interested in the technical side of SkyHanni, read
 the [Contributing Guide](https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md).
 
+Please support me on [Patreon](https://www.patreon.com/hannibal2).
+(*Guys I need money to eat* ~Forrick)
+
+
 *Check out some other really cool 1.8.9 mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/)*
