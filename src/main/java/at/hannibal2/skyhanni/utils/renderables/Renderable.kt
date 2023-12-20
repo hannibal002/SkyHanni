@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
@@ -123,6 +124,7 @@ interface Renderable {
             tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
+            color: LorenzColor? = null,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
         ): Renderable {
@@ -144,8 +146,11 @@ interface Renderable {
                             GlStateManager.translate(0F, 0F, 400F)
 
                             RenderLineTooltips.drawHoveringText(
-                                posX, posY, tipsRender,
+                                posX,
+                                posY,
+                                tipsRender,
                                 stack,
+                                color,
                                 currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
                                 currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
                             )
