@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -415,6 +416,7 @@ class SkyHanniMod {
         loadModule(AdvancedPlayerList)
         loadModule(ItemAddManager())
         loadModule(BingoCardReader())
+        loadModule(TrackerManager)
 
         // APIs
         loadModule(BazaarApi())
