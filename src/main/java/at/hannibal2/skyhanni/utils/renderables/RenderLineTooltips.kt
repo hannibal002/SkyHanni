@@ -257,12 +257,9 @@ object RenderLineTooltips {
                 }
             } */
             var tooltipY = y - 12
-            var tooltipHeight = 8
-            if (textLines.size > 1) {
-                tooltipHeight += (textLines.size - 1) * 10
-                if (textLines.size > titleLinesCount) {
-                    tooltipHeight += 2
-                }
+            var tooltipHeight = 0
+            if (tips.isNotEmpty()) {
+                tooltipHeight += tips.sumOf { it?.height ?: 0 }
             }
 
             if (tooltipY + tooltipHeight + 6 > scaled.scaledHeight) {
@@ -365,7 +362,7 @@ object RenderLineTooltips {
                 if (lineNumber + 1 == titleLinesCount) {
                     tooltipY += 2
                 }
-                tooltipY += 10
+                tooltipY += y
             }
             GlStateManager.translate(-tooltipX.toFloat(), -tooltipY.toFloat() + yTranslateSum.toFloat(), 0f)
             GlStateManager.enableLighting()

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -36,10 +37,12 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -437,6 +440,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onRenderLocation(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        Position(200, 80).renderRenderables(posLabel = "Test", renderables = listOf(Renderable.hoverTips("Table", listOf(Renderable.table(listOf(listOf(Renderable.string("adafa"), Renderable.string("ada")), listOf(Renderable.string("a"), Renderable.string("ba"))))))))
         if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
@@ -469,7 +473,7 @@ class SkyHanniDebugsAndTests {
 //        val pitch = event.pitch
 //        val volume = event.volume
 
-        //background music
+        // background music
 //        if (soundName == "note.harp") {
 ////                if (distance < 2) {
 //
@@ -504,7 +508,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //diana ancestral spade
+        // diana ancestral spade
 //        if (soundName == "note.harp") {
 //            val list = mutableListOf<Float>()
 //            list.add(0.52380955f)
@@ -579,7 +583,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //use ancestral spade
+        // use ancestral spade
 //        if (soundName == "mob.zombie.infect") {
 //            if (pitch == 1.968254f) {
 //                if (volume == 0.3f) {
@@ -589,7 +593,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //wither shield activated
+        // wither shield activated
 //        if (soundName == "mob.zombie.remedy") {
 //            if (pitch == 0.6984127f) {
 //                if (volume == 1f) {
@@ -598,7 +602,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //wither shield cooldown over
+        // wither shield cooldown over
 //        if (soundName == "random.levelup") {
 //            if (pitch == 3f) {
 //                if (volume == 1f) {
@@ -607,21 +611,21 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //teleport (hyp or aote)
+        // teleport (hyp or aote)
 //        if (soundName == "mob.endermen.portal") {
 //            if (pitch == 1f && volume == 1f) {
 //                return
 //            }
 //        }
 
-        //hyp wither impact
+        // hyp wither impact
 //        if (soundName == "random.explode") {
 //            if (pitch == 1f && volume == 1f) {
 //                return
 //            }
 //        }
 
-        //pick coins up
+        // pick coins up
 //        if (soundName == "random.orb") {
 //            if (pitch == 1.4920635f && volume == 1f) {
 //                return

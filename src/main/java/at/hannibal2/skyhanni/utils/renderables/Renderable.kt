@@ -120,7 +120,7 @@ interface Renderable {
 
         fun hoverTips(
             text: String,
-            tips: List<String>,
+            tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
             bypassChecks: Boolean = false,
@@ -287,8 +287,8 @@ interface Renderable {
                 }
             }
 
-            override val width = xOffsets.last()
-            override val height = yOffsets.last()
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
 
             override fun render(posX: Int, posY: Int) {
                 content.forEachIndexed { rowIndex, row ->
