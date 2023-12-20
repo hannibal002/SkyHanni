@@ -462,7 +462,7 @@ class SkyHanniMod {
         loadModule(BazaarBestSellMethod())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(AuctionHouseCopyUnderbidPrice())
-        loadModule(AnvilCombineHelper())
+        loadModule(AnvilCombineHelper)
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown())
         loadModule(AshfangNextResetCooldown())

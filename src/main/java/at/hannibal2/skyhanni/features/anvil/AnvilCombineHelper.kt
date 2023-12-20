@@ -7,50 +7,32 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AnvilCombineHelper {
+object AnvilCombineHelper {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.inventory.anvilCombineHelper) return
+        if (!isEnabled()) return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.gui.inventorySlots as ContainerChest
+        val chest = event.gui.inventorySlots as? ContainerChest ?: return
         val chestName = chest.getInventoryName()
 
         if (chestName != "Anvil") return
 
-        val matchLore = mutableListOf<String>()
-
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
-            if (slot.slotNumber != slot.slotIndex) continue
-            if (slot.stack == null) continue
-
-            if (slot.slotNumber == 29) {
-                val lore = slot.stack.getLore()
-                matchLore.addAll(lore)
-                break
-            }
-        }
+        val matchLore = chest.inventorySlots
+            .filterNotNull()
+            .filter { it.slotNumber == it.slotIndex && it.stack != null }
+            .firstOrNull { it.slotNumber == 29 }?.stack?.getLore() ?: return
 
         if (matchLore.isEmpty()) return
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
-            if (slot.slotNumber == slot.slotIndex) continue
-            if (slot.stack == null) continue
-
-
-            if (matchLore == slot.stack.getLore()) {
-                slot highlight LorenzColor.GREEN
-            }
-        }
+        chest.inventorySlots
+            .filterNotNull()
+            .filter { it.slotNumber != it.slotIndex && it.stack != null && matchLore == it.stack.getLore() }
+            .forEach { it highlight LorenzColor.GREEN }
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.anvilCombineHelper
 }
