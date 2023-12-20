@@ -133,6 +133,8 @@ interface Renderable {
                     get() = render.width
                 override val height = 11
 
+                val tipsRender = tips.mapNotNull { fromAny(it) }
+
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
@@ -142,7 +144,7 @@ interface Renderable {
                             GlStateManager.translate(0F, 0F, 400F)
 
                             RenderLineTooltips.drawHoveringText(
-                                posX, posY, tips,
+                                posX, posY, tipsRender,
                                 stack,
                                 currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
                                 currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
