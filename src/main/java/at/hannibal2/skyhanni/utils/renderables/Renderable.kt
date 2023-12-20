@@ -262,7 +262,10 @@ interface Renderable {
             }
         }
 
-        fun table(content: List<List<Renderable>>, xPadding: Int = 1, yPadding: Int = 0) = object : Renderable {
+        /**
+         * @param content the list of rows the table should render
+         */
+        fun table(content: List<List<Renderable?>>, xPadding: Int = 1, yPadding: Int = 0) = object : Renderable {
             val xOffsets: List<Int> = let {
                 var buffer = 0
                 var index = 0
@@ -280,7 +283,7 @@ interface Renderable {
             val yOffsets: List<Int> = let {
                 var buffer = 0
                 listOf(0) + content.map { row ->
-                    buffer += row.maxOf { it.height } + yPadding
+                    buffer += row.maxOf { it?.height ?: 0 } + yPadding
                     buffer
                 }
             }
@@ -293,7 +296,7 @@ interface Renderable {
                     row.forEachIndexed { index, renderable ->
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable.render(posX + xOffsets[index], posY + yOffsets[rowIndex])
+                        renderable?.render(posX + xOffsets[index], posY + yOffsets[rowIndex])
                         GlStateManager.popMatrix()
                     }
                 }
