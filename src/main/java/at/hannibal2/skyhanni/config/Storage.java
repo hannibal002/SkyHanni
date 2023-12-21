@@ -210,10 +210,10 @@ public class Storage {
             public Map<CropType, Boolean> toolWithBountiful = new HashMap<>();
 
             @Expose
-            public String composterCurrentOrganicMatterItem = "";
+            public NEUInternalName composterCurrentOrganicMatterItem = NEUInternalName.Companion.getNONE();
 
             @Expose
-            public String composterCurrentFuelItem = "";
+            public NEUInternalName composterCurrentFuelItem = NEUInternalName.Companion.getNONE();
 
             @Expose
             public int uniqueVisitors = 0;
