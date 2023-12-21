@@ -140,10 +140,10 @@ object ComposterOverlay {
         if (!inComposterUpgrades) return
         update()
         for (upgrade in ComposterUpgrade.entries) {
-                event.itemStack.name?.let {
+            event.itemStack.name?.let {
                 if (it.contains(upgrade.displayName)) {
                     maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
-                            group("level")?.romanToDecimalIfNecessary() ?: 0
+                        group("level")?.romanToDecimalIfNecessary() ?: 0
                     } == 25
                     extraComposterUpgrade = upgrade
                     update()
@@ -179,8 +179,9 @@ object ComposterOverlay {
                 )
             return
         }
-        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) currentOrganicMatterItem =
-            NONE
+        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) {
+            currentOrganicMatterItem = NONE
+        }
         if (currentFuelItem.let { it !in fuelFactors.keys && it != NONE }) currentFuelItem = NONE
 
         if (inComposter) {
@@ -336,7 +337,6 @@ object ComposterOverlay {
             if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
 
-
         val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
@@ -363,7 +363,6 @@ object ComposterOverlay {
         val materialCostFormat =
             " §7Material costs per $timeText: §6${NumberUtil.format(totalCost)}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
-
 
         val priceCompost = getPrice("COMPOST")
         val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
@@ -463,7 +462,7 @@ object ComposterOverlay {
         val name = itemName.substring(0, 2) + selected + rawItemName
         list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
             onClick(internalName)
-                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+            if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                 lastAttemptTime = SimpleTimeMark.now()
                 retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
             }
