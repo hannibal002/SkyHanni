@@ -24,7 +24,10 @@ class AuctionHouseCopyUnderbidPrice {
         if (internalName == NEUInternalName.NONE) return
 
         val price = internalName.getPrice().toLong() - 1
-        if (price <= 0) return
+        if (price <= 0) {
+            OSUtils.copyToClipboard("")
+            return
+        }
         OSUtils.copyToClipboard("$price")
         LorenzUtils.chat("Set §e${price.addSeparators()} §eto clipboard. (Copy Underbid Price)")
     }
