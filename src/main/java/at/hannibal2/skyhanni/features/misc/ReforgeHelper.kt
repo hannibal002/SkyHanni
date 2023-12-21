@@ -8,11 +8,15 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -36,10 +40,11 @@ fun Int.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
 class ReforgeHelper {
 
     enum class ReforgeType {
-        Sword, Ranged, Armor, Chestplate, Axe, Hoe, Pickaxe, Equipment
+        Swords, Bows, Armor, Chestplates, Helmets, Cloaks, Axes, Hoes, HoeAndAxes, Pickaxes, Equipments, FishingRods, FishingRodsAndSwords, SpecialItems, Vacuums
     }
 
     enum class StatType(val icon: String) {
+        Damage("§c❁"),
         Health("§c❤"),
         Defence("§a❈"),
         Strength("§c❁"),
@@ -149,7 +154,28 @@ class ReforgeHelper {
         }
     }
 
-    class Reforge(val name: String, val type: ReforgeType, val stats: Map<LorenzRarity, StatList>) {
+    class Reforge(val name: String, val type: ReforgeType, val stats: Map<LorenzRarity, StatList>, val specialItems: List<NEUInternalName> = emptyList()) {
+
+        fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
+
+        fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) =
+            when (type) {
+                ReforgeType.Swords -> setOf(ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_WEAPON).contains(itemCategory)
+                ReforgeType.Bows -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
+                ReforgeType.Armor -> setOf(ItemCategory.HELMET, ItemCategory.CHESTPLATE, ItemCategory.LEGGINGS, ItemCategory.BOOTS).contains(itemCategory)
+                ReforgeType.Chestplates -> itemCategory == ItemCategory.CHESTPLATE
+                ReforgeType.Helmets -> itemCategory == ItemCategory.HELMET
+                ReforgeType.Cloaks -> itemCategory == ItemCategory.CLOAK
+                ReforgeType.Axes -> itemCategory == ItemCategory.AXE
+                ReforgeType.Hoes -> itemCategory == ItemCategory.HOE
+                ReforgeType.HoeAndAxes -> itemCategory == ItemCategory.HOE || itemCategory == ItemCategory.AXE
+                ReforgeType.Pickaxes -> itemCategory == ItemCategory.PICKAXE || itemCategory == ItemCategory.DRILL || itemCategory == ItemCategory.GAUNTLET
+                ReforgeType.Equipments -> setOf(ItemCategory.CLOAK, ItemCategory.BELT, ItemCategory.NECKLACE, ItemCategory.BRACELET, ItemCategory.GLOVES).contains(itemCategory)
+                ReforgeType.FishingRods -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
+                ReforgeType.FishingRodsAndSwords -> setOf(ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_ROD, ItemCategory.FISHING_WEAPON).contains(itemCategory)
+                ReforgeType.Vacuums -> itemCategory == ItemCategory.VACUUM
+                ReforgeType.SpecialItems -> specialItems.contains(internalName)
+            }
 
     }
 
