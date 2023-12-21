@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -159,13 +159,10 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onBlockClickSend(event: BlockClickEvent) {
-        handleItemClick(event.itemInHand)
-    }
-
-    @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        handleItemClick(event.itemInHand)
+        if (event.clickType == ClickType.RIGHT_CLICK) {
+            handleItemClick(event.itemInHand)
+        }
     }
 
     private fun handleItemClick(itemInHand: ItemStack?) {
