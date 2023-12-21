@@ -243,11 +243,17 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
     ),
     GARDEN_PASTING(
         {
-            listOf(ScoreboardData.sidebarLinesFormatted.firstOrNull { it.trim().startsWith("§fPasting§7: ") }
-                ?: "<hidden>")
+            listOf(
+                ScoreboardData.sidebarLinesFormatted.firstOrNull {
+                    it.trim().startsWith("§fPasting§7: ") || it.trim().startsWith("§fBarn Pasting§7:")
+                }
+                    ?: "<hidden>"
+            )
         },
         {
-            ScoreboardData.sidebarLinesFormatted.any { it.trim().startsWith("§fPasting§7: ") }
+            ScoreboardData.sidebarLinesFormatted.any {
+                it.trim().startsWith("§fPasting§7: ") || it.trim().startsWith("§fBarn Pasting§7:")
+            }
         }
     ),
     FLIGHT_DURATION(
@@ -456,7 +462,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 false -> listOf("§cNo Magma Boss Data")
             } else
 
-            list
+                list
         },
         {
             at.hannibal2.skyhanni.data.HypixelData.skyBlockArea == "Magma Chamber"
