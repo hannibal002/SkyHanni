@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkyMartCopperPrice {
-    private val pattern = "§c(?<amount>.*) Copper".toPattern()
+    private val copperPattern = "§c(?<amount>.*) Copper".toPattern()
     private var display = emptyList<List<Any>>()
     private val config get() = GardenAPI.config.skyMart
 
@@ -38,20 +38,20 @@ class SkyMartCopperPrice {
                 val internalName = stack.getInternalName()
                 val lowestBin = internalName.getPriceOrNull() ?: continue
 
-                pattern.matchMatcher(line) {
-                    val amount = group("amount").replace(",", "").toInt()
-                    val factor = lowestBin / amount
-                    val perFormat = NumberUtil.format(factor)
-                    val priceFormat = NumberUtil.format(lowestBin)
-                    val amountFormat = NumberUtil.format(amount)
+                val amount = copperPattern.matchMatcher(line) {
+                    group("amount").replace(",", "").toInt()
+                } ?: continue
+                val factor = lowestBin / amount
+                val perFormat = NumberUtil.format(factor)
+                val priceFormat = NumberUtil.format(lowestBin)
+                val amountFormat = NumberUtil.format(amount)
 
-                    val name = stack.nameWithEnchantment!!
-                    val advancedStats = if (config.copperPriceAdvancedStats) {
-                        " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
-                    } else ""
-                    val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
-                    table[pair] = Pair(factor, internalName)
-                }
+                val name = stack.nameWithEnchantment!!
+                val advancedStats = if (config.copperPriceAdvancedStats) {
+                    " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
+                } else ""
+                val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
+                table[pair] = Pair(factor, internalName)
             }
         }
 
