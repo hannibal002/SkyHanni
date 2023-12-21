@@ -486,7 +486,7 @@ object ComposterOverlay {
         val sackStatus = sackItem.getStatus()
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
-            if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
+            if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
             // TODO Add sack type repo data
             val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL")) "Mining"
             else "Enchanted Agronomy"
@@ -506,7 +506,7 @@ object ComposterOverlay {
             return
         }
 
-        LorenzUtils.sendCommandToServer("gfs $internalName ${itemsNeeded - having}")
+        LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
                 LorenzUtils.chat("You're out of $itemName §ein your sacks!")
