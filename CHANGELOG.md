@@ -180,6 +180,10 @@
 + Added an option to not show cooldown when ability is ready. - Obsidian
 + Added an option to highlight dungeon perm/vc parties. - Cad
 + Added Glowing Mush Mixin support to the Non-God Pod display. - jani
++ Added options to hide cheap items in item profit trackers. - hannibal2
++ Bazaar Best Sell Method now warns if an unknown bazaar item is detected. - hannibal2
++ SkyHanni position editor hotkey now work outside SkyBlock as well. - hannibal2
++ Dungeon party finder highlight features now works outside Dungeon Hub as well. - hannibal2
 
 ### Fixes
 
@@ -214,6 +218,7 @@
 + Fixed sixth visitor warning title showing when disabled. - alexia
 + Show not revealed brackets in the Jacob Contest time needed display. - hannibal2
 + Fixed wrong Rancher Boots item stack size color in combination with Black Cat or Racing Helmet.- hannibal2
++ Fixed showing medal icons in Jacob inventory. - hannibal2
 
 #### Bingo Fixes
 
@@ -233,6 +238,7 @@
 + Fixed Water Hydra warning showing up multiple times. - Cad
 + Fixed Shark Message missing a color code. - jani
 + Fixed /shresetfishingtracker description - absterge
++ Fixed barn fishing reset hotkey triggering while inside a GUI. - hannibal2
 
 #### Diana Fixes
 
@@ -244,6 +250,10 @@
 
 + Fixed an error message on /pt. - nea
 + Fixed the fire sale filter when a rune is selling. - j10a1n15
+
+#### Dungeon Fixes
+
++ Fixed Hide Healer Fairy. - hannibal2
 
 #### Misc Fixes
 
@@ -264,6 +274,8 @@
 + Fixed kick alert triggering instantly. - alexia
 + Fixed daily boss kill detection in Crimson Isle Reputation Helper. - hannibal2
 + Fixed Estimated Item Value error in Jerry's Island Deliveries menu. - hannibal2
++ Fixed the /gfs command counting in the Slayer Profit Tracker.  - hannibal2
++ Fixed the Fire Veil effect and item ability cooldown not working when clicking in the air. - hannibal2
 
 #### Config Fixes
 
