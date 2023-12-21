@@ -18,11 +18,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -52,16 +52,19 @@ class NonGodPotEffectDisplay {
         SVEN("§bWolf Fur Mixin", true),
         VOID("§6Ender Portal Fumes", true),
         BLAZE("§fGabagoey", true),
+        GLOWING_MUSH("§2Glowing Mush Mixin", true),
 
         DEEP_TERROR("§4Deepterror", true),
 
         GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
         ;
     }
+
     // TODO USE SH-REPO
     private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
 
+    // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
@@ -94,6 +97,7 @@ class NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
+
         if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
             effectDuration.remove(NonGodPotEffect.GOBLIN)
             update()
@@ -120,7 +124,7 @@ class NonGodPotEffectDisplay {
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
-            val color = colorForTime(remaining)
+            val color = remaining.timerColor()
 
             val displayName = effect.tabListName
             newDisplay.add("$displayName $color$format")
@@ -132,13 +136,6 @@ class NonGodPotEffectDisplay {
             checkFooter = true
         }
         return newDisplay
-    }
-
-    private fun colorForTime(duration: Duration) = when (duration) {
-        in 0.seconds..60.seconds -> "§c"
-        in 60.seconds..3.minutes -> "§6"
-        in 3.minutes..10.minutes -> "§e"
-        else -> "§f"
     }
 
     @SubscribeEvent

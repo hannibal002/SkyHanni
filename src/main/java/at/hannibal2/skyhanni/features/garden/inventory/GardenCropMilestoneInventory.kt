@@ -1,25 +1,25 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestoneInventory {
     private var average = -1.0
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = GardenAPI.config
 
     @SubscribeEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
@@ -52,12 +52,13 @@ class GardenCropMilestoneInventory {
     }
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: ItemTooltipEvent) {
+    fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 
-        val itemStack = event.itemStack ?: return
-        val crop = GardenCropMilestones.getCropTypeByLore(itemStack) ?: return
+        val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return
+        val tier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+        if (tier > 20) return
 
         val maxTier = GardenCropMilestones.getMaxTier()
         val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop)

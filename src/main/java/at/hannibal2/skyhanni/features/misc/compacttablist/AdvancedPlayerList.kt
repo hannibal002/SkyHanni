@@ -1,20 +1,23 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.BingoAPI
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.ContributorListJson
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -73,8 +76,7 @@ object AdvancedPlayerList {
                     playerData.levelText = levelText
                     index++
                     if (name.size > index) {
-                        val nameSuffix = name.drop(index).joinToString(" ")
-                        playerData.nameSuffix = nameSuffix
+                        var nameSuffix = name.drop(index).joinToString(" ")
                         if (nameSuffix.contains("♲")) {
                             playerData.ironman = true
                         } else {
@@ -82,13 +84,16 @@ object AdvancedPlayerList {
                         }
                         if (IslandType.CRIMSON_ISLE.isInIsland()) {
                             playerData.faction = if (line.contains("§c⚒")) {
+                                nameSuffix = nameSuffix.replace("§c⚒", "")
                                 CrimsonIsleFaction.BARBARIAN
                             } else if (line.contains("§5ቾ")) {
+                                nameSuffix = nameSuffix.replace("§5ቾ", "")
                                 CrimsonIsleFaction.MAGE
                             } else {
                                 CrimsonIsleFaction.NONE
                             }
                         }
+                        playerData.nameSuffix = nameSuffix
                     } else {
                         playerData.nameSuffix = ""
                     }
@@ -105,21 +110,26 @@ object AdvancedPlayerList {
 
         val sorted = when (config.playerSortOrder) {
 
-            // Rank (Default)
-            1 -> prepare.sortedBy { -(it.value.sbLevel) }
+            // SB Level
+            PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
 
             // Name (Abc)
-            2 -> prepare.sortedBy { it.value.name.lowercase().replace("_", "") }
+            PlayerSortEntry.NAME -> prepare.sortedBy {
+                it.value.name.lowercase().replace("_", "")
+            }
 
             // Ironman/Bingo
-            3 -> prepare.sortedBy { -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1 }
+            PlayerSortEntry.PROFILE_TYPE -> prepare.sortedBy {
+                -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1
+            }
 
             // Party/Friends/Guild First
-            4 -> prepare.sortedBy { -socialScore(it.value.name) }
+            PlayerSortEntry.SOCIAL_STATUS -> prepare.sortedBy { -socialScore(it.value.name) }
 
             // Random
-            5 -> prepare.sortedBy { getRandomOrder(it.value.name) }
+            PlayerSortEntry.RANDOM -> prepare.sortedBy { getRandomOrder(it.value.name) }
 
+            // Rank (Default)
             else -> prepare
         }
 
@@ -138,7 +148,7 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isControlKeyDown()
+        val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
     }
 
@@ -204,7 +214,7 @@ object AdvancedPlayerList {
     private fun getSocialScoreIcon(score: Int) = when (score) {
 //        10 -> "§c§lME"
         10 -> ""
-        8 -> "§e§lMARKED"
+        8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"
@@ -235,5 +245,12 @@ object AdvancedPlayerList {
         BARBARIAN(" §c⚒"),
         MAGE(" §5ቾ"),
         NONE("")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
+            ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
+        }
     }
 }

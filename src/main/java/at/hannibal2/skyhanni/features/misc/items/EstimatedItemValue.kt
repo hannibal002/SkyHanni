@@ -6,10 +6,12 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -26,7 +28,6 @@ import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import kotlin.math.roundToLong
@@ -37,7 +38,9 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
-    var currentlyShowing = false
+    private var currentlyShowing = false
+
+    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -51,11 +54,11 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
@@ -132,8 +135,14 @@ object EstimatedItemValue {
             return
         }
 
-        if (InventoryUtils.openInventoryName().startsWith("Museum ")) {
+        val openInventoryName = InventoryUtils.openInventoryName()
+        if (openInventoryName.startsWith("Museum ")) {
             if (item.getLore().any { it.contains("Armor Set") }) {
+                return
+            }
+        }
+        if (openInventoryName == "Island Deliveries") {
+            if (item.getLore().any { it == "§eClick to collect!" }) {
                 return
             }
         }
@@ -154,6 +163,16 @@ object EstimatedItemValue {
     private fun draw(stack: ItemStack): List<List<Any>> {
         val internalName = stack.getInternalNameOrNull() ?: return listOf()
 
+        // Stats Breakdown
+        val name = stack.name ?: return listOf()
+        if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
+        if (name.contains("Salesperson")) return listOf()
+
+        // Autopet rule > Create Rule
+        if (!InventoryUtils.isSlotInPlayerInventory(stack)) {
+            if (InventoryUtils.openInventoryName() == "Choose a wardrobe slot") return listOf()
+        }
+
         // FIX neu item list
         if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
         // We don't need this feature to work on books at all
@@ -165,6 +184,7 @@ object EstimatedItemValue {
         // Hides the rune item
         if (internalName.contains("_RUNE;")) return listOf()
         if (internalName.contains("UNIQUE_RUNE")) return listOf()
+        if (internalName.contains("WISP_POTION")) return listOf()
 
 
         if (internalName.getItemStackOrNull() == null) {
@@ -184,7 +204,7 @@ object EstimatedItemValue {
         } else {
             NumberUtil.format(totalPrice)
         }
-        list.add("§aTotal: §6§l$numberFormat")
+        list.add("§aTotal: §6§l$numberFormat coins")
 
         val newDisplay = mutableListOf<List<Any>>()
         for (line in list) {

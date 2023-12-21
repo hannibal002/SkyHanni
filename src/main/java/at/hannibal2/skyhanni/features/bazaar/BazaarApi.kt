@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -57,20 +58,20 @@ class BazaarApi {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
-            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+            val itemName = getOpenedProduct(event.inventoryItems) ?: return
+            val openedProduct = NEUItems.getInternalNameOrNull(itemName)
             currentlyOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): String? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.displayName != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        val itemName = bazaarItem.displayName
-        return NEUItems.getInternalNameOrNull(itemName)
+        return bazaarItem.displayName
     }
 
     @SubscribeEvent
@@ -109,11 +110,12 @@ class BazaarApi {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if ("\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toRegex()
-                .matches(event.message.removeColor())
-        ) {
-            currentSearchedItem = ""
-        }
+        if (!LorenzUtils.inSkyBlock) return
+        if (!inBazaarInventory) return
+        // TODO USE SH-REPO
+        // TODO remove dynamic pattern
+        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
+            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {

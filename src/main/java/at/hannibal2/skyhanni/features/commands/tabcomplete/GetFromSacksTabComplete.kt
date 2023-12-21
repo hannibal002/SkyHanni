@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SacksJson
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.SacksJson
-import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GetFromSacksTabComplete {
@@ -26,19 +25,18 @@ object GetFromSacksTabComplete {
     }
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!isEnabled()) return
 
-        val packet = event.packet as? C01PacketChatMessage ?: return
-        val message = packet.message
-        if (commands.any { message.startsWith("/$it ") }) {
-            val rawName = message.split(" ")[1]
-            val realName = rawName.replace("_", " ")
-            if (realName == rawName) return
-            if (realName !in sackList) return
-            event.isCanceled = true
-            LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
-        }
+        val message = event.message
+        if (!commands.any { message.startsWith("/$it ") }) return
+
+        val rawName = message.split(" ")[1]
+        val realName = rawName.replace("_", " ")
+        if (realName == rawName) return
+        if (realName !in sackList) return
+        event.isCanceled = true
+        LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.gfsSack

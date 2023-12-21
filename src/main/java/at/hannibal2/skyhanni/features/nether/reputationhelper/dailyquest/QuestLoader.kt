@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.U
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.jsonobjects.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
@@ -122,7 +122,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 "DOJO" -> return DojoQuest(questName, location, displayItem, dojoGoal, state)
             }
         }
-        LorenzUtils.chat("§c[SkyHanni] Unknown Crimson Isle quest: '$name'")
+        LorenzUtils.error("Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 

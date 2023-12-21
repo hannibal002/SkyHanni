@@ -77,9 +77,7 @@ object EntityOutlineRenderer {
      *
      * @param camera       the current camera
      * @param partialTicks the progress to the next tick
-     * @param x            the camera x position
-     * @param y            the camera y position
-     * @param z            the camera z position
+     * @param vector       the camera position as Vector
      */
     @JvmStatic
     fun renderEntityOutlines(camera: ICamera, partialTicks: Float, vector: LorenzVec): Boolean {
@@ -104,13 +102,13 @@ object EntityOutlineRenderer {
         mc.renderManager.setRenderOutlines(true)
 
         // Enable outline mode
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL13.GL_COMBINE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_RGB, GL11.GL_REPLACE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_RGB, GL13.GL_CONSTANT);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_RGB, GL11.GL_SRC_COLOR);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_ALPHA, GL11.GL_REPLACE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_ALPHA, GL11.GL_TEXTURE);
-        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA);
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL13.GL_COMBINE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_RGB, GL11.GL_REPLACE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_RGB, GL13.GL_CONSTANT)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_RGB, GL11.GL_SRC_COLOR)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_COMBINE_ALPHA, GL11.GL_REPLACE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_SOURCE0_ALPHA, GL11.GL_TEXTURE)
+        GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL13.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA)
 
         // Render x-ray outlines first, ignoring the depth buffer bit
         if (!isXrayCacheEmpty()) {
@@ -284,16 +282,14 @@ object EntityOutlineRenderer {
      *
      * @param camera the current camera
      * @param entity the entity to render
-     * @param x      the camera x position
-     * @param y      the camera y position
-     * @param z      the camera z position
+     * @param vector the camera position as Vector
      * @return whether the entity should be rendered
      */
     private fun shouldRender(camera: ICamera, entity: Entity, vector: LorenzVec): Boolean =
         // Only render the view entity when sleeping or in 3rd person mode
         if (entity === mc.renderViewEntity &&
             !(mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                    mc.gameSettings.thirdPersonView != 0)
+                mc.gameSettings.thirdPersonView != 0)
         ) {
             false
         } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (mc.renderManager.shouldRender(
@@ -339,7 +335,7 @@ object EntityOutlineRenderer {
         }
     }
 
-    fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
+    private fun isCacheEmpty() = isXrayCacheEmpty() && isNoXrayCacheEmpty()
 
     private fun isXrayCacheEmpty() = entityRenderCache.xrayCache?.isEmpty() ?: true
     private fun isNoXrayCacheEmpty() = entityRenderCache.noXrayCache?.isEmpty() ?: true
@@ -361,12 +357,12 @@ object EntityOutlineRenderer {
      */
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return;
+        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return
 
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
         } catch (e: NoClassDefFoundError) {
-            ErrorManager.logError(e, "Unable to enable entity outlines, the required mixin is not loaded")
+            ErrorManager.logErrorWithData(e, "Unable to enable entity outlines, the required mixin is not loaded")
             isMissingMixin = true
             return
         }

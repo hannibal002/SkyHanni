@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,7 +32,10 @@ class JacobFarmingContestsInventory {
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
-    private val medalPattern = "§7§7You placed in the (?<medal>.*)".toPattern()
+    private val medalPattern by RepoPattern.pattern(
+        "garden.jacob.contests.inventory.medal",
+        "§7§7You placed in the (?<medal>.*) §7bracket!"
+    )
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -52,10 +56,7 @@ class JacobFarmingContestsInventory {
 
             val name = item.name!!
 
-            if (foundEvents.contains(name)) {
-            } else {
-                foundEvents.add(name)
-            }
+            foundEvents.add(name)
             val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
             FarmingContestAPI.addContest(time, item)
             if (config.realTime) {
@@ -144,7 +145,11 @@ class JacobFarmingContestsInventory {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "inventory.jacobFarmingContestHighlightRewards", "inventory.jacobFarmingContests.highlightRewards")
+        event.move(
+            3,
+            "inventory.jacobFarmingContestHighlightRewards",
+            "inventory.jacobFarmingContests.highlightRewards"
+        )
         event.move(3, "inventory.jacobFarmingContestHideDuplicates", "inventory.jacobFarmingContests.hideDuplicates")
         event.move(3, "inventory.jacobFarmingContestRealTime", "inventory.jacobFarmingContests.realTime")
         event.move(3, "inventory.jacobFarmingContestFinneganIcon", "inventory.jacobFarmingContests.finneganIcon")

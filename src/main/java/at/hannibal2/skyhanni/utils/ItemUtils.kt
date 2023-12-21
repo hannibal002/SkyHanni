@@ -6,8 +6,9 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -23,6 +24,20 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
+
+    // TODO USE SH-REPO
+    private val patternInFront = "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)".toPattern()
+    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
+    private val petLevelPattern = "\\[Lvl (.*)] (.*)".toPattern()
+
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
+    )
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -50,14 +65,7 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
-        "Archer",
-        "Berserk",
-        "Mage",
-        "Tank",
-        "Healer",
-        "➡",
-    ).any { name.contains(it) }
+    fun isPet(name: String): Boolean = petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
@@ -65,7 +73,7 @@ object ItemUtils {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
             return list
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -75,7 +83,7 @@ object ItemUtils {
         }
 
         if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-                list.add(player.inventory.itemStack)
+            list.add(player.inventory.itemStack)
         }
         return list
     }
@@ -84,7 +92,7 @@ object ItemUtils {
         val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
             return map
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -129,7 +137,11 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
 
+    // Checks for the enchantment glint as part of the minecraft enchantments
     fun ItemStack.isEnchanted() = isItemEnchanted
+
+    // Checks for hypixel enchantments in the attributes
+    fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
@@ -216,9 +228,13 @@ object ItemUtils {
         val rarity = LorenzRarity.readItemRarity(this)
         data.itemRarity = rarity
         if (rarity == null && logError) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not read rarity for item $name",
-                "getItemRarityOrNull not found for: $internalName, name:'$name''"
+                "Failed to read rarity from item rarity via item lore",
+                "internal name" to internalName,
+                "item name" to name,
+                "inventory name" to InventoryUtils.openInventoryName(),
+                "lore" to getLore(),
             )
         }
         return rarity
@@ -239,10 +255,6 @@ object ItemUtils {
         }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
-
-    // TODO USE SH-REPO
-    private val patternInFront = "(?: *§8(\\+§[\\d\\w])?(?<amount>[\\d\\.km,]+)(x )?)?(?<name>.*)".toPattern()
-    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
@@ -298,15 +310,18 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
-
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
-            ErrorManager.logErrorState(
+            ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
-                "getPetRarity not found for: ${pet.getInternalName()}, name:'$name'"
+                "Failed to read rarity from pet item via internal name",
+                "internal name" to pet.getInternalName(),
+                "item name" to name,
+                "rarity id" to rarityId,
+                "inventory name" to InventoryUtils.openInventoryName()
             )
         }
         return rarity

@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -41,7 +42,9 @@ class FishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
-        if (config.manualResetTimer.isKeyHeld()) startTime = System.currentTimeMillis()
+        if (config.manualResetTimer.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null) {
+            startTime = System.currentTimeMillis()
+        }
     }
 
     private fun tryPlaySound() {
@@ -91,6 +94,10 @@ class FishingTimer {
             inHollows = true
             return true
         }
+
+        if (config.crimsonIsle && IslandType.CRIMSON_ISLE.isInIsland()) return true
+
+        if (config.winterIsland && IslandType.WINTER.isInIsland()) return true
 
         if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50

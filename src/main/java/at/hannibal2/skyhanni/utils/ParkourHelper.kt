@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson.ShortCut
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson.ShortCut
 import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -53,7 +53,9 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        if (location.offsetCenter().distanceToPlayer() < detectionRange && Minecraft.getMinecraft().thePlayer.onGround) {
+                        val onGround = Minecraft.getMinecraft().thePlayer.onGround
+                        val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
+                        if (closeEnough && onGround) {
                             current = index
                         }
                     }
@@ -114,7 +116,7 @@ class ParkourHelper(
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }
                 if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
-                    event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
+                    event.drawString(location.offsetCenter().add(y = 1), "§a§l$index", seeThroughBlocks = true)
                 }
             }
         } catch (e: Throwable) {
