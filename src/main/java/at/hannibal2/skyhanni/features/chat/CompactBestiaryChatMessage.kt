@@ -27,7 +27,7 @@ class CompactBestiaryChatMessage {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
 
-        val titleMessage = "                                  §6§lBESTIARY"
+        val titleMessage = "§f                                  §6§lBESTIARY"
         val border = "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
 
         val message = event.message
