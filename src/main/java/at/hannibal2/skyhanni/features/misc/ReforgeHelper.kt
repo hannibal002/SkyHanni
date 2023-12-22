@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -8,15 +9,11 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -35,24 +32,20 @@ import kotlin.time.toDuration
 private const val specialSpaceNumber = "\u2001"
 private const val specialSpaceSign = " "
 
-fun Int.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
+fun Double.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
 
 class ReforgeHelper {
-
-    enum class ReforgeType {
-        Swords, Bows, Armor, Chestplates, Helmets, Cloaks, Axes, Hoes, HoeAndAxes, Pickaxes, Equipments, FishingRods, FishingRodsAndSwords, SpecialItems, Vacuums
-    }
 
     enum class StatType(val icon: String) {
         Damage("§c❁"),
         Health("§c❤"),
-        Defence("§a❈"),
+        Defense("§a❈"),
         Strength("§c❁"),
         Intelligence("§b✎"),
         Crit_Damage("§9☠"),
         Crit_Chance("§9☣"),
         Ferocity("§c⫽"),
-        Attack_Speed("§e⚔"),
+        Bonus_Attack_Speed("§e⚔"),
         Ability_Damage("§c๑"),
         Health_Regen("§c❣"),
         Vitality("§4♨"),
@@ -61,8 +54,8 @@ class ReforgeHelper {
         Swing_Range("§eⓈ"),
         Speed("§f✦"),
         Sea_Creature_Chance("§3α"),
-        MagicFind("§b✯"),
-        PetLuck("§d♣"),
+        Magic_Find("§b✯"),
+        Pet_Luck("§d♣"),
         Fishing_Speed("§b☂"),
         Bonus_Pest_Chance("§2ൠ"),
         Combat_Wisdom("§3☯"),
@@ -91,15 +84,15 @@ class ReforgeHelper {
     }
 
 
-    class StatList : EnumMap<StatType, Int>(StatType::class.java) {
+    class StatList : EnumMap<StatType, Double>(StatType::class.java) {
         operator fun minus(other: StatList): StatList {
             return StatList().apply {
                 for ((key, value) in this@StatList) {
-                    this[key] = value - (other[key] ?: 0)
+                    this[key] = value - (other[key] ?: 0.0)
                 }
                 for ((key, value) in other) {
                     if (this[key] == null) {
-                        this[key] = (this@StatList[key] ?: 0) - value
+                        this[key] = (this@StatList[key] ?: 0.0) - value
                     }
                 }
             }
@@ -115,8 +108,7 @@ class ReforgeHelper {
                 if (key == null || value == null) return@mapNotNull null
                 buildString {
                     append("§9")
-                    append((this@StatList[key] ?: 0).toStringWithPlus())
-                    LorenzDebug.log((fontRender.getStringWidth(this.toString()).toFloat() / fontRender.getStringWidth(" ").toFloat()).toString())
+                    append((this@StatList[key] ?: 0.0).toStringWithPlus())
                     while (this.length < 8) {
                         append(specialSpaceNumber)
                     }
@@ -146,50 +138,13 @@ class ReforgeHelper {
 
 
         companion object {
-            fun mapOf(vararg list: Pair<StatType, Int>) = StatList().apply {
+            fun mapOf(vararg list: Pair<StatType, Double>) = StatList().apply {
                 for ((key, value) in list) {
                     this[key] = value
                 }
             }
         }
     }
-
-    class Reforge(val name: String, val type: ReforgeType, val stats: Map<LorenzRarity, StatList>, val specialItems: List<NEUInternalName> = emptyList()) {
-
-        fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
-
-        fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) =
-            when (type) {
-                ReforgeType.Swords -> setOf(ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_WEAPON).contains(itemCategory)
-                ReforgeType.Bows -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
-                ReforgeType.Armor -> setOf(ItemCategory.HELMET, ItemCategory.CHESTPLATE, ItemCategory.LEGGINGS, ItemCategory.BOOTS).contains(itemCategory)
-                ReforgeType.Chestplates -> itemCategory == ItemCategory.CHESTPLATE
-                ReforgeType.Helmets -> itemCategory == ItemCategory.HELMET
-                ReforgeType.Cloaks -> itemCategory == ItemCategory.CLOAK
-                ReforgeType.Axes -> itemCategory == ItemCategory.AXE
-                ReforgeType.Hoes -> itemCategory == ItemCategory.HOE
-                ReforgeType.HoeAndAxes -> itemCategory == ItemCategory.HOE || itemCategory == ItemCategory.AXE
-                ReforgeType.Pickaxes -> itemCategory == ItemCategory.PICKAXE || itemCategory == ItemCategory.DRILL || itemCategory == ItemCategory.GAUNTLET
-                ReforgeType.Equipments -> setOf(ItemCategory.CLOAK, ItemCategory.BELT, ItemCategory.NECKLACE, ItemCategory.BRACELET, ItemCategory.GLOVES).contains(itemCategory)
-                ReforgeType.FishingRods -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
-                ReforgeType.FishingRodsAndSwords -> setOf(ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_ROD, ItemCategory.FISHING_WEAPON).contains(itemCategory)
-                ReforgeType.Vacuums -> itemCategory == ItemCategory.VACUUM
-                ReforgeType.SpecialItems -> specialItems.contains(internalName)
-            }
-
-    }
-
-    private val reforges = listOf(
-        Reforge("Clean", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 200))),
-        Reforge("Fierce", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 8))),
-        Reforge("Heavy", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 7))),
-        Reforge("Light", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 6))),
-        Reforge("Mythic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 5))),
-        Reforge("Pure", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 4))),
-        Reforge("Smart", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Health to 4, StatType.Defence to 4, StatType.Intelligence to 20))),
-        Reforge("Titanic", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Health to 10, StatType.Defence to 10))),
-        Reforge("Wise", ReforgeType.Armor, mapOf(LorenzRarity.COMMON to StatList.mapOf(StatType.Strength to 1))),
-    )
 
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
     val reforgeHexMenu by RepoPattern.pattern("menu.reforge.hex", "The Hex ➜ Reforges")
@@ -324,14 +279,17 @@ class ReforgeHelper {
     fun generateDisplay() = buildList<Renderable> {
         this.add(Renderable.string("§6Reforge Overlay"))
         val item = item ?: return@buildList
-        val itemType = ReforgeType.Armor
+        val internalName = item.getInternalName()
+        val itemType = item.getItemCategoryOrNull()
         val itemRarity = item.getItemRarityOrNull()
-        val currentReforge = reforges.firstOrNull { it.name == currentReforgeCapitalized }
-        val list = reforges.filter { it.type == itemType }.map { reforge ->
-            Renderable.clickAndHover("§7" + reforge.name,
-                itemRarity?.let { rarity -> reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) }
-                    ?: listOf("")) { reforgeToSearch = reforge.name.replaceFirstChar { it.lowercase() } }
-        }
+        val currentReforge = ReforgeAPI.reforgeList.firstOrNull { it.name == currentReforgeCapitalized }
+        val list = (if (isInHexReforgeMenu) ReforgeAPI.reforgeList else ReforgeAPI.nonePowerStoneReforge
+            ).filter { it.isValid(itemType, internalName) }.map { reforge ->
+                Renderable.clickAndHover(
+                    (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
+                    itemRarity?.let { rarity -> reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) }
+                        ?: listOf("")) { reforgeToSearch = reforge.name.replaceFirstChar { it.lowercase() } }
+            }
         this.addAll(list)
         if (itemType == null) {
             reforgeToSearch = ""
