@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -9,10 +10,13 @@ import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -24,6 +28,10 @@ import kotlin.time.Duration.Companion.milliseconds
 class OwnInventoryData {
     private var itemAmounts = mapOf<NEUInternalName, Int>()
     private var dirty = false
+    private val sackToInventoryChatPattern by RepoPattern.pattern(
+        "data.owninventory.chat.movedsacktoinventory",
+        "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory."
+    )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
@@ -96,6 +104,14 @@ class OwnInventoryData {
         ignoreItem(500.milliseconds) { true }
     }
 
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        sackToInventoryChatPattern.matchMatcher(event.message) {
+            val name = group("name")
+            ignoreItem(500.milliseconds) { it.getItemName().contains(name) }
+        }
+    }
+
     private fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
         ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
     }
@@ -109,7 +125,10 @@ class OwnInventoryData {
         if (diffWorld < 3_000) return
 
         ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
-        if (ignoredItemsUntil.any { it.condition(internalName) }) return
+        if (ignoredItemsUntil.any { it.condition(internalName) }) {
+//             println("ignored: $internalName")
+            return
+        }
 
         if (internalName.startsWith("MAP-")) return
 
