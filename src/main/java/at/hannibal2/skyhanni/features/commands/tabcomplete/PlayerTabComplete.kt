@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.api.FriendAPI
+import at.hannibal2.skyhanni.api.PartyAPI
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson

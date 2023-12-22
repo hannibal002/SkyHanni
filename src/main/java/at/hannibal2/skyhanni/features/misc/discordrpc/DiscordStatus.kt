@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.api.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.getTierForCropCount

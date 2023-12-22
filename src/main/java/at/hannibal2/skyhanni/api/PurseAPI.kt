@@ -1,5 +1,6 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause

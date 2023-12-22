@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
-import at.hannibal2.skyhanni.data.SackItem;
+import at.hannibal2.skyhanni.api.SackItem;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
 

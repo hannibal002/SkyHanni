@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.api.PartyAPI
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay

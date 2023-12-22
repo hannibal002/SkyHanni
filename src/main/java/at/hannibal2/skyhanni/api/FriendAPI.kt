@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType

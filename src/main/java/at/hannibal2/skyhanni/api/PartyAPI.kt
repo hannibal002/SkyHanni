@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
