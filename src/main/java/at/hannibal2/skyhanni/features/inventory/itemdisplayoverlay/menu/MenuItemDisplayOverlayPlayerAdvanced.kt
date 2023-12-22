@@ -55,7 +55,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     private val holyHeckJerryIsMayorItemNamePattern = (("JERRY IS MAYOR.*").toPattern())
     private val mayorBlankItemNamePattern = (("Mayor .*").toPattern())
     private val perkpocalypsePerksLoreLinePattern = (("^(§.)Perkpocalypse Perks:\$").toPattern())
-    private val thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumLoreLinePattern = (("§7(?<apparentlyINeedThisNow>[A-z]+ )?(players until the closing of|until the closing of the next)").toPattern())
+    private val thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumLoreLinePattern = (("(§.)*(?<apparentlyINeedThis>[A-z]+ )?players until the closing of(?<apparentlyINeedThisToo> [A-z]+)?").toPattern())
     private val isNotMayorJerryItemNamePattern = ((".*(?<! Jerry)\$").toPattern())
     private val isBazaarChestNamePattern = (("Bazaar.*").toPattern())
     private val thereIsStuffToClaimFromBazaarLoreLinePattern = ((".*to claim!").toPattern())
