@@ -23,10 +23,14 @@ class AuctionHouseCopyUnderbidPrice {
         val internalName = item.getInternalName()
         if (internalName == NEUInternalName.NONE) return
 
-        val price = internalName.getPrice().toLong() - 1
-        if (price <= 0) return
-        OSUtils.copyToClipboard("$price")
-        LorenzUtils.chat("Set §e${price.addSeparators()} §eto clipboard. (Copy Underbid Price)")
+        val price = internalName.getPrice().toLong()
+        if (price <= 0) {
+            OSUtils.copyToClipboard("")
+            return
+        }
+        val newPrice = price * item.stackSize - 1
+        OSUtils.copyToClipboard("$newPrice")
+        LorenzUtils.chat("Set §e${newPrice.addSeparators()} §eto clipboard. (Copy Underbid Price)")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.copyUnderbidPrice
