@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -35,15 +35,14 @@ class FireVeilWandParticles {
     }
 
     @SubscribeEvent
-    fun onBlockClick(event: BlockClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        if (event.clickType == ClickType.RIGHT_CLICK) {
-            val internalName = event.itemInHand?.getInternalName() ?: return
+        val internalName = event.itemInHand?.getInternalName() ?: return
 
-            if (internalName == item) {
-                lastClick = System.currentTimeMillis()
-            }
+        if (internalName == item) {
+            lastClick = System.currentTimeMillis()
         }
     }
 
