@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -87,7 +88,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        if (dirty) {
+        if (dirty || TrackerManager.dirty) {
             display = getSharedTracker()?.let {
                 buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
             } ?: emptyList()
