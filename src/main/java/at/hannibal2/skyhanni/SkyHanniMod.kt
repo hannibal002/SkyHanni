@@ -14,10 +14,6 @@ import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
-import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
@@ -42,6 +38,10 @@ import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.garden.composter.GardenComposterUpgradesData
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestonesCommunityFix
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson

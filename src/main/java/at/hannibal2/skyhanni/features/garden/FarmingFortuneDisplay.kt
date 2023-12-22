@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.CropAccessoryData
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent

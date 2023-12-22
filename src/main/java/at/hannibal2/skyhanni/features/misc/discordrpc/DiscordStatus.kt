@@ -4,14 +4,14 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
-import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
-import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.isMaxed
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.RiftAPI

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.garden.crop.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson.DicerType
 import at.hannibal2.skyhanni.events.CropClickEvent

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.garden.crop
 
 import at.hannibal2.skyhanni.events.CropUpgradeUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
