@@ -13,6 +13,7 @@
 //  - beacon power
 //  - skyblock level
 //  - more bg options (round, blurr, outline)
+//  - countdown events like fishing festival + fiesta when its not on tablist
 //
 
 package at.hannibal2.skyhanni.features.misc.customscoreboard
