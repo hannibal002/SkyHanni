@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.currentSpray
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isSprayExpired
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.markExpiredSprayAsNotified
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
@@ -27,11 +28,12 @@ class SprayDisplay {
         if (!GardenAPI.inGarden() || !event.isMod(5)) return
 
         if (config.displayEnabled) {
-            val plot = GardenPlotAPI.getCurrentPlot() ?: return
-            display = plot.currentSpray?.let {
-                val timer = it.expiry.timeUntil()
-                "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
-            } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
+            display = GardenPlotAPI.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
+                plot.currentSpray?.let {
+                    val timer = it.expiry.timeUntil()
+                    "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
+                } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
+            } ?: ""
         }
 
         if (config.expiryNotification) {

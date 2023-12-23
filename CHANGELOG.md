@@ -72,6 +72,7 @@
 + Added show special edition number as stack size when below 1k. - hannibal2
 + Added Copy Underbid Price. - hannibal2
   + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
++ Highlight your own lowest BIN auctions that are outbid. - hannibal2
 
 #### Minion Features
 
@@ -135,6 +136,8 @@
 + Show the garden build limit with F3+G on. - hannibal2
 + Added an option to show if the plot is not sprayed. - alexia
 + Changed pest spawn message format. - hannibal2
++ Improve the precision of the compost empty timer. - appable
++ Added Harvest Harbinger and Pest Repellent non-god effects. - alexia
 
 #### Fishing Changes
 
@@ -163,6 +166,10 @@
 
 + Resetting the guess and burrow locations when clearing the burrows at Diana NPC. - hannibal2
 + Removed Diana "Smooth Transition" and replaced it with "Line to Next". - hannibal2
+
+#### Inventory Changes
+
++ Copy Underbid Price now supports stack sizes of more than one. - hannibal2
 
 #### Misc Changes
 
@@ -219,6 +226,9 @@
 + Show not revealed brackets in the Jacob Contest time needed display. - hannibal2
 + Fixed wrong Rancher Boots item stack size color in combination with Black Cat or Racing Helmet.- hannibal2
 + Fixed showing medal icons in Jacob inventory. - hannibal2
++ Fixed SkyMart items showing the wrong profit when having other items as costs. - hannibal2
++ Hide "Not sprayed!" text while in the barn or outside the garden area. - hannibal2
++ Fixed armor drop tracker not instantly visible. - hannibal2
 
 #### Bingo Fixes
 
@@ -250,6 +260,7 @@
 
 + Fixed an error message on /pt. - nea
 + Fixed the fire sale filter when a rune is selling. - j10a1n15
++ Fixed bestiary compact message. - hannibal2
 
 #### Dungeon Fixes
 
@@ -276,6 +287,7 @@
 + Fixed Estimated Item Value error in Jerry's Island Deliveries menu. - hannibal2
 + Fixed the /gfs command counting in the Slayer Profit Tracker.  - hannibal2
 + Fixed the Fire Veil effect and item ability cooldown not working when clicking in the air. - hannibal2
++ Fixed broken area mini boss highlight during Derpy. - hannibal2
 
 #### Config Fixes
 
@@ -329,6 +341,7 @@
 + Created PetAPI.isCurrentPet. - hannibal2
 + Refactored Duplicate Code in SkyHanniInstallerFrame. - walker
 + Removed unnecessary non-capturing groups. - walker
++ ComposterOverlay now uses NEUInternalName. - walker
 
 ## Version 0.21.1
 
