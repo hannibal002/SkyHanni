@@ -155,7 +155,6 @@ class InformationGetter {
             "§6Year ",
             "§7Waiting for",
             "§7your vote...",
-            "e: §e§b0%",
             "Pelts: §5",
             "Tracker Mob Location:",
             "§7Boss: §",
@@ -211,5 +210,8 @@ class InformationGetter {
 
         // da
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("Current Item:") != it }
+
+        // remove that buggy redstone line wth hypixel
+        unknownLines = unknownLines.filter { "^\\s*e: §e§b(\\d{1,2}|100)%\$".toPattern().matcher(it).matches() }
     }
 }
