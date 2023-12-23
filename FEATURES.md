@@ -105,6 +105,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight depleted Bonzo's Masks in your inventory.
 + Highlight stuff that is missing in the SkyBlock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
++ Highlight your own lowest BIN auctions that are outbid. - hannibal2
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + **Contest Time** - Show the real time format to the farming contest description.
 + **Pet Candies Used number**
