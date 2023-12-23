@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
-import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -49,32 +48,10 @@ class ComposterDisplay {
         readData(event.tabList)
 
         if (tabListData.isNotEmpty()) {
-            calculateEmptyTime()
+            composterEmptyTime = ComposterAPI.estimateEmptyTimeFromTab()
             updateDisplay()
             sendNotify()
         }
-    }
-
-    private fun calculateEmptyTime() {
-        val organicMatter = ComposterAPI.getOrganicMatter()
-        val fuel = ComposterAPI.getFuel()
-
-        if (ComposterAPI.composterUpgrades.isNullOrEmpty()) {
-            composterEmptyTime = null
-            return
-        }
-
-        val timePerCompost = ComposterAPI.timePerCompost(null)
-
-        val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
-        val fuelRequired = ComposterAPI.fuelRequiredPer(null)
-
-        val organicMatterRemaining = floor(organicMatter / organicMatterRequired)
-        val fuelRemaining = floor(fuel / fuelRequired)
-
-        val endOfOrganicMatter = timePerCompost * organicMatterRemaining
-        val endOfFuel = timePerCompost * fuelRemaining
-        composterEmptyTime = if (endOfOrganicMatter > endOfFuel) endOfFuel else endOfOrganicMatter
     }
 
     private fun updateDisplay() {
