@@ -87,8 +87,9 @@ interface Renderable {
             tips: List<String>,
             bypassChecks: Boolean = false,
             onClick: () -> Unit,
+            onHover: () -> Unit = {},
         ): Renderable {
-            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
+            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover), onClick, bypassChecks = bypassChecks)
         }
 
         fun clickable(
@@ -127,6 +128,7 @@ interface Renderable {
             color: LorenzColor? = null,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
+            onHover: () -> Unit = {},
         ): Renderable {
 
             val render = string(text)
@@ -141,6 +143,7 @@ interface Renderable {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
+                            onHover.invoke()
                             list[Pair(posX, posY)] = indexes
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
@@ -261,9 +264,9 @@ interface Renderable {
             }
         }
 
-        fun placeholder(width: Int) = object : Renderable {
-            override val width: Int = width
-            override val height = 10
+        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
+            override val width = width
+            override val height = height
 
             override fun render(posX: Int, posY: Int) {
             }
