@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SeaCreatureMessageShortener {
