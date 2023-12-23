@@ -16,16 +16,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemBow
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
-// TODO USE SH-REPO
-private val selectPattern = "§aYou set your selected arrow type to §f(?<arrow>.*)§a!".toPattern()
-private val fillUpJaxPattern = "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!".toPattern()
-private val fillUpPattern = "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!".toPattern()
-private val clearedPattern = "§aCleared your quiver!".toPattern()
 
 private val infityQuiverLevelMultiplier = 0.03f
 
@@ -48,6 +43,11 @@ object QuiverAPI {
     var currentArrow: Arrows? = null
     var currentAmount: Int = 0
     var arrowAmount: MutableMap<Arrows, Float> = mutableMapOf()
+
+    private val selectPattern by RepoPattern.pattern("data.quiver.chat.select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
+    private val fillUpJaxPattern by RepoPattern.pattern("data.quiver.chat.fillupjax", "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!")
+    private val fillUpPattern by RepoPattern.pattern("data.quiver.chat.fillup", "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!")
+    private val clearedPattern by RepoPattern.pattern("data.quiver.chat.cleared", "§aCleared your quiver!")
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

@@ -9,11 +9,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-
-// TODO USE SH-REPO
-private val pattern = "§eYou selected the §a(?<power>.*) §efor your §aAccessory Bag§e!".toPattern()
 enum class Powers (val power: String) {
     // Standard
     NO_POWER("No Power"),
@@ -55,6 +53,8 @@ enum class Powers (val power: String) {
 }
 object MaxwellAPI {
     var currentPower : Powers? = null
+
+    private val pattern by RepoPattern.pattern("data.maxwell.chat.power", "§eYou selected the §a(?<power>.*) §efor your §aAccessory Bag§e!")
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
