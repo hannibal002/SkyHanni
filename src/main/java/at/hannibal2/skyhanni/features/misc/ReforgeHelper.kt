@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,7 +14,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -188,6 +191,8 @@ class ReforgeHelper {
     var waitForChat = AtomicBoolean(false)
     var waitDelay = false
 
+    var hoverdReforgeStone: NEUInternalName? = null
+
     fun itemUpdate() {
         item = inventory?.getSlot(reforgeItem)?.stack
         currentReforge = item?.getReforgeName() ?: ""
@@ -288,7 +293,12 @@ class ReforgeHelper {
                 Renderable.clickAndHover(
                     (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
                     itemRarity?.let { rarity -> reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) }
-                        ?: listOf("")) { reforgeToSearch = reforge.name.replaceFirstChar { it.lowercase() } }
+                        ?: listOf(""), onClick = { reforgeToSearch = reforge.name.replaceFirstChar { it.lowercase() } }, onHover = if (!isInHexReforgeMenu) {
+                    {}
+                } else {
+                    { hoverdReforgeStone = reforge.reforgeStone }
+                }
+                )
             }
         this.addAll(list)
         if (itemType == null) {
@@ -307,6 +317,9 @@ class ReforgeHelper {
         if (!enable()) return
         posCurrent.renderStrings(listOf(formattedReforgeToSearch, formattedCurrentReforge), posLabel = "Reforge Notify")
         posList.renderRenderables(display, posLabel = "Reforge Overlay")
+        if (hoverdReforgeStone != null) {
+            inventory?.inventory?.firstOrNull { it?.getInternalName() == hoverdReforgeStone }?.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
+        }
     }
 
     @SubscribeEvent
