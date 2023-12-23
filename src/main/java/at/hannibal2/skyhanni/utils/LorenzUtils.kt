@@ -51,8 +51,13 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
+    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
+    /**
+     * Consider using IslandType.isInIsland() instead
+     */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
@@ -282,10 +287,10 @@ object LorenzUtils {
         }
     }
 
-    fun setTextIntoSign(text: String) {
+    fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[0] = ChatComponentText(text)
+        gui.tileSign.signText[line] = ChatComponentText(text)
     }
 
     fun addTextIntoSign(addedText: String) {
@@ -294,7 +299,7 @@ object LorenzUtils {
         val lines = gui.tileSign.signText
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
-        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
 
     /**
@@ -629,7 +634,7 @@ object LorenzUtils {
         enumValueOfOrNull<T>(name)
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
-    fun isInDevEnviromen() = Launch.blackboard.get("fml.deobfuscatedEnvironment") as Boolean
+    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")

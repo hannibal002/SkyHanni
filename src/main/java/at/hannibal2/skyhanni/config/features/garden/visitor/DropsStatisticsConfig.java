@@ -76,7 +76,7 @@ public class DropsStatisticsConfig {
         SPACE_HELMET("§b1 §cSpace Helmet", 14),
         CULTIVATING_I("§b1 §9Cultivating I", 15),
         REPLENISH_I("§b1 §9Replenish I", 16),
-        DELICATE("§9Delicate V"),
+        DELICATE("§b1 §9Delicate V"),
         ;
 
         private final String str;

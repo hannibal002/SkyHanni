@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -62,7 +64,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[config.firstDagger]
+        val first = Dagger.entries[config.firstDagger.ordinal] // todo avoid ordinal
         val second = first.other()
 
         textTop = format(holding, true, first) + " " + format(holding, true, second)
@@ -249,6 +251,10 @@ class BlazeSlayerDaggerHelper {
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
         event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
         event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
+
+        event.transform(15, "slayer.blazes.hellion.firstDagger") { element ->
+            ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
+        }
     }
 
 }

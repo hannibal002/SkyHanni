@@ -38,6 +38,12 @@ object StringUtils {
 
     private val formattingChars by lazy { "kmolnr".toCharArray() + "kmolnr".uppercase().toCharArray() }
 
+    /**
+     * Removes color and optionally formatting codes from the given string, leaving plain text.
+     *
+     * @param keepFormatting Boolean indicating whether to retain non-color formatting codes (default: false).
+     * @return A string with color codes removed (and optionally formatting codes if specified).
+     */
     fun String.removeColor(keepFormatting: Boolean = false): String {
         val builder = StringBuilder(this.length)
 
@@ -156,6 +162,21 @@ object StringUtils {
         }
     }
 
+    /**
+     * Creates a comma-separated list using natural formatting (a, b, and c).
+     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
+     * @return a string representing the list joined with the Oxford comma and the word "and".
+     */
+    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
+        if (list.isEmpty()) return ""
+        if (list.size == 1) return list[0]
+        if (list.size == 2) return "${list[0]}$delimiterColor and ${list[1]}"
+        val lastIndex = list.size - 1
+        val allButLast = list.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        return "$allButLast$delimiterColor, and ${list[lastIndex]}"
+    }
+
     fun optionalPlural(number: Int, singular: String, plural: String) =
         "${number.addSeparators()} " + canBePlural(number, singular, plural)
 
@@ -258,9 +279,9 @@ object StringUtils {
         return if (matcher.matches()) matcher else null
     }
 
-    fun String.convertToFormatted(): String {
-        return this.replace("&&", "§")
-    }
+    fun String.convertToFormatted(): String = this.replace("&&", "§")
 
     fun Pattern.matches(string: String) = matcher(string).matches()
+
+    fun Pattern.find(string: String) = matcher(string).find()
 }

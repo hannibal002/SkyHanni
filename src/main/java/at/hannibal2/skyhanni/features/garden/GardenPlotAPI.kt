@@ -1,23 +1,34 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.floor
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object GardenPlotAPI {
 
-    private val pestNamePattern = "§aPlot §7- §b(?<name>.*)".toPattern()
+    private val plotNamePattern by RepoPattern.pattern("garden.plot.name", "§.Plot §7- §b(?<name>.*)")
+
+    private val plotSprayedPattern by RepoPattern.pattern(
+        "garden.plot.spray.target",
+        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+    )
 
     var plots = listOf<Plot>()
 
@@ -35,10 +46,24 @@ object GardenPlotAPI {
         var name: String,
 
         @Expose
-        var pests: Int
+        var pests: Int,
+
+        @Expose
+        var sprayExpiryTime: SimpleTimeMark?,
+
+        @Expose
+        var sprayType: SprayType?,
+
+        @Expose
+        var sprayHasNotified: Boolean
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0) }
+    data class SprayData(
+        val expiry: SimpleTimeMark,
+        val type: SprayType
+    )
+
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -51,6 +76,30 @@ object GardenPlotAPI {
         set(value) {
             getData()?.pests = value
         }
+
+    val Plot.currentSpray: SprayData?
+        get() = this.getData()?.let { plot ->
+            val expiry = plot.sprayExpiryTime?.takeIf { !it.isInPast() } ?: return null
+            val type = plot.sprayType ?: return null
+            return SprayData(expiry, type)
+        }
+
+    val Plot.isSprayExpired: Boolean
+        get() = this.getData()?.let {
+            !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
+        } == true
+
+    fun Plot.markExpiredSprayAsNotified() {
+        getData()?.apply { sprayHasNotified = true }
+    }
+
+    private fun Plot.setSpray(spray: SprayType, duration: Duration) {
+        getData()?.apply {
+            sprayType = spray
+            sprayExpiryTime = SimpleTimeMark.now() + duration
+            sprayHasNotified = false
+        }
+    }
 
     fun Plot.isBarn() = id == -1
 
@@ -90,13 +139,28 @@ object GardenPlotAPI {
     }
 
     @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!GardenAPI.inGarden()) return
+
+        plotSprayedPattern.matchMatcher(event.message) {
+            val sprayName = group("spray")
+            val plotName = group("plot")
+
+            val plot = getPlotByName(plotName)
+            val spray = SprayType.getByName(sprayName) ?: return
+
+            plot?.setSpray(spray, 30.minutes)
+        }
+    }
+
+    @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
             val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            pestNamePattern.matchMatcher(itemName) {
+            plotNamePattern.matchMatcher(itemName) {
                 plot.name = group("name")
             }
         }
@@ -104,7 +168,12 @@ object GardenPlotAPI {
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 
-    fun LorenzRenderWorldEvent.renderPlot(plot: GardenPlotAPI.Plot, lineColor: Color, cornerColor: Color) {
+    fun LorenzRenderWorldEvent.renderPlot(
+        plot: Plot,
+        lineColor: Color,
+        cornerColor: Color,
+        showBuildLimit: Boolean = false
+    ) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
         // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
@@ -116,7 +185,7 @@ object GardenPlotAPI {
 
         // Lowest point in the garden
         val minHeight = 66
-        val maxHeight = 256
+        val maxHeight = 66 + 36
 
         // Render 4 vertical corners
         for (i in 0..plotSize step plotSize) {
@@ -148,16 +217,25 @@ object GardenPlotAPI {
         }
 
         // Render horizontal
-        for (y in minHeight..maxHeight step 4) {
+        val buildLimit = minHeight + 11
+        val ints = if (showBuildLimit) {
+            (minHeight..maxHeight step 4) + buildLimit
+        } else {
+            minHeight..maxHeight step 4
+        }
+        for (y in ints) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
+            val isRedLine = y == buildLimit
+            val color = if (isRedLine) Color.red else lineColor
+            val depth = if (isRedLine) 2 else 1
             // (minX, minZ) -> (minX, minZ + 96)
-            tryDraw3DLine(start, start.add(z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start, start.add(z = plotSize), color, depth, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
-            tryDraw3DLine(start.add(z = plotSize), start.add(x = plotSize, z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), start.add(x = plotSize, z = plotSize), color, depth, true)
             // (minX + 96, minZ + 96) -> (minX + 96, minZ)
-            tryDraw3DLine(start.add(x = plotSize, z = plotSize), start.add(x = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize, z = plotSize), start.add(x = plotSize), color, depth, true)
             // (minX + 96, minZ) -> (minX, minZ)
-            tryDraw3DLine(start.add(x = plotSize), start, lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), start, color, depth, true)
         }
     }
 

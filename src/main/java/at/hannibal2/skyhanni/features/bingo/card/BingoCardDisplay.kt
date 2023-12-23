@@ -33,10 +33,6 @@ class BingoCardDisplay {
 
     private var hasHiddenPersonalGoals = false
 
-    init {
-        update()
-    }
-
     companion object {
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
@@ -118,7 +114,11 @@ class BingoCardDisplay {
             }
         }
 
-        addGoals(goals) { it.description.removeColor() + if (it.done) " §aDONE" else " " }
+        addGoals(goals) {
+            val percentageFormat = percentageFormat(it)
+            val name = it.description.removeColor()
+            "$name$percentageFormat"
+        }
 
         if (hiddenGoals > 0) {
             val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
@@ -126,6 +126,10 @@ class BingoCardDisplay {
         }
         add(Renderable.string(" "))
     }
+
+    private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
+        " " + BingoAPI.getCommunityPercentageColor(it)
+    } ?: ""
 
     private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()
@@ -207,14 +211,6 @@ class BingoCardDisplay {
         }
     }
 
-    private var highlightedMaps = mutableMapOf<String, Boolean>()
-
-    var BingoGoal.highlight: Boolean
-        get() = highlightedMaps[displayName] ?: false
-        set(value) {
-            highlightedMaps[displayName] = value
-        }
-
     private var lastSneak = false
     private var inventoryOpen = false
 
@@ -256,6 +252,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
+        if (!LorenzUtils.isBingoProfile) return
         update()
     }
 
@@ -263,6 +260,7 @@ class BingoCardDisplay {
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideCommunityGoals.onToggle { update() }
         config.nextTipDuration.onToggle { update() }
+        update()
     }
 
     @SubscribeEvent

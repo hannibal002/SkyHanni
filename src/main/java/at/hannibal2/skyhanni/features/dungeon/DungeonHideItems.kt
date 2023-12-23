@@ -150,7 +150,8 @@ class DungeonHideItems {
         }
 
         if (config.hideHealerFairy) {
-            if (skullTexture == healerFairyTexture) {
+            // Healer Fairy texture is stored in id 0, not id 4 for some reasos.
+            if (entity.inventory[0]?.getSkullTexture() == healerFairyTexture) {
                 event.isCanceled = true
                 return
             }

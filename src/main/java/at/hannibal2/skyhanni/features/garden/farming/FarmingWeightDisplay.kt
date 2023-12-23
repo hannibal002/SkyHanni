@@ -74,7 +74,7 @@ class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(1, "garden.eliteFarmingWeightoffScreenDropMessage", "garden.eliteFarmingWeightOffScreenDropMessage")
+        event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
         event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
         event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
         event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
@@ -87,6 +87,7 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
+        event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
     }
 
     companion object {
@@ -372,7 +373,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded && config.offScreenDropMessage) {
+                if (wasNotLoaded && config.showLbChange) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
@@ -385,7 +386,9 @@ class FarmingWeightDisplay {
         private fun checkOffScreenLeaderboardChanges() {
             val profileSpecific = ProfileStorageData.profileSpecific ?: return
             val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
-            if (oldPosition == -1) return
+
+            if (oldPosition <= 0) return
+            if (leaderboardPosition <= 0) return
 
             val diff = leaderboardPosition - oldPosition
             if (diff == 0) return
