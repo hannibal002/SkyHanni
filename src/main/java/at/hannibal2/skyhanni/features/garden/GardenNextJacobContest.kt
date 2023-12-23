@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
@@ -340,7 +340,7 @@ object GardenNextJacobContest {
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
-        val format = TimeUtils.formatDuration(duration)
+        val format = duration.format()
         list.add("§7(§b$format§7)")
 
         return list

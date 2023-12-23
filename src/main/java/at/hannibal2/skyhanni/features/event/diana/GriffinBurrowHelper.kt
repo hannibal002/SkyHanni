@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -172,7 +172,7 @@ object GriffinBurrowHelper {
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = inquis.spawnTime
-                    val format = TimeUtils.formatDuration(75.seconds - spawnTime.passedSince())
+                    val format = (75.seconds - spawnTime.passedSince()).format()
                     event.drawDynamicText(location.add(y = 1), "§eDespawns in §b$format", 1.6, yOff = 18f)
                 }
             }
