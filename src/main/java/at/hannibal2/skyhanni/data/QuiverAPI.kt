@@ -106,18 +106,13 @@ object QuiverAPI {
             val lore = stack.getLore()
             if (lore.isEmpty()) continue
 
-            LorenzUtils.chat("§aFound lore: ${lore[0]}")
-
             val arrow = stack.getInternalNameOrNull() ?: continue
             val amount = stack.stackSize
-
-            LorenzUtils.chat("§aFound arrow: $arrow with amount: $amount")
 
             val arrowType = Arrows.entries.find { arrow == it.internalName } ?: continue
             val arrowAmount = amount + (this.arrowAmount[arrowType] ?: 0.0f)
 
             this.arrowAmount[arrowType] = arrowAmount
-            LorenzUtils.chat("§aAdded $amount ${arrowType.arrow} to storage!")
         }
 
         saveArrowAmount()
@@ -146,8 +141,6 @@ object QuiverAPI {
                     }
                 }
             }
-
-            LorenzUtils.chat("§aRemoved ${amountToRemove()} ${arrowType.arrow} from storage!")
 
             this.arrowAmount[arrowType] = (arrowAmount - amountToRemove()).coerceAtLeast(0.0f)
 
