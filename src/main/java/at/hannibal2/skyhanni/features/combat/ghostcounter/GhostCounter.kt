@@ -263,8 +263,8 @@ object GhostCounter {
         }
         val moneyMadeWithClickableTips = Renderable.clickAndHover(
             textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
-            moneyMadeTips
-        ) { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+            moneyMadeTips, onClick =
+        { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) })
         addAsSingletonList(textFormatting.moneyHourFormat.formatText(final))
         addAsSingletonList(moneyMadeWithClickableTips)
     }
@@ -424,7 +424,7 @@ object GhostCounter {
             Option.KILLCOMBO.set(0.0)
             update()
         }
-        //replace with BestiaryLevelUpEvent ?
+        // replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message) {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
