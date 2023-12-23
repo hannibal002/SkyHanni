@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -77,7 +76,7 @@ object MaxwellAPI {
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!InventoryUtils.openInventoryName().contains("Accessory Bag Thaumaturgy")) return
+        if (!event.inventoryName.contains("Accessory Bag Thaumaturgy")) return
 
         val stacks = event.inventoryItems
         val selectedPower = stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" } ?: return

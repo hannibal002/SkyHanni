@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getTitleAndFooterAlignment
@@ -72,6 +73,7 @@ enum class ScoreboardElements(
         "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
     ),
     EMPTY_LINE3({ getEmptyLineDisplayPair() }, { true }, ""),
+    QUIVER({ getQuiverDisplayPair() }, { true }, "Flint Arrow: §f1,234"),
     POWDER(
         { getPowderDisplayPair() },
         { getPowderShowWhen() },
@@ -283,6 +285,11 @@ private fun getSlayerShowWhen() = listOf(
     IslandType.CRIMSON_ISLE,
     IslandType.THE_RIFT
 ).contains(HypixelData.skyBlockIsland)
+
+private fun getQuiverDisplayPair() = when (config.displayConfig.displayNumbersFirst) {
+    true -> listOf("${QuiverAPI.currentAmount} ${QuiverAPI.currentArrow?.arrow ?: "unknown type"} ")
+    false -> listOf("${QuiverAPI.currentArrow?.arrow ?: ("unknown type")} §f${QuiverAPI.currentAmount} Arrows")
+}.map { it to AlignmentEnum.LEFT }
 
 private fun getPowderDisplayPair() = when (config.displayConfig.displayNumbersFirst) {
     true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")

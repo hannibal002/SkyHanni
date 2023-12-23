@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.Arrows;
 import at.hannibal2.skyhanni.data.Powers;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -120,6 +121,17 @@ public class Storage {
 
         @Expose
         public Powers currentPower = null;
+
+        @Expose
+        public ArrowsStorage arrows = new ArrowsStorage();
+
+        public static class ArrowsStorage {
+            @Expose
+            public Arrows currentArrow = null;
+
+            @Expose
+            public Map<Arrows, Float> arrowAmount = new HashMap<>();
+        }
 
         @Expose
         public Map<LorenzVec, MinionConfig> minions = new HashMap<>();
