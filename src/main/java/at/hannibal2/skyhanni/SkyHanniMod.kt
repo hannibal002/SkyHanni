@@ -114,6 +114,7 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
 import at.hannibal2.skyhanni.features.event.diana.GriffinPetWarning
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
@@ -258,6 +259,7 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
@@ -362,7 +364,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.22.Beta.12",
+    version = "0.22.Beta.15",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -465,6 +467,7 @@ class SkyHanniMod {
         loadModule(BazaarBestSellMethod())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(ReforgeHelper())
+        loadModule(AuctionHouseCopyUnderbidPrice())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown())
@@ -511,7 +514,8 @@ class SkyHanniMod {
         loadModule(StatsTuning())
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
-        loadModule(DianaProfitTracker())
+        loadModule(DianaProfitTracker)
+        loadModule(MythologicalMobTracker)
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
