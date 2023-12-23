@@ -54,7 +54,7 @@ class CompactBestiaryChatMessage {
             }
             inBestiary = true
             blockedLines = 0
-            bestiaryDescription.add(message.trim())
+            bestiaryDescription.add(message)
         } else if (inBestiary) {
             event.blockedReason = "bestiary"
             blockedLines++
@@ -65,8 +65,9 @@ class CompactBestiaryChatMessage {
             if (message == border) {
                 inBestiary = false
 
-                val title = bestiaryDescription[1]
-                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", bestiaryDescription.dropLast(1), command, false)
+                val list = bestiaryDescription.map { it.replace("§f", "").trim() }
+                val title = list[1]
+                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", list.dropLast(1), command, false)
                 bestiaryDescription.clear()
                 acceptMoreDescription = true
 
@@ -80,7 +81,7 @@ class CompactBestiaryChatMessage {
                     milestoneMessage = it.groups[1]!!.value
                 }
                 if (acceptMoreDescription) {
-                    bestiaryDescription.add(message.trim())
+                    bestiaryDescription.add(message)
                 }
             }
         }
