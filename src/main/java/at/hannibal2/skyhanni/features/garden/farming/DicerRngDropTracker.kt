@@ -22,7 +22,7 @@ import java.util.regex.Pattern
 object DicerRngDropTracker {
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = GardenAPI.config.dicerCounters
-    private val tracker = SkyHanniTracker("Dicer Rng Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
+    private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
     { drawDisplay(it) }
 
     class Data : TrackerData() {
@@ -92,7 +92,7 @@ object DicerRngDropTracker {
     private fun drawDisplay(storage: Data) = buildList<List<Any>> {
         val cropInHand = cropInHand ?: return@buildList
         val items = storage.drops.getOrPut(cropInHand) { mutableMapOf() }
-        addAsSingletonList("§7Dicer Rng Drop Tracker for $toolName§7:")
+        addAsSingletonList("§7Dicer RNG Drop Tracker for $toolName§7:")
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
             addAsSingletonList(" §7- §e${amount.addSeparators()}x $displayName")
