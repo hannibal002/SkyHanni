@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -118,14 +119,12 @@ object FrozenTreasureTracker {
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
-        for (treasure in FrozenTreasure.entries) {
-            if ("FROZEN TREASURE! You found ${treasure.displayName.removeColor()}!".toRegex().matches(message)) {
-                tracker.modify {
-                    it.treasuresMined += 1
-                    it.treasureCount.addOrPut(treasure, 1)
-                }
-                if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
+        for (treasure in FrozenTreasure.entries.filter { it.pattern.matches(message) }) {
+            tracker.modify {
+                it.treasuresMined += 1
+                it.treasureCount.addOrPut(treasure, 1)
             }
+            if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
     }
 
