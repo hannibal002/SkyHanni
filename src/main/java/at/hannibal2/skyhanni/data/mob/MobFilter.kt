@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -203,7 +205,7 @@ object MobFilter {
             }
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.PRIVATE_ISLAND -> when {
-                armorStand?.isDefaultValue() != false -> MobResult.found(MobFactories.minionMob(baseEntity)) // TODO fix to always include Valid Mobs on Private Island
+                armorStand?.isDefaultValue() != false -> if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) MobResult.found(MobFactories.minionMob(baseEntity)) else MobResult.notYetFound // TODO fix to always include Valid Mobs on Private Island
                 else -> null
             }
 
