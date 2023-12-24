@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
@@ -60,7 +61,8 @@ class MobHighlight {
             }
         }
 
-        if (config.specialZealotHighlighter && maxHealth == 2_000 && entity is EntityEnderman) {
+        // Special Zealots are not impacted by derpy
+        if (config.specialZealotHighlighter && maxHealth.ignoreDerpy() == 2_000 && entity is EntityEnderman) {
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_RED.toColor().withAlpha(50))
             { config.specialZealotHighlighter }
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.specialZealotHighlighter }
