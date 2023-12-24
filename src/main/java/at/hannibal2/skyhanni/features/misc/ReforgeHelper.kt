@@ -30,9 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-private const val specialSpaceNumber = "\u2001"
-private const val specialSpaceSign = " "
-
 fun Double.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
 
 class ReforgeHelper {
@@ -42,6 +39,7 @@ class ReforgeHelper {
     val reforgeHexMenu by RepoPattern.pattern("menu.reforge.hex", "The Hex ➜ Reforges")
     val reforgeChatMessage by RepoPattern.pattern("chat.reforge.message", "§aYou reforged your .* §r§ainto a .*!")
     val reforgeChatFail by RepoPattern.pattern("chat.reforge.fail", "§cWait a moment before reforging again!")
+    val reforgeChatFail2 by RepoPattern.pattern("chat.reforge.fail2", "§cWhoa! Slow down there!")
 
     var isInReforgeMenu = false
     var isInHexReforgeMenu = false
@@ -128,7 +126,7 @@ class ReforgeHelper {
                 }
             }
 
-            reforgeChatFail.matches(event.message) -> {
+            reforgeChatFail.matches(event.message) || reforgeChatFail2.matches(event.message) -> {
                 DelayedRun.runDelayed(2.tick) {
                     waitForChat.set(false)
                 }
@@ -156,7 +154,6 @@ class ReforgeHelper {
             else -> return
         }
         isInReforgeMenu = true
-        reforgeToSearch = null
         waitForChat.set(false)
         DelayedRun.runNextTick {
             inventory = Minecraft.getMinecraft().thePlayer.openContainer
@@ -166,8 +163,16 @@ class ReforgeHelper {
     @SubscribeEvent
     fun onClose(event: InventoryCloseEvent) {
         if (!enable()) return
+        reset()
+    }
+
+    fun reset() {
         isInReforgeMenu = false
         isInHexReforgeMenu = false
+        reforgeToSearch = null
+        currentReforge = null
+        hoverdReforgeStone = null
+        updateDisplay()
     }
 
     fun generateDisplay() = buildList<Renderable> {
@@ -180,7 +185,15 @@ class ReforgeHelper {
             ).filter { it.isValid(itemType, internalName) }.map { reforge ->
                 Renderable.clickAndHover(
                     (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
-                    itemRarity?.let { rarity -> reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) }
+                    itemRarity?.let { rarity ->
+                        if (currentReforge == reforge) listOf(Renderable.string("§3Reforge is currently applied!")) else
+                            (reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) ?: emptyList()) +
+                                (currentReforge?.extraProperty?.get(rarity)?.split('\n')?.map { Renderable.string(it) }?.let { listOf(Renderable.string("§cRemoves Effect:")) + it }
+                                    ?: emptyList()) +
+                                (reforge.extraProperty?.get(rarity)?.split('\n')?.map { Renderable.string(it) }?.let { listOf(Renderable.string("§aAdds Effect:")) + it }
+                                    ?: emptyList())
+
+                    }
                         ?: listOf(""), onClick = { reforgeToSearch = reforge }, onHover = if (!isInHexReforgeMenu) {
                     {}
                 } else {
@@ -229,42 +242,22 @@ class ReforgeHelper {
         }
     }
 
-    private fun ReforgeAPI.StatList.print(current: ReforgeAPI.StatList?): List<String> {
-        val numbersInSpaces = 2
-        val fontRender = Minecraft.getMinecraft().fontRendererObj
+    private fun ReforgeAPI.StatList.print(current: ReforgeAPI.StatList?): List<Renderable> {
         val diff = current?.let { this - it }
-        return listOf("§6Reforge Stats") + (diff?.mapNotNull {
-            val value = it.value
+        val pre = listOf(Renderable.string("§6Reforge Stats"))
+        val main = ((diff ?: this).mapNotNull {
             val key = it.key
+            val value = this[key]
+            val diffValue = diff?.get(key)
             if (key == null || value == null) return@mapNotNull null
-            buildString {
-                append("§9")
-                append((this@print[key] ?: 0.0).toStringWithPlus())
-                while (this.length < 8) {
-                    append(specialSpaceNumber)
-                }
-                append(if (value < 0) "§c" else "§a+")
-                append(value)
-                while (this.length < 16) {
-                    append(specialSpaceNumber)
-                }
-                append(" ")
-                append(key.iconWithName)
-            }
-        } ?: this.mapNotNull {
-            val value = it.value
-            val key = it.key
-            if (key == null || value == null) return@mapNotNull null
-            buildString {
-                append("§9")
-                append(value.toStringWithPlus())
-                while (this.length < 8) {
-                    append(specialSpaceNumber)
-                }
-                append(" ")
-                append(key.iconWithName)
+            buildList<Renderable> {
+                add(Renderable.string("§9${value.toStringWithPlus()}"))
+                diffValue?.let { add(Renderable.string((if (it < 0) "§c" else "§a") + it.toStringWithPlus())) }
+                add(Renderable.string(key.iconWithName))
             }
         })
+        val table = Renderable.table(main, 5)
+        return pre + listOf(table)
     }
 }
 
