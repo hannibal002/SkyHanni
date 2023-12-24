@@ -22,7 +22,7 @@ import net.minecraft.item.ItemBow
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-private val infityQuiverLevelMultiplier = 0.03f
+private const val infinityQuiverLevelMultiplier = 0.03f
 
 enum class Arrows(val arrow: String, val internalName: NEUInternalName) {
     NONE("None", "NONE".asInternalName()),
@@ -136,7 +136,7 @@ object QuiverAPI {
                     true -> 1.0f
                     false -> {
                         when (infiniteQuiverLevel) {
-                            in 1..10 -> infityQuiverLevelMultiplier * infiniteQuiverLevel
+                            in 1..10 -> infinityQuiverLevelMultiplier * infiniteQuiverLevel
                             else -> 1.0f
                         }
                     }
