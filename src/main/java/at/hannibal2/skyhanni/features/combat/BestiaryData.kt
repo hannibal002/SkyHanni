@@ -464,7 +464,8 @@ object BestiaryData {
 
         fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
 
-        fun percentToTier() = currentKillToNextLevel.toDouble() / killNeededForNextLevel
+        fun percentToTier() =
+            if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
 
         fun percentToTierFormatted() = LorenzUtils.formatPercentage(percentToTier())
 
