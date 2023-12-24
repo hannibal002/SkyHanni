@@ -8,8 +8,7 @@
 // TODO LIST
 // V2 RELEASE
 //  - Soulflow API
-//  - Bank API
-//  - quiver
+//  - Bank API (actually maybe not, I like the current design)
 //  - beacon power
 //  - skyblock level
 //  - more bg options (round, blurr, outline)
